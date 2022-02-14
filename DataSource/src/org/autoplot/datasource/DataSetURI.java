@@ -1358,7 +1358,7 @@ public class DataSetURI {
                 fin= new DasProgressMonitorInputStream( fin, loadMonitor ); 
                 if ( urlc instanceof HttpURLConnection ) {
                     final HttpURLConnection hurlc= (HttpURLConnection) urlc;
-                    ((DasProgressMonitorInputStream)in).addRunWhenClosedRunnable( new Runnable() {
+                    ((DasProgressMonitorInputStream)fin).addRunWhenClosedRunnable( new Runnable() {
                         @Override
                         public void run() {
                             hurlc.disconnect();
@@ -1366,7 +1366,7 @@ public class DataSetURI {
                     });
                 }
                 if ( contentLength>-1 ) {
-                    ((DasProgressMonitorInputStream)in).setStreamLength(contentLength);
+                    ((DasProgressMonitorInputStream)fin).setStreamLength(contentLength);
                 }
                 OutputStream out= new FileOutputStream( tempfile );
                 DataSourceUtil.transfer( Channels.newChannel(fin), Channels.newChannel(out) );
