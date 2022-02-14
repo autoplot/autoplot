@@ -30,8 +30,14 @@ function buildImgUrl(srcurl, start, end) {
     var inpurl = srcurl;
     var iso8601s = new Date(start).toISOString();
     var iso8601e = new Date(end).toISOString(); 
-    var slt = inpurl.split('&timeRange=');
-    outurl = slt[0] + "&timeRange=" + iso8601s + "/" + iso8601e;
+    var slt = inpurl.split('&timerange=');
+    dd1= new Date(start);
+    dd2= new Date(end);
+    digits= [ dd1.getUTCFullYear(), dd1.getUTCMonth()+1, dd1.getUTCDate(), dd1.getUTCHours(), dd1.getUTCMinutes(), dd1.getUTCSeconds(), dd1.getUTCMilliseconds()*1000000,
+              dd2.getUTCFullYear(), dd2.getUTCMonth()+1, dd2.getUTCDate(), dd2.getUTCHours(), dd2.getUTCMinutes(), dd2.getUTCSeconds(), dd2.getUTCMilliseconds()*1000000 ];
+    timerangeStr= formatISO8601Range(digits)
+    //outurl = slt[0] + "&timerange=" + iso8601s + "/" + iso8601e;
+    outurl = slt[0] + "&timerange=" + timerangeStr;
     console.log('' + start + " - " + end + " " + new Date(start));
     console.log('' + iso8601s + "/" + iso8601e);
     return outurl;
@@ -41,6 +47,8 @@ function echoImgUrl() {
     //$('#idEchoImgUrl').text(imgurl);
     aplinkSpan= document.getElementById("aplink");
     aplinkSpan.textContent= decodeURIComponent( imgurl.substring(24) );
+    vapta= document.getElementById('vapta');
+    vapta.value= decodeURIComponent( imgurl.substring(24) );
 }
 
 function echoGraphParams() {
@@ -91,13 +99,13 @@ function refresh() {
 }
 
 /**
- * the current URL to set.  The timerange is reset by appending to this "timeRange=" + iso8601s + "/" + iso8601e;
+ * the current URL to set.  The timerange is reset by appending to this "timerange=" + iso8601s + "/" + iso8601e;
  * If blank, then read the URL from vapta input area.
  * @param {String} url the new URL.
  */
 function resetUrl(url) {
-    if ( url.length===0 ) {
-        url= '../../SimpleServlet?uri='+document.getElementById('vapta').value;
+    if ( url.length===0 ) { // get from control
+        url= '../../SimpleServlet?uri='+encodeURI(document.getElementById('vapta').value);
     }
     $('#idstatus').text("reset url "+url);
     $('#progress').attr('src', 'spinner.gif');
@@ -145,6 +153,10 @@ function centerFocus() {
 function iso8601RangeStr( startMilliseconds, endMilliseconds ) {
     st1= iso8601Str( startMilliseconds, endMilliseconds, startMilliseconds );
     st2= iso8601Str( startMilliseconds, endMilliseconds, endMilliseconds );
+    if ( st1.endsWith("00:00:00.000Z") && st2.endsWith("00:00:00.000Z" ) ) {
+        st1= st1.substr( 0,11 ) + "Z";
+        st2= st2.substr( 0,11 ) + "Z";
+    }
     return st1 + "/"+ st2;
 }
 

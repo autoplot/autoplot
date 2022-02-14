@@ -34,7 +34,7 @@
          String vap= request.getParameter("vap");
          String uri= request.getParameter("uri");
          String id= request.getParameter("id");
-         String timerange= request.getParameter("timeRange");
+         String timerange= request.getParameter("timerange");
 
          String[] dropList= null;
          String loadingMessage= null;
@@ -59,7 +59,8 @@
              }
          }
          
-         String ssArg;
+         String uriOrVap="";
+         String ssArg=null;
          if ( vap==null && uri==null ) {
              if ( dropList!=null && dropList.length>0 ) {
                 ssArg= "vap="+URLEncoder.encode(dropList[0],"US-ASCII");
@@ -71,7 +72,7 @@
                     File f= new File( ServletUtil.getServletHome().toString()+"/users" );
                     String[] ff= f.list();
                     if ( ff==null ) {
-                        out.println("Server has not been configured.  It should contain folders in " +ServletUtil.getServletHome().toString()+"/users");
+                        out.println("Server has not been configured."); //  It should contain folders in " +ServletUtil.getServletHome().toString()+"/users");
                     } else {
                         for ( String s: ff ) {
                             out.println("<a href='demo.jsp?id="+s+"'>"+s+"</a><br>");
@@ -79,21 +80,22 @@
                     }
                     out.println("<br><br>");
                 }
-                ssArg=null;
              }
          } else if ( vap!=null ) {
              ssArg= "vap="+URLEncoder.encode(vap,"US-ASCII");
+             uriOrVap= vap;
          } else {
              ssArg= "uri="+URLEncoder.encode(uri,"US-ASCII");
+             uriOrVap= uri;
          }
          
          if ( timerange!=null ) {
-             ssArg= ssArg + "&timeRange="+timerange;
+             ssArg= ssArg + "&timerange="+timerange;
          }
          
      %>
         <div id="iddivimg" style="min-width: 700px; min-height: 400px"> 
-            <% if (ssArg!=null ) { %>
+        <% if (ssArg!=null ) { %>
 		<img id="idplot" 
                      src="../../SimpleServlet?<%= ssArg %>"
                      onload="logloaded();" 
@@ -101,9 +103,12 @@
             <% } %>
 	</div>
     <div id="divprogress">
+        <% if ( vap!=null || uri!=null ) { %>
         <img src="spinner.gif" id="progress" alt="Busy..."></img>
+        <% } else { %>
+        <img src="idle-icon.png" id="progress" alt="No URI or vap file."></img>
+        <% } %>
     </div>
-       
             <button onclick="scanprev();" title="Previous interval">&lt;&lt; PREV</button>
             <button onclick="scanhalfprev();" title="Previous half interval">&lt;&lt;PR</button>
             <button onclick="scanhalfnext();" title="Next half interval">NE&gt;&gt;</button>
@@ -117,7 +122,10 @@
                     <br>
                         <button onclick="resetTime();" title="Jump to this range">Reset</button> to <input id="timerange" size="50"></input>
             </p>
-            <span id="aplink">Autoplot URI here.</span>
+            <input id='vapta' size="80" value="<%=uriOrVap%>"></input>
+        <button onclick="resetUrl(''); return false;">GO</button>
+    </form>            
+            <span id="aplink"></span>
             <div id="info"></div>
                
 		<!--<pre><div id="iddates"></div></pre> -->
@@ -155,7 +163,9 @@
         </script>
         
 <br>
-    <div id="idstatus">loading <%=loadingMessage!=null ? loadingMessage : ssArg %></div>
+    <% if ( vap!=null || uri!=null ) { %>
+        <div id="idstatus">loading <%=loadingMessage!=null ? loadingMessage : ssArg %></div>
+     <% } %>
         
 <hr></hr>
         <%
