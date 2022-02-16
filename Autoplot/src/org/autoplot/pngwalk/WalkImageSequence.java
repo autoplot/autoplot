@@ -121,6 +121,17 @@ public class WalkImageSequence implements PropertyChangeListener  {
     }
 
     /**
+     * return true if the files contain both start and end.
+     * TODO: this is a quick and dirty implementation that needs to be
+     * done thoroughly.  
+     * @return 
+     */
+    private boolean templateHasExplicitEnd( ) {
+        if ( template.contains("$(Y;end)") ) return true;
+        return false;
+    }
+    
+    /**
      * do the initial listing of the remote filesystem.  This should not
      * be done on the event thread, and should be done before the
      * sequence is used.
@@ -209,7 +220,9 @@ public class WalkImageSequence implements PropertyChangeListener  {
         }
 
         if (timeSpan != null) {
-            if ( timeSpan.width().divide(datumRanges.get(0).width() ).doubleValue(Units.dimensionless) > 100000 ) {
+            
+            if ( templateHasExplicitEnd() || 
+                    timeSpan.width().divide(datumRanges.get(0).width() ).doubleValue(Units.dimensionless) > 100000 ) {
                 logger.warning("too many spans to indicate gaps.");
                 possibleRanges = datumRanges;
             } else {
