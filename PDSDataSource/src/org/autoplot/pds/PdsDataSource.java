@@ -85,6 +85,7 @@ public class PdsDataSource extends AbstractDataSource {
             dsb.setName( i, fieldDescription.getName() );
             dsb.setLabel( i, fieldDescription.getName() );
             //TODO: Larry has nice descriptions.  How to get at those? https://space.physics.uiowa.edu/pds/cassini-rpws-electron_density/data/2006/rpws_fpe_2006-141_v1.xml
+            //TODO: also https://pds-ppi.igpp.ucla.edu/data/cassini-caps-fitted-parameters/Data/CAS_CAPS_FITTED_PARAMETERS_WILSON_V01.xml?Sc_lat&X=Utc
             switch (fieldDescription.getType()) {
                 case ASCII_DATE:
                 case ASCII_DATE_DOY:
@@ -188,6 +189,9 @@ public class PdsDataSource extends AbstractDataSource {
      * 
      * For example, with https://space.physics.uiowa.edu/voyager/data/voyager-2-pws-wf/data/1987/vg2_pws_wf_1987-04-21T17_v0.9.xml,
      * if axisName=='time' then the result will be "Epoch"
+     * 
+     * This shows where this logic fails:
+     * https://pds-ppi.igpp.ucla.edu/data/maven-swea-calibrated/data/arc_pad/2016/03/mvn_swe_l2_arcpad_20160316_v04_r01.xml
      * 
      * @param axisName the axis name
      * @return the independent variable for the axis.
@@ -458,7 +462,12 @@ public class PdsDataSource extends AbstractDataSource {
                     result= Ops.link( results[0], results[1] );
                     break;
                 case 3:
-                    result= Ops.link( results[0], results[1], results[2] );
+                    try {
+                        result= Ops.link( results[0], results[1], results[2] );
+                    } catch ( Exception ex ) {
+                        ((MutablePropertyDataSet)results[2]).putProperty(QDataSet.DEPEND_1,null);
+                        result= results[2];
+                    }
                     break;
                 default:
                     break;
