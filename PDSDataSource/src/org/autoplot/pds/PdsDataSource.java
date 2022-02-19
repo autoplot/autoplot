@@ -150,13 +150,14 @@ public class PdsDataSource extends AbstractDataSource {
         }
         return rank1;
     }
-     /**
-     *
-     * @param monitor the value of monitor
+    /**
+     * Read the XML file into a document.
+     * @param f the file
+     * @return the document object
      * @throws IOException
      * @throws SAXException
      */
-    private Document readXML( File f ) throws IOException, SAXException {
+    public static Document readXML( File f ) throws IOException, SAXException {
         DocumentBuilder builder= null;
         try {
             builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -192,11 +193,13 @@ public class PdsDataSource extends AbstractDataSource {
      * 
      * This shows where this logic fails:
      * https://pds-ppi.igpp.ucla.edu/data/maven-swea-calibrated/data/arc_pad/2016/03/mvn_swe_l2_arcpad_20160316_v04_r01.xml
+     * For this file, I had to kludge in a test for the pitch angles.
      * 
+     * @param doc the xml document
      * @param axisName the axis name
      * @return the independent variable for the axis.
      */
-    private static String resolveIndependentAxis( Document doc, String axisName ) throws XPathExpressionException {
+    public static String resolveIndependentAxis( Document doc, String axisName ) throws XPathExpressionException {
             
         XPathFactory factory= XPathFactory.newInstance();
         XPath xpath= factory.newXPath();
@@ -204,12 +207,24 @@ public class PdsDataSource extends AbstractDataSource {
         String s=  "Product_Observational/File_Area_Observational/Array[Axis_Array/axis_name='"+axisName +"']";
         NodeList oo=   (NodeList) xpath.evaluate( s, doc, XPathConstants.NODESET );
 
+        // jbf: I don't see how one can resolve the independent parameter properly.
+        // I'll go through and find the lowest rank data with the axis.
+        // "pitch angle" -> "pa"
         if ( oo.getLength()>0 ) {
-            Node o = oo.item(0);
+            int best=0;
+            for ( int i=0; i<oo.getLength(); i++ ) {
+                Node o = oo.item(i);
+                String name = (String)xpath.evaluate( "name", o, XPathConstants.STRING );
+                if ( axisName.equals("pitch angle") && name.equals("pa") ) {  //kludge for mvn_swe_l2_arcpad_20160316_v04_r01.xml
+                    best= i;
+                }
+            }
+            Node o=  oo.item(best);
             String name = (String)xpath.evaluate( "name", o, XPathConstants.STRING );
+            
             return name;
         }
-
+        
         return null;
     }
     
@@ -220,7 +235,7 @@ public class PdsDataSource extends AbstractDataSource {
      * that has a time unit (Epoch).  
      * @see https://space.physics.uiowa.edu/voyager/data/voyager-2-pws-wf/data/1987/vg2_pws_wf_1987-04-21T17_v0.9.xml
      * @param doc the parsed document for the label XML
-     * @param depend the name of the data for the dependant variable, e.g. Waveform
+     * @param depend the name of the data for the dependent variable, e.g. Waveform
      * @return ( Epoch, sample_offset, Waveform ) 
      */
     public static List<String> seekDependencies( Document doc, List<String> depend ) throws XPathExpressionException {
@@ -295,10 +310,6 @@ public class PdsDataSource extends AbstractDataSource {
         }
 
         names= seekDependencies(doc, names );
-
-        //TODO: Call a routine which scans through the document looking for
-        //dependencies.  See vap+pds:https://space.physics.uiowa.edu/voyager/data/voyager-2-pws-wf/data/1987/vg2_pws_wf_1987-04-21T17_v0.9.xml?Waveform
-        //which shows where the time and time offset arrays can be identified for Waveform.
             
         QDataSet result=null;
         QDataSet[] results= new QDataSet[names.size()];
