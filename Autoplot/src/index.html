@@ -13,7 +13,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Autoplot <a href="https://github.com/autoplot/dev/blob/master/demos/2021/20210408/demo1000000RGBColorPoints.jy">script</a> correctly plots 100,000 colored points interactively.  Recent versions of Java contain alpha channel in Color.BLUE, causing problems.
+        <p><small>Autoplot's File System API supports .tgz files now, which will be downloaded and listed automatically.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -29,7 +29,9 @@
                 
         <p>Bugfixes (2022-02-12 r26465):</p>
         <ul>
-            <li>corrections to decimalYear unit.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2435/">2435</a>: careless code assumed that CONTEXT_0 rank 0 data left over from slice1 could be added to calculate timetag
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2433/">2433</a>: $Y$m$d$H$M_to_$(Y;end)$m$d$H$M is allowed in PNG Walks now.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2432/">2432</a>: corrections to decimalYear unit.
             <li>SeriesRenderer handles rgbColor where alpha channel is non-zero.
             <li>script diff since last invocation was drawn backwards, showing changes in the wrong direction.
             <li>Use start and stop for HAPI 3.0 servers.
@@ -88,6 +90,7 @@
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/758">rfe758</a>: tickValues GUI had a bug with repeat every.  Thanks, Sadie!        </ul>
         <p>Features:</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/678">rfe678</a>: support for .tgz files.
             <li>Image renderer now supports rank 2 dataset with rgbColor units.
             <li>Jython script trace mode follows program counter.
             <li>support for bounding boxes, automatically detecting scheme and using BoundsRenderer.
