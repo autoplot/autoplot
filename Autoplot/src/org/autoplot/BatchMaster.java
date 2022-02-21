@@ -502,6 +502,7 @@ public class BatchMaster extends javax.swing.JPanel {
         jLabel1.setText("<html>This tool generates inputs for scripts, running through a series of inputs.  First load the script with the green \"play\" button, then specify the parameter name and values to assign, and optionally a second parameter.  Each value of the second parameter is run for each value of the first.  Use the inspect button to set values for any other parameters. Right-click within the values areas to generate values.");
         jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
+        param1NameCB.setEditable(true);
         param1NameCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " " }));
         param1NameCB.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -1431,6 +1432,23 @@ public class BatchMaster extends javax.swing.JPanel {
         return sb.toString();
     }
     
+    /**
+     * if the parameter name contains a split character then return the names.
+     * This is just so we can experiment with the feature.
+     * @param param
+     * @return 
+     */
+    private static String[] maybeSplit( String param ) {
+        if ( param.contains("|") ) {
+            return param.split( "\\|", -2 );
+        } else if ( param.contains(",") ) {
+            return param.split( ",", -2 );
+        } else if ( param.contains(";") ) {
+            return param.split( ";", -2 );
+        } else {
+            return null;
+        }
+    }
     
     /**
      * run the batch process.  The
@@ -1601,13 +1619,33 @@ public class BatchMaster extends javax.swing.JPanel {
                     interp.set( "dom", this.dom );
                     interp.set( "PWD", split.path );
                     String paramName= param1NameCB.getSelectedItem().toString();
-                    if ( !parms.containsKey(paramName) ) {
-                        if ( paramName.trim().length()==0 ) {
-                            throw new IllegalArgumentException("param1Name not set");
+                    String[] paramNames= maybeSplit( paramName );
+                    
+                    if ( paramNames!=null ) {
+                        char splitc= paramName.charAt(paramNames[0].length());
+                        String[] paramValues= f1.trim().split("\\"+splitc);
+                        for ( int j= 0; j<paramNames.length; j++ ) {
+                            String p= paramNames[j];
+                            String v= paramValues[j];
+                            if ( !parms.containsKey(p) ) {
+                                if ( p.trim().length()==0 ) {
+                                    throw new IllegalArgumentException("param1Name not set");
+                                } else {
+                                    throw new IllegalArgumentException("param not found: " + p );
+                                }
+                            }
+                            setParam( interp, parms.get(p), p, v );
+                            runResults.put( p, v );
                         }
+                    } else {
+                        if ( !parms.containsKey(paramName) ) {
+                            if ( paramName.trim().length()==0 ) {
+                                throw new IllegalArgumentException("param1Name not set");
+                            }
+                        }
+                        setParam( interp, parms.get(paramName), paramName, f1.trim() );
+                        runResults.put(paramName,f1.trim());
                     }
-                    setParam( interp, parms.get(paramName), paramName, f1.trim() );
-                    runResults.put(paramName,f1);
                     
                     if ( param2NameCB.getSelectedItem().toString().trim().length()==0 ) {
                         long t0= System.currentTimeMillis();
