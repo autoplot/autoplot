@@ -97,6 +97,7 @@ public class DataSetURI {
 
     static {
         FileSystem.registerFileSystemFactory("zip", new zipfs.ZipFileSystemFactory());
+        FileSystem.registerFileSystemFactory("tar", new org.das2.util.filesystem.VFSFileSystemFactory());
         FileSystem.registerFileSystemFactory("ftp", new FTPBeanFileSystemFactory());
         if ( System.getProperty("AP_CURL")!=null || System.getProperty("AP_WGET")!=null ) { // TODO: this only handles HTTP and HTTPS. FTP should probably be handled as well, but check curl.
             FileSystem.registerFileSystemFactory("http", new WGetFileSystemFactory() );
@@ -2042,6 +2043,8 @@ public class DataSetURI {
                     } // kludge for dods
                     // Hack for .zip archives:
                     if (s[j].endsWith(".zip") || s[j].endsWith(".ZIP") ) s[j] = s[j] + "/";
+                    // Hack for .tar archives:
+                    if (s[j].endsWith(".tar") || s[j].endsWith(".tgz") || s[j].endsWith(".tar.gz") ) s[j] = s[j] + "/";
 
                     boolean haveMatch= true;
                     if ( ! s[j].endsWith("/") ) {

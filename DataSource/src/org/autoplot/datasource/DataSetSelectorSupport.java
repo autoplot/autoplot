@@ -215,7 +215,9 @@ public class DataSetSelectorSupport {
                 String t = f.getName();
                 String ext = DataSetURI.getExt(t);
                 if ( ext!=null ) ext= "."+ext;
-                return ( t.endsWith(".zip") || t.endsWith(".ZIP") ) || (ext != null && ( exts.containsKey(ext) ) || ( isAutoplotApp && t.endsWith(".vap") ));
+                return ( t.endsWith(".zip") || t.endsWith(".ZIP") ) 
+                    || ( t.endsWith(".tar") || t.endsWith(".tgz") || t.endsWith(".tar.gz") )
+                    || (ext != null && ( exts.containsKey(ext) ) || ( isAutoplotApp && t.endsWith(".vap") ));
             }
 
             @Override

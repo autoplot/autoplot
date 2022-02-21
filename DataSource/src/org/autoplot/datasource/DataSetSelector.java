@@ -395,7 +395,9 @@ public class DataSetSelector extends javax.swing.JPanel {
 
         try {
 
-            if (file.endsWith("/") || file.contains("/?") || ( file.endsWith(".zip") || file.contains(".zip?") || file.endsWith(".ZIP") || surl.contains(".ZIP?") ) ) { 
+            if (file.endsWith("/") || file.contains("/?") 
+                || ( file.endsWith(".zip") || file.contains(".zip?") || file.endsWith(".ZIP") || surl.contains(".ZIP?") )
+                || ( file.endsWith(".tgz") || file.contains(".tgz?") || file.endsWith(".tar") || surl.contains(".tar?") || file.endsWith(".tar.gz") || surl.contains(".tar.gz?") ) ) { 
                 //TODO: vap+cdaweb:file:///?ds=APOLLO12_SWS_1HR&id=NSpectra_1  should not reject if empty file?
                 int carotpos = editor.getCaretPosition();
                 setMessage("busy: getting filesystem completions.");
