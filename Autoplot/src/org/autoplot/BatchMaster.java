@@ -106,7 +106,9 @@ public class BatchMaster extends javax.swing.JPanel {
     private JLabel[] param1JLabels= null;
     
     public static final int HTML_LINE_LIMIT = 50;
-    
+            
+    private ProgressMonitor monitor=null; // non-null when process is going.
+        
     /**
      * Creates new form BatchMaster
      * @param dom
@@ -719,6 +721,11 @@ public class BatchMaster extends javax.swing.JPanel {
         if ( ! ( w instanceof JDialog ) ) {
             logger.warning("untested code might leave hidden windows...");
         }
+        ProgressMonitor mon= this.monitor;
+        if ( mon!=null ) {
+            mon.cancel();
+        }
+        
         w.setVisible(false);
     }//GEN-LAST:event_cancelButtonActionPerformed
 
@@ -1457,6 +1464,7 @@ public class BatchMaster extends javax.swing.JPanel {
     public void doIt() throws IOException {
         final DasProgressPanel monitor= DasProgressPanel.createComponent( "" );
         progressPanel.add( monitor.getComponent() );
+        this.monitor= monitor;
 
         final List<JLabel> jobs1= new ArrayList<>();
         final List<JLabel> jobs2= new ArrayList<>();
@@ -1768,6 +1776,8 @@ public class BatchMaster extends javax.swing.JPanel {
             
             messageLabel.setText("Jobs are complete, click above to edit.");
             if ( !monitor.isFinished() ) monitor.finished();
+            this.monitor=null;
+            
             goButton.setEnabled(true);
         }
     }
