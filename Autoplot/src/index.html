@@ -29,6 +29,7 @@
                 
         <p>Bugfixes (2022-02-12 r26465):</p>
         <ul>
+            <li>triple-quotes check in Jython getParameters refactorings didn't look for """, only '''.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2435/">2435</a>: careless code assumed that CONTEXT_0 rank 0 data left over from slice1 could be added to calculate timetag
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2433/">2433</a>: $Y$m$d$H$M_to_$(Y;end)$m$d$H$M is allowed in PNG Walks now.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2432/">2432</a>: corrections to decimalYear unit.
@@ -90,7 +91,8 @@
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/758">rfe758</a>: tickValues GUI had a bug with repeat every.  Thanks, Sadie!        </ul>
         <p>Features:</p>
         <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/678">rfe678</a>: support for .tgz files.
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/772/">rfe772</a>: Run Batch supports list of M arguments.
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/678/">rfe678</a>: support for .tgz files.
             <li>Image renderer now supports rank 2 dataset with rgbColor units.
             <li>Jython script trace mode follows program counter.
             <li>support for bounding boxes, automatically detecting scheme and using BoundsRenderer.
