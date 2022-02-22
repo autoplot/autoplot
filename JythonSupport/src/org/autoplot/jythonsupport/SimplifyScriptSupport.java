@@ -26,6 +26,7 @@ import org.python.parser.ast.Attribute;
 import org.python.parser.ast.BinOp;
 import org.python.parser.ast.Call;
 import org.python.parser.ast.Compare;
+import org.python.parser.ast.Dict;
 import org.python.parser.ast.Expr;
 import org.python.parser.ast.Index;
 import org.python.parser.ast.List;
@@ -236,46 +237,20 @@ public class SimplifyScriptSupport {
         if (o.beginLine == 0) {
             return "(bad line number)";
         }
-        String theLine = ss[o.beginLine];
-
-        {
-            String tripleQuotes = "'''";
-            int i1 = theLine.indexOf(tripleQuotes);
-            if (i1 > -1) {
-                int i0 = theLine.lastIndexOf(tripleQuotes, i1 - 3);
-                if (i0 == -1) {
-                    int lastLine = o.beginLine;
-                    int firstLine = lastLine - 1;
-                    while (firstLine >= 0) {
-                        theLine = ss[firstLine] + "\n" + theLine;
-                        if (ss[firstLine].contains(tripleQuotes)) {
-                            break;
-                        } else {
-                            firstLine = firstLine - 1;
-                        }
-                    }
-                }
-            } else {
-                tripleQuotes = "\"\"\"";
-                i1 = theLine.indexOf(tripleQuotes);
-                if (i1 > -1) {
-                    int i0 = theLine.lastIndexOf(tripleQuotes, i1 - 3);
-                    if (i0 == -1) {
-                        int lastLine = o.beginLine;
-                        int firstLine = lastLine - 1;
-                        while (firstLine >= 0) {
-                            theLine = ss[firstLine] + "\n" + theLine;
-                            if (ss[firstLine].contains(tripleQuotes)) {
-                                break;
-                            } else {
-                                firstLine = firstLine - 1;
-                            }
-                        }
-                    }
-                }
+        int endLine= o.beginLine;
+        int beginLine= endLine;
+        if ( o instanceof Expr ) {
+            Expr e = (Expr)o;
+            if ( e.value.beginLine<beginLine ) {
+                beginLine= e.value.beginLine;
             }
         }
-        return theLine;
+        StringBuilder s= new StringBuilder();
+        for ( int i=beginLine; i<=endLine; i++ ) {
+            s.append( ss[i] );
+            if ( i<endLine ) s.append( "\n" );
+        }
+        return s.toString();
     }
 
     /**
@@ -452,21 +427,27 @@ public class SimplifyScriptSupport {
                     currentLine = acceptLine;
                 }
             } else if ( o instanceof Expr ) {
-                if (acceptLine > -1) { // always skip Expr.
-                    int thisLine = beginLine;
-                    for (int i = acceptLine; i <= thisLine; i++) {
-                        if (i < thisLine) {
-                            appendToResult(result, ss[i]).append("\n");
-                        } else {
-                            if (ss[i].length() > 0 && Character.isWhitespace(ss[i].charAt(0))) {
+                if ( ((Expr)o).value instanceof Str ) {
+                    result.append(theLine).append("\n");
+                    currentLine = o.beginLine;
+                    acceptLine= -1;
+                } else {
+                    if (acceptLine > -1) { // always skip Expr.
+                        int thisLine = beginLine;
+                        for (int i = acceptLine; i <= thisLine; i++) {
+                            if (i < thisLine) {
                                 appendToResult(result, ss[i]).append("\n");
+                            } else {
+                                if (ss[i].length() > 0 && Character.isWhitespace(ss[i].charAt(0))) {
+                                    appendToResult(result, ss[i]).append("\n");
+                                }
                             }
                         }
-                    }
-                    appendToResult(result, "\n");
-                    currentLine = thisLine;
-                    acceptLine = -1;
-                }             
+                        appendToResult(result, "\n");
+                        currentLine = thisLine;
+                        acceptLine = -1;
+                    }       
+                }
             } else { // Assign, etc
                 if (simplifyScriptToGetCompletionsOkay(o, variableNames)) {
                     if (acceptLine < 0) {
@@ -1164,6 +1145,14 @@ public class SimplifyScriptSupport {
             } else if (sn instanceof List) {
                 List ll = (List) sn;
                 for ( exprType e: ll.elts ) {
+                    traverse(e);
+                }   
+            } else if (sn instanceof Dict) {
+                Dict dict = (Dict) sn;
+                for ( exprType e: dict.keys ) {
+                    traverse(e);
+                }   
+                for ( exprType e: dict.values ) {
                     traverse(e);
                 }   
             } else {
