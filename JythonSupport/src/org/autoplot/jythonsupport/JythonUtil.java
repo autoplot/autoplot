@@ -61,7 +61,6 @@ import org.python.util.PythonInterpreter;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
-import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
 import org.python.core.PyTuple;
 
 /**
@@ -98,25 +97,30 @@ public class JythonUtil {
 
         String[] loadClasses = new String[]{"glob.py", "autoplot2017.py", "autoplotapp2017.py"}; // these must be in the root of the interpretter search path.
         for (String pysrc : loadClasses) {
-            if (pysrc.equals("glob.py")) {
-                URL jarUrl = InteractiveInterpreter.class.getResource("/" + pysrc);
-                if (jarUrl != null) {
-                    String f = getLocalJythonLib();
-                    pySys.path.insert(0, new PyString(f));
-
-                } else {
-                    logger.log(Level.WARNING, "Couldn''t find jar containing {0}.  See https://sourceforge.net/p/autoplot/bugs/576/", pysrc);
-                }
-            } else if (pysrc.equals("autoplotapp2017.py")) {
-                String f = getLocalJythonAutoplotAppLib();
-                if (!pySys.path.contains(new PyString(f))) { // TODO possible bug here: PyString/String means local path is in there 4 times.
-                    pySys.path.insert(0, new PyString(f));
-                }
-            } else {
-                String f = getLocalJythonAutoplotLib();
-                if (!pySys.path.contains(new PyString(f))) {
-                    pySys.path.insert(0, new PyString(f));
-                }
+            switch (pysrc) {
+                case "glob.py":
+                    URL jarUrl = InteractiveInterpreter.class.getResource("/" + pysrc);
+                    if (jarUrl != null) {
+                        String f = getLocalJythonLib();
+                        pySys.path.insert(0, new PyString(f));
+                        
+                    } else {
+                        logger.log(Level.WARNING, "Couldn''t find jar containing {0}.  See https://sourceforge.net/p/autoplot/bugs/576/", pysrc);
+                    }   break;
+                case "autoplotapp2017.py":
+                    {
+                        String f = getLocalJythonAutoplotAppLib();
+                        if (!pySys.path.contains(new PyString(f))) { // TODO possible bug here: PyString/String means local path is in there 4 times.
+                            pySys.path.insert(0, new PyString(f));
+                        }       break;
+                    }
+                default:
+                    {
+                        String f = getLocalJythonAutoplotLib();
+                        if (!pySys.path.contains(new PyString(f))) {
+                            pySys.path.insert(0, new PyString(f));
+                        }       break;
+                    }
             }
         }
 
@@ -997,6 +1001,12 @@ public class JythonUtil {
         if ((o instanceof org.python.parser.ast.Print)) {
             return false;
         }
+        if ((o instanceof org.python.parser.ast.Expr)) { // preserve constant strings which are effective documentation
+            org.python.parser.ast.Expr exp= (org.python.parser.ast.Expr)o;
+            if ( exp.value instanceof org.python.parser.ast.Str ) {
+                return true;
+            }
+        }
         logger.log(Level.FINEST, "not okay to simplify: {0}", o);
         return false;
     }
@@ -1249,7 +1259,7 @@ public class JythonUtil {
                     }
                 } else {
                     if (acceptLine > -1) {
-                        int thisLine = o.beginLine;
+                        int thisLine = getBeginLine( ss, o ) ;
                         String indent= indentForLine( ss[acceptLine] );
                         for (int i = acceptLine; i < thisLine; i++) {
                             if ( ss[i].contains("getDataSet") ) {
@@ -1259,7 +1269,7 @@ public class JythonUtil {
                             }
                         }
                         appendToResult(result, "\n");
-                        currentLine = thisLine;
+                        currentLine = o.beginLine;
                         acceptLine = -1;
                     } 
                 }
@@ -1275,6 +1285,21 @@ public class JythonUtil {
         return result.toString();
     }
 
+    /**
+     * there's a problem where multi-line strings and expressions have a begin line at the end not the beginning.
+     * @param ss the script which has been parsed into lines.
+     * @param o the AST statement
+     * @return the line of the beginning of the statement.
+     */
+    public static int getBeginLine( String[] ss, stmtType o ) {
+        int beginLine= o.beginLine;
+        if ( o instanceof org.python.parser.ast.Expr ) {
+            org.python.parser.ast.Expr expr= (org.python.parser.ast.Expr)o;
+            int bl2= expr.value.beginLine;
+            if ( bl2<beginLine ) beginLine= bl2;
+        }
+        return beginLine;
+    }
 
     /**
      * extracts the parts of the program that get parameters.
