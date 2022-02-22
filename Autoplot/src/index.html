@@ -27,8 +27,10 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-02-12 r26465):</p>
+        <p>Bugfixes (2022-02-22 r26493):</p>
         <ul>
+            <li>pressing "run batch" tool cancel button also cancels the running process.
+            <li>include jaxb library in stable jars to support Java 12, where this has been removed.  (There are still issues with Java 12 and PDS module.)
             <li>triple-quotes check in Jython getParameters refactorings didn't look for """, only '''.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2435/">2435</a>: careless code assumed that CONTEXT_0 rank 0 data left over from slice1 could be added to calculate timetag
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2433/">2433</a>: $Y$m$d$H$M_to_$(Y;end)$m$d$H$M is allowed in PNG Walks now.
