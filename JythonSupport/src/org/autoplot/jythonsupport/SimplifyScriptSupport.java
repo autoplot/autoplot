@@ -875,7 +875,7 @@ public class SimplifyScriptSupport {
 
     private static String maybeIndentifyValue( exprType t ) {
         if ( t instanceof Num ) {
-            return ((Num)t).toString();
+            return String.valueOf(((Num)t).n);
         } else if ( t instanceof Str ) {
             return "'"+ ((Str)t).toString() + "'";
         } else if ( t instanceof Name ) {
