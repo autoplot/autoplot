@@ -238,19 +238,39 @@ public class SimplifyScriptSupport {
         }
         String theLine = ss[o.beginLine];
 
-        String tripleQuotes = "'''";
-        int i1 = theLine.indexOf(tripleQuotes);
-        if (i1 > -1) {
-            int i0 = theLine.lastIndexOf(tripleQuotes, i1 - 3);
-            if (i0 == -1) {
-                int lastLine = o.beginLine;
-                int firstLine = lastLine - 1;
-                while (firstLine >= 0) {
-                    theLine = ss[firstLine] + "\n" + theLine;
-                    if (ss[firstLine].contains(tripleQuotes)) {
-                        break;
-                    } else {
-                        firstLine = firstLine - 1;
+        {
+            String tripleQuotes = "'''";
+            int i1 = theLine.indexOf(tripleQuotes);
+            if (i1 > -1) {
+                int i0 = theLine.lastIndexOf(tripleQuotes, i1 - 3);
+                if (i0 == -1) {
+                    int lastLine = o.beginLine;
+                    int firstLine = lastLine - 1;
+                    while (firstLine >= 0) {
+                        theLine = ss[firstLine] + "\n" + theLine;
+                        if (ss[firstLine].contains(tripleQuotes)) {
+                            break;
+                        } else {
+                            firstLine = firstLine - 1;
+                        }
+                    }
+                }
+            } else {
+                tripleQuotes = "\"\"\"";
+                i1 = theLine.indexOf(tripleQuotes);
+                if (i1 > -1) {
+                    int i0 = theLine.lastIndexOf(tripleQuotes, i1 - 3);
+                    if (i0 == -1) {
+                        int lastLine = o.beginLine;
+                        int firstLine = lastLine - 1;
+                        while (firstLine >= 0) {
+                            theLine = ss[firstLine] + "\n" + theLine;
+                            if (ss[firstLine].contains(tripleQuotes)) {
+                                break;
+                            } else {
+                                firstLine = firstLine - 1;
+                            }
+                        }
                     }
                 }
             }
