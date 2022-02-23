@@ -63,6 +63,25 @@ public class Utilities {
     }
     
     /**
+     * return the line number that contains the offset.
+     * @param comp
+     * @param offset
+     * @return the line number, zero is the first line.
+     * @throws javax.swing.text.BadLocationException
+     */
+    public static int getLineNumberForOffset(JTextComponent comp, int offset) throws BadLocationException {
+        Document doc = comp.getDocument();
+        if (offset < 0) {
+            throw new BadLocationException("Can't translate offset to line", -1);
+        } else if (offset > doc.getLength()) {
+            throw new BadLocationException("Can't translate offset to line", doc.getLength() + 1);
+        } else {
+            Element map = doc.getDefaultRootElement();
+            return map.getElementIndex(offset);
+        }
+    }
+    
+    /**
      * given a line number, where zero is the first line, what is the offset?
      * @param text the text document
      * @param line, the line number, where zero is the first line
