@@ -82,6 +82,108 @@ public class SimplifyScriptSupport {
     }
 
     /**
+     * given the node n, try to resolve its string value, maybe by implementing some of the addition (concatenation).
+     * @param n node within an AST.
+     * @param row the row of the caret
+     * @param column the column of the caret
+     * @param env any variables which have been identified as string values.
+     * @return the string or null.
+     */
+    public static String tryResolveStringNode( SimpleNode n, int row, int column, Map<String,Object> env ) {
+        if ( n.beginLine==row ) {
+            if ( n instanceof Assign ) {
+                Assign a= (Assign)n;
+                return tryResolveStringNode( a.value, row, column, env );
+            } else if ( n instanceof Str ) {
+                return ((Str)n).s;
+            } else if ( n instanceof Expr ) {
+                Expr e= (Expr)n;
+                return tryResolveStringNode( e.value, row, column, env );
+            } else if ( n instanceof Call ) {
+                Call e= (Call)n;
+                if ( e.func instanceof Name && ((Name)e.func).id.equals("getParam") ) {
+                    if ( e.args.length>1 ) {
+                        String s= tryResolveStringNode( e.args[1], row, column, env );
+                        if ( s!=null ) return s;
+                    }
+                }
+                return null;
+            } else if ( n instanceof Name ) {
+                Name na= (Name)n;
+                Object o= env.get( na.id );
+                if ( o instanceof String ) {
+                    return (String)o;
+                } else {
+                    return null;
+                }
+            } else if ( n instanceof BinOp ) {
+                BinOp e= (BinOp)n;
+                String sleft= tryResolveStringNode( e.left, row, column, env );
+                String sright= tryResolveStringNode( e.right, row, column, env );
+                if ( sleft!=null && sright!=null && e.op==BinOp.Add ) {
+                    return sleft + sright;
+                } else {
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+    
+    /**
+     * given the node n, try to resolve its string value, maybe by implementing some of the addition (concatenation).
+     * @param n the AST
+     * @param row the row of the caret
+     * @param column the column of the caret
+     * @param env any variables which have been identified as string values.
+     * @return the string or null.
+     */    
+    public static String tryResolveStringNode( Module n, int row, int column, Map<String,Object> env ) {
+        stmtType thet=null;
+        for ( stmtType t : n.body ) {
+            if ( t.beginLine>=row ) {
+                thet= t;
+                break;
+            }
+            if ( t instanceof Assign ) {
+                Assign a= (Assign)t;
+                if ( a.targets.length==1 && a.targets[0] instanceof Name ) {
+                    if ( a.value instanceof Str ) {
+                        env.put( ((Name)a.targets[0]).id, ((Str)a.value).s );
+                    } else if ( a.value instanceof BinOp ) {
+                        String s= tryResolveStringNode( a.value, a.beginLine, a.beginColumn, env );
+                        if ( s!=null ) {
+                            env.put( ((Name)a.targets[0]).id, s );
+                        }
+                    } else if ( a.value instanceof Call ) {
+                        Call c= (Call)a.value;
+                        if ( c.func instanceof Name && ((Name)c.func).id.equals("getParam") ) {
+                            String s= tryResolveStringNode( a.value, a.beginLine, a.beginColumn, env );
+                            if ( s!=null ) {
+                                env.put( ((Name)a.targets[0]).id, s );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // find the node within thet containing the carot.
+        if ( thet instanceof Assign ) {
+            exprType t= ((Assign)thet).value;
+            if ( t instanceof Call ) {
+                Call c= (Call)t;
+                if ( c.func instanceof Name && ((Name)c.func).id.equals("getDataSet") ) {
+                    return tryResolveStringNode( c.args[0], row, column, env );
+                }
+            }
+        }
+        return null;
+    }
+    
+    /**
      * Remove parts of the script which are expensive so that the script can be run and completions offered. TODO: What is the
      * difference between this and simplifyScriptToCompletions?
      *
@@ -1054,6 +1156,10 @@ public class SimplifyScriptSupport {
             }
         }
         return null;
+    }
+
+    private static Object Name(exprType func) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     private static class MyVisitorBase<R> extends VisitorBase {
