@@ -1020,7 +1020,8 @@ public class JythonCompletionTask implements CompletionTask {
     private int queryStringLiteralArgument(CompletionContext cc, CompletionResultSet arg0) {
         String method = cc.contextString;
         int [] pos= new int[2];
-        String s= DataSetUrlCompletionTask.popString(editor,pos);
+        Map<String,Object> r= DataSetUrlCompletionTask.popString(editor,pos);
+        String s= (String)r.get("string");
         if (method.equals("getDataSet") || method.equals("plot") || method.equals("plotx") || method.equals("getCompletions") ) {
             DataSetUrlCompletionTask task = new DataSetUrlCompletionTask(editor);
             task.query(arg0);
