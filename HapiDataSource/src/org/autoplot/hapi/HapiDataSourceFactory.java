@@ -6,6 +6,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.datasource.AbstractDataSourceFactory;
@@ -14,6 +15,9 @@ import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DefaultTimeSeriesBrowse;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
+import org.das2.datum.DatumRange;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * Constructor for HAPI data sources.
@@ -57,6 +61,7 @@ public class HapiDataSourceFactory extends AbstractDataSourceFactory {
         List<CompletionContext> result = new ArrayList<>();
         if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "id=", "dataset identifier"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "parameters=", "load one parameter" ));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "timerange=", "time range"));
         } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
             String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
@@ -69,7 +74,31 @@ public class HapiDataSourceFactory extends AbstractDataSourceFactory {
                         result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, ds ) );
                     }
                 }
-            } 
+            } else if ( paramName.equals("parameters") ) {
+                URI uri= cc.resourceURI;
+                if ( uri==null ) throw new IllegalArgumentException("expected das2server location");
+                URISplit split= URISplit.parse(cc.surl);
+                Map<String,String> params= URISplit.parseParams(split.params);
+                String id= params.get("id");
+                JSONArray dss= HapiServer.getParameters( uri.toURL(), id ); 
+                for ( int i=0; i<dss.length(); i++ ) {
+                    JSONObject paramObject= dss.getJSONObject(i);
+                    String name= paramObject.getString("name");
+                    if ( name.startsWith(cc.completable) ) {
+                        result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, name ) );
+                    }
+                }
+            } else if ( paramName.equals("timerange") ) {
+                URI uri= cc.resourceURI;
+                if ( uri==null ) throw new IllegalArgumentException("expected das2server location");
+                URISplit split= URISplit.parse(cc.surl);
+                Map<String,String> params= URISplit.parseParams(split.params);
+                String id= params.get("id");
+                JSONObject jo= HapiServer.getInfo( uri.toURL(), id );
+                DatumRange dr= HapiServer.getSampleTimeRange(jo);
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, dr.toString().replaceAll("\\ ","+") ) );
+            }
+
         }
         return result;
     }
