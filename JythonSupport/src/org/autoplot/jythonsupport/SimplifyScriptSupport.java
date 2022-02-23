@@ -83,6 +83,8 @@ public class SimplifyScriptSupport {
 
     /**
      * given the node n, try to resolve its string value, maybe by implementing some of the addition (concatenation).
+     * This was introduced to support URI completions within Jython codes, allowing the filename to be a variable and
+     * thus shortening lines.
      * @param n node within an AST.
      * @param row the row of the caret
      * @param column the column of the caret
@@ -135,6 +137,8 @@ public class SimplifyScriptSupport {
     
     /**
      * given the node n, try to resolve its string value, maybe by implementing some of the addition (concatenation).
+     * This was introduced to support URI completions within Jython codes, allowing the filename to be a variable and
+     * thus shortening lines.
      * @param n the AST
      * @param row the row of the caret
      * @param column the column of the caret
