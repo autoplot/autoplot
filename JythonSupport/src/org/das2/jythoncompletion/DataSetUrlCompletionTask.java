@@ -1,7 +1,10 @@
 
 package org.das2.jythoncompletion;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
@@ -11,6 +14,15 @@ import org.das2.jythoncompletion.support.CompletionTask;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSetURI.CompletionResult;
+import org.autoplot.jythonsupport.SimplifyScriptSupport;
+import org.python.parser.Node;
+import org.python.parser.SimpleNode;
+import org.python.parser.ast.Assign;
+import org.python.parser.ast.Expr;
+import org.python.parser.ast.Module;
+import org.python.parser.ast.Str;
+import org.python.parser.ast.exprType;
+import org.python.parser.ast.stmtType;
 
 /**
  * completions of a URI within the editor, which delegate down to the 
@@ -32,8 +44,29 @@ class DataSetUrlCompletionTask implements CompletionTask {
 
     }
 
-    public static String popString(JTextComponent editor, int[] pos) {
+    public static String popStringSyntax( JTextComponent editor, int[] pos) {
         try {
+            String scri= SimplifyScriptSupport.alligatorParse( editor.getText() );
+            Module n= (Module) org.python.core.parser.parse(scri, "exec");
+            int i0 = Utilities.getRowStart(editor, editor.getCaretPosition());
+            int iline= 1 + Utilities.getLineNumberForOffset(editor, i0);
+            return SimplifyScriptSupport.tryResolveStringNode( n, iline, pos[0]-i0, new LinkedHashMap<>() );
+        } catch (BadLocationException ex) {
+            Logger.getLogger(DataSetUrlCompletionTask.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+    
+    /**
+     * returns a map of the string and any offset that is applied to the position 
+     * because a field was resolved with String addition.
+     * @param editor
+     * @param pos
+     * @return map containing string:String and offset:int tags.
+     */
+    public static Map<String,Object> popString(JTextComponent editor, int[] pos) {
+        try {
+            String s= popStringSyntax( editor, pos );
             int i0 = Utilities.getRowStart(editor, editor.getCaretPosition());
             int i1 = Utilities.getRowEnd(editor, editor.getCaretPosition()) - 1; // trim end of line
             String line = editor.getText(i0, i1 - i0);
@@ -59,7 +92,15 @@ class DataSetUrlCompletionTask implements CompletionTask {
             }
             pos[0] = i0;
             pos[1] = i1;
-            return line.substring(i0, i1);
+            Map<String,Object> result= new HashMap<>();
+            if ( s!=null && s.endsWith(line.substring(i0, i1)) ) {
+                result.put( "string", s );
+                result.put( "offset", s.length()-(i1-i0) );
+            } else {
+                result.put( "string", line.substring(i0, i1) );
+                result.put( "offset", 0 );
+            }
+            return result;
         } catch (BadLocationException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (Exception ex) {
@@ -74,8 +115,10 @@ class DataSetUrlCompletionTask implements CompletionTask {
             int i0 = Utilities.getRowStart(editor, editor.getCaretPosition());
             int ipos = editor.getCaretPosition() - i0;
             int[] pos = new int[2];
-            String surl1 = popString(editor, pos);
-            int carotPos = ipos - pos[0];
+            
+            Map<String,Object> r= popString(editor, pos);
+            String surl1 = (String)r.get("string");
+            int carotPos = ipos - pos[0] + (int)r.get("offset");
 
             List<CompletionResult> rs = DataSetURI.getCompletions(surl1, carotPos, new NullProgressMonitor());
 
