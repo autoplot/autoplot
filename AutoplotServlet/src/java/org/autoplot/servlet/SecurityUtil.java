@@ -28,7 +28,9 @@ public class SecurityUtil {
      * @return 
      */
     public static boolean whoIsTrusted( String who ) {
-        if ( who.equals("localhost") || who.startsWith("192.168") || who.startsWith("10.0") ) {
+        // https://www.geeksforgeeks.org/non-routable-address-space/ 
+        // Note 172.16 through 172.31 should be allowed as well, but aren't.
+        if ( who.equals("localhost") || who.startsWith("192.168.") || who.startsWith("10.") ) { 
             return true;
         } else {
             return false;
