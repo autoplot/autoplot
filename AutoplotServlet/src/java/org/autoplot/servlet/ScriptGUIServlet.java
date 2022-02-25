@@ -28,6 +28,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -108,6 +109,13 @@ public class ScriptGUIServlet extends HttpServlet {
         
     }
     File logfile= new File( "/home/jbf/log/ScriptGUIServlet.log" );
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        System.setProperty("java.awt.headless", "true");
+        super.init(config); 
+    }
+    
     
     /**
      * write out the current canvas to stdout.  This is introduced to support servers.
@@ -223,7 +231,7 @@ public class ScriptGUIServlet extends HttpServlet {
             File imageKeyFile =  getKeyFile( key, ".png.t" );
             if ( !imageKeyFile.createNewFile() ) throw new IllegalArgumentException("unable to create file: "+imageKeyFile);
         
-            startScript( key, scriptURI, script, name, ss, pwd );
+            startScript( request, key, scriptURI, script, name, ss, pwd );
         }
     }
 
@@ -267,7 +275,7 @@ public class ScriptGUIServlet extends HttpServlet {
      * @throws UnknownHostException 
      */
     private void writeOutputText( String key, HttpServletResponse response ) throws IOException, UnknownHostException {
-
+        
         File keyFile= getKeyFile( key,".txt" );
         
         long t0= System.currentTimeMillis();
@@ -365,11 +373,7 @@ public class ScriptGUIServlet extends HttpServlet {
         return new File( keyhome, key+ ext );
     }
     
-    private void startScript( String key, String scriptURI, 
-            String script, 
-            String name, 
-            String[] aaparams, 
-            String pwd ) throws IOException {
+    private void startScript( HttpServletRequest request, String key, String scriptURI, String script, String name, String[] aaparams, String pwd) throws IOException {
         
         File scriptLogArea= new File( ServletUtil.getServletHome(), "log" );
         if ( !scriptLogArea.exists() ) {
@@ -459,7 +463,8 @@ public class ScriptGUIServlet extends HttpServlet {
         File keyLogFile= getKeyFile( key, ".stats" );
         try ( PrintStream outs= new PrintStream( new FileOutputStream( keyLogFile ) ) ) {
             outs.println( "ExecutionTimeMs: "+ elapsedTime );
-            outs.println( "Script: "+scriptURI + "?"+ String.join("&", aaparams) );
+            outs.println( "Script: "+ scriptURI + "?"+ String.join("&", aaparams) );
+            outs.println( "ClientId: "+ SecurityUtil.clientId(request) );
         }
         
         timelogger.log(Level.FINE, "end runScript {0} ({1}ms)", new Object[]{name, elapsedTime });

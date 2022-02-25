@@ -21,12 +21,26 @@ import javax.servlet.http.HttpServletRequest;
 public class SecurityUtil {
 
     /**
-     * check that the person has access to this resource
-     *
-     * @param request
-     * @throws IOException, SecurityException
+     * Return true if the address is of a domain that is trusted by the server.
+     * For example, if "X-Forwarded-For" is found in the headers, we will trust
+     * it.
+     * @param who the hostname or address.
+     * @return 
      */
-    public static void checkAllowed(HttpServletRequest request) throws IOException {
+    public static boolean whoIsTrusted( String who ) {
+        if ( who.equals("localhost") || who.startsWith("192.168") || who.startsWith("10.0") ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    /**
+     * return an identifier for the client, looking for 127.0.0.1 and X-Forwarded-For
+     * @param request
+     * @return 
+     */
+    public static String clientId( HttpServletRequest request ) {
         String who = request.getRemoteAddr();
         if (who.equals("0:0:0:0:0:0:0:1")) {
             who = "localhost";
@@ -34,11 +48,24 @@ public class SecurityUtil {
         if (who.equals("127.0.0.1")) {
             who = "localhost";
         }
-
-        String remoteHost= request.getHeader("X-Forwarded-For");
-        if ( remoteHost!=null ) {
-            who= remoteHost;
+        if ( whoIsTrusted( who ) ) {
+            String remoteHost= request.getHeader("X-Forwarded-For");
+            if ( remoteHost!=null ) {
+                who= remoteHost;
+            }
         }
+        
+        return who;
+    }
+    
+    /**
+     * check that the person has access to this resource
+     *
+     * @param request
+     * @throws IOException, SecurityException
+     */
+    public static void checkAllowed(HttpServletRequest request) throws IOException {
+        String who = clientId(request);
         
         String home = System.getProperty("AUTOPLOT_SERVLET_HOME");
         if (home == null) {
