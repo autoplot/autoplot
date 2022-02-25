@@ -713,6 +713,10 @@ public class CreatePngWalk {
 
                 if (params.removeNoData) {
                     if (!isDataVisible(dom2)) {
+                        logger.log(Level.FINE, "No data found for \"{0}\"", atime);
+                        if (!outTemp.delete()) {
+                           logger.log(Level.WARNING, "unable to delete {0}", outTemp);
+                        }
                         continue;
                     }
                 }
