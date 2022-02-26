@@ -39,6 +39,7 @@ import org.python.parser.ast.UnaryOp;
 import org.python.parser.ast.VisitorBase;
 import org.python.parser.ast.aliasType;
 import org.python.parser.ast.exprType;
+import org.python.util.PythonInterpreter;
 
 /**
  * AST support for Jython completions. This is not meant to be thorough, but instead should be helpful when working with scripts.
@@ -82,6 +83,24 @@ public class SimplifyScriptSupport {
     }
 
     /**
+     * quick and dirty attempt to resolve tuple for format statement.
+     * @param n
+     * @param row
+     * @param column
+     * @param env
+     * @return 
+     */
+    public static Object[] tryResolveTupleNode(  SimpleNode n, int row, int column, Map<String,Object> env ) {
+        Tuple t= (Tuple)n;
+        Object[] result= new Object[t.elts.length];
+        for ( int i=0; i<result.length; i++ ) {
+            result[i]= tryResolveStringNode( t.elts[i], row, column, env );
+            if ( result[i]==null ) return null;
+        }
+        return result;
+    }
+    
+    /**
      * given the node n, try to resolve its string value, maybe by implementing some of the addition (concatenation).
      * This was introduced to support URI completions within Jython codes, allowing the filename to be a variable and
      * thus shortening lines.
@@ -110,6 +129,11 @@ public class SimplifyScriptSupport {
                         String s= tryResolveStringNode( e.args[1], row, column, env );
                         if ( s!=null ) return s;
                     }
+                } else if ( e.func instanceof Name && ((Name)e.func).id.equals("str") ) {
+                    if ( e.args.length==1 ) {
+                        String s= tryResolveStringNode( e.args[0], row, column, env );
+                        if ( s!=null ) return s;
+                    }
                 }
                 return null;
             } else if ( n instanceof Name ) {
@@ -126,6 +150,20 @@ public class SimplifyScriptSupport {
                 String sright= tryResolveStringNode( e.right, row, column, env );
                 if ( sleft!=null && sright!=null && e.op==BinOp.Add ) {
                     return sleft + sright;
+                } else if ( sleft!=null && e.right instanceof Tuple && e.op==BinOp.Mod ) {
+                    //PythonInterpreter interp= new PythonInterpreter(null);
+                    Object[] ss= tryResolveTupleNode( e.right, row, column, env );
+                    if ( ss!=null ) {
+                        sleft= sleft.replaceAll("\\%d", "%s"); // small cheat
+                        try {
+                            return String.format( sleft,ss );
+                        } catch (Exception ex ) {
+                            logger.log( Level.INFO, ex.getMessage(), ex );
+                            return null;
+                        }
+                    } else {
+                        return null;
+                    }
                 } else {
                     return null;
                 }
