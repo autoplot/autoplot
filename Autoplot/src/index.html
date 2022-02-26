@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Autoplot's File System API supports .tgz files now, which will be downloaded and listed automatically.  Happy Twosday!
+        <p><small>Run batch now allows several parameters to be set at once, delimited by a semicolon.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,11 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-02-22 r26493):</p>
+        <p>Bugfixes (2022-02-26 r26510):</p>
         <ul>
+            <li>Detrend and a few other operators were missing descriptions in "add operation" dialog.
+            <li>Create PNG walk lock file wasn't deleted when culling no-data images.
+            <li>Autoplot server only believes X-Forwarded-For when remote host is from a secure network.
             <li>HapiDataSource didn't provide completions for parameters and timerange.
         </ul>
         <p>Older Bugfixes (2022-02-22 r26493):</p>
@@ -72,7 +75,7 @@
             <li>GitCommand assumed it could write to /tmp/, which isn't working on a Mac.
         <p>Features:</p>
         <ul>
-            <li>Completions on URI within getDataSet call supports simple string concatenations to allow for shorter lines without loosing completions.
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/772/">rfe774</a>: Completions on URI within getDataSet call supports simple string concatenations to allow for shorter lines without loosing completions.
         </ul>
         <p>Less recent features:</p>
         <ul>
