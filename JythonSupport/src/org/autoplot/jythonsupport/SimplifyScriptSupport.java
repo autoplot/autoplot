@@ -98,6 +98,8 @@ public class SimplifyScriptSupport {
                 return tryResolveStringNode( a.value, row, column, env );
             } else if ( n instanceof Str ) {
                 return ((Str)n).s;
+            } else if ( n instanceof Num ) {
+                return String.valueOf(((Num)n).n);
             } else if ( n instanceof Expr ) {
                 Expr e= (Expr)n;
                 return tryResolveStringNode( e.value, row, column, env );
