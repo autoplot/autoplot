@@ -56,7 +56,7 @@
 	<classpathentry kind="lib" path="APLibs/lib/jemmy-2.2.7.5.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/cdfjava.3.3.2.tt2000.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/commons-math-2.1.jar"/>
-	<classpathentry kind="lib" path="APLibs/lib/jsyntaxpane-1.1.7.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/das2java"/>
+	<classpathentry kind="lib" path="APLibs/lib/jsyntaxpane-1.2.0.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
