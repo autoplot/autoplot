@@ -512,6 +512,7 @@ public class BatchMaster extends javax.swing.JPanel {
             }
         });
 
+        param2NameCB.setEditable(true);
         param2NameCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " " }));
         param2NameCB.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -1706,9 +1707,35 @@ public class BatchMaster extends javax.swing.JPanel {
                             ByteArrayOutputStream outbaos= new ByteArrayOutputStream();
                             try {
                                 paramName= param2NameCB.getSelectedItem().toString();
-                                runResults.put(paramName,f2);
+                                
+                                paramNames= maybeSplit( paramName );
+                    
+                                if ( paramNames!=null ) {
+                                    char splitc= paramName.charAt(paramNames[0].length());
+                                    String[] paramValues= f2.trim().split("\\"+splitc);
+                                    for ( int j= 0; j<paramNames.length; j++ ) {
+                                        String p= paramNames[j];
+                                        String v= paramValues[j];
+                                        if ( !parms.containsKey(p) ) {
+                                            if ( p.trim().length()==0 ) {
+                                                throw new IllegalArgumentException("param1Name not set");
+                                            } else {
+                                                throw new IllegalArgumentException("param not found: " + p );
+                                            }
+                                        }
+                                        setParam( interp, parms.get(p), p, v );
+                                        runResults.put( p, v );
+                                    }
+                                } else {                                
+                                    if ( !parms.containsKey(paramName) ) {
+                                        if ( paramName.trim().length()==0 ) {
+                                            throw new IllegalArgumentException("param1Name not set");
+                                        }
+                                        setParam( interp, parms.get(paramName), paramName, f2.trim() );
+                                        runResults.put(paramName,f2.trim());
+                                    }
+                                }
                                 jobs2.get(i2).setIcon( working );
-                                setParam( interp, parms.get(paramName), paramName, f2.trim() );
                                 interp.setOut(outbaos);
                                 interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile), scriptFile.getName()), scriptFile.getName() );
                                 if ( writeCheckBox.isSelected() ) {
