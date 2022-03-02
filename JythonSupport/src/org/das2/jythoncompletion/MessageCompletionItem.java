@@ -89,7 +89,7 @@ public class MessageCompletionItem implements CompletionItem {
 
     @Override
     public int getSortPriority() {
-        return 0;
+        return -100;
     }
 
     @Override
