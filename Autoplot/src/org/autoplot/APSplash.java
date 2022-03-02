@@ -55,6 +55,11 @@ public class APSplash extends JFrame {
 
     private static final Logger logger= LoggerManager.getLogger("autoplot.splash");
     
+    /**
+     * return the Autoplot version.  Conventionally this is $Y$m$d$(x,regex='[a-z]') or v$Y$(x,regex='[ab]')_$(x,regex='\d+')
+     * (20220302a or v2022a_3), or (dev).
+     * @return 
+     */
     public static String getVersion() {
         try {
             String tag= AboutUtil.getReleaseTag( APSplash.class );
@@ -65,6 +70,10 @@ public class APSplash extends JFrame {
 
     }
 
+    /**
+     * return the log handler which is used to echo messages as the application starts up.
+     * @return the log handler
+     */
     public synchronized Handler getLogHandler() {
         if ( handler==null ) {
             handler= createhandler();
@@ -101,6 +110,9 @@ public class APSplash extends JFrame {
         return instance;
     }
 
+    /**
+     * show the splash image on the screen.
+     */
     public static void showSplash() {
         getInstance();
         instance.setVisible(true);
@@ -108,6 +120,10 @@ public class APSplash extends JFrame {
         checkTime("showSplash");
     }
 
+    /**
+     * used for debugging, to log the current time 
+     * @param msg 
+     */
     public static void checkTime( String msg ) {
         if ( instance!=null ) {
             logger.log( Level.FINE, "checkTime {0} @ {1} ms ", new Object[]{msg.replaceAll(" ","_").replaceFirst("_", " "), String.valueOf( System.currentTimeMillis()-instance.t0 )} );
@@ -118,13 +134,18 @@ public class APSplash extends JFrame {
         }
     }
 
+    /**
+     * hide the splash image.
+     */
     public static void hideSplash() {
         getInstance();
         instance.setVisible(false);
         checkTime("hideSplash");
     }
 
-    /** Creates a new instance of Splash */
+    /** 
+     * create a new APSplash, used to give something to look at while Autoplot is starting up.
+     */
     public APSplash() {
         super();
 
