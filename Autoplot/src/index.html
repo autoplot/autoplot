@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Run batch now allows several parameters to be set at once, delimited by a semicolon.
+        <p><small><a href="https://github.com/autoplot/dev/blob/master/demos/2022/20220301/testDecorators.jy">Script</a> to study how to properly refresh decorators.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -75,6 +75,7 @@
             <li>GitCommand assumed it could write to /tmp/, which isn't working on a Mac.
         <p>Features:</p>
         <ul>
+            <li>when Jython completions encounters an error when running, still show the completions for other symbols, improve error display.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/772/">rfe774</a>: Completions on URI within getDataSet call supports simple string concatenations to allow for shorter lines without loosing completions.
         </ul>
         <p>Less recent features:</p>
