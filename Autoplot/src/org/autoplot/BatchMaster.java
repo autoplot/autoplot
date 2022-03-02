@@ -1160,7 +1160,7 @@ public class BatchMaster extends javax.swing.JPanel {
     private void doGenerateMulti( JComboBox cb, JTextArea ta ) {
         String p= cb.getSelectedItem().toString();
         String[] pps= maybeSplitMultiParam( p );
-        String splitChar= p.substring(pps[0].length());
+        char splitChar= p.charAt(pps[0].length());
         String[][] rs1= new String[pps.length][];
         for ( int i=0; i<pps.length; i++ ) {
             p= pps[i].trim();
@@ -1643,6 +1643,9 @@ public class BatchMaster extends javax.swing.JPanel {
                     param2NameCB.getSelectedItem().toString().trim() :
                     "";
             
+            param1= cleanupMultiParam( param1 );
+            param2= cleanupMultiParam( param2 );
+            
             JSONArray paramsJson= new JSONArray();
             paramsJson.put(0,param1);
             if ( param2.length()>0 ) {
@@ -1679,15 +1682,15 @@ public class BatchMaster extends javax.swing.JPanel {
                     }); // subtask would reset indeterminate.
                     interp.set( "dom", this.dom );
                     interp.set( "PWD", split.path );
-                    String paramName= param1NameCB.getSelectedItem().toString();
+                    String paramName= param1NameCB.getSelectedItem().toString().trim();
                     String[] paramNames= maybeSplitMultiParam( paramName );
                     
                     if ( paramNames!=null ) {
                         char splitc= paramName.charAt(paramNames[0].length());
                         String[] paramValues= f1.trim().split("\\"+splitc);
                         for ( int j= 0; j<paramNames.length; j++ ) {
-                            String p= paramNames[j];
-                            String v= paramValues[j];
+                            String p= paramNames[j].trim();
+                            String v= paramValues[j].trim();
                             if ( !parms.containsKey(p) ) {
                                 if ( p.trim().length()==0 ) {
                                     throw new IllegalArgumentException("param1Name not set");
@@ -1758,7 +1761,7 @@ public class BatchMaster extends javax.swing.JPanel {
                             long t0= System.currentTimeMillis();
                             ByteArrayOutputStream outbaos= new ByteArrayOutputStream();
                             try {
-                                paramName= param2NameCB.getSelectedItem().toString();
+                                paramName= param2NameCB.getSelectedItem().toString().trim();
                                 
                                 paramNames= maybeSplitMultiParam( paramName );
                     
@@ -1766,8 +1769,8 @@ public class BatchMaster extends javax.swing.JPanel {
                                     char splitc= paramName.charAt(paramNames[0].length());
                                     String[] paramValues= f2.trim().split("\\"+splitc);
                                     for ( int j= 0; j<paramNames.length; j++ ) {
-                                        String p= paramNames[j];
-                                        String v= paramValues[j];
+                                        String p= paramNames[j].trim();
+                                        String v= paramValues[j].trim();
                                         if ( !parms.containsKey(p) ) {
                                             if ( p.trim().length()==0 ) {
                                                 throw new IllegalArgumentException("param1Name not set");
@@ -1975,6 +1978,24 @@ public class BatchMaster extends javax.swing.JPanel {
             }
         } catch (JSONException ex) {
             logger.log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * remove extraneous spaces
+     * @param param1 " myparm" or "a; b; c"
+     * @return "myparm" or "a;b;c"
+     */
+    private String cleanupMultiParam(String param1) {
+        String[] ss= maybeSplitMultiParam(param1);
+        if ( ss==null ) {
+            return param1.trim();
+        } else {
+            char ch= param1.charAt(ss[0].length());
+            for ( int i=0; i<ss.length; i++ ) {
+                ss[i]= ss[i].trim();
+            }
+            return String.join( String.valueOf(ch), ss );
         }
     }
 }
