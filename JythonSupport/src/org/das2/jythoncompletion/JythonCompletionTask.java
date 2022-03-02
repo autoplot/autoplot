@@ -954,15 +954,6 @@ public class JythonCompletionTask implements CompletionTask {
         
     }
     
-    private static String getCanonicalName( Class clas ) {
-        Package p= clas.getPackage();
-        if ( p!=null && p.getName().endsWith("org.python.core") ) {
-            return clas.getSimpleName();
-        } else {
-            return clas.getCanonicalName();
-        }
-    }
-    
     private static String methodSignature(Method javaMethod) {
         String n= javaMethod.getDeclaringClass().getCanonicalName();
         if ( n==null ) {
@@ -982,7 +973,7 @@ public class JythonCompletionTask implements CompletionTask {
         List<String> sargs = new ArrayList<>();
 
         for (Class arg : javaMethod.getParameterTypes()) {
-            sargs.add(getCanonicalName(arg));
+            sargs.add(arg.getCanonicalName());
         }
         sig.append(join(sargs, "," ));
         sig.append(RPAREN);
