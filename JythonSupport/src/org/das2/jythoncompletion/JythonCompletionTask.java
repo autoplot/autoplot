@@ -881,8 +881,20 @@ public class JythonCompletionTask implements CompletionTask {
         try {
             interp.exec( JythonRefactory.fixImports(eval) );
         } catch ( PyException ex ) {
-            if ( rs!=null ) rs.addItem(new MessageCompletionItem("Eval error in code before current position", ex.toString()));
-            return 0;
+            String message= "<html><p>Code completions couldn't run on a simplified version of the script.  This may"
+                + " due to a bug in the simplification process, or there may be a bug in the script. "
+                + "The error is shown below, and the simplified script can be reveiwed using "
+                + "Actions&rarr;Developer&rarr;\"Show Simplified Script used for Completions.\"</p><br><hr><code>"+ex.toString()+"</code>";
+            if ( rs!=null ) rs.addItem( new MessageCompletionItem("Eval error in code before current position", message));
+            int nlocal=  getLocalsCompletions( interp, cc, rs);
+            int nimportable;
+            if ( cc.completable.length()>0 ) {
+                nimportable= getImportableCompletions( eval, cc, rs );
+            } else {
+                nimportable= 0;
+            }
+            return count + nlocal + nimportable + 1;
+            
         } catch (IOException ex) {
             if ( rs!=null ) rs.addItem(new MessageCompletionItem("Error with completions",ex.toString()));
             return 0;
