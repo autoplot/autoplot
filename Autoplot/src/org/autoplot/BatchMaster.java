@@ -1003,172 +1003,222 @@ public class BatchMaster extends javax.swing.JPanel {
         FileUtil.writeStringToFile(f,src);
     }
     
+    private String[] doGenerateOne( org.autoplot.jythonsupport.JythonUtil.Param pd ) {
+        String[] ss=null; // will be generated values
+        if ( pd.type=='T' ) {
+            try {
+                if ( AutoplotUtil.showConfirmDialog( this, timeRangesPanel, "Generate Time Ranges", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+                    ss= ScriptContext.generateTimeRanges( timeFormatComboBox.getSelectedItem().toString(), timeRangeComboBox.getSelectedItem().toString() );
+                }
+            } catch (ParseException ex) {
+                Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else if ( pd.enums!=null ) {
+            final JPanel panel= new JPanel();
+            panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS ) );
+            String label= pd.label;
+            if ( pd.doc!=null ) label= "<html>"+label+", <i>"+pd.doc+"</i>";
+            panel.add( new JLabel( label ) );
+            for ( int i=0; i<pd.enums.size(); i++ ) {
+                JCheckBox checkBox= new JCheckBox(pd.enums.get(i).toString());
+                checkBox.setSelected(true);
+                panel.add( checkBox );
+            }
+            AbstractAction a= new AbstractAction("clear all") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    for ( Component c: panel.getComponents() ) {
+                        if ( c instanceof JCheckBox ) {
+                            ((JCheckBox)c).setSelected(false);
+                        }
+                    }
+                }   
+            };
+            panel.add( new JButton(a) );
+            JScrollPane scrollPane= new JScrollPane(panel);
+            scrollPane.setPreferredSize( new Dimension( 300, 400 ) );
+            scrollPane.setMaximumSize( new Dimension( 300, 400 ) );
+            scrollPane.getVerticalScrollBar().setUnitIncrement(panel.getFont().getSize());
+
+            if ( AutoplotUtil.showConfirmDialog( this, scrollPane, "Select from Values", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+                List<String> theList= new ArrayList<>();
+                for ( Component c: panel.getComponents() ) {
+                    if ( c instanceof JCheckBox ) {
+                        if ( ( (JCheckBox) c).isSelected() ) {
+                            theList.add(((JCheckBox)c).getText());
+                        }
+                    }
+                }
+                ss= theList.toArray( new String[theList.size()] );
+            }
+        } else if ( pd.type=='F' ) {
+            JPanel panel= new JPanel();
+            panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS ) );
+            String label= pd.label;
+            if ( pd.doc!=null ) label= "<html>"+label+", <i>"+pd.doc+"</i>";
+            panel.add( new JLabel( label ) );
+            JTextField min= new JTextField( "" );
+            JTextField max= new JTextField( "" );
+            JTextField step= new JTextField( "" );
+            boolean isInt;
+            min.setText( String.valueOf( pd.deft ) );
+            if ( pd.deft instanceof Integer ) {
+                max.setText( String.valueOf( ((Integer)pd.deft) + 4 ) );
+                step.setText( "1" ); 
+                isInt= true;
+            } else {
+                max.setText( String.valueOf( ((Number)pd.deft).doubleValue() + 10. ) );
+                step.setText( "0.1" ); 
+                isInt= false;
+            }
+            panel.add( new JLabel( "Minimum: " ) );
+            panel.add( min );
+            panel.add( new JLabel( "Maximum: " ) );
+            panel.add( max );
+            panel.add( new JLabel( "Step Size: " ) );
+            panel.add( step );
+            while ( AutoplotUtil.showConfirmDialog( this, panel, "Select range", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+                List<String> theList= new ArrayList<>();
+                double dmin= Double.parseDouble(min.getText());
+                double dmax= Double.parseDouble(max.getText());
+                double dstep= Double.parseDouble(step.getText());
+                if ( dstep<=0 ) continue;
+                if ( dmax<dmin ) continue;
+                int ni= (int)(Math.round((dmax-dmin)/dstep))+1;
+                int digits= (int)( Math.floor( Math.log10(dstep) ) );
+                double dfac= 1;
+                String spec;
+                if ( digits<0 ) {
+                    spec= "%."+(-digits)+"f";
+                } else {
+                    spec= "%.0f";
+                }
+                for ( int i=0; i<ni; i++ ) {
+                    double x= ( dmin + dstep * i ) * dfac;         
+                    theList.add( isInt ? String.valueOf( (int)Math.round(x) ) : String.format(spec,x) );
+                }
+                ss= theList.toArray( new String[theList.size()] );
+                break;
+            }
+        } else if ( pd.type=='R' ) {
+            String deft= String.valueOf(pd.deft);
+            File f= null;
+            try {
+                URISplit split= URISplit.parse(deft);
+                if ( split.path!=null && split.path.startsWith("file:") ) {
+                    f= new File( split.path.substring(5) );
+                }
+            } catch ( IllegalArgumentException ex ) {
+            }
+            JFileChooser cf= new JFileChooser();
+            if ( f!=null ) cf.setCurrentDirectory(f);
+            cf.setMultiSelectionEnabled(true);
+            if ( cf.showOpenDialog(this)==JFileChooser.APPROVE_OPTION ) {
+                File[] ff= cf.getSelectedFiles();
+                ss= new String[ff.length];
+                for ( int i=0; i<ff.length; i++ ) {
+                    ss[i]= "file:"+ff[i].toString();
+                }
+            }
+        } else if ( pd.type=='L' ) {
+            String deft= String.valueOf(pd.deft);
+            File f= null;
+            try {
+                URISplit split= URISplit.parse(deft);
+                if ( split.path!=null && split.path.startsWith("file:") ) {
+                    f= new File( split.path.substring(5) );
+                }
+            } catch ( IllegalArgumentException ex ) {
+            }
+            String lastItem= ""; //ta.getText().trim();
+            if ( lastItem.length()>0  ) {
+                int i= lastItem.lastIndexOf('\n');
+                lastItem= lastItem.substring(i+1);
+                URISplit split= URISplit.parse(lastItem);
+                if ( split.path!=null && split.path.startsWith("file:") ) {
+                    f= new File( split.path.substring(5) );
+                }
+            }
+            JFileChooser cf= new JFileChooser();
+            if ( f!=null ) cf.setCurrentDirectory(f);
+            cf.setMultiSelectionEnabled(true);
+            if ( cf.showOpenDialog(this)==JFileChooser.APPROVE_OPTION ) {
+                File[] ff= cf.getSelectedFiles();
+                ss= new String[ff.length];
+                for ( int i=0; i<ff.length; i++ ) {
+                    ss[i]= "file:"+ff[i].toString();
+                }
+            }
+        } else {
+            return null;
+            
+        }
+        return ss;
+
+    }
     
+    private void doGenerateMulti( JComboBox cb, JTextArea ta ) {
+        String p= cb.getSelectedItem().toString();
+        String splitChar= ";";
+        String[] pps= p.split(splitChar,-2);
+        String[][] rs1= new String[pps.length][];
+        for ( int i=0; i<pps.length; i++ ) {
+            p= pps[i].trim();
+            try {
+                org.autoplot.jythonsupport.JythonUtil.Param pd= getParamDescription( p );
+                rs1[i]= doGenerateOne(pd);
+                if ( rs1[i]==null ) {
+                    JOptionPane.showMessageDialog( this, "Parameter type isn't supported." );   
+                }
+            }catch (IOException ex) {
+                JOptionPane.showMessageDialog( this, "bad parameter name" );
+            }
+        }
+        StringBuilder sb= new StringBuilder();
+        if ( pps.length==2 ) {
+            for (String item0 : rs1[0]) {
+                for (String item1 : rs1[1]) {
+                    sb.append(item0);
+                    sb.append( splitChar );
+                    sb.append(item1);
+                    sb.append( "\n" );
+                }
+            }
+        } else if ( pps.length==3 ) {
+            for (String item0 : rs1[0]) {
+                for (String item1 : rs1[1]) {
+                    for (String item2 : rs1[2]) {
+                        sb.append(item0);
+                        sb.append( splitChar );
+                        sb.append(item1);
+                        sb.append( splitChar );
+                        sb.append(item2);
+                        sb.append( "\n" );
+                    }
+                }
+            }   
+        }
+        ta.setText( sb.toString() );
+        messageLabel.setText("Load up those parameters and hit Go!");
+        switchToEditableList();
+    }
+    
+        
     private void doGenerate( JComboBox cb, JTextArea ta ) {
         if ( cb.getSelectedItem()==null ) return;
         String p= cb.getSelectedItem().toString();
         p= p.trim();
         if ( p.length()>0 ) {
             try {
+                if ( p.contains(";") ) {
+                    doGenerateMulti( cb, ta );
+                    return;
+                }
                 org.autoplot.jythonsupport.JythonUtil.Param pd= getParamDescription( p );
                 if ( pd==null ) return; // shouldn't happen
-                String[] ss=null; // will be generated values
-                if ( pd.type=='T' ) {
-                    try {
-                        if ( AutoplotUtil.showConfirmDialog( this, timeRangesPanel, "Generate Time Ranges", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
-                            ss= ScriptContext.generateTimeRanges( timeFormatComboBox.getSelectedItem().toString(), timeRangeComboBox.getSelectedItem().toString() );
-                        }
-                    } catch (ParseException ex) {
-                        Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                } else if ( pd.enums!=null ) {
-                    final JPanel panel= new JPanel();
-                    panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS ) );
-                    String label= pd.label;
-                    if ( pd.doc!=null ) label= "<html>"+label+", <i>"+pd.doc+"</i>";
-                    panel.add( new JLabel( label ) );
-                    for ( int i=0; i<pd.enums.size(); i++ ) {
-                        JCheckBox checkBox= new JCheckBox(pd.enums.get(i).toString());
-                        checkBox.setSelected(true);
-                        panel.add( checkBox );
-                    }
-                    AbstractAction a= new AbstractAction("clear all") {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            for ( Component c: panel.getComponents() ) {
-                                if ( c instanceof JCheckBox ) {
-                                    ((JCheckBox)c).setSelected(false);
-                                }
-                            }
-                        }   
-                    };
-                    panel.add( new JButton(a) );
-                    JScrollPane scrollPane= new JScrollPane(panel);
-                    scrollPane.setPreferredSize( new Dimension( 300, 400 ) );
-                    scrollPane.setMaximumSize( new Dimension( 300, 400 ) );
-                    scrollPane.getVerticalScrollBar().setUnitIncrement(panel.getFont().getSize());
-                    
-                    if ( AutoplotUtil.showConfirmDialog( this, scrollPane, "Select from Values", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
-                        List<String> theList= new ArrayList<>();
-                        for ( Component c: panel.getComponents() ) {
-                            if ( c instanceof JCheckBox ) {
-                                if ( ( (JCheckBox) c).isSelected() ) {
-                                    theList.add(((JCheckBox)c).getText());
-                                }
-                            }
-                        }
-                        ss= theList.toArray( new String[theList.size()] );
-                    }
-                } else if ( pd.type=='F' ) {
-                    JPanel panel= new JPanel();
-                    panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS ) );
-                    String label= pd.label;
-                    if ( pd.doc!=null ) label= "<html>"+label+", <i>"+pd.doc+"</i>";
-                    panel.add( new JLabel( label ) );
-                    JTextField min= new JTextField( "" );
-                    JTextField max= new JTextField( "" );
-                    JTextField step= new JTextField( "" );
-                    boolean isInt;
-                    min.setText( String.valueOf( pd.deft ) );
-                    if ( pd.deft instanceof Integer ) {
-                        max.setText( String.valueOf( ((Integer)pd.deft) + 4 ) );
-                        step.setText( "1" ); 
-                        isInt= true;
-                    } else {
-                        max.setText( String.valueOf( ((Number)pd.deft).doubleValue() + 10. ) );
-                        step.setText( "0.1" ); 
-                        isInt= false;
-                    }
-                    panel.add( new JLabel( "Minimum: " ) );
-                    panel.add( min );
-                    panel.add( new JLabel( "Maximum: " ) );
-                    panel.add( max );
-                    panel.add( new JLabel( "Step Size: " ) );
-                    panel.add( step );
-                    while ( AutoplotUtil.showConfirmDialog( this, panel, "Select range", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
-                        List<String> theList= new ArrayList<>();
-                        double dmin= Double.parseDouble(min.getText());
-                        double dmax= Double.parseDouble(max.getText());
-                        double dstep= Double.parseDouble(step.getText());
-                        if ( dstep<=0 ) continue;
-                        if ( dmax<dmin ) continue;
-                        int ni= (int)(Math.round((dmax-dmin)/dstep))+1;
-                        int digits= (int)( Math.floor( Math.log10(dstep) ) );
-                        double dfac= 1;
-                        String spec;
-                        if ( digits<0 ) {
-                            spec= "%."+(-digits)+"f";
-                        } else {
-                            spec= "%.0f";
-                        }
-                        for ( int i=0; i<ni; i++ ) {
-                            double x= ( dmin + dstep * i ) * dfac;         
-                            theList.add( isInt ? String.valueOf( (int)Math.round(x) ) : String.format(spec,x) );
-                        }
-                        ss= theList.toArray( new String[theList.size()] );
-                        break;
-                    }
-                } else if ( pd.type=='R' ) {
-                    String deft= String.valueOf(pd.deft);
-                    File f= null;
-                    try {
-                        URISplit split= URISplit.parse(deft);
-                        if ( split.path!=null && split.path.startsWith("file:") ) {
-                            f= new File( split.path.substring(5) );
-                        }
-                    } catch ( IllegalArgumentException ex ) {
-                    }
-                    String lastItem= ta.getText().trim();
-                    if ( lastItem.length()>0  ) {
-                        int i= lastItem.lastIndexOf('\n');
-                        lastItem= lastItem.substring(i+1);
-                        URISplit split= URISplit.parse(lastItem);
-                        if ( split.path!=null && split.path.startsWith("file:") ) {
-                            f= new File( split.path.substring(5) );
-                        }
-                    }
-                    JFileChooser cf= new JFileChooser();
-                    if ( f!=null ) cf.setCurrentDirectory(f);
-                    cf.setMultiSelectionEnabled(true);
-                    if ( cf.showOpenDialog(this)==JFileChooser.APPROVE_OPTION ) {
-                        File[] ff= cf.getSelectedFiles();
-                        ss= new String[ff.length];
-                        for ( int i=0; i<ff.length; i++ ) {
-                            ss[i]= "file:"+ff[i].toString();
-                        }
-                    }
-                } else if ( pd.type=='L' ) {
-                    String deft= String.valueOf(pd.deft);
-                    File f= null;
-                    try {
-                        URISplit split= URISplit.parse(deft);
-                        if ( split.path!=null && split.path.startsWith("file:") ) {
-                            f= new File( split.path.substring(5) );
-                        }
-                    } catch ( IllegalArgumentException ex ) {
-                    }
-                    String lastItem= ta.getText().trim();
-                    if ( lastItem.length()>0  ) {
-                        int i= lastItem.lastIndexOf('\n');
-                        lastItem= lastItem.substring(i+1);
-                        URISplit split= URISplit.parse(lastItem);
-                        if ( split.path!=null && split.path.startsWith("file:") ) {
-                            f= new File( split.path.substring(5) );
-                        }
-                    }
-                    JFileChooser cf= new JFileChooser();
-                    if ( f!=null ) cf.setCurrentDirectory(f);
-                    cf.setMultiSelectionEnabled(true);
-                    if ( cf.showOpenDialog(this)==JFileChooser.APPROVE_OPTION ) {
-                        File[] ff= cf.getSelectedFiles();
-                        ss= new String[ff.length];
-                        for ( int i=0; i<ff.length; i++ ) {
-                            ss[i]= "file:"+ff[i].toString();
-                        }
-                    }
-                } else {
+                String[] ss= doGenerateOne(pd);
+                if ( ss==null ) {
                     JOptionPane.showMessageDialog( this, "Parameter type isn't supported." );
-                    return;
                 }
                 if ( ss!=null ) {
                     StringBuilder b= new StringBuilder();
