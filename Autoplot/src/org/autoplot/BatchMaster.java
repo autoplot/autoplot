@@ -1159,8 +1159,8 @@ public class BatchMaster extends javax.swing.JPanel {
     
     private void doGenerateMulti( JComboBox cb, JTextArea ta ) {
         String p= cb.getSelectedItem().toString();
-        String splitChar= ";";
-        String[] pps= p.split(splitChar,-2);
+        String[] pps= maybeSplitMultiParam( p );
+        String splitChar= p.substring(pps[0].length());
         String[][] rs1= new String[pps.length][];
         for ( int i=0; i<pps.length; i++ ) {
             p= pps[i].trim();
@@ -1168,7 +1168,8 @@ public class BatchMaster extends javax.swing.JPanel {
                 org.autoplot.jythonsupport.JythonUtil.Param pd= getParamDescription( p );
                 rs1[i]= doGenerateOne(pd);
                 if ( rs1[i]==null ) {
-                    JOptionPane.showMessageDialog( this, "Parameter type isn't supported." );   
+                    JOptionPane.showMessageDialog( this, "Parameter type isn't supported for argument "+(i+1)+"." );
+                    return;
                 }
             }catch (IOException ex) {
                 JOptionPane.showMessageDialog( this, "bad parameter name" );
@@ -1210,7 +1211,8 @@ public class BatchMaster extends javax.swing.JPanel {
         p= p.trim();
         if ( p.length()>0 ) {
             try {
-                if ( p.contains(";") ) {
+                String[] pps= maybeSplitMultiParam( p );
+                if ( pps!=null ) {
                     doGenerateMulti( cb, ta );
                     return;
                 }
@@ -1494,9 +1496,9 @@ public class BatchMaster extends javax.swing.JPanel {
      * if the parameter name contains a split character then return the names.
      * This is just so we can experiment with the feature.
      * @param param
-     * @return 
+     * @return null or the names
      */
-    private static String[] maybeSplit( String param ) {
+    private static String[] maybeSplitMultiParam( String param ) {
         if ( param.contains("|") ) {
             return param.split( "\\|", -2 );
         } else if ( param.contains(",") ) {
@@ -1678,7 +1680,7 @@ public class BatchMaster extends javax.swing.JPanel {
                     interp.set( "dom", this.dom );
                     interp.set( "PWD", split.path );
                     String paramName= param1NameCB.getSelectedItem().toString();
-                    String[] paramNames= maybeSplit( paramName );
+                    String[] paramNames= maybeSplitMultiParam( paramName );
                     
                     if ( paramNames!=null ) {
                         char splitc= paramName.charAt(paramNames[0].length());
@@ -1758,7 +1760,7 @@ public class BatchMaster extends javax.swing.JPanel {
                             try {
                                 paramName= param2NameCB.getSelectedItem().toString();
                                 
-                                paramNames= maybeSplit( paramName );
+                                paramNames= maybeSplitMultiParam( paramName );
                     
                                 if ( paramNames!=null ) {
                                     char splitc= paramName.charAt(paramNames[0].length());
