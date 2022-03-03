@@ -2070,7 +2070,13 @@ public class BatchMaster extends javax.swing.JPanel {
         JPanel p= new JPanel();
         List<JCheckBox> paramsCB= new ArrayList<>();
         p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
-        for ( int i=1; i<param1NameCB.getModel().getSize()-1; i++ ) {
+        int istart;
+        if ( param1NameCB.getModel().getElementAt(0).toString().trim().length()==0 ) {
+            istart=1;
+        } else {
+            istart=0;
+        }
+        for ( int i= istart; i<param1NameCB.getModel().getSize()-1; i++ ) {
             String param=param1NameCB.getModel().getElementAt(i);
             JCheckBox cb= new JCheckBox( param );
             p.add( cb );
