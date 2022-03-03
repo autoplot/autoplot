@@ -311,10 +311,12 @@
                       </Group>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace min="0" pref="434" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="292" max="32767" attributes="0"/>
                       <Component id="writeCheckBox" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="writeFilenameCB" min="-2" pref="238" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="pngWalkToolButton" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="messageLabel" min="-2" pref="389" max="-2" attributes="0"/>
@@ -340,13 +342,16 @@
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="param1ScrollPane" pref="280" max="32767" attributes="0"/>
+                  <Component id="param1ScrollPane" pref="279" max="32767" attributes="0"/>
                   <Component id="param2ScrollPane" max="32767" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="writeCheckBox" alignment="1" min="-2" max="-2" attributes="0"/>
-                  <Component id="writeFilenameCB" alignment="1" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" alignment="1" groupAlignment="3" attributes="0">
+                      <Component id="writeFilenameCB" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="pngWalkToolButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
               </Group>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
@@ -539,6 +544,15 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editParamsButtonActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="pngWalkToolButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="PNG Walk Tool"/>
+        <Property name="toolTipText" type="java.lang.String" value="Open template in the PNG Walk Tool"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pngWalkToolButtonActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

@@ -77,6 +77,7 @@ import org.autoplot.datasource.URISplit;
 import org.autoplot.jythonsupport.Param;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
 import org.autoplot.jythonsupport.ui.Util;
+import org.autoplot.pngwalk.PngWalkTool;
 import org.das2.datum.Units;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.QDataSet;
@@ -309,6 +310,7 @@ public class BatchMaster extends javax.swing.JPanel {
         writeFilenameCB = new javax.swing.JComboBox<>();
         progressPanel = new javax.swing.JPanel();
         editParamsButton = new javax.swing.JButton();
+        pngWalkToolButton = new javax.swing.JButton();
 
         jList2.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -576,6 +578,14 @@ public class BatchMaster extends javax.swing.JPanel {
             }
         });
 
+        pngWalkToolButton.setText("PNG Walk Tool");
+        pngWalkToolButton.setToolTipText("Open template in the PNG Walk Tool");
+        pngWalkToolButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pngWalkToolButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -609,10 +619,12 @@ public class BatchMaster extends javax.swing.JPanel {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(generateButton2))))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 434, Short.MAX_VALUE)
+                        .addGap(0, 292, Short.MAX_VALUE)
                         .addComponent(writeCheckBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(writeFilenameCB, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(writeFilenameCB, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pngWalkToolButton))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(messageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 389, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE)))
@@ -635,12 +647,14 @@ public class BatchMaster extends javax.swing.JPanel {
                     .addComponent(generateButton2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(param1ScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE)
+                    .addComponent(param1ScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
                     .addComponent(param2ScrollPane))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(writeCheckBox, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(writeFilenameCB, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(writeFilenameCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(pngWalkToolButton)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(22, 22, 22)
@@ -917,6 +931,10 @@ public class BatchMaster extends javax.swing.JPanel {
         switchToEditableList();
         editParamsButton.setEnabled(false);
     }//GEN-LAST:event_editParamsButtonActionPerformed
+
+    private void pngWalkToolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pngWalkToolButtonActionPerformed
+        PngWalkTool.start( writeFilenameCB.getSelectedItem().toString(), SwingUtilities.getWindowAncestor(this) );
+    }//GEN-LAST:event_pngWalkToolButtonActionPerformed
 
     private void doLoadFromFile( JTextArea paramValues ) {
         JFileChooser chooser= new JFileChooser();
@@ -1960,6 +1978,7 @@ public class BatchMaster extends javax.swing.JPanel {
     private javax.swing.JTextArea param2Values;
     private javax.swing.JMenuItem pasteMenuItem;
     private javax.swing.JMenuItem pasteMenuItem2;
+    private javax.swing.JButton pngWalkToolButton;
     private javax.swing.JPanel progressPanel;
     private javax.swing.JMenuItem showHelpMenuItem;
     private javax.swing.JComboBox<String> timeFormatComboBox;
