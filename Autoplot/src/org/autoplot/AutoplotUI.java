@@ -3424,8 +3424,8 @@ APSplash.checkTime("init 52.9");
         toolsMenu.add(cacheMenu);
         toolsMenu.add(jSeparator3);
 
-        pngWalkMenuItem.setText("PNG Walk Viewer");
-        pngWalkMenuItem.setToolTipText("Bring up the PNG Walk tool to browse a set of images.");
+        pngWalkMenuItem.setText("PNG Walk Tool");
+        pngWalkMenuItem.setToolTipText("Bring up the PNG Walk Tool to browse a set of images.");
         pngWalkMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 pngWalkMenuItemActionPerformed(evt);
