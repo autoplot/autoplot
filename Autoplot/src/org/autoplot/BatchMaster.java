@@ -4,6 +4,7 @@ package org.autoplot;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
@@ -213,13 +214,14 @@ public class BatchMaster extends javax.swing.JPanel {
 
             Map<String,org.autoplot.jythonsupport.JythonUtil.Param> parms= Util.getParams( env, script, URISplit.parseParams(split.params), new NullProgressMonitor() );
 
-            String[] items= new String[parms.size()+1];
+            String[] items= new String[parms.size()+2];
             int i=0;
             items[0]="";
             for ( Entry<String,org.autoplot.jythonsupport.JythonUtil.Param> p: parms.entrySet() ) {
                 items[i+1]= p.getKey();
                 i=i+1;
             }
+            items[parms.size()+1]= "Select Multiple...";
             ComboBoxModel m1= new DefaultComboBoxModel(Arrays.copyOfRange(items,1,items.length));
             param1NameCB.setModel(m1);
             generateButton1.setEnabled( items.length>1 );
@@ -765,6 +767,10 @@ public class BatchMaster extends javax.swing.JPanel {
 
     private void param1NameCBItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_param1NameCBItemStateChanged
         if ( evt.getStateChange()==ItemEvent.SELECTED ) {
+            if ( param1NameCB.getSelectedIndex()==param1NameCB.getItemCount()-1 ) {
+                doSelectMultiple(param1NameCB,param1NameCB.getSelectedItem());
+                return;
+            }
             boolean present= param1NameCB.getSelectedItem().toString().trim().length()>0;
             generateButton1.setEnabled( present );
             generateMenuItem1.setEnabled( present );
@@ -776,6 +782,10 @@ public class BatchMaster extends javax.swing.JPanel {
 
     private void param2NameCBItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_param2NameCBItemStateChanged
         if ( evt.getStateChange()==ItemEvent.SELECTED ) {
+            if ( param2NameCB.getSelectedIndex()==param2NameCB.getItemCount()-1 ) {
+                doSelectMultiple(param2NameCB,param2NameCB.getSelectedItem());
+                return;
+            }
             boolean present= param2NameCB.getSelectedItem().toString().trim().length()>0;
             generateButton2.setEnabled( present );
             generateMenuItem2.setEnabled( present );
@@ -1996,6 +2006,33 @@ public class BatchMaster extends javax.swing.JPanel {
                 ss[i]= ss[i].trim();
             }
             return String.join( String.valueOf(ch), ss );
+        }
+    }
+
+    private void doSelectMultiple(JComboBox<String> param1NameCB, Object selectedItem) {
+        JPanel p= new JPanel();
+        List<JCheckBox> paramsCB= new ArrayList<>();
+        p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
+        for ( int i=1; i<param1NameCB.getModel().getSize()-1; i++ ) {
+            String param=param1NameCB.getModel().getElementAt(i);
+            JCheckBox cb= new JCheckBox( param );
+            p.add( cb );
+            paramsCB.add( cb );
+        }
+        if ( JOptionPane.OK_OPTION==
+            JOptionPane.showConfirmDialog(param1NameCB,p,"Multiple Parameters",JOptionPane.OK_CANCEL_OPTION ) ) {
+            StringBuilder b= new StringBuilder();
+            for ( int i=0; i<paramsCB.size(); i++ ) {
+                if ( paramsCB.get(i).isSelected() ) {
+                    if ( b.length()>0 ) b.append(";");
+                    b.append( paramsCB.get(i).getText() );
+                }
+            }
+            Runnable run= () -> {
+                param1NameCB.setSelectedItem(b.toString());
+            };
+            SwingUtilities.invokeLater(run);
+            
         }
     }
 }
