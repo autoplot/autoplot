@@ -14,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -30,6 +31,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -1386,7 +1388,7 @@ public class BatchMaster extends javax.swing.JPanel {
      * @return the name of the file used.
      * @throws IOException 
      */
-    private String doWrite( String f1, String f2 ) throws IOException {
+    private String doWrite( String f1, String f2, String uri ) throws IOException {
         f1= f1.replaceAll("/", "_");
         f2= f2.replaceAll("/", "_");
         f1= f1.replaceAll(" ", "_");
@@ -1409,7 +1411,10 @@ public class BatchMaster extends javax.swing.JPanel {
             }
             String s= f.toString();
             if ( s.endsWith(".png") ) {
-                ScriptContext.writeToPng(s);
+                BufferedImage bufferedImage = ScriptContext.writeToBufferedImage();
+                Map<String,String> metadata= new LinkedHashMap<>();
+                metadata.put( "ScriptURI",uri );
+                ScriptContext.writeToPng(bufferedImage,s,metadata);
             } else if ( s.endsWith(".pdf") ) {
                 ScriptContext.writeToPdf(s);
             } 
@@ -1695,6 +1700,8 @@ public class BatchMaster extends javax.swing.JPanel {
             
             for ( String f1 : ff1 ) {
                 JSONObject runResults= new JSONObject();
+                Map<String,Object> scriptParams= new LinkedHashMap<>();
+                scriptParams.putAll( params );
                 try {
                     if ( monitor.isCancelled() ) {
                         break;
@@ -1735,6 +1742,7 @@ public class BatchMaster extends javax.swing.JPanel {
                             }
                             setParam( interp, parms.get(p), p, v );
                             runResults.put( p, v );
+                            scriptParams.put( p, v );
                         }
                     } else {
                         if ( !parms.containsKey(paramName) ) {
@@ -1744,6 +1752,7 @@ public class BatchMaster extends javax.swing.JPanel {
                         }
                         setParam( interp, parms.get(paramName), paramName, f1.trim() );
                         runResults.put(paramName,f1.trim());
+                        scriptParams.put(paramName,f1.trim());
                     }
                     
                     if ( param2NameCB.getSelectedItem().toString().trim().length()==0 ) {
@@ -1754,7 +1763,8 @@ public class BatchMaster extends javax.swing.JPanel {
                             interp.setOut(outbaos);
                             interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile),scriptFile.getName()), scriptFile.getName() );
                             if ( writeCheckBox.isSelected() ) {
-                                runResults.put( "writeFile", doWrite( f1.trim(), "" ) );
+                                String uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
+                                runResults.put( "writeFile", doWrite( f1.trim(), "", uri ) );
                             }
                             jobs1.get(i1).setIcon(okay);
                         } catch ( IOException | JSONException | RuntimeException ex ) {
@@ -1815,6 +1825,7 @@ public class BatchMaster extends javax.swing.JPanel {
                                         }
                                         setParam( interp, parms.get(p), p, v );
                                         runResults.put( p, v );
+                                        scriptParams.put( p, v );
                                     }
                                 } else {                                
                                     if ( !parms.containsKey(paramName) ) {
@@ -1823,13 +1834,15 @@ public class BatchMaster extends javax.swing.JPanel {
                                         }
                                         setParam( interp, parms.get(paramName), paramName, f2.trim() );
                                         runResults.put(paramName,f2.trim());
+                                        scriptParams.put( paramName,f2.trim() );
                                     }
                                 }
                                 jobs2.get(i2).setIcon( working );
                                 interp.setOut(outbaos);
                                 interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile), scriptFile.getName()), scriptFile.getName() );
                                 if ( writeCheckBox.isSelected() ) {
-                                    runResults.put( "writeFile", doWrite( f1.trim(),f2.trim() ) );
+                                    String uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
+                                    runResults.put( "writeFile", doWrite( f1.trim(),f2.trim(), uri ) );
                                 }
                                 jobs2.get(i2).setIcon(okay);
                                 runResults.put("result","");
