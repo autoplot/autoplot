@@ -512,47 +512,6 @@ public class JythonUtil {
         }
     }
 
-    /**
-     * TODO: this ought to remove the need for ParametersFormPanel.
-     */
-    public static class Param {
-
-        public String name;
-        public String label; // the label for the variable used in the script
-        public Object deft;
-        public Object value; // the value if available, null means not present.
-        public String doc;
-        public List<Object> enums;  // the allowed values
-        public List<Object> examples;    // example values
-
-        /**
-         * constraints for the value, such as:<ul>
-         * <li>'labels':['RBSP-A','RBSP-B'] labels for each enum.
-         * </ul>
-         */
-        public Map<Object, Object> constraints;
-
-        /**
-         * The parameter type:<ul>
-         * <li>T (TimeRange),
-         * <li>A (String, but note a string with the values enumerated either T
-         * or F is treated as a boolean.)
-         * <li>F (Double or Integer, but note the values [0,1] imply it's a
-         * boolean.),
-         * <li>D (Datum),
-         * <li>S (DatumRange),
-         * <li>U (Dataset URI),
-         * <li>L (URL), a file location, not a URI with parameters.
-         * <li>or R (the resource URI)
-         * </ul>
-         */
-        public char type;
-
-        @Override
-        public String toString() {
-            return name + "=" + deft;
-        }
-    }
 
     /**
      * scrape through the script looking for documentation declarations returns
@@ -1621,6 +1580,7 @@ public class JythonUtil {
             p.name = oo.__getitem__(0).toString(); // name in the URI
             p.deft = oo.__getitem__(1);
             p.doc = oo.__getitem__(2).toString();
+            p.constraints= new HashMap<>(); // always have constraints so we don't need null check.
             PyObject oconstraints= oo.__getitem__(3); 
             if (oconstraints instanceof PyList) {
                 PyList pyList = ((PyList) oconstraints);
@@ -1646,7 +1606,7 @@ public class JythonUtil {
                 } else {
                     examplesObject = null;
                 }
-                Map<Object, Object> constraints = new HashMap<>();
+                Map<String, Object> constraints = new HashMap<>();
                 if ( enumsObject != null ) {
                     if (  enumsObject instanceof PyList ) {
                         PyList enumsList = (PyList) enumsObject;
@@ -1680,9 +1640,9 @@ public class JythonUtil {
                         PyObject labelsObject = pyDict.get(new PyString("labels"));
                         if (labelsObject != null && labelsObject instanceof PyList) {
                             PyList labelsList = (PyList) labelsObject;
-                            List<Object> labels = new ArrayList(labelsList.size());
+                            List<String> labels = new ArrayList(labelsList.size());
                             for (int j = 0; j < labelsList.size(); j++) {
-                                labels.add(j, labelsList.get(j));
+                                labels.add(j, labelsList.get(j).toString());
                             }
                             constraints.put("labels", labels);
                         }
@@ -1993,6 +1953,7 @@ public class JythonUtil {
             p.name = oo.__getitem__(0).toString(); // name in the URI
             p.deft = oo.__getitem__(1);
             p.doc = oo.__getitem__(2).toString();
+            p.constraints= new HashMap<>();
             if (oo.__getitem__(3) instanceof PyList) {
                 PyList pyList = ((PyList) oo.__getitem__(3));
                 List<Object> enums = new ArrayList(pyList.size());
@@ -2010,7 +1971,7 @@ public class JythonUtil {
                 } else {
                     enumsObject = null;
                 }
-                Map<Object, Object> constraints = new HashMap<>();
+                Map<String, Object> constraints = new HashMap<>();
                 if (enumsObject != null && enumsObject instanceof PyList) {
                     PyList enumsList = (PyList) enumsObject;
                     List<Object> enums = new ArrayList(enumsList.size());
@@ -2028,7 +1989,7 @@ public class JythonUtil {
                         constraints.put("labels", labels);
                     }
                 }
-                p.constraints = constraints;
+                p.constraints.putAll( constraints );
             }
             p.value = params == null ? null : params.get(p.name);
 
