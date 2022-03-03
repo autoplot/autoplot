@@ -463,19 +463,16 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 }
             }
             
-            if ( i0==-1 ) {
-                        
-                try {
-                    File file = DataSetURI.getFile( filename, new AlertNullProgressMonitor("get image file") ); // assume it's local.
-                    String scriptURI= ImageUtil.getScriptURI(file);
-                    if ( scriptURI!=null ) {
-                        return true;
-                    }
-                } catch (FileSystemOfflineException ex) {
-                    Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
-                    Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
+            try {
+                File file = DataSetURI.getFile( filename, new AlertNullProgressMonitor("get image file") ); // assume it's local.
+                String scriptURI= ImageUtil.getScriptURI(file);
+                if ( scriptURI!=null ) {
+                    return true;
                 }
+            } catch (FileSystemOfflineException ex) {
+                Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
             }
             
             if ( productFile==null ) {
@@ -1308,7 +1305,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 logger.fine("seq was null");
                 return;
             }
-            String item= seq.currentImage().getUri().toString();
+            String item= DataSetURI.fromUri(seq.currentImage().getUri());
 
             for ( int i=0; i<actionEnablers.size(); i++ ) {
                 if ( actionEnablers.get(i)!=null ) {
