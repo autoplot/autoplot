@@ -37,6 +37,7 @@ import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import static org.autoplot.datasource.jython.JythonDataSource.PARAM_SCRIPT;
 import org.autoplot.jythonsupport.JythonRefactory;
 import org.autoplot.jythonsupport.JythonUtil;
+import org.autoplot.jythonsupport.Param;
 import org.autoplot.jythonsupport.PyQDataSet;
 
 /**
@@ -110,7 +111,7 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
 
     }
 
-    protected static Map<String,JythonUtil.Param> getParams( String suri, Map<String,String> current, ProgressMonitor mon ) throws IOException, PyException {
+    protected static Map<String,Param> getParams( String suri, Map<String,String> current, ProgressMonitor mon ) throws IOException, PyException {
         String furi= getScript( suri );
 
         File src = DataSetURI.getFile(furi, mon );
@@ -122,11 +123,11 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
             Map<String,Object> env= new HashMap<>();
             env.put( "PWD", split.path );
             
-            List<JythonUtil.Param> r2= JythonUtil.getGetParams( env, script, current );
+            List<Param> r2= JythonUtil.getGetParams( env, script, current );
 
-            Map<String,JythonUtil.Param> result= new LinkedHashMap();
+            Map<String,Param> result= new LinkedHashMap();
 
-            for ( JythonUtil.Param r : r2 ) {
+            for ( Param r : r2 ) {
                 result.put( r.name, r );
             }
 
@@ -134,11 +135,11 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
         }
     }
 
-    protected static Map<String,JythonUtil.Param> getParams( URI uri, Map<String,String> current, ProgressMonitor mon ) throws IOException, PyException {
+    protected static Map<String,Param> getParams( URI uri, Map<String,String> current, ProgressMonitor mon ) throws IOException, PyException {
         return getParams( uri.toString(), current, mon );
     }
 
-    protected static Map<String,JythonUtil.Param> getParams( URI uri, ProgressMonitor mon ) throws IOException, PyException {
+    protected static Map<String,Param> getParams( URI uri, ProgressMonitor mon ) throws IOException, PyException {
         return getParams( uri.toString(), new HashMap<String,String>(), mon );
     }
 
@@ -154,10 +155,10 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
                 for (String n : po.keySet()) {
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, n, this, "arg_0", null, null));
                 }
-                Map<String,JythonUtil.Param> po2= getParams( cc.resourceURI, new NullProgressMonitor() );
-                for ( Entry<String,JythonUtil.Param> e: po2.entrySet() ) {
+                Map<String,Param> po2= getParams( cc.resourceURI, new NullProgressMonitor() );
+                for ( Entry<String,Param> e: po2.entrySet() ) {
                     String n= e.getKey();
-                    JythonUtil.Param parm= e.getValue();
+                    Param parm= e.getValue();
                     if ( parm.doc==null ) parm.doc="";
                     if ( !parm.name.equals(parm.label) ) {
                         parm.doc+= " (named "+parm.label+" in the script)";
@@ -173,8 +174,8 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
             if ( paramName.equals("script") ) {
                 //TODO: filesystem completions.
             } else {
-                Map<String,JythonUtil.Param> po2= getParams( cc.resourceURI, new NullProgressMonitor() );
-                JythonUtil.Param pp= po2.get(paramName);
+                Map<String,Param> po2= getParams( cc.resourceURI, new NullProgressMonitor() );
+                Param pp= po2.get(paramName);
                 if ( pp!=null ) {
                     if ( pp.deft instanceof Number ) {
                         result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, String.valueOf(pp.deft), paramName + " default is '"+ pp.deft + "'", pp.doc ) );
@@ -202,7 +203,7 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
         Map<String,String> uriParams= URISplit.parseParams(split.params);
         
         try {
-            Map<String,JythonUtil.Param> parms= getParams( surl, new HashMap<String,String>(), mon);
+            Map<String,Param> parms= getParams( surl, new HashMap<String,String>(), mon);
             if ( parms.containsKey( JythonDataSource.PARAM_TIMERANGE ) && !uriParams.containsKey(JythonDataSource.PARAM_TIMERANGE) ) {
                 problems.add(TimeSeriesBrowse.PROB_NO_TIMERANGE_PROVIDED);
                 return true;

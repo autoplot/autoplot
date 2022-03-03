@@ -15,6 +15,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.jythonsupport.JythonUtil;
+import org.autoplot.jythonsupport.Param;
 
 /**
  * utility methods, for example getting parameters from a script.
@@ -31,7 +32,7 @@ public class Util {
      * @return
      * @throws IOException 
      */
-    protected static Map<String,JythonUtil.Param> getParams( URI uri, ProgressMonitor mon ) throws IOException {
+    protected static Map<String, Param> getParams( URI uri, ProgressMonitor mon ) throws IOException {
 
         URISplit split= URISplit.parse(uri);
         Map<String,String> params= URISplit.parseParams(split.params);
@@ -44,11 +45,11 @@ public class Util {
 
         File src = DataSetURI.getFile(furi, mon );
 
-        List<JythonUtil.Param> r2= JythonUtil.getGetParams( new FileReader(src) );
+        List<Param> r2= JythonUtil.getGetParams( new FileReader(src) );
 
-        Map<String,JythonUtil.Param> result= new LinkedHashMap();
+        Map<String, Param> result= new LinkedHashMap();
 
-        for ( JythonUtil.Param r : r2 ) {
+        for ( Param r : r2 ) {
             result.put( r.name, r );
         }
 
@@ -63,11 +64,11 @@ public class Util {
      * @return
      * @throws IOException 
      */
-    protected static Map<String,JythonUtil.Param> getParams( String src, ProgressMonitor mon ) throws IOException {
+    protected static Map<String, Param> getParams( String src, ProgressMonitor mon ) throws IOException {
         return getParams( null, src, new HashMap(), mon );
     }
     
-    protected static Map<String,JythonUtil.Param> getParams( String src, Map<String,String> params, ProgressMonitor mon ) throws IOException {
+    protected static Map<String, Param> getParams( String src, Map<String,String> params, ProgressMonitor mon ) throws IOException {
         return getParams( null, src, params, mon );
     }
 
@@ -81,13 +82,13 @@ public class Util {
      * @throws IOException 
      * @see org.autoplot.jythonsupport.ui.ParametersFormPanel#doVariables(java.util.Map, java.lang.String, java.util.Map, javax.swing.JPanel) 
      */
-    public static Map<String,JythonUtil.Param> getParams( Map<String,Object> env, String src, Map<String,String> params, ProgressMonitor mon ) throws IOException {
+    public static Map<String, Param> getParams( Map<String,Object> env, String src, Map<String,String> params, ProgressMonitor mon ) throws IOException {
         logger.finer("enter getParams");
-        List<JythonUtil.Param> r2= JythonUtil.getGetParams( env, src, params );
+        List<Param> r2= JythonUtil.getGetParams( env, src, params );
 
-        Map<String,JythonUtil.Param> result= new LinkedHashMap();
+        Map<String, Param> result= new LinkedHashMap();
 
-        for ( JythonUtil.Param r : r2 ) {
+        for ( Param r : r2 ) {
             result.put( r.name, r );
         }
 

@@ -42,13 +42,13 @@ import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.TimeRangeTool;
 import org.autoplot.datasource.WindowManager;
 import org.autoplot.jythonsupport.JythonUtil;
-import org.autoplot.jythonsupport.JythonUtil.Param;
 import org.das2.util.ColorUtil;
 import java.awt.Color;
 import java.net.URL;
 import javax.swing.JColorChooser;
 import org.autoplot.datasource.RecentComboBox;
 import org.autoplot.jythonsupport.JythonUtil.ScriptDescriptor;
+import org.autoplot.jythonsupport.Param;
 import org.das2.util.FileUtil;
 
 /**
@@ -324,7 +324,7 @@ public class ParametersFormPanel {
                 paramsPanel.add( new JLabel("<html><br><br></html>") );  
             } 
 
-            for ( JythonUtil.Param parm : parms ) {
+            for ( Param parm : parms ) {
                 
                 String vname= parm.name;                
                 String label;
