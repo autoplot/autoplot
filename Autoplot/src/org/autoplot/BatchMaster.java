@@ -522,7 +522,7 @@ public class BatchMaster extends javax.swing.JPanel {
             }
         });
 
-        cancelButton.setText("Cancel");
+        cancelButton.setText("Dismiss");
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancelButtonActionPerformed(evt);
@@ -1081,7 +1081,6 @@ public class BatchMaster extends javax.swing.JPanel {
             boolean isInt;
             min.setText( String.valueOf( pd.deft ) );
             if ( pd.deft instanceof Integer ) {
-                max.setText( String.valueOf( ((Integer)pd.deft) + 4 ) );
                 step.setText( "1" ); 
                 isInt= true;
             } else {
@@ -1089,6 +1088,13 @@ public class BatchMaster extends javax.swing.JPanel {
                 step.setText( "0.1" ); 
                 isInt= false;
             }
+            if ( pd.constraints.containsKey("min") ) {
+                min.setText( String.valueOf( pd.constraints.get("min") ) );
+            }
+            if ( pd.constraints.containsKey("max") ) {
+                max.setText( String.valueOf( pd.constraints.get("max") ) );
+            }
+            
             panel.add( new JLabel( "Minimum: " ) );
             panel.add( min );
             panel.add( new JLabel( "Maximum: " ) );
