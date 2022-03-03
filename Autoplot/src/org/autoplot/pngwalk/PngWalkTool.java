@@ -463,7 +463,20 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 }
             }
             
-            if ( i0==-1 ) return false;
+            if ( i0==-1 ) {
+                        
+                try {
+                    File file = DataSetURI.getFile( filename, new AlertNullProgressMonitor("get image file") ); // assume it's local.
+                    String scriptURI= ImageUtil.getScriptURI(file);
+                    if ( scriptURI!=null ) {
+                        return true;
+                    }
+                } catch (FileSystemOfflineException ex) {
+                    Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
             
             if ( productFile==null ) {
                 productFile = template.substring(0, i0) + ".vap";
@@ -483,7 +496,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);                        
-                final String suri;
+                String suri=null;
                 if ( tool.seq==null ) {
                     suri=null;
                 } else {
@@ -501,6 +514,18 @@ public final class PngWalkTool extends javax.swing.JPanel {
                         if ( json!=null ) { 
                             jsonTimeRange= RichPngUtil.getXRange(json);
                         }
+                    } catch ( IOException ex ) {
+                        logger.log( Level.WARNING, null, ex );
+                    }
+                    
+                    // look in script and offer to run the script.
+                    try {
+                        File file = DataSetURI.getFile( s, new AlertNullProgressMonitor("get image file") ); // assume it's local.
+                        String scriptURI= ImageUtil.getScriptURI( file );
+                        if ( scriptURI!=null ) {
+                            suri= scriptURI;
+                        }
+
                     } catch ( IOException ex ) {
                         logger.log( Level.WARNING, null, ex );
                     }
@@ -564,27 +589,36 @@ public final class PngWalkTool extends javax.swing.JPanel {
                         timeRange= jsonTimeRange.toString().replaceAll("\\s", "+");
                     }
                     
-                    String productFile;
-                    
-                    if ( tool.product!=null && tool.product.length()>0 && tool.baseurl.length()>1 ) {
-                        productFile = tool.baseurl + tool.product + ".vap";  //HERE IT IS
-                    } else {
-                        productFile = template.substring(0, i0) + ".vap";  
-                    }
-                    if ( timeRange!=null ) {
-                        suri = productFile + "?timeRange=" + timeRange;
-                    } else {
-                        JOptionPane.showMessageDialog(ScriptContext.getViewWindow(), "unable to resolve time range from image metadata or filename.");
-                        return;
+                    if ( suri==null ) {
+                        String productFile;
+
+                        if ( tool.product!=null && tool.product.length()>0 && tool.baseurl.length()>1 ) {
+                            productFile = tool.baseurl + tool.product + ".vap";  //HERE IT IS
+                        } else {
+                            productFile = template.substring(0, i0) + ".vap";  
+                        }
+                        if ( timeRange!=null ) {
+                            suri = productFile + "?timeRange=" + timeRange;
+                        } else {
+                            JOptionPane.showMessageDialog(ScriptContext.getViewWindow(), "unable to resolve time range from image metadata or filename.");
+                            return;
+                        }
                     }
                 }
 
+                final String fsuri= suri;
+                
                 Runnable run = () -> {
                     ScriptContext.createGui();
                     Window apWindow= ScriptContext.getViewWindow();
-                    if ( suri!=null ) {
+                    if ( fsuri!=null ) {
                         raiseApWindowSoon(apWindow);
-                        ScriptContext.plot(suri);
+                        if ( fsuri.startsWith("script:") ) {
+                            ScriptContext.getApplication().runScriptTools(fsuri);
+                            return;
+                        } else {
+                            ScriptContext.plot(fsuri);
+                        }
                     }
                     // go through and check for the axis autorange flag, and autorange if necessary.
                     Application dom= ScriptContext.getDocumentModel();
