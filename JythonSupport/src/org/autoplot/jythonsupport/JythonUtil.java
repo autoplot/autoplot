@@ -1979,7 +1979,7 @@ public class JythonUtil {
                         enums.add(j, enumsList.get(j));
                     }
                     p.enums = enums;
-                    PyObject labelsObject = pyDict.pop(new PyString("labels"));
+                    PyObject labelsObject = pyDict.pop( new PyString("labels"), null );
                     if (labelsObject != null && labelsObject instanceof PyList) {
                         PyList labelsList = (PyList) labelsObject;
                         List<Object> labels = new ArrayList(labelsList.size());
@@ -1987,6 +1987,22 @@ public class JythonUtil {
                             labels.add(j, labelsList.get(j));
                         }
                         constraints.put("labels", labels);
+                    }
+                }
+                PyObject pymin= pyDict.get( new PyString("min"), null );
+                if ( pymin!=null ) {
+                    if ( pymin instanceof PyInteger ) {
+                        constraints.put( "min", ((PyInteger)pymin).__tojava__(Integer.class) );
+                    } else {
+                        constraints.put( "min", Double.parseDouble( pymin.__str__().toString() ) );
+                    }
+                }
+                PyObject pymax= pyDict.get( new PyString("max"), null );
+                if ( pymax!=null ) {
+                    if ( pymin instanceof PyInteger ) {
+                        constraints.put( "max", ((PyInteger)pymax).__tojava__(Integer.class) );
+                    } else {
+                        constraints.put( "max", Double.parseDouble( pymax.__str__().toString() ) );
                     }
                 }
                 p.constraints.putAll( constraints );
