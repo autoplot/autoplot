@@ -42,7 +42,7 @@ import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.dom.Application;
 import org.autoplot.jythonsupport.JythonRefactory;
-import org.autoplot.jythonsupport.JythonUtil.Param;
+import org.autoplot.jythonsupport.Param;
 import org.autoplot.scriptconsole.DumpRteExceptionHandler;
 import org.autoplot.scriptconsole.LoggingOutputStream;
 import org.das2.datum.Datum;
@@ -124,7 +124,7 @@ public class ScriptGUIServlet extends HttpServlet {
      * @param out the OutputStream accepting the data, which is not closed.
      * @throws java.io.IOException
      */
-    private static void writeToPng( Application dom, BufferedImage orig, OutputStream out) throws IOException {
+    private static void writeToPng( Application dom, String suri, BufferedImage orig, OutputStream out) throws IOException {
         waitUntilIdle();
 
         DasCanvas c = dom.getController().getApplicationModel().getCanvas();
@@ -147,7 +147,8 @@ public class ScriptGUIServlet extends HttpServlet {
         DasPNGEncoder encoder = new DasPNGEncoder();
         encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, new Date().toString());
         encoder.addText(DasPNGConstants.KEYWORD_SOFTWARE, "Autoplot" );
-        encoder.addText(DasPNGConstants.KEYWORD_PLOT_INFO, c.getImageMetadata() );        
+        encoder.addText(DasPNGConstants.KEYWORD_PLOT_INFO, c.getImageMetadata() ); 
+        encoder.addText("ScriptURI",suri);
 
         encoder.write( image, out);
 
@@ -450,7 +451,15 @@ public class ScriptGUIServlet extends HttpServlet {
 
         File imageKeyFile =  getKeyFile( key, ".png.t" );
         try ( FileOutputStream out= new FileOutputStream( imageKeyFile, true ) ) {
-            writeToPng(dom, baseImage, out );
+            Map<String,Object> params= new LinkedHashMap<>();
+            for ( int i=0; i<aaparams.length; i++ ) {
+                String p= aaparams[i];
+                if ( p.startsWith("script=") ) continue;
+                int ieq= p.indexOf("=");
+                if ( ieq>-1 ) params.put( p.substring(0,ieq), p.substring(ieq+1) );
+            }
+            String suri= URISplit.format( "script", scriptURI, params );
+            writeToPng(dom, suri, baseImage, out );
         }
         if ( !imageKeyFile.renameTo( getKeyFile( key, ".png" ) ) ) {
             throw new IllegalArgumentException("unable to rename file (.png)");
