@@ -17,7 +17,7 @@ import org.autoplot.ScriptContext;
 import org.autoplot.dom.Application;
 import org.python.util.PythonInterpreter;
 import org.autoplot.jythonsupport.JythonUtil;
-import org.autoplot.jythonsupport.JythonUtil.Param;
+import org.autoplot.jythonsupport.Param;
 import org.autoplot.jythonsupport.SimplifyScriptSupport;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;

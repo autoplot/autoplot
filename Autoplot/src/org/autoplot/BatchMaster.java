@@ -72,7 +72,7 @@ import org.python.util.InteractiveInterpreter;
 import org.autoplot.dom.Application;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
-import org.autoplot.jythonsupport.JythonUtil.Param;
+import org.autoplot.jythonsupport.Param;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
 import org.autoplot.jythonsupport.ui.Util;
 import org.das2.datum.Units;
@@ -212,12 +212,12 @@ public class BatchMaster extends javax.swing.JPanel {
             env.put( "dom", dom );
             env.put( "PWD", split.path );
 
-            Map<String,org.autoplot.jythonsupport.JythonUtil.Param> parms= Util.getParams( env, script, URISplit.parseParams(split.params), new NullProgressMonitor() );
+            Map<String,org.autoplot.jythonsupport.Param> parms= Util.getParams( env, script, URISplit.parseParams(split.params), new NullProgressMonitor() );
 
             String[] items= new String[parms.size()+2];
             int i=0;
             items[0]="";
-            for ( Entry<String,org.autoplot.jythonsupport.JythonUtil.Param> p: parms.entrySet() ) {
+            for ( Entry<String,org.autoplot.jythonsupport.Param> p: parms.entrySet() ) {
                 items[i+1]= p.getKey();
                 i=i+1;
             }
@@ -1013,7 +1013,7 @@ public class BatchMaster extends javax.swing.JPanel {
         FileUtil.writeStringToFile(f,src);
     }
     
-    private String[] doGenerateOne( org.autoplot.jythonsupport.JythonUtil.Param pd ) {
+    private String[] doGenerateOne( org.autoplot.jythonsupport.Param pd ) {
         String[] ss=null; // will be generated values
         if ( pd.type=='T' ) {
             try {
@@ -1029,8 +1029,11 @@ public class BatchMaster extends javax.swing.JPanel {
             String label= pd.label;
             if ( pd.doc!=null ) label= "<html>"+label+", <i>"+pd.doc+"</i>";
             panel.add( new JLabel( label ) );
+            List<String> labels= (List<String>)pd.constraints.get( Param.CONSTRAINT_LABELS );
             for ( int i=0; i<pd.enums.size(); i++ ) {
-                JCheckBox checkBox= new JCheckBox(pd.enums.get(i).toString());
+                String ll= pd.enums.get(i).toString();
+                if ( labels!=null ) ll=ll+": "+labels.get(i);
+                JCheckBox checkBox= new JCheckBox(ll);
                 checkBox.setSelected(true);
                 panel.add( checkBox );
             }
@@ -1055,7 +1058,12 @@ public class BatchMaster extends javax.swing.JPanel {
                 for ( Component c: panel.getComponents() ) {
                     if ( c instanceof JCheckBox ) {
                         if ( ( (JCheckBox) c).isSelected() ) {
-                            theList.add(((JCheckBox)c).getText());
+                            String t= ((JCheckBox)c).getText();
+                            int icolon= t.indexOf(": ");
+                            if ( icolon>-1 ) {
+                                t= t.substring(0,icolon);
+                            }
+                            theList.add(t);
                         }
                     }
                 }
@@ -1175,7 +1183,7 @@ public class BatchMaster extends javax.swing.JPanel {
         for ( int i=0; i<pps.length; i++ ) {
             p= pps[i].trim();
             try {
-                org.autoplot.jythonsupport.JythonUtil.Param pd= getParamDescription( p );
+                org.autoplot.jythonsupport.Param pd= getParamDescription( p );
                 rs1[i]= doGenerateOne(pd);
                 if ( rs1[i]==null ) {
                     JOptionPane.showMessageDialog( this, "Parameter type isn't supported for argument "+(i+1)+"." );
@@ -1226,7 +1234,7 @@ public class BatchMaster extends javax.swing.JPanel {
                     doGenerateMulti( cb, ta );
                     return;
                 }
-                org.autoplot.jythonsupport.JythonUtil.Param pd= getParamDescription( p );
+                org.autoplot.jythonsupport.Param pd= getParamDescription( p );
                 if ( pd==null ) return; // shouldn't happen
                 String[] ss= doGenerateOne(pd);
                 if ( ss==null ) {
@@ -1250,7 +1258,7 @@ public class BatchMaster extends javax.swing.JPanel {
      * @return the Param or null.
      * @throws IOException 
      */
-    private org.autoplot.jythonsupport.JythonUtil.Param getParamDescription( String name ) throws IOException {
+    private org.autoplot.jythonsupport.Param getParamDescription( String name ) throws IOException {
         
         String scriptName= dataSetSelector1.getValue();
         URISplit split= URISplit.parse(scriptName);
@@ -1287,7 +1295,7 @@ public class BatchMaster extends javax.swing.JPanel {
      * @param f1
      * @throws IOException 
      */
-    private void setParam( InteractiveInterpreter interp, org.autoplot.jythonsupport.JythonUtil.Param paramDescription, 
+    private void setParam( InteractiveInterpreter interp, org.autoplot.jythonsupport.Param paramDescription, 
             String paramName, String f1 ) throws IOException {
         if ( paramDescription==null ) {
             throw new IllegalArgumentException("expected to see parameter description!");
@@ -1618,7 +1626,7 @@ public class BatchMaster extends javax.swing.JPanel {
             File scriptFile= DataSetURI.getFile( split.file, monitor.getSubtaskMonitor("download script") );
             String script= readScript( scriptFile );
             
-            Map<String,org.autoplot.jythonsupport.JythonUtil.Param> parms= Util.getParams( env, script, params, new NullProgressMonitor() );
+            Map<String,org.autoplot.jythonsupport.Param> parms= Util.getParams( env, script, params, new NullProgressMonitor() );
 
             InteractiveInterpreter interp = JythonUtil.createInterpreter( true, false );
             interp.exec(JythonRefactory.fixImports("import autoplot2017")); 
