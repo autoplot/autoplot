@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import org.das2.graph.Renderer;
 import org.jdesktop.beansbinding.AutoBinding;
 import org.jdesktop.beansbinding.BeanProperty;
@@ -396,11 +397,15 @@ public final class OrbitStylePanel extends javax.swing.JPanel implements PlotSty
     }//GEN-LAST:event_tickStyleComboBoxItemStateChanged
 
     private void tickValuesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tickValuesButtonActionPerformed
-        TickValuesStringSchemeEditor edit= new TickValuesStringSchemeEditor();
+        final TickValuesStringSchemeEditor edit= new TickValuesStringSchemeEditor();
         edit.setValue( tickValuesTF.getText() );
         if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( this, edit, 
                 TickValuesStringSchemeEditor.EDITOR_TITLE, JOptionPane.PLAIN_MESSAGE ) ) {
-            tickValuesTF.setText( edit.getValue() );
+            SwingUtilities.invokeLater(() -> {
+                tickValuesTF.setText( edit.getValue() );
+                update();
+            });
+            
         }
     }//GEN-LAST:event_tickValuesButtonActionPerformed
 
