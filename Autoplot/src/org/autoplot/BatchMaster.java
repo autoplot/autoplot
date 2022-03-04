@@ -293,6 +293,8 @@ public class BatchMaster extends javax.swing.JPanel {
         helpMenu = new javax.swing.JMenu();
         showHelpMenuItem = new javax.swing.JMenuItem();
         jPanel1 = new javax.swing.JPanel();
+        postRunPopupMenu = new javax.swing.JPopupMenu();
+        copyUri = new javax.swing.JMenuItem();
         goButton = new javax.swing.JButton();
         param1ScrollPane = new javax.swing.JScrollPane();
         param1Values = new javax.swing.JTextArea();
@@ -316,6 +318,11 @@ public class BatchMaster extends javax.swing.JPanel {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
+        });
+        jList2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jList2MouseClicked(evt);
+            }
         });
         jScrollPane2.setViewportView(jList2);
 
@@ -468,6 +475,9 @@ public class BatchMaster extends javax.swing.JPanel {
             .addGap(0, 100, Short.MAX_VALUE)
         );
 
+        copyUri.setText("Copy Script URI");
+        postRunPopupMenu.add(copyUri);
+
         goButton.setText("Go!");
         goButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -526,7 +536,7 @@ public class BatchMaster extends javax.swing.JPanel {
             }
         });
 
-        cancelButton.setText("Dismiss");
+        cancelButton.setText("Close");
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancelButtonActionPerformed(evt);
@@ -935,6 +945,10 @@ public class BatchMaster extends javax.swing.JPanel {
     private void pngWalkToolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pngWalkToolButtonActionPerformed
         PngWalkTool.start( writeFilenameCB.getSelectedItem().toString(), SwingUtilities.getWindowAncestor(this) );
     }//GEN-LAST:event_pngWalkToolButtonActionPerformed
+
+    private void jList2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jList2MouseClicked
+        jPopupMenu2.show( this, evt.getX(), evt.getY() );
+    }//GEN-LAST:event_jList2MouseClicked
 
     private void doLoadFromFile( JTextArea paramValues ) {
         JFileChooser chooser= new JFileChooser();
@@ -1850,10 +1864,10 @@ public class BatchMaster extends javax.swing.JPanel {
                                         if ( paramName.trim().length()==0 ) {
                                             throw new IllegalArgumentException("param1Name not set");
                                         }
-                                        setParam( interp, parms.get(paramName), paramName, f2.trim() );
-                                        runResults.put(paramName,f2.trim());
-                                        scriptParams.put( paramName,f2.trim() );
                                     }
+                                    setParam( interp, parms.get(paramName), paramName, f2.trim() );
+                                    runResults.put(paramName,f2.trim());
+                                    scriptParams.put( paramName,f2.trim() );
                                 }
                                 jobs2.get(i2).setIcon( working );
                                 interp.setOut(outbaos);
@@ -1947,6 +1961,7 @@ public class BatchMaster extends javax.swing.JPanel {
     private javax.swing.JMenuItem OpenMenuItem;
     private javax.swing.JMenuItem SaveAsMenuItem;
     private javax.swing.JButton cancelButton;
+    private javax.swing.JMenuItem copyUri;
     private org.autoplot.datasource.DataSetSelector dataSetSelector1;
     private javax.swing.JButton editParamsButton;
     private javax.swing.JMenuItem exportResultsMenuItem;
@@ -1979,6 +1994,7 @@ public class BatchMaster extends javax.swing.JPanel {
     private javax.swing.JMenuItem pasteMenuItem;
     private javax.swing.JMenuItem pasteMenuItem2;
     private javax.swing.JButton pngWalkToolButton;
+    private javax.swing.JPopupMenu postRunPopupMenu;
     private javax.swing.JPanel progressPanel;
     private javax.swing.JMenuItem showHelpMenuItem;
     private javax.swing.JComboBox<String> timeFormatComboBox;
