@@ -119,6 +119,13 @@ public class RunBatchTool extends javax.swing.JPanel {
      */
     public RunBatchTool( final Application dom ) {
         initComponents();
+
+        Preferences prefs= Preferences.userNodeForPackage(RunBatchTool.class );
+        String s= prefs.get( "lastTemplate", null );
+        if ( s!=null ) {
+            writeFilenameCB.setSelectedItem(s);
+        }
+        
         generateButton1.setEnabled(false);
         generateButton2.setEnabled(false);
         generateMenuItem1.setEnabled(false);
@@ -568,6 +575,12 @@ public class RunBatchTool extends javax.swing.JPanel {
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, writeCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), writeFilenameCB, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
+        writeFilenameCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                writeFilenameCBActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout progressPanelLayout = new javax.swing.GroupLayout(progressPanel);
         progressPanel.setLayout(progressPanelLayout);
         progressPanelLayout.setHorizontalGroup(
@@ -948,6 +961,10 @@ public class RunBatchTool extends javax.swing.JPanel {
     private void jList2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jList2MouseClicked
         jPopupMenu2.show( this, evt.getX(), evt.getY() );
     }//GEN-LAST:event_jList2MouseClicked
+
+    private void writeFilenameCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_writeFilenameCBActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_writeFilenameCBActionPerformed
 
     private void doLoadFromFile( JTextArea paramValues ) {
         JFileChooser chooser= new JFileChooser();
@@ -1429,6 +1446,8 @@ public class RunBatchTool extends javax.swing.JPanel {
         
         if ( writeCheckBox.isSelected() ) {
             String template= writeFilenameCB.getSelectedItem().toString();
+            Preferences prefs= Preferences.userNodeForPackage( RunBatchTool.class );
+            prefs.put( "lastTemplate", template );
             String[] ss= template.split("\\$x",-2);
             StringBuilder f= new StringBuilder(ss[0]);
             if ( ss.length>1 ) {

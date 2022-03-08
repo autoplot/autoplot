@@ -534,6 +534,9 @@
       <BindingProperties>
         <BindingProperty name="enabled" source="writeCheckBox" sourcePath="${selected}" target="writeFilenameCB" targetPath="enabled" updateStrategy="0" immediately="false"/>
       </BindingProperties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="writeFilenameCBActionPerformed"/>
+      </Events>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
       </AuxValues>
