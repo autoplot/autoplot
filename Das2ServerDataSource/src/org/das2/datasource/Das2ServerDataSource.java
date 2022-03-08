@@ -28,6 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -877,6 +878,17 @@ public final class Das2ServerDataSource extends AbstractDataSource {
 					throw new DasServerException("Client has been redirected more than 20 times");
 				
 				// Update the URL and continue
+                                // There's a weird problem where the Location header field which is returned has the + converted
+                                // to a space, and this needs to be converted back.
+                                URISplit split= URISplit.parse(sLoc);
+                                Map<String,String> zparams= URISplit.parseParams(split.params);
+                                for ( Entry<String,String> e: zparams.entrySet() ) {
+                                    String s= e.getValue().replaceAll(" ", "+");
+                                    e.setValue( s );
+                                }
+                                split.params= URISplit.formatParams(zparams);
+                                sLoc= URISplit.format(split);
+                                
 				url = new URL(sLoc);
 				++nRedirects;
 				continue;
