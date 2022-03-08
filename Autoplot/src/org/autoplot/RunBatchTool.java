@@ -92,7 +92,7 @@ import org.json.JSONObject;
  * @see https://sourceforge.net/p/autoplot/feature-requests/545/
  * @author jbf
  */
-public class BatchMaster extends javax.swing.JPanel {
+public class RunBatchTool extends javax.swing.JPanel {
 
     private static final Logger logger= LoggerManager.getLogger("jython.batchmaster");
     
@@ -117,7 +117,7 @@ public class BatchMaster extends javax.swing.JPanel {
      * Creates new form BatchMaster
      * @param dom
      */
-    public BatchMaster( final Application dom ) {
+    public RunBatchTool( final Application dom ) {
         initComponents();
         generateButton1.setEnabled(false);
         generateButton2.setEnabled(false);
@@ -129,7 +129,7 @@ public class BatchMaster extends javax.swing.JPanel {
         /**
          * register the browse trigger to the same action, because we always browse.
          */
-        dataSetSelector1.registerBrowseTrigger( "(.*)\\.jy(\\?.*)?", new AbstractAction( "Review Script" ) {
+        dataSetSelector1.registerBrowseTrigger("(.*)\\.jy(\\?.*)?", new AbstractAction( "Review Script" ) {
             @Override
             public void actionPerformed( ActionEvent ev ) {
                 org.das2.util.LoggerManager.logGuiEvent(ev);                    
@@ -143,8 +143,7 @@ public class BatchMaster extends javax.swing.JPanel {
                     env.put( "dom", dom );
                     env.put( "PWD", split.path );
                     File scriptFile= DataSetURI.getFile(s,new NullProgressMonitor());
-                    if ( JOptionPane.OK_OPTION==JythonUtil.showScriptDialog( 
-                            BatchMaster.this, 
+                    if ( JOptionPane.OK_OPTION==JythonUtil.showScriptDialog(RunBatchTool.this, 
                             env, 
                             scriptFile, 
                             args, 
@@ -199,7 +198,7 @@ public class BatchMaster extends javax.swing.JPanel {
             String scriptName= dataSetSelector1.getValue();
             URISplit split= URISplit.parse(scriptName);
             if ( !split.file.endsWith(".jy") ) {
-                JOptionPane.showMessageDialog( BatchMaster.this, "script must end in .jy: "+scriptName );
+                JOptionPane.showMessageDialog(RunBatchTool.this, "script must end in .jy: "+scriptName );
                 return;
             }
 
@@ -208,7 +207,7 @@ public class BatchMaster extends javax.swing.JPanel {
             //Map<String,String> params= URISplit.parseParams(split.params);  //TODO: support these.
             Map<String,Object> env= new HashMap<>();
 
-            DasProgressPanel monitor= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(BatchMaster.this), "download script");
+            DasProgressPanel monitor= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(RunBatchTool.this), "download script");
             File scriptFile= DataSetURI.getFile( split.file, monitor );
             String script= readScript( scriptFile );
 
@@ -242,7 +241,7 @@ public class BatchMaster extends javax.swing.JPanel {
 
 
         } catch (IOException ex) {
-            Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(RunBatchTool.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             state= STATE_READY;
         }
@@ -778,7 +777,7 @@ public class BatchMaster extends javax.swing.JPanel {
                 }
                 param1Values.setText(ss.toString());
             } catch (Exception ex) {
-                Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(RunBatchTool.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }//GEN-LAST:event_loadUriMenuItemActionPerformed
@@ -822,7 +821,7 @@ public class BatchMaster extends javax.swing.JPanel {
         JFileChooser chooser= new JFileChooser();
         chooser.setFileFilter( new FileNameExtensionFilter( "Batch Parameters", "batch") );
         chooser.setDialogType( JFileChooser.OPEN_DIALOG );
-        Preferences prefs= Preferences.userNodeForPackage( BatchMaster.class );
+        Preferences prefs= Preferences.userNodeForPackage(RunBatchTool.class );
         String s= prefs.get("batch",null);
         if ( s!=null ) {
             chooser.setSelectedFile(new File(s));
@@ -834,7 +833,7 @@ public class BatchMaster extends javax.swing.JPanel {
                 try {
                     loadBatchFile( f );
                 } catch (IOException|JSONException ex) {
-                    JOptionPane.showMessageDialog( BatchMaster.this, "Unable to open file. "+ex.getMessage() );
+                    JOptionPane.showMessageDialog(RunBatchTool.this, "Unable to open file. "+ex.getMessage() );
                 }
             };
             new Thread(run).start();
@@ -845,7 +844,7 @@ public class BatchMaster extends javax.swing.JPanel {
         JFileChooser chooser= new JFileChooser();
         chooser.setFileFilter( new FileNameExtensionFilter( "Batch Parameters", "batch") );
         chooser.setDialogType( JFileChooser.OPEN_DIALOG );
-        Preferences prefs= Preferences.userNodeForPackage( BatchMaster.class );
+        Preferences prefs= Preferences.userNodeForPackage(RunBatchTool.class );
         String s= prefs.get("batch",null);
         if ( s!=null ) {
             chooser.setSelectedFile(new File(s));
@@ -862,7 +861,7 @@ public class BatchMaster extends javax.swing.JPanel {
                 try {
                     saveFile( f );
                 } catch (IOException|JSONException ex) {
-                    JOptionPane.showMessageDialog( BatchMaster.this, "Unable to save file. "+ex.getMessage() );
+                    JOptionPane.showMessageDialog(RunBatchTool.this, "Unable to save file. "+ex.getMessage() );
                 }
             };
             new Thread(run).start();
@@ -873,7 +872,7 @@ public class BatchMaster extends javax.swing.JPanel {
         JFileChooser chooser= new JFileChooser();
         chooser.setFileFilter( new FileNameExtensionFilter( "CSV Files", "csv") );
         chooser.setDialogType( JFileChooser.OPEN_DIALOG );
-        Preferences prefs= Preferences.userNodeForPackage( BatchMaster.class );
+        Preferences prefs= Preferences.userNodeForPackage(RunBatchTool.class );
         String s= prefs.get("export",null);
         if ( s!=null ) {
             chooser.setSelectedFile(new File(s));
@@ -888,18 +887,18 @@ public class BatchMaster extends javax.swing.JPanel {
             
             if ( results==null ) {
                 String msg= "Output will be written to "+f+".pending and moved after the run.";
-                JOptionPane.showMessageDialog( BatchMaster.this, msg );
+                JOptionPane.showMessageDialog(RunBatchTool.this, msg );
                 return;
             }
             prefs.put("export", f.toString() );
             Runnable run= () -> {
                 try {
                     exportResults( f );
-                    JOptionPane.showMessageDialog( BatchMaster.this, "data saved to "+f );
+                    JOptionPane.showMessageDialog(RunBatchTool.this, "data saved to "+f );
                 } catch (IOException ex) {
-                    JOptionPane.showMessageDialog( BatchMaster.this, "Unable to save file. "+ex.getMessage() );
+                    JOptionPane.showMessageDialog(RunBatchTool.this, "Unable to save file. "+ex.getMessage() );
                 } catch (JSONException ex) {
-                    JOptionPane.showMessageDialog( BatchMaster.this, "Unable to save file because of JSON exception "+ex.getMessage() );
+                    JOptionPane.showMessageDialog(RunBatchTool.this, "Unable to save file because of JSON exception "+ex.getMessage() );
                 }
             };
             new Thread(run).start();
@@ -954,7 +953,7 @@ public class BatchMaster extends javax.swing.JPanel {
         JFileChooser chooser= new JFileChooser();
         chooser.setFileFilter( new FileNameExtensionFilter( "Text Files", "txt") );
         chooser.setDialogType( JFileChooser.OPEN_DIALOG );
-        Preferences prefs= Preferences.userNodeForPackage( BatchMaster.class );
+        Preferences prefs= Preferences.userNodeForPackage(RunBatchTool.class );
         String s= prefs.get("textfile",null);
         if ( s!=null ) {
             chooser.setSelectedFile(new File(s));
@@ -1010,7 +1009,7 @@ public class BatchMaster extends javax.swing.JPanel {
         
         params.put( "script", scriptName );
         Runnable run= () -> {
-            BatchMaster.this.dataSetSelector1.setValue(scriptName);
+            RunBatchTool.this.dataSetSelector1.setValue(scriptName);
             doPlayButton();
         };
         try {
@@ -1024,15 +1023,15 @@ public class BatchMaster extends javax.swing.JPanel {
         params.put( "param1Values", jo.getString("param1Values"));
         params.put( "param2Values", jo.getString("param2Values"));                
         run= () -> {
-            BatchMaster.this.param1NameCB.setSelectedItem(params.get("param1"));
-            BatchMaster.this.param2NameCB.setSelectedItem(params.get("param2"));
-            BatchMaster.this.param1Values.setText(params.get("param1Values"));
-            BatchMaster.this.param2Values.setText(params.get("param2Values"));
+            RunBatchTool.this.param1NameCB.setSelectedItem(params.get("param1"));
+            RunBatchTool.this.param2NameCB.setSelectedItem(params.get("param2"));
+            RunBatchTool.this.param1Values.setText(params.get("param1Values"));
+            RunBatchTool.this.param2Values.setText(params.get("param2Values"));
         };
         try {
             SwingUtilities.invokeAndWait(run);
         } catch (InterruptedException | InvocationTargetException ex) {
-            Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(RunBatchTool.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -1060,7 +1059,7 @@ public class BatchMaster extends javax.swing.JPanel {
                     ss= ScriptContext.generateTimeRanges( timeFormatComboBox.getSelectedItem().toString(), timeRangeComboBox.getSelectedItem().toString() );
                 }
             } catch (ParseException ex) {
-                Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(RunBatchTool.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else if ( pd.enums!=null ) {
             final JPanel panel= new JPanel();
@@ -1314,7 +1313,7 @@ public class BatchMaster extends javax.swing.JPanel {
         String scriptName= dataSetSelector1.getValue();
         URISplit split= URISplit.parse(scriptName);
         if ( !split.file.endsWith(".jy") ) {
-            JOptionPane.showMessageDialog( BatchMaster.this, "script must end in .jy: "+scriptName );
+            JOptionPane.showMessageDialog(RunBatchTool.this, "script must end in .jy: "+scriptName );
             return null;
         }
 
@@ -1379,7 +1378,7 @@ public class BatchMaster extends javax.swing.JPanel {
                     interp.set("_apdr", timeRange );
                     interp.exec("autoplot2017.params[\'"+paramName+"\']=_apdr");// JythonRefactory okay
                 } catch (ParseException ex) {
-                    Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(RunBatchTool.class.getName()).log(Level.SEVERE, null, ex);
                 }   break;
             default:
                 interp.exec("autoplot2017.params[\'"+paramName+"\']="+f1);// JythonRefactory okay
@@ -1456,10 +1455,10 @@ public class BatchMaster extends javax.swing.JPanel {
         }
     }
     
-    private static final Icon queued= new ImageIcon(BatchMaster.class.getResource("/resources/grey.gif"));
-    private static final Icon working= new ImageIcon(BatchMaster.class.getResource("/resources/blue_anime.gif"));
-    private static final Icon okay= new ImageIcon(BatchMaster.class.getResource("/resources/blue.gif"));
-    private static final Icon prob= new ImageIcon(BatchMaster.class.getResource("/resources/red.gif"));    
+    private static final Icon queued= new ImageIcon(RunBatchTool.class.getResource("/resources/grey.gif"));
+    private static final Icon working= new ImageIcon(RunBatchTool.class.getResource("/resources/blue_anime.gif"));
+    private static final Icon okay= new ImageIcon(RunBatchTool.class.getResource("/resources/blue.gif"));
+    private static final Icon prob= new ImageIcon(RunBatchTool.class.getResource("/resources/red.gif"));    
 
     private void switchToEditableList() {
         messageLabel.setText("Load up those parameters and hit Go!");
@@ -1602,16 +1601,16 @@ public class BatchMaster extends javax.swing.JPanel {
 
             for ( int i=0; i<jobs1.size(); i++ ) {
                 final int fi= i;
-                jobs1.get(i).addMouseListener( new MouseAdapter() {
+                jobs1.get(i).addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         selectRecord(fi);
-                        String param1= (String)BatchMaster.this.param1NameCB.getSelectedItem();
-                        if ( BatchMaster.this.results!=null ) {
+                        String param1= (String)RunBatchTool.this.param1NameCB.getSelectedItem();
+                        if ( RunBatchTool.this.results!=null ) {
                             String s= jobs1.get(fi).getText();
                             List<JSONObject> thisRow= new ArrayList<>();
                             try {
-                                JSONObject jo= BatchMaster.this.results;
+                                JSONObject jo= RunBatchTool.this.results;
                                 JSONArray ja= jo.getJSONArray("results");
                                 for ( int j=0; j<ja.length(); j++ ) {
                                     JSONObject jo1= ja.getJSONObject(j);
@@ -1639,7 +1638,7 @@ public class BatchMaster extends javax.swing.JPanel {
                                 }
                                 
                             } catch (JSONException ex) {
-                                Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
+                                Logger.getLogger(RunBatchTool.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         }
                     }
@@ -1908,7 +1907,7 @@ public class BatchMaster extends javax.swing.JPanel {
                         }
                     }
                 } catch (IOException | RuntimeException | JSONException ex) {
-                    Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(RunBatchTool.class.getName()).log(Level.SEVERE, null, ex);
                     jobs1.get(i1).setIcon(prob);
                     jobs1.get(i1).setToolTipText(htmlize(ex.toString()));
                 }
@@ -1947,7 +1946,7 @@ public class BatchMaster extends javax.swing.JPanel {
     public static void main( String[] args ) {
         JDialog dia= new JDialog();
         dia.setResizable(true);
-        BatchMaster mmm= new BatchMaster(new Application());
+        RunBatchTool mmm= new RunBatchTool(new Application());
         dia.setContentPane( mmm );
         dia.setJMenuBar( mmm.getMenuBar() );
         mmm.param1NameCB.setSelectedItem("ie");
