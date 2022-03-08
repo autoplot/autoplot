@@ -183,6 +183,7 @@ public final class Das2ServerDataSource extends AbstractDataSource {
         private final ProgressMonitor mon;
         private final DasProgressMonitorInputStream mpin;
         private final DatumRange timeRange;
+        private Units units; // integer units used for increment
         private long lastUpdate= -1; // milliseconds since 1970
         
         private MonitoringDataSetStreamHandler( DasProgressMonitorInputStream mpin, ProgressMonitor mon, DatumRange timeRange ) {
@@ -191,6 +192,7 @@ public final class Das2ServerDataSource extends AbstractDataSource {
             this.mon= mon;
             this.mpin= mpin;
             this.timeRange= timeRange;
+            this.units= Units.seconds;
         }
         
         @Override
@@ -200,7 +202,13 @@ public final class Das2ServerDataSource extends AbstractDataSource {
                 mpin.setEnableProgressPosition(false);
             } else {
                 this.monitorXTags= true;
-                mon.setTaskSize( (long)(timeRange.width().doubleValue(Units.seconds)) );
+                if ( timeRange.width().gt( Units.days.createDatum(480) ) ) {
+                    this.units= Units.days;
+                } else if ( timeRange.width().gt( Units.hours.createDatum(48) ) ) {
+                    this.units= Units.hours;
+                }
+                mon.setTaskSize( (long)(timeRange.width().doubleValue(units)) );
+                mon.setAdditionalInfo( this.units.toString() );
                 mpin.setEnableProgressPosition(false);
             }
         }   
@@ -212,8 +220,7 @@ public final class Das2ServerDataSource extends AbstractDataSource {
                 long t= System.currentTimeMillis();
                 if ( ( t - lastUpdate > 300 ) ) {
                     if ( xTag.getUnits().isConvertibleTo( timeRange.min().getUnits() ) ) {
-                        System.err.println("xtag: "+xTag);
-                        long taskProgress = ( xTag.subtract( timeRange.min() ).intValue( Units.seconds ) );
+                        long taskProgress = ( xTag.subtract( timeRange.min() ).intValue( units ) );
                         mon.setTaskProgress(taskProgress);
                     }
                     lastUpdate= t;
