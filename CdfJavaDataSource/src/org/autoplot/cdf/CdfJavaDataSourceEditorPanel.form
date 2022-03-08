@@ -22,7 +22,7 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jPanel1" alignment="0" max="32767" attributes="2"/>
+          <Component id="jPanel1" alignment="0" pref="703" max="32767" attributes="2"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -49,7 +49,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jSplitPane2" pref="606" max="32767" attributes="0"/>
+                  <Component id="jSplitPane2" pref="675" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -122,19 +122,20 @@
                                   <Group type="102" attributes="0">
                                       <EmptySpace min="12" pref="12" max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="subsetComboBox" alignment="0" min="-2" pref="160" max="-2" attributes="0"/>
-                                          <Group type="102" alignment="0" attributes="0">
+                                          <Group type="102" attributes="0">
                                               <Group type="103" groupAlignment="0" attributes="0">
                                                   <Component id="noInterpMeta" alignment="0" min="-2" max="-2" attributes="0"/>
                                                   <Component id="showAllVarTypeCB" alignment="0" min="-2" max="-2" attributes="0"/>
+                                                  <Component id="sortAlphaCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                                               </Group>
-                                              <EmptySpace max="-2" attributes="0"/>
+                                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                               <Group type="103" groupAlignment="0" attributes="0">
-                                                  <Component id="filterComboBox" min="-2" max="-2" attributes="0"/>
-                                                  <Component id="noDep" min="-2" max="-2" attributes="0"/>
+                                                  <Component id="filterComboBox" alignment="0" min="-2" max="-2" attributes="0"/>
+                                                  <Component id="noDep" alignment="0" min="-2" max="-2" attributes="0"/>
+                                                  <Component id="emptyVariablesCB" alignment="0" min="-2" max="-2" attributes="0"/>
                                               </Group>
                                           </Group>
-                                          <Component id="sortAlphaCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="subsetComboBox" alignment="0" min="-2" pref="160" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
                               </Group>
@@ -169,7 +170,10 @@
                                   <Component id="filterComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
-                              <Component id="sortAlphaCheckBox" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="sortAlphaCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="emptyVariablesCB" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -285,6 +289,16 @@
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="sortAlphaCheckBoxActionPerformed"/>
                       </Events>
                     </Component>
+                    <Component class="javax.swing.JCheckBox" name="emptyVariablesCB">
+                      <Properties>
+                        <Property name="selected" type="boolean" value="true"/>
+                        <Property name="text" type="java.lang.String" value="empty variables"/>
+                        <Property name="toolTipText" type="java.lang.String" value="show variables which have no records"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="emptyVariablesCBActionPerformed"/>
+                      </Events>
+                    </Component>
                   </SubComponents>
                 </Container>
                 <Container class="javax.swing.JTabbedPane" name="jTabbedPane1">
@@ -332,7 +346,7 @@
                       <Layout>
                         <DimensionLayout dim="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="xCheckBox" pref="332" max="32767" attributes="0"/>
+                              <Component id="xCheckBox" pref="401" max="32767" attributes="0"/>
                               <Component id="jScrollPane4" alignment="0" max="32767" attributes="0"/>
                           </Group>
                         </DimensionLayout>
@@ -341,7 +355,7 @@
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="xCheckBox" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="jScrollPane4" pref="187" max="32767" attributes="0"/>
+                                  <Component id="jScrollPane4" pref="169" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -384,7 +398,7 @@
                       <Layout>
                         <DimensionLayout dim="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="yCheckBox" pref="332" max="32767" attributes="0"/>
+                              <Component id="yCheckBox" pref="401" max="32767" attributes="0"/>
                               <Component id="jScrollPane5" alignment="0" max="32767" attributes="0"/>
                           </Group>
                         </DimensionLayout>
@@ -393,7 +407,7 @@
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="yCheckBox" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace min="-2" max="-2" attributes="0"/>
-                                  <Component id="jScrollPane5" pref="187" max="32767" attributes="0"/>
+                                  <Component id="jScrollPane5" pref="169" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>

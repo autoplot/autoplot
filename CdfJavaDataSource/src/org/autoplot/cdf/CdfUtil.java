@@ -49,7 +49,22 @@ import org.das2.util.monitor.NullProgressMonitor;
 public class CdfUtil {
 
     private final static Logger logger= LoggerManager.getLogger("apdss.cdf");
-
+    
+    /**
+     * if "true", show empty records (true is default).
+     */
+    public static String OPTION_INCLUDE_EMPTY_RECORDS= "includeEmptyRecords";
+    
+    /**
+     * if "true", then don't show the number of records.
+     */
+    public static String OPTION_IS_MASTER = "isMaster";
+    
+    /**
+     * if "true" then return more detailed descriptions in HTML
+     */
+    public static String OPTION_DEEP = "deep";
+    
     /**
      * return the Java type used to store the CDF data type.
      * @param type 45, 44, or 51
@@ -1040,7 +1055,7 @@ public class CdfUtil {
      * @throws Exception
      */
     public static Map<String, String> getPlottable(CDFReader cdf, boolean dataOnly, int rankLimit) throws Exception {
-        return getPlottable(cdf, dataOnly, rankLimit, false, false);
+        return getPlottable(cdf, dataOnly, rankLimit, new HashMap<String,String>() );
     }
     
     /**
@@ -1066,6 +1081,14 @@ public class CdfUtil {
         }
     }
     
+    private static String getOption( Map<String,String> options, String key, String deft ) {
+        if ( options.containsKey(key) ) {
+            return options.get(key);
+        } else {
+            return deft;
+        }
+    }
+    
     /**
      * Return a map where keys are the names of the variables, and values are descriptions.  This 
      * allows for a deeper query, getting detailed descriptions within the values, and also supports the
@@ -1074,18 +1097,21 @@ public class CdfUtil {
      * @param cdf
      * @param dataOnly show only the DATA and not SUPPORT_DATA.  Note I reclaimed this parameter because I wasn't using it.
      * @param rankLimit show only variables with no more than this rank.
-     * @param deep return more detailed descriptions in HTML
-     * @param master cdf is a master cdf, so don't indicate record counts.
+     * @param options see constants for parameter names.
      * @return map of parameter name to short description
      * @throws Exception
      */
-    public static Map<String, String> getPlottable(CDFReader cdf, boolean dataOnly, int rankLimit, boolean deep, boolean master) throws Exception {
+    public static Map<String, String> getPlottable(CDFReader cdf, boolean dataOnly, int rankLimit, Map<String,String> options) throws Exception {
 
         Map<String, String> result = new LinkedHashMap<>();
         Map<String, String> dependent= new LinkedHashMap<>();
 
-        boolean isMaster= master; //cdf.getName().contains("MASTERS"); // don't show of Epoch=0, just "Epoch"
+        boolean isMaster= getOption( options, OPTION_IS_MASTER, "false" ).equals("true"); 
 
+        boolean deep= getOption( options, OPTION_DEEP, "false" ).equals("true");
+        
+        boolean showEmpty= getOption( options, OPTION_INCLUDE_EMPTY_RECORDS, "true" ).equals("true");
+        
         logger.fine("getting CDF variables");
         String[] v = cdf.getVariableNames();
         logger.log(Level.FINE, "got {0} variables", v.length);
@@ -1160,6 +1186,12 @@ public class CdfUtil {
                 }
                 maxRec = cdf.getNumberOfValues(svar); 
                 recCount= maxRec;
+                
+                if ( recCount==0 && !showEmpty ) {
+                    logger.log(Level.FINER, "skipping because variable is empty: {0}", svar );
+                    continue;
+                }
+                
                 dims = getDimensions(cdf, svar);
 
                 if (dims == null) {

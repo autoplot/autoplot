@@ -94,6 +94,7 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
         whereTF = new javax.swing.JTextField();
         filterComboBox = new org.autoplot.datasource.RecentComboBox();
         sortAlphaCheckBox = new javax.swing.JCheckBox();
+        emptyVariablesCB = new javax.swing.JCheckBox();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jScrollPane3 = new javax.swing.JScrollPane();
         parameterTree = new javax.swing.JTree();
@@ -180,6 +181,15 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
             }
         });
 
+        emptyVariablesCB.setSelected(true);
+        emptyVariablesCB.setText("empty variables");
+        emptyVariablesCB.setToolTipText("show variables which have no records");
+        emptyVariablesCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                emptyVariablesCBActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -199,16 +209,17 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
                     .add(jPanel3Layout.createSequentialGroup()
                         .add(12, 12, 12)
                         .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(subsetComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 160, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .add(jPanel3Layout.createSequentialGroup()
                                 .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                                     .add(noInterpMeta)
-                                    .add(showAllVarTypeCB))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                    .add(showAllVarTypeCB)
+                                    .add(sortAlphaCheckBox))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                                 .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                                     .add(filterComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                    .add(noDep)))
-                            .add(sortAlphaCheckBox))))
+                                    .add(noDep)
+                                    .add(emptyVariablesCB)))
+                            .add(subsetComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 160, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
                 .add(0, 0, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
@@ -235,7 +246,9 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
                     .add(showAllVarTypeCB)
                     .add(filterComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(sortAlphaCheckBox))
+                .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(sortAlphaCheckBox)
+                    .add(emptyVariablesCB)))
         );
 
         jSplitPane1.setRightComponent(jPanel3);
@@ -274,7 +287,7 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(xCheckBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 332, Short.MAX_VALUE)
+            .add(xCheckBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
             .add(jScrollPane4)
         );
         jPanel2Layout.setVerticalGroup(
@@ -282,7 +295,7 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
             .add(jPanel2Layout.createSequentialGroup()
                 .add(xCheckBox)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE))
+                .add(jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("X", jPanel2);
@@ -301,7 +314,7 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(yCheckBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 332, Short.MAX_VALUE)
+            .add(yCheckBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
             .add(jScrollPane5)
         );
         jPanel4Layout.setVerticalGroup(
@@ -309,7 +322,7 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
             .add(jPanel4Layout.createSequentialGroup()
                 .add(yCheckBox)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE))
+                .add(jScrollPane5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Y", jPanel4);
@@ -335,7 +348,7 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 606, Short.MAX_VALUE)
+                .add(jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 675, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -350,11 +363,11 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 634, Short.MAX_VALUE)
+            .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 703, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 453, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         bindingGroup.bind();
@@ -410,6 +423,10 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
         updateTree();
     }//GEN-LAST:event_sortAlphaCheckBoxActionPerformed
 
+    private void emptyVariablesCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emptyVariablesCBActionPerformed
+        setURI( getURI() );
+    }//GEN-LAST:event_emptyVariablesCBActionPerformed
+
     private void updateTree() {
         String param = getParam();
         fillTree( this.parameterTree, parameterInfo, cdf, param, "" );
@@ -444,6 +461,7 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
         }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox emptyVariablesCB;
     private org.autoplot.datasource.RecentComboBox filterComboBox;
     private javax.swing.JLabel interpretMetadataLabel;
     private javax.swing.JLabel jLabel4;
@@ -633,21 +651,29 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
             
             boolean isMaster= fileName.contains("MASTERS");
             
+            Map<String,String> options= new HashMap<>();
+            options.put( org.autoplot.cdf.CdfUtil.OPTION_INCLUDE_EMPTY_RECORDS,  String.valueOf(this.emptyVariablesCB.isSelected()) );
+            options.put( org.autoplot.cdf.CdfUtil.OPTION_IS_MASTER, String.valueOf(isMaster) );
+            options.put( org.autoplot.cdf.CdfUtil.OPTION_DEEP, String.valueOf(true) );
+            
             try {
-                parameterDescriptions= org.autoplot.cdf.CdfUtil.getPlottable( cdf, !this.showAllVarTypeCB.isSelected(), QDataSet.MAX_RANK, false, false );
+                parameterDescriptions= org.autoplot.cdf.CdfUtil.getPlottable(cdf, !this.showAllVarTypeCB.isSelected(), 
+                    QDataSet.MAX_RANK);
             } catch ( Exception ex ) {
                 this.parameterTree.setModel( new DefaultTreeModel( new DefaultMutableTreeNode("") ) );
                 this.paramInfo.setText( "<html>Unable to work with metadata in CDF file:<br>"+ex );
                 throw ex;
-            }
+            }            
             
-            Map<String,String> allParameterInfo= org.autoplot.cdf.CdfUtil.getPlottable( cdf, false, QDataSet.MAX_RANK, true, isMaster );
-            Map<String,String> dataParameterInfo= org.autoplot.cdf.CdfUtil.getPlottable( cdf, true, QDataSet.MAX_RANK, true, isMaster );
-            Map<String,String> whereParameterInfo= org.autoplot.cdf.CdfUtil.getPlottable( cdf, false, 2, false, isMaster );
+            Map<String,String> allParameterInfo= org.autoplot.cdf.CdfUtil.getPlottable(cdf, false, QDataSet.MAX_RANK, options );
+            Map<String,String> dataParameterInfo= org.autoplot.cdf.CdfUtil.getPlottable(cdf, true, QDataSet.MAX_RANK, options );
+            options.put( org.autoplot.cdf.CdfUtil.OPTION_DEEP, String.valueOf( false ) );
+            Map<String,String> whereParameterInfo= org.autoplot.cdf.CdfUtil.getPlottable(cdf, false, 2, options);
 
             if ( dataParameterInfo.isEmpty() ) {
                 this.showAllVarTypeCB.setSelected(true);
-                parameterDescriptions= org.autoplot.cdf.CdfUtil.getPlottable( cdf, !this.showAllVarTypeCB.isSelected(), QDataSet.MAX_RANK, false, false );
+                parameterDescriptions= org.autoplot.cdf.CdfUtil.getPlottable(cdf, 
+                    !this.showAllVarTypeCB.isSelected(), QDataSet.MAX_RANK, new HashMap<String,String>());
                 this.showAllVarTypeCB.setEnabled(false);
             }
             
@@ -708,7 +734,7 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
             
             fillTree( this.parameterTree, parameterInfo, cdf, param, slice1 );
             
-            Map<String,String> parameterDescriptions2= org.autoplot.cdf.CdfUtil.getPlottable( cdf, false, QDataSet.MAX_RANK, false, false );
+            Map<String,String> parameterDescriptions2= org.autoplot.cdf.CdfUtil.getPlottable(cdf, false, QDataSet.MAX_RANK );
             String xparam= lparams.remove("depend0");
             String xslice1= null;
             if ( xparam==null ) xparam= lparams.remove("X");
