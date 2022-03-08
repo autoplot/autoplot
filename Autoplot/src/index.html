@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Simple string calculations allow scripts to be readable with shorter lines, but still have completions.  Here tab is pressed after "column=" to complete the URI in getDataSet.
+        <p><small>levels control on Contours renderer allows minor contour lines specification (+10/+1) in <a href='https://github.com/autoplot/dev/blob/master/demos/2022/20220304/screen20220304.jy'>this script</a>.  Let me know if you think you might use this rarely-used renderer and I'll see if I can make it look nicer!
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -78,6 +78,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>CDF editor has checkbox to remove zero-record variables from the list of parameters which happens with PSP CDF files.  Thanks, Kristoff!
+            <li>Waypoints Digitizer at <a href="https://github.com/autoplot/dev/blob/master/demos/digitizers/findPeakDigitizerWayPoints.jy">GitHub</a> supports data with rank 2 ytags.  Thanks, Kristoff!
             <li>Waypoints Mouse Module provides a new control for digitizing scripts.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/775/">rfe775</a>: Run Batch now embeds the ScriptURI into each image, and the Png Walk Tool will rerun the script when "View in Autoplot" is pressed.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/772/">rfe772</a>: The right argument of Run Batch can also have multiple parameters, and GUI reveals the feature.  
