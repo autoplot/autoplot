@@ -56,9 +56,12 @@ import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.DasException;
 import org.das2.client.AccessDeniedException;
 import org.das2.client.DasServerException;
+import org.das2.datum.DatumVector;
 import org.das2.qds.ops.Ops;
 import org.das2.qstream.QDataSetStreamHandler;
+import org.das2.stream.PacketDescriptor;
 import org.das2.util.CredentialsManager;
+import org.das2.util.monitor.AbstractProgressMonitor;
 
 /**
  * DataSource for communicating with Das2servers.
@@ -168,6 +171,59 @@ public final class Das2ServerDataSource extends AbstractDataSource {
             return null;
         }
     }
+    
+    /**
+     * detects if the stream is sending progress information, and uses timetags to
+     * show progress when the stream doesn't have progress info.  Many of the readers
+     * do not output progress information.
+     */
+    private static class MonitoringDataSetStreamHandler extends org.das2.client.QDataSetStreamHandler  {
+
+        private boolean monitorXTags;
+        private final ProgressMonitor mon;
+        private final DasProgressMonitorInputStream mpin;
+        private final DatumRange timeRange;
+        private long lastUpdate= -1; // milliseconds since 1970
+        
+        private MonitoringDataSetStreamHandler( DasProgressMonitorInputStream mpin, ProgressMonitor mon, DatumRange timeRange ) {
+            super( );
+            this.monitorXTags= false;
+            this.mon= mon;
+            this.mpin= mpin;
+            this.timeRange= timeRange;
+        }
+        
+        @Override
+        public void streamDescriptor(StreamDescriptor sd) throws StreamException {
+            super.streamDescriptor(sd);
+            if (mon.getTaskSize() != -1 && mon.getTaskSize()!=1000 ) { // progress messages are on the stream.
+                mpin.setEnableProgressPosition(false);
+            } else {
+                this.monitorXTags= true;
+                mon.setTaskSize( (long)(timeRange.width().doubleValue(Units.seconds)) );
+                mpin.setEnableProgressPosition(false);
+            }
+        }   
+
+        @Override
+        public void packet(PacketDescriptor pd, Datum xTag, DatumVector[] vectors) throws StreamException {
+            super.packet(pd, xTag, vectors); 
+            if ( monitorXTags ) {
+                long t= System.currentTimeMillis();
+                if ( ( t - lastUpdate > 300 ) ) {
+                    if ( xTag.getUnits().isConvertibleTo( timeRange.min().getUnits() ) ) {
+                        System.err.println("xtag: "+xTag);
+                        long taskProgress = ( xTag.subtract( timeRange.min() ).intValue( Units.seconds ) );
+                        mon.setTaskProgress(taskProgress);
+                    }
+                    lastUpdate= t;
+                }
+                
+            }
+        }
+        
+    }
+    
     
     @Override
     public synchronized QDataSet getDataSet(final ProgressMonitor mon) throws Exception {
@@ -446,7 +502,7 @@ public final class Das2ServerDataSource extends AbstractDataSource {
                     }
                 }
             };
-
+            
             try {
                 StreamTool.readStream(channel, handler);
             } catch (StreamException ex) {
@@ -493,15 +549,20 @@ public final class Das2ServerDataSource extends AbstractDataSource {
             
         } else {
             
-            org.das2.client.QDataSetStreamHandler handler= new org.das2.client.QDataSetStreamHandler() {
-                @Override
-                public void streamDescriptor(StreamDescriptor sd) throws StreamException {
-                    super.streamDescriptor(sd);
-                    if (mon.getTaskSize() != -1) { // progress messages are on the stream.
-                        mpin.setEnableProgressPosition(false);
+            org.das2.client.QDataSetStreamHandler handler;
+            if ( System.getProperty("timetagMonitoringDas2StreamHandler","false").startsWith("t") ) {
+                handler = new MonitoringDataSetStreamHandler( mpin, mon, timeRange );
+            } else {
+                handler= new org.das2.client.QDataSetStreamHandler() {
+                    @Override
+                    public void streamDescriptor(StreamDescriptor sd) throws StreamException {
+                        super.streamDescriptor(sd);
+                        if (mon.getTaskSize() != -1) { // progress messages are on the stream.
+                            mpin.setEnableProgressPosition(false);
+                        }
                     }
-                }
-            };
+                };
+            }
             handler.setMonitor(mon);
 
             try {
