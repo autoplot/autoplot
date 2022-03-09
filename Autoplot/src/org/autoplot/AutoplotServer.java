@@ -3,11 +3,14 @@ package org.autoplot;
 
 import java.awt.Font;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.Units;
 import org.das2.graph.DasCanvas;
 import static org.autoplot.ScriptContext.*;
+import org.autoplot.datasource.DataSetURI;
 
 import org.das2.util.ArgumentList;
 import org.autoplot.dom.Application;
@@ -119,6 +122,8 @@ public class AutoplotServer {
         
         double scale; // the scale factor should we want to rescale fonts.
         
+        Map<String,String> meta= new HashMap<>(); // store metadata like remote URI or VAP
+        
         if ( !vap.equals("") ) {
             logger.log(Level.FINE, "about to load the vap {0}", vap);
 
@@ -130,8 +135,13 @@ public class AutoplotServer {
 
             Application readOnlyDom= loadVap(vap); // read again to get options.
             load(vap);
+            
+            if ( vap.startsWith("http") ) {
+                meta.put( PNG_KEY_VAP, vap );
+            }
+            
             //dom.syncTo( readOnlyDom );
-            dom.getOptions().syncToAll( readOnlyDom.getOptions(), new ArrayList<String>() );
+            dom.getOptions().syncToAll( readOnlyDom.getOptions(), new ArrayList<>() );
             
             logger.log(Level.FINE, "vap is loaded and printable with data loaded");
             
@@ -181,7 +191,7 @@ public class AutoplotServer {
             dom.getController().getCanvas().getController().getDasCanvas().setSize(width, height);
             
             c.prepareForOutput(width, height); // KLUDGE, resize all components for TimeSeriesBrowse
-
+            
         } else {
             dom.getController().getCanvas().setWidth(width);
             dom.getController().getCanvas().setHeight(height);
@@ -189,6 +199,10 @@ public class AutoplotServer {
             c.prepareForOutput(width, height); // KLUDGE, resize all components for TimeSeriesBrowse
             
             suri= URISplit.makeAbsolute( System.getProperty("user.dir"), suri );
+            
+            if ( !suri.startsWith("/") && !suri.startsWith("file:" ) ) {
+                meta.put( PNG_KEY_URI, suri );
+            }
             
             logger.log(Level.FINE, "plot uri {0}", suri);
             
@@ -223,7 +237,7 @@ public class AutoplotServer {
                     writeToPng( System.out );
                 } else {
                     logger.log(Level.INFO, "write to {0}", outfile);
-                    writeToPng( outfile, width, height );
+                    writeToPng( outfile, width, height, meta );
                     System.err.println("write to "+ outfile);
                 }
                 break;

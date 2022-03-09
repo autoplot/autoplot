@@ -1295,7 +1295,25 @@ addBottomDecoration( dom.canvases[0], paint )
             }
         }
     }
-
+    
+    /**
+     * The name of the script which results in the image, optionally with its arguments.
+     * @see org.das2.util.DasPNGConstants
+     */
+    public static String PNG_KEY_SCRIPT="AutoplotScriptURI";
+    
+    /**
+     * The Autoplot .vap file which results in the image, optionally with "?" and modifiers.
+     * @see org.das2.util.DasPNGConstants
+     */
+    public static String PNG_KEY_VAP="AutoplotVap";
+    
+    /**
+     * The Autoplot URI which results in the image.
+     * @see org.das2.util.DasPNGConstants
+     */
+    public static String PNG_KEY_URI="AutoplotURI";
+        
     /**
      * write out the current canvas to a png file.
      * TODO: bug 557: this has issues with the size.  It's coded to get the size from
@@ -1323,6 +1341,32 @@ addBottomDecoration( dom.canvases[0], paint )
         writeToPng( image, filename, meta );
     }
 
+    /**
+     * write out the current canvas to a png file, using the given size and also insert
+     * additional metadata.
+     * Note for relative references, this will use the Java process present working directory (PWD) instead
+     * of the PWD variable found in scripts
+     * @param filename The name of a local file
+     * @param width the width in pixels of the png
+     * @param height the height in pixels of the png
+     * @param metadata if non-null, then write name/values pairs into the PNG Metadata. "Creation Time", "Software" and "plotInfo" is always added.
+     * @see 
+     * @throws java.io.IOException
+     */
+    public static void writeToPng( String filename, int width, int height, Map<String,String> metadata ) throws IOException {
+        filename= getLocalFilename(filename);
+        
+        BufferedImage image = model.canvas.getImage( width, height );
+        
+        Logger llogger= Logger.getLogger("autoplot.scriptcontext.writeToPng");
+        llogger.log(Level.FINE, "writeToPng({0},{1},{2})->{3},{4} image.", new Object[]{filename, width, height, image.getWidth(), image.getHeight()});
+        Map<String,String> meta= new LinkedHashMap<>();
+        meta.putAll(metadata);
+        meta.put( DasPNGConstants.KEYWORD_SOFTWARE, "Autoplot" );
+        meta.put( DasPNGConstants.KEYWORD_PLOT_INFO, model.canvas.getImageMetadata() );
+        writeToPng( image, filename, meta );
+    }
+    
     /**
      * See also writeToPng( OutputStream out )
      * @param image the image to write out.
