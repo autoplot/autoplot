@@ -12,6 +12,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -35,6 +36,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -86,6 +92,7 @@ import org.das2.util.FileUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.python.util.PythonInterpreter;
 
 /**
  * Tool for running batches, generating inputs for jython scripts.
@@ -705,7 +712,17 @@ public class RunBatchTool extends javax.swing.JPanel {
             try {
                 String scriptName= dataSetSelector1.getValue();
                 dom.getController().getApplicationModel().addRecent(scriptName);
-                doIt();
+                if ( ( evt.getModifiers() & KeyEvent.SHIFT_MASK ) == KeyEvent.SHIFT_MASK ) {
+                    String warning="<html><p>Multi-thread mode is only stable when each process is independent, use with caution.  Proceed?</p></html>";
+                    if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( param1NameCB, warning, 
+                        "Multi-Thread warning", JOptionPane.OK_CANCEL_OPTION ) ) {
+                        doIt(true);
+                    } else {
+                        doIt();
+                    }
+                } else {
+                    doIt();
+                }
             } catch (IOException ex) {
                 messageLabel.setText(ex.getMessage());
             }
@@ -1433,10 +1450,12 @@ public class RunBatchTool extends javax.swing.JPanel {
      * write the current canvas to a file.
      * @param f1
      * @param f2
+     * @param uri
+     * @param dom if non-null, use this application for the image.
      * @return the name of the file used.
      * @throws IOException 
      */
-    private String doWrite( String f1, String f2, String uri ) throws IOException {
+    private String doWrite( String f1, String f2, String uri, Application dom) throws IOException {
         f1= f1.replaceAll("/", "_");
         f2= f2.replaceAll("/", "_");
         f1= f1.replaceAll(" ", "_");
@@ -1461,7 +1480,12 @@ public class RunBatchTool extends javax.swing.JPanel {
             }
             String s= f.toString();
             if ( s.endsWith(".png") ) {
-                BufferedImage bufferedImage = ScriptContext.writeToBufferedImage();
+                BufferedImage bufferedImage;
+                if ( dom!=null ) {
+                    bufferedImage = ScriptContext.writeToBufferedImage(dom);
+                } else {
+                    bufferedImage = ScriptContext.writeToBufferedImage();
+                }
                 Map<String,String> metadata= new LinkedHashMap<>();
                 metadata.put( "ScriptURI",uri );
                 ScriptContext.writeToPng(bufferedImage,s,metadata);
@@ -1601,10 +1625,135 @@ public class RunBatchTool extends javax.swing.JPanel {
     }
     
     /**
-     * run the batch process.  The
+     * run the batch process.  
      * @throws IOException 
      */
     public void doIt() throws IOException {
+        doIt(false);
+    } 
+    
+    private JSONObject doOneJob( JLabel jobLabel, 
+        File scriptFile,
+        Map<String,Param> parms, 
+        Map<String,String> params, 
+        String paramName, 
+        String paramValue ) {
+        
+        URISplit split= URISplit.parse(scriptFile.toString());
+        
+        paramValue= paramValue.trim();
+        paramName= paramName.trim();
+
+        JSONObject runResults= new JSONObject();
+
+        try {
+            Application myDom= (Application)this.dom.copy();
+            
+            ProgressMonitor myMonitor= new NullProgressMonitor() {
+                @Override
+                public boolean isCancelled() {
+                    return monitor.isCancelled();
+                }
+            }; // subtask would reset indeterminate.
+            
+            InteractiveInterpreter interp = JythonUtil.createInterpreter( true, false, myDom, myMonitor );
+            interp.exec(JythonRefactory.fixImports("import autoplot2017")); 
+            Map<String,Object> scriptParams= new LinkedHashMap<>();
+            scriptParams.putAll( params );
+
+            if ( monitor.isCancelled() ) {
+                return null;
+            }
+
+            jobLabel.setIcon(working);
+            interp.set( "PWD", split.path );
+            String[] paramNames= maybeSplitMultiParam( paramName );
+
+            if ( paramNames!=null ) {
+                char splitc= paramName.charAt(paramNames[0].length());
+                String[] paramValues= paramValue.trim().split("\\"+splitc);
+                for ( int j= 0; j<paramNames.length; j++ ) {
+                    String p= paramNames[j].trim();
+                    String v= paramValues[j].trim();
+                    if ( !parms.containsKey(p) ) {
+                        if ( p.trim().length()==0 ) {
+                            throw new IllegalArgumentException("param1Name not set");
+                        } else {
+                            throw new IllegalArgumentException("param not found: " + p );
+                        }
+                    }
+                    setParam( interp, parms.get(p), p, v );
+                    runResults.put( p, v );
+                    scriptParams.put( p, v );
+                }
+            } else {
+                if ( !parms.containsKey(paramName) ) {
+                    if ( paramName.length()==0 ) {
+                        throw new IllegalArgumentException("param1Name not set");
+                    }
+                }
+                setParam( interp, parms.get(paramName), paramName, paramValue );
+                runResults.put(paramName,paramValue);
+                scriptParams.put(paramName,paramValue);
+            }
+
+            if ( param2NameCB.getSelectedItem().toString().trim().length()==0 ) {
+                long t0= System.currentTimeMillis();
+                ByteArrayOutputStream outbaos= new ByteArrayOutputStream();
+                try {
+                    param1ScrollPane.scrollRectToVisible( jobLabel.getBounds() );
+                    interp.setOut(outbaos);
+                    interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile),scriptFile.getName()), scriptFile.getName() );
+                    if ( writeCheckBox.isSelected() ) {
+                        String uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
+                        runResults.put("writeFile", doWrite(paramValue, "", uri, myDom ) );
+                    }
+                    jobLabel.setIcon(okay);
+                } catch ( IOException | JSONException | RuntimeException ex ) {
+                    String msg= ex.toString();
+                    runResults.put("result",msg);
+                    jobLabel.setIcon(prob);
+                } finally {
+                    outbaos.close();
+                    runResults.put("stdout", new String(outbaos.toByteArray(),"US-ASCII") );
+                    runResults.put("executionTime", System.currentTimeMillis()-t0);                            
+                    System.out.println(runResults.getString("stdout"));
+                }
+                if ( jobLabel.getIcon()==okay ) {
+                    jobLabel.setToolTipText( htmlize(runResults.getString("stdout")) );
+                } else {
+                    jobLabel.setToolTipText( htmlize(runResults.getString("stdout"),runResults.getString("result")));
+                }
+
+
+                JSONObject copy = new JSONObject(runResults, JSONObject.getNames(runResults));
+
+                return copy;
+
+            } else {
+                throw new IllegalArgumentException("only one argument for multi-threaded version");
+            }
+                
+        } catch ( IOException | RuntimeException | JSONException ex) {
+            Logger.getLogger(RunBatchTool.class.getName()).log(Level.SEVERE, null, ex);
+            jobLabel.setIcon(prob);
+            jobLabel.setToolTipText(htmlize(ex.toString()));
+            String[] names= JSONObject.getNames(runResults);
+            if ( names!=null ) {
+                JSONObject copy = new JSONObject( runResults,names );
+                return copy;
+            } else {
+                return runResults;
+            }
+        }
+
+    }
+    
+    /**
+     * experiment to try multi-threaded approach to running 16 processes at once.
+     * @throws IOException 
+     */
+    public void doItMultiThreadOneArgument( ) throws IOException {
         final DasProgressPanel monitor= DasProgressPanel.createComponent( "" );
         progressPanel.add( monitor.getComponent() );
         this.monitor= monitor;
@@ -1613,7 +1762,229 @@ public class RunBatchTool extends javax.swing.JPanel {
         final List<JLabel> jobs2= new ArrayList<>();
         
         editParamsButton.setEnabled(true);
+
+        final AtomicInteger threadCounter= new AtomicInteger(0);
         
+        ThreadFactory tf= (Runnable r) -> new Thread( r, "run-batch-"+threadCounter.incrementAndGet());
+        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8,tf);
+        //ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
+        //ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newCachedThreadPool(tf);
+        
+        String scriptName= dataSetSelector1.getValue();
+
+        URISplit split= URISplit.parse(scriptName);
+        pwd= split.path;
+
+        if ( !split.file.endsWith(".jy") ) {
+            JOptionPane.showMessageDialog( this, "script must end in .jy: "+scriptName );
+            return;
+        }
+        
+        {
+            String[] ff1= param1Values.getText().split("\n");
+            JPanel p= switchListToIconLabels( jobs1, ff1 );
+
+            for ( int i=0; i<jobs1.size(); i++ ) {
+                final int fi= i;
+                jobs1.get(i).addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        selectRecord(fi);
+                        String param1= (String)RunBatchTool.this.param1NameCB.getSelectedItem();
+                        if ( RunBatchTool.this.results!=null ) {
+                            String s= jobs1.get(fi).getText();
+                            List<JSONObject> thisRow= new ArrayList<>();
+                            try {
+                                JSONObject jo= RunBatchTool.this.results;
+                                JSONArray ja= jo.getJSONArray("results");
+                                for ( int j=0; j<ja.length(); j++ ) {
+                                    JSONObject jo1= ja.getJSONObject(j);
+                                    if ( jo1.getString(param1).equals(s) ) {
+                                        thisRow.add( jo1 );
+                                    }
+                                }
+                                if ( jobs2.size()==thisRow.size() ) {
+                                    for ( int i=0; i<thisRow.size(); i++ ) {
+                                        JSONObject runResults= thisRow.get(i);
+                                        String except= thisRow.get(i).getString("result");
+                                        if ( except.length()>0 ) {
+                                            jobs2.get(i).setIcon(prob);
+                                        } else {
+                                            jobs2.get(i).setIcon(okay);
+                                        }
+                                        if ( jobs2.get(i).getIcon()==okay ) {
+                                            jobs2.get(i).setToolTipText( htmlize(runResults.getString("stdout")) );
+                                        } else {
+                                            jobs2.get(i).setToolTipText( htmlize(runResults.getString("stdout"),runResults.getString("result")));
+                                        }
+                                    }
+                                } else {
+                                    logger.fine("Nothing to do.");
+                                }
+                                
+                            } catch (JSONException ex) {
+                                Logger.getLogger(RunBatchTool.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }
+                });
+            }
+
+            param1JLabels= jobs1.toArray( new JLabel[jobs1.size()] );
+            param1ScrollPane.getViewport().setView(p);   
+        }
+               
+        if ( param2Values.getText().trim().length()>0 ) {
+            String[] ff1= param2Values.getText().split("\n");
+            JPanel p= switchListToIconLabels( jobs2, ff1 );
+            param2ScrollPane.getViewport().setView(p);   
+        } 
+        
+        try {
+
+            String[] ff1= param1Values.getText().split("\n");
+
+            monitor.setTaskSize(ff1.length);
+            monitor.started();
+            
+            Map<String,String> params= URISplit.parseParams(split.params);
+            Map<String,Object> env= new HashMap<>();
+            env.put("dom",this.dom);
+            env.put("PWD",pwd);
+
+            final File scriptFile= DataSetURI.getFile( split.file, monitor.getSubtaskMonitor("download script") );
+            String script= readScript( scriptFile );
+            
+            Map<String,org.autoplot.jythonsupport.Param> parms= Util.getParams( env, script, params, new NullProgressMonitor() );
+
+            InteractiveInterpreter interp = JythonUtil.createInterpreter( true, false );
+            interp.exec(JythonRefactory.fixImports("import autoplot2017")); 
+            
+            ParametersFormPanel pfp= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
+            pfp.doVariables( env, scriptFile, params, null );
+            params.entrySet().forEach((ent) -> {
+                try {
+                    pfp.getFormData().implement( interp, ent.getKey(), ent.getValue() );
+                } catch (ParseException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
+            });
+
+            if ( writeCheckBox.isSelected() ) {
+                String template= writeFilenameCB.getSelectedItem().toString();
+                if ( !( template.endsWith(".pdf") || template.endsWith(".png") ) ) {
+                    AutoplotUtil.showConfirmDialog( this, "write template must end in .pdf or .png", "Write Template Error", JOptionPane.OK_OPTION );
+                    return;
+                }
+            }
+            
+            JSONObject jo= new JSONObject();
+            JSONArray ja= new JSONArray();
+            
+            jo.put( "results", ja );
+             
+            String param1= param1NameCB.getSelectedItem()!=null ? 
+                    param1NameCB.getSelectedItem().toString().trim() :
+                    "";
+            String param2= param2NameCB.getSelectedItem()!=null ?
+                    param2NameCB.getSelectedItem().toString().trim() :
+                    "";
+            
+            param1= cleanupMultiParam( param1 );
+            param2= cleanupMultiParam( param2 );
+            
+            JSONArray paramsJson= new JSONArray();
+            paramsJson.put(0,param1);
+            if ( param2.length()>0 ) {
+                paramsJson.put(1,param2);
+            }
+            jo.put("params", paramsJson );
+            
+            monitor.setTaskSize( ff1.length );
+            monitor.started();
+            monitor.setTaskProgress(0);
+            
+            int icount=0;
+            int i1=0;
+            int exportResultsWritten=0;
+            final AtomicInteger I1= new AtomicInteger(0);
+            
+            for ( String f1 : ff1 ) {
+                final String final_f1= f1;
+                final String final_param1= param1;
+                final Map<String,String> final_params= params;
+                final JLabel jobLabel= jobs1.get(i1);
+                Runnable runOne= () -> {
+                    doOneJob( jobLabel, scriptFile, parms, final_params, final_param1, final_f1 );
+                    if ( monitor.isFinished() ) {
+                        System.err.println("huh?");
+                    }
+                    monitor.setTaskProgress(I1.incrementAndGet());
+                };
+                executor.execute(runOne);
+                i1=i1+1;
+                
+                if ( resultsFile!=null ) {
+                    if ( resultsFile.getName().endsWith(".json") ) {
+                        
+                    } else {
+                        File pendingResultsFile= new File( resultsFile.getAbsolutePath()+".pending" );
+                        exportResultsPendingCSV( pendingResultsFile, jo, ja, exportResultsWritten );
+                    }
+                    exportResultsWritten= icount;
+                }
+                
+                JSONObject pendingResults= new JSONObject( jo.toString() );
+                pendingResults.put( "results", new JSONArray( ja.toString() ) );
+            }
+            
+            while ( true ) {
+                if ( executor.getActiveCount()==0 && I1.intValue()==ff1.length ) {
+                    break;
+                }
+            }
+                
+            jo.put( "results", ja );
+            results= jo;
+            
+        } catch (JSONException ex) {
+            logger.log(Level.SEVERE, null, ex);
+            
+        } finally {
+            
+            messageLabel.setText("Jobs are complete, click above to edit.");
+            if ( !monitor.isFinished() ) monitor.finished();
+            this.monitor=null;
+            
+            goButton.setEnabled(true);
+        }
+        
+    }
+    
+    /**
+     * run the batch process.  
+     * @param multiThread if true, allow multiple threads to work simultaneously.
+     * @throws IOException 
+     */
+    public void doIt( boolean multiThread ) throws IOException {
+
+        String pp2= param2NameCB.getSelectedItem()!=null ?
+                    param2NameCB.getSelectedItem().toString().trim() :
+                    "";
+        if ( pp2.equals("") && multiThread ) {    
+            doItMultiThreadOneArgument();
+            return;
+        }
+    
+        final DasProgressPanel monitor= DasProgressPanel.createComponent( "" );
+        progressPanel.add( monitor.getComponent() );
+        this.monitor= monitor;
+
+        final List<JLabel> jobs1= new ArrayList<>();
+        final List<JLabel> jobs2= new ArrayList<>();
+        
+        editParamsButton.setEnabled(true);
+                
         {
             String[] ff1= param1Values.getText().split("\n");
             JPanel p= switchListToIconLabels( jobs1, ff1 );
@@ -1814,7 +2185,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                             interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile),scriptFile.getName()), scriptFile.getName() );
                             if ( writeCheckBox.isSelected() ) {
                                 String uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
-                                runResults.put( "writeFile", doWrite( f1.trim(), "", uri ) );
+                                runResults.put("writeFile", doWrite(f1.trim(), "", uri, null ) );
                             }
                             jobs1.get(i1).setIcon(okay);
                         } catch ( IOException | JSONException | RuntimeException ex ) {
@@ -1892,7 +2263,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                                 interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile), scriptFile.getName()), scriptFile.getName() );
                                 if ( writeCheckBox.isSelected() ) {
                                     String uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
-                                    runResults.put( "writeFile", doWrite( f1.trim(),f2.trim(), uri ) );
+                                    runResults.put("writeFile", doWrite(f1.trim(),f2.trim(), uri, null ) );
                                 }
                                 jobs2.get(i2).setIcon(okay);
                                 runResults.put("result","");
