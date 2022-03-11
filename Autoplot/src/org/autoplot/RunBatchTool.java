@@ -717,8 +717,6 @@ public class RunBatchTool extends javax.swing.JPanel {
                     if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( param1NameCB, warning, 
                         "Multi-Thread warning", JOptionPane.OK_CANCEL_OPTION ) ) {
                         doIt(true);
-                    } else {
-                        doIt();
                     }
                 } else {
                     doIt();
@@ -1766,7 +1764,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         final AtomicInteger threadCounter= new AtomicInteger(0);
         
         ThreadFactory tf= (Runnable r) -> new Thread( r, "run-batch-"+threadCounter.incrementAndGet());
-        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8,tf);
+        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(32,tf);
         //ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
         //ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newCachedThreadPool(tf);
         
