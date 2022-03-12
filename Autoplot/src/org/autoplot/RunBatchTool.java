@@ -57,6 +57,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
@@ -64,6 +65,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -713,10 +715,35 @@ public class RunBatchTool extends javax.swing.JPanel {
                 String scriptName= dataSetSelector1.getValue();
                 dom.getController().getApplicationModel().addRecent(scriptName);
                 if ( ( evt.getModifiers() & KeyEvent.SHIFT_MASK ) == KeyEvent.SHIFT_MASK ) {
-                    String warning="<html><p>Multi-thread mode is only stable when each process is independent, use with caution.  Proceed?</p></html>";
-                    if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( param1NameCB, warning, 
+                    String warning="<html><p>Multi-thread mode is only stable when each process<br>"
+                        + "is independent, use with caution.  For example, if the script plots<br>"
+                        + "data, then the two scripts will interfere with one another.<br><br>"
+                        + "Proceed?</p></html>";
+                    JPanel p= new JPanel( );
+                    p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
+                    JLabel l= new JLabel(warning);
+                    l.setAlignmentX( JLabel.LEFT_ALIGNMENT );
+                    l.setHorizontalAlignment( SwingConstants.LEFT );
+                    p.add( l );
+                    
+                    JPanel p2= new JPanel();
+                    p2.setLayout( new BoxLayout( p2, BoxLayout.X_AXIS ) );
+                    JTextField tf= new JFormattedTextField( 32 );
+                    p2.add( new JLabel("Number of threads:") );
+                    p2.add( tf );
+                    int size= tf.getFont().getSize();
+                    tf.setMaximumSize( new Dimension( size*5, size*2 ) );
+                    tf.setPreferredSize( new Dimension( size*5, size*2 ) );
+
+                    p2.setAlignmentX( JPanel.LEFT_ALIGNMENT  );
+                    
+                    p.add( p2 );
+                        
+                    if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( param1NameCB, p, 
                         "Multi-Thread warning", JOptionPane.OK_CANCEL_OPTION ) ) {
-                        doIt(true);
+                        doIt( Integer.parseInt(tf.getText()) );
+                    } else {
+                        goButton.setEnabled(true);
                     }
                 } else {
                     doIt();
@@ -1627,7 +1654,7 @@ public class RunBatchTool extends javax.swing.JPanel {
      * @throws IOException 
      */
     public void doIt() throws IOException {
-        doIt(false);
+        doIt(0);
     } 
     
     private JSONObject doOneJob( JLabel jobLabel, 
@@ -1749,9 +1776,10 @@ public class RunBatchTool extends javax.swing.JPanel {
     
     /**
      * experiment to try multi-threaded approach to running 16 processes at once.
+     * @param threadCount number of concurrent threads.
      * @throws IOException 
      */
-    public void doItMultiThreadOneArgument( ) throws IOException {
+    public void doItMultiThreadOneArgument( int threadCount ) throws IOException {
         final DasProgressPanel monitor= DasProgressPanel.createComponent( "" );
         progressPanel.add( monitor.getComponent() );
         this.monitor= monitor;
@@ -1764,7 +1792,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         final AtomicInteger threadCounter= new AtomicInteger(0);
         
         ThreadFactory tf= (Runnable r) -> new Thread( r, "run-batch-"+threadCounter.incrementAndGet());
-        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(32,tf);
+        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(threadCount,tf);
         //ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
         //ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newCachedThreadPool(tf);
         
@@ -1961,16 +1989,16 @@ public class RunBatchTool extends javax.swing.JPanel {
     
     /**
      * run the batch process.  
-     * @param multiThread if true, allow multiple threads to work simultaneously.
+     * @param multiThread if greater than 0, allow multiple threads to work simultaneously.
      * @throws IOException 
      */
-    public void doIt( boolean multiThread ) throws IOException {
+    public void doIt( int multiThread ) throws IOException {
 
         String pp2= param2NameCB.getSelectedItem()!=null ?
                     param2NameCB.getSelectedItem().toString().trim() :
                     "";
-        if ( pp2.equals("") && multiThread ) {    
-            doItMultiThreadOneArgument();
+        if ( pp2.equals("") && multiThread>0 ) {    
+            doItMultiThreadOneArgument(multiThread);
             return;
         }
     
