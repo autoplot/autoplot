@@ -431,8 +431,11 @@ public class PlotElementController extends DomNodeController {
                     }
                 }
             } else if ( evt.getPropertyName().equals( PlotElement.PROP_COMPONENT ) ) {
+                String oldv= (String)evt.getOldValue();
+                oldv= DataSetOps.makeProcessStringCanonical(oldv);
                 String newv= (String)evt.getNewValue();
-                if ( DataSetOps.changesDimensions( (String)evt.getOldValue(), newv ) ) { //TODO: why two methods see axisDimensionsChange 10 lines above
+                newv= DataSetOps.makeProcessStringCanonical(newv);
+                if ( DataSetOps.changesDimensions( oldv, newv ) ) { //TODO: why two methods see axisDimensionsChange 10 lines above
                     logger.log(Level.FINER, "component property change requires we reset render and dimensions: {0}->{1}", new Object[]{(String) evt.getOldValue(), (String) evt.getNewValue()});
                     setResetPlotElement(true);
                     setResetRanges(true);
@@ -1048,12 +1051,15 @@ public class PlotElementController extends DomNodeController {
             QDataSet fillDs = dsf.controller.getFillDataSet();
             Exception renderException= null;
             if (fillDs != null) {
-                final String comp= plotElement.getComponent().trim();
-                logger.log(Level.FINE, "updateDataSetImmediately: {0} {1}", new Object[]{plotElement, plotElement.getRenderType() });
-                logger.log(Level.FINE, "  resetPlotElement: {0}", resetPlotElement );
-                logger.log(Level.FINE, "  resetRanges: {0}", resetRanges);
-                logger.log(Level.FINE, "  resetRenderType: {0}", resetRenderType );
-                logger.log(Level.FINE, "  dataSet: {0}", String.valueOf(fillDs) );
+                final String comp= DataSetOps.makeProcessStringCanonical( plotElement.getComponent().trim() );
+                if ( logger.isLoggable(Level.FINE) ) {
+                    logger.log(Level.FINE, "updateDataSetImmediately: {0} {1}", new Object[]{plotElement, plotElement.getRenderType() });
+                    logger.log(Level.FINE, "  resetPlotElement: {0}", resetPlotElement );
+                    logger.log(Level.FINE, "  resetRanges: {0}", resetRanges);
+                    logger.log(Level.FINE, "  resetRenderType: {0}", resetRenderType );
+                    logger.log(Level.FINE, "  component: {0}", comp );
+                    logger.log(Level.FINE, "  dataSet: {0}", String.valueOf(fillDs) );
+                }
                 
                 //This was to support the CdawebVapServlet, where partial vaps are handled.  See https://sourceforge.net/p/autoplot/bugs/1304/
                 //if ( plotElement.isAutoRenderType() ) {
