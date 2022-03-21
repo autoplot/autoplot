@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>levels control on Contours renderer allows minor contour lines specification (+10/+1) in <a href='https://github.com/autoplot/dev/blob/master/demos/2022/20220304/screen20220304.jy'>this script</a>.  Let me know if you think you might use this rarely-used renderer and I'll see if I can make it look nicer!
+        <p><small>Modified <a href='https://github.com/autoplot/dev/blob/master/demos/digitizers/findPeakDigitizerWayPoints.jy'>findPeakDigitizerWayPoints.jy script</a> used to digitize branch location in image.  Happy Spring!
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,9 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-03-04 r26544):</p>
+        <p>Bugfixes (2022-03-21 r26560):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2441/">2441</a>: components wouldn't reset properly in some cases, because "changesDimension" function expected pipe.  Thanks, Chris!
             <li>correction to edit tick values dialog and its connection to the orbit renderer.  Thanks, Sadie!
             <li>stars added to Granny Text editor psym menu.  Thanks, Sadie!
             <li>Detrend and a few other operators were missing descriptions in "add operation" dialog.  Thanks, Seth!
@@ -78,6 +79,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Report download progress on Das2Server datasets without progress info by inspecting time tags.
+            <li>Contours renderer now supports minor ticks specification like "+10/5" (5 minor intervals per major interval every 10 units), drawing a thinner contour line.
             <li>CDF editor has checkbox to remove zero-record variables from the list of parameters which happens with PSP CDF files.  Thanks, Kristoff!
             <li>Waypoints Digitizer at <a href="https://github.com/autoplot/dev/blob/master/demos/digitizers/findPeakDigitizerWayPoints.jy">GitHub</a> supports data with rank 2 ytags.  Thanks, Kristoff!
             <li>Waypoints Mouse Module provides a new control for digitizing scripts.
