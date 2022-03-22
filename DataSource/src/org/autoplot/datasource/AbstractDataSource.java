@@ -314,7 +314,9 @@ public abstract class AbstractDataSource implements DataSource {
      * @param d rank 0 value or rank 1 range for the "within" operator.
      * @return the dataset with the filter applied.  (Note this may or may not be the same object.)
      */
-    private MutablePropertyDataSet applyFilter( MutablePropertyDataSet result, QDataSet parm, String op, QDataSet d ) throws NoDataInIntervalException {
+    private static MutablePropertyDataSet applyFilter( 
+        MutablePropertyDataSet result, QDataSet parm, String op, QDataSet d ) 
+        throws NoDataInIntervalException {
         QDataSet r;
         if ( parm.rank()>1 && parm.rank()<result.rank() ) {
             QDataSet[] operands= new QDataSet[2];
@@ -402,7 +404,9 @@ public abstract class AbstractDataSource implements DataSource {
      * @throws NoDataInIntervalException
      * @throws ParseException 
      */
-    protected MutablePropertyDataSet doWhereFilter( String w, QDataSet parm, MutablePropertyDataSet result) throws NoDataInIntervalException, ParseException {
+    protected static MutablePropertyDataSet doWhereFilter( 
+        String w, QDataSet parm, MutablePropertyDataSet result) 
+        throws NoDataInIntervalException, ParseException {
         Pattern p= Pattern.compile("\\.([elgn][qte])\\(");
         Matcher m= p.matcher(w);
         int ieq;
@@ -428,37 +432,38 @@ public abstract class AbstractDataSource implements DataSource {
             if ( sval.endsWith(")") ) sval= sval.substring(0,sval.length()-1);
             parm= Ops.reform(parm); // TODO: Nasty kludge why did we see it in the first place vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN&where=range__C4_CP_FGM_SPIN.eq(3)
             QDataSet d;
-            if ( parm.rank()==2 ) {
-                if ( sval.equals("mode") && ( op.equals("eq") || op.equals("ne") ) ) {
-                    QDataSet hash= Ops.hashcodes(parm);
-                    QDataSet mode= Ops.mode(hash);
-                    d= mode;
-                    parm= hash;
-                } else {
-                    Units du= SemanticOps.getUnits(parm);
-                    d= DataSetUtil.asDataSet( du.parse(sval) );
-                }
-            } else if ( parm.rank()==1 ) {
-                switch (sval) {
-                    case "mode":
-                        QDataSet mode= Ops.mode(parm);
+            switch (parm.rank()) {
+                case 2:
+                    if ( sval.equals("mode") && ( op.equals("eq") || op.equals("ne") ) ) {
+                        QDataSet hash= Ops.hashcodes(parm);
+                        QDataSet mode= Ops.mode(hash);
                         d= mode;
-                        break;
-                    case "median":
-                        QDataSet median= Ops.median(parm);
-                        d= median;
-                        break;
-                    case "mean":
-                        QDataSet mean= Ops.mean(parm);
-                        d= mean;
-                        break;
-                    default:
+                        parm= hash;
+                    } else {
                         Units du= SemanticOps.getUnits(parm);
-                        d= DataSetUtil.asDataSet(du.parse(sval));
-                        break;
-                }
-            } else {
-                throw new IllegalArgumentException("param is rank>2");
+                        d= DataSetUtil.asDataSet( du.parse(sval) );
+                    }   break;
+                case 1:
+                    switch (sval) {
+                        case "mode":
+                            QDataSet mode= Ops.mode(parm);
+                            d= mode;
+                            break;
+                        case "median":
+                            QDataSet median= Ops.median(parm);
+                            d= median;
+                            break;
+                        case "mean":
+                            QDataSet mean= Ops.mean(parm);
+                            d= mean;
+                            break;
+                        default:
+                            Units du= SemanticOps.getUnits(parm);
+                            d= DataSetUtil.asDataSet(du.parse(sval));
+                            break;
+                    }   break;
+                default:
+                    throw new IllegalArgumentException("param is rank>2");
             }
             
             result= applyFilter(result, parm, op, d );
@@ -467,9 +472,7 @@ public abstract class AbstractDataSource implements DataSource {
         return result;
     }
     
-    
-
-    private HashMap<Class, Object> capabilities = new HashMap<Class, Object>();
+    private HashMap<Class, Object> capabilities = new HashMap<>();
 
     /**
      * attempt to get a capability.  null will be returned if the 
