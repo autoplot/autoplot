@@ -397,10 +397,10 @@ public abstract class AbstractDataSource implements DataSource {
     /**
      * implement where constraint.  This was extracted from the CdfDataSource to support HDF5 files as well, and soon .txt files.
      * 
-     * @param w
-     * @param parm
-     * @param result
-     * @return
+     * @param w where constraint, like vol.gt(10).  Note the variable name (vol) is ignored.
+     * @param parm parameter to test
+     * @param result the result
+     * @return the result (same as result param)
      * @throws NoDataInIntervalException
      * @throws ParseException 
      */
