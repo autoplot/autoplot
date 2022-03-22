@@ -2,14 +2,8 @@
 package org.autoplot.dom;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.EventQueue;
-import java.awt.Toolkit;
 import java.awt.Window;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.ClipboardOwner;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
@@ -27,13 +21,7 @@ import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.Datum;
@@ -70,13 +58,11 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.jdesktop.beansbinding.Converter;
 import org.autoplot.ApplicationModel;
 import org.autoplot.AutoRangeUtil;
-import org.autoplot.AutoplotUI;
 import org.autoplot.RenderType;
 import org.autoplot.AutoplotUtil;
 import static org.autoplot.AutoplotUtil.SERIES_SIZE_LIMIT;
 import org.autoplot.ExportDataPanel;
 import org.autoplot.RenderTypeUtil;
-import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.AnonymousDataSource;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSource;
@@ -90,20 +76,14 @@ import org.das2.qds.JoinDataSet;
 import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
 import org.das2.qds.examples.Schemes;
-import org.autoplot.datasource.DataSourceFormat;
-import org.autoplot.datasource.DataSourceRegistry;
-import org.autoplot.datasource.DataSourceUtil;
-import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.qds.ops.Ops;
 import org.autoplot.metatree.MetadataUtil;
 import org.das2.components.VerticalSpectrogramAverager;
-import org.das2.components.VerticalSpectrogramSlicer;
 import org.das2.event.DataRangeSelectionListener;
 import org.das2.event.HorizontalDragRangeSelectorMouseModule;
 import org.das2.graph.BoundsRenderer;
 import org.das2.graph.PolarPlotRenderer;
-import org.das2.util.monitor.AlertNullProgressMonitor;
 
 /**
  * PlotElementController manages the PlotElement, for example resolving the datasource and loading the dataset.
@@ -1078,10 +1058,18 @@ public class PlotElementController extends DomNodeController {
                     } else if ( comp.startsWith("|") ) {
                         try {
                             QDataSet fillDs2 = fillDs;
+                            String srenderType= (String)fillDs2.property(QDataSet.RENDER_TYPE);
                             if ( comp.length()>0 ) fillDs2= processDataSet( comp, fillDs2 );
                             if ( fillDs2==null ) throw new NullPointerException("operations result in null: "+comp);
                             String s= resolveRenderType( fillDs2 );
+                            if ( comp.length()>0 && comp.startsWith("|unbundle(") && srenderType!=null ) { // vap+inline:ripplesVectorTimeSeries(200)&RENDER_TYPE=hugeScatter
+                                if ( !srenderType.contains(">") ) {
+                                    srenderType= srenderType + ">";
+                                }
+                                s= srenderType;
+                            }
                             int i= s.indexOf('>');
+                            if ( i==-1 ) i=s.length();
                             RenderType renderType= RenderType.valueOf(s.substring(0,i));
                             if ( !renderType.equals(plotElement.renderType) &&  getRenderer()!=null ) getRenderer().setDataSet(null); //bug1065
                             plotElement.renderType = renderType; // setRenderTypeAutomatically.  We don't want to fire off event here.
