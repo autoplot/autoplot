@@ -446,7 +446,8 @@ public class CdfDataSource extends AbstractDataSource {
     }
 
     /**
-     * get the dataset with the attributes.  attributes may be specified separately to support CDAWebDataSource, which uses a "master" cdf to override the specs within each file.
+     * get the dataset with the attributes.  attributes may be specified separately to support 
+     * CDAWebDataSource, which uses a "master" cdf to override the specs within each file.
      * @param mon
      * @param attr1
      * @return
