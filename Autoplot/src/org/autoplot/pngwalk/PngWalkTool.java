@@ -1012,16 +1012,6 @@ public final class PngWalkTool extends javax.swing.JPanel {
         final JCheckBoxMenuItem qcmi= new JCheckBoxMenuItem("Show Only Quality Control Records",false);
         tool.qcFilterMenuItem= qcmi;
         
-        final JMenuItem qc0= new JMenuItem( new AbstractAction( "<html><strike>Start Quality Control Tool (QC)</strike>" ) {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                LoggerManager.logGuiEvent(e);        
-                JOptionPane.showMessageDialog( tool, "This has been moved to Tools menu" );
-            }
-        });
-        qc0.setToolTipText("Quality Control Tool has been moved to the Tools menu.");
-        optionsMenu.add( qc0 );
-        
         qcmi.addActionListener( new AbstractAction(  ) {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -1036,17 +1026,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         qcmi.setEnabled(false);
         
         optionsMenu.add(qcmi);
-        
-        final JMenuItem dg0= new JMenuItem( new AbstractAction( "<html><strike>Start Digitizer</strike>" ) {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                LoggerManager.logGuiEvent(e);        
-                JOptionPane.showMessageDialog( tool, "This has been moved to Tools menu" );
-            }
-        });
-        dg0.setToolTipText("Start up the Digitizer that receives pairs from the single view.  See http://autoplot.org/richPng.");
-        optionsMenu.add( dg0 );
-        
+                
         result.add( optionsMenu );
 
         final JMenu toolsMenu= new JMenu("Tools");

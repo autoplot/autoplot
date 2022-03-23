@@ -266,6 +266,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
         loginButton = new javax.swing.JButton();
         sequencePropertiesHost = new javax.swing.JTextField();
         okSaveNextButton = new javax.swing.JButton();
+        problemSaveNextButton = new javax.swing.JButton();
         commentSplitPane = new javax.swing.JSplitPane();
         jScrollPane1 = new javax.swing.JScrollPane();
         previousCommentEditorPane = new javax.swing.JEditorPane();
@@ -328,6 +329,14 @@ public class QualityControlPanel extends javax.swing.JPanel {
             }
         });
 
+        problemSaveNextButton.setText("Problem Save Next");
+        problemSaveNextButton.setToolTipText("Mark as Problem, Save, and advance to next image.  ");
+        problemSaveNextButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                problemSaveNextButtonActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -338,13 +347,14 @@ public class QualityControlPanel extends javax.swing.JPanel {
                     .add(okRadioButton)
                     .add(problemRadioButton)
                     .add(ignoreRadioButton))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                    .add(okSaveNextButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(problemSaveNextButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(saveButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 69, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jPanel1Layout.createSequentialGroup()
-                        .add(okSaveNextButton)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(loginButton)))
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, saveButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 69, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, loginButton))
                 .addContainerGap())
             .add(sequencePropertiesHost)
         );
@@ -361,7 +371,9 @@ public class QualityControlPanel extends javax.swing.JPanel {
                             .add(loginButton)
                             .add(okSaveNextButton))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(problemRadioButton)
+                        .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(problemRadioButton)
+                            .add(problemSaveNextButton))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(ignoreRadioButton)))
                 .addContainerGap(19, Short.MAX_VALUE))
@@ -397,7 +409,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
+            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 371, Short.MAX_VALUE)
             .add(jPanel2Layout.createSequentialGroup()
                 .add(jLabel1)
                 .add(0, 0, Short.MAX_VALUE))
@@ -434,14 +446,14 @@ public class QualityControlPanel extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(commentSplitPane)
+            .add(commentSplitPane, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .add(jPanel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(commentSplitPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
+                .add(commentSplitPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -579,6 +591,13 @@ public class QualityControlPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_newCommentTextAreaKeyTyped
 
+    private void problemSaveNextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_problemSaveNextButtonActionPerformed
+        LoggerManager.logGuiEvent(evt);
+        problemRadioButton.setSelected(true);
+        saveButtonActionPerformed(evt);
+        walkImageSequence.next();
+    }//GEN-LAST:event_problemSaveNextButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JSplitPane commentSplitPane;
@@ -596,6 +615,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
     private javax.swing.JButton okSaveNextButton;
     private javax.swing.JEditorPane previousCommentEditorPane;
     private javax.swing.JRadioButton problemRadioButton;
+    private javax.swing.JButton problemSaveNextButton;
     private javax.swing.JButton saveButton;
     private javax.swing.JTextField sequencePropertiesHost;
     private javax.swing.ButtonGroup statusButtonGroup;
