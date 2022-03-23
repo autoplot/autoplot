@@ -28,8 +28,10 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-03-21 r26560):</p>
+        <p>Bugfixes (2022-03-23 r26567):</p>
         <ul>
+            <li>DataSet iterator would fail when non-qube bundle contained dataset with 0 records.  Thanks, Corentin!
+            <li>binary (e.g. divide) and unary (e.g. exp10) operators now support non-qubes when second argument is (rank 0) scalar.  Thanks, Corentin!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2441/">2441</a>: components wouldn't reset properly in some cases, because "changesDimension" function expected pipe.  Thanks, Chris!
             <li>correction to edit tick values dialog and its connection to the orbit renderer.  Thanks, Sadie!
             <li>stars added to Granny Text editor psym menu.  Thanks, Sadie!
@@ -79,6 +81,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>introduce "specialColors property" which allows colors to be assigned to values, beyond the colorbar transform.  Thanks James and Sadie!
             <li>Report download progress on Das2Server datasets without progress info by inspecting time tags.
             <li>Contours renderer now supports minor ticks specification like "+10/5" (5 minor intervals per major interval every 10 units), drawing a thinner contour line.
             <li>CDF editor has checkbox to remove zero-record variables from the list of parameters which happens with PSP CDF files.  Thanks, Kristoff!
