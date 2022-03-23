@@ -480,6 +480,14 @@ public final class PngWalkTool extends javax.swing.JPanel {
             }
             
             try {
+                if ( productFile!=null && !WalkUtil.fileExists(productFile) ) {
+                    if ( template.startsWith(tool.baseurl) ) {
+                        String vv= tool.pwd +  tool.product + ".vap";
+                        if ( vv!=null ) {
+                            return WalkUtil.fileExists(vv);
+                        }
+                    }
+                }    
                 return WalkUtil.fileExists(productFile);
             } catch (FileSystemOfflineException | URISyntaxException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
@@ -594,6 +602,18 @@ public final class PngWalkTool extends javax.swing.JPanel {
                         } else {
                             productFile = template.substring(0, i0) + ".vap";  
                         }
+                        
+                        try {
+                            if ( !WalkUtil.fileExists(productFile) ) {
+                                String productFile2 = tool.pwd + tool.product + ".vap";
+                                if ( WalkUtil.fileExists(productFile2) ) {
+                                    productFile= productFile2;
+                                }
+                            }
+                        } catch (FileSystemOfflineException | URISyntaxException ex) {
+                            logger.log(Level.SEVERE, null, ex);
+                        }
+                        
                         if ( timeRange!=null ) {
                             suri = productFile + "?timeRange=" + timeRange;
                         } else {
