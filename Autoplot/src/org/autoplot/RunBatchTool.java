@@ -88,6 +88,7 @@ import org.das2.qds.DataSetUtil;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
 import org.das2.util.FileUtil;
+import org.das2.util.monitor.AlertNullProgressMonitor;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -308,6 +309,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         jPanel1 = new javax.swing.JPanel();
         postRunPopupMenu = new javax.swing.JPopupMenu();
         copyUri = new javax.swing.JMenuItem();
+        rerunScriptMenuItem = new javax.swing.JMenuItem();
         goButton = new javax.swing.JButton();
         param1ScrollPane = new javax.swing.JScrollPane();
         param1Values = new javax.swing.JTextArea();
@@ -495,6 +497,15 @@ public class RunBatchTool extends javax.swing.JPanel {
             }
         });
         postRunPopupMenu.add(copyUri);
+
+        rerunScriptMenuItem.setText("Re-Run Script");
+        rerunScriptMenuItem.setToolTipText("Re run the script with these arguments");
+        rerunScriptMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rerunScriptMenuItemActionPerformed(evt);
+            }
+        });
+        postRunPopupMenu.add(rerunScriptMenuItem);
 
         goButton.setText("Go!");
         goButton.addActionListener(new java.awt.event.ActionListener() {
@@ -1025,6 +1036,35 @@ public class RunBatchTool extends javax.swing.JPanel {
         }
         
     }//GEN-LAST:event_copyUriActionPerformed
+
+    private void rerunScriptMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rerunScriptMenuItemActionPerformed
+        JLabel jLabel1= getSelectedLabel();
+        
+        String argName= param1NameCB.getSelectedItem().toString();
+        String argValue= jLabel1.getText();
+        
+        String scriptName= dataSetSelector1.getValue();
+
+        URISplit split= URISplit.parse(scriptName);
+        pwd= split.path;
+        
+        Map<String,Object> env= new HashMap<>();
+        env.put("dom",this.dom);
+        env.put("PWD",pwd);
+            
+        try {
+            final File scriptFile= DataSetURI.getFile( split.file, new AlertNullProgressMonitor() );
+            String script= readScript( scriptFile );
+            Map<String,String> params= URISplit.parseParams( split.params );
+            Map<String,org.autoplot.jythonsupport.Param> parms= Util.getParams( env, script, params, new NullProgressMonitor() );
+            doOneJob( jLabel1, scriptFile, parms, params, argName, argValue, new NullProgressMonitor() );
+                
+        } catch (IOException ex) {
+            Logger.getLogger(RunBatchTool.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+    }//GEN-LAST:event_rerunScriptMenuItemActionPerformed
 
     private void doLoadFromFile( JTextArea paramValues ) {
         JFileChooser chooser= new JFileChooser();
@@ -1675,12 +1715,24 @@ public class RunBatchTool extends javax.swing.JPanel {
         doIt(0);
     } 
     
+    /**
+     * 
+     * @param jobLabel
+     * @param scriptFile
+     * @param parms
+     * @param params
+     * @param paramName
+     * @param paramValue
+     * @param monitor monitor for the job
+     * @return 
+     */
     private JSONObject doOneJob( JLabel jobLabel, 
         File scriptFile,
         Map<String,Param> parms, 
         Map<String,String> params, 
         String paramName, 
-        String paramValue ) {
+        String paramValue, 
+        final ProgressMonitor monitor ) {
         
         URISplit split= URISplit.parse(scriptFile.toString());
         
@@ -1792,7 +1844,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         }
 
     }
-    
+        
     /**
      * experiment to try multi-threaded approach to running 16 processes at once.
      * @param threadCount number of concurrent threads.
@@ -1961,7 +2013,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                 final Map<String,String> final_params= params;
                 final JLabel jobLabel= jobs1.get(i1);
                 Runnable runOne= () -> {
-                    doOneJob( jobLabel, scriptFile, parms, final_params, final_param1, final_f1 );
+                    doOneJob( jobLabel, scriptFile, parms, final_params, final_param1, final_f1, monitor.getSubtaskMonitor(final_f1) );
                     if ( monitor.isFinished() ) {
                         System.err.println("huh?");
                     }
@@ -2466,6 +2518,7 @@ public class RunBatchTool extends javax.swing.JPanel {
     private javax.swing.JButton pngWalkToolButton;
     private javax.swing.JPopupMenu postRunPopupMenu;
     private javax.swing.JPanel progressPanel;
+    private javax.swing.JMenuItem rerunScriptMenuItem;
     private javax.swing.JMenuItem showHelpMenuItem;
     private javax.swing.JComboBox<String> timeFormatComboBox;
     private javax.swing.JComboBox<String> timeRangeComboBox;
