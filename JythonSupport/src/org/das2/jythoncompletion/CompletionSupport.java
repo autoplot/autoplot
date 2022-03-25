@@ -185,14 +185,21 @@ public class CompletionSupport {
                 int lpar= i-1;
                 while ( lpar>0 && ( rparCount>0 || rbackCount>0 ) ) {
                     contextString= tokens.get(lpar).image + contextString;
-                    if ( lpar>=0 && tokens.get(lpar).kind==PythonGrammarConstants.LPAREN ) {
-                        rparCount--;
-                    } else if ( lpar>=0 && tokens.get(lpar).kind==PythonGrammarConstants.RPAREN ) {
-                        rparCount++;
-                    } else if ( lpar>=0 && tokens.get(lpar).kind==PythonGrammarConstants.LBRACKET ) {
-                        rbackCount--;
-                    } else if ( lpar>=0 && tokens.get(lpar).kind==PythonGrammarConstants.RBRACKET ) {
-                        rbackCount++;
+                    switch (tokens.get(lpar).kind) {
+                        case PythonGrammarConstants.LPAREN:
+                            rparCount--;
+                            break;
+                        case PythonGrammarConstants.RPAREN:
+                            rparCount++;
+                            break;
+                        case PythonGrammarConstants.LBRACKET:
+                            rbackCount--;
+                            break;
+                        case PythonGrammarConstants.RBRACKET:
+                            rbackCount++;
+                            break;
+                        default:
+                            break;
                     }
                     if ( rparCount==0 ) {
                         if ( lpar>0 && tokens.get(lpar-1).kind==PythonGrammarConstants.NAME ) {
