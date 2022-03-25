@@ -1040,6 +1040,10 @@ public class RunBatchTool extends javax.swing.JPanel {
     private void rerunScriptMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rerunScriptMenuItemActionPerformed
         JLabel jLabel1= getSelectedLabel();
         
+        if ( !param2NameCB.getSelectedItem().toString().trim().equals("") ) {
+            JOptionPane.showMessageDialog( this, "Rerun is not supported with two arguments");
+            return;
+        }
         String argName= param1NameCB.getSelectedItem().toString();
         String argValue= jLabel1.getText();
         
