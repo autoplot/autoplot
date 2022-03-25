@@ -28,8 +28,10 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-03-23 r26567):</p>
+        <p>Bugfixes (2022-03-25 r26577):</p>
         <ul>
+            <li>round of FindBugs cleanup.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2442/">2442</a>: where waitUntilIdle failed to consider that the ephemeris might still be loading.
             <li>DataSet iterator would fail when non-qube bundle contained dataset with 0 records.  Thanks, Corentin!
             <li>binary (e.g. divide) and unary (e.g. exp10) operators now support non-qubes when second argument is (rank 0) scalar.  Thanks, Corentin!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2441/">2441</a>: components wouldn't reset properly in some cases, because "changesDimension" function expected pipe.  Thanks, Chris!
@@ -81,6 +83,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>pngwalk Quality Control tool has "Problem Save Next" button so problem flag can be set for many images rapidly.
             <li>pngwalk .vap file can reside next to the .pngwalk file, so that png files can exist without pngwalk tool files.
             <li>introduce "specialColors property" which allows colors to be assigned to values, beyond the colorbar transform.  Thanks James and Sadie!
             <li>Report download progress on Das2Server datasets without progress info by inspecting time tags.
