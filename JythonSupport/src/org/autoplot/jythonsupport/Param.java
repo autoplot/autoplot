@@ -41,19 +41,19 @@ public class Param {
     /**
      * List&lt;String&gt; of labels.
      */
-    public static String CONSTRAINT_LABELS = "labels";
+    public static final String CONSTRAINT_LABELS = "labels";
     /**
      * Number for the minimum, inclusive
      */
-    public static String CONSTRAINT_MIN = "min";
+    public static final String CONSTRAINT_MIN = "min";
     /**
      * Number for the maximum, inclusive
      */
-    public static String CONSTRAINT_MAX = "max";
+    public static final String CONSTRAINT_MAX = "max";
     /**
      * List&lt;Object&gt; example values, which will be the same as the examples field.
      */
-    public static String CONSTRAINT_EXAMPLES = "examples";
+    public static final String CONSTRAINT_EXAMPLES = "examples";
 
     @Override
     public String toString() {
