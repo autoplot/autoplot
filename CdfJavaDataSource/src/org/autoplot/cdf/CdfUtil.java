@@ -53,17 +53,17 @@ public class CdfUtil {
     /**
      * if "true", show empty records (true is default).
      */
-    public static String OPTION_INCLUDE_EMPTY_RECORDS= "includeEmptyRecords";
+    public static final String OPTION_INCLUDE_EMPTY_RECORDS= "includeEmptyRecords";
     
     /**
      * if "true", then don't show the number of records.
      */
-    public static String OPTION_IS_MASTER = "isMaster";
+    public static final String OPTION_IS_MASTER = "isMaster";
     
     /**
      * if "true" then return more detailed descriptions in HTML
      */
-    public static String OPTION_DEEP = "deep";
+    public static final String OPTION_DEEP = "deep";
     
     /**
      * return the Java type used to store the CDF data type.
