@@ -1300,19 +1300,19 @@ addBottomDecoration( dom.canvases[0], paint )
      * The name of the script which results in the image, optionally with its arguments.
      * @see org.das2.util.DasPNGConstants
      */
-    public static String PNG_KEY_SCRIPT="AutoplotScriptURI";
+    public static final String PNG_KEY_SCRIPT="AutoplotScriptURI";
     
     /**
      * The Autoplot .vap file which results in the image, optionally with "?" and modifiers.
      * @see org.das2.util.DasPNGConstants
      */
-    public static String PNG_KEY_VAP="AutoplotVap";
+    public static final String PNG_KEY_VAP="AutoplotVap";
     
     /**
      * The Autoplot URI which results in the image.
      * @see org.das2.util.DasPNGConstants
      */
-    public static String PNG_KEY_URI="AutoplotURI";
+    public static final String PNG_KEY_URI="AutoplotURI";
         
     /**
      * write out the current canvas to a png file.
