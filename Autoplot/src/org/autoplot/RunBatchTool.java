@@ -9,12 +9,14 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -117,6 +119,8 @@ public class RunBatchTool extends javax.swing.JPanel {
     private File resultsFile=null;
     
     private JLabel[] param1JLabels= null;
+    
+    private Map<JLabel,String> jobs= new HashMap<>();
     
     public static final int HTML_LINE_LIMIT = 50;
             
@@ -491,6 +495,11 @@ public class RunBatchTool extends javax.swing.JPanel {
         );
 
         copyUri.setText("Copy Script URI");
+        copyUri.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                copyUriActionPerformed(evt);
+            }
+        });
         postRunPopupMenu.add(copyUri);
 
         goButton.setText("Go!");
@@ -1007,6 +1016,21 @@ public class RunBatchTool extends javax.swing.JPanel {
     private void writeFilenameCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_writeFilenameCBActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_writeFilenameCBActionPerformed
+
+    private void copyUriActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyUriActionPerformed
+        JLabel p= getSelectedLabel();
+        String uri= jobs.get(p);
+        if ( uri!=null ) {
+            System.err.println(uri);
+            StringSelection stringSelection= new StringSelection( uri );
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents( stringSelection, null );
+            messageLabel.setText("URI copied to system clipboard.");
+        } else {
+            messageLabel.setText("Unable to find script URI.");
+            System.err.println("internal error...");
+        }
+        
+    }//GEN-LAST:event_copyUriActionPerformed
 
     private void doLoadFromFile( JTextArea paramValues ) {
         JFileChooser chooser= new JFileChooser();
@@ -1729,11 +1753,12 @@ public class RunBatchTool extends javax.swing.JPanel {
                     param1ScrollPane.scrollRectToVisible( jobLabel.getBounds() );
                     interp.setOut(outbaos);
                     interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile),scriptFile.getName()), scriptFile.getName() );
+                    String uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
                     if ( writeCheckBox.isSelected() ) {
-                        String uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
                         runResults.put("writeFile", doWrite(paramValue, "", uri, myDom ) );
                     }
                     jobLabel.setIcon(okay);
+                    jobs.put( jobLabel, uri );
                 } catch ( IOException | JSONException | RuntimeException ex ) {
                     String msg= ex.toString();
                     runResults.put("result",msg);
@@ -1784,6 +1809,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         progressPanel.add( monitor.getComponent() );
         this.monitor= monitor;
 
+        jobs.clear();
         final List<JLabel> jobs1= new ArrayList<>();
         final List<JLabel> jobs2= new ArrayList<>();
         
@@ -1993,7 +2019,9 @@ public class RunBatchTool extends javax.swing.JPanel {
      * @throws IOException 
      */
     public void doIt( int multiThread ) throws IOException {
-
+        
+        jobs.clear();
+        
         String pp2= param2NameCB.getSelectedItem()!=null ?
                     param2NameCB.getSelectedItem().toString().trim() :
                     "";
@@ -2014,13 +2042,20 @@ public class RunBatchTool extends javax.swing.JPanel {
         {
             String[] ff1= param1Values.getText().split("\n");
             JPanel p= switchListToIconLabels( jobs1, ff1 );
-
+            //p.addMouseListener( getPostPopupMouseAdapter() );
             for ( int i=0; i<jobs1.size(); i++ ) {
                 final int fi= i;
                 jobs1.get(i).addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
+                        if ( e.isPopupTrigger() ) {
+                            selectRecord(fi);
+                            RunBatchTool.this.selectedLabel= jobs1.get(fi);
+                            postRunPopupMenu.show( e.getComponent(), e.getX(), e.getY() );
+                            return;
+                        }
                         selectRecord(fi);
+                        RunBatchTool.this.selectedLabel= jobs1.get(fi);
                         String param1= (String)RunBatchTool.this.param1NameCB.getSelectedItem();
                         if ( RunBatchTool.this.results!=null ) {
                             String s= jobs1.get(fi).getText();
@@ -2058,6 +2093,27 @@ public class RunBatchTool extends javax.swing.JPanel {
                             }
                         }
                     }
+
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        if ( e.isPopupTrigger() ) {
+                            selectRecord(fi);
+                            RunBatchTool.this.selectedLabel= jobs1.get(fi);
+                            postRunPopupMenu.show( e.getComponent(), e.getX(), e.getY() );
+                            return;
+                        }
+                    }
+
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                        if ( e.isPopupTrigger() ) {
+                            selectRecord(fi);
+                            RunBatchTool.this.selectedLabel= jobs1.get(fi);
+                            postRunPopupMenu.show( e.getComponent(), e.getX(), e.getY() );
+                            return;
+                        }
+                    }
+                    
                 });
             }
 
@@ -2202,15 +2258,17 @@ public class RunBatchTool extends javax.swing.JPanel {
                         scriptParams.put(paramName,f1.trim());
                     }
                     
+                    String uri=null;
+                    
                     if ( param2NameCB.getSelectedItem().toString().trim().length()==0 ) {
                         long t0= System.currentTimeMillis();
                         ByteArrayOutputStream outbaos= new ByteArrayOutputStream();
                         try {
                             param1ScrollPane.scrollRectToVisible( jobs1.get(i1).getBounds() );
                             interp.setOut(outbaos);
+                            uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
                             interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile),scriptFile.getName()), scriptFile.getName() );
                             if ( writeCheckBox.isSelected() ) {
-                                String uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
                                 runResults.put("writeFile", doWrite(f1.trim(), "", uri, null ) );
                             }
                             jobs1.get(i1).setIcon(okay);
@@ -2223,6 +2281,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                             runResults.put("stdout", new String(outbaos.toByteArray(),"US-ASCII") );
                             runResults.put("executionTime", System.currentTimeMillis()-t0);                            
                             System.out.println(runResults.getString("stdout"));
+                            jobs.put( jobs1.get(i1), uri );                            
                         }
                         if ( jobs1.get(i1).getIcon()==okay ) {
                             jobs1.get(i1).setToolTipText( htmlize(runResults.getString("stdout")) );
@@ -2251,7 +2310,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                                 break;
                             }
                             long t0= System.currentTimeMillis();
-                            ByteArrayOutputStream outbaos= new ByteArrayOutputStream();
+                            ByteArrayOutputStream outbaos= new ByteArrayOutputStream();                            
                             try {
                                 paramName= param2NameCB.getSelectedItem().toString().trim();
                                 
@@ -2286,9 +2345,9 @@ public class RunBatchTool extends javax.swing.JPanel {
                                 }
                                 jobs2.get(i2).setIcon( working );
                                 interp.setOut(outbaos);
+                                uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
                                 interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile), scriptFile.getName()), scriptFile.getName() );
                                 if ( writeCheckBox.isSelected() ) {
-                                    String uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
                                     runResults.put("writeFile", doWrite(f1.trim(),f2.trim(), uri, null ) );
                                 }
                                 jobs2.get(i2).setIcon(okay);
@@ -2302,6 +2361,8 @@ public class RunBatchTool extends javax.swing.JPanel {
                             } finally {
                                 runResults.put("stdout", new String(outbaos.toByteArray(),"US-ASCII") );
                                 runResults.put("executionTime", System.currentTimeMillis()-t0);
+                                jobs.put( jobs1.get(i1), uri );
+                                jobs.put( jobs2.get(i2), uri );
                                 outbaos.close();
                                 System.out.println(runResults.getString("stdout"));
                             }
@@ -2528,5 +2589,11 @@ public class RunBatchTool extends javax.swing.JPanel {
             SwingUtilities.invokeLater(run);
             
         }
+    }
+
+    private JLabel selectedLabel;
+    
+    private JLabel getSelectedLabel() {
+        return this.selectedLabel;
     }
 }
