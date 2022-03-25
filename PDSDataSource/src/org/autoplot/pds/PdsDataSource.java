@@ -130,14 +130,8 @@ public class PdsDataSource extends AbstractDataSource {
         return rank1;
     }
     
-    /**
-     * TODO: verify me!
-     * @param dd
-     * @return 
-     */
     private double[] flatten3d( double[][][] dd ) {
         double[] rank1= new double[dd.length*dd[0].length*dd[0][0].length];
-        int nj= dd[0].length;
         int kk= 0;
         int[] qube= new int[] { dd.length, dd[0].length, dd[0][0].length };
         for ( int i0=0; i0<qube[0]; i0++ ) {
@@ -198,6 +192,7 @@ public class PdsDataSource extends AbstractDataSource {
      * @param doc the xml document
      * @param axisName the axis name
      * @return the independent variable for the axis.
+     * @throws javax.xml.xpath.XPathExpressionException
      */
     public static String resolveIndependentAxis( Document doc, String axisName ) throws XPathExpressionException {
             
@@ -237,6 +232,7 @@ public class PdsDataSource extends AbstractDataSource {
      * @param doc the parsed document for the label XML
      * @param depend the name of the data for the dependent variable, e.g. Waveform
      * @return ( Epoch, sample_offset, Waveform ) 
+     * @throws javax.xml.xpath.XPathExpressionException
      */
     public static List<String> seekDependencies( Document doc, List<String> depend ) throws XPathExpressionException {
         if ( depend.size()==1 ) { // always will have one element.
