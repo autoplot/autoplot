@@ -6,7 +6,6 @@ import com.github.difflib.patch.Patch;
 import external.AnnotationCommand;
 import external.PlotCommand;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -31,8 +30,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -40,8 +37,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
-import javax.swing.border.LineBorder;
-import javax.swing.text.BadLocationException;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.jythonsupport.JythonRefactory;
 import org.das2.system.RequestProcessor;
@@ -52,7 +47,6 @@ import org.python.core.PySystemState;
 import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
 import org.autoplot.dom.Application;
-import org.autoplot.scriptconsole.JythonScriptPanel;
 import org.autoplot.scriptconsole.MakeToolPanel;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceUtil;
@@ -483,8 +477,12 @@ public class JythonUtil {
             Map<String,String> params, 
             boolean askParams, boolean makeTool, 
             ProgressMonitor mon1) throws IOException {
-        return invokeScriptSoon( url, dom, params, askParams, makeTool, null, mon1 );
-    }            
+        try {
+            return invokeScriptSoon( url.toURI(), dom, params, askParams, makeTool, null, mon1 );
+        } catch (URISyntaxException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
     
     /**
      * invoke the Jython script on another thread.  Script parameters can be passed in, and the scientist can be 
@@ -508,36 +506,36 @@ public class JythonUtil {
         return invokeScriptSoon( uri, dom, vars, askParams, makeTool, null, mon1 );
     }       
     
-    /**
-     * invoke the Jython script on another thread.  Script parameters can be passed in, and the scientist can be 
-     * provided a dialog to set the parameters.  Note this will return before the script is actually
-     * executed, and monitor should be used to detect that the script is finished.
-     * @param url the address of the script.
-     * @param dom if null, then null is passed into the script and the script must not use dom.
-     * @param params values for parameters, or null.
-     * @param askParams if true, query the scientist for parameter settings.
-     * @param makeTool if true, offer to put the script into the tools area for use later (only if askParams).
-     * @param scriptPanel null or place to mark error messages and to mark as running a script.
-     * @param mon1 monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
-     * @return JOptionPane.OK_OPTION of the script is invoked.
-     * @throws java.io.IOException
-     * @deprecated use invokeScriptSoon with URI.
-     */    
-    public static int invokeScriptSoon( 
-            final URL url, 
-            final Application dom, 
-            Map<String,String> params, 
-            boolean askParams, 
-            final boolean makeTool, 
-            final JythonScriptPanel scriptPanel,
-            ProgressMonitor mon1) throws IOException {
-        try {
-            URI uri= url.toURI();
-            return invokeScriptSoon( uri, dom, params, askParams, makeTool, scriptPanel, mon1 );
-        } catch (URISyntaxException ex) {
-            throw new IllegalArgumentException(ex);
-        }
-    }
+//    /**
+//     * invoke the Jython script on another thread.  Script parameters can be passed in, and the scientist can be 
+//     * provided a dialog to set the parameters.  Note this will return before the script is actually
+//     * executed, and monitor should be used to detect that the script is finished.
+//     * @param url the address of the script.
+//     * @param dom if null, then null is passed into the script and the script must not use dom.
+//     * @param params values for parameters, or null.
+//     * @param askParams if true, query the scientist for parameter settings.
+//     * @param makeTool if true, offer to put the script into the tools area for use later (only if askParams).
+//     * @param scriptPanel null or place to mark error messages and to mark as running a script.
+//     * @param mon1 monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
+//     * @return JOptionPane.OK_OPTION of the script is invoked.
+//     * @throws java.io.IOException
+//     * @deprecated use invokeScriptSoon with URI.
+//     */    
+//    public static int invokeScriptSoon( 
+//            final URL url, 
+//            final Application dom, 
+//            Map<String,String> params, 
+//            boolean askParams, 
+//            final boolean makeTool, 
+//            final JythonScriptPanel scriptPanel,
+//            ProgressMonitor mon1) throws IOException {
+//        try {
+//            URI uri= url.toURI();
+//            return invokeScriptSoon( uri, dom, params, askParams, makeTool, scriptPanel, mon1 );
+//        } catch (URISyntaxException ex) {
+//            throw new IllegalArgumentException(ex);
+//        }
+//    }
     
     /**
      * invoke the Jython script on another thread.  Script parameters can be passed in, and the scientist can be 
@@ -548,7 +546,7 @@ public class JythonUtil {
      * @param params values for parameters, or null.
      * @param askParams if true, query the scientist for parameter settings.
      * @param makeTool if true, offer to put the script into the tools area for use later (only if askParams).
-     * @param scriptPanel null or place to mark error messages and to mark as running a script.
+     * @param runListener null or place to mark error messages and to mark as running a script.
      * @param mon1 monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
      * @return JOptionPane.OK_OPTION of the script is invoked.
      * @throws java.io.IOException
@@ -559,7 +557,7 @@ public class JythonUtil {
             final Map<String,String> params, 
             final boolean askParams, 
             final boolean makeTool, 
-            final JythonScriptPanel scriptPanel,
+            final JythonRunListener runListener,
             final ProgressMonitor mon1) throws IOException {
         
         if ( EventQueue.isDispatchThread() ) {
@@ -573,7 +571,7 @@ public class JythonUtil {
             @Override
             public void run() {
                 try {
-                    result.add( invokeScriptSoon( uri, file, dom, params, askParams, makeTool, scriptPanel, mon1 ) );
+                    result.add( invokeScriptSoon( uri, file, dom, params, askParams, makeTool, runListener, mon1 ) );
                 } catch (IOException ex) {
                     result.add(ex);
                 }
@@ -652,6 +650,7 @@ public class JythonUtil {
         } 
     }
     
+    
     /**
      * invoke the Jython script on another thread.  Script parameters can be passed in, and the scientist can be 
      * provided a dialog to set the parameters.  Note this will return before the script is actually
@@ -663,7 +662,7 @@ public class JythonUtil {
      * @param params values for parameters, or null.
      * @param askParams if true, query the scientist for parameter settings.
      * @param makeTool if true, offer to put the script into the tools area for use later (only if askParams).
-     * @param scriptPanel null or place to mark error messages and to mark as running a script.
+     * @param jythonRunListener null or place to mark error messages and to mark as running a script.
      * @param mon1 monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
      * @return JOptionPane.OK_OPTION of the script is invoked.
      * @throws java.io.IOException
@@ -675,8 +674,9 @@ public class JythonUtil {
             Map<String,String> params, 
             boolean askParams, 
             final boolean makeTool, 
-            final JythonScriptPanel scriptPanel,
-            ProgressMonitor mon1) throws IOException {        
+            final JythonRunListener jythonRunListener,
+            ProgressMonitor mon1) throws IOException {       
+
         final ProgressMonitor mon;
         if ( mon1==null ) {
             mon= new NullProgressMonitor();
@@ -742,11 +742,8 @@ public class JythonUtil {
                         interp.set( "dom", dom );
                         interp.set( "PWD", split.path ); 
                         
-                        if ( scriptPanel!=null ) {
-                            if ( ! scriptPanel.isDirty() && makeTool ) {
-                                scriptPanel.loadFile(file);
-                            }
-                            scriptPanel.setRunningScript(file);
+                        if ( jythonRunListener!=null ) {
+                            jythonRunListener.runningScript(file);
                         }
                         try ( FileInputStream in = new FileInputStream(file) ) {
                             
@@ -769,22 +766,13 @@ public class JythonUtil {
                             interp.execfile( JythonRefactory.fixImports(in,file.getName()), uri.toString() );
                             
                         } catch ( PyException ex ) {
-                            if ( scriptPanel!=null ) {
-                                String fn= scriptPanel.getFilename();
-                                if ( fn!=null ) {
-                                    try {
-                                        if ( new File( fn ).equals( file ) ) {
-                                            scriptPanel.getAnnotationsSupport().annotateError( ex, 0 );
-                                        }
-                                    } catch (BadLocationException ex1) {
-                                        logger.log(Level.SEVERE, null, ex1);
-                                    }
-                                }
+                            if ( jythonRunListener!=null ) {
+                                jythonRunListener.exceptionEncountered(file,ex);
                             }
                             throw ex;
                         } finally {
                             if ( !mon.isFinished() ) mon.finished();
-                            if ( scriptPanel!=null ) scriptPanel.setRunningScript(null);
+                            if ( jythonRunListener!=null ) jythonRunListener.runningScript(null);
                         } 
                         //TODO: error annotations on the editor.  This really would be nice.
                     } catch (IOException ex) {

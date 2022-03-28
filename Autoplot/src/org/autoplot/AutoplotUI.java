@@ -110,8 +110,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
 import javax.xml.parsers.ParserConfigurationException;
+import static org.autoplot.JythonUtil.invokeScriptSoon;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.autoplot.pngwalk.CreatePngWalk;
 import org.autoplot.pngwalk.PngWalkTool;
@@ -184,6 +186,7 @@ import org.das2.components.propertyeditor.TickValuesStringSchemeEditor;
 import org.das2.graph.DasAnnotation;
 import org.das2.graph.GraphUtil;
 import org.das2.components.GrannyTextEditor;
+import org.python.core.PyException;
 import org.python.util.PythonInterpreter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -881,8 +884,9 @@ public final class AutoplotUI extends javax.swing.JFrame {
                     try {
                         URISplit split= URISplit.parse(s);        //bug 1408--note runScript doesn't account for changes made to the GUI.
                         args= URISplit.parseParams(split.params);
+                        JythonRunListener runListener= makeJythonRunListener( scriptPanel, split.resourceUri, true );
                         if ( JOptionPane.OK_OPTION==JythonUtil.invokeScriptSoon( split.resourceUri, dom, 
-                                args, true, true, scriptPanel, new NullProgressMonitor() ) ) {
+                                args, true, true, runListener, new NullProgressMonitor() ) ) {
                             split.params= URISplit.formatParams(args);
                             if ( split.params.trim().length()==0 ) split.params=null;
                             String history= URISplit.format(split);
@@ -929,8 +933,10 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 String s= source.getValue();
                 if ( s.endsWith(".jy") ) {
                     try {
-                        JythonUtil.invokeScriptSoon( DataSetURI.getResourceURI(s), dom, 
-                                new HashMap(), true, true, scriptPanel, new NullProgressMonitor() );
+                        URI uri= DataSetURI.getResourceURI(s);
+                        JythonRunListener runListener= makeJythonRunListener( scriptPanel, uri, true );
+                        JythonUtil.invokeScriptSoon( uri, dom, 
+                                new HashMap(), true, true, runListener, new NullProgressMonitor() );
                     } catch ( IOException ex ) {
                         throw new RuntimeException(ex);
                     }
@@ -6341,8 +6347,9 @@ APSplash.checkTime("init 240");
                 @Override
                 public void run() {
                     try {
+                        JythonRunListener runListener= makeJythonRunListener( scriptPanel, split.resourceUri, true );
                         int res= JythonUtil.invokeScriptSoon( split.resourceUri, dom, 
-                                params, askParams, !fisTool, scriptPanel, mon );
+                                params, askParams, !fisTool, runListener, mon );
                         if ( res==JOptionPane.OK_OPTION ) {
                             split.params= params.isEmpty() ? null : URISplit.formatParams(params);
                             dom.getController().getApplicationModel().addRecent(URISplit.format(split));
@@ -6534,4 +6541,66 @@ APSplash.checkTime("init 240");
         }
 
     }
+    
+    private static JythonRunListener makeJythonRunListener( JythonScriptPanel scriptPanel, final URI uri, boolean doShowScript ) {
+        JythonRunListener runListener= new JythonRunListener() {
+            @Override
+            public void runningScript(File file) {                        
+                if ( ! scriptPanel.isDirty() && doShowScript ) { // makeTool==false means it's already a tool
+                    try {
+                        if ( file!=null ) scriptPanel.loadFile(file);
+                    } catch (IOException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
+                scriptPanel.setRunningScript(file);
+            }
+
+            @Override
+            public void exceptionEncountered(File fn,PyException ex) {
+                try {
+                    File file = DataSetURI.getFile( uri, new NullProgressMonitor() ); 
+                    if ( file.equals( fn ) ) {
+                        scriptPanel.getAnnotationsSupport().annotateError( ex, 0 );
+                    }
+                } catch (BadLocationException ex1) {
+                    logger.log(Level.SEVERE, null, ex1);
+                } catch (IOException ex1) {
+                    logger.log(Level.SEVERE, null, ex1);
+                }
+            }
+            
+        };
+        return runListener;
+    }
+    
+    /**
+     * invoke the Jython script on another thread.  Script parameters can be passed in, and the scientist can be 
+     * provided a dialog to set the parameters.  Note this will return before the script is actually
+     * executed, and monitor should be used to detect that the script is finished.
+     * This should be called from the event thread!
+     * @param uri the resource URI of the script (without parameters).
+     * @param file the file which has been downloaded.
+     * @param dom if null, then null is passed into the script and the script must not use dom.
+     * @param params values for parameters, or null.
+     * @param askParams if true, query the scientist for parameter settings.
+     * @param makeTool if true, offer to put the script into the tools area for use later (only if askParams).
+     * @param scriptPanel null or place to mark error messages and to mark as running a script.
+     * @param mon1 monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
+     * @return JOptionPane.OK_OPTION of the script is invoked.
+     * @throws java.io.IOException
+     */
+    public static int invokeScriptSoon( 
+            final URI uri, 
+            final File file, 
+            final Application dom, 
+            Map<String,String> params, 
+            boolean askParams, 
+            final boolean makeTool, 
+            final JythonScriptPanel scriptPanel,
+            ProgressMonitor mon1) throws IOException {        
+        JythonRunListener runListener= makeJythonRunListener( scriptPanel, uri, makeTool );
+                        
+        return JythonUtil.invokeScriptSoon( uri, file, dom, params, askParams, makeTool, runListener, mon1 );
+    }    
 }
