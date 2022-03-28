@@ -6543,6 +6543,9 @@ APSplash.checkTime("init 240");
     }
     
     private static JythonRunListener makeJythonRunListener( JythonScriptPanel scriptPanel, final URI uri, boolean doShowScript ) {
+        if ( scriptPanel==null ) {
+            throw new NullPointerException( "scriptPanel argument cannot be null");
+        }
         JythonRunListener runListener= new JythonRunListener() {
             @Override
             public void runningScript(File file) {                        
