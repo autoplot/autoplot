@@ -212,6 +212,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
     private String baseurl; // the base url
     private String qcturl;  // the url for quality control data.
     private String pwd=null; // the location of the .pngwalk file, if used, or null.
+    private String vapfile=null;
     
     public static void main(String[] args) {
 
@@ -276,6 +277,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         String baseurl= "";
         String pwd="";
         String qcturl= "";
+        String vapfile= "";
         try {
             Properties p= new Properties();
             if ( split.file==null ) {
@@ -290,15 +292,21 @@ public final class PngWalkTool extends javax.swing.JPanel {
             
             pwd= split.path; // pwd is the location of the pngwalk file, which could be different than the template.
             
+            product= p.getProperty("product");
+
+            pwd= p.getProperty("pwd",pwd);  // so that the .pngwalk file can be used out-of-context.
+            
             baseurl= p.getProperty("baseurl","."); // baseurl is needed so that pngwalks can be used out-of-context, for example when a browser downloads the file and hands it off to Autoplot.
-            if ( !baseurl.equals(".") ) {
+            if ( !baseurl.startsWith(".") ) {
                 if ( !baseurl.endsWith("/") ) {
                     baseurl= baseurl + "/";
                 }
-                split.path=baseurl;
+                split.path= baseurl;
+            } else {
+                split.path= checkRelativeBaseurl( baseurl, pwd, product );
             }
             
-            qcturl= p.getProperty("qcturl",baseurl); // allow the qc data to come from a different place
+            qcturl= p.getProperty("qcturl",pwd); // allow the qc data to come from a different place
             
             String t;
             if ( !p.getProperty("filePattern","").equals("") ) {
@@ -308,7 +316,8 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 t= split.path + p.getProperty("product") + "_" + p.getProperty("timeFormat") +vers + ".png";
             }
             template= t;
-            product= p.getProperty("product");
+            vapfile= p.getProperty("vapfile","");
+            
         } catch (FileSystemOfflineException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (FileNotFoundException ex) {
@@ -329,6 +338,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         result.put( "baseurl", baseurl );
         result.put( "qcturl", qcturl );
         result.put( "pwd", pwd );
+        result.put( "vapfile", vapfile );
         return result;
 
     }
@@ -342,11 +352,36 @@ public final class PngWalkTool extends javax.swing.JPanel {
         SwingUtilities.invokeLater(run);
     }
     
+    /**
+     * 
+     * @param baseurl  -- possibly relative location, only "./" and ../dir/" supported.
+     * @param template
+     * @param product
+     * @return 
+     */
     private static String checkRelativeBaseurl( String baseurl, String template, String product ) {
         if ( baseurl.equals(".") ) {
             URISplit split= URISplit.parse(template);
             String f= split.path;
             int i= f.indexOf( "/"+product+".pngwalk" );
+            if ( i==-1 ) {
+                i= f.indexOf('*');
+                if ( i>-1 ) i= f.lastIndexOf('/',i);
+            }
+            if ( i==-1 ) {
+                if ( f.endsWith("/") ) {
+                    baseurl= f;
+                }
+            }
+            if ( i>-1 ) {
+                baseurl= f.substring(0,i+1);
+            }
+        } else if ( baseurl.startsWith("../") ) { // ../fgmjuno/
+            URISplit split= URISplit.parse(template);
+            String f= split.path;
+            int i= f.lastIndexOf("/",f.length()-2);
+            f= f.substring(0,i) + baseurl.substring(2);
+            i= f.indexOf( "/"+product+".pngwalk" );
             if ( i==-1 ) {
                 i= f.indexOf('*');
                 if ( i>-1 ) i= f.lastIndexOf('/',i);
@@ -369,8 +404,10 @@ public final class PngWalkTool extends javax.swing.JPanel {
         baseurl= map.get("baseurl");
         qcturl= map.get("qcturl");
         pwd= map.get("pwd");
+        vapfile= map.get("vapfile");
         baseurl= checkRelativeBaseurl( baseurl, file, product );
         qcturl= checkRelativeBaseurl( qcturl, pwd, product );
+        vapfile= checkRelativeBaseurl( vapfile, pwd, product );
         String template= map.get("template");  
         this.setTemplate(template); 
     }
