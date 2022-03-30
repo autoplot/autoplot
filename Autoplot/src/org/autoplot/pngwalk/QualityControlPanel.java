@@ -56,7 +56,8 @@ public class QualityControlPanel extends javax.swing.JPanel {
         nullRadioButton = new JRadioButton();
         statusButtonGroup.add(nullRadioButton);  //add to button group, but not to UI
         ItemListener l= (ItemEvent e) -> {
-            if ( okRadioButton.isSelected() || problemRadioButton.isSelected() || ignoreRadioButton.isSelected() ) {
+            boolean canWrite= !sequencePropertiesHost.getText().endsWith("(read only)");
+            if ( canWrite && ( okRadioButton.isSelected() || problemRadioButton.isSelected() || ignoreRadioButton.isSelected() ) ) {
                 saveButton.setEnabled(true);
             } else {
                 saveButton.setEnabled(false);
@@ -211,32 +212,35 @@ public class QualityControlPanel extends javax.swing.JPanel {
 
     }
     private void login() {
-        if ( walkImageSequence.getQualityControlSequence()==null ) {
-            URI uri= walkImageSequence.getQCFolder();
+        URI uri= walkImageSequence.getQCFolder();
+        try {
+            URI uris = KeyChain.getDefault().resolveUserInfo(uri);
+            walkImageSequence.initQualitySequence(uris);
             try {
-                URI uris = KeyChain.getDefault().resolveUserInfo(uri);
-                walkImageSequence.initQualitySequence(uris);
-                try {
-                    FileSystem fs= FileSystem.create(uri);
-                    WriteCapability w= fs.getFileObject("testwrite.txt").getCapability(WriteCapability.class);
-                    if ( w!=null && w.canWrite() ) {
-                        setStateButtonedEnabled(true);
-                        saveButton.setEnabled(true);
-                        loginButton.setEnabled(false);        
-                    } else {
-                        loginButton.setEnabled(false);    
-                        loginButton.setToolTipText("<html>Unable to write to File System<br>"+fs.getRootURI());
-                        saveButton.setEnabled(false);
-                        sequencePropertiesHost.setText( uri.toString() + " -- " + "Unable to write to file system" );
-                    }
-                } catch ( FileSystem.FileSystemOfflineException | UnknownHostException | FileNotFoundException ex) {
-                    Logger.getLogger(QualityControlPanel.class.getName()).log(Level.SEVERE, null, ex);
+                FileSystem fs= FileSystem.create(uri);
+                WriteCapability w= fs.getFileObject("testwrite.txt").getCapability(WriteCapability.class);
+                if ( w!=null && w.canWrite() ) {
+                    setStateButtonedEnabled(true);
+                    saveButton.setEnabled(true);
+                    okSaveNextButton.setEnabled(true);
+                    problemSaveNextButton.setEnabled(true);
+                    loginButton.setEnabled(false);        
+                    sequencePropertiesHost.setText( uri.toString() );
+                } else {
+                    loginButton.setEnabled(false);    
+                    loginButton.setToolTipText("<html>Unable to write to File System<br>"+fs.getRootURI());
+                    saveButton.setEnabled(false);
+                    okSaveNextButton.setEnabled(false);
+                    problemSaveNextButton.setEnabled(false);
+                    sequencePropertiesHost.setText( uri.toString() + " (read only)" );
                 }
-                
-
-            } catch (CancelledOperationException ex) {
-                logger.log( Level.INFO, ex.getMessage(), ex );
+            } catch ( FileSystem.FileSystemOfflineException | UnknownHostException | FileNotFoundException ex) {
+                Logger.getLogger(QualityControlPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
+
+
+        } catch (CancelledOperationException ex) {
+            logger.log( Level.INFO, ex.getMessage(), ex );
         }
     }
 
@@ -254,7 +258,6 @@ public class QualityControlPanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         statusButtonGroup = new javax.swing.ButtonGroup();
         jLabel2 = new javax.swing.JLabel();
@@ -319,10 +322,6 @@ public class QualityControlPanel extends javax.swing.JPanel {
 
         okSaveNextButton.setText("OK Save Next");
         okSaveNextButton.setToolTipText("Mark as OK, Save, and advance to next image.  Ctrl+Enter can be used as well.");
-
-        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, okRadioButton, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), okSaveNextButton, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
-        bindingGroup.addBinding(binding);
-
         okSaveNextButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 okSaveNextButtonActionPerformed(evt);
@@ -459,8 +458,6 @@ public class QualityControlPanel extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
-
-        bindingGroup.bind();
     }// </editor-fold>//GEN-END:initComponents
 
     protected transient WalkImageSequence walkImageSequence = null;
@@ -531,9 +528,10 @@ public class QualityControlPanel extends javax.swing.JPanel {
                         setStateButtonedEnabled(true);                    
                     }
                 }
-                if ( uri.getScheme().equals("file") ) {  // log in automatically if it's not restricted
-                    login();
-                }
+                login();
+                //if ( uri.getScheme().equals("file") ) {  // log in automatically if it's not restricted
+                //    login();
+                //}
             };
             new Thread( run ).start();
         }
@@ -620,7 +618,6 @@ public class QualityControlPanel extends javax.swing.JPanel {
     private javax.swing.JTextField sequencePropertiesHost;
     private javax.swing.ButtonGroup statusButtonGroup;
     private javax.swing.JLabel statusLabel;
-    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
     public static void main(String[] args) {
