@@ -2516,6 +2516,7 @@ public final class HapiDataSource extends AbstractDataSource {
                     Object olabel= jsonObjecti.get( HapiUtil.KEY_LABEL );
                     if ( olabel instanceof String ) {
                         pds[i].label= (String)olabel;
+                        pds[i].labels= null;
                     } else if ( olabel instanceof JSONArray ) {
                         JSONArray array= (JSONArray)olabel;
                         pds[i].labels= new String[array.length()];
