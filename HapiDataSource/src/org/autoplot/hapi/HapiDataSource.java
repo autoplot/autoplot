@@ -292,6 +292,7 @@ public final class HapiDataSource extends AbstractDataSource {
         String name= "";
         String description= "";
         String label="";
+        String[] labels=null;
         String type= "";
         /**
          * number of indices in each index.
@@ -2515,6 +2516,12 @@ public final class HapiDataSource extends AbstractDataSource {
                     Object olabel= jsonObjecti.get( HapiUtil.KEY_LABEL );
                     if ( olabel instanceof String ) {
                         pds[i].label= (String)olabel;
+                    } else if ( olabel instanceof JSONArray ) {
+                        JSONArray array= (JSONArray)olabel;
+                        pds[i].labels= new String[array.length()];
+                        for ( int j=0; j<array.length(); j++ ) {
+                            pds[i].labels[j]= array.getString(j);
+                        }
                     }
                     if ( pds[i].label==null ) pds[i].label= name;
                 } else {
@@ -2636,6 +2643,9 @@ public final class HapiDataSource extends AbstractDataSource {
         ds= Ops.putProperty( ds, QDataSet.UNITS, pds1.units );
         if ( pds1.hasFill ) {
             ds= Ops.putProperty( ds, QDataSet.FILL_VALUE, pds1.fillValue );
+        }
+        if ( pds1.labels!=null ) {
+            ds= Ops.putProperty( ds, QDataSet.DEPEND_1, Ops.labelsDataset( pds1.labels ) );
         }
         return ds;
     }
