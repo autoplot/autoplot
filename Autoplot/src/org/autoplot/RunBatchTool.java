@@ -1061,7 +1061,11 @@ public class RunBatchTool extends javax.swing.JPanel {
             String script= readScript( scriptFile );
             Map<String,String> params= URISplit.parseParams( split.params );
             Map<String,org.autoplot.jythonsupport.Param> parms= Util.getParams( env, script, params, new NullProgressMonitor() );
-            doOneJob( jLabel1, scriptFile, parms, params, argName, argValue, new NullProgressMonitor() );
+            Runnable run= () -> {
+                doOneJob( jLabel1, scriptFile, parms, params, argName, argValue, new NullProgressMonitor() );
+            };
+            jLabel1.setIcon( ICON_WORKING );
+            new Thread( run, "run-batch-0" ).start();
                 
         } catch (IOException ex) {
             Logger.getLogger(RunBatchTool.class.getName()).log(Level.SEVERE, null, ex);
@@ -1585,10 +1589,10 @@ public class RunBatchTool extends javax.swing.JPanel {
         }
     }
     
-    private static final Icon queued= new ImageIcon(RunBatchTool.class.getResource("/resources/grey.gif"));
-    private static final Icon working= new ImageIcon(RunBatchTool.class.getResource("/resources/blue_anime.gif"));
-    private static final Icon okay= new ImageIcon(RunBatchTool.class.getResource("/resources/blue.gif"));
-    private static final Icon prob= new ImageIcon(RunBatchTool.class.getResource("/resources/red.gif"));    
+    private static final Icon ICON_QUEUED= new ImageIcon(RunBatchTool.class.getResource("/resources/grey.gif"));
+    private static final Icon ICON_WORKING= new ImageIcon(RunBatchTool.class.getResource("/resources/blue_anime.gif"));
+    private static final Icon ICON_OKAY= new ImageIcon(RunBatchTool.class.getResource("/resources/blue.gif"));
+    private static final Icon ICON_PROB= new ImageIcon(RunBatchTool.class.getResource("/resources/red.gif"));    
 
     private void switchToEditableList() {
         messageLabel.setText("Load up those parameters and hit Go!");
@@ -1613,7 +1617,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         p.setLayout( new BoxLayout(p,BoxLayout.Y_AXIS) );
         for ( String f: ff1 ) {
             JLabel l= new JLabel(f);
-            l.setIcon(queued);
+            l.setIcon(ICON_QUEUED);
             p.add( l );
             jobs1.add(l);
         }
@@ -1764,7 +1768,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                 return null;
             }
 
-            jobLabel.setIcon(working);
+            jobLabel.setIcon(ICON_WORKING);
             interp.set( "PWD", split.path );
             String[] paramNames= maybeSplitMultiParam( paramName );
 
@@ -1807,19 +1811,19 @@ public class RunBatchTool extends javax.swing.JPanel {
                     if ( writeCheckBox.isSelected() ) {
                         runResults.put("writeFile", doWrite(paramValue, "", uri, myDom ) );
                     }
-                    jobLabel.setIcon(okay);
+                    jobLabel.setIcon(ICON_OKAY);
                     jobs.put( jobLabel, uri );
                 } catch ( IOException | JSONException | RuntimeException ex ) {
                     String msg= ex.toString();
                     runResults.put("result",msg);
-                    jobLabel.setIcon(prob);
+                    jobLabel.setIcon(ICON_PROB);
                 } finally {
                     outbaos.close();
                     runResults.put("stdout", new String(outbaos.toByteArray(),"US-ASCII") );
                     runResults.put("executionTime", System.currentTimeMillis()-t0);                            
                     System.out.println(runResults.getString("stdout"));
                 }
-                if ( jobLabel.getIcon()==okay ) {
+                if ( jobLabel.getIcon()==ICON_OKAY ) {
                     jobLabel.setToolTipText( htmlize(runResults.getString("stdout")) );
                 } else {
                     jobLabel.setToolTipText( htmlize(runResults.getString("stdout"),runResults.getString("result")));
@@ -1836,7 +1840,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                 
         } catch ( IOException | RuntimeException | JSONException ex) {
             Logger.getLogger(RunBatchTool.class.getName()).log(Level.SEVERE, null, ex);
-            jobLabel.setIcon(prob);
+            jobLabel.setIcon(ICON_PROB);
             jobLabel.setToolTipText(htmlize(ex.toString()));
             String[] names= JSONObject.getNames(runResults);
             if ( names!=null ) {
@@ -1910,11 +1914,11 @@ public class RunBatchTool extends javax.swing.JPanel {
                                         JSONObject runResults= thisRow.get(i);
                                         String except= thisRow.get(i).getString("result");
                                         if ( except.length()>0 ) {
-                                            jobs2.get(i).setIcon(prob);
+                                            jobs2.get(i).setIcon(ICON_PROB);
                                         } else {
-                                            jobs2.get(i).setIcon(okay);
+                                            jobs2.get(i).setIcon(ICON_OKAY);
                                         }
-                                        if ( jobs2.get(i).getIcon()==okay ) {
+                                        if ( jobs2.get(i).getIcon()==ICON_OKAY ) {
                                             jobs2.get(i).setToolTipText( htmlize(runResults.getString("stdout")) );
                                         } else {
                                             jobs2.get(i).setToolTipText( htmlize(runResults.getString("stdout"),runResults.getString("result")));
@@ -2124,11 +2128,11 @@ public class RunBatchTool extends javax.swing.JPanel {
                                         JSONObject runResults= thisRow.get(i);
                                         String except= thisRow.get(i).getString("result");
                                         if ( except.length()>0 ) {
-                                            jobs2.get(i).setIcon(prob);
+                                            jobs2.get(i).setIcon(ICON_PROB);
                                         } else {
-                                            jobs2.get(i).setIcon(okay);
+                                            jobs2.get(i).setIcon(ICON_OKAY);
                                         }
-                                        if ( jobs2.get(i).getIcon()==okay ) {
+                                        if ( jobs2.get(i).getIcon()==ICON_OKAY ) {
                                             jobs2.get(i).setToolTipText( htmlize(runResults.getString("stdout")) );
                                         } else {
                                             jobs2.get(i).setToolTipText( htmlize(runResults.getString("stdout"),runResults.getString("result")));
@@ -2267,7 +2271,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                         continue;
                     }
 
-                    jobs1.get(i1).setIcon(working);
+                    jobs1.get(i1).setIcon(ICON_WORKING);
                     //interp.set( "monitor", monitor.getSubtaskMonitor(f1) );
                     interp.set( "monitor", new NullProgressMonitor() {
                         @Override
@@ -2321,11 +2325,11 @@ public class RunBatchTool extends javax.swing.JPanel {
                             if ( writeCheckBox.isSelected() ) {
                                 runResults.put("writeFile", doWrite(f1.trim(), "", uri, null ) );
                             }
-                            jobs1.get(i1).setIcon(okay);
+                            jobs1.get(i1).setIcon(ICON_OKAY);
                         } catch ( IOException | JSONException | RuntimeException ex ) {
                             String msg= ex.toString();
                             runResults.put("result",msg);
-                            jobs1.get(i1).setIcon(prob);
+                            jobs1.get(i1).setIcon(ICON_PROB);
                         } finally {
                             outbaos.close();
                             runResults.put("stdout", new String(outbaos.toByteArray(),"US-ASCII") );
@@ -2333,7 +2337,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                             System.out.println(runResults.getString("stdout"));
                             jobs.put( jobs1.get(i1), uri );                            
                         }
-                        if ( jobs1.get(i1).getIcon()==okay ) {
+                        if ( jobs1.get(i1).getIcon()==ICON_OKAY ) {
                             jobs1.get(i1).setToolTipText( htmlize(runResults.getString("stdout")) );
                         } else {
                             jobs1.get(i1).setToolTipText( htmlize(runResults.getString("stdout"),runResults.getString("result")));
@@ -2348,7 +2352,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                         String[] ff2= param2Values.getText().split("\n");
 
                         for ( int i2=0; i2<jobs2.size(); i2++ ) {
-                            jobs2.get(i2).setIcon(queued);
+                            jobs2.get(i2).setIcon(ICON_QUEUED);
                         }
                         
                         int i2=0;
@@ -2393,20 +2397,20 @@ public class RunBatchTool extends javax.swing.JPanel {
                                     runResults.put(paramName,f2.trim());
                                     scriptParams.put( paramName,f2.trim() );
                                 }
-                                jobs2.get(i2).setIcon( working );
+                                jobs2.get(i2).setIcon( ICON_WORKING );
                                 interp.setOut(outbaos);
                                 uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
                                 interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile), scriptFile.getName()), scriptFile.getName() );
                                 if ( writeCheckBox.isSelected() ) {
                                     runResults.put("writeFile", doWrite(f1.trim(),f2.trim(), uri, null ) );
                                 }
-                                jobs2.get(i2).setIcon(okay);
+                                jobs2.get(i2).setIcon(ICON_OKAY);
                                 runResults.put("result","");
                             } catch ( IOException | JSONException | RuntimeException ex ) {
                                 String msg= ex.toString();
                                 runResults.put("result",msg);
-                                jobs1.get(i1).setIcon(prob);
-                                jobs2.get(i2).setIcon(prob); // this will only show briefly, but it is still helpful.
+                                jobs1.get(i1).setIcon(ICON_PROB);
+                                jobs2.get(i2).setIcon(ICON_PROB); // this will only show briefly, but it is still helpful.
                                 problemMessage= msg;
                             } finally {
                                 runResults.put("stdout", new String(outbaos.toByteArray(),"US-ASCII") );
@@ -2416,7 +2420,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                                 outbaos.close();
                                 System.out.println(runResults.getString("stdout"));
                             }
-                            if ( jobs1.get(i1).getIcon()!=prob ) {
+                            if ( jobs1.get(i1).getIcon()!=ICON_PROB ) {
                                 jobs2.get(i2).setToolTipText( htmlize(runResults.getString("stdout")) );
                             } else {
                                 String s= htmlize(runResults.getString("stdout"),runResults.getString("result"));
@@ -2429,13 +2433,13 @@ public class RunBatchTool extends javax.swing.JPanel {
                             icount++;
                         }
                         if ( problemMessage==null ) {
-                            jobs1.get(i1).setIcon(okay);
+                            jobs1.get(i1).setIcon(ICON_OKAY);
                             jobs1.get(i1).setToolTipText(null);
                         }
                     }
                 } catch (IOException | RuntimeException | JSONException ex) {
                     Logger.getLogger(RunBatchTool.class.getName()).log(Level.SEVERE, null, ex);
-                    jobs1.get(i1).setIcon(prob);
+                    jobs1.get(i1).setIcon(ICON_PROB);
                     jobs1.get(i1).setToolTipText(htmlize(ex.toString()));
                 }
                 i1=i1+1;
