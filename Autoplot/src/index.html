@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Improvements to .pngwalk file make it easier to annotate remote pngwalks.  Here an old pngwalk at NASA CDAWeb is annotated.
+        <p><small>Spaces in zip file names would cause a runtime exception, preventing use with Google Drive.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,7 +28,12 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-03-29 r26596):</p>
+        <p>Bugfixes (2022-04-05 r26606):</p>
+        <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2444/">2444</a>: Run Batch would not create a new interpretter for each run, so information could leak from one run to another.
+            <li>Re-run single job of batch would run on event thread, hiding feedback and locking application.
+        </ul>
+        <p>Older Bugfixes (2022-03-29 r26596):</p>
         <ul>
             <li>HAPI Server dataset label can be an array to label components.  This had never been supported.
             <li>zip file names can contain spaces.  Thanks, Kristoff!
@@ -44,46 +49,10 @@
             <li>Autoplot server only believes X-Forwarded-For when remote host is from a secure network.
             <li>HapiDataSource didn't provide completions for parameters and timerange.
         </ul>
-        <p>Older Bugfixes (2022-02-22 r26493):</p>
-        <ul>
-            <li>pressing "run batch" tool cancel button also cancels the running process.
-            <li>include jaxb library in stable jars to support Java 12, where this has been removed.  (There are still issues with Java 12 and PDS module.)
-            <li>triple-quotes check in Jython getParameters refactorings didn't look for """, only '''.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2435/">2435</a>: careless code assumed that CONTEXT_0 rank 0 data left over from slice1 could be added to calculate timetag
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2433/">2433</a>: $Y$m$d$H$M_to_$(Y;end)$m$d$H$M is allowed in PNG Walks now.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2432/">2432</a>: corrections to decimalYear unit.
-            <li>SeriesRenderer handles rgbColor where alpha channel is non-zero.
-            <li>script diff since last invocation was drawn backwards, showing changes in the wrong direction.
-            <li>Use start and stop for HAPI 3.0 servers.
-            <li>Autoplot-based HAPI server properly formats times with Z suffix.  Thanks, Bob!
-            <li>HAPI data source editor is set properly when there is an error getting the catalog.  Before it would leave an old catalog showing.
-            <li>go-to line action from the Jython editor line number gutter now requires shift to activate.
-            <li>runtime error during data source editor creation could leave the data set selector in a locked state.
-            <li>correction to rescale routine, which ignored the "max" parameter.
-            <li>if a data source crashed during GUI initialization, the data set selector could be locked up.
-            <li>trace functionality revisited to use Jython AST for handling code.
-            <li>Run Batch Tool save action used open dialog, now uses save.
-            <li>dataSetWrapper needed to wrap slice and trim methods.
-            <li>Recent change to support colors for nominal data in HAPI client broke timetag-only read.
-            <li>DataSetBuilder's toString method used * for streaming dimension, when : is consistent with Jython.
-            <li>Polar plot handles bundle(angles,radii).
-            <li>correctly handle autoranging with the Series renderer and bundle of X,Y.
-            <li><a href='https://github.com/das-developers/das2java/issues/26'>0026</a>: clip lines outside of the plot bounds, so that performance is preserved with lines to log(0) a.k.a. -Inf, which was limited to -10000 px.
-            <li><a href='https://sourceforge.net/p/autoplot/bugs/2429/'>2429</a>: don't do the automatic DEPEND_0 when the column read is column 0.  Thanks, Sadie!
-            <li><a href='https://sourceforge.net/p/autoplot/feature-requests/651/'>rfe651</a>: orbit:/tmp/orbitsfile.txt:mms-1 is no longer interpreted as range.  This is only supported with numeric orbit numbers.
-            <li><a href='https://sourceforge.net/p/autoplot/feature-requests/651/'>rfe651</a>: pressing the events list green play button will always re-read the events definitions from the file.  Thanks, Ivar!
-            <li>Trim whitespace at end of Jython code when showing differences, because on Windows every line was marked as changed on Bill's computer.
-            <li><a href='https://sourceforge.net/p/autoplot/feature-requests/363/'>rfe363</a>: various code fragments (else, subscript, etc) were handled improperly, causing completions to fail.
-            <li><a href='https://sourceforge.net/p/autoplot/feature-requests/363/'>rfe363</a>: bug where line was included in simplify for completions, but shouldn't have been, which caused completions to fail.
-            <li><a href='https://sourceforge.net/p/autoplot/bugs/2425'>2425</a>: fill-to-zero mode with 691200 points showed that reduced version wasn't used.
-            <li>bugfix: color scatter mode didn't listen to the log property of the colorbar.  Thanks, Sadie!
-            <li>some thread use clean up after seeing issues with Java 17.
-            <li><a href='https://sourceforge.net/p/autoplot/bugs/2424'>2424</a>: set the application when running custom actions in the editor, when working with multiple windows.  Thanks, Sadie!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2421">2421</a>: add action to show simplified script to get parameters.
-            <li>annotation editor dialog now has GrannyTextEditor button.
-            <li>GitCommand assumed it could write to /tmp/, which isn't working on a Mac.
-        </ul>
         <p>Features:</p>
+        <ul>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>.pngwalk can contain the name of an external .vap file in vapfile property, to support PDS and read-only PNG Walks.  Thanks, Chris!
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/775/">rfe775</a>: Run Batch lets you rerun one job and copy the script URIs.
@@ -99,20 +68,6 @@
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/772/">rfe772</a>: The right argument of Run Batch can also have multiple parameters, and GUI reveals the feature.  
             <li>when Jython completions encounters an error when running, still show the completions for other symbols, improve error display.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/774/">rfe774</a>: Completions on URI within getDataSet call supports simple string concatenations to allow for shorter lines without loosing completions.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/772/">rfe772</a>: Run Batch supports list of M arguments.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/678/">rfe678</a>: support for .tgz files.
-            <li>Image renderer now supports rank 2 dataset with rgbColor units.
-            <li>Jython script trace mode follows program counter.
-            <li>support for bounding boxes, automatically detecting scheme and using BoundsRenderer.
-            <li>AutoplotServlet's ScriptGUIServlet now has previous/next buttons on timerange GUI.
-            <li><a href='https://sourceforge.net/p/autoplot/feature-requests/363/'>363</a>: support completions on object within array, like dom.plots[2].*
-            <li>improvements to Jython to Java code converter.
-            <li>introduce readConfiguration command, which reads configuration into map of name/value pairs to help with scripting and supports %{PWD}.
-            <li>Introduce pull and push to GitCommand, looking forward to when pure-Java git library is introduced.
-            <li>Scroll to where the Jython error occurred, in addition to showing the red squiggly.
         </ul>
         <p>Known issues:</p>
         <ul>
