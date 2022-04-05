@@ -14,6 +14,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -2099,78 +2100,8 @@ public class RunBatchTool extends javax.swing.JPanel {
             //p.addMouseListener( getPostPopupMouseAdapter() );
             for ( int i=0; i<jobs1.size(); i++ ) {
                 final int fi= i;
-                jobs1.get(i).addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        if ( e.isPopupTrigger() ) {
-                            selectRecord(fi);
-                            RunBatchTool.this.selectedLabel= jobs1.get(fi);
-                            postRunPopupMenu.show( e.getComponent(), e.getX(), e.getY() );
-                            return;
-                        }
-                        selectRecord(fi);
-                        RunBatchTool.this.selectedLabel= jobs1.get(fi);
-                        String param1= (String)RunBatchTool.this.param1NameCB.getSelectedItem();
-                        if ( RunBatchTool.this.results!=null ) {
-                            String s= jobs1.get(fi).getText();
-                            List<JSONObject> thisRow= new ArrayList<>();
-                            try {
-                                JSONObject jo= RunBatchTool.this.results;
-                                JSONArray ja= jo.getJSONArray("results");
-                                for ( int j=0; j<ja.length(); j++ ) {
-                                    JSONObject jo1= ja.getJSONObject(j);
-                                    if ( jo1.getString(param1).equals(s) ) {
-                                        thisRow.add( jo1 );
-                                    }
-                                }
-                                if ( jobs2.size()==thisRow.size() ) {
-                                    for ( int i=0; i<thisRow.size(); i++ ) {
-                                        JSONObject runResults= thisRow.get(i);
-                                        String except= thisRow.get(i).getString("result");
-                                        if ( except.length()>0 ) {
-                                            jobs2.get(i).setIcon(ICON_PROB);
-                                        } else {
-                                            jobs2.get(i).setIcon(ICON_OKAY);
-                                        }
-                                        if ( jobs2.get(i).getIcon()==ICON_OKAY ) {
-                                            jobs2.get(i).setToolTipText( htmlize(runResults.getString("stdout")) );
-                                        } else {
-                                            jobs2.get(i).setToolTipText( htmlize(runResults.getString("stdout"),runResults.getString("result")));
-                                        }
-                                    }
-                                } else {
-                                    logger.fine("Nothing to do.");
-                                }
-                                
-                            } catch (JSONException ex) {
-                                Logger.getLogger(RunBatchTool.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        if ( e.isPopupTrigger() ) {
-                            selectRecord(fi);
-                            RunBatchTool.this.selectedLabel= jobs1.get(fi);
-                            postRunPopupMenu.show( e.getComponent(), e.getX(), e.getY() );
-                            return;
-                        }
-                    }
-
-                    @Override
-                    public void mouseReleased(MouseEvent e) {
-                        if ( e.isPopupTrigger() ) {
-                            selectRecord(fi);
-                            RunBatchTool.this.selectedLabel= jobs1.get(fi);
-                            postRunPopupMenu.show( e.getComponent(), e.getX(), e.getY() );
-                            return;
-                        }
-                    }
-                    
-                });
+                jobs1.get(i).addMouseListener( getJobsMouseListener( fi, jobs1, jobs2 ) );
             }
-
             param1JLabels= jobs1.toArray( new JLabel[jobs1.size()] );
             param1ScrollPane.getViewport().setView(p);   
         }
@@ -2473,7 +2404,80 @@ public class RunBatchTool extends javax.swing.JPanel {
             goButton.setEnabled(true);
         }
     }
-    
+        
+    private MouseListener getJobsMouseListener( final int fi, final List<JLabel> jobs1, final List<JLabel> jobs2 ) {
+        return new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if ( e.isPopupTrigger() ) {
+                    selectRecord(fi);
+                    RunBatchTool.this.selectedLabel= jobs1.get(fi);
+                    postRunPopupMenu.show( e.getComponent(), e.getX(), e.getY() );
+                    return;
+                }
+                selectRecord(fi);
+                RunBatchTool.this.selectedLabel= jobs1.get(fi);
+                String param1= (String)RunBatchTool.this.param1NameCB.getSelectedItem();
+                if ( RunBatchTool.this.results!=null ) {
+                    String s= jobs1.get(fi).getText();
+                    List<JSONObject> thisRow= new ArrayList<>();
+                    try {
+                        JSONObject jo= RunBatchTool.this.results;
+                        JSONArray ja= jo.getJSONArray("results");
+                        for ( int j=0; j<ja.length(); j++ ) {
+                            JSONObject jo1= ja.getJSONObject(j);
+                            if ( jo1.getString(param1).equals(s) ) {
+                                thisRow.add( jo1 );
+                            }
+                        }
+                        if ( jobs2.size()==thisRow.size() ) {
+                            for ( int i=0; i<thisRow.size(); i++ ) {
+                                JSONObject runResults= thisRow.get(i);
+                                String except= thisRow.get(i).getString("result");
+                                if ( except.length()>0 ) {
+                                    jobs2.get(i).setIcon(ICON_PROB);
+                                } else {
+                                    jobs2.get(i).setIcon(ICON_OKAY);
+                                }
+                                if ( jobs2.get(i).getIcon()==ICON_OKAY ) {
+                                    jobs2.get(i).setToolTipText( htmlize(runResults.getString("stdout")) );
+                                } else {
+                                    jobs2.get(i).setToolTipText( htmlize(runResults.getString("stdout"),runResults.getString("result")));
+                                }
+                            }
+                        } else {
+                            logger.fine("Nothing to do.");
+                        }
+
+                    } catch (JSONException ex) {
+                        Logger.getLogger(RunBatchTool.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if ( e.isPopupTrigger() ) {
+                    selectRecord(fi);
+                    RunBatchTool.this.selectedLabel= jobs1.get(fi);
+                    postRunPopupMenu.show( e.getComponent(), e.getX(), e.getY() );
+                    return;
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if ( e.isPopupTrigger() ) {
+                    selectRecord(fi);
+                    RunBatchTool.this.selectedLabel= jobs1.get(fi);
+                    postRunPopupMenu.show( e.getComponent(), e.getX(), e.getY() );
+                    return;
+                }
+            }
+
+        };
+    }
+        
     public static void main( String[] args ) {
         JDialog dia= new JDialog();
         dia.setResizable(true);
@@ -2651,4 +2655,6 @@ public class RunBatchTool extends javax.swing.JPanel {
     private JLabel getSelectedLabel() {
         return this.selectedLabel;
     }
+
+
 }
