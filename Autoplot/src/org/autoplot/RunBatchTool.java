@@ -2138,18 +2138,7 @@ public class RunBatchTool extends javax.swing.JPanel {
             
             Map<String,org.autoplot.jythonsupport.Param> parms= Util.getParams( env, script, params, new NullProgressMonitor() );
 
-            InteractiveInterpreter interp = JythonUtil.createInterpreter( true, false );
-            interp.exec(JythonRefactory.fixImports("import autoplot2017")); 
-            
-            ParametersFormPanel pfp= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
-            pfp.doVariables( env, scriptFile, params, null );
-            params.entrySet().forEach((ent) -> {
-                try {
-                    pfp.getFormData().implement( interp, ent.getKey(), ent.getValue() );
-                } catch (ParseException ex) {
-                    logger.log(Level.SEVERE, null, ex);
-                }
-            });
+            InteractiveInterpreter interp = createInterpretter(env, scriptFile, params);
 
             if ( writeCheckBox.isSelected() ) {
                 String template= writeFilenameCB.getSelectedItem().toString();
@@ -2654,6 +2643,33 @@ public class RunBatchTool extends javax.swing.JPanel {
     
     private JLabel getSelectedLabel() {
         return this.selectedLabel;
+    }
+
+    /**
+     * create the interpretter with the script settings.  This will be further modified 
+     * to each state in the list.
+     * @param env the environment, like PWD etc
+     * @param scriptFile the script we are running
+     * @param params the constant parameters for the script.
+     * @return the interpretter
+     * @throws IOException 
+     */
+    private InteractiveInterpreter createInterpretter(
+        Map<String,Object> env, File scriptFile, Map<String,String> params ) throws IOException {
+        InteractiveInterpreter interp = JythonUtil.createInterpreter( true, false );
+        interp.exec(JythonRefactory.fixImports("import autoplot2017")); 
+
+        ParametersFormPanel pfp= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
+        pfp.doVariables( env, scriptFile, params, null );
+        params.entrySet().forEach((ent) -> {
+            try {
+                pfp.getFormData().implement( interp, ent.getKey(), ent.getValue() );
+            } catch (ParseException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        });
+        return interp;
+
     }
 
 
