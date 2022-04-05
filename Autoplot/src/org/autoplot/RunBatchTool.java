@@ -1471,7 +1471,7 @@ public class RunBatchTool extends javax.swing.JPanel {
      * @param f1
      * @throws IOException 
      */
-    private void setParam( InteractiveInterpreter interp, org.autoplot.jythonsupport.Param paramDescription, 
+    private static void setParam( InteractiveInterpreter interp, String pwd, org.autoplot.jythonsupport.Param paramDescription, 
             String paramName, String f1 ) throws IOException {
         if ( paramDescription==null ) {
             throw new IllegalArgumentException("expected to see parameter description!");
@@ -1786,7 +1786,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                             throw new IllegalArgumentException("param not found: " + p );
                         }
                     }
-                    setParam( interp, parms.get(p), p, v );
+                    setParam( interp, pwd, parms.get(p), p, v );
                     runResults.put( p, v );
                     scriptParams.put( p, v );
                 }
@@ -1796,7 +1796,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                         throw new IllegalArgumentException("param1Name not set");
                     }
                 }
-                setParam( interp, parms.get(paramName), paramName, paramValue );
+                setParam( interp, pwd, parms.get(paramName), paramName, paramValue );
                 runResults.put(paramName,paramValue);
                 scriptParams.put(paramName,paramValue);
             }
@@ -2138,7 +2138,7 @@ public class RunBatchTool extends javax.swing.JPanel {
             
             Map<String,org.autoplot.jythonsupport.Param> parms= Util.getParams( env, script, params, new NullProgressMonitor() );
 
-            InteractiveInterpreter interp = createInterpretter(env, scriptFile, params);
+            InteractiveInterpreter interp;
 
             if ( writeCheckBox.isSelected() ) {
                 String template= writeFilenameCB.getSelectedItem().toString();
@@ -2192,50 +2192,17 @@ public class RunBatchTool extends javax.swing.JPanel {
                     }
 
                     jobs1.get(i1).setIcon(ICON_WORKING);
-                    //interp.set( "monitor", monitor.getSubtaskMonitor(f1) );
-                    interp.set( "monitor", new NullProgressMonitor() {
-                        @Override
-                        public boolean isCancelled() {
-                            return monitor.isCancelled();
-                        }
-                    }); // subtask would reset indeterminate.
-                    interp.set( "dom", this.dom );
-                    interp.set( "PWD", split.path );
-                    String paramName= param1NameCB.getSelectedItem().toString().trim();
-                    String[] paramNames= maybeSplitMultiParam( paramName );
-                    
-                    if ( paramNames!=null ) {
-                        char splitc= paramName.charAt(paramNames[0].length());
-                        String[] paramValues= f1.trim().split("\\"+splitc);
-                        for ( int j= 0; j<paramNames.length; j++ ) {
-                            String p= paramNames[j].trim();
-                            String v= paramValues[j].trim();
-                            if ( !parms.containsKey(p) ) {
-                                if ( p.trim().length()==0 ) {
-                                    throw new IllegalArgumentException("param1Name not set");
-                                } else {
-                                    throw new IllegalArgumentException("param not found: " + p );
-                                }
-                            }
-                            setParam( interp, parms.get(p), p, v );
-                            runResults.put( p, v );
-                            scriptParams.put( p, v );
-                        }
-                    } else {
-                        if ( !parms.containsKey(paramName) ) {
-                            if ( paramName.trim().length()==0 ) {
-                                throw new IllegalArgumentException("param1Name not set");
-                            }
-                        }
-                        setParam( interp, parms.get(paramName), paramName, f1.trim() );
-                        runResults.put(paramName,f1.trim());
-                        scriptParams.put(paramName,f1.trim());
-                    }
                     
                     String uri=null;
                     
                     if ( param2NameCB.getSelectedItem().toString().trim().length()==0 ) {
+                        
                         long t0= System.currentTimeMillis();
+                        
+                        interp= createInterpretter(env, scriptFile, params, split.path );
+    
+                        doSetParameter( param1NameCB, f1, parms, interp, pwd, runResults, scriptParams);
+                        
                         ByteArrayOutputStream outbaos= new ByteArrayOutputStream();
                         try {
                             param1ScrollPane.scrollRectToVisible( jobs1.get(i1).getBounds() );
@@ -2284,39 +2251,15 @@ public class RunBatchTool extends javax.swing.JPanel {
                                 break;
                             }
                             long t0= System.currentTimeMillis();
-                            ByteArrayOutputStream outbaos= new ByteArrayOutputStream();                            
-                            try {
-                                paramName= param2NameCB.getSelectedItem().toString().trim();
-                                
-                                paramNames= maybeSplitMultiParam( paramName );
+                            
+                            interp= createInterpretter( env, scriptFile, params, split.path );
+
+                            doSetParameter( param1NameCB, f1, parms, interp, pwd, runResults, scriptParams);
                     
-                                if ( paramNames!=null ) {
-                                    char splitc= paramName.charAt(paramNames[0].length());
-                                    String[] paramValues= f2.trim().split("\\"+splitc);
-                                    for ( int j= 0; j<paramNames.length; j++ ) {
-                                        String p= paramNames[j].trim();
-                                        String v= paramValues[j].trim();
-                                        if ( !parms.containsKey(p) ) {
-                                            if ( p.trim().length()==0 ) {
-                                                throw new IllegalArgumentException("param1Name not set");
-                                            } else {
-                                                throw new IllegalArgumentException("param not found: " + p );
-                                            }
-                                        }
-                                        setParam( interp, parms.get(p), p, v );
-                                        runResults.put( p, v );
-                                        scriptParams.put( p, v );
-                                    }
-                                } else {                                
-                                    if ( !parms.containsKey(paramName) ) {
-                                        if ( paramName.trim().length()==0 ) {
-                                            throw new IllegalArgumentException("param1Name not set");
-                                        }
-                                    }
-                                    setParam( interp, parms.get(paramName), paramName, f2.trim() );
-                                    runResults.put(paramName,f2.trim());
-                                    scriptParams.put( paramName,f2.trim() );
-                                }
+                            ByteArrayOutputStream outbaos= new ByteArrayOutputStream();                            
+                            try {                                
+                                doSetParameter( param2NameCB, f2, parms, interp, pwd, runResults, scriptParams );
+                                
                                 jobs2.get(i2).setIcon( ICON_WORKING );
                                 interp.setOut(outbaos);
                                 uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
@@ -2391,6 +2334,40 @@ public class RunBatchTool extends javax.swing.JPanel {
             this.monitor=null;
             
             goButton.setEnabled(true);
+        }
+    }
+
+    private static void doSetParameter( JComboBox cb, String paramValue, Map<String, Param> parms, InteractiveInterpreter interp, String pwd, JSONObject runResults, Map<String, Object> scriptParams) throws JSONException, IOException, IllegalArgumentException {
+        
+        String paramName= cb.getSelectedItem().toString().trim();
+        String[] paramNames= maybeSplitMultiParam( paramName );
+        
+        if ( paramNames!=null ) {
+            char splitc= paramName.charAt(paramNames[0].length());
+            String[] paramValues= paramValue.trim().split("\\"+splitc);
+            for ( int j= 0; j<paramNames.length; j++ ) {
+                String p= paramNames[j].trim();
+                String v= paramValues[j].trim();
+                if ( !parms.containsKey(p) ) {
+                    if ( p.trim().length()==0 ) {
+                        throw new IllegalArgumentException("param1Name not set");
+                    } else {
+                        throw new IllegalArgumentException("param not found: " + p );
+                    }
+                }
+                setParam( interp, pwd, parms.get(p), p, v );
+                runResults.put( p, v );
+                scriptParams.put( p, v );
+            }
+        } else {
+            if ( !parms.containsKey(paramName) ) {
+                if ( paramName.trim().length()==0 ) {
+                    throw new IllegalArgumentException("param1Name not set");
+                }
+            }
+            setParam( interp, pwd, parms.get(paramName), paramName, paramValue.trim() );
+            runResults.put(paramName,paramValue.trim());
+            scriptParams.put(paramName,paramValue.trim());
         }
     }
         
@@ -2655,7 +2632,7 @@ public class RunBatchTool extends javax.swing.JPanel {
      * @throws IOException 
      */
     private InteractiveInterpreter createInterpretter(
-        Map<String,Object> env, File scriptFile, Map<String,String> params ) throws IOException {
+        Map<String,Object> env, File scriptFile, Map<String,String> params, String pwd ) throws IOException {
         InteractiveInterpreter interp = JythonUtil.createInterpreter( true, false );
         interp.exec(JythonRefactory.fixImports("import autoplot2017")); 
 
@@ -2668,6 +2645,17 @@ public class RunBatchTool extends javax.swing.JPanel {
                 logger.log(Level.SEVERE, null, ex);
             }
         });
+                           
+        interp.set( "monitor", new NullProgressMonitor() {
+            @Override
+            public boolean isCancelled() {
+                return monitor.isCancelled();
+            }
+        }); // subtask would reset indeterminate.
+
+        interp.set( "dom", this.dom );
+        interp.set( "PWD", pwd );
+
         return interp;
 
     }
