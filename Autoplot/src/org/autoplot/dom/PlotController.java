@@ -1396,6 +1396,56 @@ public final class PlotController extends DomNodeController {
         Renderer r= p.getController().getRenderer();
         pp.removeRenderer(r);
         pp.addRenderer(r);
+    }    
+
+    /**
+     * move the plot element to just above the reference element.
+     * @param reference
+     * @param p
+     */
+    public void moveToJustAbove( PlotElement reference, PlotElement p ) {
+        if ( reference==p ) throw new IllegalArgumentException("reference and p are the same plot element");
+        if ( !reference.getPlotId().equals(p.getPlotId()) ) throw new IllegalArgumentException("reference and p must be in the same plot");
+        final DomLock lock= dom.getController().mutatorLock();
+        lock.lock("Move to Just Above");
+        try {
+            if (!p.getPlotId().equals(this.plot.getId())) {
+                throw new IllegalArgumentException("this is not my plot");
+            }
+            
+            Application dom2= (Application) this.dom.copy();
+            DomUtil.moveToJustAbove( dom2, reference.getId(), p.getId() );
+            this.dom.syncTo( dom2 );
+
+        } finally {
+            lock.unlock();
+        }
+
+    }
+    
+    /**
+     * move the plot element to just below the reference element.
+     * @param reference
+     * @param p
+     */
+    public void moveToJustBelow( PlotElement reference, PlotElement p ) {
+        if ( reference==p ) throw new IllegalArgumentException("reference and p are the same plot element");
+        if ( !reference.getPlotId().equals(p.getPlotId()) ) throw new IllegalArgumentException("reference and p must be in the same plot");
+        final DomLock lock= dom.getController().mutatorLock();
+        lock.lock("Move to Just Below");
+        try {
+            if (!p.getPlotId().equals(this.plot.getId())) {
+                throw new IllegalArgumentException("this is not my plot");
+            }
+            
+            Application dom2= (Application) this.dom.copy();
+            DomUtil.moveToJustBelow( dom2, reference.getId(), p.getId() );
+            this.dom.syncTo( dom2 );
+
+        } finally {
+            lock.unlock();
+        }
+
     }
     
     /**

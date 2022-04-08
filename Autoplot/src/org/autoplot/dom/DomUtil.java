@@ -101,10 +101,13 @@ public class DomUtil {
     /**
      * move the plot element within the dom below the plot element.
      * @param dom the dom (with no controllers)
-     * @param reference the plot element which is the reference
-     * @param p the plot element to move
+     * @param referenceId the plot element which is the reference
+     * @param pId the plot element to move
      */
-    public static void moveToJustBelow( Application dom, PlotElement reference, PlotElement p ) {
+    public static void moveToJustBelow( Application dom, String referenceId, String pId ) {
+        PlotElement reference= (PlotElement) getElementById( dom, referenceId );
+        PlotElement p= (PlotElement) getElementById( dom, pId );
+        
         if ( reference==p ) throw new IllegalArgumentException("reference and p are the same plot element");
         if ( !reference.getPlotId().equals(p.getPlotId()) ) throw new IllegalArgumentException("reference and p must be in the same plot");
             
@@ -131,10 +134,12 @@ public class DomUtil {
     /**
      * move the plot element within the dom below the plot element.
      * @param dom the dom (with no controllers)
-     * @param reference the plot element which is the reference
-     * @param p the plot element to move
+     * @param referenceId the plot element which is the reference
+     * @param pId the plot element to move
      */
-    public static void moveToJustAbove( Application dom, PlotElement reference, PlotElement p ) {
+    public static void moveToJustAbove( Application dom, String referenceId, String pId ) {
+        PlotElement reference= (PlotElement) getElementById( dom, referenceId );
+        PlotElement p= (PlotElement) getElementById( dom, pId );
         if ( reference==p ) throw new IllegalArgumentException("reference and p are the same plot element");
         if ( !reference.getPlotId().equals(p.getPlotId()) ) throw new IllegalArgumentException("reference and p must be in the same plot");
             
