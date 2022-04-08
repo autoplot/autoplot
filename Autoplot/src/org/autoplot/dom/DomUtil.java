@@ -99,6 +99,36 @@ public class DomUtil {
     }
 
     /**
+     * move the plot element within the dom below the plot element.
+     * @param dom the dom (with no controllers)
+     * @param reference the plot element which is the reference
+     * @param p the plot element to move
+     */
+    public static void moveToJustBelow( Application dom, PlotElement reference, PlotElement p ) {
+        if ( reference==p ) throw new IllegalArgumentException("reference and p are the same plot element");
+        if ( !reference.getPlotId().equals(p.getPlotId()) ) throw new IllegalArgumentException("reference and p must be in the same plot");
+            
+        List<PlotElement> newPes= new ArrayList( Arrays.asList(dom.getPlotElements()) );
+            
+        // find the topmost element of plot.
+        int top;
+        for ( top=newPes.size()-1; top>=0; top-- ) {
+            if ( newPes.get(top)==reference ) break;
+        }
+
+        int ploc;
+        for ( ploc=0; ploc<newPes.size(); ploc++ ) {
+            if ( newPes.get(ploc)==p ) break;
+        }
+
+        newPes.remove(p);
+        newPes.add( top-1, p );
+
+        dom.setPlotElements(newPes.toArray( new PlotElement[newPes.size()] ));
+
+    }
+    
+    /**
      * Either sets or gets the property at the expression.
      * Expressions like:
      *<blockquote><pre><small>{@code
