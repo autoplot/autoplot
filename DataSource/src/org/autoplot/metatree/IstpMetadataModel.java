@@ -236,7 +236,11 @@ public class IstpMetadataModel extends MetadataModel {
             if ( min<max ) {
                 return DatumRange.newDatumRange(min, max, units);
             } else {
-                logger.log(Level.WARNING, "SCALEMIN and SCALEMAX has min value greater than max value: {0} > {1}", new Object[]{min, max});
+                if ( Double.isFinite(min) && Double.isFinite(max) ) {
+                    logger.log(Level.WARNING, "SCALEMIN and SCALEMAX has min value greater than max value: {0} > {1}", new Object[]{min, max});
+                } else {
+                    logger.log(Level.FINE, "SCALEMIN and SCALEMAX are NaN and NaN" );
+                }
                 return null;
             }
         }
