@@ -759,7 +759,11 @@ public class Util {
     }
     
     /**
-     * read the preferences into a map.  These are name, value pairs.
+     * read the preferences into a map.  These are name=value pairs
+     * and anything following a pound symbol (#) is ignored.  Anything
+     * before the equal sign is trimmed, so "x=2" and "x = 2" have 
+     * the same interpretation.
+     * 
      * This has a number of TODOs, namely:<ul>
      * <li> allow quoted values, and hashes within quotes.
      * <li> allow defaults to be specified.
