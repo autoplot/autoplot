@@ -1349,6 +1349,7 @@ public class JythonUtil {
 
         HashSet variableNames = new HashSet();
         variableNames.add("getParam");  // this is what allows the getParam calls to be included.
+        variableNames.add("map");
         variableNames.add("str");  // include casts.
         variableNames.add("int");
         variableNames.add("long");
