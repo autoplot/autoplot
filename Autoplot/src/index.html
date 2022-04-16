@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Spaces in zip file names would cause a runtime exception, preventing use with Google Drive.
+        <p><small>Run Batch Tool now allows you to re-run individual jobs interactively.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -30,6 +30,10 @@
                 
         <p>Bugfixes (2022-04-05 r26606):</p>
         <ul>
+            <li>check list of renderers for transitional case, where the returned list would be one element too long with a null in the last element.
+            <li>remove "Here DELTA" debug message in SubsetDataSet.
+            <li>Jython symbol "map" is included in list of quickly executed routines, to support use in generating getParam GUIs.
+            <li>suppress warning about SCALEMIN and SCALEMAX when they are NaN, NaN, and just ignore them.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2444/">2444</a>: Run Batch would not create a new interpretter for each run, so information could leak from one run to another.
             <li>Re-run single job of batch would run on event thread, hiding feedback and locking application.
         </ul>
@@ -51,6 +55,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Color Scatter mode now has icon.
         </ul>
         <p>Less recent features:</p>
         <ul>
