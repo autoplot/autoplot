@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <jnlp 
     spec="1.0+"
-    codebase="https://ci-pw.physics.uiowa.edu/job/autoplot-release/lastSuccessfulBuild/artifact/autoplot/Autoplot/dist/"
+    codebase="https://ci-pw.physics.uiowa.edu/job/autoplot-release-2022/lastSuccessfulBuild/artifact/autoplot/Autoplot/dist/"
     href="autoplot_1GB.jnlp">
    
     <information> 
