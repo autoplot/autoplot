@@ -82,6 +82,7 @@ import org.das2.graph.DasColorBar;
 import org.das2.graph.Painter;
 import org.das2.qds.DataSetOps;
 import org.das2.qds.DataSetUtil;
+import org.das2.qds.DataSetWrapper;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.ops.Ops;
 import org.das2.qstream.SimpleStreamFormatter;
@@ -665,29 +666,7 @@ public class ScriptContext extends PyJavaInstance {
     
     private static MutablePropertyDataSet ensureMutable( QDataSet ds ) {
         if ( ds==null ) return null;
-        if ( DataSetUtil.isQube(ds) ) {
-            if ( ds instanceof MutablePropertyDataSet ) {
-                MutablePropertyDataSet mpds= (MutablePropertyDataSet)ds;
-                if ( mpds.isImmutable() ) {
-                    return DataSetOps.makePropertiesMutable(mpds);
-                } else {
-                    return mpds; // TODO: make sure that plot doesn't mutate
-                }
-            } else {
-                return DataSetOps.makePropertiesMutable(ds);
-            }
-        } else {
-            if ( ds instanceof MutablePropertyDataSet ) {
-                MutablePropertyDataSet mpds= (MutablePropertyDataSet)ds;
-                if ( mpds.isImmutable() ) {
-                    return DataSetOps.makePropertiesMutable(mpds);
-                } else {
-                    return mpds; // TODO: make sure that plot doesn't mutate
-                }
-            } else {
-                return DataSetOps.makePropertiesMutable(ds);
-            }
-        }
+        return Ops.copy(ds);
     }
     
     private static void ensureImmutable( QDataSet ... dss ) {
