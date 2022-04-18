@@ -261,7 +261,7 @@
                                     <StringItem index="15" value="acos(x)"/>
                                     <StringItem index="16" value="atan2(y,x)"/>
                                     <StringItem index="17" value="atan(x)"/>
-                                    <StringItem index="18" value=" "/>
+                                    <StringItem index="18" value="crossProduct(a,b)"/>
                                   </StringArray>
                                 </Property>
                                 <Property name="selectionMode" type="int" value="0"/>
