@@ -60,6 +60,9 @@ import org.autoplot.jythonsupport.JythonRefactory;
 import org.autoplot.jythonsupport.JythonToJavaConverter;
 import org.autoplot.jythonsupport.SimplifyScriptSupport;
 import org.das2.graph.GraphUtil;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.python.core.PyArray;
 import org.python.core.PyFloat;
 import org.python.core.PyReflectedField;
@@ -1071,7 +1074,13 @@ public class JythonCompletionTask implements CompletionTask {
         try {
             PyObject po= interp.eval(method);
             PyObject doc= interp.eval(method+".__doc__");
-             if ( po instanceof PyFunction ) {
+            PyObject completions;
+            try {
+                completions = interp.eval(method+".__completions__");
+            } catch ( PyException ex ) {
+                completions = null;
+            }
+            if ( po instanceof PyFunction ) {
                 method= getPyFunctionSignature((PyFunction)po);
                 String signature= makeInlineSignature( po, doc );
                 result.addItem( new MessageCompletionItem( method, signature ) );
@@ -1092,7 +1101,27 @@ public class JythonCompletionTask implements CompletionTask {
                 }
             } else {
                 String signature= makeInlineSignature( po, doc );
-                result.addItem( new MessageCompletionItem( method, signature ) );
+                if ( completions!=null ) {
+                    try {
+                        JSONObject jo= new JSONObject( completions.toString() );
+                        JSONArray kws= jo.getJSONArray("keywords");
+                        for ( int i=0; i<kws.length(); i++ ) {
+                            JSONObject kw = kws.getJSONObject(i);
+                            String name= kw.getString("name");
+                            if ( name.startsWith(cc.completable) ) {
+                                String docs= kw.optString("description");
+                                DefaultCompletionItem item= new DefaultCompletionItem( name, cc.completable.length(), name, name, "inline:"+docs );
+                                item.sortPriority= -100;
+                                item.icon= JAVA_JYTHON_METHOD_ICON;
+                                result.addItem( item );
+                            }
+                        }
+                    } catch (JSONException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
+                MessageCompletionItem item= new MessageCompletionItem( method, signature );
+                result.addItem( item );
             }
         } catch ( RuntimeException ex ) {
             return 0;
