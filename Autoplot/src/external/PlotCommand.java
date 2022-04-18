@@ -2,9 +2,14 @@
 package external;
 
 import java.awt.Color;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import org.das2.datum.DatumRange;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DefaultPlotSymbol;
@@ -87,6 +92,15 @@ public class PlotCommand extends PyObject {
             + " <tr><td> overplotOf</td><td>a plot or plot element with which this should share axes.  Note something should reset the plot!</td>"
             + "</table></html>");
 
+    public static final PyString __completions__;
+    
+    static {
+        String text = new BufferedReader(
+            new InputStreamReader( PlotCommand.class.getResourceAsStream("PlotCommand.json"), StandardCharsets.UTF_8) )
+            .lines().collect(Collectors.joining("\n"));
+        __completions__= new PyString( text );
+    }
+        
     private static QDataSet coerceIt( PyObject arg0 ) {
         Object o = arg0.__tojava__(QDataSet.class);
         if (o == null || o == Py.NoConversion) {
