@@ -28,8 +28,10 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-04-16 r26614):</p>
+        <p>Bugfixes (2022-04-19 r26623):</p>
         <ul>
+            <li>new specialColors code didn't handle missing data and would cause runtime error.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2445/">2445</a>: plot makes a copy of the data for defense and for performance.
             <li>check list of renderers for transitional case, where the returned list would be one element too long with a null in the last element.
             <li>remove "Here DELTA" debug message in SubsetDataSet.
             <li>Jython symbol "map" is included in list of quickly executed routines, to support use in generating getParam GUIs.
@@ -55,6 +57,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>completions on plot command now supports completing keyword parameters.
             <li>crossProduct function added.
             <li>Color Scatter mode now has icon.
         </ul>
