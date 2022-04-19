@@ -73,6 +73,7 @@ import org.autoplot.datasource.DataSourceRegistry;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.WindowManager;
 import org.autoplot.jythonsupport.JythonToJavaConverter;
+import org.autoplot.jythonsupport.JythonUtil;
 import org.autoplot.jythonsupport.PyQDataSet;
 import org.autoplot.jythonsupport.SimplifyScriptSupport;
 import org.autoplot.jythonsupport.StaticCodeAnalysis;
@@ -173,7 +174,7 @@ public class EditorTextPane extends JEditorPane {
                     @Override
                     public void actionPerformed( ActionEvent e ) {
                         LoggerManager.logGuiEvent(e);                
-                        showCompletionsView();
+                        showParametersView();
                     }
                 } );                
                 
@@ -279,6 +280,59 @@ public class EditorTextPane extends JEditorPane {
      */
     JEditorPane completionsEditorPane= null;
 
+    private void showInCompletionsEditorPane( String scriptPrime ) {
+                    JEditorPane a;
+        JDialog d;
+        if ( completionsEditorPane==null ) {
+            a= new JEditorPane();
+            completionsEditorPane= a;
+            DefaultSyntaxKit.initKit();
+            Properties p= new Properties();
+            String f= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA );
+            File config= new File( new File(f), "config" );
+            if ( config.exists() ) { // Note the syntax kit has already been configured.
+                try {
+                    File syntaxPropertiesFile= new File( config, "jsyntaxpane.properties" );
+                    logger.log(Level.FINE, "Resetting editor colors using {0}", syntaxPropertiesFile );
+                    try ( FileInputStream in = new FileInputStream( syntaxPropertiesFile ) ) {
+                        p.load( in );
+                    }
+                } catch (FileNotFoundException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
+                String s;
+                s= p.getProperty("Background", "0xFFFFFF");
+                a.setBackground( Color.decode( s ) );
+                s= p.getProperty("CaretColor", "0x000000" );
+                a.setCaretColor( Color.decode( s ) );
+                s= p.getProperty( CONFIG_SELECTION,"0x99ccff");
+                EditorTextPane.this.setSelectionColor( Color.decode( s ) );
+                SyntaxStyle deft= SyntaxStyles.getInstance().getStyle(null);
+                if ( a.getBackground().getRed()<128 ) {
+                    deft.setColorString("0xFFFFFF");
+                } else {
+                    deft.setColorString("0x000000");
+                }
+                completionsEditorPane.setFont( completionsEditorPane.getFont().deriveFont(10.f) );
+            }
+            a.setContentType("text/python");
+            d= new JDialog();
+            d.setTitle("Completions Peek Editor");
+            a.setMinimumSize( new Dimension(600,800) );
+            a.setPreferredSize( new Dimension(600,800) );
+            d.getContentPane().add(new JScrollPane(a));
+            d.pack();
+        } else {
+            a= completionsEditorPane;
+            d= (JDialog)SwingUtilities.getWindowAncestor( completionsEditorPane );
+        }
+        a.setText(scriptPrime);
+        d.setVisible(true);
+
+    }
+    
     public void showCompletionsView() {
         String doThis= this.getSelectedText();
         if ( doThis==null || doThis.length()==0 ) {
@@ -287,59 +341,22 @@ public class EditorTextPane extends JEditorPane {
         }
         try {
             String scriptPrime= SimplifyScriptSupport.simplifyScriptToCompletions(doThis);
-            JEditorPane a;
-            JDialog d;
-            if ( completionsEditorPane==null ) {
-                a= new JEditorPane();
-                completionsEditorPane= a;
-                DefaultSyntaxKit.initKit();
-                Properties p= new Properties();
-                String f= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA );
-                File config= new File( new File(f), "config" );
-                if ( config.exists() ) { // Note the syntax kit has already been configured.
-                    try {
-                        File syntaxPropertiesFile= new File( config, "jsyntaxpane.properties" );
-                        logger.log(Level.FINE, "Resetting editor colors using {0}", syntaxPropertiesFile );
-                        try ( FileInputStream in = new FileInputStream( syntaxPropertiesFile ) ) {
-                            p.load( in );
-                        }
-                    } catch (FileNotFoundException ex) {
-                        logger.log(Level.SEVERE, null, ex);
-                    } catch (IOException ex) {
-                        logger.log(Level.SEVERE, null, ex);
-                    }
-                    String s;
-                    s= p.getProperty("Background", "0xFFFFFF");
-                    a.setBackground( Color.decode( s ) );
-                    s= p.getProperty("CaretColor", "0x000000" );
-                    a.setCaretColor( Color.decode( s ) );
-                    s= p.getProperty( CONFIG_SELECTION,"0x99ccff");
-                    EditorTextPane.this.setSelectionColor( Color.decode( s ) );
-                    SyntaxStyle deft= SyntaxStyles.getInstance().getStyle(null);
-                    if ( a.getBackground().getRed()<128 ) {
-                        deft.setColorString("0xFFFFFF");
-                    } else {
-                        deft.setColorString("0x000000");
-                    }
-                }
-                a.setContentType("text/python");
-                d= new JDialog();
-                d.setTitle("Completions Peek Editor");
-                a.setMinimumSize( new Dimension(600,800) );
-                a.setPreferredSize( new Dimension(600,800) );
-                d.getContentPane().add(new JScrollPane(a));
-                d.pack();
-            } else {
-                a= completionsEditorPane;
-                d= (JDialog)SwingUtilities.getWindowAncestor( completionsEditorPane );
-            }
-            a.setText(scriptPrime);
-            d.setVisible(true);
+            showInCompletionsEditorPane(scriptPrime);
         } catch ( NumberFormatException | PySyntaxError ex ) {
             logger.log( Level.WARNING, ex.getMessage(), ex );
             JOptionPane.showMessageDialog( this, ex.toString() );
         }
     }    
+
+    /**
+     * show the script used to create the GUI panel.
+     */
+    public void showParametersView() {
+        String script= this.getText();
+        String scriptPrime= JythonUtil.simplifyScriptToGetParams( script, true );
+        showInCompletionsEditorPane(scriptPrime);
+    }
+    
     /**
      * Ed and I verified that this is being set off of the event thread.
      * @param doc 

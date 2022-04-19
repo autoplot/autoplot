@@ -62,6 +62,7 @@ import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
 import org.python.core.PyTuple;
+import org.python.parser.ast.TryExcept;
 
 /**
  * Utilities to support Jython scripting.
@@ -615,7 +616,9 @@ public class JythonUtil {
         "linspace,", "logspace,",
         "dblarr,", "fltarr,", "strarr,", "intarr,", "bytarr,",
         "ripples,", "split,", 
-        "color,", "colorFromString,", "isinstance,"};
+        "color,", "colorFromString,", "isinstance,",
+        "readConfiguration,"
+    };
          
     /**
      * return true if the function call is trivial to execute and can be
@@ -1025,9 +1028,9 @@ public class JythonUtil {
     }
     
     private static StringBuilder appendToResult(StringBuilder result, String line) {
-        //if ( line.contains("sTimeBinSeconds") ) {
-        //    System.err.println("heresTimeBinSeconds");
-        //}
+        if ( line.contains("try") ) {
+            System.err.println("heresTry1139");
+        }
         result.append(line);
         return result;
     }
@@ -1087,6 +1090,9 @@ public class JythonUtil {
         for (int istatement = 0; istatement < stmts.length; istatement++) {
             stmtType o = stmts[istatement];
             String theLine= SimplifyScriptSupport.getSourceForStatement( ss, o );
+            if ( stmts.length==431 && o.beginLine >200 ) {
+                System.err.println("theLine: "+ o.beginLine + " " +theLine);
+            }
             int lineCount= theLine.split("\n",-2).length;
             
             if ( depth==0 ) {
@@ -1107,6 +1113,12 @@ public class JythonUtil {
             if (beginLine > lastLine) {
                 continue;
             }
+            if ( o instanceof TryExcept ) {
+                System.err.println("here try except");
+                acceptLine= -1;
+                continue;
+            }
+            
             if (o instanceof org.python.parser.ast.If) {
                 if (acceptLine > -1) {
                     for (int i = acceptLine; i < beginLine; i++) {
@@ -1360,6 +1372,7 @@ public class JythonUtil {
         variableNames.add("URL");
         variableNames.add("True");
         variableNames.add("False");
+        variableNames.add("readConfiguration"); // don't understand my own code...
 
         try {
             Module n = (Module) org.python.core.parser.parse(script, "exec");

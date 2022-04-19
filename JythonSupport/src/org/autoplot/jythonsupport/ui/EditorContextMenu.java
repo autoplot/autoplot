@@ -613,7 +613,6 @@ public class EditorContextMenu {
                     editor.showCompletionsView();
                 }                
             });
-            mi.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_F12, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK ) ); 
             
             developerMenu.add(mi);
             
@@ -621,31 +620,10 @@ public class EditorContextMenu {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);       
-                    String script= editor.getText();
-                    String scriptPrime= JythonUtil.simplifyScriptToGetParams( script, true );
-                    
-                    JEditorPane a;
-                    JDialog d;
-                    a= new JEditorPane();
-                    DefaultSyntaxKit.initKit();
-                    SyntaxStyle deft= SyntaxStyles.getInstance().getStyle(null);
-                    if ( a.getBackground().getRed()<128 ) {
-                        deft.setColorString("0xFFFFFF");
-                    } else {
-                        deft.setColorString("0x000000");
-                    }
-                
-                    a.setContentType("text/python");
-                    d= new JDialog();
-                    d.setTitle("Get Parameters Editor");
-                    a.setMinimumSize( new Dimension(600,800) );
-                    a.setPreferredSize( new Dimension(600,800) );
-                    d.getContentPane().add(new JScrollPane(a));
-                    d.pack();
-                    a.setText(scriptPrime);
-                    d.setVisible(true);
+                    editor.showParametersView();
                 }
             } );
+            mi.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_F12, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK ) ); 
              
             developerMenu.add(mi);            
                         
