@@ -1061,7 +1061,23 @@ public class SimplifyScriptSupport {
                     if ( vv!=null ) {
                         return id + " = " + vv;
                     } else {
-                        return id  + JythonCompletionTask.__CLASSTYPE + " = " + e1.getImage();
+                        if ( e1.getImage()==null ) {
+                            if ( e1 instanceof Subscript ) {
+                                Subscript s= (Subscript)e1;
+                                if ( s.slice instanceof Index && s.value instanceof Name ) {
+                                    Index i= (Index)s.slice;
+                                    String ss= maybeIndentifyValue(i.value);
+                                    String nn= ((Name)s.value).id;
+                                    return id + " = " + nn + "[" + ss +"]";
+                                } else {
+                                    return null;
+                                }
+                            } else {
+                                return null;
+                            }
+                        } else {
+                            return id  + JythonCompletionTask.__CLASSTYPE + " = " + e1.getImage();
+                        }
                     }
                 case "getDataSet":
                 case "xtags":
