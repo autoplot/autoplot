@@ -62,6 +62,7 @@ import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
 import org.python.core.PyTuple;
+import org.python.parser.ast.BinOp;
 import org.python.parser.ast.TryExcept;
 
 /**
@@ -662,9 +663,14 @@ public class JythonUtil {
         boolean visitNameFail = false;
 
         HashSet names = new HashSet();
+        SimpleNode node;
 
-        MyVisitorBase(HashSet names) {
+        MyVisitorBase(HashSet names, SimpleNode node ) {
             this.names = names;
+            this.node = node; // for reference
+            if ( this.node.toString().contains("id=mlt_full") ) {
+                System.err.println("HERE STOP 671");
+            }
         }
 
         @Override
@@ -702,6 +708,10 @@ public class JythonUtil {
                         logger.log(Level.FINE, "looksOkay=False, {0}", sn);
                     }
                     looksOkay = newLooksOkay;
+                }
+            } else if ( sn instanceof BinOp ) {
+                if ( !trivialFunctionCall(((BinOp) sn).right) || !trivialFunctionCall(((BinOp) sn).left ) ) {
+                    looksOkay= false;
                 }
             } else if (sn instanceof Name) {
                 //visitName((Name)sn).id
@@ -741,7 +751,7 @@ public class JythonUtil {
                 return false;
             }
         }
-        MyVisitorBase vb = new MyVisitorBase(variableNames);
+        MyVisitorBase vb = new MyVisitorBase(variableNames,o);
         try {
             o.traverse(vb);
             logger.finest(String.format(" %04d simplify->%s: %s", o.beginLine, vb.looksOkay(), o));
@@ -791,9 +801,21 @@ public class JythonUtil {
                 if (!variableNames.contains(n.id)) {
                     return false;
                 }
+            } else if ( at.value instanceof Call ) {
+                return simplifyScriptToGetParamsCanResolve( at.value, variableNames );
+            } else {
+                return false;
             }
         }
-        MyVisitorBase vb = new MyVisitorBase(variableNames);
+        if ( o instanceof Call ) {  // ds.property( QDataSet.DEPEND_0 )
+            Call c= (Call) o;
+            if ( c.func instanceof Attribute ) {
+                if ( !simplifyScriptToGetParamsCanResolve( c.func, variableNames ) ){
+                    return false;
+                }
+            }
+        }
+        MyVisitorBase vb = new MyVisitorBase(variableNames,o);
         try {
             o.traverse(vb);
             logger.finest(String.format(" %04d canResolve->%s: %s", o.beginLine, vb.visitNameFail, o));
@@ -920,6 +942,17 @@ public class JythonUtil {
         }
         if ((o instanceof org.python.parser.ast.Assign)) {
             Assign a = (Assign) o;
+            for ( exprType a1 : a.targets ) {
+                if ( a1 instanceof Subscript ) {
+                    Subscript ss= (Subscript)a1;
+                    if ( !simplifyScriptToGetParamsCanResolve(ss.value,variableNames) ) {
+                        return false;
+                    }
+                    if ( !simplifyScriptToGetParamsCanResolve(ss.slice,variableNames) ) {
+                        return false;
+                    }
+                }
+            }
             if (simplifyScriptToGetParamsOkayNoCalls(a.value, variableNames)) {
                 if (!simplifyScriptToGetParamsCanResolve(a.value, variableNames)) {
                     return false;
@@ -1028,9 +1061,9 @@ public class JythonUtil {
     }
     
     private static StringBuilder appendToResult(StringBuilder result, String line) {
-        if ( line.contains("try") ) {
-            System.err.println("heresTry1139");
-        }
+        //if ( line.contains("mlt_full") ) {
+        //    System.err.println("here stop");
+        //}
         result.append(line);
         return result;
     }
@@ -1090,9 +1123,9 @@ public class JythonUtil {
         for (int istatement = 0; istatement < stmts.length; istatement++) {
             stmtType o = stmts[istatement];
             String theLine= SimplifyScriptSupport.getSourceForStatement( ss, o );
-            if ( stmts.length==431 && o.beginLine >200 ) {
-                System.err.println("theLine: "+ o.beginLine + " " +theLine);
-            }
+            //if ( stmts.length==109 && o.beginLine >50 ) {
+            //    System.err.println("theLine: "+ o.beginLine + " " +theLine);
+            //}
             int lineCount= theLine.split("\n",-2).length;
             
             if ( depth==0 ) {
@@ -1372,7 +1405,6 @@ public class JythonUtil {
         variableNames.add("URL");
         variableNames.add("True");
         variableNames.add("False");
-        variableNames.add("readConfiguration"); // don't understand my own code...
 
         try {
             Module n = (Module) org.python.core.parser.parse(script, "exec");
