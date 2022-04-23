@@ -94,7 +94,7 @@ public class JavadocLookup {
                     }
                 } else {
                     String v= lookupVersions.get(s);
-                    if ( v.startsWith("1.8") ) {
+                    if ( v==null || v.startsWith("1.8") ) { //v==null when there is no internet (Dallas flight) It might be nice to have offline message.
                         return s + signature.replaceAll("[\\(\\)\\,]", "-");
                     } else {
                         if ( s.endsWith("/") ) {
