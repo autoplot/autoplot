@@ -813,7 +813,7 @@ public class DataMashUp extends javax.swing.JPanel {
         boolean haveAllIds= false;
         String timerange= null;
         String explicitTimerange= null;
-        boolean synch= false;
+        boolean synch= ss.length==1;
         for ( String s: ss ) {
             if ( s.trim().length()==0 ) continue;
             int i= s.indexOf("=");
@@ -874,6 +874,10 @@ public class DataMashUp extends javax.swing.JPanel {
                 }
                 fillTree(s, ids, new ArrayList<>() );
             }
+        }
+        
+        if ( uris.size()==1 ) {
+            synch= true;
         }
         synchronizeCB.setSelected(synch);
         
