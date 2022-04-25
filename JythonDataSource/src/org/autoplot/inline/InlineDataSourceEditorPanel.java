@@ -9,6 +9,8 @@ import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
@@ -299,6 +301,26 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             }
         }
     }
+    
+    /**
+     * 
+     * @param s
+     * @param delims
+     * @return 
+     */
+    private static String maybeFindDelim( String s, String[] delims ) {
+        s= s.trim();
+        for ( String d: delims ) {
+            String[] ss= s.split(d,-2);
+            if ( ss.length>1 ) {
+                return d;
+            }
+        }
+        return null;
+    }
+    
+    private static final String[] delims= new String[] {" ",","} ;
+    
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         LoggerManager.logGuiEvent(evt);
         JPanel p= new JPanel();
@@ -307,7 +329,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         } else {
             p.setLayout( new FlowLayout() );
         }
-        JTextField[] tfs= new JTextField[tm.getColumnCount()];
+        final JTextField[] tfs= new JTextField[tm.getColumnCount()];
         for ( int i=0; i<tm.getColumnCount(); i++ ) {  // load up the last record so it can be edited to make new record
             JComboBox cb1= new JComboBox();
             cb1.setToolTipText("Examples");
@@ -338,10 +360,23 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                     ss[i]= (String)tm.getValueAt(i,0);
                 }
             }
-            StringBuilder sval= new StringBuilder(tfs[0].getText());
-            for ( int i=1; i<tm.getColumnCount(); i++ ) {
-                sval.append(",").append(tfs[i].getText());
+            String s= tfs[0].getText().trim();
+            
+            StringBuilder sval;
+            String delim= maybeFindDelim( s, delims );
+            if ( delim!=null ) {
+                String[] ssval= s.split(delim,-2);
+                sval= new StringBuilder(ssval[0]);
+                for ( int i=1; i<tm.getColumnCount(); i++ ) {
+                    sval.append(",").append(ssval[i]);
+                }
+            } else {
+                sval= new StringBuilder(tfs[0].getText());
+                for ( int i=1; i<tm.getColumnCount(); i++ ) {
+                    sval.append(",").append(tfs[i].getText());
+                }
             }
+            
             if ( tm.getColumnCount()>1 ) {
                 ss[tm.getRowCount()]= sval.toString();                
                 tm= toTableModel( DataSourceUtil.strjoin( Arrays.asList(ss), ";" ), 2 );
