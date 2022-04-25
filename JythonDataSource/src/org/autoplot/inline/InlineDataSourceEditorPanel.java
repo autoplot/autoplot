@@ -319,7 +319,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         return null;
     }
     
-    private static final String[] delims= new String[] {" ",","} ;
+    private static final String[] SINGLE_TEXTFIELD_DELIMS= new String[] {" ",","} ;
     
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         LoggerManager.logGuiEvent(evt);
@@ -363,7 +363,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             String s= tfs[0].getText().trim();
             
             StringBuilder sval;
-            String delim= maybeFindDelim( s, delims );
+            String delim= maybeFindDelim( s, SINGLE_TEXTFIELD_DELIMS );
             if ( delim!=null ) {
                 String[] ssval= s.split(delim,-2);
                 sval= new StringBuilder(ssval[0]);
