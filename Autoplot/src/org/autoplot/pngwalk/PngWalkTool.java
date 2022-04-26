@@ -210,6 +210,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
     private String product; // the product
     private String baseurl; // the base url
+    private String version; // the version, if used.
     private String qcturl;  // the url for quality control data.
     private String pwd=null; // the location of the .pngwalk file, if used, or null.
     private String vapfile=null;
@@ -278,6 +279,8 @@ public final class PngWalkTool extends javax.swing.JPanel {
         String pwd="";
         String qcturl= "";
         String vapfile= "";
+        String version= "";
+        
         try {
             Properties p= new Properties();
             if ( split.file==null ) {
@@ -317,6 +320,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
             }
             template= t;
             vapfile= p.getProperty("vapfile","");
+            version= vers;
             
         } catch (FileSystemOfflineException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
@@ -339,6 +343,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         result.put( "qcturl", qcturl );
         result.put( "pwd", pwd );
         result.put( "vapfile", vapfile );
+        result.put( "version", version );
         return result;
 
     }
@@ -405,6 +410,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         qcturl= map.get("qcturl");
         pwd= map.get("pwd");
         vapfile= map.get("vapfile");
+        version= map.get("version");
         baseurl= checkRelativeBaseurl( baseurl, file, product );
         qcturl= checkRelativeBaseurl( qcturl, pwd, product );
         vapfile= checkRelativeBaseurl( vapfile, pwd, product );
@@ -521,10 +527,19 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     if ( template.startsWith(tool.baseurl) ) {
                         String vv= tool.pwd +  tool.product + ".vap";
                         if ( vv!=null ) {
-                            return WalkUtil.fileExists(vv);
+                            if ( WalkUtil.fileExists(vv) ) {
+                                return true;
+                            } else {
+                                if ( tool.version.length()>0 ) {
+                                    vv= tool.pwd +  tool.product + tool.version + ".vap";
+                                    return WalkUtil.fileExists(vv);
+                                } else {
+                                    return false;
+                                }
+                            }
                         }
                     }
-                }    
+                } 
                 return WalkUtil.fileExists(productFile);
             } catch (FileSystemOfflineException | URISyntaxException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
@@ -645,6 +660,11 @@ public final class PngWalkTool extends javax.swing.JPanel {
                                 String productFile2 = tool.pwd + tool.product + ".vap";
                                 if ( WalkUtil.fileExists(productFile2) ) {
                                     productFile= productFile2;
+                                } else {
+                                    productFile2 = tool.pwd + tool.product + tool.version + ".vap";
+                                    if ( WalkUtil.fileExists(productFile2) ) {
+                                        productFile= productFile2;
+                                    }
                                 }
                             }
                         } catch (FileSystemOfflineException | URISyntaxException ex) {
