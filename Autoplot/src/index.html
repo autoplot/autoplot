@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Studying a leak in the pool.  "vap+inline:" source can be used to quickly create small data sets.
+        <p><small>Pngwalk Tool used to flip through IDL output at CDAWeb.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,9 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-04-25 r26633):</p>
+        <p>Bugfixes (2022-04-29 r26638):</p>
         <ul>
+            <li>improve feedback when "{" is seen in the middle of a HAPI data response, which is an easy mistake for servers to make.
             <li>make it much more likely that the mashup tool result in synchronize data sets to be set.
             <li>new specialColors code didn't handle missing data and would cause runtime error.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2445/">2445</a>: plot makes a copy of the data for defense and for performance.
@@ -58,6 +59,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>new series icons reflect linethickness.
             <li>allow .vap file in pngwalk using version numbers to check for the versioned .vap file as well.
             <li>allow space or comma to be entered in single field of inline data dialog to speed up data entry in some cases.
             <li>spectrogram icon reflects colorbar used.
