@@ -530,7 +530,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                             if ( WalkUtil.fileExists(vv) ) {
                                 return true;
                             } else {
-                                if ( tool.version.length()>0 ) {
+                                if ( tool.version!=null && tool.version.length()>0 ) {
                                     vv= tool.pwd +  tool.product + tool.version + ".vap";
                                     return WalkUtil.fileExists(vv);
                                 } else {
