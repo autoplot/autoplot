@@ -186,6 +186,7 @@ import org.das2.components.propertyeditor.TickValuesStringSchemeEditor;
 import org.das2.graph.DasAnnotation;
 import org.das2.graph.GraphUtil;
 import org.das2.components.GrannyTextEditor;
+import org.das2.components.propertyeditor.SpecialColorsStringSchemeEditor;
 import org.python.core.PyException;
 import org.python.util.PythonInterpreter;
 import org.w3c.dom.Document;
@@ -1220,6 +1221,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
         SwingUtilities.invokeLater(() -> {
             addTools();
             PropertyEditor.addStringEditor("tickValues", new TickValuesStringSchemeEditor() );
+            PropertyEditor.addStringEditor("specialColors", new SpecialColorsStringSchemeEditor() );
             PropertyEditor.addStringEditor("autoRangeHints", new AutoRangeHintsStringSchemeEditor() );
             PropertyEditor.addStringEditor("label", GraphUtil.newGrannyTextEditor() );
             PropertyEditor.addStringEditor("title", GraphUtil.newGrannyTextEditor() );
