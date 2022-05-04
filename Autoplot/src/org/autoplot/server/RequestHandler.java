@@ -34,20 +34,14 @@ public class RequestHandler {
      * a secure sandbox.  This will be done by removing import statements and
      * exec/eval statements, but note the formatDataSet command could be used to
      * write files.
+     * 
+     * Since connections are only allowed from the localhost, so the restriction
+     * on import is being removed.  https://sourceforge.net/p/autoplot/bugs/2448/
+     *
      * @param in
      * @return null if the command should not be executed.
      */
     private String untaint( String in, OutputStream out ) {
-        try {
-            if ( in.contains("import") ) {
-                out.write("commands cannot contain import\n".getBytes());
-                in= null;
-            } else if ( in.contains("eval") ) {
-                out.write("commands cannot contain eval\n".getBytes());
-                in= null;
-            }
-        } catch ( IOException ex ) {
-        }
         return in;
     }
     
