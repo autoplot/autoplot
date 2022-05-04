@@ -20,7 +20,6 @@ import org.autoplot.scriptconsole.LogConsole;
 
 /**
  * Handles requests coming in from the server.
- * TODO: check against --script option in Autoplot.  JythonMain had a problem with imports.
  * @author jbf
  */
 public class RequestHandler {
