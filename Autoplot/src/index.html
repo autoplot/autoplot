@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Pngwalk Tool used to flip through IDL output at CDAWeb.
+        <p><small>May the 4th be with you!
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,7 +28,11 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-04-29 r26638):</p>
+        <p>Bugfixes (2022-05-03 r26638):</p>
+        <ul>
+            <li>Autoplot Server feature, where telnet from localhost can control Autoplot, once again allows imports.  Thanks, Simon!
+        </ul>
+        <p>Older Bugfixes (2022-04-29 r26638):</p>
         <ul>
             <li>improve feedback when "{" is seen in the middle of a HAPI data response, which is an easy mistake for servers to make.
             <li>make it much more likely that the mashup tool result in synchronize data sets to be set.
@@ -41,23 +45,11 @@
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2444/">2444</a>: Run Batch would not create a new interpretter for each run, so information could leak from one run to another.
             <li>Re-run single job of batch would run on event thread, hiding feedback and locking application.
         </ul>
-        <p>Older Bugfixes (2022-03-29 r26596):</p>
-        <ul>
-            <li>HAPI Server dataset label can be an array to label components.  This had never been supported.
-            <li>zip file names can contain spaces.  Thanks, Kristoff!
-            <li>round of FindBugs cleanup.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2442/">2442</a>: where waitUntilIdle failed to consider that the ephemeris might still be loading.
-            <li>DataSet iterator would fail when non-qube bundle contained dataset with 0 records.  Thanks, Corentin!
-            <li>binary (e.g. divide) and unary (e.g. exp10) operators now support non-qubes when second argument is (rank 0) scalar.  Thanks, Corentin!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2441/">2441</a>: components wouldn't reset properly in some cases, because "changesDimension" function expected pipe.  Thanks, Chris!
-            <li>correction to edit tick values dialog and its connection to the orbit renderer.  Thanks, Sadie!
-            <li>stars added to Granny Text editor psym menu.  Thanks, Sadie!
-            <li>Detrend and a few other operators were missing descriptions in "add operation" dialog.  Thanks, Seth!
-            <li>Create PNG walk lock file wasn't deleted when culling no-data images.
-            <li>Autoplot server only believes X-Forwarded-For when remote host is from a secure network.
-            <li>HapiDataSource didn't provide completions for parameters and timerange.
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li>Minimal specialColors property GUI added to assist in its use.
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>new series icons reflect linethickness.
             <li>allow .vap file in pngwalk using version numbers to check for the versioned .vap file as well.
@@ -67,23 +59,6 @@
             <li>completions on plot command now supports completing keyword parameters.
             <li>crossProduct function added.
             <li>Color Scatter mode now has icon.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>.pngwalk can contain the name of an external .vap file in vapfile property, to support PDS and read-only PNG Walks.  Thanks, Chris!
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/775/">rfe775</a>: Run Batch lets you rerun one job and copy the script URIs.
-            <li>pngwalk Quality Control tool has "Problem Save Next" button so problem flag can be set for many images rapidly.  Thanks, Sadie!
-            <li>pngwalk .vap file can reside next to the .pngwalk file, so that png files can exist without pngwalk tool files.  Thanks, Chris!
-            <li>introduce "specialColors property" which allows colors to be assigned to values, beyond the colorbar transform.  Thanks James and Sadie!
-            <li>Report download progress on Das2Server datasets without progress info by inspecting time tags.
-            <li>Contours renderer now supports minor ticks specification like "+10/5" (5 minor intervals per major interval every 10 units), drawing a thinner contour line.
-            <li>CDF editor has checkbox to remove zero-record variables from the list of parameters which happens with PSP CDF files.  Thanks, Kristoff!
-            <li>Waypoints Digitizer at <a href="https://github.com/autoplot/dev/blob/master/demos/digitizers/findPeakDigitizerWayPoints.jy">GitHub</a> supports data with rank 2 ytags.  Thanks, Kristoff!
-            <li>Waypoints Mouse Module provides a new control for digitizing scripts.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/775/">rfe775</a>: Run Batch now embeds the ScriptURI into each image, and the Png Walk Tool will rerun the script when "View in Autoplot" is pressed.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/772/">rfe772</a>: The right argument of Run Batch can also have multiple parameters, and GUI reveals the feature.  
-            <li>when Jython completions encounters an error when running, still show the completions for other symbols, improve error display.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/774/">rfe774</a>: Completions on URI within getDataSet call supports simple string concatenations to allow for shorter lines without loosing completions.
         </ul>
         <p>Known issues:</p>
         <ul>
