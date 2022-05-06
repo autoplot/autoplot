@@ -67,6 +67,7 @@ import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -799,7 +800,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         }
     }
     private Window parentWindow;
-    private JCheckBoxMenuItem qcFilterMenuItem;
+    private List<AbstractButton> qcFilterMenuItems= new ArrayList<>();
 
     /**
      * return the interval size (up/down)
@@ -1086,24 +1087,77 @@ public final class PngWalkTool extends javax.swing.JPanel {
         }
         optionsMenu.add( thumbsizeMenu );
 
+        final JMenu qcFiltersMenu= new JMenu("QC Filters");
+        ButtonGroup bg= new ButtonGroup();
+        
         final JCheckBoxMenuItem qcmi= new JCheckBoxMenuItem("Show Only Quality Control Records",false);
-        tool.qcFilterMenuItem= qcmi;
+        tool.qcFilterMenuItems.add( qcFiltersMenu );
         
         qcmi.addActionListener( new AbstractAction(  ) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if ( qcmi.isSelected() ) {
                     tool.seq.setQCFilter("op");
-                } else {
+                }
+            }
+        } );
+        qcmi.setToolTipText("show only QC records with Okay or Problem setting.");
+        tool.qcFilterMenuItems.add( qcmi);
+        bg.add(qcmi);
+        qcFiltersMenu.add(qcmi);
+        
+        final JCheckBoxMenuItem qcmi2= new JCheckBoxMenuItem("Show Okay Records",false);
+        
+        qcmi2.addActionListener( new AbstractAction(  ) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if ( qcmi2.isSelected() ) {
+                    tool.seq.setQCFilter("o");
+                }
+            }
+        } );
+        qcmi2.setToolTipText("show only QC records with Okay setting.");
+        tool.qcFilterMenuItems.add( qcmi2);
+        bg.add(qcmi2);
+        qcFiltersMenu.add(qcmi2);
+        
+        final JCheckBoxMenuItem qcmi3= new JCheckBoxMenuItem("Show Problem Records",false);
+        
+        qcmi3.addActionListener( new AbstractAction(  ) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if ( qcmi3.isSelected() ) {
+                    tool.seq.setQCFilter("p");
+                }
+            }
+        } );
+        qcmi3.setToolTipText("show only QC records with Problem setting.");
+        tool.qcFilterMenuItems.add(qcmi3);
+        bg.add(qcmi3);
+        qcFiltersMenu.add(qcmi3);
+        
+     
+        final JCheckBoxMenuItem qcmi4= new JCheckBoxMenuItem("Show All Records",false);
+           
+        qcmi4.addActionListener( new AbstractAction(  ) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if ( qcmi4.isSelected() ) {
                     tool.seq.setQCFilter("");
                 }
             }
         } );
-        qcmi.setToolTipText("show only QC records with Okay or Bad setting.");
-        qcmi.setEnabled(false);
+        qcmi4.setToolTipText("show all records.");
+        tool.qcFilterMenuItems.add(qcmi4);
+        bg.add(qcmi4);
+        qcmi4.setSelected(true);
+        qcFiltersMenu.add(qcmi4);
+        optionsMenu.add(qcFiltersMenu);
         
-        optionsMenu.add(qcmi);
-                
+        for ( AbstractButton b: tool.qcFilterMenuItems ) {
+            b.setEnabled( tool.qcPanel!=null );
+        }
+        
         result.add( optionsMenu );
 
         final JMenu toolsMenu= new JMenu("Tools");
@@ -1459,8 +1513,10 @@ public final class PngWalkTool extends javax.swing.JPanel {
             setNavButtonsEnabled(true);
             if ( navMenu!=null ) navMenu.setEnabled(true);
             seq.setQCFilter("");
-            if ( qcFilterMenuItem!=null ) {
-                qcFilterMenuItem.setSelected(false);
+            if ( qcFilterMenuItems!=null ) {
+                for ( AbstractButton b: qcFilterMenuItems ) {
+                    b.setEnabled( qcPanel!=null );
+                }
             }
             if ( qcPanel!=null ) {
                 qcPanel.setWalkImageSequence(seq);
@@ -1781,7 +1837,9 @@ public final class PngWalkTool extends javax.swing.JPanel {
             }
             ENABLE_QUALITY_CONTROL= true;
         }
-        qcFilterMenuItem.setEnabled(true);
+        for ( AbstractButton b: qcFilterMenuItems ) {
+            b.setEnabled(true);
+        }
     }
 
     protected DataPointRecorder digitizer= null;
