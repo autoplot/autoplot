@@ -452,7 +452,7 @@ public class StatePersistence {
         
         Application state = (Application) StatePersistence.restoreState(in);
         
-        List<String> problems= DomUtil.checkUniqueIdsAndReferences( state, new ArrayList<String>() );
+        List<String> problems= DomUtil.checkUniqueIdsAndReferences( state, new ArrayList<>() );
         if ( problems.size()>0 ) {
             for ( String s: problems ) {
                 logger.warning(s);
