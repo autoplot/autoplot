@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>May the 4th be with you!
+        <p><small>PNGWalk tool correctly supports https://space.physics.uiowa.edu/das2/autoplot/jnlp/2022*/screen.png.
             </small></p>
         <p>Autoplot allows plotting of data from many data sources, including remote CDF files and OpenDAP servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,9 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-05-03 r26638):</p>
+        <p>Bugfixes (2022-05-10 r26649):</p>
         <ul>
+            <li>HttpFileSystem getHeadMetadata had incorrect code when assembing URL for head request.
             <li>PNGWalkTool had excessive synchronized block use, causing hang on Mac.  Thanks, Sadie!
             <li>Autoplot Server feature, where telnet from localhost can control Autoplot, once again allows imports.  Thanks, Simon!
         </ul>
