@@ -1328,7 +1328,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param filename The name of a local file
      * @param width the width in pixels of the png
      * @param height the height in pixels of the png
-     * @param metadata if non-null, then write name/values pairs into the PNG Metadata. "Creation Time", "Software" and "plotInfo" is always added.
+     * @param metadata if non-null, then write name/values pairs into the PNG Metadata. "Creation Time", "Software" and "plotInfo" are always added.
      * @see 
      * @throws java.io.IOException
      */
