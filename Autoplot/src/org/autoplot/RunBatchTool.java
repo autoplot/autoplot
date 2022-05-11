@@ -88,6 +88,7 @@ import org.das2.datum.Units;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
+import org.das2.util.DasPNGConstants;
 import org.das2.util.FileUtil;
 import org.das2.util.monitor.AlertNullProgressMonitor;
 import org.json.JSONArray;
@@ -1580,6 +1581,10 @@ public class RunBatchTool extends javax.swing.JPanel {
                 }
                 Map<String,String> metadata= new LinkedHashMap<>();
                 metadata.put( "ScriptURI",uri );
+                if ( dom!=null ) {
+                    metadata.put( DasPNGConstants.KEYWORD_PLOT_INFO, 
+                        dom.getController().getApplicationModel().canvas.getImageMetadata() );
+                }
                 ScriptContext.writeToPng(bufferedImage,s,metadata);
             } else if ( s.endsWith(".pdf") ) {
                 ScriptContext.writeToPdf(s);
@@ -2209,8 +2214,9 @@ public class RunBatchTool extends javax.swing.JPanel {
                             interp.setOut(outbaos);
                             uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
                             interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile),scriptFile.getName()), scriptFile.getName() );
+                            Application myDom= ScriptContext.getDocumentModel();
                             if ( writeCheckBox.isSelected() ) {
-                                runResults.put("writeFile", doWrite(f1.trim(), "", uri, null ) );
+                                runResults.put("writeFile", doWrite(f1.trim(), "", uri, myDom ) );
                             }
                             jobs1.get(i1).setIcon(ICON_OKAY);
                         } catch ( IOException | JSONException | RuntimeException ex ) {
@@ -2265,7 +2271,8 @@ public class RunBatchTool extends javax.swing.JPanel {
                                 uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
                                 interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile), scriptFile.getName()), scriptFile.getName() );
                                 if ( writeCheckBox.isSelected() ) {
-                                    runResults.put("writeFile", doWrite(f1.trim(),f2.trim(), uri, null ) );
+                                    Application myDom= ScriptContext.getDocumentModel();
+                                    runResults.put("writeFile", doWrite(f1.trim(),f2.trim(), uri, myDom ) );
                                 }
                                 jobs2.get(i2).setIcon(ICON_OKAY);
                                 runResults.put("result","");
