@@ -4,3 +4,4 @@ org.autoplot.xmlfile.XmlFileDataSourceFactory xml
 org.autoplot.html.HtmlTableDataSourceFactory htm html
 org.autoplot.csv.CsvDataSourceFactory csv0
 org.autoplot.orbit.OrbitDataSourceFactory orbit
+org.autoplot.ascii.OdlDataSourceFactory sts odl
