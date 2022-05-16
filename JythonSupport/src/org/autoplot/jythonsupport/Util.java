@@ -811,7 +811,7 @@ public class Util {
      */
     public static String[] getCompletions( String file ) throws Exception {
         List<DataSetURI.CompletionResult> cc= DataSetURI.getCompletions( file, file.length(), new NullProgressMonitor() );
-        List<DataSetURI.CompletionResult> resultList= new ArrayList<DataSetURI.CompletionResult>();
+        List<DataSetURI.CompletionResult> resultList= new ArrayList<>();
         for (DataSetURI.CompletionResult cc1 : cc) {
             if (cc1.maybePlot == true) {
                 resultList.add(cc1);
@@ -839,7 +839,7 @@ public class Util {
      */
     public static String[] getAllCompletions( String file ) throws Exception {
         List<DataSetURI.CompletionResult> cc= DataSetURI.getCompletions( file, file.length(), new NullProgressMonitor() );
-        List<DataSetURI.CompletionResult> resultList= new ArrayList<DataSetURI.CompletionResult>();
+        List<DataSetURI.CompletionResult> resultList= new ArrayList<>();
         for (DataSetURI.CompletionResult cc1 : cc) {
             resultList.add(cc1);
         }
