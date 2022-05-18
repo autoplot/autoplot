@@ -1058,19 +1058,19 @@ public class PlotElementController extends DomNodeController {
                     } else if ( comp.startsWith("|") ) {
                         try {
                             QDataSet fillDs2 = fillDs;
-                            String srenderType= (String)fillDs2.property(QDataSet.RENDER_TYPE);
-                            if ( srenderType!=null ) {
-                                srenderType= resolveRenderType( fillDs2 );
-                            }
+                            //String srenderType= (String)fillDs2.property(QDataSet.RENDER_TYPE);
+                            //if ( srenderType!=null ) {
+                            //    srenderType= resolveRenderType( fillDs2 );
+                            //}
                             if ( comp.length()>0 ) fillDs2= processDataSet( comp, fillDs2 );
                             if ( fillDs2==null ) throw new NullPointerException("operations result in null: "+comp);
                             String s= resolveRenderType( fillDs2 );
-                            if ( comp.length()>0 && comp.startsWith("|unbundle(") && srenderType!=null ) { // vap+inline:ripplesVectorTimeSeries(200)&RENDER_TYPE=hugeScatter
-                                if ( !srenderType.contains(">") ) {
-                                    srenderType= srenderType + ">";
-                                }
-                                s= srenderType;
-                            }
+                            //if ( comp.length()>0 && comp.startsWith("|unbundle(") && srenderType!=null ) { // vap+inline:ripplesVectorTimeSeries(200)&RENDER_TYPE=hugeScatter
+                            //    if ( !srenderType.contains(">") ) {
+                            //        srenderType= srenderType + ">";
+                            //    }
+                            //    s= srenderType;
+                            //}
                             int i= s.indexOf('>');
                             if ( i==-1 ) i=s.length();
                             RenderType renderType= RenderType.valueOf(s.substring(0,i));
