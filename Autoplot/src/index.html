@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>New digitizer finds the peak within a steerable band.
+        <p><small><a href='https://github.com/autoplot/dev/blob/master/demos/2022/20220517/dandilion.jy'>Script</a> makes black-or-white image from picture of <a href='https://jfaden.net/~jbf/autoplot/demos/2022/20220517/2022-05-17T11-06-04.png'>dandelion</a>.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,10 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-05-13 r26649):</p>
+        <p>Bugfixes (2022-05-21 r26649):</p>
         <ul>
+            <li><a href='https://sourceforge.net/p/autoplot/bugs/2451/'>2451</a>: back out change from Mar 21 (rev 26562), which broke existing functionality
+            <li>remove where TODO items in BufferDataSet.append, supporting append of longs.
             <li><a href='https://sourceforge.net/p/autoplot/bugs/2449/'>2449</a>: case where append fails because timetags are different backing.  Thanks, Ivar!
             <li>HttpFileSystem getHeadMetadata had incorrect code when assembing URL for head request.
             <li>PNGWalkTool had excessive synchronized block use, causing hang on Mac.  Thanks, Sadie!
