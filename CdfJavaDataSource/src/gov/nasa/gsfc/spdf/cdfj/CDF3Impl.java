@@ -129,13 +129,18 @@ final class CDF3Impl extends CDFImpl implements CDF3, java.io.Serializable {
 
     protected ByteBuffer getRecord(long offset)  {
         if (fc == null) return super.getRecord(offset);
-        ByteBuffer lenBuf = ByteBuffer.allocate(4);
+        ByteBuffer lenBuf = ByteBuffer.allocate(8);
         synchronized (fc) {
             try {
-                fc.position((long)offset + 4);
+                fc.position((long)offset + 8);
                 fc.read(lenBuf);
-                int size = lenBuf.getInt(0);
-                return getRecord(offset, size);
+                long size = lenBuf.getLong(0);
+                if ( size>Integer.MAX_VALUE ) {
+                    throw new IllegalArgumentException("blocks longer than 2**32 are not supported.");
+                }
+                return getRecord(offset, (int)size);
+            } catch ( RuntimeException ex ) {
+                throw ex;
             } catch (Throwable ex) {
                 ex.printStackTrace();
                 return null;
