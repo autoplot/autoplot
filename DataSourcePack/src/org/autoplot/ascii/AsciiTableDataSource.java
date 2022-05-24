@@ -331,7 +331,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                     }
                 }
                 if ( columns.length==1 ) {
-                    vds= (ArrayDataSet) Ops.unbundle( vdss, 0 );
+                    vds= (MutablePropertyDataSet) Ops.unbundle( vdss, 0 );
                 } else {
                     vds= Ops.maybeCopy( vdss );
                 }
