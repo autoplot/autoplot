@@ -259,7 +259,7 @@ public final class JythonDataSource extends AbstractDataSource implements Cachin
                     logger.warning("done.");
                 }
 
-                interp.set("PWD",split.path);
+                interp.set("PWD", URISplit.parse( jythonScript.toURI() ).path );
                 interp.exec("import autoplot2017 as autoplot");
                 interp.exec("autoplot.params=dict()");
                 for ( Entry<String,String> e : paramsl.entrySet()) {
