@@ -28,9 +28,12 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-05-21 r26649):</p>
+        <p>Bugfixes (2022-05-26 r26649):</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2454/">2454</a>: correction to .jyds scripts, when script=xx keyword is used, PWD must be xx's location, not the data location.
+            <li>DisplayDataMouseModule shows the data precisely within the box, so that expected number of data points within a box can be confirmed.
+            <li>Correction to trim of JoinDataSet, which didn't consider that DEPEND_1 might be rank 2.
+            <li>Corrections to FFTPower Translation code, which was broken after years of disuse.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2453/">2453</a>: CDF-reading code throws informative exception when blocks are greater than 2GB.
             <li><a href='https://sourceforge.net/p/autoplot/bugs/2451/'>2451</a>: RENDER_TYPE=scatter is propagated through slice.
             <li><a href='https://sourceforge.net/p/autoplot/bugs/2451/'>2451</a>: back out change from Mar 21 (rev 26562), which broke existing functionality
