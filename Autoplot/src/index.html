@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Revisiting the Cookbook's <a href="http://autoplot.org/cookbook#L-shell_as_Y_axis">LSpec</a> routine, and a new version is found <a href='https://github.com/autoplot/dev/blob/master/demos/2022/NewLSpec.jy'>at GitHub</a>.
+        <p><small>Controls on symbol size and thickness is reflected in the legend.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -30,6 +30,7 @@
                 
         <p>Bugfixes (2022-05-26 r26667):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2455/">2455</a>: misuse of iterator in Jython setItem sloppiness would result in hang.  Thanks, Bill!
             <li>Corrections to FFTPower Translation code, which was broken after years of disuse.  Thanks, Jolene!
             <li>corrections to CdfSparseDataSet, which is needed to support FFTPower operation.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2454/">2454</a>: correction to .jyds scripts, when script=xx keyword is used, PWD must be xx's location, not the data location.
