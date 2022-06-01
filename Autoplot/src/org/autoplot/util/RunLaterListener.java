@@ -74,7 +74,6 @@ public abstract class RunLaterListener implements PropertyChangeListener, Runnab
         } else {
             RequestProcessor.invokeLater(this);
         }
-        System.err.println("finished pce");
     }
 
     @Override
