@@ -131,10 +131,12 @@ public class DataSourceController extends DomNodeController {
                     logger.log(Level.WARNING, " !! {0}", evt.getOldValue());
                     return;
                 }
+                //System.err.println("*** register "+resetMePropertyChangeListener);
                 DataSourceController.this.changesSupport.registerPendingChange(resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE);
                 setUriNeedsResolution(true);
                 if (!dom.controller.isValueAdjusting()) {
                     try {
+                        //System.err.println("*** unregister "+resetMePropertyChangeListener);
                         DataSourceController.this.changesSupport.performingChange(resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE);
                         dsf.setFilters(""); // reset filters
                         resolveDataSource(false, getMonitor("resetting data source", "resetting data source"));
@@ -142,9 +144,11 @@ public class DataSourceController extends DomNodeController {
                         DataSourceController.this.changesSupport.changePerformed(resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE);
                     }
                 } else {
+                    //System.err.println("*** runlater "+resetMePropertyChangeListener);
                     new RunLaterListener(ChangesSupport.PROP_VALUEADJUSTING, dom.controller, true) {
                         @Override
                         public void run() {
+                            //System.err.println("*** unregister "+resetMePropertyChangeListener);
                             try {
                                 DataSourceController.this.changesSupport.performingChange(resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE);
                                 if (uriNeedsResolution) {

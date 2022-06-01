@@ -501,6 +501,7 @@ public class DataSetURI {
      * @return the factory that produces the data source.
      * @throws java.io.IOException 
      * @throws URISyntaxException if the schemeSpecficPart is not itself a URI.
+     * @throws IllegalArgumentException if 
      * TODO: this should probably throw UnrecognizedDataSourceException
      */
     public static DataSourceFactory getDataSourceFactory(
@@ -514,6 +515,10 @@ public class DataSetURI {
                 DataSourceFactory delegateFactory;
                 if ( eext.equals(RECOGNIZE_FILE_EXTENSION_XML) || eext.equals(RECOGNIZE_FILE_EXTENSION_JSON) ) {
                     String ff= AggregatingDataSourceFactory.getRepresentativeFile( uri, mon.getSubtaskMonitor("find representative file") );
+                    if ( ff==null ) {
+                        mon.finished();
+                        throw new IllegalArgumentException("Unable to find file from aggregation: "+uri);
+                    }
                     File f= getFile( ff, mon.getSubtaskMonitor("get representative file") );
                     mon.finished();
                     String extr= DataSourceRecognizer.guessDataSourceType(f);

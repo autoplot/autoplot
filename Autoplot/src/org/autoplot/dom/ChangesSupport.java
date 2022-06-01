@@ -42,7 +42,7 @@ public final class ChangesSupport {
     Map<Object,String> threads;
     
     WeakReference<Object> parent;
-    private static final Logger logger= org.das2.util.LoggerManager.getLogger( "autoplot.dom" );
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger( "autoplot.dom.change" );
 
     /**
      * if the propertyChangeSupport is provided, then change messages will be sent to

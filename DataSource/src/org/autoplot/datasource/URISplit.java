@@ -616,6 +616,10 @@ public class URISplit {
      * @return the decomposed uri.
      */
     public static URISplit parse( String surl, int caretPos, boolean normalize) {
+        
+        if ( surl==null ) {
+            throw new NullPointerException("surl cannot be null");   
+        }
 
         logger.log( Level.FINE, "URISplit.parse(\"{0}\",{1},{2})", new Object[]{ surl, caretPos, normalize });
 
