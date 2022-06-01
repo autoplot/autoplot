@@ -3,14 +3,19 @@ package org.autoplot.util;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.logging.Level;
 import org.das2.system.RequestProcessor;
-
+import org.das2.util.LoggerManager;
+import java.util.logging.Logger;
+    
 /**
  * maybe a handy class to have something run later.
  * @author jbf
  */
 public abstract class RunLaterListener implements PropertyChangeListener, Runnable {
 
+    private static final Logger logger= LoggerManager.getLogger("autoplot.dom");
+    
     public interface PropertyChange {
         public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener);
         public void addPropertyChangeListener(PropertyChangeListener listener);
@@ -43,7 +48,7 @@ public abstract class RunLaterListener implements PropertyChangeListener, Runnab
         } else {
             this.node.addPropertyChangeListener( this );
         }
-        
+
     }
 
     @Override
@@ -61,11 +66,15 @@ public abstract class RunLaterListener implements PropertyChangeListener, Runnab
             return;
         }
         if ( immediatelyAfter ) {
-            run();
+            try {
+                run();
+            } catch ( Exception ex ) {
+                logger.log( Level.WARNING, "https://sourceforge.net/p/autoplot/bugs/2456/: error occurred which would block other listeners", ex );
+            }
         } else {
             RequestProcessor.invokeLater(this);
         }
-        
+        System.err.println("finished pce");
     }
 
     @Override
