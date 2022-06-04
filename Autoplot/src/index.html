@@ -32,6 +32,9 @@
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2456/">2456</a>: progress bar left hanging after runtime error because RunLaterListener runtime error would block later listeners.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2455/">2455</a>: misuse of iterator in Jython setItem sloppiness would result in hang.  Thanks, Bill!
+        </ul>
+        <p>Older Bugfixes (2022-05-26 r26667):</p>
+        <ul>
             <li>Corrections to FFTPower Translation code, which was broken after years of disuse.  Thanks, Jolene!
             <li>corrections to CdfSparseDataSet, which is needed to support FFTPower operation.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2454/">2454</a>: correction to .jyds scripts, when script=xx keyword is used, PWD must be xx's location, not the data location.
@@ -46,35 +49,14 @@
             <li>PNGWalkTool had excessive synchronized block use, causing hang on Mac.  Thanks, Sadie!
             <li>Autoplot Server feature, where telnet from localhost can control Autoplot, once again allows imports.  Thanks, Simon!
         </ul>
-        <p>Older Bugfixes (2022-04-29 r26638):</p>
-        <ul>
-            <li>improve feedback when "{" is seen in the middle of a HAPI data response, which is an easy mistake for servers to make.
-            <li>make it much more likely that the mashup tool result in synchronize data sets to be set.
-            <li>new specialColors code didn't handle missing data and would cause runtime error.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2445/">2445</a>: plot makes a copy of the data for defense and for performance.
-            <li>check list of renderers for transitional case, where the returned list would be one element too long with a null in the last element.
-            <li>remove "Here DELTA" debug message in SubsetDataSet.
-            <li>Jython symbol "map" is included in list of quickly executed routines, to support use in generating getParam GUIs.
-            <li>suppress warning about SCALEMIN and SCALEMAX when they are NaN, NaN, and just ignore them.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2444/">2444</a>: Run Batch would not create a new interpretter for each run, so information could leak from one run to another.
-            <li>Re-run single job of batch would run on event thread, hiding feedback and locking application.
-        </ul>
         <p>Features:</p>
+        <ul>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>Introduce ODL/STS data source.  Thanks, Bill!
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/781/">781</a> pngwalk tool "show only QC records" more options.  Thanks, Sadie!
             <li>Minimal specialColors property GUI added to assist in its use.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>new series icons reflect linethickness.
-            <li>allow .vap file in pngwalk using version numbers to check for the versioned .vap file as well.
-            <li>allow space or comma to be entered in single field of inline data dialog to speed up data entry in some cases.
-            <li>spectrogram icon reflects colorbar used.
-            <li>new series icons reflect symbolSize
-            <li>completions on plot command now supports completing keyword parameters.
-            <li>crossProduct function added.
-            <li>Color Scatter mode now has icon.
         </ul>
         <p>Known issues:</p>
         <ul>
