@@ -79,21 +79,23 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
         try {
             URISplit split= URISplit.parse( suri );
             Map<String,String> params= URISplit.parseParams(split.params);
-            
+
             String id= params.get("arg_0");
             if ( id==null ) id= params.get("id");
             if ( id==null ) id= params.get("X");
             if ( id==null ) id= params.get("Y");
             if ( id==null ) id= params.get("Z");
-            
+
             File xmlfile = DataSetURI.getFile( split.resourceUri.toURL() ,new NullProgressMonitor());
-            if ( !xmlfile.getAbsolutePath().toLowerCase().endsWith(".xml") ) {
-                problems.add("reference should be to the xml label file");
+            URL fileUrl;
+            try {
+                fileUrl = getFileResource( split.resourceUri.toURL(), mon );
+            } catch ( IOException | URISyntaxException | ParserConfigurationException | XPathExpressionException | SAXException ex ) {
+                problems.add("uri should point to xml or lblx file");
                 return true;
             }
-            URL fileUrl= getFileResource( split.resourceUri.toURL(), mon );
             DataSetURI.getFile(fileUrl,mon );
-            
+
             if ( id==null ) {
                 return true;
             } else {
@@ -105,9 +107,10 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
                     return true;
                 }
             }
-        } catch (IOException | URISyntaxException | ParserConfigurationException | SAXException | XPathExpressionException ex) {
-            Logger.getLogger(PdsDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
-            return true;
+        } catch ( IOException ex ) {
+            logger.log(Level.SEVERE, null, ex);
+            problems.add(ex.getMessage());
+            return false;
         }
     }
 
@@ -169,15 +172,19 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
             logger.log(Level.FINE, "getCompletions {0}", cc.resourceURI);
             
             File xmlfile = DataSetURI.getFile(cc.resourceURI.toURL(),new NullProgressMonitor());
-            if ( !xmlfile.getAbsolutePath().toLowerCase().endsWith(".xml") ) {
+            
+            URL fileUrl;
+            try {
+                fileUrl = getFileResource( cc.resourceURI.toURL(), mon );
+            } catch ( IOException | URISyntaxException | ParserConfigurationException | XPathExpressionException | SAXException ex ) {
                 List<CompletionContext> ccresult= new ArrayList<>();
-                ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "point to the xml file" ) );
+                ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "point to the xml or lblx file" ) );
                 return ccresult;
             }
-            URL fileUrl= getFileResource( cc.resourceURI.toURL(), mon );
             DataSetURI.getFile(fileUrl,mon );
              
-            Map<String,String> result= getDataObjectNames(xmlfile.toURI().toURL(), mon);
+            Map<String,String> result;
+            result = getDataObjectNames(xmlfile.toURI().toURL(), mon);
             
             List<CompletionContext> ccresult= new ArrayList<>();
             ccresult.add( new CompletionContext( 
