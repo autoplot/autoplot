@@ -5002,7 +5002,7 @@ private void updateFrameTitle() {
                     try {
                         String pwd= new File(".").getCanonicalPath();
                         if ( pwd.length()>2 ) {
-                            if ( System.getProperty("os.family").equals("Windows") ) {
+                            if ( "Windows".equals(System.getProperty("os.family")) ) {
                                 pwd= pwd + "\\";
                             } else {
                                 pwd= pwd + "/"; 
