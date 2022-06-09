@@ -47,6 +47,7 @@ public class DatasetCommand extends PyObject {
             + "<tr><td>validMin validMax</td><td>range of valid values for the data.</td></tr>\n"
             + "<tr><td>typicalMin typicalMax</td><td>typical range dataset, used for suggesting axis ranges.</td></tr>\n"
             + "<tr><td>scaleType</td><td>'log' or 'linear'</td></tr>\n"
+            + "<tr><td>averageType</td><td>'linear', 'geometric', 'mod360', 'mod24', 'modpi', 'modtau'</td></tr>\n"
             + "<tr><td>format</td><td>format specifier, like %d or %.2f</td></tr>\n"
             + "<tr><td>cadence</td><td>nominal cadence, like 60s or 100Hz.  Note this goes with the independent parameter (timetags).</td></tr>\n"
             + "</table></html>");
@@ -101,7 +102,7 @@ public class DatasetCommand extends PyObject {
             "title", "label", "name",
             "units", "format", "cadence", 
             "fillValue", "validMin", "validMax", "typicalMin", "typicalMax",
-            "scaleType",
+            "scaleType", "averageType",
             "renderType", "bins1", "bins0", "cacheTag", "userProperties",
             "deltaPlus", "deltaMinus", "binPlus", "binMinus", "binMin", "binMax",
         },
@@ -109,7 +110,7 @@ public class DatasetCommand extends PyObject {
             Py.None, Py.None, Py.None,
             Py.None, Py.None, Py.None,
             Py.None, Py.None, Py.None, Py.None, Py.None,
-            Py.None,
+            Py.None, Py.None,
             Py.None, Py.None, Py.None, Py.None, Py.None,
             Py.None, Py.None, Py.None, Py.None, Py.None, Py.None,
         } );
@@ -227,6 +228,9 @@ public class DatasetCommand extends PyObject {
                     break;
                 case "scaleType":
                     result= Ops.putProperty( result, QDataSet.SCALE_TYPE, sval );
+                    break;
+                case "averageType":
+                    result= Ops.putProperty( result, QDataSet.AVERAGE_TYPE, sval );
                     break;
                 case "cadence":
                     result= Ops.putProperty( result, QDataSet.CADENCE, sval );
