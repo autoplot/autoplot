@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Controls on symbol size and thickness is reflected in the legend.
+        <p><small>AVERAGE_TYPE metadata is introduced to properly handle interpolation of data which are angles or hours of day.  See <a href="https://github.com/autoplot/dev/blob/master/demos/2022/20220608/demoSynchronize.jy">the script</a>.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,9 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-06-07 r26676):</p>
+        <p>Bugfixes (2022-06-11 r26680):</p>
         <ul>
+            <li>Annotation had code which assumed the x axis units were not time location units.
             <li>lblx extention triggered PDS source, but parts within the source were still checking for a .xml extension.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2456/">2456</a>: progress bar left hanging after runtime error because RunLaterListener runtime error would block later listeners.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2455/">2455</a>: misuse of iterator in Jython setItem sloppiness would result in hang.  Thanks, Bill!
@@ -52,6 +53,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/784/">784</a> QDataSet AVERAGE_TYPE metadata introduced and used in interpolate.
         </ul>
         <p>Less recent features:</p>
         <ul>
