@@ -431,6 +431,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
         for ( int i=0; i<opsCbs.size(); i++ ) {
             if ( opsCbs.get(i).isSelected() ) {
                 String paramName= opsCbs.get(i).getText();
+                if ( paramName.endsWith("=") ) paramName= paramName.substring(0,paramName.length()-1);
                 String paramValue;
                 if ( opsComboBoxes.get(i)!=null ) {
                     paramValue= String.valueOf( opsComboBoxes.get(i).getSelectedItem() );
@@ -438,7 +439,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
                     paramValue= "????";
                 }
                 int icolon= paramValue.indexOf(':');
-                if ( icolon!=-1 && !paramValue.substring(0,icolon).equals("orbit")) {
+                if ( icolon!=-1 && !paramName.equalsIgnoreCase( URISplit.PARAM_TIME_RANGE ) ) {
                     paramValue= paramValue.substring(0,icolon);
                 }
                 if ( amp ) {
@@ -450,6 +451,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
                     amp= true;
                 }
                 base.append( paramName ); //TODO: is there an equals here?
+                base.append( "=" );
                 base.append( paramValue );
             }
         }
