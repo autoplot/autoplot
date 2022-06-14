@@ -153,14 +153,23 @@ public class NetCDFDataSource extends AbstractDataSource {
             
             QDataSet result= NetCdfVarDataSet.create( variable, constraint, ncfile, mon.getSubtaskMonitor(15,20,"copy over ") );
             
+            String xunits= getParam( "xunits", "" );
+            
             if ( sxVariable!=null && sxVariable.length()>0 ) {
                 NetCdfVarDataSet xds= NetCdfVarDataSet.create( xVariable, constraint, ncfile, new NullProgressMonitor() );
             
-                String xunits= getParam( "xunits", "" );
                 if ( !xunits.equals("") ) {
-                    xds.putProperty( QDataSet.UNITS, Units.lookupUnits(xunits) );
+                    xds.putProperty( QDataSet.UNITS, Units.lookupUnits(xunits.replaceAll("\\+"," ")) );
                 }
                 result = Ops.link( xds, result );
+            }
+            
+            if ( xunits.length()>0 && sxVariable==null ) {
+                NetCdfVarDataSet dep0= (NetCdfVarDataSet) result.property(QDataSet.DEPEND_0);
+                if ( dep0!=null ) {
+                    dep0.putProperty( QDataSet.UNITS, Units.lookupUnits(xunits.replaceAll("\\+"," ")) );
+                }
+                result= Ops.putProperty( result, QDataSet.DEPEND_0, dep0 );
             }
 
             if ( syVariable!=null && syVariable.length()>0 ) {
@@ -259,6 +268,8 @@ public class NetCDFDataSource extends AbstractDataSource {
     
     /**
      * this is sloppy in that it opens the file and then relies on someone else to close it.
+     * The local variables "variable" "xvariable" and "yvariable" are populated, as well as 
+     * "whereVariable".
      * @param mon
      * @throws IOException
      */
