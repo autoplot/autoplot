@@ -23,7 +23,7 @@ public class JarRelauncher {
     public static void main( String[] args ) {
         //TODO: can a CDF file be dropped onto a jar file?
         String myPath= System.getProperty("pwd"); //TODO: check this
-        if ( System.getProperty("os.family").equals("Windows") ) {
+        if ( "Windows".equals(System.getProperty("os.family")) ) {
             String javaPath = System.getProperty("java.home") + "\\bin\\java.exe";
             try {
                 Runtime.getRuntime().exec("\\" + javaPath + " -Xmx1000M -jar " + myPath + "autoplot.jar org.autoplot.AutoplotUI");
