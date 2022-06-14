@@ -158,7 +158,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
      }
      
     /**
-     * Read the NetCDF data.
+     * Read the NetCDF data, including DEPEND_0 if used, using the CDF conventions.
      * @param variable the NetCDF variable.
      * @param ncfile the NetCDF file.
      * @param constraints null, or string like "[0:10]"  Note it's allowed for the constraint to not have [] because this is called recursively.
