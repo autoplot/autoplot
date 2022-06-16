@@ -571,7 +571,12 @@ public final class AggregatingDataSource extends AbstractDataSource {
                     if ( xds!=null && filenameProvidesContext ) {
                         Units tu= SemanticOps.getUnits(xds);
                         if ( tu.isConvertibleTo(Units.hours) ) {
-                            xds= Ops.add( xds, dr1.min() );
+                            Datum d= Ops.datum(xds.slice(0));
+                            if ( d.lt(Units.hours.createDatum(-48) ) || d.gt( Units.hours.createDatum(48) ) ) {
+                                logger.fine("filenameProvidesContext, but units do not appear to be hours");
+                            } else {
+                                xds= Ops.add( xds, dr1.min() );
+                            }
                             ds1= Ops.link( xds, ds1 );
                         } else if ( UnitsUtil.isTimeLocation(tu) ) {
                             logger.fine("timetags already have context");
@@ -887,6 +892,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
         MutablePropertyDataSet dep0 = result == null ? null : (MutablePropertyDataSet) result.property(DDataSet.DEPEND_0);
         if ( dep0==null ) return null;
         QDataSet b= SemanticOps.bounds(dep0).slice(1);
+        Units.us2000.createDatum(b.value(0));
         return DatumRangeUtil.roundSections( DataSetUtil.asDatumRange( b,true ), 24 ); 
     }
 
