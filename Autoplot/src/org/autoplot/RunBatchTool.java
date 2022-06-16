@@ -1591,12 +1591,7 @@ public class RunBatchTool extends javax.swing.JPanel {
             }
             String s= f.toString();
             if ( s.endsWith(".png") ) {
-                BufferedImage bufferedImage;
-                if ( dom!=null ) {
-                    bufferedImage = ScriptContext.writeToBufferedImage(dom);
-                } else {
-                    bufferedImage = ScriptContext.writeToBufferedImage();
-                }
+                BufferedImage bufferedImage = ScriptContext.writeToBufferedImage();
                 Map<String,String> metadata= new LinkedHashMap<>();
                 metadata.put( "ScriptURI",uri );
                 if ( dom!=null ) {
