@@ -28,8 +28,11 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-06-13 r26680):</p>
+        <p>Bugfixes (2022-06-16 r26692):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2461/">2456</a>: corrections to fix Run Batch when colorbar is changed and overlays used.
+            <li>filenameProvidesContext checks to see if the hours offset really looks like it is hours.
+            <li>getProperty('os.family') is returning null on some platforms.
             <li>URI vap+orbit:rbspa-pp&timerange=tr would be mangled in the editor if the timerange contained colons.
             <li>Annotation had code which assumed the x axis units were not time location units.
             <li>lblx extention triggered PDS source, but parts within the source were still checking for a .xml extension.
