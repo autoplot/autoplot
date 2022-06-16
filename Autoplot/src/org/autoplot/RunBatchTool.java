@@ -322,7 +322,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         param1NameCB = new javax.swing.JComboBox<>();
         param2NameCB = new javax.swing.JComboBox<>();
-        cancelButton = new javax.swing.JButton();
+        closeButton = new javax.swing.JButton();
         generateButton1 = new javax.swing.JButton();
         generateButton2 = new javax.swing.JButton();
         writeCheckBox = new javax.swing.JCheckBox();
@@ -330,6 +330,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         progressPanel = new javax.swing.JPanel();
         editParamsButton = new javax.swing.JButton();
         pngWalkToolButton = new javax.swing.JButton();
+        cancelButton = new javax.swing.JButton();
 
         jList2.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -567,10 +568,10 @@ public class RunBatchTool extends javax.swing.JPanel {
             }
         });
 
-        cancelButton.setText("Close");
-        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+        closeButton.setText("Close");
+        closeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cancelButtonActionPerformed(evt);
+                closeButtonActionPerformed(evt);
             }
         });
 
@@ -633,6 +634,14 @@ public class RunBatchTool extends javax.swing.JPanel {
             }
         });
 
+        cancelButton.setText("Cancel");
+        cancelButton.setEnabled(false);
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -640,15 +649,6 @@ public class RunBatchTool extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(progressPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(cancelButton)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(goButton, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(editParamsButton, javax.swing.GroupLayout.Alignment.TRAILING)))
                     .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addComponent(dataSetSelector1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
@@ -666,15 +666,25 @@ public class RunBatchTool extends javax.swing.JPanel {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(generateButton2))))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 292, Short.MAX_VALUE)
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(writeCheckBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(writeFilenameCB, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(pngWalkToolButton))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(messageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 389, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(messageLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(progressPanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 74, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(cancelButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(goButton, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(closeButton))
+                            .addComponent(editParamsButton, javax.swing.GroupLayout.Alignment.TRAILING))))
                 .addContainerGap())
         );
 
@@ -709,6 +719,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(goButton)
+                            .addComponent(closeButton)
                             .addComponent(cancelButton)))
                     .addGroup(layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -815,7 +826,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_param2ValuesMouseReleased
 
-    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+    private void closeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeButtonActionPerformed
         Window w=SwingUtilities.getWindowAncestor(this);
         if ( ! ( w instanceof JDialog ) ) {
             logger.warning("untested code might leave hidden windows...");
@@ -826,7 +837,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         }
         
         w.setVisible(false);
-    }//GEN-LAST:event_cancelButtonActionPerformed
+    }//GEN-LAST:event_closeButtonActionPerformed
 
     private void loadUriMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadUriMenuItemActionPerformed
         DataSetSelector eventsDataSetSelector= new DataSetSelector();
@@ -1075,6 +1086,13 @@ public class RunBatchTool extends javax.swing.JPanel {
         
         
     }//GEN-LAST:event_rerunScriptMenuItemActionPerformed
+
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        ProgressMonitor mon= this.monitor;
+        if ( mon!=null ) {
+            mon.cancel();
+        }
+    }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void doLoadFromFile( JTextArea paramValues ) {
         JFileChooser chooser= new JFileChooser();
@@ -2098,6 +2116,9 @@ public class RunBatchTool extends javax.swing.JPanel {
         final List<JLabel> jobs2= new ArrayList<>();
         
         editParamsButton.setEnabled(true);
+        
+        closeButton.setEnabled(false);
+        cancelButton.setEnabled(true);
                 
         {
             String[] ff1= param1Values.getText().split("\n");
@@ -2336,10 +2357,12 @@ public class RunBatchTool extends javax.swing.JPanel {
             
         } finally {
             
-            messageLabel.setText("Jobs are complete, click above to edit.");
+            messageLabel.setText("Jobs are complete, click \"Edit Parameter Values\" to edit.");
             if ( !monitor.isFinished() ) monitor.finished();
             this.monitor=null;
             
+            cancelButton.setEnabled(false);
+            closeButton.setEnabled(true);
             goButton.setEnabled(true);
         }
     }
@@ -2468,6 +2491,7 @@ public class RunBatchTool extends javax.swing.JPanel {
     private javax.swing.JMenuItem OpenMenuItem;
     private javax.swing.JMenuItem SaveAsMenuItem;
     private javax.swing.JButton cancelButton;
+    private javax.swing.JButton closeButton;
     private javax.swing.JMenuItem copyUri;
     private org.autoplot.datasource.DataSetSelector dataSetSelector1;
     private javax.swing.JButton editParamsButton;
