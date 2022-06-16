@@ -573,7 +573,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                         if ( tu.isConvertibleTo(Units.hours) ) {
                             Datum d= Ops.datum(xds.slice(0));
                             if ( d.lt(Units.hours.createDatum(-48) ) || d.gt( Units.hours.createDatum(48) ) ) {
-                                logger.fine("filenameProvidesContext, but units do not appear to be hours");
+                                logger.warning("filenameProvidesContext, but times must be -48 to +48 hours");
                             } else {
                                 xds= Ops.add( xds, dr1.min() );
                             }
