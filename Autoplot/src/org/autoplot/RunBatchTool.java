@@ -1769,7 +1769,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         JSONObject runResults= new JSONObject();
 
         try {
-            Application myDom= (Application)this.dom.copy();
+            Application myDom= this.dom;
             
             ProgressMonitor myMonitor= new NullProgressMonitor() {
                 @Override
