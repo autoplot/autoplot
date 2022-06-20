@@ -28,10 +28,13 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-06-16 r26692):</p>
+        <p>Bugfixes (2022-06-20 r26698):</p>
         <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2461/">2456</a>: corrections to fix Run Batch when colorbar is changed and overlays used.
-            <li>filenameProvidesContext checks to see if the hours offset really looks like it is hours.
+            <li>Interval Average of PSP/EPILo data showed that rank 2 time-varying DEPEND_1 was not handled property in some rank-reducing routines.  Thanks, Jon N!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2462/">2462</a>: dataset('2021-02-02') returns a rank 0 dataset instant, not rank 1 range.  
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2463/">2463</a>: detect where erg_hep_l2_omniflux has energy[2,n] to represent bins.  Thanks, Allison!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2461/">2456</a>: corrections to fix Run Batch when colorbar is changed and overlays used.  Thanks, Sadie!
+            <li>filenameProvidesContext checks to see if the hours offset really looks like it is hours.  Thanks, Sadie!
             <li>getProperty('os.family') is returning null on some platforms.
             <li>URI vap+orbit:rbspa-pp&timerange=tr would be mangled in the editor if the timerange contained colons.
             <li>Annotation had code which assumed the x axis units were not time location units.
