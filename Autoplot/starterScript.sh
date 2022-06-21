@@ -74,17 +74,17 @@ fi
 
 if [ "$APDEBUG" == "1" ]; then 
    if [ "${JAVA_HOME}" -a \( -x "${JAVA_HOME}"/bin/java \) ]; then      
-      echo $EXEC "${JAVA_HOME}"/bin/java ${JAVA_ARGS} -jar ${JARFILE} "${AP_ARGS}"
+      echo $EXEC "${JAVA_HOME}"/bin/java ${JAVA_ARGS} -jar ${JARFILE} ${AP_ARGS}
    else
-      echo $EXEC /usr/bin/env java ${JAVA_ARGS} -jar ${JARFILE} "${AP_ARGS}"
+      echo $EXEC /usr/bin/env java ${JAVA_ARGS} -jar ${JARFILE} ${AP_ARGS}
    fi
 fi
 
 
 if [ "${JAVA_HOME}" -a \( -x "${JAVA_HOME}"/bin/java \) ]; then      
-      $EXEC "${JAVA_HOME}"/bin/java ${JAVA_ARGS} -jar ${JARFILE} "${AP_ARGS}"
+      $EXEC "${JAVA_HOME}"/bin/java ${JAVA_ARGS} -jar ${JARFILE} ${AP_ARGS}
 else
-      $EXEC /usr/bin/env java ${JAVA_ARGS} -jar ${JARFILE} "${AP_ARGS}"
+      $EXEC /usr/bin/env java ${JAVA_ARGS} -jar ${JARFILE} ${AP_ARGS}
 fi
 
 exit
