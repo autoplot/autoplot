@@ -133,12 +133,15 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
      * @see #splitIndex(java.lang.String) which splits the static part from the agg part.
      */
     public static FileStorageModel getFileStorageModel(String suri) throws IOException {
+
+        suri= suri.replaceAll("\\*","\\$x");
+        
         URISplit split= URISplit.parse(suri);
         String surl= split.surl; // support cases where resource URI is not yet valid.
         int i = surl.indexOf('?');
 
         String sansArgs = i == -1 ? surl : surl.substring(0, i);
-
+        
         i = splitIndex(sansArgs);
         FileSystem fs;
         
@@ -204,6 +207,14 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         }
     }
 
+    /**
+     * return the context to use for the delegate file.  Bugs:<ul>
+     * <li>file:///tmp/convert/j*.dat?column=
+     * </ul>
+     * @param cc
+     * @return
+     * @throws IOException 
+     */
     private static CompletionContext getDelegateDataSourceCompletionContext(CompletionContext cc) throws IOException {
 
         String surl = cc.surl;
@@ -228,7 +239,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         } else {
             delegateFfile= fsm.getFileSystem().getRootURI().resolve(URISplit.uriEncode(encodedDelegateFile)).toString();
         }
-        urlLen += delegateFfile.length();
+        urlLen += split.file.length();
         carotPos -= urlLen - delegateFfile.length();
         split.file = delegateFfile;
 
@@ -346,6 +357,8 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         List<CompletionContext> result = new ArrayList<>();
         CompletionContext delegatecc = getDelegateDataSourceCompletionContext(cc);
 
+        logger.log(Level.FINE, "got delegate cc: {0}", delegatecc);
+        
         List<CompletionContext> delegateCompletions = f.getCompletions(delegatecc,mon);
         result.addAll(delegateCompletions);
 
