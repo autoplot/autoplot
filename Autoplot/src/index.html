@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Run Batch tool has tooltips showing the output from jobs which failed.
+        <p><small>Old unnoticed bug with completions of aggregations showed in this case (*.dat) and is now fixed.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -30,7 +30,9 @@
                 
         <p>Bugfixes (2022-06-20 r26698):</p>
         <ul>
-            <li>Interval Average of PSP/EPILo data showed that rank 2 time-varying DEPEND_1 was not handled property in some rank-reducing routines.  Thanks, Jon N!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2464/">2464</a>: completions for /tmp/convert/*.dat?column= produced runtime error because of old miscalculation.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2459/">2459</a>: command-line autoplot with --script couldn't pass arguments to script because of unnecessary quotes.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2465/">2465</a>: Interval Average of PSP/EPILo data showed that rank 2 time-varying DEPEND_1 was not handled property in some rank-reducing routines.  Thanks, Jon N!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2462/">2462</a>: dataset('2021-02-02') returns a rank 0 dataset instant, not rank 1 range.  
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2463/">2463</a>: detect where erg_hep_l2_omniflux has energy[2,n] to represent bins.  Thanks, Allison!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2461/">2456</a>: corrections to fix Run Batch when colorbar is changed and overlays used.  Thanks, Sadie!
