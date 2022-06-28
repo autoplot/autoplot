@@ -1597,9 +1597,10 @@ public class CdfDataSource extends AbstractDataSource {
             QDataSet depDs= (QDataSet) result.property("DEPEND_"+idep);
             if ( depDs!=null && depDs.rank() == 2 && depDs.length(0) == 2 && depDs.length()==qubeDims[idep] ) {
                 logger.warning("applying min,max kludge for old LANL cdf files");
-                MutablePropertyDataSet depDs1 = (MutablePropertyDataSet) Ops.reduceMean(depDs, 1);
                 QDataSet binmax = DataSetOps.slice1(depDs, 1);
                 QDataSet binmin = DataSetOps.slice1(depDs, 0);
+                MutablePropertyDataSet depDs1 = 
+                    DataSetOps.makePropertiesMutable( Ops.add( binmin, Ops.divide( Ops.subtract(binmax,binmin), 2 ) ) );
                 depDs1.putProperty(QDataSet.DELTA_MINUS, Ops.subtract(depDs1, binmin));
                 depDs1.putProperty(QDataSet.DELTA_PLUS, Ops.subtract(binmax, depDs1));
                 depDs = depDs1;
