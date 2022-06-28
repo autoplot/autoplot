@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Comparison of same data transmitted by a HAPI server and by CDF.
+        <p><small>Script used to reload spacecraft position which had been represented in ASCII file with insufficient resolution.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,9 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-06-25 r26702):</p>
+        <p>Bugfixes (2022-06-28 r26702):</p>
         <ul>
+            <li><a href='https://sourceforge.net/p/autoplot/bugs/2449/'>2449</a>: other cases where append fails because timetags are different backing.  Thanks, Sadie!
             <li>check to see if findex failure is due to non-repeating or decreasing and report more precise error.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2464/">2464</a>: completions for /tmp/convert/*.dat?column= produced runtime error because of old miscalculation.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2459/">2459</a>: command-line autoplot with --script couldn't pass arguments to script because of unnecessary quotes.
