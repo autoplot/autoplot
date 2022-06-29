@@ -548,11 +548,11 @@ public class CdfDataSource extends AbstractDataSource {
             List<QDataSet> args= new ArrayList();
             String function= (String)attr1.get("FUNCTION");
             if ( function==null ) function= (String)attr1.get("FUNCT");
-            if ( attr1.get("COMPONENT_0")!=null ) args.add( loadVariableAndDependents( cdf, (String)attr1.get("COMPONENT_0"), constraint, false, true, null, -1, mon.getSubtaskMonitor("c0") ) );
-            if ( attr1.get("COMPONENT_1")!=null ) args.add( loadVariableAndDependents( cdf, (String)attr1.get("COMPONENT_1"), constraint, false, true, null, -1, mon.getSubtaskMonitor("c1") ) );
-            if ( attr1.get("COMPONENT_2")!=null ) args.add( loadVariableAndDependents( cdf, (String)attr1.get("COMPONENT_2"), constraint, false, true, null, -1, mon.getSubtaskMonitor("c2") ) );
-            if ( attr1.get("COMPONENT_3")!=null ) args.add( loadVariableAndDependents( cdf, (String)attr1.get("COMPONENT_3"), constraint, false, true, null, -1, mon.getSubtaskMonitor("c3") ) );
-            if ( attr1.get("COMPONENT_4")!=null ) args.add( loadVariableAndDependents( cdf, (String)attr1.get("COMPONENT_4"), constraint, false, true, null, -1, mon.getSubtaskMonitor("c4") ) );
+            if ( attr1.get("COMPONENT_0")!=null ) args.add(loadVariableAndDependents(cdf, (String)attr1.get("COMPONENT_0"), constraint, false, true, null, -1, -1, mon.getSubtaskMonitor("c0") ) );
+            if ( attr1.get("COMPONENT_1")!=null ) args.add(loadVariableAndDependents(cdf, (String)attr1.get("COMPONENT_1"), constraint, false, true, null, -1, -1, mon.getSubtaskMonitor("c1") ) );
+            if ( attr1.get("COMPONENT_2")!=null ) args.add(loadVariableAndDependents(cdf, (String)attr1.get("COMPONENT_2"), constraint, false, true, null, -1, -1, mon.getSubtaskMonitor("c2") ) );
+            if ( attr1.get("COMPONENT_3")!=null ) args.add(loadVariableAndDependents(cdf, (String)attr1.get("COMPONENT_3"), constraint, false, true, null, -1, -1, mon.getSubtaskMonitor("c3") ) );
+            if ( attr1.get("COMPONENT_4")!=null ) args.add(loadVariableAndDependents(cdf, (String)attr1.get("COMPONENT_4"), constraint, false, true, null, -1, -1, mon.getSubtaskMonitor("c4") ) );
             try {
                 result= (MutablePropertyDataSet) CdfVirtualVars.execute( attr1, function, args, mon.getSubtaskMonitor("virtual variable") );
             } catch ( IllegalArgumentException ex ) {
@@ -576,7 +576,7 @@ public class CdfDataSource extends AbstractDataSource {
                     }
                     String c= constraints.isEmpty() ? null : constraints.get(i);
                     HashMap<String,Object> attrs1 = readAttributes(cdf, s, 0);
-                    QDataSet result1= loadVariableAndDependents(cdf, s, c, false, doDep, attrs1, -1, mon.getSubtaskMonitor("reading "+s+" from CDF file") );
+                    QDataSet result1= loadVariableAndDependents(cdf, s, c, false, doDep, attrs1, -1, -1, mon.getSubtaskMonitor("reading "+s+" from CDF file") );
                     Pattern p= Pattern.compile("\\[\\:\\,(\\d+)\\]");
                     if ( c!=null ) {
                         Matcher m= p.matcher(c);
@@ -596,9 +596,9 @@ public class CdfDataSource extends AbstractDataSource {
             String os1= (String)map.get(PARAM_SLICE1);
             if ( os1!=null && !os1.equals("") && cdf.getDimensions(svariable).length>0 ) {
                 int is= Integer.parseInt(os1);
-                result= loadVariableAndDependents( cdf, svariable, constraint, false, doDep, attr1, is, mon.getSubtaskMonitor("reading "+svariable+" from CDF file") );
+                result= loadVariableAndDependents(cdf, svariable, constraint, false, doDep, attr1, is, -1, mon.getSubtaskMonitor("reading "+svariable+" from CDF file") );
             } else {
-                result= loadVariableAndDependents(cdf, svariable, constraint, false, doDep, attr1, -1, mon.getSubtaskMonitor("reading "+svariable+" from CDF file") );
+                result= loadVariableAndDependents(cdf, svariable, constraint, false, doDep, attr1, -1, -1, mon.getSubtaskMonitor("reading "+svariable+" from CDF file") );
             }
         }
 
@@ -619,7 +619,7 @@ public class CdfDataSource extends AbstractDataSource {
             } else {
                 constraint1 = constraint;
             }
-            QDataSet parm= loadVariableAndDependents(cdf, sx, constraint1, false);
+            QDataSet parm= loadVariableAndDependents(cdf, sx, constraint1, false, false, null, -1, result.length(), new NullProgressMonitor());
             if ( parm.length()!=result.length() ) {
                 throw new IllegalArgumentException("length of X doesn't match that of data, check each variable's length.");
             }
@@ -637,7 +637,7 @@ public class CdfDataSource extends AbstractDataSource {
             } else {
                 constraint1 = constraint;
             }            
-            QDataSet parm= loadVariableAndDependents(cdf, sy, constraint1, false);
+            QDataSet parm= loadVariableAndDependents(cdf, sy, constraint1, false, false, null, -1, result.length(), new NullProgressMonitor() );
             if ( parm.length()==1 && parm.rank()==2 && result.rank()>1 && result.length()>1 ) {
                 parm= parm.slice(0); // reform rte_1731551069
             }  // rte_1731551069: check for non-time-varying data for "Y" which needs to be reformed.  With where constraint, coerce rank 1 Y to rank 2.
@@ -656,7 +656,7 @@ public class CdfDataSource extends AbstractDataSource {
             } else {
                 constraint1 = constraint;
             }  
-            QDataSet parm= loadVariableAndDependents(cdf, sparm, constraint1, false);
+            QDataSet parm= loadVariableAndDependents(cdf, sparm, constraint1, false, false, null, -1, result.length(), new NullProgressMonitor());
             if ( parm.length()==1 && parm.rank()==2 && result.rank()>1 && result.length()>1 ) {
                 parm= Ops.replicate( parm.slice(0), result.length() ); // reform rte_1731551069
             }
@@ -969,7 +969,7 @@ public class CdfDataSource extends AbstractDataSource {
      * @throws Exception 
      */
     private QDataSet getDeltaPlusMinus( final CDFReader cdf, QDataSet ds, final String deltaPlus, final String constraints ) throws Exception {
-        QDataSet delta= loadVariableAndDependents(cdf, (String)deltaPlus, constraints, false ); //TODO: slice1
+        QDataSet delta= loadVariableAndDependents(cdf, (String)deltaPlus, constraints, false, false, null, -1, ds.length(), new NullProgressMonitor() ); //TODO: slice1
         if ( delta.rank()>0 && delta.length()==1 && ( delta.length()!=ds.length() || ds.length()==1 ) ) {
             delta= delta.slice(0); //vap+cdaweb:ds=C3_PP_CIS&id=T_p_par__C3_PP_CIS&timerange=2005-09-07+through+2005-09-19
         }
@@ -999,7 +999,7 @@ public class CdfDataSource extends AbstractDataSource {
      * @throws ParseException 
      */
     private MutablePropertyDataSet loadVariableAndDependents(final CDFReader cdf, final String svariable, final String constraints, boolean reform) throws Exception, ParseException {
-        return loadVariableAndDependents( cdf, svariable, constraints, reform, false, null, -1, new NullProgressMonitor() );
+        return loadVariableAndDependents(cdf, svariable, constraints, reform, false, null, -1, -1, new NullProgressMonitor() );
     }
 
     /**
@@ -1079,19 +1079,17 @@ public class CdfDataSource extends AbstractDataSource {
      * @param constraints null or a constraint string like "[0:10000]" to read a subset of records.
      * @param reform for depend_1, we read the one and only rec, and the rank is decreased by 1.
      * @param loadDependents if true, recurse to read variables this depends on.
+     * @param thisAttributes the value of thisAttributes
      * @param slice1 if &gt;-1, then slice on the first dimension.  This is to support extracting components.
-     * @return the dataset 
+     * @param expectRec the value of expectRec 
+     * @param mon the value of mon 
      * @throws CDFException
      * @throws ParseException
+     * @return the org.das2.qds.MutablePropertyDataSet
      */
-    private synchronized MutablePropertyDataSet loadVariableAndDependents(final CDFReader cdf, 
-            final String svariable, 
-            final String constraints, 
-            boolean reform, 
-            boolean loadDependents, 
-            Map<String,Object> thisAttributes, 
-            int slice1, 
-            ProgressMonitor mon) throws Exception, ParseException {
+    private synchronized MutablePropertyDataSet loadVariableAndDependents(
+        final CDFReader cdf, final String svariable, final String constraints, boolean reform, boolean loadDependents, 
+        Map<String,Object> thisAttributes, int slice1, int expectRec, ProgressMonitor mon) throws Exception, ParseException {
         
         logger.log(Level.FINE, "loadVariableAndDependents {0} constraints={1} dependVar={2} slice1={3} reform={4}", new Object[] { svariable, constraints, loadDependents, slice1, reform } );
         if ( !hasVariable(cdf, svariable) ) {
@@ -1310,7 +1308,8 @@ public class CdfDataSource extends AbstractDataSource {
         if ( slice && loadDependents ) {
             Map dep0map= (Map) thisAttributes.get( "DEPEND_0" );
             if ( dep0map!=null ) {
-                QDataSet dep0= loadVariableAndDependents(cdf, (String) dep0map.get("NAME"), constraints, false);
+                QDataSet dep0= loadVariableAndDependents(cdf, (String) dep0map.get("NAME"), constraints, false, 
+                    false, null, -1, result.length(), new NullProgressMonitor());
                 result.putProperty( QDataSet.CONTEXT_0, dep0 );
             }
         }
@@ -1392,7 +1391,7 @@ public class CdfDataSource extends AbstractDataSource {
                         lablDs= loadVariableAndDependents(cdf, labl, constraints, idep > 0);
                         if ( idep==1 && attributes!=null ) attributes.put( "LABL_PTR_1", lablDs );
                     } catch ( Exception ex ) {
-                        logger.log( Level.FINE, "unable to load LABL_PTR_"+sidep+" for "+svariable, ex );
+                        logger.log(Level.FINE, "unable to load LABL_PTR_"+sidep+" for "+svariable, ex );
                         thisAttributes.remove("LABL_PTR_" + sidep);
                     }
                     if ( lablDs!=null && lablDs.length()<4 && displayType==null ) {
@@ -1419,7 +1418,7 @@ public class CdfDataSource extends AbstractDataSource {
                             reformDep= false;
                         }
 
-                        depDs = loadVariableAndDependents(cdf, depName, constraints, reformDep, false, depAttr, -1, null);
+                        depDs = loadVariableAndDependents(cdf, depName, constraints, reformDep, false, depAttr, -1, result.length(), null);
                         //depDs = CdfUtil.loadVariable(cdf, depName ); // EXPERIMENT--DO NOT COMMIT
 
                         if ( idep>0 && reformDep==false && depDs.length()==1 && ( qubeDims[0]==1 || qubeDims[0]>depDs.length() ) ) { //bugfix https://sourceforge.net/p/autoplot/bugs/471/
@@ -1595,7 +1594,7 @@ public class CdfDataSource extends AbstractDataSource {
         //kludge for LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?FPDO  Autoplot Test016 has one of these vap:file:///home/jbf/ct/lanl/hudson/LANL_LANL-97A_H3_SOPA_20060505_V01.cdf?FEDU.
         for ( int idep=1; idep<result.rank(); idep++ ) {
             QDataSet depDs= (QDataSet) result.property("DEPEND_"+idep);
-            if ( depDs!=null && depDs.rank() == 2 && depDs.length(0) == 2 && depDs.length()==qubeDims[idep] ) {
+            if ( result.length()!=2 && depDs!=null && depDs.rank() == 2 && depDs.length(0) == 2 && depDs.length()==qubeDims[idep] ) {
                 logger.warning("applying min,max kludge for old LANL cdf files");
                 QDataSet binmax = DataSetOps.slice1(depDs, 1);
                 QDataSet binmin = DataSetOps.slice1(depDs, 0);
