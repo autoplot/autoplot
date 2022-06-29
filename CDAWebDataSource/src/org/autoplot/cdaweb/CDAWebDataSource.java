@@ -296,6 +296,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                             try {
                                 ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1,metadata );
                             } catch ( IllegalArgumentException ex ) {
+                                ex.printStackTrace();
                                 String p= params.get(PARAM_ID);
                                 logger.log(Level.INFO, "parameter not found for interval: {0}", p );
                                 throw new NoDataInIntervalException("parameter not found for interval: "+p );
