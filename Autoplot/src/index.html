@@ -28,8 +28,9 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-06-28 r26702):</p>
+        <p>Bugfixes (2022-06-29 r26708):</p>
         <ul>
+            <li><a href='https://sourceforge.net/p/autoplot/bugs/2467/'>2467</a>: old kludge which assumed CDF DEPEND with 2 records of min and max prevented use of a PSP dataset.  Thanks, Sadie!
             <li><a href='https://sourceforge.net/p/autoplot/bugs/2449/'>2449</a>: other cases where append fails because timetags are different backing.  Thanks, Sadie!
             <li>check to see if findex failure is due to non-repeating or decreasing and report more precise error.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2464/">2464</a>: completions for /tmp/convert/*.dat?column= produced runtime error because of old miscalculation.
