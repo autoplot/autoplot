@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Script used to reload spacecraft position which had been represented in ASCII file with insufficient resolution.
+        <p><small>Images from Iowa State soil conditions website viewed in PNG Walk Tool.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -29,6 +29,10 @@
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
         <p>Bugfixes (2022-06-29 r26708):</p>
+        <ul>
+            <li><a href='https://github.com/das-developers/das2java/issues/28'>28</a>: Corrections to DataPointRecorder, which sorted numbers alphabetically, not numerically.
+        </ul>
+        <p>Older Bugfixes (2022-06-29 r26708):</p>
         <ul>
             <li><a href='https://sourceforge.net/p/autoplot/bugs/2467/'>2467</a>: old kludge which assumed CDF DEPEND with 2 records of min and max prevented use of a PSP dataset.  Thanks, Sadie!
             <li><a href='https://sourceforge.net/p/autoplot/bugs/2449/'>2449</a>: other cases where append fails because timetags are different backing.  Thanks, Sadie!
@@ -47,31 +51,13 @@
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2456/">2456</a>: progress bar left hanging after runtime error because RunLaterListener runtime error would block later listeners.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2455/">2455</a>: misuse of iterator in Jython setItem sloppiness would result in hang.  Thanks, Bill!
         </ul>
-        <p>Older Bugfixes (2022-05-26 r26667):</p>
-        <ul>
-            <li>Corrections to FFTPower Translation code, which was broken after years of disuse.  Thanks, Jolene!
-            <li>corrections to CdfSparseDataSet, which is needed to support FFTPower operation.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2454/">2454</a>: correction to .jyds scripts, when script=xx keyword is used, PWD must be xx's location, not the data location.
-            <li>DisplayDataMouseModule shows the data precisely within the box, so that expected number of data points within a box can be confirmed.
-            <li>Correction to trim of JoinDataSet, which didn't consider that DEPEND_1 might be rank 2.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2453/">2453</a>: CDF-reading code throws informative exception when blocks are greater than 2GB.  Thanks, Kristoff!
-            <li><a href='https://sourceforge.net/p/autoplot/bugs/2451/'>2451</a>: RENDER_TYPE=scatter is propagated through slice.
-            <li><a href='https://sourceforge.net/p/autoplot/bugs/2451/'>2451</a>: back out change from Mar 21 (rev 26562), which broke existing functionality.  Thanks, Jon N!
-            <li>remove where TODO items in BufferDataSet.append, supporting append of longs.
-            <li><a href='https://sourceforge.net/p/autoplot/bugs/2449/'>2449</a>: case where append fails because timetags are different backing.  Thanks, Ivar!
-            <li>HttpFileSystem getHeadMetadata had incorrect code when assembing URL for head request.
-            <li>PNGWalkTool had excessive synchronized block use, causing hang on Mac.  Thanks, Sadie!
-            <li>Autoplot Server feature, where telnet from localhost can control Autoplot, once again allows imports.  Thanks, Simon!
-        </ul>
         <p>Features:</p>
         <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/784/">784</a> QDataSet AVERAGE_TYPE metadata introduced and used in interpolate.
+            <li>Add withinSet function which returns one where the data is within a set of values.
         </ul>
         <p>Less recent features:</p>
         <ul>
-            <li>Introduce ODL/STS data source.  Thanks, Bill!
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/781/">781</a> pngwalk tool "show only QC records" more options.  Thanks, Sadie!
-            <li>Minimal specialColors property GUI added to assist in its use.
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/784/">784</a> QDataSet AVERAGE_TYPE metadata introduced and used in interpolate.
         </ul>
         <p>Known issues:</p>
         <ul>
