@@ -227,7 +227,9 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                         logger.fine("writing bundled datasets to CDF separately.");
                     } else {
                         String name= nameFor(bds);
-                        addVariableRank1NoVary( cdf, bds, name, true, new HashMap<String,String>(), mon.getSubtaskMonitor("bundle1") );
+                        if ( bds.rank()==1 || ( bds.rank()==2 && Schemes.isBundleDescriptor(bds) ) ) {
+                            addVariableRank1NoVary( cdf, bds, name, true, new HashMap<String,String>(), mon.getSubtaskMonitor("bundle1") );
+                        }
                     }
                 } else {
                     String name= nameFor(bds);
