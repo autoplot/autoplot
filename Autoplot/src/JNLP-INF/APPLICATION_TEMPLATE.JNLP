@@ -24,6 +24,7 @@
         </shortcut>
         <association mime-type="application/autoplot+xml" extensions="vap"/>
         <association mime-type="application/x-cdf" extensions="cdf"/>        
+        <association mime-type="application/vnd.nasa.pds.pds4+xml " extensions="lblx"/>
         <association mime-type="application/x-pngwalk" extensions="pngwalk"/> 
         <association mime-type="application/vnd.autoplot.pngwalk" extensions="pngwalk"/>
         <association mime-type="application/vnd.autoplot.vap+xml" extensions="vap"/>         
@@ -49,6 +50,7 @@
         <property name="http.agent" value="*" />
         <property name="com.apple.mrj.application.apple.menu.about.name" value="*" /> <!-- bug 2312 -->
         <property name="autoplot.release.type" value="*" /> <!-- bug 2383 -->
+        <property name="log4j2.formatMsgNoLookups" value="true" /> <!-- https://sourceforge.net/p/autoplot/bugs/2420/, just in case someone links in old version -->
     </resources> 
 
     <application-desc  main-class="org.autoplot.AutoplotUI">

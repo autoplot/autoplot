@@ -50,6 +50,7 @@
         <property name="java.util.Arrays.useLegacyMergeSort" value="true" /> <!-- bug 1159 -->
         <property name="http.agent" value="Autoplot-#{tag}" />
         <property name="com.apple.mrj.application.apple.menu.about.name" value="Autoplot" /> <!-- bug 2312 -->
+        <property name="autoplot.release.type" value="webstart" />
         <property name="log4j2.formatMsgNoLookups" value="true" /> <!-- https://sourceforge.net/p/autoplot/bugs/2420/, just in case someone links in old version -->
 
     </resources> 
