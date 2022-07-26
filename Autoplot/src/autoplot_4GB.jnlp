@@ -24,6 +24,7 @@
         </shortcut>
         <association mime-type="application/autoplot+xml" extensions="vap"/>
         <association mime-type="application/x-cdf" extensions="cdf"/>
+        <association mime-type="application/vnd.nasa.pds.pds4+xml " extensions="lblx"/>        
         <association mime-type="application/x-pngwalk" extensions="pngwalk"/>
         <association mime-type="application/vnd.autoplot.pngwalk" extensions="pngwalk"/>
         <association mime-type="application/vnd.autoplot.vap+xml" extensions="vap"/>        
