@@ -34,7 +34,7 @@
         <all-permissions/>
     </security>
 
-    <resources> 
+    <resources arch="x86_64"> > 
         <j2se version="1.8+" initial-heap-size="96m" max-heap-size="1G" 
               href="http://java.sun.com/products/autodl/j2se" >
         </j2se>
