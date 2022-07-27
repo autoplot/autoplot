@@ -142,7 +142,7 @@ public class WalkUtil {
         for ( i = 0; i < ss.length; i++) {
             DatumRange dr2=null;
             if ( fsm!=null ) dr2= fsm.getRangeFor(ss[i]);
-            if ( dr==null || dr2==null || dr.contains(dr2) ) {
+            if ( dr==null || dr2==null || dr.intersects(dr2) ) {
                 if ( fs instanceof LocalFileSystem ) {
                     File f= fs.getFileObject(ss[i]).getFile();
                     result.add( f.toURI() );
