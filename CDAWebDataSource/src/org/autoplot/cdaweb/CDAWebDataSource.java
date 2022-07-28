@@ -126,14 +126,17 @@ public class CDAWebDataSource extends AbstractDataSource {
         ArrayDataSet accum = null;
 
         try {
-
-            try {
-                mon.setProgressMessage("refreshing database");
-                db.maybeRefresh( mon.getSubtaskMonitor(0,10,"refreshing database") ); 
-            } catch ( IOException ex ) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-                mon.setProgressMessage("unable to connect via ftp");
-                throw ex;
+            boolean useService= !( "F".equals(ws) );
+            
+            if ( !useService ) {
+                try {
+                    mon.setProgressMessage("refreshing database");
+                    db.maybeRefresh( mon.getSubtaskMonitor(0,10,"refreshing database") ); 
+                } catch ( IOException ex ) {
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
+                    mon.setProgressMessage("unable to connect via ftp");
+                    throw ex;
+                }
             }
 
             String[] files;
