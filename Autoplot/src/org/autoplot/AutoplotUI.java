@@ -5004,11 +5004,13 @@ private void updateFrameTitle() {
                         if ( pwd.length()>2 ) {
                             if ( "Windows".equals(System.getProperty("os.family")) ) {
                                 pwd= pwd + "\\";
+                                initialURL= pwd + initialURL;
                             } else {
-                                pwd= pwd + "/"; 
+                                initialURL = URISplit.makeAbsolute( pwd, initialURL );
                             }   
+                        } else {
+                            initialURL= pwd + initialURL;
                         }
-                        initialURL= pwd + initialURL;
                     } catch ( IOException ex ) {
                         logger.log( Level.WARNING, null, ex );
                     }
@@ -5022,12 +5024,12 @@ private void updateFrameTitle() {
 
         if (alm.getBooleanValue("scriptPanel")) {
             logger.fine("enable scriptPanel");
-            model.getDocumentModel().getOptions().setScriptVisible(true);
+            model.getDom().getOptions().setScriptVisible(true);
         }
 
         if (alm.getBooleanValue("logConsole")) {
             logger.fine("enable scriptPanel");
-            model.getDocumentModel().getOptions().setLogConsoleVisible(true);
+            model.getDom().getOptions().setLogConsoleVisible(true);
         }
 
         logger.fine("add shutdown hook");
