@@ -47,7 +47,6 @@ import org.das2.qds.DataSetUtil;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.DataSourceUtil;
-import org.das2.qds.BundleDataSet;
 import org.das2.qds.SparseDataSetBuilder;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.AsciiHeadersParser;
@@ -1257,7 +1256,14 @@ public class AsciiTableDataSource extends AbstractDataSource {
             String k= e.getKey();
             Object v= e.getValue();
             if ( v==null ) continue;
-            if ( !( v instanceof Number || v instanceof String || v instanceof org.das2.datum.Datum ) ) remove.add(k);
+            boolean isAllowed= v instanceof Number 
+                || v instanceof String
+                || v instanceof org.das2.datum.Datum 
+                || v.getClass().isArray();
+            if ( ! isAllowed ) {
+                logger.log(Level.FINE, "removing user property because of type: {0}", k);
+                remove.add(k);
+            }
         }
         for ( String k: remove ) {
             props.remove(k);
