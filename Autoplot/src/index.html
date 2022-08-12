@@ -30,6 +30,8 @@
                 
         <p>Bugfixes (2022-07-23 r26711):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2471/">2471</a>: Firebird JSON headed ASCII contained invalid reference and couldn't be used, make more permissive to keep what is correct.
+            <li>Delay initialization of CDAWeb database if we already know the dataset and parameter, since it takes 20-30 seconds to initialize.
             <li><a href='https://github.com/das-developers/das2java/issues/32'>32</a>: Das2 waitUntilIdle loop wouldn't properly block when ephemeris was loading, causing glitches in automated testing and PNG Walks.
             <li>bundle from HAPI exported to CDF would fail because of careless check of dataset type.
             <li><a href='https://sourceforge.net/p/autoplot/bugs/2470/'>2470</a>: Rich ASCII (JSON headed ASCII) detects ISO8601 automatically, to match SpacePy.
@@ -58,6 +60,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Preserve string array properties in JSON headed ascii, and preserve unrecognized properties in USER_PROPERTIES.
+            <li>add mime type for PDS lblx files.
             <li>Add withinSet function which returns one where the data is within a set of values.
         </ul>
         <p>Less recent features:</p>
