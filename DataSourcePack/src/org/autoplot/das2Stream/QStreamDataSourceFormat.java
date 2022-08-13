@@ -58,16 +58,12 @@ public class QStreamDataSourceFormat implements DataSourceFormat {
         java.util.Map<String, String> params= URISplit.parseParams(split.params);
 
         boolean binary= "binary".equals( params.get( "type" ) );
-        FileOutputStream fo=null;
-        try {
-            fo= new FileOutputStream( new File( split.resourceUri ) );
+        try (FileOutputStream fo = new FileOutputStream( new File( split.resourceUri ) )) {
             if ( SemanticOps.isBundle(data) ) {
                 new org.das2.qstream.BundleStreamFormatter().format( data, fo, !binary );
             } else {
                 new org.das2.qstream.SimpleStreamFormatter().format( data, fo, !binary );
             }
-        } finally {
-            if ( fo!=null ) fo.close();
         }
     }
 
