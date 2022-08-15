@@ -1204,7 +1204,8 @@ public class AutoplotUtil {
         QDataSet dep1 = (QDataSet) fillds.property(QDataSet.DEPEND_1);
         QDataSet plane0 = (QDataSet) fillds.property(QDataSet.PLANE_0);
         QDataSet bundle1= (QDataSet) fillds.property(QDataSet.BUNDLE_1);
-
+        QDataSet dep0= (QDataSet) fillds.property(QDataSet.DEPEND_0);
+        
         if ( fillds.property( QDataSet.JOIN_0 )!=null ) {
             if ( fillds.length()==0 ) {
                 return RenderType.series;
@@ -1237,7 +1238,7 @@ public class AutoplotUtil {
                 if ( bundle1!=null ) {
                     if ( bundle1.length()==3 && bundle1.property(QDataSet.DEPEND_0,2)!=null ) { // bad kludge
                         spec= RenderType.colorScatter;
-                    } else if (bundle1.length() == 3 && bundle1.property(QDataSet.DEPENDNAME_0, 2) != null) { // bad kludge
+                    } else if ( dep0==null && bundle1.length() == 3 && bundle1.property(QDataSet.DEPENDNAME_0, 2) != null) { // bad kludge
                         spec= RenderType.colorScatter;
                     } else if ( Schemes.isXYZScatter(fillds) && fillds.property(QDataSet.DEPEND_0)==null && !Schemes.isEventsList(fillds) ) { 
                         spec= RenderType.colorScatter;
@@ -1272,7 +1273,6 @@ public class AutoplotUtil {
             spec= RenderType.digital;
 
         } else if ( SemanticOps.getUnits(fillds) instanceof EnumerationUnits ) {
-            QDataSet dep0= (QDataSet) fillds.property(QDataSet.DEPEND_0);
             if ( dep0==null ) {
                 spec= RenderType.digital;
             } else {
