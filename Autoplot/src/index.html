@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>The code for handling JSON-Headed ASCII (Rich ASCII) is updated to handle slight changes in the spec.
+        <p><small><a href='https://github.com/autoplot/dev/blob/master/demos/digitizers/findPeakDigitizerWayPoints.jy'>Digitizing script</a> tested on new data.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,7 +28,10 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-08-13 r26726):</p>
+        <p>Bugfixes (2022-08-13 r26728):</p>
+        <ul>
+        </ul>
+        <p>Older Bugfixes (2022-08-13 r26726):</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2471/">2471</a>: Firebird JSON headed ASCII contained invalid reference and couldn't be used, make more permissive to keep what is correct.
             <li>Delay initialization of CDAWeb database if we already know the dataset and parameter, since it takes 20-30 seconds to initialize.
@@ -39,34 +42,15 @@
             <li>Improved support for decimal year.  Thanks, Bill!
             <li>fast branch added for reduceMean of ds[N,2], avoiding use of slow iterator for frequently-occurring operation.
         </ul>
-        <p>Older Bugfixes (2022-06-29 r26708):</p>
-        <ul>
-            <li><a href='https://sourceforge.net/p/autoplot/bugs/2467/'>2467</a>: old kludge which assumed CDF DEPEND with 2 records of min and max prevented use of a PSP dataset.  Thanks, Sadie!
-            <li><a href='https://sourceforge.net/p/autoplot/bugs/2449/'>2449</a>: other cases where append fails because timetags are different backing.  Thanks, Sadie!
-            <li>check to see if findex failure is due to non-repeating or decreasing and report more precise error.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2464/">2464</a>: completions for /tmp/convert/*.dat?column= produced runtime error because of old miscalculation.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2459/">2459</a>: command-line autoplot with --script couldn't pass arguments to script because of unnecessary quotes.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2465/">2465</a>: Interval Average of PSP/EPILo data showed that rank 2 time-varying DEPEND_1 was not handled property in some rank-reducing routines.  Thanks, Jon N!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2462/">2462</a>: dataset('2021-02-02') returns a rank 0 dataset instant, not rank 1 range.  
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2463/">2463</a>: detect where erg_hep_l2_omniflux has energy[2,n] to represent bins.  Thanks, Allison!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2461/">2456</a>: corrections to fix Run Batch when colorbar is changed and overlays used.  Thanks, Sadie!
-            <li>filenameProvidesContext checks to see if the hours offset really looks like it is hours.  Thanks, Sadie!
-            <li>getProperty('os.family') is returning null on some platforms.
-            <li>URI vap+orbit:rbspa-pp&timerange=tr would be mangled in the editor if the timerange contained colons.
-            <li>Annotation had code which assumed the x axis units were not time location units.
-            <li>lblx extention triggered PDS source, but parts within the source were still checking for a .xml extension.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2456/">2456</a>: progress bar left hanging after runtime error because RunLaterListener runtime error would block later listeners.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2455/">2455</a>: misuse of iterator in Jython setItem sloppiness would result in hang.  Thanks, Bill!
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li><a href='https://github.com/das-developers/das2java/issues/18'>18</a>: New tick logic used on one or two-cycle log axes.
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>Preserve string array properties in JSON headed ascii, and preserve unrecognized properties in USER_PROPERTIES.
             <li>add mime type for PDS lblx files.
             <li>Add withinSet function which returns one where the data is within a set of values.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/784/">784</a> QDataSet AVERAGE_TYPE metadata introduced and used in interpolate.
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
