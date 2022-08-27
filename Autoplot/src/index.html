@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small><a href='https://github.com/autoplot/dev/blob/master/demos/digitizers/findPeakDigitizerWayPoints.jy'>Digitizing script</a> tested on new data.
+        <p><small>Support for datasets with BINS for DEPEND_0 is improved, <a href='https://github.com/autoplot/dev/blob/master/bugs/ghdas2/0035/demoBug.jy'>this script</a> demonstrates.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -30,6 +30,7 @@
                 
         <p>Bugfixes (2022-08-13 r26728):</p>
         <ul>
+            <li>Correction to fast branch for reduceMean.
         </ul>
         <p>Older Bugfixes (2022-08-13 r26726):</p>
         <ul>
@@ -44,6 +45,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li><a href='https://github.com/das-developers/das2java/issues/35'>35</a>: Improve support for DEPEND_0 with bins data set. 
             <li><a href='https://github.com/das-developers/das2java/issues/18'>18</a>: New tick logic used on one or two-cycle log axes.
         </ul>
         <p>Less recent features:</p>
