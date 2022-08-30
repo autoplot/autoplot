@@ -808,7 +808,12 @@ public final class PyQDataSet extends PyJavaInstance {
                         ((QubeDataSetIterator) iter).setIndexIteratorFactory(k, fit);
                     }
                 } else {
-                    iter = new IndexListDataSetIterator(that);
+                    if ( that.rank()==1 ) {
+                        QubeDataSetIterator.DimensionIteratorFactory fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
+                        ((QubeDataSetIterator) iter).setIndexIteratorFactory(0, fit);
+                    } else {
+                        iter = new IndexListDataSetIterator(that);
+                    }
                 }
             } else {
                 QubeDataSetIterator.DimensionIteratorFactory fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
