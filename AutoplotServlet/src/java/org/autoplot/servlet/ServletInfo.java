@@ -138,18 +138,30 @@ public class ServletInfo extends HttpServlet {
         return true;
     }
 
-    private static File cacheDirectory=null;
+    private static volatile File cacheDirectory=null;
             
     public static File getCacheDirectory() {
-        if ( cacheDirectory==null ) {
-            cacheDirectory= new File("/tmp/apsrv/cache/" + AutoplotUtil.getProcessId("000") );
-            if ( !cacheDirectory.exists() ) {
-                if ( !cacheDirectory.mkdirs() ) {
-                    throw new IllegalArgumentException("fail to make cache directory: "+cacheDirectory);
+        File cd0 = ServletInfo.cacheDirectory;
+        if ( cd0==null ) {
+            synchronized (ServletInfo.class) {
+                cd0 = ServletInfo.cacheDirectory;
+                if ( cd0==null ) {
+                    if ( !new File("/tmp/apsrv/").exists() ) {
+                        if ( ! new File("/tmp/apsrv/").mkdirs() ) {
+                            throw new IllegalArgumentException("unable to make apsrv directory: /tmp/apsrv");
+                        }
+                    }
+                    File cd= new File("/tmp/apsrv/cache/" + AutoplotUtil.getProcessId("000") );
+                    if ( !cd.exists() ) {
+                        if ( !cd.mkdirs() ) {
+                            throw new IllegalArgumentException("fail to make cache directory: "+cd);
+                        }
+                    }
+                    ServletInfo.cacheDirectory= cd0 = cd;                    
                 }
             }
         }
-        return cacheDirectory;
+        return cd0;
     }
     
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
