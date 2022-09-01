@@ -140,6 +140,11 @@ public class ServletInfo extends HttpServlet {
 
     private static volatile File cacheDirectory=null;
             
+    /**
+     * return the location of the cache which this server will use, a directory
+     * in /tmp/apsrv.
+     * @return 
+     */
     public static File getCacheDirectory() {
         File cd0 = ServletInfo.cacheDirectory;
         if ( cd0==null ) {
