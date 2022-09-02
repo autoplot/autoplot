@@ -6351,7 +6351,8 @@ APSplash.checkTime("init 240");
                 @Override
                 public void run() {
                     try {
-                        JythonRunListener runListener= makeJythonRunListener( AutoplotUI.this, split.resourceUri, true );
+                        boolean doShowScript= !split.resourceUri.toString().endsWith("createScreenShot.jy");
+                        JythonRunListener runListener= makeJythonRunListener( AutoplotUI.this, split.resourceUri, doShowScript );
                         int res= JythonUtil.invokeScriptSoon( split.resourceUri, dom, 
                                 params, askParams, !fisTool, runListener, mon );
                         if ( res==JOptionPane.OK_OPTION ) {
