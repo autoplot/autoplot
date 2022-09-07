@@ -60,8 +60,8 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
     public CdfJavaDataSourceEditorPanel() {
         initComponents();
         parameterTree.getSelectionModel().setSelectionMode( TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION );
-        parameterTree1.getSelectionModel().setSelectionMode( TreeSelectionModel.SINGLE_TREE_SELECTION );
-        parameterTree2.getSelectionModel().setSelectionMode( TreeSelectionModel.SINGLE_TREE_SELECTION );
+        xParameterTree.getSelectionModel().setSelectionMode( TreeSelectionModel.SINGLE_TREE_SELECTION );
+        yParameterTree.getSelectionModel().setSelectionMode( TreeSelectionModel.SINGLE_TREE_SELECTION );
         jPanel3.setVisible(false);
         if ( AutoplotHelpSystem.getHelpSystem()!=null ) { // to help with debugging, check for null so we needn't initialize all of Autoplot to debug.
             AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "cdf_main");
@@ -100,11 +100,11 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
         parameterTree = new javax.swing.JTree();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
-        parameterTree1 = new javax.swing.JTree();
+        xParameterTree = new javax.swing.JTree();
         xCheckBox = new javax.swing.JCheckBox();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane5 = new javax.swing.JScrollPane();
-        parameterTree2 = new javax.swing.JTree();
+        yParameterTree = new javax.swing.JTree();
         yCheckBox = new javax.swing.JCheckBox();
         jScrollPane2 = new javax.swing.JScrollPane();
         paramInfo = new javax.swing.JLabel();
@@ -268,12 +268,12 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
 
         jTabbedPane1.addTab("Data", jScrollPane3);
 
-        parameterTree1.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
+        xParameterTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
             public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
-                parameterTree1ValueChanged(evt);
+                xParameterTreeValueChanged(evt);
             }
         });
-        jScrollPane4.setViewportView(parameterTree1);
+        jScrollPane4.setViewportView(xParameterTree);
 
         xCheckBox.setText("Set Variable for X");
         xCheckBox.setToolTipText("Specify the parameter to use for the X tags, overriding any settings found in the file.");
@@ -300,12 +300,12 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
 
         jTabbedPane1.addTab("X", jPanel2);
 
-        parameterTree2.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
+        yParameterTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
             public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
-                parameterTree2ValueChanged(evt);
+                yParameterTreeValueChanged(evt);
             }
         });
-        jScrollPane5.setViewportView(parameterTree2);
+        jScrollPane5.setViewportView(yParameterTree);
 
         yCheckBox.setText("Set Variable for Y");
         yCheckBox.setToolTipText("Specify the parameter to use for the Y tags, overriding any settings found in the file.");
@@ -363,7 +363,7 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 703, Short.MAX_VALUE)
+            .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -383,7 +383,7 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
         updateMetadata(tab);
     }//GEN-LAST:event_jTabbedPane1StateChanged
 
-    private void parameterTree2ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_parameterTree2ValueChanged
+    private void yParameterTreeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_yParameterTreeValueChanged
         yCheckBox.setSelected(true);
         TreePath tp= evt.getPath();
         if ( isValidCDF ) {
@@ -391,13 +391,13 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
             String longName= yparameterInfo.get(yparameter);
             paramInfo.setText( longName );
         }
-    }//GEN-LAST:event_parameterTree2ValueChanged
+    }//GEN-LAST:event_yParameterTreeValueChanged
 
     private void xCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_xCheckBoxActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_xCheckBoxActionPerformed
 
-    private void parameterTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_parameterTree1ValueChanged
+    private void xParameterTreeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_xParameterTreeValueChanged
         xCheckBox.setSelected(true);
         TreePath tp= evt.getPath();
         if ( isValidCDF ) {
@@ -405,7 +405,7 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
             String longName= xparameterInfo.get(xparameter);
             paramInfo.setText( longName );
         }
-    }//GEN-LAST:event_parameterTree1ValueChanged
+    }//GEN-LAST:event_xParameterTreeValueChanged
 
     private void parameterTreeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_parameterTreeValueChanged
         TreePath tp= evt.getPath();
@@ -480,8 +480,6 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
     private javax.swing.JCheckBox noInterpMeta;
     private javax.swing.JLabel paramInfo;
     private javax.swing.JTree parameterTree;
-    private javax.swing.JTree parameterTree1;
-    private javax.swing.JTree parameterTree2;
     private javax.swing.JCheckBox showAllVarTypeCB;
     private javax.swing.JCheckBox sortAlphaCheckBox;
     private javax.swing.JComboBox subsetComboBox;
@@ -490,7 +488,9 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
     private javax.swing.JComboBox whereParamList;
     private javax.swing.JTextField whereTF;
     private javax.swing.JCheckBox xCheckBox;
+    private javax.swing.JTree xParameterTree;
     private javax.swing.JCheckBox yCheckBox;
+    private javax.swing.JTree yParameterTree;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
@@ -750,7 +750,7 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
                     }
                 }
             }
-            fillTree( this.parameterTree1, parameterDescriptions2, cdf, xparam, xslice1 );
+            fillTree(this.xParameterTree, parameterDescriptions2, cdf, xparam, xslice1 );
             
             String yslice1= null;
             String yparam= lparams.remove("Y");
@@ -766,7 +766,7 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
                     }
                 }
             }
-            fillTree( this.parameterTree2, parameterDescriptions2, cdf, yparam, yslice1 );
+            fillTree(this.yParameterTree, parameterDescriptions2, cdf, yparam, yslice1 );
             
             logger.finest("close cdf");
 
@@ -901,7 +901,7 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
             }
             
             if ( xCheckBox.isSelected() ) {
-                TreePath depend0Path= parameterTree1.getSelectionPath();
+                TreePath depend0Path= xParameterTree.getSelectionPath();
                 if ( depend0Path!=null ) {
                     if ( depend0Path.getPathCount()==3 ) {
                         String p= String.valueOf( depend0Path.getPathComponent(1) );
@@ -918,7 +918,7 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
             }
 
             if ( yCheckBox.isSelected() ) {
-                TreePath yPath= parameterTree2.getSelectionPath();
+                TreePath yPath= yParameterTree.getSelectionPath();
                 if ( yPath!=null ) {
                     if ( yPath.getPathCount()==3 ) {
                         String p= String.valueOf( yPath.getPathComponent(1) );

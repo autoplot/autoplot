@@ -22,7 +22,7 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jPanel1" alignment="0" pref="703" max="32767" attributes="2"/>
+          <Component id="jPanel1" alignment="0" max="32767" attributes="2"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -368,9 +368,9 @@
 
                           <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
                           <SubComponents>
-                            <Component class="javax.swing.JTree" name="parameterTree1">
+                            <Component class="javax.swing.JTree" name="xParameterTree">
                               <Events>
-                                <EventHandler event="valueChanged" listener="javax.swing.event.TreeSelectionListener" parameters="javax.swing.event.TreeSelectionEvent" handler="parameterTree1ValueChanged"/>
+                                <EventHandler event="valueChanged" listener="javax.swing.event.TreeSelectionListener" parameters="javax.swing.event.TreeSelectionEvent" handler="xParameterTreeValueChanged"/>
                               </Events>
                             </Component>
                           </SubComponents>
@@ -420,9 +420,9 @@
 
                           <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
                           <SubComponents>
-                            <Component class="javax.swing.JTree" name="parameterTree2">
+                            <Component class="javax.swing.JTree" name="yParameterTree">
                               <Events>
-                                <EventHandler event="valueChanged" listener="javax.swing.event.TreeSelectionListener" parameters="javax.swing.event.TreeSelectionEvent" handler="parameterTree2ValueChanged"/>
+                                <EventHandler event="valueChanged" listener="javax.swing.event.TreeSelectionListener" parameters="javax.swing.event.TreeSelectionEvent" handler="yParameterTreeValueChanged"/>
                               </Events>
                             </Component>
                           </SubComponents>
