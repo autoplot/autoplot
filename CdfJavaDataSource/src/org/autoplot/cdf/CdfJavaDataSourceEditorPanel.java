@@ -734,7 +734,7 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
             
             fillTree( this.parameterTree, parameterInfo, cdf, param, slice1 );
             
-            Map<String,String> parameterDescriptions2= org.autoplot.cdf.CdfUtil.getPlottable(cdf, false, QDataSet.MAX_RANK );
+            Map<String,String> parameterDescriptions2= org.autoplot.cdf.CdfUtil.getPlottable(cdf, false, 2 );
             String xparam= lparams.remove("depend0");
             String xslice1= null;
             if ( xparam==null ) xparam= lparams.remove("X");
@@ -750,6 +750,7 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
                     }
                 }
             }
+            
             fillTree(this.xParameterTree, parameterDescriptions2, cdf, xparam, xslice1 );
             
             String yslice1= null;
