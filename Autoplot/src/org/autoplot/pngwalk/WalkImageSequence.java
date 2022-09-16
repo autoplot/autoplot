@@ -376,7 +376,12 @@ public class WalkImageSequence implements PropertyChangeListener  {
                 if ( displayRange!=null ) {
                     displayImages.clear();
 
+                    boolean hasXLogic= this.template!=null && this.template.contains("$x") 
+                                && datumRanges.size()==existingImages.size();
+                    int i=0;
+                    
                     for (DatumRange dr : displayRange) {
+                        
                         int ind= datumRanges.indexOf(dr);
                         if ( ind>-1 ) {
                             if ( qualitySeq!=null && qcFilter.length()>0 ) {
@@ -385,7 +390,12 @@ public class WalkImageSequence implements PropertyChangeListener  {
                                     continue;
                                 }
                             }
-                            displayImages.add(existingImages.get(ind));//TODO: suspect this is very inefficient.
+                            if ( hasXLogic ) {
+                                displayImages.add(existingImages.get(i));
+                                i++;
+                            } else {
+                                displayImages.add(existingImages.get(ind));//TODO: suspect this is very inefficient.
+                            }
                         } else if (showMissing && timeSpan != null) {
                             if ( qualitySeq!=null && qcFilter.length()>0 ) {
                                 continue;
