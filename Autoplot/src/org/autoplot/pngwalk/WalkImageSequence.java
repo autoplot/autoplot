@@ -376,7 +376,8 @@ public class WalkImageSequence implements PropertyChangeListener  {
                 if ( displayRange!=null ) {
                     displayImages.clear();
 
-                    boolean hasXLogic= this.template!=null && this.template.contains("$x") 
+                    boolean hasX= this.template.contains("$x") || this.template.contains("*") || this.template.contains("$(x;") || this.template.contains("$(x,");
+                    boolean hasXLogic= this.template!=null && hasX 
                                 && datumRanges.size()==existingImages.size();
                     int i=0;
                     
