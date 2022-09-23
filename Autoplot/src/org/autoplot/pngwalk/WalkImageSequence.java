@@ -22,6 +22,8 @@ import org.das2.datum.Units;
 import org.das2.util.filesystem.FileSystem;
 import org.autoplot.dom.DebugPropertyChangeSupport;
 import org.autoplot.datasource.DataSetURI;
+import org.das2.datum.TimeParser;
+import org.das2.fsm.FileStorageModel;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
 import org.das2.util.filesystem.FileSystemUtil;
@@ -191,19 +193,35 @@ public class WalkImageSequence implements PropertyChangeListener  {
         }
 
         //if ( uris.size()>20 ) {uris= uris.subList(0,30); }
-
+        FileStorageModel fsm=null;
+        {
+            String sansArgs= template;
+            int i = splitIndex(sansArgs);
+            URI surls= DataSetURI.getResourceURI(sansArgs.substring(0, i+1));
+            FileSystem fs = FileSystem.create( surls );
+            String spec= sansArgs.substring(i+1);
+            if ( TimeParser.isSpec(spec) ) fsm= FileStorageModel.create( fs, spec );        
+        }
+        
         existingImages = new ArrayList<>();
         for (int i=0; i < uris.size(); i++) {
             existingImages.add(new WalkImage(uris.get(i),haveThumbs400));
             //System.err.println(i + ": " + datumRanges.get(i));
 
             String captionString;
-            int splitIndex=-1;
+            int splitIndex= WalkUtil.splitIndex( template );
             if (datumRanges.get(i) != null) {
                 captionString = datumRanges.get(i).toString();//TODO: consider not formatting these until visible.
+                if ( ( template.contains("*") || template.contains("$x") ) && fsm!=null ) {
+                    String cs= uris.get(i).toString();
+                    if ( template.startsWith("file:///") && cs.length()>6 && cs.charAt(6)!='/' ) {
+                        splitIndex= splitIndex-2;
+                    }            
+                    String x1= fsm.getField( "x", cs.substring(splitIndex+1) );
+                    captionString = captionString + " " + x1;   
+                }
             } else {
                 captionString = FileSystemUtil.uriDecode(uris.get(i).toString());
-                if ( splitIndex==-1 ) splitIndex= WalkUtil.splitIndex( template );
                 if ( template.startsWith("file:///") && captionString.length()>6 && captionString.charAt(6)!='/' ) {
                     splitIndex= splitIndex-2;
                 }
