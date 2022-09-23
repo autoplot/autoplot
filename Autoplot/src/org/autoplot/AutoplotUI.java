@@ -6510,12 +6510,14 @@ APSplash.checkTime("init 240");
 
         scriptPanel.addSettingsMenuItem( mi );
         
-        File f= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "bookmarks" );
-        f= new File( f.toString(), "editor.xml" );
+        File fdir= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "bookmarks" );
+        final File f= new File( fdir, "editor.xml" );
         if ( f.exists() ) {
-            try {
+            JMenu j= new JMenu("Custom Actions");
+            Runnable run= new Runnable() {
+                public void run() {
+                try {
                 List<Bookmark> bs= Bookmark.parseBookmarks(f.toURI().toURL());
-                JMenu j= new JMenu("Custom Actions");
                 DelayMenu.calculateMenu(j, bs, (ActionEvent e) -> {
                     final String cmd= e.getActionCommand();
                     Runnable run= () -> {
@@ -6537,11 +6539,14 @@ APSplash.checkTime("init 240");
                         scriptPanel.addMenuItem((JMenuItem)c);
                     }
                 }
-            } catch (MalformedURLException ex) {
+                                } catch (MalformedURLException ex) {
                 Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException | SAXException | BookmarksException ex) {
                 Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
             }
+                }
+                };
+                new Thread(run).start();
 
         }
 
