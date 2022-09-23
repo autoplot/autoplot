@@ -132,7 +132,7 @@ final class CDF3Impl extends CDFImpl implements CDF3, java.io.Serializable {
         ByteBuffer lenBuf = ByteBuffer.allocate(8);
         synchronized (fc) {
             try {
-                fc.position((long)offset + 8);
+                fc.position((long)offset);
                 fc.read(lenBuf);
                 long size = lenBuf.getLong(0);
                 if ( size>Integer.MAX_VALUE ) {
