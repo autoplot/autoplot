@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Me me me me me!  It's always a good day when you think of Beaker, the Muppet.
+        <p><small>New <a href="https://github.com/autoplot/dev/blob/master/demos/formats/cdf/cdfLayout.jy">script</a> used to study CDF internal layout.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,11 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-09-16 r26740):</p>
+        <p>Bugfixes (2022-09-23 r26747):</p>
         <ul>
+            <li>skip the cadence check when there are 100,000,000 or more points and the x ds are just indices.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2453/">2453</a>: correction in loading of CDFs which prevented huge (>2GB CDFs) from being loaded and data exported.
+            <li>editor tools scripts were loaded on the event thread, causing hang when internet is not available.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2476/">2476</a>: validate check on BINS_1 min&lt;max resulted in test148 failing.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2475/">2475</a>: kludgey solution for pngwalks with $Y$m$d_$x.  This will be studied again soon.  Thanks, Sadie!
             <li>CDF GUI doesn't offer rank 3 datasets for X and Y.
