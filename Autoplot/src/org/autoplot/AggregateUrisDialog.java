@@ -15,6 +15,7 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -30,6 +31,7 @@ import org.autoplot.dom.DataSourceFilter;
 import org.autoplot.dom.DomOps;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.ThreadManager;
+import org.das2.util.LoggerManager;
 
 /**
  * Dialog assisting the scientists in creating aggregations for file
@@ -44,6 +46,7 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
     private final Application dom;
     private final DataSetSelector dataSetSelector;
 
+    private static final Logger logger= LoggerManager.getLogger( "autoplot.gui" );
     /** 
      * Creates new form AggregateUrisDialog
      * @param dom the application
@@ -330,8 +333,12 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
                 dom.syncTo(dom2);
                 DataSourceFilter[] dsfs= dom.getDataSourceFilters();
                 for ( DataSourceFilter dsf: dsfs ) {
-                    dsf.getController().update();
-                    dom.getController().getApplicationModel().addRecent( dsf.getUri() );
+                    if ( dsf.getUri().equals("vap+internal:") ) {
+                        logger.fine("skipping vap+internal:");
+                    } else {
+                        dsf.getController().update();
+                        dom.getController().getApplicationModel().addRecent( dsf.getUri() );
+                    }
                 }
                 String newUri= dom.getController().getDataSourceFilter().getUri();
                 dataSetSelector.setValue(newUri);
