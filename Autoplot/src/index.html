@@ -30,8 +30,9 @@
                 
         <p>Bugfixes (2022-09-23 r26747):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2477/">2477</a>: aggregate all clears "vap+internal" datasets.  Thanks Cindy!
             <li>skip the cadence check when there are 100,000,000 or more points and the x ds are just indices.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2453/">2453</a>: correction in loading of CDFs which prevented huge (>2GB CDFs) from being loaded and data exported.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2453/">2453</a>: correction in loading of CDFs which prevented huge (>2GB CDFs) from being loaded and data exported. Thanks, Kristoff!
             <li>editor tools scripts were loaded on the event thread, causing hang when internet is not available.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2476/">2476</a>: validate check on BINS_1 min&lt;max resulted in test148 failing.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2475/">2475</a>: kludgey solution for pngwalks with $Y$m$d_$x.  This will be studied again soon.  Thanks, Sadie!
