@@ -24,31 +24,7 @@ public final class ReaderFactory {
      */
     public static CDFReader getReader(String fname) throws
         CDFException.ReaderError {
-        CDFImpl cdf = null;
-        File file = new File(fname);
-        try {
-            RandomAccessFile raf = new RandomAccessFile(file, "r");
-            long len = raf.length(); 
-            if (len > preamble) len = preamble;
-            byte[] ba = new byte[(int)len];
-            raf.readFully(ba);
-            ByteBuffer buf = ByteBuffer.wrap(ba);
-            cdf = getVersion(buf, raf.getChannel());
-        } catch (Throwable th) {
-            CDFException.ReaderError ex= new CDFException.ReaderError("I/O Error reading " + fname,th);
-            throw ex;
-        }
-        if ( cdf==null ) {
-            throw new IllegalArgumentException("File is not a CDF-format file.");
-        }
-        final String _fname = file.getPath();
-        cdf.setSource(new CDFFactory.CDFSource() {
-            public String getName() {return _fname;};
-            public boolean isFile() {return true;};
-        });
-        CDFReader rdr = new CDFReader();
-        rdr.setImpl(cdf);
-        return rdr;
+        return getReader( fname, false );
     }
 
     /**
@@ -131,23 +107,42 @@ public final class ReaderFactory {
         }
         return null;
     }
+    
+    /**
+     * get a reader, forcing that all is read into memory in one heap byte array.
+     * This has the limitation that the file cannot be greater than 2GB in length.
+     * @param fname the file name.
+     * @param map read the file into a memory block on the heap
+     * @return a CDFReader
+     * @throws gov.nasa.gsfc.spdf.cdfj.CDFException.ReaderError 
+     */
     public static CDFReader getReader(String fname, boolean map) throws
         CDFException.ReaderError {
         CDFImpl cdf = null;
         File file = new File(fname);
         try {
-            int len = (int)file.length();
-            byte[] ba = new byte[len];
-            int rem = len;
-            FileInputStream fis = new FileInputStream(file);
-            int n = 0;
-            while (rem > 0) {
-                len = fis.read(ba, n, rem);
-                n += len;
-                rem -= len;
+            if ( map ) {
+                int len = (int)file.length();
+                byte[] ba = new byte[len];
+                int rem = len;
+                try (FileInputStream fis = new FileInputStream(file)) {
+                    int n = 0;
+                    while (rem > 0) {
+                        len = fis.read(ba, n, rem);
+                        n += len;
+                        rem -= len;
+                    }
+                }
+                cdf = CDFFactory.getCDF(ba);
+            } else {
+                RandomAccessFile raf = new RandomAccessFile(file, "r");
+                long len = raf.length(); 
+                if (len > preamble) len = preamble;
+                byte[] ba = new byte[(int)len];
+                raf.readFully(ba);
+                ByteBuffer buf = ByteBuffer.wrap(ba);                
+                cdf = getVersion(buf, raf.getChannel());
             }
-            fis.close();
-            cdf = CDFFactory.getCDF(ba);
             if ( cdf==null ) {
                 throw new IllegalArgumentException("File is not a CDF-format file: "+fname);
             }
