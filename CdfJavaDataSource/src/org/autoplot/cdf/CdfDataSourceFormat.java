@@ -5,6 +5,7 @@ import gov.nasa.gsfc.spdf.cdfj.CDFDataType;
 import gov.nasa.gsfc.spdf.cdfj.CDFException;
 import gov.nasa.gsfc.spdf.cdfj.CDFReader;
 import gov.nasa.gsfc.spdf.cdfj.CDFWriter;
+import gov.nasa.gsfc.spdf.cdfj.ReaderFactory;
 import java.lang.reflect.Array;
 import org.autoplot.datasource.DataSourceUtil;
 import org.das2.datum.Units;
@@ -107,7 +108,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 logger.log(Level.FINE, "call cdf= new CDFWriter( false )");
                 cdf = new CDFWriter( false );
             } else {
-                CDFReader read= new CDFReader( ffile.toString() );
+                CDFReader read= ReaderFactory.getReader( ffile.toString() );
                 for ( String n : read.getVariableNames() ) {
                     namesRev.put( n,null );
                 }
@@ -151,7 +152,8 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 if ( !append ) {
                     String name= nameFor(dep1);
                     if ( dep1.rank()==1 ) {
-                        addVariableRank1NoVary( cdf, dep1, name, true, new HashMap<String,String>(), mon.getSubtaskMonitor("dep1") );
+                        addVariableRank1NoVary( cdf, dep1, name, true, new HashMap<String,String>(), 
+                                mon.getSubtaskMonitor("dep1") );
                     } else {
                         addVariableRankN( cdf, dep1, name, true, new HashMap<String,String>(), mon.getSubtaskMonitor("dep1") );
                     }
@@ -176,7 +178,8 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 if ( !append ) {
                     String name= nameFor(dep2);
                     if ( dep2.rank()==1 ) {
-                        addVariableRank1NoVary( cdf, dep2, name, true, new HashMap<String,String>(), mon.getSubtaskMonitor("dep2") );
+                        addVariableRank1NoVary( cdf, dep2, name, true, new HashMap<String,String>(), 
+                                mon.getSubtaskMonitor("dep2") );
                     } else {
                         addVariableRankN( cdf, dep2, name, true, new HashMap<String,String>(), mon.getSubtaskMonitor("dep2") );
                     }
@@ -201,7 +204,8 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 if ( !append ) {
                     String name= nameFor(dep3);
                     if ( dep3.rank()==1 ) {
-                        addVariableRank1NoVary( cdf, dep3, name, true, new HashMap<String,String>(), mon.getSubtaskMonitor("dep3") );
+                        addVariableRank1NoVary( cdf, dep3, name, true, new HashMap<String,String>(), 
+                                mon.getSubtaskMonitor("dep3") );
                     } else {
                         addVariableRankN( cdf, dep3, name, true, new HashMap<String,String>(), mon.getSubtaskMonitor("dep3") );
                     }
@@ -228,7 +232,8 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                     } else {
                         String name= nameFor(bds);
                         if ( bds.rank()==1 || ( bds.rank()==2 && Schemes.isBundleDescriptor(bds) ) ) {
-                            addVariableRank1NoVary( cdf, bds, name, true, new HashMap<String,String>(), mon.getSubtaskMonitor("bundle1") );
+                            addVariableRank1NoVary( cdf, bds, name, true, new HashMap<String,String>(), 
+                                    mon.getSubtaskMonitor("bundle1") );
                         }
                     }
                 } else {
@@ -302,7 +307,8 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         
     }
 
-    private static void addVariableRank1NoVary( CDFWriter cdf, QDataSet ds, String name, boolean isSupport, Map<String,String> params, org.das2.util.monitor.ProgressMonitor mon ) throws Exception {
+    private static void addVariableRank1NoVary( CDFWriter cdf, QDataSet ds, String name, boolean isSupport, 
+            Map<String,String> params, org.das2.util.monitor.ProgressMonitor mon ) throws Exception {
         Units units = (Units) ds.property(QDataSet.UNITS);
         CDFDataType type = CDFDataType.DOUBLE;
 
@@ -318,7 +324,8 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             //cdf.createVariable( name, type, new int[0] );
             
             Object array= dataSetToArray( ds, uc, type, mon );
-            logger.log(Level.FINE, "call cdf.addNRVVariable( {0},{1},{2})", new Object[]{name, logName(type), logName( new int[] { ds.length() } ), logName(array) });
+            logger.log(Level.FINE, "call cdf.addNRVVariable( {0},{1},{2})", 
+                    new Object[]{name, logName(type), logName( new int[] { ds.length() } ), logName(array) });
             cdf.addNRVVariable( name, type, new int[] { ds.length() }, array );
         } else if ( Schemes.isBundleDescriptor(ds) ) {
             String[] array= new String[ ds.length() ];
@@ -332,7 +339,8 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 int l= s.length();
                 dim= dim<l ? l : dim;
             }
-            logger.log(Level.FINE, "call cdf.addNRVVariable( {0},{1},{2})", new Object[]{name, logName(type), logName( new int[] { ds.length() } ), logName(array) });
+            logger.log(Level.FINE, "call cdf.addNRVVariable( {0},{1},{2})", 
+                    new Object[]{name, logName(type), logName( new int[] { ds.length() } ), logName(array) });
             
             cdf.addNRVVariable( name, CDFDataType.CHAR, new int[] { ds.length() }, dim, array );
             
@@ -633,7 +641,8 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         
     }
 
-    private static void addVariableRankN( CDFWriter cdf, QDataSet ds, String name, boolean isSupport, Map<String,String> params, org.das2.util.monitor.ProgressMonitor mon) throws Exception {
+    private static void addVariableRankN( CDFWriter cdf, QDataSet ds, String name, boolean isSupport, 
+            Map<String,String> params, org.das2.util.monitor.ProgressMonitor mon) throws Exception {
         Units units = (Units) ds.property(QDataSet.UNITS);
         CDFDataType type = CDFDataType.DOUBLE;
 
@@ -706,7 +715,8 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             
         if ( compressed ) {
             if ( ds.rank()==1 ) {
-                logger.log(Level.FINE, "call cdf.defineCompressedVariable( {0}, {1}, {2} )", new Object[] { name, logName(type), logName(new int[0]) } );
+                logger.log(Level.FINE, "call cdf.defineCompressedVariable( {0}, {1}, {2} )", 
+                        new Object[] { name, logName(type), logName(new int[0]) } );
                 cdf.defineCompressedVariable( name, type, new int[0] );
                 addData( cdf, name, dataSetToNioArray( ds, uc, type, mon ) ); //TODO: I think I need to compress the channel.
             } else { 
@@ -801,13 +811,15 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         }
     }
     
-    private static void defineCompressedVariable( CDFWriter cdf, String name, CDFDataType type, int[] dims )  throws Exception{
-        logger.log(Level.FINE, "call cdf.defineCompressedVariable({0},{1},{2})", new Object[] { logName(name), logName(type), logName(dims) } );
+    private static void defineCompressedVariable( CDFWriter cdf, String name, CDFDataType type, int[] dims )  throws Exception {
+        logger.log(Level.FINE, "call cdf.defineCompressedVariable({0},{1},{2})", 
+                new Object[] { logName(name), logName(type), logName(dims) } );
         cdf.defineCompressedVariable( name, type, dims );
     }
     
-    private static void defineVariable( CDFWriter cdf, String name, CDFDataType type, int[] dims )  throws Exception{
-        logger.log(Level.FINE, "call cdf.defineVariable({0},{1},{2})", new Object[] { logName(name), logName(type), logName(dims) } );
+    private static void defineVariable( CDFWriter cdf, String name, CDFDataType type, int[] dims )  throws Exception {
+        logger.log(Level.FINE, "call cdf.defineVariable({0},{1},{2})", 
+                new Object[] { logName(name), logName(type), logName(dims) } );
         cdf.defineVariable( name, type, dims );
     }
     
@@ -816,8 +828,10 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         cdf.addData( name, d );
     }
 
-    private static void addVariableAttributeEntry( CDFWriter cdf, String varName, String attrName, CDFDataType type, Object o ) throws CDFException.WriterError {
-        logger.log( Level.FINE, "call cdf.addVariableAttributeEntry( {0}, {1}, {2}, {3} )",  new Object[] { logName(varName), logName(attrName), logName(type), logName( o ) } );
+    private static void addVariableAttributeEntry( CDFWriter cdf, String varName, String attrName, CDFDataType type, Object o ) 
+            throws CDFException.WriterError {
+        logger.log( Level.FINE, "call cdf.addVariableAttributeEntry( {0}, {1}, {2}, {3} )",  
+                new Object[] { logName(varName), logName(attrName), logName(type), logName( o ) } );
         if ( type==CDFDataType.CHAR && o.toString().length()==0 ) { 
             o= " ";
         }
@@ -831,7 +845,8 @@ public class CdfDataSourceFormat implements DataSourceFormat {
      * @param ds the dataset containing metadata.
      * @throws Exception 
      */
-    private static void copyMetadata( CDFWriter cdf, Units units, String name, CDFDataType type, boolean isSupport, QDataSet ds ) throws Exception {
+    private static void copyMetadata( CDFWriter cdf, Units units, String name, CDFDataType type, boolean isSupport, QDataSet ds ) 
+            throws Exception {
         
         if ( units!=null ) {
             if (units == Units.cdfEpoch) {
@@ -888,7 +903,8 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             if ( units==Units.cdfEpoch ) {
                 
             } else if ( units==Units.cdfTT2000 ) {
-                cdf.addVariableAttributeEntry( name, "FILLVAL", CDFDataType.TT2000, new long[] { fillval.longValue() } ); //TODO: use long access, if available.
+                //TODO: use long access, if available.
+                cdf.addVariableAttributeEntry( name, "FILLVAL", CDFDataType.TT2000, new long[] { fillval.longValue() } ); 
             } else {
                 cdf.addVariableAttributeEntry( name,"FILLVAL", type, new double[] { fillval.doubleValue() });
             }
