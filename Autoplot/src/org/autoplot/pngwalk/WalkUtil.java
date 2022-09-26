@@ -120,7 +120,9 @@ public class WalkUtil {
         FileSystem fs = FileSystem.create( surls );
         String spec= sansArgs.substring(i+1);
 
-        spec= spec.replaceAll("\\?", "*");
+        spec= spec.replaceAll("\\*", ".*"); //GRR.  What if I put .* in there knowing it was a regex.
+        spec= spec.replaceAll("\\?", ".");
+        spec= spec.replaceAll("\\$x", ".*");
         
         FileStorageModel fsm=null;
         if ( TimeParser.isSpec(spec) ) fsm= FileStorageModel.create( fs, spec );
