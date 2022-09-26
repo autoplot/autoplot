@@ -214,11 +214,11 @@ public class CDFWriter extends GenericWriter {
                 cdf = ReaderFactory.getReader(fname);
             } else {
 
-                if (isWindows()) {
-                    return ReaderFactory.getReader(fname, true);
-                }
+                //if (isWindows()) {
+                //    return ReaderFactory.getReader(fname, true);
+                //}
 
-                cdf = new GenericReader(fname);
+                cdf = ReaderFactory.getReader( fname );
             }
         } catch (Throwable th) {
             throw new CDFException.ReaderError(th.getMessage(),th);
