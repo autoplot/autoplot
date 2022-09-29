@@ -384,7 +384,8 @@ public class JythonToJavaConverter {
             s= s.replaceAll("public static ([a-zA-Z0-9_]+)","# returns $1\n"+indent+"def");
             s= s.replaceAll("private static ([a-zA-Z0-9_]+)","# returns $1\n"+indent+"def");
             s= s.replaceAll("for\\s+\\(\\s*int\\s+([a-z]+)\\s*=\\s*(\\d+)\\s*\\; \\s*\\1\\s*\\<\\s*(\\d+)\\;\\s*\\1\\+\\+\\s*\\)", "for $1 in xrange($2,$3)");
-            s= s.replaceAll(".substring\\(([a-z\\+\\-\\.0-9\\(\\)]+\\s*)(,\\s*([a-z\\+\\-\\.0-9]+)\\s*)?\\)","[$1:$3]" ); // TODO: verify substring(5)
+            s= s.replaceAll("\\.substring\\(([a-z\\+\\-\\.0-9]+\\s*)(,\\s*([a-z\\+\\-\\.0-9]+)\\s*)?\\)","[$1:$3]" );
+            s= s.replaceAll("\\.substring\\(([a-z\\+\\-\\.0-9\\(\\)]+\\s*)(,\\s*([a-z\\+\\-\\.0-9]+)\\s*)?\\)","[$1:$3]" );
             s= s.replaceAll(".charAt\\(([a-z\\+\\-\\.0-9\\(\\)]+\\s*)\\)","[$1]" );
             s= s.replaceAll("([a-zA-Z0-9_]+).length\\(\\)","len($1)" );
             
