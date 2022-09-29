@@ -341,7 +341,15 @@ public class JythonToJavaConverter {
         for ( String s: ss ) {
             logger.log(Level.FINER, "line {0}: {1}", new Object[]{lineNumber, s});
             lineNumber++;
-            s= s.trim();
+            
+            String strim= s.trim();
+            int javaIndent= strim.length()>1 ? s.indexOf(strim.substring(0,1)) : 0;
+            s= strim;
+            indentLevel= javaIndent;
+            if ( indentLevel!=indent.length()) {
+                indent= "                                                                       ".substring(0,indentLevel);
+            }
+
             if ( s.endsWith(";") ) s= s.substring(0,s.length()-1);
             s= s.replaceAll("//","#");
             if ( s.startsWith("/*") ) withinComment= true;
@@ -366,11 +374,16 @@ public class JythonToJavaConverter {
             s= s.replaceAll("false","False");
             s= s.replaceAll("true","True");
             s= s.replaceAll("startsWith","startswith");
+            s= s.replaceAll("endsWith","endswith");
             s= s.replaceAll("else if","elif");
             s= s.replaceAll("\\|\\|","or");
             s= s.replaceAll("\\&\\&","and");
-            s= s.replaceAll("public static","def");
-            s= s.replaceAll(".substring\\(([a-z\\+\\-\\.0-9\\(\\)]+\\s*)(,\\s*([a-z\\+\\-\\.0-9]+)\\s*)?\\)","[$1:$3]" );
+            s= s.replaceAll("String.format\\((.*?),(.*)\\)", "$1 % \\($2\\)");
+            s= s.replaceAll("public static final ([a-zA-Z0-9_]+)","# returns $1\n"+indent+"def");
+            s= s.replaceAll("private static final ([a-zA-Z0-9_]+)","# returns $1\n"+indent+"def");
+            s= s.replaceAll("public static ([a-zA-Z0-9_]+)","# returns $1\n"+indent+"def");
+            s= s.replaceAll("private static ([a-zA-Z0-9_]+)","# returns $1\n"+indent+"def");
+            s= s.replaceAll(".substring\\(([a-z\\+\\-\\.0-9\\(\\)]+\\s*)(,\\s*([a-z\\+\\-\\.0-9]+)\\s*)?\\)","[$1:$3]" ); // TODO: verify substring(5)
             s= s.replaceAll(".charAt\\(([a-z\\+\\-\\.0-9\\(\\)]+\\s*)\\)","[$1]" );
             s= s.replaceAll("([a-zA-Z0-9_]+).length\\(\\)","len($1)" );
             
@@ -383,13 +396,11 @@ public class JythonToJavaConverter {
                     s= "from "+m.group(1)+" import "+m.group(2);
                 }
             }
-            int[] chrcount= count( s, chrs );
-            indentLevel= Math.max( 0, Math.min( 32, indentLevel 
-                    + (chrcount[0]-chrcount[1])*4 
-                    + (chrcount[2]-chrcount[3])*4 ) );
-            if ( s.startsWith("}") && indent.length()>=4 ) {
-                indent= indent.substring(4);
+            
+            if ( s.contains("reformatIsoTime")) {
+                System.err.println("Stop here jeremy");
             }
+            
             if ( s.contains("{") ) {
                 s= s.replace("{",":");
             } 
@@ -416,11 +427,7 @@ public class JythonToJavaConverter {
             }
             b.append(s).append("\n");
             logger.log(Level.FINER, "out  {0}: {1}", new Object[]{lineNumber, s});
-            
-            if ( indentLevel!=indent.length()) {
-                indent= "                                ".substring(0,indentLevel);
-            }
-            
+                        
         }
         StringBuilder sb= new StringBuilder();
         for ( String s : importedPaths ) {
