@@ -16,7 +16,7 @@ import org.das2.util.filesystem.FileSystemUtil;
 import org.das2.util.monitor.ProgressMonitor;
 
 /**
- *
+ * A file within a Zip file
  * @author Ed Jackson
  */
 public class ZipFileObject extends FileObject {
