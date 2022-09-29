@@ -641,13 +641,15 @@ public class DataSourceController extends DomNodeController {
 
             doDimensionNames();
 
+            long datasetSize= DataSetUtil.totalLengthAsLong(ds);
             if ( ds.rank()<=QDataSet.MAX_RANK && DataSetUtil.totalLength(ds) < LIMIT_STATS_COUNT && UnitsUtil.isIntervalOrRatioMeasurement(SemanticOps.getUnits(ds)) ) {
                 setStatus("busy: do statistics on the data...");
                 try {
-                    if ( DataSetUtil.totalLength(ds)>0 ) {
+                    if ( datasetSize>0 && datasetSize<QDataSet.LIMIT_HUGE_DATASET ) {
                         logger.fine("do statistics on the data");
+                        long t0= System.currentTimeMillis();
                         setHistogram(new AutoHistogram().doit(ds, null));
-                        logger.fine("done with statistics on the data");
+                        logger.log(Level.FINE, "done with statistics on the data ({0}ms)", System.currentTimeMillis()-t0);
                     }
                 } catch ( RuntimeException ex ) {
                     logger.warning("runtime error during histogram usually means invalid data in data set.");
@@ -661,7 +663,11 @@ public class DataSourceController extends DomNodeController {
             setStatus("busy: apply fill");
 
             //doFillValidRange();  the QDataSet returned
-            updateFill();
+            if ( datasetSize<QDataSet.LIMIT_HUGE_DATASET ) {
+                updateFill();
+            } else {
+                setFillDataSet(ds);
+            }
 
             setStatus("done, apply fill");
 
