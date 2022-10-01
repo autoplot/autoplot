@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>New <a href="https://github.com/autoplot/dev/blob/master/demos/formats/cdf/cdfLayout.jy">script</a> used to study CDF internal layout.  Happy Fall!
+        <p><small>Inspecting the internals of a CDF file, using the new <a href="https://github.com/autoplot/dev/blob/master/demos/formats/cdf/cdfLayout.jy">script</a> using Gantt mode. Variables like bmag and fce are stored in compressed blocks. Happy Fall!
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,9 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-09-23 r26747):</p>
+        <p>Bugfixes (2022-10-01 r26747):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2475/">2475</a>: corrections to pngwalks with $Y$m$d_$x.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2477/">2477</a>: aggregate all clears "vap+internal" datasets.  Thanks Cindy!
             <li>skip the cadence check when there are 100,000,000 or more points and the x ds are just indices.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2453/">2453</a>: correction in loading of CDFs which prevented huge (>2GB CDFs) from being loaded and data exported. Thanks, Kristoff!
