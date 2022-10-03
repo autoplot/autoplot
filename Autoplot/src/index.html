@@ -28,8 +28,10 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-10-01 r26747):</p>
+        <p>Bugfixes (2022-10-03 r26747):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2480/">2480</a>: slice1 was dropping the fill value found within a dataset, correct this for now by using unbundle.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2479/">2479</a>: vap+cdaweb needs old initialization with some data sets, back out the change.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2475/">2475</a>: corrections to pngwalks with $Y$m$d_$x.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2477/">2477</a>: aggregate all clears "vap+internal" datasets.  Thanks Cindy!
             <li>skip the cadence check when there are 100,000,000 or more points and the x ds are just indices.
