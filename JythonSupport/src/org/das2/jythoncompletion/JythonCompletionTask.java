@@ -442,15 +442,20 @@ public class JythonCompletionTask implements CompletionTask {
                 } else if (lcontext instanceof PyClass) {
                     PyClassPeeker peek = new PyClassPeeker((PyClass) lcontext);
                     Class dc = peek.getJavaClass();
-                    Field f = null;
-                    try {
-                        f = dc.getField(label);
-                    } catch (NoSuchFieldException | SecurityException ex) {
+                    if ( dc==null ) {
+                        logger.fine("unable to identify JavaClass");
+                        signature = "" + lcontext.__getattr__(label);
+                    } else {
+                        Field f = null;
+                        try {
+                            f = dc.getField(label);
+                        } catch (NoSuchFieldException | SecurityException ex) {
+                        }
+                        if (f == null) {
+                            continue;
+                        }
+                        signature = fieldSignature(f);
                     }
-                    if (f == null) {
-                        continue;
-                    }
-                    signature = fieldSignature(f);
                 } else if (lcontext instanceof PyJavaInstance) {
                     if (po instanceof PyMethod) {
                         PyMethod m = (PyMethod) po;
