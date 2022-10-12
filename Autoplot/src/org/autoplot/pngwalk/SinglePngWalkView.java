@@ -19,7 +19,9 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,6 +29,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.das2.qds.QDataSet;
+import org.python.core.PyException;
 
 /**
  * An implementation of PngWalkView to display a single image.
@@ -47,6 +50,7 @@ public final class SinglePngWalkView extends PngWalkView {
     int clickDigitizerSelect= -1;
     
     long reportedExceptionTime= 0;
+    String reportedExceptionStr= "";
     
     private PngWalkTool viewer=null;
     
@@ -390,16 +394,21 @@ public final class SinglePngWalkView extends PngWalkView {
             AffineTransform at1= AffineTransform.getTranslateInstance( lrect.x, lrect.y );
             at1.scale(factor, factor);
             g2.transform(at1);
+            Color c0= g2.getColor();
             viewer.decorators.forEach((p) -> {
                 try {
                     p.paint(g2);
                 } catch ( Exception ex ) {
                     long t= System.currentTimeMillis();
                     if ( (t-reportedExceptionTime)>1000 ) {
+                        ByteArrayOutputStream baos= new ByteArrayOutputStream();
                         ex.printStackTrace();
-                        reportedExceptionTime= t;
+                        ex.printStackTrace(new PrintStream(baos));
+                        reportedExceptionStr= baos.toString();
+                        reportedExceptionTime= t;   
                     }
-                    g2.drawString(ex.getMessage(), 0, 16 );
+                    g2.setColor(c0);
+                    g2.drawString(reportedExceptionStr, 0, 16 );
                 }
             });
 
