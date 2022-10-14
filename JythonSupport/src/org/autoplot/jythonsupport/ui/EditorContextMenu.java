@@ -2,7 +2,6 @@
 package org.autoplot.jythonsupport.ui;
 
 import ZoeloeSoft.projects.JFontChooser.JFontChooser;
-import java.awt.Dimension;
 import java.awt.Font;
 import org.das2.components.propertyeditor.PropertyEditor;
 import java.awt.event.ActionEvent;
@@ -18,20 +17,17 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDialog;
-import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Element;
-import jsyntaxpane.DefaultSyntaxKit;
 import jsyntaxpane.SyntaxStyle;
 import jsyntaxpane.SyntaxStyles;
 import jsyntaxpane.actions.ActionUtils;
@@ -45,7 +41,6 @@ import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.jythonsupport.ClipboardEditorPanel;
 import org.autoplot.jythonsupport.JavaJythonConverter;
-import org.autoplot.jythonsupport.JythonUtil;
 import org.autoplot.jythonsupport.MathematicaJythonConverter;
 import static org.das2.jythoncompletion.JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER;
 import org.das2.jythoncompletion.JythonInterpreterProvider;
@@ -54,7 +49,7 @@ import org.das2.jythoncompletion.JythonInterpreterProvider;
  *
  * @author jbf
  */
-public class EditorContextMenu {
+public final class EditorContextMenu {
 
     private static final Logger logger= Logger.getLogger("jython.editor");
 
@@ -158,7 +153,8 @@ public class EditorContextMenu {
                                 int line= Integer.parseInt(fs.substring(0,i));
                                 Element ee= editor.getDocument().getDefaultRootElement().getElement(line-1);
                                 editor.setCaretPosition(ee.getStartOffset());
-                            }    break;
+                            }    
+                            break;
                     }
                 }
 
