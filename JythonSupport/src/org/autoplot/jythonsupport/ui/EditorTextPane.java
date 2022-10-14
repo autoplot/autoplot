@@ -731,7 +731,7 @@ public class EditorTextPane extends JEditorPane {
             int length= -1;
             try {
                 while ( line!=null ) {
-                    if ( line.startsWith("def ") && line.contains("(") ) {
+                    if ( line.trim().startsWith("def ") && line.contains("(") ) {
                         int i= line.indexOf("(");
                         jumpToList.add( reader.getLineNumber() + ":" + line.substring(0,i) );
                     } else if ( line.startsWith("class ") && line.contains(":") ) {
