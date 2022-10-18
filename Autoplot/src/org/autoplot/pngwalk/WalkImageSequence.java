@@ -303,7 +303,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
         int idx= -1;
         
         if ( datumRanges.isEmpty() || datumRanges.get(0)==null ) {
-            logger.info("ranges are not available");
+            logger.log(Level.INFO, "pngwalk does not have time ranges for each image ({0})", template);
             return;
         }
 
