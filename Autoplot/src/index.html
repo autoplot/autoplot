@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Length mouse action can be divided into regular intervals by pressing 1 through 9, and frequency shown by editing the property under the controller.
+        <p><small>New kernel spectrogram rebinner spreads out each point using flat plate kernels to give appealing nearest-neighbor with soft edges.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,7 +28,12 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-10-08 r26747):</p>
+        <p>Bugfixes (2022-10-26 r26772):</p>
+        <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2481/">2481</a>: ASCII file multi-field times with tab delimiters can now be read.
+            <li>Improve feedback when PNGWalk setTimeRange is called but images do not contain URI templates like $Y$m$d.png.
+        </ul>
+        <p>Older Bugfixes (2022-10-08 r26747):</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2480/">2480</a>: slice1 was dropping the fill value found within a dataset, correct this for now by using unbundle.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2479/">2479</a>: vap+cdaweb needs old initialization with some data sets, back out the change.
@@ -44,29 +49,18 @@
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2134/">2134</a>: rank 1 indices for rank 2 dataset was incorrectly implemented.
             <li>Correction to fast branch for reduceMean.
         </ul>
-        <p>Older Bugfixes (2022-08-13 r26726):</p>
-        <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2471/">2471</a>: Firebird JSON headed ASCII contained invalid reference and couldn't be used, make more permissive to keep what is correct.
-            <li>Delay initialization of CDAWeb database if we already know the dataset and parameter, since it takes 20-30 seconds to initialize.
-            <li><a href='https://github.com/das-developers/das2java/issues/32'>32</a>: Das2 waitUntilIdle loop wouldn't properly block when ephemeris was loading, causing glitches in automated testing and PNG Walks.
-            <li>bundle from HAPI exported to CDF would fail because of careless check of dataset type.
-            <li><a href='https://sourceforge.net/p/autoplot/bugs/2470/'>2470</a>: Rich ASCII (JSON headed ASCII) detects ISO8601 automatically, to match SpacePy.
-            <li><a href='https://github.com/das-developers/das2java/issues/28'>28</a>: Corrections to DataPointRecorder, which sorted numbers alphabetically, not numerically.
-            <li>Improved support for decimal year.  Thanks, Bill!
-            <li>fast branch added for reduceMean of ds[N,2], avoiding use of slow iterator for frequently-occurring operation.
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li>New kernel spectrogram rebinner is available, where points are spread out and mixed together.
+            <li>dataset command handles DatumVector class, which is an array of Datums.
+            <li>Jython editor "jump to" includes methods within classes.
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>handle completions on Jython object with fields.
             <li>Butterworth filter accepts rank 2 waveform data.  detrend1 added for rank 2 waveform data.
             <li><a href='https://github.com/das-developers/das2java/issues/35'>35</a>: Improve support for DEPEND_0 with bins data set. 
             <li><a href='https://github.com/das-developers/das2java/issues/18'>18</a>: New tick logic used on one or two-cycle log axes.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>Preserve string array properties in JSON headed ascii, and preserve unrecognized properties in USER_PROPERTIES.
-            <li>add mime type for PDS lblx files.
-            <li>Add withinSet function which returns one where the data is within a set of values.
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
