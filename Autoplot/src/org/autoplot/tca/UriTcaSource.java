@@ -20,6 +20,7 @@ import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
+import org.das2.datum.UnitsUtil;
 import org.das2.qds.ops.Ops;
 
 /**
@@ -419,6 +420,15 @@ public class UriTcaSource extends AbstractQFunction {
             label= "Time";
             if ( needToRead ) { // we need to verify that this TSB will return time for its independent parameter
                 try {
+                    DatumRange tr= this.tsb.getTimeRange();
+                    if ( UnitsUtil.isTimeLocation( tr.getUnits() ) ) {
+                        Datum timeLimit= Units.days.createDatum(2);
+                        if ( tr.width().gt( timeLimit ) ) {
+                            logger.fine("limiting initial read to two days.");
+                            tr= new DatumRange( tr.min(), tr.min().add(timeLimit) );
+                            this.tsb.setTimeRange(tr);
+                        }
+                    }
                     doRead();
                     if ( ds==null ) {
                         label= "";
