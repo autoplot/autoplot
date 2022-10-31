@@ -65,17 +65,6 @@ public class Test005 {
                 System.err.println("margin column: "+ mc.getId() + " " + mc.getLeft() + " " + mc.getRight() );
             }
 
-            xxx("demo2");
-
-            {
-                String suri = "http://virbo.org/ftp/LANL/LANL1991/SOPA+ESP/H0/LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?";
-                List<CompletionResult> completionResult = DataSetURI.getCompletions(suri, suri.length(), new NullProgressMonitor());
-                try (PrintWriter out = new PrintWriter("test005_demo3.txt")) {
-                    for (CompletionResult l : completionResult) {
-                        out.println(l.completion);
-                    }
-                }
-            }
             xxx("demo3");
 
             //OFFLINE MODE vvv
