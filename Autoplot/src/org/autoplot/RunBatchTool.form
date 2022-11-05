@@ -409,6 +409,7 @@
     <Component class="javax.swing.JButton" name="goButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Go!"/>
+        <Property name="toolTipText" type="java.lang.String" value="Run the batch processes, holding shift to run independent processes in parallel."/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="goButtonActionPerformed"/>

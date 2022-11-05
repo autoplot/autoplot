@@ -511,6 +511,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         postRunPopupMenu.add(rerunScriptMenuItem);
 
         goButton.setText("Go!");
+        goButton.setToolTipText("Run the batch processes, holding shift to run independent processes in parallel.");
         goButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 goButtonActionPerformed(evt);
@@ -744,7 +745,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                 if ( ( evt.getModifiers() & KeyEvent.SHIFT_MASK ) == KeyEvent.SHIFT_MASK ) {
                     String warning="<html><p>Multi-thread mode is only stable when each process<br>"
                         + "is independent, use with caution.  For example, if the script plots<br>"
-                        + "data, then the two scripts will interfere with one another.<br><br>"
+                        + "data, then two concurrent invocations will interfere with one another.<br><br>"
                         + "Proceed?</p></html>";
                     JPanel p= new JPanel( );
                     p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
