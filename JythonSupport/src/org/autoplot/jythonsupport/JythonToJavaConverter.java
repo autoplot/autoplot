@@ -26,6 +26,7 @@ import org.python.core.PyInteger;
 import org.python.parser.SimpleNode;
 import org.python.parser.ast.Assign;
 import org.python.parser.ast.Attribute;
+import org.python.parser.ast.AugAssign;
 import org.python.parser.ast.BinOp;
 import org.python.parser.ast.Call;
 import org.python.parser.ast.ClassDef;
@@ -47,6 +48,7 @@ import org.python.parser.ast.Return;
 import org.python.parser.ast.Slice;
 import org.python.parser.ast.Str;
 import org.python.parser.ast.Tuple;
+import org.python.parser.ast.UnaryOp;
 import org.python.parser.ast.VisitorBase;
 import org.python.parser.ast.While;
 import org.python.parser.ast.exprType;
@@ -603,7 +605,7 @@ public class JythonToJavaConverter {
                 this.builder.append("return");
                 if ( rt.value!=null ) {
                     this.builder.append(" ");
-                    traverse("", rt.value, false);
+                    traverse("", rt.value, true);
                 }
             } else if (sn instanceof ImportFrom) {
                 ImportFrom ff = ((ImportFrom) sn);
@@ -619,6 +621,21 @@ public class JythonToJavaConverter {
             } else if (sn instanceof Num) {
                 Num ex = (Num) sn;
                 this.builder.append(ex.n);
+            } else if (sn instanceof UnaryOp) {
+                UnaryOp op= ((UnaryOp)sn);
+                switch (op.op) {
+                    case UnaryOp.UAdd:
+                        this.builder.append("+");
+                        traverse("",op.operand,true);
+                        break;
+                    case UnaryOp.USub:
+                        this.builder.append("-");
+                        traverse("",op.operand,true);
+                        break;
+                    default:
+                        this.builder.append(op.toString());
+                        break;
+                }
             } else if (sn instanceof BinOp) {
                 BinOp as = ((BinOp) sn);
                 if (as.left instanceof Str && as.op == 5) {
@@ -733,6 +750,23 @@ public class JythonToJavaConverter {
                     if ( i>0 ) this.builder.append(',');
                     traverse( "", ss.elts[i], true );
                 }
+            } else if ( sn instanceof AugAssign ) {
+                AugAssign a1= (AugAssign)sn;
+                switch (a1.op) {
+                    case AugAssign.Add:
+                        traverse("", a1.target, true);
+                        this.builder.append("+=");
+                        traverse("", a1.value, true);
+                        break;
+                    case AugAssign.Sub:
+                        traverse("", a1.target, true);
+                        this.builder.append("+=");
+                        traverse("", a1.value, true);   
+                        break;
+                    default:
+                        this.builder.append(sn.toString()).append("\n");
+                        break;
+                }
             } else {
                 this.builder.append(sn.toString()).append("\n");
                 lineNumber++;
@@ -762,8 +796,33 @@ public class JythonToJavaConverter {
             return visitNameFail;
         }
 
+        private String guessType( exprType ex ) {
+            return "Object";
+        }
+        
+        private String guessReturnType( stmtType[] statements ) {
+            String returnType= "void";
+            for ( stmtType s : statements ) {
+                if ( s instanceof If ) {
+                    String s1= guessReturnType(((If)s).body);
+                    if ( !s1.equals("void") ) {
+                        returnType= s1;
+                    }
+                } else if ( s instanceof For ) {
+                    String s1= guessReturnType(((For)s).body);
+                    if ( !s1.equals("void") ) {
+                        returnType= s1;
+                    }
+                } else if ( s instanceof Return ) {
+                    return guessType( ((Return)s).value );
+                }
+            }
+            return returnType;
+        }
+        
         private void handleFunctionDef( FunctionDef fd, String indent, boolean inline ) throws Exception {
-            this.builder.append("private Object ").append(fd.name).append("(");
+            String returnType= guessReturnType(fd.body );
+            this.builder.append("private ").append(returnType).append(" ").append(fd.name).append("(");
             for (int i = 0; i < fd.args.args.length; i++) {
                 if (i > 0) {
                     this.builder.append(",");
@@ -777,7 +836,7 @@ public class JythonToJavaConverter {
         }
 
         private void handlePrint( Print pr, String indent, boolean inline) throws Exception {
-            this.builder.append("System.err.println(");
+            this.builder.append("System.out.println(");
             for (int i = 0; i < pr.values.length; i++) {
                 if (i > 0) {
                     this.builder.append(",");
@@ -871,7 +930,7 @@ public class JythonToJavaConverter {
 
         private void handleWhile(While ff, String indent, boolean inline) throws Exception {
             this.builder.append("while ( ");
-            traverse( ff.test );
+            traverse( "", ff.test, true );
             this.builder.append(" ) {\n");
             lineNumber++;
             handleBody(ff.body, spaces4+ indent );
