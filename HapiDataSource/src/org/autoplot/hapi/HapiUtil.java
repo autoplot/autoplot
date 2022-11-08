@@ -70,7 +70,7 @@ public final class HapiUtil {
                                 String theDefinitionsRef= theRef.substring(14);
                                 if ( definitions.has(theDefinitionsRef) ) {
                                     Object deref= definitions.get(theDefinitionsRef);
-                                    param.put( k, deref );
+                                    ja.put( i, deref );
                                 } else {
                                     throw new IllegalArgumentException("reference not found within definitions: "+theRef);
                                 }
