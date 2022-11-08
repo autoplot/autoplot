@@ -82,6 +82,8 @@ public final class HapiUtil {
                         }
                     } else if ( o1 instanceof JSONArray ) {
                         logger.fine("not resolving array of array, but this is easy to do with a small refactoring");
+                    } else if ( o1 instanceof Integer || o1 instanceof Double ) {
+                        
                     } else {
                         logger.fine("not resolving array of things.");
                     }
