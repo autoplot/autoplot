@@ -474,6 +474,7 @@ public class ScriptGUIServlet extends HttpServlet {
             outs.println( "ExecutionTimeMs: "+ elapsedTime );
             outs.println( "Script: "+ scriptURI + "?"+ String.join("&", aaparams) );
             outs.println( "ClientId: "+ SecurityUtil.clientId(request) );
+            outs.println( "UserAgent: " + request.getHeader("User-Agent") );
         }
         
         timelogger.log(Level.FINE, "end runScript {0} ({1}ms)", new Object[]{name, elapsedTime });
