@@ -30,6 +30,9 @@
                 
         <p>Bugfixes (2022-10-28 r26774):</p>
         <ul>
+            <li>Indicate to the scientist that Run Batch supports concurrent runs (by holding shift).
+            <li><a href="https://github.com/das-developers/das2java/issues/39">0039</a>: revisit scan next/prev buttons on axis.
+            <li>Correction to handling of $ref in HAPI, code assumed ref would be within structure and not array.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2483/">2483</a>: TCA ephemeris loads incorrect time initially, blocking correct load.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2481/">2481</a>: ASCII file multi-field times with tab delimiters can now be read.
             <li>Improve feedback when PNGWalk setTimeRange is called but images do not contain URI templates like $Y$m$d.png.
@@ -52,6 +55,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>DDataSet addValue method checks for zero and returns trivially without mutability test, since this happens often.
             <li>New kernel spectrogram rebinner is available, where points are spread out and mixed together.
             <li>dataset command handles DatumVector class, which is an array of Datums.
             <li>Jython editor "jump to" includes methods within classes.
