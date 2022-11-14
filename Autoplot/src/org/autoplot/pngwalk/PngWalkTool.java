@@ -1561,7 +1561,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
             } catch (java.io.IOException e) {
                 // This probably means the template was invalid. Don't set new sequence.
                 if ( !getStatus().startsWith("error") ) setStatus("error:"+e.getMessage());
-                throw new RuntimeException(e);
+                return;
             }
 
             SwingUtilities.invokeLater( new Runnable() {
