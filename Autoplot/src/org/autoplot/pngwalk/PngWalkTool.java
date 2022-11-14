@@ -1561,6 +1561,11 @@ public final class PngWalkTool extends javax.swing.JPanel {
             } catch (java.io.IOException e) {
                 // This probably means the template was invalid. Don't set new sequence.
                 if ( !getStatus().startsWith("error") ) setStatus("error:"+e.getMessage());
+                Container p= SwingUtilities.getWindowAncestor(this);
+                if ( p==null ) p= parentWindow;
+                if ( this.getX()!=0 ) p= this; // for Linux, where the component isn't initialized yet.
+                JOptionPane.showMessageDialog( p, "<html>Unable to find directory for: <br>"+ seq.getTemplate() );
+                
                 return;
             }
 
