@@ -1694,10 +1694,15 @@ public final class PngWalkTool extends javax.swing.JPanel {
      * @return the current timerange
      */
     public DatumRange getTimeRange() {
-        DatumRange tr= seq.imageAt( seq.getIndex() ).getDatumRange();
-        if ( tr!=null ) {
-            return tr;
-        } else {
+        try {
+            DatumRange tr= seq.imageAt( seq.getIndex() ).getDatumRange();
+            if ( tr!=null ) {
+                return tr;
+            } else {
+                return timeRange;
+            }
+        } catch ( Exception ex ) {
+            // this happens when the sequence is initializing on another thread.
             return timeRange;
         }
     }
