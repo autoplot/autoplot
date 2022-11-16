@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Demonstration of how to interpolate in angle space and map the contours to a cartesian space is found in <a href="https://github.com/autoplot/dev/blob/master/demos/2022/20221104/contourAngle.jy">this script</a>.  Also, <a href="https://youtu.be/h2-5It_PJv0">this video</a> on "Thunder Runs" explains Ukraine's recent success and its origins in the Iraq war.  Thank you, vets!
+        <p><small>Silly "disks" mode used for testing new kernel rebinner.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,9 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-11-11 r26782):</p>
+        <p>Bugfixes (2022-11-11 r26790):</p>
         <ul>
+            <li>binding two pngwalks immediately after starting them result in runtime error.  Thanks, JM!
             <li>Indicate to the scientist that Run Batch supports concurrent runs (by holding shift).
             <li><a href="https://github.com/das-developers/das2java/issues/39">0039</a>: revisit scan next/prev buttons on axis.
             <li>Correction to handling of $ref in HAPI, code assumed ref would be within structure and not array.
