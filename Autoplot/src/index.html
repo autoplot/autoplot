@@ -28,8 +28,10 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-11-11 r26790):</p>
+        <p>Bugfixes (2022-11-17 r26794):</p>
         <ul>
+            <li>LIMIT_HUGE_DATASET increased to 1000M points from 100M.  Thanks, Kristoff! 
+            <li>Catch runtime error when non-existent directory is entered in PNGWalk tool.  Thanks, Sadie!
             <li>binding two pngwalks immediately after starting them result in runtime error.  Thanks, JM!
             <li>Indicate to the scientist that Run Batch supports concurrent runs (by holding shift).
             <li><a href="https://github.com/das-developers/das2java/issues/39">0039</a>: revisit scan next/prev buttons on axis.
