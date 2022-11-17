@@ -57,6 +57,7 @@ public class Util {
                 recent = Bookmark.parseBookmarks(AutoplotUtil.readDoc(new FileInputStream(f)).getDocumentElement());
                 setRecent(sel,recent);
             } catch (BookmarksException | SAXException | IOException | ParserConfigurationException ex) {
+                logger.severe("Error when reading "+f+":");
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
 
