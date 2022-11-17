@@ -2561,11 +2561,18 @@ APSplash.checkTime("init 52.9");
             }
             
         } else if ( desiredAppSize.width>screenSize.getWidth() || desiredAppSize.height>screenSize.getHeight() ) {
-
-            String[] options= new String[] { "Scale to fit display", "Use scrollbars" };
-            int i= JOptionPane.showOptionDialog( this, "Canvas size doesn't fit well on this display.", "Incompatible Canvas Size", 
-                    JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE, ERROR_ICON,
-                    options, options[1] );
+            int i;
+            
+            String defaultOption= System.getProperty("resizeOption","");
+            logger.log(Level.FINE, "System property resizeOption set to \"{0}\"", defaultOption);
+            if ( defaultOption.equals("") ) {
+                String[] options= new String[] { "Scale to fit display", "Use scrollbars" };
+                i= JOptionPane.showOptionDialog( this, "Canvas size doesn't fit well on this display.", "Incompatible Canvas Size", 
+                        JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE, ERROR_ICON,
+                        options, options[1] );
+            } else {
+                i= defaultOption.equals("scrollbars") ? 1 : 0;
+            }
             if ( i!= JOptionPane.CLOSED_OPTION ) {
                 if ( i==0 ) {
                     double aspect= 1.0*h/w;
