@@ -666,6 +666,7 @@ public class DataSourceController extends DomNodeController {
             if ( datasetSize<QDataSet.LIMIT_HUGE_DATASET ) {
                 updateFill();
             } else {
+                logger.warning("dataset is too big to perform stats.  See QDataSet.LIMIT_HUGE_DATASET.");
                 setFillDataSet(ds);
             }
 
