@@ -1261,9 +1261,12 @@ public class AutoplotUtil {
                     }
                 }
             } else {
+                int[] dims= DataSetUtil.qubeDims(fillds);
                 if ( dep1==null && fillds.rank()==2 && fillds.length()>3 && fillds.length(0)<4 ) { // Vector quantities without labels. [3x3] is a left a matrix.
                     spec = RenderType.series;
-                } else if ( fillds.rank()==2 && fillds.length()==2 && fillds.length(0)==2 ) {
+                } else if ( fillds.rank()==2 && dims[0]==2 && dims[1]==2 ) {
+                    spec = RenderType.bounds;
+                } else if ( fillds.rank()==3 && dims!=null && dims[1]==2 && dims[2]==2 ) {
                     spec = RenderType.bounds;
                 } else {
                     spec = specPref;

@@ -2006,6 +2006,8 @@ public class PlotElementController extends DomNodeController {
                 throw new NullPointerException("unable to find plot for plotElement: "+plotElement );
             }
 
+            logger.log(Level.FINE, "renderType: {0}", plotElement.getRenderType());
+            
             PlotElement peleCopy = (PlotElement) plotElement.copy();
             peleCopy.setId("");
             peleCopy.setParent("");

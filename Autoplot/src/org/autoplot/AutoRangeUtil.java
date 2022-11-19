@@ -544,16 +544,34 @@ public class AutoRangeUtil {
             result.robustMin = Double.MAX_VALUE;
             Units units = null;
             UnitsConverter uc = UnitsConverter.IDENTITY;
-            for (int i = 0; i < ds.length(); i++) {
-                AutoRangeDescriptor r1 = autoRange(ds.slice(i), properties, false);
-                if (units == null) {
-                    units = r1.range.getUnits();
-                } else {
-                    uc = r1.range.getUnits().getConverter(units);
-                }
-                result.range = result.range == null ? r1.range : DatumRangeUtil.union(result.range, r1.range);
-                if (r1.log) {
-                    result.log = true;
+            if ( ds.rank()==3 ) {
+                for (int j = 0; j < ds.length(); j++) {
+                    QDataSet ds1= ds.slice(j);
+                    for ( int i=0; i<ds1.length(); i++ ) {
+                        AutoRangeDescriptor r1 = autoRange(ds1.slice(i), properties, false);
+                        if (units == null) {
+                            units = r1.range.getUnits();
+                        } else {
+                            uc = r1.range.getUnits().getConverter(units);
+                        }
+                        result.range = result.range == null ? r1.range : DatumRangeUtil.union(result.range, r1.range);
+                        if (r1.log) {
+                            result.log = true;
+                        }
+                    }
+                }                 
+            } else {
+                for (int i = 0; i < ds.length(); i++) {
+                    AutoRangeDescriptor r1 = autoRange(ds.slice(i), properties, false);
+                    if (units == null) {
+                        units = r1.range.getUnits();
+                    } else {
+                        uc = r1.range.getUnits().getConverter(units);
+                    }
+                    result.range = result.range == null ? r1.range : DatumRangeUtil.union(result.range, r1.range);
+                    if (r1.log) {
+                        result.log = true;
+                    }
                 }
             }
             result.robustMin = result.range.min().doubleValue(result.range.getUnits());
