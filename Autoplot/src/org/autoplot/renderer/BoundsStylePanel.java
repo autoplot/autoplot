@@ -77,7 +77,9 @@ public class BoundsStylePanel extends javax.swing.JPanel implements PlotStylePan
         controls.put( Renderer.CONTROL_KEY_COLOR, Renderer.encodeColorControl( (Color)colorEditor1.getValue() ) );
         //controls.put( "fillLabel", fillLabelTF.getText() );
         controls.put( Renderer.CONTROL_KEY_FILL_COLOR, Renderer.encodeColorControl( (Color)colorEditor2.getValue() ) );
+        controls.put( Renderer.CONTROL_KEY_FILL_TEXTURE, String.valueOf( this.textureComboBox.getSelectedItem() ) );
         String c= Renderer.formatControl(controls);
+        System.err.println("controls: "+c);
         this.control= c;
         firePropertyChange( Renderer.PROP_CONTROL, oldValue, c );
     }
@@ -85,6 +87,7 @@ public class BoundsStylePanel extends javax.swing.JPanel implements PlotStylePan
         this.control= renderer.getControl();
         colorEditor1.setValue( renderer.getColorControl( Renderer.CONTROL_KEY_COLOR, (Color)colorEditor1.getValue() ) );
         colorEditor2.setValue( renderer.getColorControl( Renderer.CONTROL_KEY_FILL_COLOR, (Color)colorEditor2.getValue() ) );
+        this.textureComboBox.setSelectedItem( renderer.getControl("fillTexture", "" ) );
     }
     
     @Override
@@ -133,6 +136,8 @@ public class BoundsStylePanel extends javax.swing.JPanel implements PlotStylePan
         colorPanel = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         fillColorPanel = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        textureComboBox = new javax.swing.JComboBox<>();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Bounds"));
 
@@ -144,6 +149,15 @@ public class BoundsStylePanel extends javax.swing.JPanel implements PlotStylePan
 
         fillColorPanel.setLayout(new java.awt.BorderLayout());
 
+        jLabel3.setText("Fill Texture:");
+
+        textureComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "", "solid", "hash" }));
+        textureComboBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                textureComboBoxItemStateChanged(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -152,16 +166,21 @@ public class BoundsStylePanel extends javax.swing.JPanel implements PlotStylePan
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(colorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addGap(134, 134, 134)))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(fillColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(fillColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(colorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(jLabel2)
+                                    .addGap(134, 134, 134)))
+                            .addGap(0, 0, Short.MAX_VALUE))
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(jLabel3)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(textureComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -172,13 +191,21 @@ public class BoundsStylePanel extends javax.swing.JPanel implements PlotStylePan
                         .addContainerGap()
                         .addComponent(jLabel2))
                     .addComponent(colorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(23, 23, 23)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel1)
                     .addComponent(fillColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(77, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(textureComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(64, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void textureComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_textureComboBoxItemStateChanged
+        update();
+    }//GEN-LAST:event_textureComboBoxItemStateChanged
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -188,5 +215,7 @@ public class BoundsStylePanel extends javax.swing.JPanel implements PlotStylePan
     private javax.swing.JPanel fillColorPanel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JComboBox<String> textureComboBox;
     // End of variables declaration//GEN-END:variables
 }
