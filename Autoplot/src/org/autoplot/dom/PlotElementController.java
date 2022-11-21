@@ -1393,6 +1393,10 @@ public class PlotElementController extends DomNodeController {
                     }
                 }
             }
+            
+            if ( Schemes.isArrayOfBoundingBox(fillDs) ) {
+                return "";
+            }
 
             // pick a slice index near the middle, which is less likely to be all fill.
             int n= Math.max( 0, qube.get(sliceIndex)/2-1 );
