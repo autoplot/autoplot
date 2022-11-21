@@ -78,16 +78,19 @@ public class BoundsStylePanel extends javax.swing.JPanel implements PlotStylePan
         //controls.put( "fillLabel", fillLabelTF.getText() );
         controls.put( Renderer.CONTROL_KEY_FILL_COLOR, Renderer.encodeColorControl( (Color)colorEditor2.getValue() ) );
         controls.put( Renderer.CONTROL_KEY_FILL_TEXTURE, String.valueOf( this.textureComboBox.getSelectedItem() ) );
+        controls.put( "polar", Renderer.encodeBooleanControl( polarCheckBox.isSelected() ) );
         String c= Renderer.formatControl(controls);
         System.err.println("controls: "+c);
         this.control= c;
         firePropertyChange( Renderer.PROP_CONTROL, oldValue, c );
     }
+    
     private void updateGUI( Renderer renderer ) {
         this.control= renderer.getControl();
         colorEditor1.setValue( renderer.getColorControl( Renderer.CONTROL_KEY_COLOR, (Color)colorEditor1.getValue() ) );
         colorEditor2.setValue( renderer.getColorControl( Renderer.CONTROL_KEY_FILL_COLOR, (Color)colorEditor2.getValue() ) );
         this.textureComboBox.setSelectedItem( renderer.getControl("fillTexture", "" ) );
+        polarCheckBox.setSelected( renderer.getBooleanControl("polar",false) );
     }
     
     @Override
@@ -138,6 +141,7 @@ public class BoundsStylePanel extends javax.swing.JPanel implements PlotStylePan
         fillColorPanel = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         textureComboBox = new javax.swing.JComboBox<>();
+        polarCheckBox = new javax.swing.JCheckBox();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Bounds"));
 
@@ -158,6 +162,13 @@ public class BoundsStylePanel extends javax.swing.JPanel implements PlotStylePan
             }
         });
 
+        polarCheckBox.setText("polar");
+        polarCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                polarCheckBoxActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -169,18 +180,19 @@ public class BoundsStylePanel extends javax.swing.JPanel implements PlotStylePan
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(fillColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(textureComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(polarCheckBox)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                 .addComponent(colorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGroup(layout.createSequentialGroup()
                                     .addComponent(jLabel2)
-                                    .addGap(134, 134, 134)))
-                            .addGap(0, 0, Short.MAX_VALUE))
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jLabel3)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(textureComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                    .addGap(134, 134, 134))))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -199,13 +211,19 @@ public class BoundsStylePanel extends javax.swing.JPanel implements PlotStylePan
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(textureComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(64, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(polarCheckBox)
+                .addContainerGap(39, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void textureComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_textureComboBoxItemStateChanged
         update();
     }//GEN-LAST:event_textureComboBoxItemStateChanged
+
+    private void polarCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_polarCheckBoxActionPerformed
+        update();
+    }//GEN-LAST:event_polarCheckBoxActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -216,6 +234,7 @@ public class BoundsStylePanel extends javax.swing.JPanel implements PlotStylePan
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JCheckBox polarCheckBox;
     private javax.swing.JComboBox<String> textureComboBox;
     // End of variables declaration//GEN-END:variables
 }
