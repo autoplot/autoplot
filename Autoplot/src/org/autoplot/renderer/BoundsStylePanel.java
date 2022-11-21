@@ -155,7 +155,7 @@ public class BoundsStylePanel extends javax.swing.JPanel implements PlotStylePan
 
         jLabel3.setText("Fill Texture:");
 
-        textureComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "", "solid", "hash" }));
+        textureComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " ", "solid", "hash", "backhash", "crosshash" }));
         textureComboBox.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 textureComboBoxItemStateChanged(evt);
@@ -183,7 +183,7 @@ public class BoundsStylePanel extends javax.swing.JPanel implements PlotStylePan
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(textureComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(textureComboBox, 0, 1, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(polarCheckBox)
