@@ -43,6 +43,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -385,7 +386,8 @@ public class RunBatchTool extends javax.swing.JPanel {
         timeRangeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Jun 2000", "2000", "2000-01-01/03-01", "2000-2016" }));
 
         timeFormatComboBox.setEditable(true);
-        timeFormatComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "$Y-$m-$d", "$Y", "$Y-$(m,span=3)", "$Y-$m", "$Y_$j", "$Y-$m-$dT$H/PT1H", "$Y-$m-$dT$H$M/PT1M", "$Y-$m-$dT$H$M$S/PT1S", " " }));
+        timeFormatComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "$Y-$m-$d", "$Y", "$Y-$(m,span=3)", "$Y-$m", "$Y_$j", "$Y-$m-$dT$H/PT1H", "$Y-$m-$dT$H$M/PT1M", "$Y-$m-$dT$H$M$S/PT1S", "$(o;id=rbspa-pp)" }));
+        timeFormatComboBox.setToolTipText("Use the droplist to select from options, and make edits if necessary.");
 
         jLabel3.setText("Time Format:");
 
@@ -1202,7 +1204,14 @@ public class RunBatchTool extends javax.swing.JPanel {
         if ( pd.type=='T' ) {
             try {
                 if ( AutoplotUtil.showConfirmDialog( this, timeRangesPanel, "Generate Time Ranges", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
-                    ss= ScriptContext.generateTimeRanges( timeFormatComboBox.getSelectedItem().toString(), timeRangeComboBox.getSelectedItem().toString() );
+                    String template= timeFormatComboBox.getSelectedItem().toString();
+                    Pattern p= Pattern.compile("\\$\\(o[,;]id=([a-zA-Z\\-_]+)\\)");
+                    Matcher m= p.matcher(template);
+                    if ( m.matches() ) {
+                        String id= m.group(1);
+                        template= "orbit:"+id+":"+template;
+                    }
+                    ss= ScriptContext.generateTimeRanges(template, timeRangeComboBox.getSelectedItem().toString() );
                 }
             } catch (ParseException ex) {
                 Logger.getLogger(RunBatchTool.class.getName()).log(Level.SEVERE, null, ex);

@@ -144,9 +144,10 @@
                 <StringItem index="5" value="$Y-$m-$dT$H/PT1H"/>
                 <StringItem index="6" value="$Y-$m-$dT$H$M/PT1M"/>
                 <StringItem index="7" value="$Y-$m-$dT$H$M$S/PT1S"/>
-                <StringItem index="8" value=" "/>
+                <StringItem index="8" value="$(o;id=rbspa-pp)"/>
               </StringArray>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Use the droplist to select from options, and make edits if necessary."/>
           </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
