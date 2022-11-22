@@ -2528,8 +2528,20 @@ public class PlotElementController extends DomNodeController {
             if ( qube==null ) {
                 // nothing
             } else {
-                peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
-                peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
+                DatumRange xrange= DataSetUtil.asDatumRange( qube.slice(0),true ); // angle maybe
+                DatumRange yrange= DataSetUtil.asDatumRange( qube.slice(1),true );
+                
+                if ( props.containsKey(QDataSet.RENDER_TYPE) ) { // Let's kludge in a check for polar, whee!
+                    // The renderer has an unfortunate mistake where the controls will affect the autoranging.  This should
+                    // probably be redone.
+                    String rt= (String)props.get(QDataSet.RENDER_TYPE);
+                    if ( rt.contains("polar=T") ) {
+                        xrange= DatumRange.newRange( yrange.max().negative(), yrange.max() );
+                        yrange= xrange;
+                    }
+                }
+                peleCopy.getPlotDefaults().getXaxis().setRange( xrange );
+                peleCopy.getPlotDefaults().getYaxis().setRange( yrange );
                 peleCopy.getPlotDefaults().getZaxis().setAutoRange(false);
             }
             
