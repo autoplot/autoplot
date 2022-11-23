@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Silly "disks" mode used for testing new kernel rebinner.
+        <p><small>Series of panoramas taken in the neighborhood.  Happy Thanksgiving, Americans!
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -30,6 +30,8 @@
                 
         <p>Bugfixes (2022-11-17 r26794):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2488/">2488</a>: Run batch tools time range generation supports orbit numbers.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2488/">2488</a>: script update flashes blue, not red, since red is alarming.
             <li>LIMIT_HUGE_DATASET increased to 1000M points from 100M.  Thanks, Kristoff! 
             <li>Catch runtime error when non-existent directory is entered in PNGWalk tool.  Thanks, Sadie!
             <li>binding two pngwalks immediately after starting them result in runtime error.  Thanks, JM!
@@ -58,6 +60,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>new array-of-bounding-boxes dataset scheme, supported in the bounds renderer.
+            <li>bounds renderer supports polar plot annotations, array of bounds, and different hashes.
             <li>allow export resizeOption="resize" to avoid constant querying which prevents scripts from running.
             <li>DDataSet addValue method checks for zero and returns trivially without mutability test, since this happens often.
             <li>New kernel spectrogram rebinner is available, where points are spread out and mixed together.
