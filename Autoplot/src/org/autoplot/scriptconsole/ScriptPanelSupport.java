@@ -102,6 +102,7 @@ import org.autoplot.datasource.jython.JythonDataSource;
 import org.autoplot.datasource.jython.JythonDataSourceFactory;
 import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
+import org.das2.util.ColorUtil;
 import org.das2.util.filesystem.GitCommand;
 import org.python.parser.Node;
 import org.python.parser.ast.Expr;
@@ -445,7 +446,7 @@ public class ScriptPanelSupport {
                             if ( !ScriptPanelSupport.this.panel.isDirty() ) {
                                 try {
                                     Color color= ScriptPanelSupport.this.panel.getBackground();
-                                    ScriptPanelSupport.this.panel.setBackground(Color.red);
+                                    ScriptPanelSupport.this.panel.setBackground(ColorUtil.DODGER_BLUE);
                                     Thread.sleep(300);
                                     ScriptPanelSupport.this.panel.setBackground(color);
                                     loadFile( ScriptPanelSupport.this.file );
