@@ -660,6 +660,15 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
     }//GEN-LAST:event_jTree1ValueChanged
 
+    private void updateDas2Servers() {
+        Runnable runOffEvt= new Runnable() {
+            public void run() {
+                updateDas2ServersImmediately();
+            }
+        };
+        new Thread(runOffEvt).start();
+    }
+
 
     private void updateDas2ServersImmediately() {
         d2ss= listDas2Servers();
@@ -1078,20 +1087,9 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         if ( s.equals("http://planet.physics.uiowa.edu/das/das2Server") ) {
             return false;
         }
-        URL url= new URL(s+"?server=logo");
-        URLConnection connect= url.openConnection();
-        try {
-            InputStream in= connect.getInputStream();
-            if ( connect.getContentType().startsWith("image") ) {
-                in.close();
-                return false;
-            } else {
-                in.close();
-                return true;
-            }
-        } catch ( IOException ex ) {
-            return false; // we'll tell them later
-        }
+        // there's really no way to tell if it really is a Das2Server on the event thread, so accept all URIs. 
+        // and graphically tell them if it is not a valid server.
+        return false;
     }
 
 
@@ -1175,16 +1173,9 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         String key= serverURL + "?" + dataSetId;
         readerParams.put( key, paramsStr.toString() );
 
-        updateDas2ServersImmediately(); // this will set serverUrl to the last used server if nothing is specified.
-
-        Runnable run = new Runnable() {
-            @Override
-            public void run() {
-                das2ServerComboBox.setSelectedItem(serverURL);
-                jTree1.setModel( waitTreeModel() );
-            }
-        };
-        SwingUtilities.invokeLater(run);
+        das2ServerComboBox.setSelectedItem(serverURL);
+        
+        updateDas2Servers(); // this will set serverUrl to the last used server if nothing is specified.
         
         if ( serverURL.length()>0 ) {
             RequestProcessor.invokeLater( getDataSetsRunnable() );
