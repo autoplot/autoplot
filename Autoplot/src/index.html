@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Series of panoramas taken in the neighborhood.  Happy Thanksgiving, Americans!
+        <p><small>The "bounds" renderer works again with a time series of bounding intervals, and hash fill has been added.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,10 +28,14 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-11-23 r26806):</p>
-        <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2488/">2488</a>: Run batch tools time range generation supports orbit numbers.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2488/">2488</a>: script update flashes blue, not red, since red is alarming.
+        <p>Bugfixes (2022-11-28 r26808):</p>
+        <ul> 
+            <li>Das2Server editor would do web request on event thread, which can hang the GUI.
+            <li>new code checking for "NaN to NaN" in DatumRange didn't consider that Datum might be time location. 
+            <li>Das2Stream correction to "property yValidMin should be type Double" where it can also be a Datum.
+            <li>Correction to support gitlabs.com filesystems.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2488/">2488</a>: Run batch tools time range generation supports orbit numbers.  Thanks, Sadie!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2488/">2488</a>: script update flashes blue, not red, since red is alarming.  Thanks, Sadie!
             <li>LIMIT_HUGE_DATASET increased to 1000M points from 100M.  Thanks, Kristoff! 
             <li>Catch runtime error when non-existent directory is entered in PNGWalk tool.  Thanks, Sadie!
             <li>binding two pngwalks immediately after starting them result in runtime error.  Thanks, JM!
@@ -39,7 +43,7 @@
             <li><a href="https://github.com/das-developers/das2java/issues/39">0039</a>: revisit scan next/prev buttons on axis.
             <li>Correction to handling of $ref in HAPI, code assumed ref would be within structure and not array.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2483/">2483</a>: TCA ephemeris loads incorrect time initially, blocking correct load.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2481/">2481</a>: ASCII file multi-field times with tab delimiters can now be read.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2481/">2481</a>: ASCII file multi-field times with tab delimiters can now be read.  Thanks, Bill!
             <li>Improve feedback when PNGWalk setTimeRange is called but images do not contain URI templates like $Y$m$d.png.
         </ul>
         <p>Older Bugfixes (2022-10-08 r26747):</p>
@@ -60,6 +64,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>bounds renderer supports bounding interval time series.
             <li>new array-of-bounding-boxes dataset scheme, supported in the bounds renderer.
             <li>bounds renderer supports polar plot annotations, array of bounds, and different hashes.
             <li>allow export resizeOption="resize" to avoid constant querying which prevents scripts from running.
