@@ -31,6 +31,7 @@
         <p>Bugfixes (2022-11-28 r26808):</p>
         <ul> 
             <li>Das2Server editor would do web request on event thread, which can hang the GUI.
+            <li>correction to histogram dialog when "manual" is selected.  Thanks, Sadie!
             <li>new code checking for "NaN to NaN" in DatumRange didn't consider that Datum might be time location. 
             <li>Das2Stream correction to "property yValidMin should be type Double" where it can also be a Datum.
             <li>Correction to support gitlab.com filesystems.
