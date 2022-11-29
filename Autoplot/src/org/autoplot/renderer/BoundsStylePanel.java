@@ -3,7 +3,6 @@ package org.autoplot.renderer;
 
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.das2.graph.Renderer;
@@ -15,10 +14,10 @@ import org.autoplot.PlotStylePanel;
 import org.autoplot.dom.PlotElement;
 
 /**
- * Style panel for orbit renderer
+ * Style panel for bounds renderer, which draws regions identified by bounds datasets.
  * @author jbf
  */
-public class BoundsStylePanel extends javax.swing.JPanel implements PlotStylePanel.StylePanel {
+public final class BoundsStylePanel extends javax.swing.JPanel implements PlotStylePanel.StylePanel {
 
     /**
      * Creates new form DigitalStylePanel
@@ -28,20 +27,14 @@ public class BoundsStylePanel extends javax.swing.JPanel implements PlotStylePan
         //note the colorPanel must have its layout set to BorderLayout.
         colorEditor1.setValue(Color.BLACK);
         colorPanel.add( colorEditor1.getSmallEditor() );
-        colorEditor1.addPropertyChangeListener( new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                update();
-            }
+        colorEditor1.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+            update();
         });
         
         colorEditor2.setValue(Color.BLACK);
         fillColorPanel.add( colorEditor2.getSmallEditor() );
-        colorEditor2.addPropertyChangeListener( new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                update();
-            }
+        colorEditor2.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+            update();
         });
         
         validate();
