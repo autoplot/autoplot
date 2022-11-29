@@ -33,7 +33,7 @@ public class Util {
      * push the context menu item identified by the items.  This is a
      * list of regular expressions identifying the levels.
      * @param c the focus plot
-     * @param items labels, eg [ "Plot Style", "Series" ]
+     * @param items labels, eg [ "Plot Element Type", "Series" ]
      * @return the JMenuItem found, which has been pushed.
      */
     public static JMenuItem pushContextMenu( DasPlot c, String[] items ) {
