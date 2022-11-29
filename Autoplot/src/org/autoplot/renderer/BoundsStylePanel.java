@@ -80,7 +80,6 @@ public class BoundsStylePanel extends javax.swing.JPanel implements PlotStylePan
         controls.put( Renderer.CONTROL_KEY_FILL_TEXTURE, String.valueOf( this.textureComboBox.getSelectedItem() ) );
         controls.put( "polar", Renderer.encodeBooleanControl( polarCheckBox.isSelected() ) );
         String c= Renderer.formatControl(controls);
-        System.err.println("controls: "+c);
         this.control= c;
         firePropertyChange( Renderer.PROP_CONTROL, oldValue, c );
     }
