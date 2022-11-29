@@ -913,6 +913,7 @@ public class GuiSupport {
         tt.put( "Image", RenderType.image);
         tt.put( "Pitch Angle Distribution", RenderType.pitchAngleDistribution);
         tt.put( "Orbit Plot", RenderType.orbitPlot );
+        tt.put( "Bounds", RenderType.bounds );
         tt.put( "Contour Plot", RenderType.contour);
         tt.put( "Stacked Histogram", RenderType.stackedHistogram);
         return tt;
@@ -920,7 +921,8 @@ public class GuiSupport {
 
     public static JMenu createEZAccessMenu(final Plot plot) {
 
-        JMenu result = new JMenu("Plot Style");
+        JMenu result = new JMenu("Plot Element Type");
+        result.setToolTipText("Plot Type was formerly the Plot Style menu");
         JMenuItem mi;
 
         result.setName(plot.getId()+"_ezaccessmenu");
