@@ -140,6 +140,11 @@ public enum RenderType {
                 return ds.rank()==2;
             case stackedHistogram:
                 return ds.rank()==2;
+            case bounds:
+                return Schemes.isBoundingBox(ds) 
+                        || Schemes.isArrayOfBoundingBox(ds) 
+                        || ( Schemes.isTrajectory(ds) || ds.length(0)==2 )
+                        || Schemes.isRank2Bins(ds);
             default:
                 return true;
         }
