@@ -922,7 +922,7 @@ public class GuiSupport {
     public static JMenu createEZAccessMenu(final Plot plot) {
 
         JMenu result = new JMenu("Plot Element Type");
-        result.setToolTipText("Plot Type was formerly the Plot Style menu");
+        result.setToolTipText("Plot Element Type was formerly the Plot Style menu");
         JMenuItem mi;
 
         result.setName(plot.getId()+"_ezaccessmenu");
