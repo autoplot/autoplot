@@ -28,7 +28,7 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-11-28 r26808):</p>
+        <p>Bugfixes (2022-11-29 r26816):</p>
         <ul> 
             <li>Das2Server editor would do web request on event thread, which can hang the GUI.
             <li>correction to histogram dialog when "manual" is selected.  Thanks, Sadie!
@@ -65,7 +65,8 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>bounds renderer supports bounding interval time series.
+            <li>"Plot Style" subpanel renamed "Plot Type", since "Plot Style" is used elsewhere and it's a poor name anyway.
+            <li>bounds renderer supports bounding interval time series and output of contour (trajectories).
             <li>new array-of-bounding-boxes dataset scheme, supported in the bounds renderer.
             <li>bounds renderer supports polar plot annotations, array of bounds, and different hashes.
             <li>allow export resizeOption="resize" to avoid constant querying which prevents scripts from running.
