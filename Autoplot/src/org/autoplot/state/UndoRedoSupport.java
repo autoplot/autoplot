@@ -324,6 +324,20 @@ public class UndoRedoSupport {
                     logger.severe("IndexOutOfBounds error that needs to be fixed because needs synchronization");
                 }
             }
+            pattern= Pattern.compile("plots\\[(\\d+)\\].xaxis.scale");
+            m= pattern.matcher(s.propertyName());
+            if ( m.matches() ) {
+                try {
+                    Plot p= dom.getPlots( Integer.parseInt(m.group(1) ) );
+                    BindingModel bm= DomUtil.findBinding( dom, p.getXaxis(), "range", dom, "timeRange" );
+                    //BindingModel bm= dom.getController().findBinding( p.getXaxis(), "range", dom, "timeRange" );
+                    if ( bm!=null ) {
+                        timeRangeBound.add(s);
+                    }
+                } catch ( IndexOutOfBoundsException ex ) {
+                    logger.severe("IndexOutOfBounds error that needs to be fixed because needs synchronization");
+                }
+            }
         }
         diffs.removeAll(timeRangeBound);
         return diffs;
