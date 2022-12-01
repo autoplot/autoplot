@@ -23,6 +23,7 @@ import org.autoplot.datasource.MetadataModel;
 import org.das2.qds.ops.Ops;
 import org.autoplot.metatree.IstpMetadataModel;
 import org.autoplot.metatree.MetadataUtil;
+import org.das2.datum.EnumerationUnits;
 import org.das2.datum.UnitsUtil;
 import ucar.ma2.DataType;
 import ucar.ma2.InvalidRangeException;
@@ -393,55 +394,55 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         if ( o!=null && o instanceof String ) {
             properties.put( QDataSet.FORMAT, MetadataUtil.normalizeFormatSpecifier( (String)o ) );
         }
+
+        EnumerationUnits eu= null;
         
         if ( data==null ) {
             if ( cdata==null ) {
                 throw new RuntimeException("Either data or cdata should be defined at this point");
             }
-            //20110101T00:00 is 14 chars long.  "2011-Jan-01T00:00:00.000000000     " is 35 chars long. (LANL has padding after the times to make it 35 characters long.)
-            if ( shape.length==2 && shape[1]>=14 && shape[1]<=35 ) { // NASA/Goddard translation service formats Times as strings, check for this.
-                logger.fine("parsing times formatted in char arrays");
-                data= new double[shape[0]];
-                String ss= new String(cdata);
-                TimeParser tp= null;
-                boolean tryGuessTimeParser= true;
-                for ( int i=0; i<shape[0]; i++ ) {
-                    int n= i*shape[1];
-                    String s= ss.substring( n, n+shape[1] );
-                    try {
-                        if ( tp!=null ) {
-                            data[i]= tp.parse(s).getTime(Units.us2000);
-                        } else {
+            logger.fine("parsing times formatted in char arrays");
+            data= new double[shape[0]];
+            String ss= new String(cdata);
+            TimeParser tp= null;
+            boolean tryGuessTimeParser= true;
+            for ( int i=0; i<shape[0]; i++ ) {
+                int n= i*shape[1];
+                String s= ss.substring( n, n+shape[1] );
+                try {
+                    if ( tp!=null ) {
+                        data[i]= tp.parse(s).getTime(Units.us2000);
+                    } else {
+                        if ( tryGuessTimeParser && TimeParser.isIso8601String(s) ) {
                             data[i] = Units.us2000.parse(s).doubleValue(Units.us2000);
-                        }
-                    } catch (ParseException ex) {
-                        if ( tryGuessTimeParser ) {
-                            tryGuessTimeParser= false;
                             tp= guessTimeParser(s);
-                            if ( tp==null ) {
-                                data[i]= Units.us2000.getFillDouble();
-                            } else {
-                                try {
-                                    data[i]= tp.parse(s).getTime(Units.us2000);
-                                } catch ( ParseException ex2 ) {
-                                    data[i]= Units.us2000.getFillDouble();
-                                }
-                            }
                         } else {
-                            data[i]= Units.us2000.getFillDouble();
+                            tryGuessTimeParser= false;
+                            if ( eu==null ) eu= Units.nominal("netcdf");
+                            data[i] = eu.createDatum(s).doubleValue(eu);
                         }
                     }
+                } catch ( ParseException ex ) {
+                    data[i]= Double.NaN;
                 }
-                properties.put(QDataSet.UNITS,Units.us2000);
-                shape= new int[] { shape[0] };
-            } else {
-                data= (double[])a.get1DJavaArray( Double.class ); // whoops, it wasn't NASA/Goddard data after all.
             }
+            if ( eu!=null ) {
+                properties.put(QDataSet.UNITS,eu);
+            } else {
+                properties.put(QDataSet.UNITS,Units.us2000);
+            }
+            shape= new int[] { shape[0] };            
         }
 
         if ( attributes.containsKey("_FillValue" ) ) {
-            double fill= Double.parseDouble( (String) attributes.get("_FillValue") );
-            properties.put( QDataSet.FILL_VALUE, fill );
+            String sfill= (String) attributes.get("_FillValue");
+            if ( eu!=null ) {
+                properties.put( QDataSet.FILL_VALUE, eu.createDatum(sfill).doubleValue(eu) );
+            } else {
+                double fill= Double.parseDouble( sfill );
+                properties.put( QDataSet.FILL_VALUE, fill );
+            }
+            
         }
 
         o= attributes.get("missing_value");
