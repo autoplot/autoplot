@@ -330,6 +330,30 @@ public class UndoRedoSupport {
     }
 
     /**
+     * remove extra xaxis differences that are redundant because of scale change.
+     * @param dom the model, presumably containing the same plots and bindings.
+     * @param diffs
+     * @return
+     */
+    private static List<Diff> removeRedundantDiffs( Application dom, List<Diff> diffs ) {
+        diffs= new ArrayList( diffs );
+        List<Diff> removeUs= new ArrayList();
+        for (Diff s : diffs) {
+            Pattern pattern= Pattern.compile("plots\\[(\\d+)\\].([xyz])axis.range");
+            Matcher m= pattern.matcher(s.propertyName());
+            if ( m.matches() ) {
+                for (Diff s2 : diffs) {
+                    if ( s2.propertyName().equals( "plots["+m.group(1)+"]."+m.group(2)+"axis.scale" ) ) {
+                        removeUs.add(s);
+                    }
+                }
+            }
+        }
+        diffs.removeAll(removeUs);
+        return diffs;
+    }
+
+    /**
      * provide a human-readable description of the given diffs.
      * @param diffs list of differences to describe.
      * @param element really only provided to contain the output.
@@ -349,6 +373,7 @@ public class UndoRedoSupport {
         String focus=null;
 
         diffs= removeTimeRangeBindings( this.applicationModel.getDocumentModel(), diffs );
+        diffs= removeRedundantDiffs( this.applicationModel.getDocumentModel(), diffs );
 
         for (Diff s : diffs) {
             if (s.getDescription().contains("plotDefaults")) {
