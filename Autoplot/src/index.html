@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>The "bounds" renderer works again with a time series of bounding intervals, and hash fill has been added.  <a href="https://github.com/autoplot/dev/blob/master/demos/2022/20221118/boundsTimeSeries.jy">This script</a> demos.
+        <p><small>Bounds renderer supports output from contour routine.  <a href="https://github.com/autoplot/dev/blob/master/demos/2022/20221118/boundsDemoScatterBreak.jy">This script</a> demos.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,13 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-11-29 r26816):</p>
+        <p>Bugfixes (2022-12-01 r26816):</p>
         <ul> 
+            <li>don't paint the DasAxis when the initial resize hasn't happened.
+            <li>Remove redundant "range" and "scale" label from undo list.  Correction to where undo wasn't kept.
+        </ul>
+        <p>Older Bugfixes (2022-11-29 r26816):</p>
+        <ul>
             <li>Das2Server editor would do web request on event thread, which can hang the GUI.
             <li>correction to histogram dialog when "manual" is selected.  Thanks, Sadie!
             <li>new code checking for "NaN to NaN" in DatumRange didn't consider that Datum might be time location. 
@@ -47,25 +52,13 @@
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2481/">2481</a>: ASCII file multi-field times with tab delimiters can now be read.  Thanks, Bill!
             <li>Improve feedback when PNGWalk setTimeRange is called but images do not contain URI templates like $Y$m$d.png.
         </ul>
-        <p>Older Bugfixes (2022-10-08 r26747):</p>
-        <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2480/">2480</a>: slice1 was dropping the fill value found within a dataset, correct this for now by using unbundle.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2479/">2479</a>: vap+cdaweb needs old initialization with some data sets, back out the change.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2475/">2475</a>: corrections to pngwalks with $Y$m$d_$x.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2477/">2477</a>: aggregate all clears "vap+internal" datasets.  Thanks Cindy!
-            <li>skip the cadence check when there are 100,000,000 or more points and the x ds are just indices.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2453/">2453</a>: correction in loading of CDFs which prevented huge (>2GB CDFs) from being loaded and data exported. Thanks, Kristoff!
-            <li>editor tools scripts were loaded on the event thread, causing hang when internet is not available.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2476/">2476</a>: validate check on BINS_1 min&lt;max resulted in test148 failing.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2475/">2475</a>: kludgey solution for pngwalks with $Y$m$d_$x.  This will be studied again soon.  Thanks, Sadie!
-            <li>CDF GUI doesn't offer rank 3 datasets for X and Y.
-            <li>special (kludgey) code to prevent "createScreenShot.jy" from loading automatically.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2134/">2134</a>: rank 1 indices for rank 2 dataset was incorrectly implemented.
-            <li>Correction to fast branch for reduceMean.
-        </ul>
         <p>Features:</p>
         <ul>
-            <li>"Plot Style" submenu renamed "Plot Type", since "Plot Style" is used elsewhere and it's a poor name anyway.
+            <li><a href='https://sourceforge.net/p/autoplot/feature-requests/793/'>793</a>: handle nominal data in NetCDF (and HDF5).  Thanks, JM!
+        </ul>
+        <p>Less recent features:</p>
+        <ul>
+            <li>"Plot Style" submenu renamed "Plot Element Type", since "Plot Style" is used elsewhere and it's a poor name anyway.
             <li>bounds renderer supports bounding interval time series and output of contour (trajectories).
             <li>new array-of-bounding-boxes dataset scheme, supported in the bounds renderer.
             <li>bounds renderer supports polar plot annotations, array of bounds, and different hashes.
@@ -74,13 +67,6 @@
             <li>New kernel spectrogram rebinner is available, where points are spread out and mixed together.
             <li>dataset command handles DatumVector class, which is an array of Datums.
             <li>Jython editor "jump to" includes methods within classes.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>handle completions on Jython object with fields.
-            <li>Butterworth filter accepts rank 2 waveform data.  detrend1 added for rank 2 waveform data.
-            <li><a href='https://github.com/das-developers/das2java/issues/35'>35</a>: Improve support for DEPEND_0 with bins data set. 
-            <li><a href='https://github.com/das-developers/das2java/issues/18'>18</a>: New tick logic used on one or two-cycle log axes.
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
