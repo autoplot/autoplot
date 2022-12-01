@@ -1633,6 +1633,7 @@ APSplash.checkTime("init 270");
                     }
                 } else {
                     //I've hit this state before when loading empty vap file: file:///home/jbf/ct/autoplot/script/demos/interpolateToCommonTags2.vap
+                    undoRedoSupport.pushState(evt,"????");
                     logger.fine("tickleTimer contained no messages.");
                 }
 
