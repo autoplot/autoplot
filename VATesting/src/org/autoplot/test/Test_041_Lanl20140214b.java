@@ -72,14 +72,14 @@ public class Test_041_Lanl20140214b implements Scenario {
             waitUntilIdle();
 
             Util.pushContextMenu( dom.getPlots(0).getController().getDasPlot(),
-                    new String[] { "Plot Style", "Series" } );
+                    new String[] { "Plot Element Type", "Series" } );
             
             waitUntilIdle();
             
             writeToPng( "Test_041_Lanl20140214b.002.png");
             
             Util.pushContextMenu( dom.getPlots(0).getController().getDasPlot(),
-                    new String[] { "Plot Style", "Series" } );
+                    new String[] { "Plot Element Type", "Series" } );
             
             waitUntilIdle();
             
