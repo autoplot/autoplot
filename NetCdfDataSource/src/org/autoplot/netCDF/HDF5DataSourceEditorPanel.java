@@ -493,11 +493,11 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                     
                 } else {
                 
-                    boolean isFormattedTime= v.getDataType()==DataType.CHAR && v.getRank()==2 && v.getShape(1)>=14;
-                    if ( isFormattedTime ) {
+                    boolean isFormattedStringsOrTime= v.getDataType()==DataType.CHAR && v.getRank()==2;
+                    if ( isFormattedStringsOrTime ) {
                         logger.log(Level.FINE, "detected formatted time: {0}", v.getName());
                     }
-                    if ( !isFormattedTime && !v.getDataType().isNumeric() ) continue;
+                    if ( !isFormattedStringsOrTime && !v.getDataType().isNumeric() ) continue;
                     StringBuilder description= new StringBuilder( v.getName()+"[" );
                     for ( int k=0; k<v.getDimensions().size(); k++ ) {
                         Dimension d= v.getDimension(k);
