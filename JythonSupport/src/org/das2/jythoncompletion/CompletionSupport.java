@@ -469,7 +469,9 @@ public class CompletionSupport {
                 return new CompletionContext( CompletionContext.METHOD_NAME, contextString, tokens.get(myTokenIndex).image );
             } else if ( tokens.get(myTokenIndex).kind==PythonGrammarConstants.SINGLE_STRING  // some completions provided for strings.
                     ||  tokens.get(myTokenIndex).kind==PythonGrammarConstants.SINGLE_STRING2 ) {
-                if ( myTokenIndex>3 && tokens.get(myTokenIndex-4).kind==PythonGrammarConstants.NAME && tokens.get(myTokenIndex-2).kind==PythonGrammarConstants.NAME) { // phib= getDataSet( f + '?column=' )
+                if ( myTokenIndex>3 && tokens.get(myTokenIndex-4).kind==PythonGrammarConstants.NAME 
+                        && tokens.get(myTokenIndex-2).kind==PythonGrammarConstants.NAME 
+                        && tokens.get(myTokenIndex-3).kind!=PythonGrammarConstants.EQUAL ) { // phib= getDataSet( f + '?column=' )
                     return new CompletionContext( CompletionContext.STRING_LITERAL_ARGUMENT, tokens.get(myTokenIndex-4).image, tokens.get(myTokenIndex).image );
                 } else if ( myTokenIndex>1 && tokens.get(myTokenIndex-2).kind==PythonGrammarConstants.NAME ) { // phib= getDataSet( 'https://rbspgway.jhuapl.edu/share/ac6/data/AC6-A/2014/AC6-A_20141231_V03.tgz/AC6-A_20141231_L2_survey_V03.csv' )
                     return new CompletionContext( CompletionContext.STRING_LITERAL_ARGUMENT, tokens.get(myTokenIndex-2).image, tokens.get(myTokenIndex).image );
