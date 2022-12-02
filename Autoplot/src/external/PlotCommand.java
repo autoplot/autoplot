@@ -3,9 +3,12 @@ package external;
 
 import java.awt.Color;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,6 +25,7 @@ import org.python.core.PyObject;
 import org.python.core.PyString;
 import org.autoplot.RenderType;
 import org.autoplot.ScriptContext;
+import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.CanvasUtil;
 import org.autoplot.dom.Column;
@@ -34,11 +38,13 @@ import org.autoplot.dom.Row;
 import org.das2.qds.QDataSet;
 import org.autoplot.jythonsupport.JythonOps;
 import org.autoplot.jythonsupport.PyQDataSetAdapter;
+import org.das2.datum.DatumRangeUtil;
 import org.das2.graph.FillStyle;
 import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.ops.Ops;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.python.core.PyJavaInstance;
 import org.python.core.PyList;
 import org.python.core.PyMethod;
@@ -353,6 +359,15 @@ public class PlotCommand extends PyObject {
 
         if ( nargs==1 && po0 instanceof PyString ) {
             ScriptContext.plot( iplot, ((PyString) po0).toString());
+        } else if ( nargs==2 && po0 instanceof PyString && args[1] instanceof PyString ) {
+            DatumRange drtr= DatumRangeUtil.parseTimeRangeValid(((PyString)args[1]).toString() );
+            try{
+                String uri= DataSourceUtil.setTimeRange( ((PyString) po0).toString(), drtr, new NullProgressMonitor() );
+                ScriptContext.plot( iplot, uri );          
+            } catch ( IOException | URISyntaxException | ParseException ex ) {
+                throw new RuntimeException(ex);
+            }
+            
         } else {
             for ( int i=0; i<nargs; i++ ) {
                 QDataSet ds= coerceIt(args[i]);
