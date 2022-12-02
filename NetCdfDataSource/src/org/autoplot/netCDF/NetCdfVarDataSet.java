@@ -413,12 +413,17 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                     if ( tp!=null ) {
                         data[i]= tp.parse(s).getTime(Units.us2000);
                     } else {
-                        if ( tryGuessTimeParser && TimeParser.isIso8601String(s) ) {
-                            data[i] = Units.us2000.parse(s).doubleValue(Units.us2000);
-                            tp= guessTimeParser(s);
-                        } else {
+                        if ( tryGuessTimeParser ) { // see if it is a time, and if not load it as nominal data.
                             tryGuessTimeParser= false;
-                            if ( eu==null ) eu= Units.nominal("netcdf");
+                            tp= guessTimeParser(s); 
+                            if ( tp==null ) {
+                                eu= Units.nominal("netcdf");
+                            }
+                        }
+                        if ( tp!=null ) {
+                            data[i] = tp.parse(s).getTime(Units.us2000);
+                        } else {
+                            assert eu!=null;
                             data[i] = eu.createDatum(s).doubleValue(eu);
                         }
                     }
