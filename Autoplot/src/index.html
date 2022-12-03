@@ -28,9 +28,11 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-12-01 r26816):</p>
+        <p>Bugfixes (2022-12-03 r26816):</p>
         <ul> 
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2490/">2490</a>renderType propagates though binary operations, because histogram vanish would dissappear when divided.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2490/">2491</a>: plot( uri, timerange, monitor ) is supported.
+            <li>RTEs should be sent to cottagesystems.com, not jfaden.net, to work around SSL certificate issue.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2490/">2490</a>: renderType propagates though binary operations, because histogram vanish would dissappear when divided.
             <li>corrections to parsing of "|histogram(2022-09-29T08:36:00Z,2022-09-29T10:07:00Z,1 min )" which supported spaces in some places but not others.
             <li>correction to change which broke completions for "ds=getDataSet('https://&lt;C&gt;')"
             <li>don't paint the DasAxis when the initial resize hasn't happened.
