@@ -39,6 +39,7 @@ import org.autoplot.jythonsupport.Util;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumUtil;
 import org.das2.datum.InconvertibleUnitsException;
+import org.das2.qds.examples.Schemes;
 
 /**
  * Data source used mostly for demonstrations and quick modifications
@@ -392,7 +393,7 @@ public class InlineDataSource extends AbstractDataSource {
             throw new IllegalArgumentException("URI don't contain anything to plot");
         }
         
-        for ( int idep=0; idep<4; idep++ ) {
+        for ( int idep=0; idep<QDataSet.MAX_RANK; idep++ ) {
             Map<String,String> depp= deppropn[idep];
             if ( depp==null ) continue;
             for ( Entry<String,String> ent: depp.entrySet() ) {
@@ -444,6 +445,8 @@ public class InlineDataSource extends AbstractDataSource {
                     if ( ds.property(QDataSet.RENDER_TYPE)!=null ) zz.putProperty(QDataSet.RENDER_TYPE,ds.property(QDataSet.RENDER_TYPE)); // vap+inline:0,0,100,100,0,0; 0,0,0,100,100,0&RENDER_TYPE=scatter
                     zz.putProperty( QDataSet.DEPEND_0, xx );
                     ds= zz;
+                } else if ( Schemes.isBoundingBox(ds) ) {
+                    // do nothing
                 } else {
                     MutablePropertyDataSet xx= DDataSet.copy(DataSetOps.slice1(ds,0));
                     MutablePropertyDataSet zz= DDataSet.copy(DataSetOps.slice1(ds,ds.length(0)-1));
