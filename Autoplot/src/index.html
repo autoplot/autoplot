@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Bounds renderer supports output from contour routine.  <a href="https://github.com/autoplot/dev/blob/master/demos/2022/20221118/boundsDemoScatterBreak.jy">This script</a> demos.
+        <p><small>New boundsDataset command parses string to make bounding boxes, using vap+inline:boundsDataset('2003-04-05;5to50')&RENDER_TYPE='bounds>fillTexture=hash&fillColor=blue&color=blue'
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,10 +28,10 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-12-03 r26816):</p>
+        <p>Bugfixes (2022-12-05 r26835):</p>
         <ul> 
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2490/">2491</a>: plot( uri, timerange, monitor ) is supported.
-            <li>RTEs should be sent to cottagesystems.com, not jfaden.net, to work around SSL certificate issue.
+            <li>RTEs are sent to cottagesystems.com, not jfaden.net, to work around SSL certificate issue.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2490/">2490</a>: renderType propagates though binary operations, because histogram vanish would dissappear when divided.
             <li>corrections to parsing of "|histogram(2022-09-29T08:36:00Z,2022-09-29T10:07:00Z,1 min )" which supported spaces in some places but not others.
             <li>correction to change which broke completions for "ds=getDataSet('https://&lt;C&gt;')"
@@ -59,6 +59,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>boundsDataset command allows bounding boxes to be created without scripts.
             <li><a href='https://sourceforge.net/p/autoplot/feature-requests/793/'>793</a>: handle nominal data in NetCDF (and HDF5).  Thanks, JM!
         </ul>
         <p>Less recent features:</p>
