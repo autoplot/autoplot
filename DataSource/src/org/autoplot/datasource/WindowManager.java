@@ -190,9 +190,9 @@ public class WindowManager {
         WindowManager.getInstance().recallWindowSizePosition(dia);
         try { 
             dia.setVisible(true);
-        } catch ( ClassCastException ex ) {
+        } catch ( Exception ex ) {
             logger.log( Level.WARNING, null, ex ); // TODO: bug2293: explore where this comes from.
-        }
+        } 
         WindowManager.getInstance().recordWindowSizePosition(dia);        
     }
     
