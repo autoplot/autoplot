@@ -607,7 +607,7 @@ public class JythonUtil {
      * @see SimplifyScriptSupport#okay
      */
     final static String[] okay = new String[] {
-        "range,", "xrange,", "irange,","map,","join,",
+        "range,", "xrange,", "irange,","map,","join,","len,","dict,","zip,",
         "getParam,", "lower,", "upper,", "URI,", "URL,",
         "setScriptDescription", "setScriptTitle", "setScriptLabel", "setScriptIcon",
         "DatumRangeUtil,", "TimeParser,",
@@ -1100,7 +1100,7 @@ public class JythonUtil {
      *
      * @param ss the entire script, ss[0] is empty string so that ss[1] is the first line of the script.
      * @param stmts statements being processed.
-     * @param variableNames variable names that have been resolved.
+     * @param variableNames variable/procedure names that have been resolved.
      * @param beginLine first line of the script being processed.
      * @param lastLine INCLUSIVE last line of the script being processed.
      * @param depth recursion depth, for debugging.
@@ -1405,6 +1405,11 @@ public class JythonUtil {
         variableNames.add("URL");
         variableNames.add("True");
         variableNames.add("False");
+        variableNames.add("range");
+        variableNames.add("xrange");
+        variableNames.add("map");
+        variableNames.add("dict");
+        variableNames.add("zip");
 
         try {
             Module n = (Module) org.python.core.parser.parse(script, "exec");
