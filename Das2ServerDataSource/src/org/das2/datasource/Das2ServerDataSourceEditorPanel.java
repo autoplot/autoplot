@@ -958,7 +958,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     private void das2ServerComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_das2ServerComboBoxActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
         Object o= das2ServerComboBox.getSelectedItem();
-        if ( o!=null ) {
+        if ( o!=null && String.valueOf(o).length()>0 ) {
             try {
                 URL url= new URL(String.valueOf(o));
                 setServerURL( url.toString() );
@@ -1103,11 +1103,15 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         URISplit split= URISplit.parse(uri);
 
-        String uriServerUrl= DataSetURI.fromUri( split.resourceUri );
-        if ( uriServerUrl.length()>0 && !uriServerUrl.startsWith("file:/") ) {
-            serverURL= uriServerUrl;
-        } else {
+        if ( split.resourceUri==null ) {
             serverURL= "";
+        } else {
+            String uriServerUrl= DataSetURI.fromUri( split.resourceUri );
+            if ( uriServerUrl.length()>0 && !uriServerUrl.startsWith("file:/") ) {
+                serverURL= uriServerUrl;
+            } else {
+                serverURL= "";
+            }
         }
 
         Map<String,String> params= URISplit.parseParams(split.params);
