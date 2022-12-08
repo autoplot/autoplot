@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>New boundsDataset command used with in-line source to add box, and an annotation is used to add a label.
+        <p><small>Moon position in GSE from AMDA HAPI server.  (vap+hapi:http://amda.irap.omp.eu/service/hapi?id=moon-earth-all&amp;parameters=Time,xyz_moon_gsm and <a href='https://github.com/autoplot/dev/blob/master/demos/2022/20221208/moon-gse-hapi.vap'>vap on GitHub</a>.)
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -30,6 +30,7 @@
                 
         <p>Bugfixes (2022-12-08 r26838):</p>
         <ul> 
+            <li>vap+hapi:http://amda.irap.omp.eu/service/hapi?id=ace-epam-ca60&amp;parameters=Time,ace_epam_ca60_he&amp;timerange=2022-06-16 showed where kernel-rebinner wasn't expecting a bins dataset.
             <li>bug with das2server when "vap+das2server:" was entered, as with File->Add Plot From->Das2Server.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2490/">2491</a>: plot( uri, timerange, monitor ) is supported.
             <li>RTEs are sent to cottagesystems.com, not jfaden.net, to work around SSL certificate issue.
