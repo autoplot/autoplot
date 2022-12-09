@@ -20,6 +20,7 @@ import java.beans.PropertyChangeListener;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -659,6 +660,34 @@ public class CanvasController extends DomNodeController {
     }
 
     /**
+     * find a group of count columns side-by-side, returning null if none exists.  This presently handles only
+     * the simple case where the dom contains either a single column or n-column plots.
+     * @param count
+     * @return 
+     */
+    private List<Column> findColumnSet( int count ) {
+        Column[] cc= canvas.getColumns();
+                
+        if ( cc.length==count ) {
+            double[] mins= new double[count];
+            double[] maxs= new double[count];
+            
+            for ( int i=0; i<cc.length; i++ ) {
+                mins[i]= cc[i].getController().dasColumn.getDMinimum();
+                maxs[i]= cc[i].getController().dasColumn.getDMaximum();
+                if ( i>0 ) {
+                    if ( mins[i]<maxs[i-1] ) { // there's an overlap
+                        return null; 
+                    }
+                }
+            }
+            return Arrays.asList(cc);
+        } else {
+            return null;
+        }
+    }
+    
+    /**
      * add columns to the current plot.
      * @param count number of columns to add, must be &gt; 1.
      * @return a list of the new Columns.
@@ -667,7 +696,10 @@ public class CanvasController extends DomNodeController {
         
         if ( count<2 ) throw new IllegalArgumentException("count must be greater than 1");
         
-        List<Column> result = new ArrayList();
+        List<Column> result= findColumnSet(count);
+        if ( result!=null ) return result;
+        
+        result = new ArrayList();
 
         DomLock lock = changesSupport.mutatorLock();
         lock.lock( "Add Columns");
