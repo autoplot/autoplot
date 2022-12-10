@@ -44,6 +44,12 @@ public class AutoRangeHintsStringSchemeEditor extends javax.swing.JPanel impleme
         logFalseRB = new javax.swing.JRadioButton();
         centerCB = new javax.swing.JCheckBox();
         centerTextField = new javax.swing.JTextField();
+        minValueCB = new javax.swing.JCheckBox();
+        minValueTF = new javax.swing.JTextField();
+        maxValueCB = new javax.swing.JCheckBox();
+        maxValueTF = new javax.swing.JTextField();
+        extendByPercentCB = new javax.swing.JCheckBox();
+        extendByPercentTF = new javax.swing.JTextField();
 
         jLabel1.setText("Auto Range Hints");
 
@@ -84,6 +90,27 @@ public class AutoRangeHintsStringSchemeEditor extends javax.swing.JPanel impleme
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, centerCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), centerTextField, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
+        minValueCB.setText("Min Value");
+
+        minValueTF.setText("0");
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, minValueCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), minValueTF, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
+        maxValueCB.setText("Max Value");
+
+        maxValueTF.setText("100");
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, maxValueCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), maxValueTF, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
+        extendByPercentCB.setText("Extend by Percent");
+
+        extendByPercentTF.setText("10");
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, extendByPercentCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), extendByPercentTF, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -91,15 +118,12 @@ public class AutoRangeHintsStringSchemeEditor extends javax.swing.JPanel impleme
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(18, 18, 18))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(12, 12, 12)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(includeZeroCB)
-                            .addComponent(logCB)
-                            .addComponent(widthCheckBox)
-                            .addComponent(widthsCheckBox)
-                            .addComponent(centerCB)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(21, 21, 21)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -109,8 +133,34 @@ public class AutoRangeHintsStringSchemeEditor extends javax.swing.JPanel impleme
                                         .addComponent(logTrueRB)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(logFalseRB))
-                                    .addComponent(centerTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE))))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(minValueTF, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(0, 0, Short.MAX_VALUE))))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(minValueCB)
+                                .addGap(96, 96, 96)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(21, 21, 21)
+                                        .addComponent(maxValueTF, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(0, 0, Short.MAX_VALUE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(maxValueCB)
+                                        .addContainerGap(266, Short.MAX_VALUE))))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(extendByPercentCB)
+                                    .addComponent(includeZeroCB)
+                                    .addComponent(logCB)
+                                    .addComponent(widthCheckBox)
+                                    .addComponent(widthsCheckBox)
+                                    .addComponent(centerCB)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(21, 21, 21)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(centerTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)
+                                            .addComponent(extendByPercentTF, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addGap(0, 0, Short.MAX_VALUE))))))
         );
 
         layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {centerTextField, widthTextField});
@@ -140,7 +190,19 @@ public class AutoRangeHintsStringSchemeEditor extends javax.swing.JPanel impleme
                 .addComponent(centerCB)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(centerTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(minValueCB)
+                    .addComponent(maxValueCB))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(minValueTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(maxValueTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(extendByPercentCB)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(extendByPercentTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(89, Short.MAX_VALUE))
         );
 
         bindingGroup.bind();
@@ -176,6 +238,18 @@ public class AutoRangeHintsStringSchemeEditor extends javax.swing.JPanel impleme
         } else {
             centerCB.setSelected(false);
         }
+        if ( params.containsKey("min") ) {
+            minValueCB.setSelected(true);
+            minValueTF.setText(params.get("min"));
+        }
+        if ( params.containsKey("max") ) {
+            maxValueCB.setSelected(true);
+            maxValueTF.setText(params.get("max"));
+        }
+        if ( params.containsKey("extend") ) {
+            extendByPercentCB.setSelected(true);
+            extendByPercentTF.setText(params.get("extend"));
+        }
             
     }
 
@@ -197,6 +271,15 @@ public class AutoRangeHintsStringSchemeEditor extends javax.swing.JPanel impleme
         if ( centerCB.isSelected() ) {
             b.append("&center=").append( centerTextField.getText().trim() );
         }
+        if ( minValueCB.isSelected() ) {
+            b.append("&min=").append(minValueTF.getText().trim());
+        }
+        if ( maxValueCB.isSelected() ) {
+            b.append("&max=").append(maxValueTF.getText().trim());
+        }
+        if ( extendByPercentCB.isSelected() ) {
+            b.append("&extend=").append(extendByPercentTF.getText().trim());
+        }
         return b.length()==0 ? "" : b.substring(1);
     }
 
@@ -214,11 +297,17 @@ public class AutoRangeHintsStringSchemeEditor extends javax.swing.JPanel impleme
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JCheckBox centerCB;
     private javax.swing.JTextField centerTextField;
+    private javax.swing.JCheckBox extendByPercentCB;
+    private javax.swing.JTextField extendByPercentTF;
     private javax.swing.JCheckBox includeZeroCB;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JCheckBox logCB;
     private javax.swing.JRadioButton logFalseRB;
     private javax.swing.JRadioButton logTrueRB;
+    private javax.swing.JCheckBox maxValueCB;
+    private javax.swing.JTextField maxValueTF;
+    private javax.swing.JCheckBox minValueCB;
+    private javax.swing.JTextField minValueTF;
     private javax.swing.JCheckBox widthCheckBox;
     private javax.swing.JTextField widthTextField;
     private javax.swing.JCheckBox widthsCheckBox;
