@@ -462,7 +462,7 @@ public class DomOps {
             double MaxUpJEm;
             double MaxDownPx;
             for ( Plot plotj : plots ) {
-                if ( plotj.getColumnId().equals( dom.getCanvases(0).getMarginColumn().getId() ) ) {
+                if ( true ) { //TODO: this was a check against the margin column.  Why?
                     String title= plotj.getTitle();
                     String content= title; // title.replaceAll("(\\!c|\\!C|\\<br\\>)", " ");
                     boolean addLines= plotj.isDisplayTitle() && content.trim().length()>0;
