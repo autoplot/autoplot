@@ -913,14 +913,18 @@ public final class PlotController extends DomNodeController {
      * implement hints like width=40&amp;includeZero=T.  
      * <blockquote><pre>
      * includeZero   T or F     make sure that zero is within the result.
+     * min           0          make zero be the minimum value.
+     * max           100        make 100 be the maximum value
      * width         30nT       use this width.  This is a formatted datum which 
      *                          is parsed with the units of the axis, or with the number of cycles for log.
      * log           T or F     force log or linear axis
      * widths        30nT,300nT,3000nT   use one of these widths
      * center        0          constrain the center to be this location
+     * extend        10         percent to extend the range beyond the min and the max, so the width is this percent more.  This is done after other constraints.
+     *               0,10       percent the max by ten percent.
      * (not yet) reluctant     T or F     use the old range if it is acceptable.
      * </pre></blockquote>
-
+     * Width or width imply that extend=0, but extend=10 may become the default.
      * @param axis the axis to which we are applying the hints.
      * @param hintsString the string, ampersand-delimited; or null when no hints should be applied.
      */
@@ -930,10 +934,29 @@ public final class PlotController extends DomNodeController {
         boolean log= axis.isLog();
 
         boolean includeZero= "T".equals(hints.get("includeZero"));
+        Datum minValue= null;
+        {
+            String s= hints.get("min");
+            if ( s!=null ) try {
+                minValue= axis.getRange().getUnits().parse(s);
+            } catch (ParseException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        }
+        Datum maxValue= null;
+        {
+            String s= hints.get("max");
+            if ( s!=null ) try {
+                maxValue= axis.getRange().getUnits().parse(s);
+            } catch (ParseException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        }
         String width= hints.get("width");
         String widths= hints.get("widths");
         String center= hints.get("center");
         String logHint= hints.get("log");
+        String extend= hints.get("extend");
 
         if ( logHint!=null && UnitsUtil.isRatioMeasurement( axis.getRange().getUnits() ) ) {
             if ( logHint.equals("T") ) {
@@ -1022,6 +1045,29 @@ public final class PlotController extends DomNodeController {
                 }
             }
         }
+        
+        if ( minValue!=null && UnitsUtil.isRatioMeasurement(range.getUnits() ) ) {
+            if ( widths==null && width==null ) {
+                if ( range.max().gt(minValue) ) {
+                    range= DatumRange.newRange( minValue, range.max() );
+                }
+            } else {
+                Datum w= range.width();
+                range= DatumRange.newRange( minValue, minValue.add(w) );
+            }
+        }
+        
+        if ( maxValue!=null && UnitsUtil.isRatioMeasurement(range.getUnits() ) ) {
+            if ( widths==null && width==null ) {
+                if ( range.min().lt(maxValue) ) {
+                    range= DatumRange.newRange( range.min(), maxValue );
+                }
+            } else {
+                Datum w= range.width();
+                range= DatumRange.newRange( maxValue.subtract(w), maxValue );
+            }
+        }
+
         if ( center!=null ) {
             Units u= range.getUnits();
             try {
@@ -1042,6 +1088,23 @@ public final class PlotController extends DomNodeController {
                 logger.log(Level.WARNING, null, ex);
             }              
         }
+        
+        if ( extend!=null ) {
+            double dextendmin,dextendmax;
+            if ( extend.contains(",") ) {
+                String[] ss= extend.split(",");
+                dextendmin= Double.parseDouble(ss[0])/100;
+                dextendmax= Double.parseDouble(ss[1])/100;
+            } else {
+                dextendmax= dextendmin= Double.parseDouble(extend)/100/2;
+            }
+            if ( log ) {
+                range= DatumRangeUtil.rescaleLog( range, 0-dextendmin, 1+dextendmax );
+            } else {
+                range= DatumRangeUtil.rescale( range, 0-dextendmin, 1+dextendmax );
+            }
+        }
+        
         AxisController ac= axis.getController();
         if ( ac!=null ) {
             ac.setRangeAutomatically( range, log );
