@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Moon position in GSE from AMDA HAPI server.  (vap+hapi:http://amda.irap.omp.eu/service/hapi?id=moon-earth-all&amp;parameters=Time,xyz_moon_gsm and <a href='https://github.com/autoplot/dev/blob/master/demos/2022/20221208/moon-gse-hapi.vap'>vap on GitHub</a>.)
+        <p><small>Semi-transparent white used to model the giant snowstorm coming to the middle of the USA.  Happy holidays!
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,7 +28,7 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-12-08 r26838):</p>
+        <p>Bugfixes (2022-12-21 r26838):</p>
         <ul> 
             <li>vap+hapi:http://amda.irap.omp.eu/service/hapi?id=ace-epam-ca60&amp;parameters=Time,ace_epam_ca60_he&amp;timerange=2022-06-16 showed where kernel-rebinner wasn't expecting a bins dataset.
             <li>bug with das2server when "vap+das2server:" was entered, as with File->Add Plot From->Das2Server.
@@ -61,6 +61,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>KernelRebinner supports rank 2 bundle of X,Y,Z.
+            <li>new min, max, and extend autorangeHints.
             <li>boundsDataset command allows bounding boxes to be created without scripts.
             <li><a href='https://sourceforge.net/p/autoplot/feature-requests/793/'>793</a>: handle nominal data in NetCDF (and HDF5).  Thanks, JM!
         </ul>
