@@ -116,16 +116,41 @@ public class DebugPropertyChangeSupport extends PropertyChangeSupport {
     }
 
     public void printListeners(String propName) {
+        List<String> skipSource= Arrays.asList( "org.autoplot.dom.DebugPropertyChangeSupport","org.autoplot.dom.DomNodeController" );        
         PropertyChangeListener[] ll= super.getPropertyChangeListeners(propName);
         for ( PropertyChangeListener l: ll ) {
-            System.err.println(l);
+            if ( DEBUG ) {
+                final String key= l.toString()+ " " + propName;
+                StackTraceElement[] ee= sources.get( key );
+                for ( StackTraceElement e : ee ) {
+                    if ( !skipSource.contains((e.getClassName())) ) {
+                        System.err.println(e);
+                        break;
+                    }
+                }
+            } else {
+                System.err.println(l);
+            }
         }
     }
     
     public void printListeners() {
+        List<String> skipSource= Arrays.asList( "org.autoplot.dom.DebugPropertyChangeSupport","org.autoplot.dom.DomNodeController" );
         PropertyChangeListener[] ll= super.getPropertyChangeListeners();
         for ( PropertyChangeListener l: ll ) {
-            System.err.println(l);
+            if ( DEBUG ) {
+                final String key= l.toString();
+                StackTraceElement[] ee= sources.get( key );
+                for ( StackTraceElement e : ee ) {
+                    if ( !skipSource.contains((e.getClassName())) ) {
+                        System.err.println(e);
+                        break;
+                    }
+                }
+
+            } else {
+                System.err.println(l);
+            }
         }
     }
     
