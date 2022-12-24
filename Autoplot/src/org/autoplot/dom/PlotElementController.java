@@ -2295,10 +2295,40 @@ public class PlotElementController extends DomNodeController {
 
     }
 
+    /**
+     * This is the old updateFillSeries and updateFillSpectrogram code.  
+     * 
+     * This calculates
+     * ranges and preferred symbol settings, and puts the values in peleCopy.plotDefaults.
+     * The dom Plot containing this plotElement should be listening for changes in plotElement.plotDefaults,
+     * and can then decide if it wants to use the autorange settings.
+     *
+     * This also sets the style node of the plotElement copy, so its values should be sync'ed as well.
+     * 
+     * This routine can be found by searching for "liver," since it is not the heart but pretty close to it.
+     * 
+     * @param peleCopy the plot element.
+     * @param props metadata provided by the data source, converted to uniform QDataSet scheme (e.g. get(DEPEND_0).get(TYPICAL_MIN) )
+     * @param fillDs the dataset
+     */
     public static void doAutoranging( PlotElement peleCopy, Map<String,Object> props, QDataSet fillDs ) {
         doAutoranging( peleCopy, props, fillDs, false );
     }
 
+    private static void copyAutorange( Plot p, QDataSet bounds ) {
+        assert Schemes.isBoundingBox(bounds);
+        p.xaxis.setRange( DataSetUtil.asDatumRange( bounds.slice(0),true ) );
+        p.xaxis.setLog( "log".equals( bounds.slice(0).property(QDataSet.SCALE_TYPE) ) );
+        p.yaxis.setRange( DataSetUtil.asDatumRange( bounds.slice(1),true ) );
+        p.yaxis.setLog( "log".equals( bounds.slice(1).property(QDataSet.SCALE_TYPE) ) );
+        if ( bounds.length()>2 ) {
+            p.zaxis.setRange( DataSetUtil.asDatumRange( bounds.slice(2),true ) );
+            p.zaxis.setLog( "log".equals( bounds.slice(2).property(QDataSet.SCALE_TYPE) ) );
+        } else {
+            p.zaxis.setAutoRange(false);
+        }
+    }
+    
     /**
      * This is the old updateFillSeries and updateFillSpectrogram code.  
      * 
@@ -2454,72 +2484,55 @@ public class PlotElementController extends DomNodeController {
             if ( qube==null ) {
                 // nothing
             } else {
-                peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
+                copyAutorange( peleCopy.getPlotDefaults(), qube );
                 String label=  (String) qube.slice(0).property( QDataSet.LABEL );
                 peleCopy.getPlotDefaults().getXaxis().setLabel( label==null ? "" : label );
-                peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
                 label=  (String) qube.slice(1).property( QDataSet.LABEL );
                 peleCopy.getPlotDefaults().getYaxis().setLabel( label==null ? "" : label );
-                if ( qube.length()>2 ) {
-                    peleCopy.getPlotDefaults().getZaxis().setRange( DataSetUtil.asDatumRange( qube.slice(2),true ) );
-                    peleCopy.getPlotDefaults().getZaxis().setLog( "log".equals( qube.slice(2).property(QDataSet.SCALE_TYPE) ) );
-                }
             }
         } else if ( spec==RenderType.digital ) {
             QDataSet qube= DigitalRenderer.doAutorange( fillDs );
             if ( qube==null ) {
                 // nothing
             } else {
-                peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
-                peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
-                peleCopy.getPlotDefaults().getZaxis().setAutoRange(false);
+                copyAutorange( peleCopy.getPlotDefaults(), qube );
             }
         } else if ( spec==RenderType.contour ) {
             QDataSet qube= ContoursRenderer.doAutorange( fillDs );
             if ( qube==null ) {
                 // nothing
             } else {
-                peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
-                peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
-                peleCopy.getPlotDefaults().getZaxis().setAutoRange(false);
+                copyAutorange( peleCopy.getPlotDefaults(), qube );
             }
         } else if ( spec==RenderType.eventsBar ) {
             QDataSet qube= EventsRenderer.doAutorange( fillDs );
             if ( qube==null ) {
                 // nothing
             } else {
-                peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
-                peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
+                copyAutorange( peleCopy.getPlotDefaults(), qube );
                 peleCopy.getPlotDefaults().getYaxis().setAutoRange(false);
                 peleCopy.getPlotDefaults().getYaxis().setVisible(false);
-                peleCopy.getPlotDefaults().getZaxis().setAutoRange(false);
             }
         } else if ( spec==RenderType.vectorPlot ) { //TODO: this should be discoverable
             QDataSet qube= VectorPlotRenderer.doAutorange( fillDs );
             if ( qube==null ) {
                 // nothing
             } else {
-                peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
-                peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
-                peleCopy.getPlotDefaults().getZaxis().setAutoRange(false);
+                copyAutorange( peleCopy.getPlotDefaults(), qube );
             }
         } else if ( spec==RenderType.orbitPlot ) { 
             QDataSet qube= TickCurveRenderer.doAutorange( fillDs );
             if ( qube==null ) {
                 // nothing
             } else {
-                peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
-                peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
-                peleCopy.getPlotDefaults().getZaxis().setAutoRange(false);
+                copyAutorange( peleCopy.getPlotDefaults(), qube );
             }
         } else if ( spec==RenderType.image ) {
             QDataSet qube= RGBImageRenderer.doAutorange( fillDs );
             if ( qube==null ) {
                 // nothing
             } else {
-                peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
-                peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
-                peleCopy.getPlotDefaults().getZaxis().setAutoRange(false);
+                copyAutorange( peleCopy.getPlotDefaults(), qube );                
             }
         } else if ( spec==RenderType.internal ) {
             // nothing
