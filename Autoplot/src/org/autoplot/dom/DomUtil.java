@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.beans.IndexedPropertyDescriptor;
 import java.beans.IntrospectionException;
+import java.beans.PropertyChangeSupport;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
 import java.io.ByteArrayOutputStream;
@@ -1160,6 +1161,27 @@ public class DomUtil {
         return result;
     }
 
+    /**
+     * print a list of who is listening to the property
+     * @param o the dom node or dom node controller.
+     * @param prop the property name.
+     */
+    public static void findListeners( Object o, String prop ) {
+        if ( o instanceof DomNode ) {
+            PropertyChangeSupport pcs= ((DomNode)o).propertyChangeSupport;
+            if ( pcs instanceof DebugPropertyChangeSupport ) { 
+                ((DebugPropertyChangeSupport)pcs).printListeners(prop);
+            }
+        } else if ( o instanceof DomNodeController ) {
+            PropertyChangeSupport pcs= ((DomNodeController)o).propertyChangeSupport;
+            if ( pcs instanceof DebugPropertyChangeSupport ) { 
+                ((DebugPropertyChangeSupport)pcs).printListeners(prop);
+            }
+        } else {
+            System.err.println( "Not supported: "+o );
+        }
+    }
+    
     /**
      * Look through the state property values for references to ${PWD}
      * and replace them with sval.

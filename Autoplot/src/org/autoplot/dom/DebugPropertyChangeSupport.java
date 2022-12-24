@@ -115,6 +115,20 @@ public class DebugPropertyChangeSupport extends PropertyChangeSupport {
         if ( DEBUG ) printOldListeners();
     }
 
+    public void printListeners(String propName) {
+        PropertyChangeListener[] ll= super.getPropertyChangeListeners(propName);
+        for ( PropertyChangeListener l: ll ) {
+            System.err.println(l);
+        }
+    }
+    
+    public void printListeners() {
+        PropertyChangeListener[] ll= super.getPropertyChangeListeners();
+        for ( PropertyChangeListener l: ll ) {
+            System.err.println(l);
+        }
+    }
+    
     private void printOldListeners() {
 //        long tnow= System.currentTimeMillis();
 //        for ( Entry<String,Long> e: birthMilli.entrySet() ) {
