@@ -139,11 +139,17 @@ public class NetCdfVarDataSet extends AbstractDataSet {
      private TimeParser guessTimeParser( String s ) {
         TimeParser tp=null;
         int digitCount=-1;
+        s= s.trim();
         for ( int ich=0; ich<s.length(); ich++ ) {
             if ( !Character.isDigit(s.charAt(ich) ) ) {
-                if ( digitCount==-1 ) digitCount= ich; // http://amda-dev.irap.omp.eu/BASE/DATA/WND/SWE/swe19970812.nc?Time has null char at 17.
+                if ( digitCount==-1 ) {
+                    digitCount= ich;
+                } // http://amda-dev.irap.omp.eu/BASE/DATA/WND/SWE/swe19970812.nc?Time has null char at 17.
             } else {
-                if ( digitCount>-1 ) return null; // we found a non-digit preceeding a digit, so this isn't a block of digits like expected.
+                if ( digitCount>-1 ) {
+                    digitCount=-1;
+                    break;
+                } // we found a non-digit preceeding a digit, so this isn't a block of digits like expected.
             }
         }
         switch (digitCount) {
@@ -153,10 +159,20 @@ public class NetCdfVarDataSet extends AbstractDataSet {
             case 17:
                 tp= TimeParser.create("$Y$m$d$H$M$S$(subsec,places=3)");
                 break;
+            case -1:
+                try {
+                    String t= TimeParser.iso8601String(s);
+                    tp= TimeParser.create(t);
+                    break;
+                } catch ( IllegalArgumentException ex ) {
+                    return null;
+                }
             default:
         }
         return tp;
      }
+     
+     
      
     /**
      * Read the NetCDF data, including DEPEND_0 if used, using the CDF conventions.
