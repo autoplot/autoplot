@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Semi-transparent white used to model the giant snowstorm coming to the middle of the USA.  Happy holidays!
+        <p><small>CSV files from Emporia circuit panel monitor are displayed as Load(Day,TimeOfDay) spectrograms.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,10 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-12-21 r26838):</p>
+        <p>Bugfixes (2022-12-28 r26852):</p>
         <ul> 
+            <li>Image render type autorange detects log spacing in axes.
+            <li>NetCDF/HDF files can contain formatted ISO8601 again.
             <li>vap+hapi:http://amda.irap.omp.eu/service/hapi?id=ace-epam-ca60&amp;parameters=Time,ace_epam_ca60_he&amp;timerange=2022-06-16 showed where kernel-rebinner wasn't expecting a bins dataset.
             <li>bug with das2server when "vap+das2server:" was entered, as with File->Add Plot From->Das2Server.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2490/">2491</a>: plot( uri, timerange, monitor ) is supported.
