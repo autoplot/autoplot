@@ -82,7 +82,7 @@ public class XmlfileDataSource extends AbstractDataSource {
 
             if ( type==XMLTypeCheck.TYPE_SPASE ) {
                 SpaseRecordDataSource srds= new SpaseRecordDataSource(uri);
-                return srds.getDataSet(mon);
+                return srds.getDataSet(mon.getSubtaskMonitor("read spase"));
 
             } else if ( type==XMLTypeCheck.TYPE_HELM ) {
 
