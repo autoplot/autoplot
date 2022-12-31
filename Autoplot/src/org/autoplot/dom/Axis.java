@@ -43,8 +43,8 @@ public class Axis extends DomNode {
             return;
         }
 //        System.err.println("range="+range);
-        if ( this.controller!=null 
-            && this.controller.dasAxis.isHorizontal()
+        if ( this.controller==null 
+            && this.getId().equals("")
             && org.das2.datum.UnitsUtil.isTimeLocation( range.getUnits() ) 
             && DatumRangeUtil.parseTimeRangeValid("Dec 2005 through Jan 2006").contains(range) 
                 ) {
