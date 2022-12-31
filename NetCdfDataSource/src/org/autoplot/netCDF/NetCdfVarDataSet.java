@@ -139,7 +139,6 @@ public class NetCdfVarDataSet extends AbstractDataSet {
      private TimeParser guessTimeParser( String s ) {
         TimeParser tp=null;
         int digitCount=-1;
-        s= s.trim();
         for ( int ich=0; ich<s.length(); ich++ ) {
             if ( !Character.isDigit(s.charAt(ich) ) ) {
                 if ( digitCount==-1 ) {
@@ -160,6 +159,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                 tp= TimeParser.create("$Y$m$d$H$M$S$(subsec,places=3)");
                 break;
             case -1:
+                s= s.trim();
                 try {
                     String t= TimeParser.iso8601String(s);
                     tp= TimeParser.create(t);
