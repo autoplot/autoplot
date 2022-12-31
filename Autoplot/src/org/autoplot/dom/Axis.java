@@ -48,8 +48,15 @@ public class Axis extends DomNode {
             && org.das2.datum.UnitsUtil.isTimeLocation( range.getUnits() ) 
             && DatumRangeUtil.parseTimeRangeValid("Dec 2005 through Jan 2006").contains(range) 
                 ) {
+            if ( DatumRangeUtil.parseTimeRangeValid("2005-12-31 22:00 to 2006-01-02 01:00").equals(range) ) {
+                new Exception("where is this coming from").printStackTrace();
+            }
+            if ( DatumRangeUtil.parseTimeRangeValid("2005-12-31 23:00 to 2006-01-02 01:00").equals(range) ) {
+                new Exception("this is the correct path").printStackTrace();
+            }
             System.err.println("### xaxis setRange "+range);
         }
+        
 //        if ( this.controller!=null 
 //            && this.controller.dasAxis.isHorizontal()
 //            && org.das2.datum.UnitsUtil.isTimeLocation( range.getUnits() ) 
