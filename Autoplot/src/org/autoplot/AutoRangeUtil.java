@@ -978,7 +978,8 @@ public class AutoRangeUtil {
                             }
                         }
                         DatumRange rmin= div.rangeContaining(result.range.min());
-                        logger1.log(Level.FINER, "hours: {0}", TimeUtil.toTimeArray(result.range.min())[3] );
+                        int [] ta= TimeUtil.toTimeArray(result.range.min()); 
+                        logger1.log(Level.FINER, "hours, minutes, seconds: {0} {1} {2}", new Object[] { ta[3], ta[4], ta[5] } );
                         logger1.log(Level.FINER, "rmin: {0} {1}", new Object[] { rmin, rmin.getUnits() } );
                         logger1.log(Level.FINER, "result.range.min(): {0} {1}", new Object[] { result.range.min(), result.range.min().getUnits() } );
                         logger1.log(Level.FINER, "range.max-rmin: {0}", rmin.max().subtract(result.range.min()));
