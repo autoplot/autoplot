@@ -2623,25 +2623,7 @@ public class PlotElementController extends DomNodeController {
                 }
             }
 
-            if ( !peleCopy.getPlotDefaults().getXaxis().isAutoRange() ) {
-                logger.fine("20121015: I was thinking autorange would always be true");
-            }
-            
-            if ( xds.length()==24 ) {
-                String h= String.format( "%05d", (int)(Math.random()*10000) );
-                System.err.println("LINE2625: "+ xds + " " + props.get(QDataSet.DEPEND_0) + " " + ignoreDsProps + " " + "/tmp/ap/"+h+".qds" );
-                try {
-                    new SimpleStreamFormatter().format( xds, new FileOutputStream("/tmp/ap/"+h+".qds"), true );
-                } catch (FileNotFoundException ex) {
-                    Logger.getLogger(PlotElementController.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (StreamException | IOException ex) {
-                    Logger.getLogger(PlotElementController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
             AutoRangeUtil.AutoRangeDescriptor xdesc = AutoRangeUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0), ignoreDsProps);
-            if ( xds.length()==24 ) {
-                System.err.println("LINE2629: "+ xdesc.range );
-            }
 
             peleCopy.getPlotDefaults().getXaxis().setLog(xdesc.log);
             if ( UnitsUtil.isOrdinalMeasurement( xdesc.range.getUnits() ) ) {
