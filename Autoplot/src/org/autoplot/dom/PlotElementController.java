@@ -2621,7 +2621,13 @@ public class PlotElementController extends DomNodeController {
                 logger.fine("20121015: I was thinking autorange would always be true");
             }
             
+            if ( xds.length()==24 ) {
+                System.err.println("LINE2625: "+ xds + " " + props.get(QDataSet.DEPEND_0) + " " + ignoreDsProps );
+            }
             AutoRangeUtil.AutoRangeDescriptor xdesc = AutoRangeUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0), ignoreDsProps);
+            if ( xds.length()==24 ) {
+                System.err.println("LINE2629: "+ xdesc.range );
+            }
 
             peleCopy.getPlotDefaults().getXaxis().setLog(xdesc.log);
             if ( UnitsUtil.isOrdinalMeasurement( xdesc.range.getUnits() ) ) {
