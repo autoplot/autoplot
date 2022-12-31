@@ -978,6 +978,8 @@ public class AutoRangeUtil {
                             }
                         }
                         DatumRange rmin= div.rangeContaining(result.range.min());
+                        logger1.log(Level.FINER, "rmin: {0} {1}", new Object[] { rmin, rmin.getUnits() } );
+                        logger1.log(Level.FINER, "result.range.min(): {0} {1}", new Object[] { result.range.min(), result.range.min().getUnits() } );
                         logger1.log(Level.FINER, "range.max-rmin: {0}", rmin.max().subtract(result.range.min()));
                         logger1.log(Level.FINER, "div.rangeContaining units: {0}", rmin.getUnits());
                         DatumRange rmax= div.rangeContaining(result.range.max());
