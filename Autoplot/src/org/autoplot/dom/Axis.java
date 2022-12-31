@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.logging.Level;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
 //import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
 //import org.das2.datum.UnitsUtil;
@@ -42,12 +43,13 @@ public class Axis extends DomNode {
             return;
         }
 //        System.err.println("range="+range);
-//        if ( this.controller!=null 
-//            && this.controller.dasAxis.isHorizontal()
-//            && !org.das2.datum.UnitsUtil.isTimeLocation( range.getUnits() ) 
-//            && range.width().value()==1. ) {
-//            logger.log( Level.WARNING, "breakpoint here in setRange");
-//        }
+        if ( this.controller!=null 
+            && this.controller.dasAxis.isHorizontal()
+            && org.das2.datum.UnitsUtil.isTimeLocation( range.getUnits() ) 
+            && DatumRangeUtil.parseTimeRangeValid("Dec 2005 through Jan 2006").contains(range) 
+                ) {
+            System.err.println("### xaxis setRange "+range);
+        }
 //        if ( this.controller!=null 
 //            && this.controller.dasAxis.isHorizontal()
 //            && org.das2.datum.UnitsUtil.isTimeLocation( range.getUnits() ) 

@@ -1,20 +1,13 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package test.endtoend;
 
 import java.io.PrintWriter;
-import java.util.List;
 import org.autoplot.AutoplotUI;
 import org.autoplot.AutoplotUtil;
 import org.das2.datum.DatumRangeUtil;
-import org.das2.util.monitor.NullProgressMonitor;
 import static org.autoplot.ScriptContext.*;
 import org.autoplot.dom.Axis;
 import org.autoplot.dom.Column;
-import org.autoplot.datasource.DataSetURI;
-import org.autoplot.datasource.DataSetURI.CompletionResult;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 
