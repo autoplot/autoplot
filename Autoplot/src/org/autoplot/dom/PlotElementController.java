@@ -8,6 +8,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -84,6 +87,9 @@ import org.das2.event.DataRangeSelectionListener;
 import org.das2.event.HorizontalDragRangeSelectorMouseModule;
 import org.das2.graph.BoundsRenderer;
 import org.das2.graph.PolarPlotRenderer;
+import org.das2.qds.util.QStreamFormatter;
+import org.das2.qstream.SimpleStreamFormatter;
+import org.das2.qstream.StreamException;
 
 /**
  * PlotElementController manages the PlotElement, for example resolving the datasource and loading the dataset.
@@ -2622,7 +2628,15 @@ public class PlotElementController extends DomNodeController {
             }
             
             if ( xds.length()==24 ) {
-                System.err.println("LINE2625: "+ xds + " " + props.get(QDataSet.DEPEND_0) + " " + ignoreDsProps );
+                String h= String.format( "%05d", (int)(Math.random()*10000) );
+                System.err.println("LINE2625: "+ xds + " " + props.get(QDataSet.DEPEND_0) + " " + ignoreDsProps + " " + "/tmp/ap/"+h+".qds" );
+                try {
+                    new SimpleStreamFormatter().format( xds, new FileOutputStream("/tmp/ap/"+h+".qds"), true );
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(PlotElementController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (StreamException | IOException ex) {
+                    Logger.getLogger(PlotElementController.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             AutoRangeUtil.AutoRangeDescriptor xdesc = AutoRangeUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0), ignoreDsProps);
             if ( xds.length()==24 ) {
