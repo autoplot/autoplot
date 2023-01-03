@@ -12,9 +12,9 @@
         <br><a href="https://das2.org/autoplot/build/windows/Autoplot.exe"><img style="vertical-align: middle;" alt="" src="windows.png" height="28"> exe</a>: a self-contained installer for Windows computers. (<a href="http://autoplot.org/latest/">Production releases</a> only)
 
         <p>
-        <img alt="screenshot"  src="screen.png">
+        <img alt="screenshot"  src="screen.gif">
         </p>
-        <p><small>CSV files from Emporia circuit panel monitor are displayed as Load(Day,TimeOfDay) spectrograms.
+        <p><small>One of my covid projects was to finally track down this strange bug where sometimes autoranging would be off by an hour.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,11 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2022-12-28 r26852):</p>
+        <p>Bugfixes (2023-01-03 r26868):</p>
         <ul> 
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2497/">2497</a>: Allow trivial calculations, such as "PWD+..." to be in getParam calls.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2496/">2496</a>: track down where order preceding units conversion can affect result of conversion by a trivial amount, which might be amplified in testing.
+            <li><a href='https://sourceforge.net/p/autoplot/feature-requests/793/'>793</a>: swe19970812.nc?Time was broken because the non-digit whitespace was needed for the logic.
             <li>Image render type autorange detects log spacing in axes.
             <li>NetCDF/HDF files can contain formatted ISO8601 again.
             <li>vap+hapi:http://amda.irap.omp.eu/service/hapi?id=ace-epam-ca60&amp;parameters=Time,ace_epam_ca60_he&amp;timerange=2022-06-16 showed where kernel-rebinner wasn't expecting a bins dataset.
@@ -63,6 +66,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>ScriptGUIServlet uses new TimeUtil.js to properly handle next/previous.
             <li>KernelRebinner supports rank 2 bundle of X,Y,Z.
             <li>new min, max, and extend autorangeHints.
             <li>boundsDataset command allows bounding boxes to be created without scripts.
