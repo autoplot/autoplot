@@ -608,7 +608,7 @@ public class JythonUtil {
      */
     final static String[] okay = new String[] {
         "range,", "xrange,", "irange,","map,","join,","len,","dict,","zip,",
-        "getParam,", "lower,", "upper,", "URI,", "URL,",
+        "getParam,", "lower,", "upper,", "URI,", "URL,", "PWD,",
         "setScriptDescription", "setScriptTitle", "setScriptLabel", "setScriptIcon",
         "DatumRangeUtil,", "TimeParser,",
         "str,", "int,", "long,", "float,", "datum,", "datumRange,","dataset,",
@@ -652,6 +652,12 @@ public class JythonUtil {
             }
             logger.log(Level.FINER, "trivialFunctionCall={0} for {1}", new Object[]{klugdyOkay, c.func.toString()});
             return klugdyOkay;
+        } else if ( sn instanceof org.python.parser.ast.Num ) {
+            return true;
+        } else if ( sn instanceof org.python.parser.ast.Name ) {
+            return true;
+        } else if ( sn instanceof org.python.parser.ast.Str ) {
+            return true;
         } else {
             return false;
         }
@@ -710,7 +716,7 @@ public class JythonUtil {
                     looksOkay = newLooksOkay;
                 }
             } else if ( sn instanceof BinOp ) {
-                if ( !trivialFunctionCall(((BinOp) sn).right) || !trivialFunctionCall(((BinOp) sn).left ) ) {
+                if ( !trivialFunctionCall(((BinOp) sn).left ) || !trivialFunctionCall(((BinOp) sn).right) ) {
                     looksOkay= false;
                 }
             } else if (sn instanceof Name) {
@@ -1410,6 +1416,7 @@ public class JythonUtil {
         variableNames.add("map");
         variableNames.add("dict");
         variableNames.add("zip");
+        variableNames.add("PWD");
 
         try {
             Module n = (Module) org.python.core.parser.parse(script, "exec");
