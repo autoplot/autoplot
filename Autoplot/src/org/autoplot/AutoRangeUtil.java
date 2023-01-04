@@ -955,31 +955,31 @@ public class AutoRangeUtil {
                                 new Object[]{ 
                                     String.format( "%20f", resultmin.doubleValue( resultmin.getUnits() ) ), 
                                     resultmin.getUnits()} );
-                        if ( result.range.contains( DatumUtil.parseValid("2006-01-01T00:30") ) ) {
-                            logger1.log(Level.FINER,"here's that interesting case");
-                            Units tu;
-                            try {
-                                tu = Units.lookupTimeUnits("hr since 2001-01-01T00:00:00Z");
-                                Datum da=tu.createDatum(43823.0);
-                                DomainDivider domainDivider= DomainDividerUtil.getDomainDivider(da,da);
-                                DatumRange r= domainDivider.rangeContaining(da);
-                                logger.log(Level.FINER, ">>> {0} \"{1}\" {2} \"{3}\" {4} {5}", new Object[]{
-                                    r, 
-                                    r.getUnits(), 
-                                    da.doubleValue(da.getUnits()), 
-                                    da.getUnits(), 
-                                    Ops.convertUnitsTo(da.subtract(r.min()),Units.nanoseconds),
-                                    da.subtract(result.range.min())
-                                }
-                                );
-                                
-                            } catch (ParseException ex) {
-                                Logger.getLogger(AutoRangeUtil.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                        }
+//                        if ( result.range.contains( DatumUtil.parseValid("1993-01-01T00:30") ) ) {
+//                            logger1.log(Level.FINER,"here's that interesting case");
+//                            Units tu;
+//                            try {
+//                                tu = Units.lookupTimeUnits("hr since 2001-01-01T00:00:00Z");
+//                                Datum da=tu.createDatum(43823.0);
+//                                DomainDivider domainDivider= DomainDividerUtil.getDomainDivider(da,da);
+//                                DatumRange r= domainDivider.rangeContaining(da);
+//                                logger.log(Level.FINER, ">>> {0} \"{1}\" {2} \"{3}\" {4} {5}", new Object[]{
+//                                    r, 
+//                                    r.getUnits(), 
+//                                    da.doubleValue(da.getUnits()), 
+//                                    da.getUnits(), 
+//                                    Ops.convertUnitsTo(da.subtract(r.min()),Units.nanoseconds),
+//                                    da.subtract(result.range.min())
+//                                }
+//                                );
+//                                
+//                            } catch (ParseException ex) {
+//                                Logger.getLogger(AutoRangeUtil.class.getName()).log(Level.SEVERE, null, ex);
+//                            }
+//                        }
                         DatumRange rmin= div.rangeContaining(result.range.min());
-                        int [] ta= TimeUtil.toTimeArray(result.range.min()); 
-                        logger1.log(Level.FINER, "hours, minutes, seconds: {0} {1} {2}", new Object[] { ta[3], ta[4], ta[5] } );
+                        //int [] ta= TimeUtil.fromDatum(result.range.min()); 
+                        //logger1.log(Level.FINER, "hours, minutes, seconds: {0} {1} {2}", new Object[] { ta[3], ta[4], ta[5] } );
                         logger1.log(Level.FINER, "rmin: {0} {1}", new Object[] { rmin, rmin.getUnits() } );
                         logger1.log(Level.FINER, "result.range.min(): {0} {1}", new Object[] { result.range.min(), result.range.min().getUnits() } );
                         logger1.log(Level.FINER, "range.max-rmin: {0}", rmin.max().subtract(result.range.min()));
