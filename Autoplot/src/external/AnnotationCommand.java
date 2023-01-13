@@ -11,6 +11,8 @@ import org.autoplot.ScriptContext;
 import org.autoplot.dom.Annotation;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.DomNode;
+import org.autoplot.dom.DomUtil;
+import org.autoplot.dom.Plot;
 import org.autoplot.jythonsupport.JythonOps;
 import org.das2.graph.AnchorPosition;
 import org.das2.graph.AnchorType;
@@ -255,6 +257,11 @@ public class AnnotationCommand extends PyObject {
                     case "plotId":
                         annotation.setPlotId(sval);
                         annotation.setAnchorType( AnchorType.DATA );
+                        DomNode p= DomUtil.getElementById(dom,sval);
+                        if ( p instanceof Plot ) {
+                            annotation.setRowId(((Plot)p).getRowId());
+                            annotation.setColumnId(((Plot)p).getColumnId());
+                        }
                         break;
                     case "xrange":
                         annotation.setXrange(JythonOps.datumRange(val));
