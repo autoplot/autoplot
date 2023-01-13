@@ -739,6 +739,8 @@ public class ScriptPanelSupport {
      */
     private void executeScriptImmediately( int mode ) throws RuntimeException, Error {
         int offset = 0;
+        int lineOffset= 0;
+        
         //ProgressMonitor mon= //DasProgressPanel.createComponentPanel(model.getCanvas(),"running script");
         ProgressMonitor mon= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(panel), "running script");
 
@@ -812,8 +814,13 @@ public class ScriptPanelSupport {
                             }
                         }
                         
-                        int i0= offset;
-                        int i1= i0;
+                        for ( int i= lineOffset; i<l0-1; i++ ) {
+                            offset= offset + sscript[i].length() + 1;
+                        }
+                        lineOffset= l1;
+                        
+                        int i0= offset; // start character of the line
+                        int i1= i0;     // end character of the line
                         for ( int itn2= l0-1; itn2<l1-1; itn2++ ) {
                             i1= i1 + sscript[itn2].length() + 1;
                         }
