@@ -12,9 +12,9 @@
         <br><a href="https://das2.org/autoplot/build/windows/Autoplot.exe"><img style="vertical-align: middle;" alt="" src="windows.png" height="28"> exe</a>: a self-contained installer for Windows computers. (<a href="http://autoplot.org/latest/">Production releases</a> only)
 
         <p>
-        <img alt="screenshot"  src="screen.gif">
+        <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>One of my covid projects was to finally track down this strange <a href='https://sourceforge.net/p/autoplot/bugs/2496/'>bug</a>, where sometimes in automatic testing autoranging would be off by an hour.  Happy New Year!
+        <p><small>New identifyContinuousBlocks takes this useful functionality and makes a standard call for the operation.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,9 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-01-03 r26868):</p>
+        <p>Bugfixes (2023-01-13 r26875):</p>
         <ul> 
+            <li>annotation command uses row and column from identified plot.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2497/">2497</a>: Allow trivial calculations, such as "PWD+..." to be in getParam calls.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2496/">2496</a>: track down where order preceding units conversion can affect result of conversion by a trivial amount, which might be amplified in testing.
             <li><a href='https://sourceforge.net/p/autoplot/feature-requests/793/'>793</a>: swe19970812.nc?Time was broken because the non-digit whitespace was needed for the logic.
