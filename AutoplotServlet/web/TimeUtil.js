@@ -659,7 +659,7 @@ class TimeUtil {
     static isoTimeToArray(time) {
         var result;
         if (time.length === 4) {
-            result = [Integer.parseInt(time), 1, 1, 0, 0, 0, 0];
+            result = [parseInt(time), 1, 1, 0, 0, 0, 0];
         } else {
             if (time.startsWith("now") || time.startsWith("last")) {
                 var n;
