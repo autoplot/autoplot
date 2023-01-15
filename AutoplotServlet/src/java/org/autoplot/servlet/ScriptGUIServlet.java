@@ -558,6 +558,7 @@ public class ScriptGUIServlet extends HttpServlet {
             out.println("<html>");
             out.println("<head>");
             out.println("<title>"+name+"</title>");
+            out.println("<script src=\"ScriptGUIServlet.js\"></script>");
             out.println("</head>");
             out.println("<body>");
             if ( sd.getTitle().length()>0 ) {
@@ -651,7 +652,7 @@ public class ScriptGUIServlet extends HttpServlet {
             out.println( "</td>\n");
             out.println( "<td valign='top'>\n");
             out.println( "<div border=1></div>\n");
-            out.println("<img src='ScriptGUIServlet?img=1&key="+key+sparams+"' alt='image' width='800' height='500'>\n" );
+            out.println("<img id='outputImage' src='ScriptGUIServlet?img=1&key="+key+sparams+"' alt='image' width='800' height='500'>\n" );
             out.println( "</td>\n");
             out.println( "</tr>\n");
             out.println( "</table>\n");
@@ -662,9 +663,9 @@ public class ScriptGUIServlet extends HttpServlet {
             out.println("Running script <a href="+scriptURI+">"+scriptURI+"</a>");
             out.println("Pick <a href='ScriptGUIServletPick'>another</a>...\n");
             out.println("<br><small>key="+key+" "+uri+"</small> ");
+            out.println("<script>clearImageSizeWhenLoaded(document.getElementById('outputImage'));</script>");
             out.println("</body>");
             out.close();
-            
         }
         
     }
