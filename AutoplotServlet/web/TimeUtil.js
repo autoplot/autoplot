@@ -1123,6 +1123,30 @@ class TimeUtil {
     }
 
     /**
+     * return true if the time appears to be properly formatted.  Properly formatted strings include:<ul>
+     * <li>Any supported ISO8601 time
+     * <li>2000 and 2000-01 (just a year and month)
+     * <li>now - the current time reported by the processing system
+     * <li>lastyear - last year boundary
+     * <li>lastmonth - last month boundary
+     * <li>lastday - last midnight boundary
+     * <li>lasthour - last midnight boundary
+     * <li>now-P1D - yesterday at this time
+     * <li>lastday-P1D - yesterday midnight boundary
+     * </ul>
+     * @param {string} time
+     * @returns {invalid|Boolean}
+     */
+    static isValidFormattedTime( time ) {
+        time;
+        var b1= time.length>0;
+        var b2= (/[0-9]/.test(time.charAt(0)) 
+                || time.charAt(0) === 'P'
+                || time.startsWith("now") 
+                || time.startsWith("last") );
+        return b1 && b2;
+    }
+    /**
      * parse the ISO8601 time range, like "1998-01-02/1998-01-17", into
      * start and stop times, returned in a 14 element array of ints.
      * @param stringIn string to parse, like "1998-01-02/1998-01-17"
@@ -1134,12 +1158,9 @@ class TimeUtil {
         if (ss.length !== 2) {
             throw "expected one slash (/) splitting start and stop times.";
         }
-        if (ss[0].length === 0 || !(/[0-9]/.test(ss[0].charAt(0)) || ss[0].charAt(0) == 'P' || ss[0].startsWith("now"))) {
-            throw "first time/duration is misformatted.  Should be ISO8601 time or duration like P1D.";
-        }
-        if (ss[1].length === 0 || !(/[0-9]/.test(ss[1].charAt(0)) || ss[1].charAt(0) == 'P' || ss[1].startsWith("now"))) {
-            throw "second time/duration is misformatted.  Should be ISO8601 time or duration like P1D.";
-        }
+        if ( !TimeUtil.isValidFormattedTime(ss[0]) ) throw "first time/duration is misformatted.  Should be ISO8601 time or duration like P1D.";
+        if ( !TimeUtil.isValidFormattedTime(ss[1]) ) throw "second time/duration is misformatted.  Should be ISO8601 time or duration like P1D.";
+        
         var result = [0,0,0,0,0,0,0,0,0,0,0,0,0,0];
         if (ss[0].startsWith("P")) {
             var duration = TimeUtil.parseISO8601Duration(ss[0]);
