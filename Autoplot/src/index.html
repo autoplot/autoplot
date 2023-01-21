@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>New identifyContinuousBlocks takes this useful functionality and makes a standard call for the operation.
+        <p><small>The CSV reader is used to easily read the output of commercial temperature sensors monitoring the pool water temperature and ground temperature outside of the pool.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,10 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-01-13 r26875):</p>
+        <p>Bugfixes (2023-01-21 r26875):</p>
         <ul> 
+            <li>Correction to nominal units handling, where nominal datums are now sorted alphabetically, but old code still sorted by creation order.  Thanks Jean-Marc!
+            <li>correction to trace mode, where Jython code is broken up into individual commands and executed one-by-one.
             <li>annotation command uses row and column from identified plot.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2497/">2497</a>: Allow trivial calculations, such as "PWD+..." to be in getParam calls.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2496/">2496</a>: track down where order preceding units conversion can affect result of conversion by a trivial amount, which might be amplified in testing.
@@ -67,6 +69,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>AsciiParser has new methods for parsing data within a string, useful for scripts with an in-line calibration table.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/795/">795</a>: new identifyContinuousBlocks routine added.
             <li>ScriptGUIServlet uses new TimeUtil.js to properly handle next/previous.
             <li>KernelRebinner supports rank 2 bundle of X,Y,Z.
