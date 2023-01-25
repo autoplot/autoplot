@@ -5630,7 +5630,9 @@ APSplash.checkTime("init 240");
                         statusTextField.setToolTipText(fmessage);
                     } catch ( ArrayIndexOutOfBoundsException e ) {
                         logger.log( Level.SEVERE, e.getMessage(), e ); // rte_0759798375_20121111_205149_*.xml
-                    }
+                    } catch ( java.lang.AssertionError e ) {
+                        logger.log( Level.SEVERE, e.getMessage(), e ); // rte_1865701214_20230125_111810_*.xml
+                    }                    
                 } catch ( Exception e ) {
                     logger.log( Level.SEVERE, e.getMessage(), e ); // rte_0759798375_20121111_205149_*.xml
                 }
