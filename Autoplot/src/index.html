@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>The CSV reader is used to easily read the output of commercial temperature sensors monitoring the pool water temperature and ground temperature outside of the pool.
+        <p><small>New kernel rebinner with time-varying ytags.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -30,6 +30,10 @@
                 
         <p>Bugfixes (2023-01-21 r26875):</p>
         <ul> 
+            <li>rte_1865701214: strange and annoying RTE associated with setting the status bar text.
+        </ul>
+        <p>Older Bugfixes (2023-01-21 r26875):</p>
+        <ul>
             <li>Correction to nominal units handling, where nominal datums are now sorted alphabetically, but old code still sorted by creation order.  Thanks Jean-Marc!
             <li>correction to trace mode, where Jython code is broken up into individual commands and executed one-by-one.
             <li>annotation command uses row and column from identified plot.
@@ -48,26 +52,10 @@
             <li>don't paint the DasAxis when the initial resize hasn't happened.
             <li>Remove redundant "range" and "scale" label from undo list.  Correction to where undo wasn't kept.
         </ul>
-        <p>Older Bugfixes (2022-11-29 r26816):</p>
-        <ul>
-            <li>Das2Server editor would do web request on event thread, which can hang the GUI.
-            <li>correction to histogram dialog when "manual" is selected.  Thanks, Sadie!
-            <li>new code checking for "NaN to NaN" in DatumRange didn't consider that Datum might be time location. 
-            <li>Das2Stream correction to "property yValidMin should be type Double" where it can also be a Datum.
-            <li>Correction to support gitlab.com filesystems.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2488/">2488</a>: Run batch tools time range generation supports orbit numbers.  Thanks, Sadie!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2488/">2488</a>: script update flashes blue, not red, since red is alarming.  Thanks, Sadie!
-            <li>LIMIT_HUGE_DATASET increased to 1000M points from 100M.  Thanks, Kristoff! 
-            <li>Catch runtime error when non-existent directory is entered in PNGWalk tool.  Thanks, Sadie!
-            <li>binding two pngwalks immediately after starting them result in runtime error.  Thanks, JM!
-            <li>Indicate to the scientist that Run Batch supports concurrent runs (by holding shift).
-            <li><a href="https://github.com/das-developers/das2java/issues/39">0039</a>: revisit scan next/prev buttons on axis.
-            <li>Correction to handling of $ref in HAPI, code assumed ref would be within structure and not array.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2483/">2483</a>: TCA ephemeris loads incorrect time initially, blocking correct load.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2481/">2481</a>: ASCII file multi-field times with tab delimiters can now be read.  Thanks, Bill!
-            <li>Improve feedback when PNGWalk setTimeRange is called but images do not contain URI templates like $Y$m$d.png.
-        </ul>
         <p>Features:</p>
+        <ul>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>AsciiParser has new methods for parsing data within a string, useful for scripts with an in-line calibration table.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/795/">795</a>: new identifyContinuousBlocks routine added.
@@ -76,18 +64,6 @@
             <li>new min, max, and extend autorangeHints.
             <li>boundsDataset command allows bounding boxes to be created without scripts.
             <li><a href='https://sourceforge.net/p/autoplot/feature-requests/793/'>793</a>: handle nominal data in NetCDF (and HDF5).  Thanks, JM!
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>"Plot Style" submenu renamed "Plot Element Type", since "Plot Style" is used elsewhere and it's a poor name anyway.
-            <li>bounds renderer supports bounding interval time series and output of contour (trajectories).
-            <li>new array-of-bounding-boxes dataset scheme, supported in the bounds renderer.
-            <li>bounds renderer supports polar plot annotations, array of bounds, and different hashes.
-            <li>allow export resizeOption="resize" to avoid constant querying which prevents scripts from running.
-            <li>DDataSet addValue method checks for zero and returns trivially without mutability test, since this happens often.
-            <li>New kernel spectrogram rebinner is available, where points are spread out and mixed together.
-            <li>dataset command handles DatumVector class, which is an array of Datums.
-            <li>Jython editor "jump to" includes methods within classes.
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
