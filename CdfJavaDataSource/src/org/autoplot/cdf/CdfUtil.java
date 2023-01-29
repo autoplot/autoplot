@@ -16,6 +16,7 @@ import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -65,6 +66,16 @@ public class CdfUtil {
      */
     public static final String OPTION_DEEP = "deep";
     
+    /**
+     * if "true" return only the data variables, not the support data.
+     */
+    public static final String OPTION_DATA_ONLY = "dataOnly";
+    
+    /**
+     * if greater than -1, then only read variables up to this rank.
+     */
+    public static final String OPTION_RANK_LIMIT = String.valueOf( QDataSet.MAX_RANK );
+            
     /**
      * return the Java type used to store the CDF data type.
      * @param type 45, 44, or 51
@@ -1056,6 +1067,266 @@ public class CdfUtil {
      */
     public static Map<String, String> getPlottable(CDFReader cdf, boolean dataOnly, int rankLimit) throws Exception {
         return getPlottable(cdf, dataOnly, rankLimit, new HashMap<String,String>() );
+    }
+    
+    /**
+     * information about a variable.  This might be used for CDF and HDF as well, so this code shouldn't
+     * get too married to CDF.  TODO: Why not just use QDataSet bundle descriptor?
+     */
+    public static class CdfVariableDescription {
+        public String name;
+        public String description;
+        public String variableType;
+        public boolean isSupport;
+        public long numberOfRecords;
+        /**
+         * null or the name of the DEPEND_0 
+         */
+        public String depend0Name;
+        public int dimensions[];
+        public String[] depends;
+    }
+    
+    /**
+     * retrieve information about all the variables.  A LinkedHashMap will be returned
+     * to preserve the order.
+     * @param cdf
+     * @param options map of options like OPTION_DEEP and OPTION_DATA_ONLY
+     * @return 
+     * @throws gov.nasa.gsfc.spdf.cdfj.CDFException.ReaderError 
+     */
+    public static LinkedHashMap<String, CdfVariableDescription> getPlottable( CDFReader cdf, Map<String,String> options ) throws CDFException.ReaderError {
+        
+        LinkedHashMap <String, CdfVariableDescription> result = new LinkedHashMap<>();
+
+        if ( options==null ) options= Collections.emptyMap();
+        
+        boolean isMaster= getOption( options, OPTION_IS_MASTER, "false" ).equals("true"); 
+
+        boolean deep= getOption( options, OPTION_DEEP, "true" ).equals("true");
+        
+        boolean showEmpty= getOption( options, OPTION_INCLUDE_EMPTY_RECORDS, "true" ).equals("true");
+        
+        boolean dataOnly= getOption( options, OPTION_DATA_ONLY, "false" ).equals("true");
+        
+        int rankLimit = Integer.parseInt( getOption( options, OPTION_RANK_LIMIT, String.valueOf(QDataSet.MAX_RANK) ) );
+        
+        logger.fine("getting CDF variables");
+        String[] v = cdf.getVariableNames();
+        logger.log(Level.FINE, "got {0} variables", v.length);
+
+        logger.fine("getting CDF attributes");
+
+        boolean[] isData= new boolean[v.length];
+        int i=-1;
+        
+        int skipCount=0;
+        for (String svar : v) {
+            i=i+1;
+            if ( dataOnly ) {
+                Object attr= getAttribute(cdf, svar, "VAR_TYPE" );
+                if ( attr==null ) {
+                    for ( String s: cdf.variableAttributeNames(svar) ) {
+                        if ( s.equalsIgnoreCase("VAR_TYPE") ) {
+                            attr= getAttribute(cdf,svar,s);
+                        }
+                    }
+                    if ( attr!=null ) {
+                        logger.log(Level.INFO, "Wrong-case VAR_TYPE attribute found, should be \"VAR_TYPE\"");
+                    }
+                }
+                if ( attr!=null && "data".equalsIgnoreCase(attr.toString()) ) {
+                    if ( !attr.equals("data") ) {
+                        logger.log(Level.INFO, "var_type is case-sensitive, should be \"data\", not {0}", attr);
+                        attr= "data";
+                    }
+                }
+                if ( attr==null || !attr.equals("data") ) {
+                    skipCount++;
+                    isData[i]= false;
+                } else {
+                    isData[i]= true;
+                }
+            }
+        }
+        //if ( skipCount==v.length ) {
+        //    logger.fine( "turning off dataOnly because it rejects everything");
+        //    dataOnly= false;
+        //}
+
+        i=-1;
+        for (String v1 : v) {
+            i=i+1;
+            String svar=null;
+            List<String> warn= new ArrayList();
+            String xDependVariable=null;
+            boolean isVirtual= false;
+            long xMaxRec = -1;
+            long maxRec= -1;
+            long recCount= -1;
+            String scatDesc = null;
+            String svarNotes = null;                
+            StringBuilder vdescr=null;
+            int rank=-1;
+            int[] dims=new int[0];
+            int varType=0;
+            try {
+                svar = v1;
+                try {
+                    varType= cdf.getType(svar);
+                } catch ( CDFException ex ) {
+                    throw new RuntimeException(ex);
+                }
+                // reject variables that are ordinal data that do not have DEPEND_0.
+                boolean hasDep0= hasAttribute( cdf, svar, "DEPEND_0" );
+                if ( ( varType==CDFConstants.CDF_CHAR || varType==CDFConstants.CDF_UCHAR ) && ( !hasDep0 ) ) {
+                    logger.log(Level.FINER, "skipping because ordinal and no depend_0: {0}", svar );
+                    continue;
+                }
+                maxRec = cdf.getNumberOfValues(svar); 
+                recCount= maxRec;
+                
+                if ( recCount==0 && !showEmpty ) {
+                    logger.log(Level.FINER, "skipping because variable is empty: {0}", svar );
+                    continue;
+                }
+                
+                dims = getDimensions(cdf, svar);
+
+                if (dims == null) {
+                    rank = 1;
+                } else {
+                    rank = dims.length + 1;
+                }
+                if (rank > rankLimit) {
+                    continue;
+                }
+                if ( svar.equals("Time_PB5") ) {
+                    logger.log(Level.FINER, "skipping {0} because we always skip Time_PB5", svar );
+                    continue;
+                }
+                if ( dataOnly ) {
+                    if ( !isData[i] ) continue;
+                }
+                Object att= getAttribute( cdf, svar, "VIRTUAL" );
+                if ( att!=null ) {
+                    logger.log(Level.FINER, "get attribute VIRTUAL entry for {0}", svar );
+                    if ( String.valueOf(att).toUpperCase().equals("TRUE") ) {
+                        String funct= (String)getAttribute( cdf, svar, "FUNCTION" );
+                        if ( funct==null ) funct= (String) getAttribute( cdf, svar, "FUNCT" ) ; // in alternate_view in IDL: 11/5/04 - TJK - had to change FUNCTION to FUNCT for IDL6.* compatibili
+                        if ( !CdfVirtualVars.isSupported(funct) ) {
+                            if ( !funct.startsWith("comp_themis") ) {
+                                logger.log(Level.FINER, "virtual function not supported: {0}", funct);
+                            }
+                            continue;
+                        } else {
+                            vdescr= new StringBuilder(funct);
+                            vdescr.append( "( " );
+                            int icomp=0;
+                            String comp= (String)getAttribute( cdf, svar, "COMPONENT_"+icomp );
+                            if ( comp!=null ) {
+                                vdescr.append( comp );
+                                icomp++;
+                            }
+                            for ( ; icomp<5; icomp++ ) {
+                                comp= (String)getAttribute( cdf, svar, "COMPONENT_"+icomp );
+                                if ( comp!=null ) {
+                                    vdescr.append(", ").append(comp);
+                                } else {
+                                    break;
+                                }
+                            }
+                            vdescr.append(" )");
+                        }
+                        isVirtual= true;
+                    }
+                }
+            }catch (CDFException | RuntimeException e) {
+                logger.fine(e.getMessage());
+            }
+            try {
+                if ( hasAttribute( cdf, svar, "DEPEND_0" )) {  // check for metadata for DEPEND_0
+                    Object att= getAttribute( cdf, svar, "DEPEND_0" );
+                    if ( att!=null ) {
+                        logger.log(Level.FINER, "get attribute DEPEND_0 entry for {0}", svar);
+                        xDependVariable = String.valueOf(att);
+                        if ( !hasVariable(cdf,xDependVariable ) ) throw new Exception("No such variable: "+String.valueOf(att));
+                        xMaxRec = cdf.getNumberOfValues( xDependVariable );
+                        if ( xMaxRec!=maxRec && vdescr==null && cdf.recordVariance(svar) ) {
+                            if ( maxRec==-1 ) maxRec+=1; //why?
+                            if ( maxRec==0 ) {
+                                warn.add("data contains no records" );
+                            } else {
+                                warn.add("depend0 length ("+xDependVariable+"["+xMaxRec+"]) is inconsistent with length ("+(maxRec)+")" );
+                            }
+                            //TODO: warnings are incorrect for Themis data.
+                        }
+                    } else {
+                        if ( dataOnly ) {
+                            continue; // vap+cdaweb:ds=GE_K0_PWI&id=freq_b&timerange=2012-06-12
+                        }
+                    }
+                }
+            } catch (CDFException e) {
+                warn.add( "problem with DEPEND_0: " + e.getMessage() );
+            } catch (Exception e) {
+                warn.add( "problem with DEPEND_0: " + e.getMessage() );
+            }
+            
+            CdfVariableDescription description= new CdfVariableDescription();
+            
+            //TODO: this could probably recurse into this routine now.
+            DepDesc dep1desc= getDepDesc( cdf, svar, rank, dims, 1, warn, isMaster );
+            DepDesc dep2desc= getDepDesc( cdf, svar, rank, dims, 2, warn, isMaster );
+            DepDesc dep3desc= getDepDesc( cdf, svar, rank, dims, 3, warn, isMaster );
+            if (deep) {
+                Object o= (Object) getAttribute( cdf, svar, "CATDESC" );
+                if ( o != null && o instanceof String ) {
+                    logger.log(Level.FINER, "get attribute CATDESC entry for {0}", svar );
+                    scatDesc = (String)o ;
+                }
+                o=  getAttribute( cdf, svar, "VAR_NOTES" );
+                if ( o!=null  && o instanceof String ) {
+                    logger.log(Level.FINER, "get attribute VAR_NOTES entry for {0}", svar );
+                    svarNotes = (String)o ;
+                }
+            }
+            
+            description.name= svar;
+            description.description= svarNotes;
+            description.variableType= getStringDataType( varType );
+            description.numberOfRecords= maxRec;
+            description.depends= new String[rank-1];
+            description.depend0Name= xDependVariable; // might be null;
+                    
+            String desc = svar;
+            if (xDependVariable != null) {
+                desc += "[" + maybeShorten( svar, xDependVariable );
+                if ( ( xMaxRec>0 || !isMaster ) && xMaxRec==maxRec ) { // small kludge for CDAWeb, where we expect masters to be empty.
+                    desc+= "=" + (xMaxRec);
+                }
+                if ( dep1desc.dep != null) {
+                    desc += "," + maybeShorten( svar, dep1desc.dep ) + "=" + dep1desc.nrec + ( dep1desc.rank2 ? "*": "" );
+                    if ( dep2desc.dep != null) {
+                        desc += "," + maybeShorten( svar, dep2desc.dep ) + "=" + dep2desc.nrec + ( dep2desc.rank2 ? "*": "" );
+                        if (dep3desc.dep != null) {
+                            desc += "," + maybeShorten( svar, dep3desc.dep ) + "=" + dep3desc.nrec + ( dep3desc.rank2 ? "*": "" );
+                        }
+                    }
+                } else if ( rank>1 ) {
+                    desc += ","+DataSourceUtil.strjoin( dims, ",");
+                }
+                desc += "]";
+            }
+                        
+            result.put(svar, description);
+            
+        } // for each variable
+
+        logger.fine("done, get plottable ");
+
+        return result;
+        
     }
     
     /**
