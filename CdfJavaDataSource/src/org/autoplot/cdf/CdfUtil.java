@@ -1381,6 +1381,7 @@ public class CdfUtil {
             
             description.name= svar;
             description.description= svarNotes;
+            description.isSupport= ! isData[i];
             description.htmlDescription= htmlDescription;
             
             description.variableType= getStringDataType( varType );
