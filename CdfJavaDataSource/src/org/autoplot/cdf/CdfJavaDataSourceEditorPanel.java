@@ -11,6 +11,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -29,6 +30,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
+import org.autoplot.cdf.CdfUtil.CdfVariableDescription;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.util.DasExceptionHandler;
 import org.das2.util.filesystem.FileSystem;
@@ -412,9 +414,60 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
         if ( isValidCDF ) {
             parameter= String.valueOf(tp.getPathComponent(1));
             updateMetadata();
+            LinkedHashMap<String,CdfVariableDescription> xx= getCompatible( parameter, X_PARAMETER );
+            fillTree( xParameterTree, toDescriptions(xx), cdf, parameter, vapScheme);
+            LinkedHashMap<String,CdfVariableDescription> yy= getCompatible( parameter, Y_PARAMETER );
+            fillTree( yParameterTree, toDescriptions(yy), cdf, parameter, vapScheme);
         }
     }//GEN-LAST:event_parameterTreeValueChanged
 
+    /**
+     * convert the CdfVariableDescription blocks into an html page describing the variables.
+     * @param xx
+     * @return 
+     */
+    private Map<String,String> toDescriptions( LinkedHashMap<String,CdfVariableDescription> xx ) {
+        LinkedHashMap<String,String> result= new LinkedHashMap<>();
+        for ( Entry<String,CdfVariableDescription> e: xx.entrySet() ) {
+            CdfVariableDescription desc=e.getValue();
+            result.put( e.getKey(), desc.htmlDescription );
+        }
+        return result;
+    }
+    
+    /**
+     * return the list of variables which are compatible with this parameter, having the same number 
+     * of records, etc.
+     * @param parameter
+     * @param whichIndependentParameter
+     * @return a linked hash map of name to descriptions.
+     */
+    private LinkedHashMap<String,CdfVariableDescription> getCompatible( String parameter, Object whichIndependentParameter ) {
+        CdfVariableDescription dependent= cdfParameterInfo.get(parameter);
+        LinkedHashMap<String,CdfVariableDescription> result= new LinkedHashMap<>();
+        for ( Entry<String,CdfVariableDescription> cvds : cdfParameterInfo.entrySet() ) {
+            CdfVariableDescription cvd = cvds.getValue();
+            if ( whichIndependentParameter==X_PARAMETER ) {
+                if ( cvd.numberOfRecords==dependent.numberOfRecords ) {
+                    result.put( cvd.name, cvd );
+                }
+            } else if ( whichIndependentParameter==Y_PARAMETER) {
+                if ( cvd.dimensions.length==1 && dependent.dimensions.length==1 
+                        && cvd.dimensions[0]==dependent.dimensions[0] ) {
+                    if ( cvd.numberOfRecords==1 ) {
+                        result.put( cvd.name, cvd );
+                    } else if ( cvd.numberOfRecords==dependent.numberOfRecords ) {
+                        result.put( cvd.name, cvd );
+                    }
+                } else if ( cvd.dimensions.length==0 && dependent.dimensions.length==0
+                        && cvd.numberOfRecords==dependent.numberOfRecords ) {
+                    result.put( cvd.name, cvd );
+                }
+            }
+        }
+        return result;
+    }
+    
     private void filterComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filterComboBoxActionPerformed
         updateTree();
     }//GEN-LAST:event_filterComboBoxActionPerformed
@@ -545,10 +598,18 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
      */
     Map<String,String> yparameterInfo;
     
+    /**
+     * new descriptions of variables with size and lengths
+     */
+    LinkedHashMap<String,org.autoplot.cdf.CdfUtil.CdfVariableDescription> cdfParameterInfo;
+    
     String parameter;
     String xparameter;
     String yparameter;
 
+    private static final String X_PARAMETER = "X_PARAMETER";
+    private static final String Y_PARAMETER = "Y_PARAMETER";
+    
     boolean showAllInitially= false;
     
     /**
@@ -670,6 +731,8 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
             options.put( org.autoplot.cdf.CdfUtil.OPTION_DEEP, String.valueOf( false ) );
             Map<String,String> whereParameterInfo= org.autoplot.cdf.CdfUtil.getPlottable(cdf, false, 2, options);
 
+            cdfParameterInfo= org.autoplot.cdf.CdfUtil.getPlottable(cdf, options);
+            
             if ( dataParameterInfo.isEmpty() ) {
                 this.showAllVarTypeCB.setSelected(true);
                 parameterDescriptions= org.autoplot.cdf.CdfUtil.getPlottable(cdf, 
@@ -967,7 +1030,7 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
     /**
      * fill the parameter tree using metadata.
      * @param parameterTree the tree which will contain the parameter list.
-     * @param mm the metadata
+     * @param mm the metadata map from parameter names to html descriptions.
      * @param cdf the cdf file.
      * @param param null or the name of the parameter which should be selected.
      * @param slice1 null or the slice selection (X,Y,Z of BGSM, for example).

@@ -1076,6 +1076,7 @@ public class CdfUtil {
     public static class CdfVariableDescription {
         public String name;
         public String description;
+        public String htmlDescription;
         public String variableType;
         public boolean isSupport;
         public long numberOfRecords;
@@ -1292,11 +1293,100 @@ public class CdfUtil {
                 }
             }
             
+            String htmlDescription = svar;
+            if (xDependVariable != null) {
+                htmlDescription += "[" + maybeShorten( svar, xDependVariable );
+                if ( ( xMaxRec>0 || !isMaster ) && xMaxRec==maxRec ) { // small kludge for CDAWeb, where we expect masters to be empty.
+                    htmlDescription+= "=" + (xMaxRec);
+                }
+                if ( dep1desc.dep != null) {
+                    htmlDescription += "," + maybeShorten( svar, dep1desc.dep ) + "=" + dep1desc.nrec + ( dep1desc.rank2 ? "*": "" );
+                    if ( dep2desc.dep != null) {
+                        htmlDescription += "," + maybeShorten( svar, dep2desc.dep ) + "=" + dep2desc.nrec + ( dep2desc.rank2 ? "*": "" );
+                        if (dep3desc.dep != null) {
+                            htmlDescription += "," + maybeShorten( svar, dep3desc.dep ) + "=" + dep3desc.nrec + ( dep3desc.rank2 ? "*": "" );
+                        }
+                    }
+                } else if ( rank>1 ) {
+                    htmlDescription += ","+DataSourceUtil.strjoin( dims, ",");
+                }
+                htmlDescription += "]";
+            }
+                    
+            if (deep) {
+                StringBuilder descbuf = new StringBuilder("<html><b>" + htmlDescription + "</b><br><br>");
+
+                int itype= -1;
+                try { 
+                    //assert svar is valid.
+                    itype= cdf.getType(svar);
+                } catch ( CDFException ex ) {}
+                
+                String recDesc= ""+ CdfUtil.getStringDataType( itype );
+                if ( dims!=null && dims.length>0 ) {
+                    recDesc= recDesc+"["+ DataSourceUtil.strjoin( dims, ",") + "]";
+                }
+
+                if (scatDesc != null) {
+                    descbuf.append(scatDesc).append("<br><br>");
+                }
+                if (svarNotes !=null ) {
+                    descbuf.append("<p><small>").append(svarNotes).append("</small></p><br>");
+                }
+                Vector variablePurpose= cdf.getAttributeEntries(svar,"VARIABLE_PURPOSE");
+                if ( variablePurpose.size()>0 ) {
+                    AttributeEntry e= (AttributeEntry)variablePurpose.get(0);
+                    StringBuilder s= new StringBuilder( String.valueOf(e.getValue()) );
+                    for ( int i1=1; i1<variablePurpose.size(); i1++ ) {
+                        e= (AttributeEntry)variablePurpose.get(i1);
+                        s.append(",").append(e.getValue());
+                    }
+                    descbuf.append("<p><small>VARIABLE_PURPOSE: ").append(s).append("</small></p><br>");
+                }
+                
+                if (maxRec != xMaxRec) {
+                    if ( isVirtual ) {
+                        descbuf.append("(virtual function ").append(vdescr).append( ")<br>");
+                    } else {
+                        if ( isMaster ) {
+                            descbuf.append("records of ").append(recDesc).append("<br>");
+                        } else {
+                            descbuf.append( recCount ).append(" records of ").append(recDesc).append("<br>");
+                        }
+                    }
+                } else {
+                    if ( isMaster ) {
+                        descbuf.append("records of ").append(recDesc).append("<br>");
+                    } else {
+                        descbuf.append( recCount ).append(" records of ").append(recDesc).append("<br>");
+                    }
+                }
+
+                for ( String s: warn ) {
+                    descbuf.append("<br>");
+                    if ( s.startsWith("NOTE") ) {
+                        descbuf.append(s);
+                    } else {
+                        descbuf.append("WARNING: ").append(s);
+                    }
+                }
+
+                
+                descbuf.append("</html>");
+                htmlDescription=descbuf.toString();
+                
+            }
+            
+            if ( svarNotes==null ) svarNotes="";
+            
             description.name= svar;
             description.description= svarNotes;
+            description.htmlDescription= htmlDescription;
+            
             description.variableType= getStringDataType( varType );
             description.numberOfRecords= maxRec;
             description.depends= new String[rank-1];
+            description.dimensions= dims;
             description.depend0Name= xDependVariable; // might be null;
                     
             String desc = svar;
