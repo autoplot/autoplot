@@ -414,10 +414,16 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
         if ( isValidCDF ) {
             parameter= String.valueOf(tp.getPathComponent(1));
             updateMetadata();
+            String s;
+            String slice1;
+            s= getParamAndSubset(xParameterTree,"");
+            slice1= s.length()==0 ? "" : s.substring(xparameter.length()); 
             LinkedHashMap<String,CdfVariableDescription> xx= getCompatible( parameter, X_PARAMETER );
-            fillTree( xParameterTree, toDescriptions(xx), cdf, parameter, vapScheme);
+            fillTree( xParameterTree, toDescriptions(xx), cdf, xparameter, slice1 );
+            s= getParamAndSubset(yParameterTree,"");
+            slice1= s.length()==0 ? "" : s.substring(xparameter.length());
             LinkedHashMap<String,CdfVariableDescription> yy= getCompatible( parameter, Y_PARAMETER );
-            fillTree( yParameterTree, toDescriptions(yy), cdf, parameter, vapScheme);
+            fillTree( yParameterTree, toDescriptions(yy), cdf, yparameter, slice1 );
         }
     }//GEN-LAST:event_parameterTreeValueChanged
 
@@ -921,6 +927,35 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
         return p;
     }
     
+    /**
+     * return the parameter, if something is selected, possibly with [:,n] to indicate a slice should be done.
+     * @param jtree the tree showing the selection
+     * @param subset subset by index, like [::2] for every other element.
+     * @return empty string if no selection, or the path.
+     */
+    private String getParamAndSubset( JTree jtree, String subset )  {
+        StringBuilder parameter= new StringBuilder();
+        TreePath[] tps= jtree.getSelectionPaths(); // typically this will be a one-element array.
+        if ( tps==null ) tps= new TreePath[] { jtree.getSelectionPath() };
+        for ( TreePath treePath : tps ) {
+            if ( parameter.length()>0 ) parameter.append(";");
+            if ( treePath==null ) {
+                logger.fine("param was null");
+            } else if ( treePath.getPathCount()==3 ) {
+                String p= String.valueOf( treePath.getPathComponent(1) );
+                p= p.replaceAll("=", "%3D");
+                String val=  String.valueOf( treePath.getPathComponent(2) );
+                int idx= val.indexOf(":");
+                parameter.append(p).append("[:,").append(val.substring(0,idx).trim()).append("]");
+            } else {
+                String p= String.valueOf( treePath.getPathComponent(1) );
+                p= p.replaceAll("=", "%3D");
+                parameter.append(p).append(subset);
+            }
+        }
+        return parameter.toString();
+    }
+    
     @Override
     public String getURI() {
         
@@ -945,57 +980,18 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
             StringBuilder arg0= new StringBuilder();
             
             if ( tps!=null ) {
-                for ( TreePath treePath : tps ) {
-                    if ( arg0.length()>0 ) arg0.append(";");
-                    if ( treePath==null ) {
-                        logger.fine("param was null");
-                    } else if ( treePath.getPathCount()==3 ) {
-                        String p= String.valueOf( treePath.getPathComponent(1) );
-                        p= p.replaceAll("=", "%3D");
-                        String val=  String.valueOf( treePath.getPathComponent(2) );
-                        int idx= val.indexOf(":");
-                        arg0.append(p).append("[:,").append(val.substring(0,idx).trim()).append("]");
-                    } else {
-                        String p= String.valueOf( treePath.getPathComponent(1) );
-                        p= p.replaceAll("=", "%3D");
-                        arg0.append(p).append(subset);
-                    }
-                }
-                lparams.put( "arg_0", arg0.toString() );
+                String p= getParamAndSubset(parameterTree,subset);
+                if ( p.length()>0 ) lparams.put( "arg_0", p );
             }
             
             if ( xCheckBox.isSelected() ) {
-                TreePath depend0Path= xParameterTree.getSelectionPath();
-                if ( depend0Path!=null ) {
-                    if ( depend0Path.getPathCount()==3 ) {
-                        String p= String.valueOf( depend0Path.getPathComponent(1) );
-                        p= p.replaceAll("=", "%3D");
-                        String val=  String.valueOf( depend0Path.getPathComponent(2) );
-                        int idx= val.indexOf(":");
-                        lparams.put( "x", p +"[:,"+val.substring(0,idx).trim()+"]" );
-                    } else {
-                        String p= String.valueOf( depend0Path.getPathComponent(1) );
-                        p= p.replaceAll("=", "%3D");
-                        lparams.put( "x", p );
-                    }
-                }
+                String p = getParamAndSubset(xParameterTree,"");
+                if ( p.length()>0 ) lparams.put( "x", p );
             }
 
             if ( yCheckBox.isSelected() ) {
-                TreePath yPath= yParameterTree.getSelectionPath();
-                if ( yPath!=null ) {
-                    if ( yPath.getPathCount()==3 ) {
-                        String p= String.valueOf( yPath.getPathComponent(1) );
-                        p= p.replaceAll("=", "%3D");
-                        String val=  String.valueOf( yPath.getPathComponent(2) );
-                        int idx= val.indexOf(":");
-                        lparams.put( "y", p +"[:,"+val.substring(0,idx).trim()+"]" );
-                    } else {
-                        String p= String.valueOf( yPath.getPathComponent(1) );
-                        p= p.replaceAll("=", "%3D");
-                        lparams.put( "y", p );
-                    }                
-                }
+                String p= getParamAndSubset(yParameterTree,"");
+                if ( p.length()>0 ) lparams.put( "y", p );
             }
             
             if ( noDep.isSelected() ) {
