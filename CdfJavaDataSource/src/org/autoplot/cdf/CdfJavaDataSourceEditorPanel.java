@@ -934,11 +934,11 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
      * @return empty string if no selection, or the path.
      */
     private String getParamAndSubset( JTree jtree, String subset )  {
-        StringBuilder parameter= new StringBuilder();
+        StringBuilder ps= new StringBuilder();
         TreePath[] tps= jtree.getSelectionPaths(); // typically this will be a one-element array.
         if ( tps==null ) tps= new TreePath[] { jtree.getSelectionPath() };
         for ( TreePath treePath : tps ) {
-            if ( parameter.length()>0 ) parameter.append(";");
+            if ( ps.length()>0 ) ps.append(";");
             if ( treePath==null ) {
                 logger.fine("param was null");
             } else if ( treePath.getPathCount()==3 ) {
@@ -946,14 +946,14 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
                 p= p.replaceAll("=", "%3D");
                 String val=  String.valueOf( treePath.getPathComponent(2) );
                 int idx= val.indexOf(":");
-                parameter.append(p).append("[:,").append(val.substring(0,idx).trim()).append("]");
+                ps.append(p).append("[:,").append(val.substring(0,idx).trim()).append("]");
             } else {
                 String p= String.valueOf( treePath.getPathComponent(1) );
                 p= p.replaceAll("=", "%3D");
-                parameter.append(p).append(subset);
+                ps.append(p).append(subset);
             }
         }
-        return parameter.toString();
+        return ps.toString();
     }
     
     @Override
