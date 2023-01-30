@@ -733,7 +733,8 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
 
             cdfParameterInfo= org.autoplot.cdf.CdfUtil.getPlottable(cdf, options);
             
-            if ( dataParameterInfo.isEmpty() ) {
+            String param= lparams.remove("arg_0");
+            if ( isSupportParameter( cdfParameterInfo, param ) ) {
                 this.showAllVarTypeCB.setSelected(true);
                 parameterDescriptions= org.autoplot.cdf.CdfUtil.getPlottable(cdf, 
                     !this.showAllVarTypeCB.isSelected(), QDataSet.MAX_RANK, new HashMap<String,String>());
@@ -774,7 +775,6 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
             Pattern slice1pattern= Pattern.compile("\\[\\:\\,(\\d+)\\]");
             String slice1= lparams.remove("slice1"); // legacy
 
-            String param= lparams.remove("arg_0");
             String subset= null;
             if ( param!=null ) {
                 int i= param.indexOf("[");
@@ -1171,6 +1171,25 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
         
         logger.exiting("CdfJavaDataSourceEditorPanel", "fillTree" );
         
+    }
+
+    private static boolean isSupportParameter(Map<String, CdfVariableDescription> dataParameterInfo, String param) {
+        if ( param==null || param.trim().length()==0  ) {
+            return false;
+        }
+        String[] params;
+        if ( param.contains(";") ) {
+            params= param.split(";");
+        } else {
+            params= new String[] { param };
+        }
+        for ( String p: params ) {
+            CdfVariableDescription cdfvd= dataParameterInfo.get(p);
+            if ( cdfvd!=null ) { // sure hope so
+                if ( cdfvd.isSupport ) return true;
+            }
+        }
+        return false;
     }
 
 }
