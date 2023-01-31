@@ -674,7 +674,7 @@ public class JythonUtil {
         MyVisitorBase(HashSet names, SimpleNode node ) {
             this.names = names;
             this.node = node; // for reference
-            if ( this.node.toString().contains("id=mlt_full") ) {
+            if ( this.node.toString().contains("id=r_erg") ) {
                 System.err.println("HERE STOP 671");
             }
         }
@@ -684,12 +684,7 @@ public class JythonUtil {
             if (!names.contains(node.id)) {
                 visitNameFail = true;
             }
-            return super.visitName(node); //To change body of generated methods, choose Tools | Templates.
-        }
-
-        @Override
-        public Object visitCall(Call node) throws Exception {
-            return super.visitCall(node); //To change body of generated methods, choose Tools | Templates.
+            return null;
         }
 
         @Override
@@ -703,24 +698,26 @@ public class JythonUtil {
                 boolean newLooksOkay = trivialFunctionCall(sn);
                 if (!newLooksOkay) {
                     logger.log(Level.FINE, "looksOkay=False, {0}", sn);
+                } else {
+                    Call c= (Call)sn;
+                    for ( exprType e: c.args ) {
+                        if ( !simplifyScriptToGetParamsCanResolve( e, names ) ) {
+                            newLooksOkay= false;
+                            visitNameFail= true;  // TODO: I don't understand why there are two variables...
+                        }
+                    }
                 }
                 looksOkay = newLooksOkay;
             } else if (sn instanceof Assign) { // TODO: I have to admit I don't understand what traverse means.  I would have thought it was all nodes...
                 Assign a = ((Assign) sn);
                 exprType et = a.value;
                 if (et instanceof Call) {
-                    boolean newLooksOkay = trivialFunctionCall(et);
-                    if (!newLooksOkay) {
-                        logger.log(Level.FINE, "looksOkay=False, {0}", sn);
-                    }
-                    looksOkay = newLooksOkay;
+                    traverse( et );
                 }
             } else if ( sn instanceof BinOp ) {
-                if ( !trivialFunctionCall(((BinOp) sn).left ) || !trivialFunctionCall(((BinOp) sn).right) ) {
-                    looksOkay= false;
-                }
-            } else if (sn instanceof Name) {
-                //visitName((Name)sn).id
+                traverse(((BinOp) sn).left);
+                traverse(((BinOp) sn).right);
+
             }
         }
 
