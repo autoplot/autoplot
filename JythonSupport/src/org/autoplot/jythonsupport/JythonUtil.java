@@ -1150,7 +1150,7 @@ public class JythonUtil {
                 continue;
             }
             if ( o instanceof TryExcept ) {
-                System.err.println("here try except");
+                //System.err.println("here try except");
                 acceptLine= -1;
                 continue;
             }
