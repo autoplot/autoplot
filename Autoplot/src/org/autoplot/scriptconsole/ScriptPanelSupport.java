@@ -861,6 +861,7 @@ public class ScriptPanelSupport {
                     clearAnnotations();
                 } else if ( ( ( mode & Event.SHIFT_MASK ) == Event.SHIFT_MASK ) || ( ( mode & Event.ALT_MASK ) == Event.ALT_MASK ) ) {
                     JPanel p= new JPanel();
+                    p.setLayout( new BorderLayout() );
                     Map<String,String> vars= new HashMap();
                     ParametersFormPanel pfp= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
                     Map<String,Object> env= new HashMap();
