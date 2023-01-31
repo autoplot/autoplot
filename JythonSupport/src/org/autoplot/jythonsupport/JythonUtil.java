@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -1606,7 +1607,7 @@ public class JythonUtil {
         interp.exec(prog);
         interp.exec("import autoplot2017 as autoplot\n");
         PyList sort = (PyList) interp.eval("autoplot._paramSort");
-
+                
         boolean altWhy = false; // I don't know why things are suddenly showing up in this other space.
         if (sort.isEmpty()) {
             try {
@@ -1619,16 +1620,26 @@ public class JythonUtil {
                 // good...
             }
         }
+        
+        LinkedList<String> jsort= new LinkedList<>();
+        for (int i = 0; i < sort.__len__(); i++) {
+            String item= (String)sort.get(i);
+            if ( jsort.contains(item) ) {
+                jsort.remove(item);  
+            } 
+            jsort.add(item); // move it to the end
+        }
 
         final List<Param> result = new ArrayList();
-        for (int i = 0; i < sort.__len__(); i++) {
-            String theParamName = (String) sort.get(i);
+        for (int i = 0; i < jsort.size(); i++) {
+            
+            String theParamName = (String) jsort.get(i);
             PyList oo = (PyList) interp.eval("autoplot._paramMap['" + theParamName + "']");
             if (altWhy) {
-                oo = (PyList) interp.eval("_paramMap['" + (String) sort.get(i) + "']");
+                oo = (PyList) interp.eval("_paramMap['" + theParamName + "']");
             }
             Param p = new Param();
-            p.label = (String) sort.get(i);   // should be name in the script
+            p.label = theParamName;   // should be name in the script
             if (p.label.startsWith("__")) {
                 continue;  // __doc__, __main__ symbols defined by Jython.
             }
