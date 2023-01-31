@@ -455,8 +455,10 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
             CdfVariableDescription cvd = cvds.getValue();
             if ( whichIndependentParameter==X_PARAMETER ) {
                 if ( cvd.numberOfRecords==dependent.numberOfRecords ) {
-                    result.put( cvd.name, cvd );
-                }
+                    if ( cvd.dimensions.length==0 || ( cvd.dimensions.length==1 && cvd.dimensions[0]==2 ) ) {
+                        result.put( cvd.name, cvd );
+                    }
+                } 
             } else if ( whichIndependentParameter==Y_PARAMETER) {
                 if ( cvd.dimensions.length==1 && dependent.dimensions.length==1 
                         && cvd.dimensions[0]==dependent.dimensions[0] ) {
