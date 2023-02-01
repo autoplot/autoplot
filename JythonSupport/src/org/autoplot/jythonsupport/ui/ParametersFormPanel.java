@@ -49,6 +49,7 @@ import javax.swing.JColorChooser;
 import org.autoplot.datasource.RecentComboBox;
 import org.autoplot.jythonsupport.JythonUtil.ScriptDescriptor;
 import org.autoplot.jythonsupport.Param;
+import org.das2.datum.UnitsUtil;
 import org.das2.util.FileUtil;
 
 /**
@@ -390,7 +391,15 @@ public class ParametersFormPanel {
                     values= parm.enums;
                 }
                 
-                switch (parm.type) {
+                // little kludge: if the default is a timerange, then assume it must always be a timerange.
+                char type= parm.type;
+                if ( type=='S' ) {
+                    if ( UnitsUtil.isTimeLocation( ((DatumRange)parm.deft).getUnits() ) ) {
+                        type='T';
+                    }
+                }
+                
+                switch (type) {
                     case 'U':
                         {
                             final DataSetSelector sel= new DataSetSelector();
