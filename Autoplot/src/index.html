@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>New kernel rebinner with time-varying ytags.
+        <p><small>CDF dialog is improved to clarify its use, culling selections which would result in errors.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,11 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-01-21 r26875):</p>
+        <p>Bugfixes (2023-02-01 r26875):</p>
         <ul> 
+            <li>handle when getParam is called with the same parameter name twice, dialog is now resizable.
+            <li>"if(len(r_erg))" was included in simplified Jython script, causing runtime error.  Thanks, Sadie!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2501">2501</a>: clean up the X and Y parts of the CDF editor dialog, so that only compatible Xs and Ys are offered. don't allow EwEw&X=EwEw, etc.
             <li>rte_1865701214: strange and annoying RTE associated with setting the status bar text.
         </ul>
         <p>Older Bugfixes (2023-01-21 r26875):</p>
@@ -54,6 +57,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/796/">796</a>: improve support for second timerange parameter
         </ul>
         <p>Less recent features:</p>
         <ul>
