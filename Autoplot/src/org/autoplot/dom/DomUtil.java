@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -896,6 +897,15 @@ public class DomUtil {
         return result;
     }
 
+    private static void checkIds( HashSet<String> ids, DomNode[] n, List<String> problems ) {
+        for ( int i=0; i<n.length; i++ ) {
+            if ( ids.contains(n[i].id) ) {
+                problems.add("multiple nodes have the same id: "+n[i].id);
+            }
+            ids.add(n[i].id);
+        }
+    }
+    
     /**
      * returns true if the dom is valid, throws a runtime exception otherwise
      * @param application the dom
@@ -952,6 +962,12 @@ public class DomUtil {
                 if ( getElementById(application, p.getColumnId() )==null )
                     problems.add("unable to find column "+p.getColumnId()+" for plot  "+p.getId());
             }
+            
+            HashSet<String> ids= new HashSet<String>();
+            checkIds( ids, application.getPlots(), problems );
+            checkIds( ids, application.getPlotElements(), problems );
+            checkIds( ids, application.getDataSourceFilters(), problems );
+            checkIds( ids, application.getAnnotations(), problems );
 
         } finally {
             if ( lock!=null ) {
