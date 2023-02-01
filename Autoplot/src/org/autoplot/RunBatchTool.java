@@ -86,6 +86,7 @@ import org.autoplot.jythonsupport.ui.ParametersFormPanel;
 import org.autoplot.jythonsupport.ui.Util;
 import org.autoplot.pngwalk.PngWalkTool;
 import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
@@ -1201,7 +1202,7 @@ public class RunBatchTool extends javax.swing.JPanel {
      */
     private String[] doGenerateOne( org.autoplot.jythonsupport.Param pd ) {
         String[] ss=null; // will be generated values
-        if ( pd.type=='T' ) {
+        if ( pd.type=='T' || ( pd.type=='S' && UnitsUtil.isTimeLocation(((DatumRange)pd.deft).getUnits()) ) ) {
             try {
                 if ( AutoplotUtil.showConfirmDialog( this, timeRangesPanel, "Generate Time Ranges", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
                     String template= timeFormatComboBox.getSelectedItem().toString();
