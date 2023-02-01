@@ -371,6 +371,7 @@ public class StatePersistence {
      * to implement this.  So we do this for now.
      * 
      * @param state the application model
+     * @see DomUtil#deleteDuplicateIds(org.autoplot.dom.Application) 
      */
     private static void makeValid( Application state ) {
         if ( state.getController()!=null ) throw new IllegalArgumentException("state must not have controller");
@@ -436,6 +437,9 @@ public class StatePersistence {
                 BeanProperty.create(m.getDstProperty()).setValue(dst,srcVal);
             }
         }
+        
+        DomUtil.deleteDuplicateIds(state);
+        
     }
 
     

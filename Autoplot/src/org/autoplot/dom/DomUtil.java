@@ -911,6 +911,8 @@ public class DomUtil {
      * @param application the dom
      * @param problems descriptions of the problems will be inserted here
      * @return true if the dom is valid, throws a runtime exception otherwise
+     * @see #deleteDuplicateIds(org.autoplot.dom.Application) 
+     * @see #checkUniqueIdsAndReferences(org.autoplot.dom.Application, java.util.List) 
      */
     public static boolean validateDom( Application application, List<String> problems ) {
 
@@ -1432,6 +1434,67 @@ public class DomUtil {
                 "=" + arow.getTop() + "," + arow.getBottom() );
     }
 
+    /**
+     * if there are duplicate ids, we can delete them to at least make the vap valid.
+     * @param state 
+     */
+    public static void deleteDuplicateIds(Application state) {
+        HashSet<String> s;
+        
+        if ( state.controller!=null ) {
+            throw new IllegalArgumentException("application can not have a controller.");
+        }
+        
+        s = new HashSet<>();
+        List<Annotation> ann= new ArrayList<>();
+        for ( Annotation a: state.getAnnotations() ) {
+            if ( !s.contains(a.id) ) {
+                ann.add(a);
+            }
+        }
+        state.setAnnotations(ann.toArray(new Annotation[ann.size()]));
+        
+        s = new HashSet<>();
+        List<DataSourceFilter> ff= new ArrayList<>();
+        for ( DataSourceFilter a: state.getDataSourceFilters() ) {
+            if ( !s.contains(a.id) ) {
+                ff.add(a);
+            }
+            s.add(a.id);
+        }
+        state.setDataSourceFilters(ff.toArray(new DataSourceFilter[ff.size()]));
+
+        s = new HashSet<>();
+        List<PlotElement> pes= new ArrayList<>();
+        for ( PlotElement a: state.getPlotElements() ) {
+            if ( !s.contains(a.id) ) {
+                pes.add(a);
+            }
+            s.add(a.id);
+        }
+        state.setPlotElements(pes.toArray(new PlotElement[pes.size()]));
+        
+        s = new HashSet<>();
+        List<Plot> ps= new ArrayList<>();
+        for ( Plot a: state.getPlots() ) {
+            if ( !s.contains(a.id) ) {
+                ps.add(a);
+            }
+            s.add(a.id);
+        }
+        state.setPlots(ps.toArray(new Plot[ps.size()]));
+
+    }
+    
+          
+    /**
+     * detect where ids are not unique
+     * @param dom
+     * @param problems
+     * @return 
+     * @see #deleteDuplicateIds which will make the vap valid, at least.
+     * @see #validateDom(org.autoplot.dom.Application, java.util.List) 
+     */
     public static List<String> checkUniqueIdsAndReferences( Application dom, List<String> problems ) {
         // check that all ids within the .vap are unique
         Map<String,DomNode> ids= new HashMap<>();
