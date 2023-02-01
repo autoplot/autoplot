@@ -391,6 +391,7 @@ public class ParametersFormPanel {
                     values= parm.enums;
                 }
                 
+                // https://sourceforge.net/p/autoplot/feature-requests/796/
                 // little kludge: if the default is a timerange, then assume it must always be a timerange.
                 char type= parm.type;
                 if ( type=='S' ) {
