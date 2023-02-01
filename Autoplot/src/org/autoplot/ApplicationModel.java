@@ -1247,13 +1247,21 @@ public final class ApplicationModel {
             // GuiSupport.setFont( this, newFont );  // this is in-lined to support AutoplotApplet.
             getCanvas().setBaseFont(newFont);
             Font f2 = getCanvas().getFont();
-            getDocumentModel().getOptions().setCanvasFont( DomUtil.encodeFont(f2) );
+            getDom().getOptions().setCanvasFont( DomUtil.encodeFont(f2) );
             state.getCanvases(0).setFont( DomUtil.encodeFont(newFont) );
             state.getCanvases(0).setFitted(dom.getCanvases(0).isFitted());
             state.getCanvases(0).setWidth( dom.getCanvases(0).getWidth());
             state.getCanvases(0).setHeight( dom.getCanvases(0).getHeight());
         }
         
+        ArrayList<String> problems= new ArrayList();
+        if ( !DomUtil.validateDom( state, problems ) ) {
+            for ( String p: problems ) {
+                System.err.println(p);
+            }
+        }
+        
+                
         //logger.fine("" + state.diffs(this.dom));
         restoreState(state);
         
