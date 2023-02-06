@@ -642,7 +642,7 @@ public class DataSourceController extends DomNodeController {
             doDimensionNames();
 
             long datasetSize= DataSetUtil.totalLengthAsLong(ds);
-            if ( ds.rank()<=QDataSet.MAX_RANK && DataSetUtil.totalLength(ds) < LIMIT_STATS_COUNT && UnitsUtil.isIntervalOrRatioMeasurement(SemanticOps.getUnits(ds)) ) {
+            if ( ds.rank()<=QDataSet.MAX_RANK && datasetSize < LIMIT_STATS_COUNT && UnitsUtil.isIntervalOrRatioMeasurement(SemanticOps.getUnits(ds)) ) {
                 setStatus("busy: do statistics on the data...");
                 try {
                     if ( datasetSize>0 && datasetSize<QDataSet.LIMIT_HUGE_DATASET ) {
@@ -692,7 +692,7 @@ public class DataSourceController extends DomNodeController {
     /**
      * this is the maximum number of points which we will perform stats on.
      */
-    protected static final int LIMIT_STATS_COUNT = 200000000;
+    protected static final int LIMIT_STATS_COUNT = 150_000_000;
 
     DataSourceFilter[] parentSources;
     
