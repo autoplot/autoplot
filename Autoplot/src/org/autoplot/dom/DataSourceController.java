@@ -656,8 +656,21 @@ public class DataSourceController extends DomNodeController {
                     setHistogram(null);
                 }
             } else {
-                logger.fine("skipping stats because there is too much data");
-                setHistogram(null);
+                if ( datasetSize < ( LIMIT_STATS_COUNT * 4 ) ) {
+                    Runnable run= new Runnable() {
+                        public void run() {
+                            long t0= System.currentTimeMillis();
+                            setHistogram(new AutoHistogram().doit(ds, null));
+                            logger.log(Level.FINE, "done with statistics on the data ({0}ms)", System.currentTimeMillis()-t0);                            
+                        }
+                    };
+                    setHistogram(null);
+                    logger.fine("do statistics on the data in the background");
+                    new Thread(run).start();
+                } else {
+                    logger.fine("skipping stats because there is too much data");
+                    setHistogram(null);
+                }
             }
 
             setStatus("busy: apply fill");
