@@ -660,6 +660,7 @@ public class DataSourceController extends DomNodeController {
                     Runnable run= new Runnable() {
                         public void run() {
                             long t0= System.currentTimeMillis();
+                            setStatus("do statistics on the data in the background");
                             setHistogram(new AutoHistogram().doit(ds, null));
                             logger.log(Level.FINE, "done with statistics on the data ({0}ms)", System.currentTimeMillis()-t0);                            
                         }
