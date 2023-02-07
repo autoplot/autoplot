@@ -100,6 +100,11 @@
                      src="../../SimpleServlet?<%= ssArg %>"
                      onload="logloaded();" 
                 >
+            <% } else { %>
+		<img id="idplot" 
+                     src="blank.png"
+                     onload="logloaded();" 
+                >            
             <% } %>
 	</div>
     <div id="divprogress">
