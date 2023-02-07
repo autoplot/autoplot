@@ -129,7 +129,7 @@
             </p>
             <input id='vapta' size="80" value="<%=uriOrVap%>"></input>
             <button onclick="resetUrl(''); return false;"><img src='go.png' alt="GO"></img></button>
-    </form>            
+</form><br>          
             <span id="aplink"></span>
             <div id="info"></div>
                
