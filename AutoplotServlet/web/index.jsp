@@ -54,8 +54,7 @@
         <p><a href="completions.html">"Completions"</a> shows how to get completions, which could be used to create a more interactive client.
         </p>
         
-        <p><a href="thin/zoom/demo.html">"Thin"<a> shows how Autoplot is used to implement a thin-client that is usable on phones.  
-                    <b>The current version of this at <a href="http://autoplot.org/git/web/thin/zoom/demo.html">github</a></b>
+        <p><a href="thin/zoom/demo.jsp">"Thin"<a> shows how Autoplot is used to implement a thin-client that is usable on phones.  
         </p>
         
         <p>The source for all of these is found at <a href="https://sourceforge.net/p/autoplot/code/HEAD/tree/autoplot/trunk/AutoplotServlet/">SourceForge</a>.</p>
