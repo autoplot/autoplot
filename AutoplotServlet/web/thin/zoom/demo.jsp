@@ -72,7 +72,7 @@
                     File f= new File( ServletUtil.getServletHome().toString()+"/users" );
                     String[] ff= f.list();
                     if ( ff==null ) {
-                        out.println("Server has not been configured."); //  It should contain folders in " +ServletUtil.getServletHome().toString()+"/users");
+                        out.println("Server has not been configured to support individual users."); //  It should contain folders in " +ServletUtil.getServletHome().toString()+"/users");
                     } else {
                         for ( String s: ff ) {
                             out.println("<a href='demo.jsp?id="+s+"'>"+s+"</a><br>");
@@ -128,7 +128,7 @@
                         <button onclick="resetTime();" title="Jump to this range">Reset</button> to <input id="timerange" size="50"></input>
             </p>
             <input id='vapta' size="80" value="<%=uriOrVap%>"></input>
-        <button onclick="resetUrl(''); return false;">GO</button>
+            <button onclick="resetUrl(''); return false;"><img src='go.png' alt="GO"></img></button>
     </form>            
             <span id="aplink"></span>
             <div id="info"></div>
