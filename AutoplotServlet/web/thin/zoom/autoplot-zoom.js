@@ -105,11 +105,10 @@ function refresh() {
  */
 function resetUrl(url) {
     if ( url.length===0 ) { // get from control
-        console.info('here 108 '+document.getElementById('vapta').value);
         url= '../../SimpleServlet?uri='+encodeURIComponent(document.getElementById('vapta').value);
         console.info('here 110: '+url);
     } else {
-        console.info('here 112');
+        console.info('here 112' + url);
     }
     $('#idstatus').text("reset url "+url);
     $('#progress').attr('src', 'spinner.gif');
