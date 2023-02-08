@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>CDF dialog is improved to clarify its use, culling selections which would result in errors.
+        <p><small>New map image is available, copied from https://www.naturalearthdata.com and used in Autoplot with <a href="https://cottagesystems.com/data/maps/earth/NE1_50M_SR_W.png?xaxis=[-180,0,180,10800]&yaxis=[-90,0,90,5400]">this URI</a>. Existing outlines overlaid to verify.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,10 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-02-01 r26875):</p>
+        <p>Bugfixes (2023-02-08 r26915):</p>
         <ul> 
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/795/">rfe795</a>corrections to identifyContinuousBlocks.
+            <li>tweak where statistics are run on large datasets, which was causing pause before display.  Run large dataset stats in the background.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2504">2504</a>: loading a .vap with duplicate IDs results in very weird behavior.
             <li>handle when getParam is called with the same parameter name twice, dialog is now resizable.
             <li>"if(len(r_erg))" was included in simplified Jython script, causing runtime error.  Thanks, Sadie!
@@ -58,6 +60,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Improvements to the Autoplot servlet, after seeing modern JavaScripts needed corrections to the code.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/796/">796</a>: improve support for second timerange parameter
         </ul>
         <p>Less recent features:</p>
