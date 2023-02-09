@@ -16,6 +16,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.text.ParseException;
@@ -341,10 +342,10 @@ public class HapiServer {
         Map<String,String> params= new HashMap<>();
         params.put( HapiSpec.URL_PARAM_ID, id );
         
-        // https://sourceforge.net/p/autoplot/feature-requests/696/
-        if ( server.toString().contains("http://hapi-server.org/servers/TestDataRef/hapi") ) {
-            params.put( "resolve_references","false");
-        }
+        //// https://sourceforge.net/p/autoplot/feature-requests/696/
+        //if ( server.toString().contains("http://hapi-server.org/servers/TestDataRef/hapi") ) {
+        //    params.put( "resolve_references","false");
+        //}
         
         url= HapiServer.createURL(server, HapiSpec.INFO_URL, params );
         logger.log(Level.FINE, "getInfo {0}", url.toString());
@@ -757,5 +758,49 @@ public class HapiServer {
             }
             return sampleRange;                
         }
+    }
+
+    /**
+     * encode the string into a URL, handling encoded characters.  Note this does 
+     * nothing right now, but should still be used as the one place to handle URLs.
+     * @param s
+     * @return
+     * @throws MalformedURLException 
+     */
+    public static final URL encodeURL(String s) throws MalformedURLException {
+        try {
+            if (true) {
+                // s.matches("\\A\\p{ASCII}*\\z") ) {
+                return new URL(s);
+            } else {
+                s = URLEncoder.encode(s); // re-decode these because they work and it makes the URL ledgible.
+                s = s.replaceAll("\\%3A", ":");
+                s = s.replaceAll("\\%2F", "/");
+                s = s.replaceAll("\\%2B", "+");
+                s = s.replaceAll("\\%2C", ",");
+                return new URL(s);
+            }
+        } catch (MalformedURLException ex) {
+            return new URL(URLEncoder.encode(s));
+        }
+    }
+
+    /**
+     * decode the URL into a string useful in Autoplot URIs.
+     * @param s
+     * @return 
+     */
+    public static final String decodeURL(URL s) {
+        return URLDecoder.decode(s.toString());
+    }
+
+    /**
+     * replace pluses with %2B and spaces with pluses.
+     * @param s
+     * @return
+     */
+    public static final String encodeURLParameters(String s) {
+        s = s.replaceAll("\\+", "%2B");
+        return s.replaceAll(" ", "+");
     }
 }

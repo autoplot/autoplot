@@ -20,6 +20,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.Iterator;
@@ -217,7 +218,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             try {
                 String s= currentId;
                 if ( s!=null && s.trim().length()>0 ) {
-                    resetId( new URL( (String)serversComboBox.getSelectedItem() ), s );  
+                    resetId(HapiServer.encodeURL( (String)serversComboBox.getSelectedItem() ), s );  
                 } else {
                     parametersPanel.removeAll();
                     parametersPanel.add(new JLabel(" "));
@@ -228,9 +229,9 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
 //                    } catch (IOException ex) {
 //                        Logger.getLogger(HapiDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
 //                    }
-                    
+
                     titleLabel.setText(" ");
-                    
+
                 }
             } catch (MalformedURLException ex) {
                 JOptionPane.showMessageDialog( parametersPanel, ex.toString() );
@@ -536,7 +537,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
 
     private void serversComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serversComboBoxActionPerformed
         try {
-            final URL url= new URL( (String)serversComboBox.getSelectedItem() );
+            final URL url= HapiServer.encodeURL( (String)serversComboBox.getSelectedItem() );
             if ( currentServer==null || !url.toExternalForm().equals(currentServer.toExternalForm()) ) {
                 DefaultListModel m= new DefaultListModel() ;
                 m.add(0,"Reading list of available datasets...");
@@ -826,7 +827,11 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 logger.log(Level.SEVERE, null, ex);
             }
         }
-        serversComboBox.setSelectedItem( split.file );
+        try {
+            serversComboBox.setSelectedItem(HapiServer.decodeURL( HapiServer.encodeURL(split.file) ) );
+        } catch ( MalformedURLException ex ) {
+            serversComboBox.setSelectedItem( split.file ); // do what we did before.
+        }
         Map<String,String> params= URISplit.parseParams( split.params );
         
         String id= params.get("id");
@@ -884,10 +889,18 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         String id= idsList2.getSelectedValue();
         if ( id==null ) {
             id= "";
-        } else {           
-            id= HapiServer.urlEncode(id);
+        } else {
+            id = HapiServer.encodeURLParameters(id);
+            //id= HapiServer.urlEncode(id);
         }
-        String uri= "vap+hapi:" + serversComboBox.getSelectedItem().toString() + "?id=" + id + "&timerange="+timeRangeComboBox.getText().replaceAll(" ","+");
+        String uri= "vap+hapi:";
+        try {
+            // please encode the URLs before making Autoplot URIs, which really should be ASCII.
+            uri = uri + HapiServer.encodeURL( serversComboBox.getSelectedItem().toString() ).toString();
+        } catch ( MalformedURLException ex ) {
+            uri = uri + serversComboBox.getSelectedItem().toString();
+        }
+        uri = uri + "?id=" + id + "&timerange="+timeRangeComboBox.getText().replaceAll(" ","+");
         if ( binaryCB.isSelected() && binaryCB.isEnabled() ) {
             uri+= "&format=binary";
         }
@@ -895,7 +908,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             uri+= "&cache=F";
         }
         if ( parameters.length()>0 ) {
-            return uri + "&parameters="+parameters;
+            return uri + "&parameters="+HapiServer.encodeURLParameters(parameters);
         } else {
             return uri;
         }
