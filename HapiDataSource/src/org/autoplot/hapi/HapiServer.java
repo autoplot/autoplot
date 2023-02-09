@@ -803,4 +803,14 @@ public class HapiServer {
         s = s.replaceAll("\\+", "%2B");
         return s.replaceAll(" ", "+");
     }
+    
+    /**
+     * replace %2B with pluses and pluses with spaces.
+     * @param s
+     * @return
+     */
+    public static final String decodeURLParameters(String s) {
+        s = s.replaceAll("\\+", " ");
+        return s.replaceAll("%2B", "+");
+    }    
 }

@@ -853,6 +853,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         
         String parameters= params.get("parameters");
         if ( parameters!=null ) {
+            parameters= HapiServer.decodeURLParameters(parameters);
             this.currentParameters= parameters;
             setParameters(this.currentParameters);
             resetVariableTimer.tickle("initialUpdate");
