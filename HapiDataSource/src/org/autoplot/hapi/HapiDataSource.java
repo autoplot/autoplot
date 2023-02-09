@@ -970,29 +970,8 @@ public final class HapiDataSource extends AbstractDataSource {
             pp= URLDecoder.decode(pp,"UTF-8");
         }
         
-        boolean isGroupId=true;
-        JSONArray jo= HapiServer.getCatalog(server.toURL());
-        for ( int i=0; i<jo.length(); i++ ) {
-            JSONObject jo1= jo.getJSONObject(i);
-            if ( jo1.get("id").equals(id) ) {
-                isGroupId= false;
-            }
-        }
-        
         JSONObject info;
-        if ( isGroupId ) {
-            JSONObject r = maybeGetDiffResolutionInfo(id);
-            if ( r==null ) {
-                throw new IllegalArgumentException("Bad id: "+id );
-            } else {
-                info= r;
-            }
-        } else {
-            info= getInfo(id);
-        }
-
-        
-        
+        info= getInfo(id);
         
         info= HapiUtil.resolveRefs(info);
         
@@ -1032,6 +1011,10 @@ public final class HapiDataSource extends AbstractDataSource {
         int nparam= parametersArray.length(); // this is the actual number sent.
         if ( pp.length()>0 ) {
             String[] pps= pp.split(",");
+            for ( int i=0; i<pps.length; i++ ) {
+                pps[i]= pps[i].replace("+"," ");
+                pps[i]= pps[i].replaceAll("\\%2B","+");
+            }
             Map<String,Integer> map= new HashMap();
             for ( int i=0; i<nparam; i++ ) {
                 map.put( parametersArray.getJSONObject(i).getString("name"), i ); // really--should name/id are two names for the same thing...
