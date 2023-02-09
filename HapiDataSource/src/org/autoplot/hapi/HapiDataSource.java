@@ -70,6 +70,7 @@ import org.autoplot.datasource.DefaultTimeSeriesBrowse;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.Caching;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
+import static org.autoplot.hapi.HapiServer.readFromURL;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.fsm.FileStorageModel;
@@ -246,12 +247,54 @@ public final class HapiDataSource extends AbstractDataSource {
     
     public static final double FILL_VALUE= -1e38;
     
-    private JSONObject getInfo( ) throws MalformedURLException, IOException, JSONException {
+    /**
+     * returns the info for the object to use, or null.
+     * @return 
+     */
+    private JSONObject maybeGetDiffResolutionInfo(String id) {
+        try {
+            URL url= HapiServer.createURL( this.resourceURI.toURL(), "semantics");
+            String s= readFromURL( url, "json" );
+            JSONObject o= new JSONObject(s);
+            JSONArray a= o.optJSONArray("cadenceVariants");
+            if ( a!=null ) {
+                for ( int i=0; i<a.length(); i++ ) {
+                    Object o1= a.get(i);
+                    if ( o1 instanceof JSONObject ) {
+                        JSONObject jo2= (JSONObject)o1;
+                        if ( jo2.optString("groupId","").equals(id) ) {
+                            String sourceId= jo2.getString("sourceId");
+                            return getInfo( sourceId );
+                        }
+                    }
+                }
+            }
+            return null;
+        } catch (JSONException ex) {
+            Logger.getLogger(HapiDataSource.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(HapiDataSource.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+    
+    private JSONObject getInfo( String id ) throws MalformedURLException, IOException, JSONException {
         URI server = this.resourceURI;
-        String id= getParam("id","" );
         if ( id.equals("") ) throw new IllegalArgumentException("missing id");
         id = URLDecoder.decode(id,"UTF-8");
-        return HapiServer.getInfo(server.toURL(), id);
+        JSONArray jo= HapiServer.getCatalog(server.toURL());
+        for ( int i=0; i<jo.length(); i++ ) {
+            JSONObject jo1= jo.getJSONObject(i);
+            if ( jo1.get("id").equals(id) ) {
+                return HapiServer.getInfo(server.toURL(), id);
+            }
+        }
+        JSONObject r = maybeGetDiffResolutionInfo(id);
+        if ( r==null ) {
+            throw new IllegalArgumentException("Bad id: "+id );
+        } else {
+            return r;
+        }
     }
 
     /**
@@ -926,7 +969,31 @@ public final class HapiDataSource extends AbstractDataSource {
         if ( pp.contains("%2C") ) {  // commas are escaped
             pp= URLDecoder.decode(pp,"UTF-8");
         }
-        JSONObject info= getInfo();
+        
+        boolean isGroupId=true;
+        JSONArray jo= HapiServer.getCatalog(server.toURL());
+        for ( int i=0; i<jo.length(); i++ ) {
+            JSONObject jo1= jo.getJSONObject(i);
+            if ( jo1.get("id").equals(id) ) {
+                isGroupId= false;
+            }
+        }
+        
+        JSONObject info;
+        if ( isGroupId ) {
+            JSONObject r = maybeGetDiffResolutionInfo(id);
+            if ( r==null ) {
+                throw new IllegalArgumentException("Bad id: "+id );
+            } else {
+                info= r;
+            }
+        } else {
+            info= getInfo(id);
+        }
+
+        
+        
+        
         info= HapiUtil.resolveRefs(info);
         
         String vers= info.getString("HAPI");
