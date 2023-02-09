@@ -47,6 +47,7 @@ import org.das2.qds.ops.Ops;
 import org.das2.qds.util.DataSetBuilder;
 import org.autoplot.metatree.IstpMetadataModel;
 import org.autoplot.netCDF.NetCDFDataSource;
+import org.das2.qds.DataSetOps;
 
 /**
  * Special data source for reading time series from NASA Goddard's CDAWeb
@@ -88,6 +89,7 @@ public class CDAWebDataSource extends AbstractDataSource {
     }
 
     Map<String,Object> metadata;
+    Map<String,Object>[] metadatas;
 
     DatumRange tr;
     String ds;
@@ -196,7 +198,17 @@ public class CDAWebDataSource extends AbstractDataSource {
             mon.setProgressMessage("getting metadata for "+ds);
             getMetadata( SubTaskMonitor.create( mon,0,10) );
 
-            String virtual= (String) metadata.get( "VIRTUAL" );
+            String virtual=null;
+            String[] virtuals=null;
+            
+            if ( metadata!=null ) {
+                virtual= (String) metadata.get( "VIRTUAL" );
+            } else {
+                virtuals= new String[metadatas.length];
+                for ( int i=0; i<metadatas.length; i++ ) {
+                    virtuals[i]= (String) metadatas[i].get( "VIRTUAL" );
+                }
+            }
 
             DatumRange range=null;
             
@@ -219,56 +231,15 @@ public class CDAWebDataSource extends AbstractDataSource {
                 MutablePropertyDataSet ds1=null;
                 try {
                     if ( virtual!=null && !virtual.equals("") ) {
-                        int nc=0;
-                        List<QDataSet> comps= new ArrayList();
-                        String function= (String)metadata.get( "FUNCTION" );
-                        if ( function==null ) {
-                            function= (String)metadata.get( "FUNCT" ); // THA_L2_ESA
+                        ds1 = readVirtualVariable(file, metadata, fileDataSourceFactory, ds1, t1);
+                    } else if ( virtuals!=null ) {
+                        QDataSet dss=null;
+                        for ( int i2=0; i2<metadatas.length; i2++ ) {
+                            ds1 = readVirtualVariable(file, metadatas[i2], fileDataSourceFactory, ds1, t1);
+                            dss= Ops.bundle( dss, ds1 );
                         }
-                        String missingComponentName= null;
-                        if ( function!=null ) {
-                            String comp= (String)metadata.get( "COMPONENT_"  + nc );
-                            while ( comp!=null ) {
-                                Map<String,String> fileParams= new HashMap(getParams());
-                                fileParams.remove( PARAM_TIMERANGE );
-                                fileParams.remove( PARAM_DS );
-                                fileParams.put( PARAM_ID, comp );
-                                URI file1;
-                                file1= DataSetURI.getURI(  file + "?" + URISplit.formatParams(fileParams) );
-                                logger.log(Level.FINER, "loading component for virtual variable: {0}", file1);
-                                DataSource dataSource= fileDataSourceFactory.getDataSource( file1 );
-                                try {
-                                    ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1.getSubtaskMonitor("load "+comp) );
-                                } catch ( Exception ex ) {
-                                    ds1= null; // !!!!
-                                    logger.log( Level.WARNING, ex.getMessage(), ex );
-                                    missingComponentName= comp;
-                                }
-                                comps.add( ds1 );
-                                nc++;
-                                comp= (String) metadata.get( "COMPONENT_"  + nc );
-                            }
-                            boolean missingComponent= false;
-                            for (QDataSet comp1 : comps) {
-                                if (comp1 == null) {
-                                    missingComponent= true;
-                                }
-                            }
-                            if ( !missingComponent ) {
-                                try {
-                                    ds1= (MutablePropertyDataSet)CdfVirtualVars.execute( metadata, function, comps, t1 );
-                                    // check for slice        
-                                    String id_= getParams().get("id");
-                                    ds1= maybeImplementSlice( id_,ds1 );
-                                } catch (IllegalArgumentException ex ){
-                                    throw new IllegalArgumentException("The virtual variable " + id + " cannot be plotted because the function is not supported: "+function, ex);
-                                }
-                            } else {
-                                throw new IllegalArgumentException("The virtual variable "+id + " cannot be plotted because a component "+missingComponentName+" is missing");
-                            }
-                        } else {
-                        throw new IllegalArgumentException("The virtual variable " + id + " cannot be plotted because the function is not identified" );
-                        }
+                        ds1= DataSetOps.makePropertiesMutable(dss);
+                        
                     } else {
                         Map<String,String> fileParams= new HashMap(getParams());
                         fileParams.remove( PARAM_TIMERANGE );
@@ -352,7 +323,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                 result= accum;
             }
             
-            if ( result!=null && result.property(QDataSet.UNITS)==null && metadata.containsKey("UNIT_PTR_VALUE" ) ) {
+            if ( result!=null && result.property(QDataSet.UNITS)==null && ( metadata!=null && metadata.containsKey("UNIT_PTR_VALUE" ) ) ) {
                 QDataSet unitss= (QDataSet) metadata.get("UNIT_PTR_VALUE");
                 boolean allSame= true;
                 for ( int i=0; i<unitss.length(); i++ ) {
@@ -363,7 +334,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                 if ( allSame ) result= Ops.putProperty( result, QDataSet.UNITS, Units.lookupUnits(unitss.slice(0).toString()) );
             } 
 
-            if ( result!=null && result.property(QDataSet.DEPEND_1)==null ) { // kludge to learn about master file new HFR-SPECTRA_EMFISIS
+            if ( result!=null && result.property(QDataSet.DEPEND_1)==null && metadata!=null ) { // kludge to learn about master file new HFR-SPECTRA_EMFISIS  // TODO: metadatas?
                 Map dep1p= (Map) metadata.get("DEPEND_1");
                 if ( dep1p!=null && dep1p.containsKey("NAME") && result.rank()>1 ) {
                     String dep1= (String)dep1p.get("NAME");
@@ -375,7 +346,7 @@ public class CDAWebDataSource extends AbstractDataSource {
             }
             
             // kludge to get y labels when they are in the skeleton.
-            if ( result!=null && result.rank()==2 ) {
+            if ( result!=null && result.rank()==2 && metadata!=null ) { // TODO: metadatas?
                 QDataSet labels= (QDataSet) result.property(QDataSet.DEPEND_1);
                 String labelVar= (String)metadata.get( "LABL_PTR_1");
                 String renderType= (String)result.property(QDataSet.RENDER_TYPE);
@@ -397,7 +368,7 @@ public class CDAWebDataSource extends AbstractDataSource {
 
             // slice1 datasets should get the labels from the master if we sliced it already.
             String slice1=getParam("slice1", "" ); 
-            if ( result!=null && slice1.length()>0 ) { 
+            if ( result!=null && slice1.length()>0 && metadata!=null ) {  // TODO: metadatas?
                 int islice1= Integer.parseInt(slice1);
                 String labelVar= (String)metadata.get( "LABL_PTR_1");
                 if ( labelVar!=null ) {
@@ -464,12 +435,67 @@ public class CDAWebDataSource extends AbstractDataSource {
 
     }
 
+    private MutablePropertyDataSet readVirtualVariable(String file, Map<String,Object> meta, 
+            DataSourceFactory fileDataSourceFactory, MutablePropertyDataSet ds1, ProgressMonitor t1) throws Exception {
+        int nc=0;
+        List<QDataSet> comps= new ArrayList();
+        String function= (String)meta.get( "FUNCTION" );
+        if ( function==null ) {
+            function= (String)meta.get( "FUNCT" ); // THA_L2_ESA
+        }
+        String missingComponentName= null;
+        if ( function!=null ) {
+            String comp= (String)meta.get( "COMPONENT_"  + nc );
+            while ( comp!=null ) {
+                Map<String,String> fileParams= new HashMap(getParams());
+                fileParams.remove( PARAM_TIMERANGE );
+                fileParams.remove( PARAM_DS );
+                fileParams.put( PARAM_ID, comp );
+                URI file1;
+                file1= DataSetURI.getURI(  file + "?" + URISplit.formatParams(fileParams) );
+                logger.log(Level.FINER, "loading component for virtual variable: {0}", file1);
+                DataSource dataSource= fileDataSourceFactory.getDataSource( file1 );
+                try {
+                    ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1.getSubtaskMonitor("load "+comp) );
+                } catch ( Exception ex ) {
+                    ds1= null; // !!!!
+                    logger.log( Level.WARNING, ex.getMessage(), ex );
+                    missingComponentName= comp;
+                }
+                comps.add( ds1 );
+                nc++;
+                comp= (String) meta.get( "COMPONENT_"  + nc );
+            }
+            boolean missingComponent= false;
+            for (QDataSet comp1 : comps) {
+                if (comp1 == null) {
+                    missingComponent= true;
+                }
+            }
+            if ( !missingComponent ) {
+                try {
+                    ds1= (MutablePropertyDataSet)CdfVirtualVars.execute( meta, function, comps, t1 );
+                    // check for slice
+                    String id_= getParams().get("id");
+                    ds1= maybeImplementSlice( id_,ds1 );
+                } catch (IllegalArgumentException ex ){
+                    throw new IllegalArgumentException("The virtual variable " + id + " cannot be plotted because the function is not supported: "+function, ex);
+                }
+            } else {
+                throw new IllegalArgumentException("The virtual variable "+id + " cannot be plotted because a component "+missingComponentName+" is missing");
+            }
+        } else {
+            throw new IllegalArgumentException("The virtual variable " + id + " cannot be plotted because the function is not identified" );
+        }
+        return ds1;
+    }
+
     @Override
     public synchronized Map<String, Object> getMetadata(ProgressMonitor mon) throws Exception {
         if ( "T".equals(this.savail) ) {
             return null;
         }
-        if ( metadata==null ) {
+        if ( metadata==null && metadatas==null ) {
             mon.started();
             CDAWebDB db= CDAWebDB.getInstance();
             
@@ -480,9 +506,19 @@ public class CDAWebDataSource extends AbstractDataSource {
             String y= getParam("y",null);
             if ( x!=null ) master+="&x="+x;
             if ( y!=null ) master+="&y="+y;
-            DataSource cdf= getDelegateFactory(split.ext).getDataSource( DataSetURI.getURI(master) );
-
-            metadata= cdf.getMetadata(mon.getSubtaskMonitor("getMetadata")); // note this is a strange branch, because usually we have read data first.
+            
+            if ( id.contains(";") ) {
+                String[] params= id.split(";"); 
+                metadatas= new Map[params.length];
+                for ( int i=0; i<params.length; i++ ) {
+                    String m= URISplit.removeParam( master, URISplit.PARAM_ARG_0 ) + "?" + params[i];
+                    DataSource cdf= getDelegateFactory(split.ext).getDataSource( DataSetURI.getURI(m) );
+                    metadatas[i]= cdf.getMetadata(mon.getSubtaskMonitor("getMetadata for "+params[i]) );
+                }
+            } else {
+                DataSource cdf= getDelegateFactory(split.ext).getDataSource( DataSetURI.getURI(master) );
+                metadata= cdf.getMetadata(mon.getSubtaskMonitor("getMetadata")); // note this is a strange branch, because usually we have read data first.
+            }
 
             String slice1= getParam("slice1","" ); // kludge to grab LABL_PTR_1 when slice1 is used.
             if ( !slice1.equals("") ) {
