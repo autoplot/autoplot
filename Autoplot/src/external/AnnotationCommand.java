@@ -258,7 +258,7 @@ public class AnnotationCommand extends PyObject {
                         break;
                     case "plotId":
                         annotation.setPlotId(sval);
-                        if ( keywordsList.contains("xrange") || keywordsList.contains("yrange" ) ) {
+                        if ( keywordsList.contains("xrange") || keywordsList.contains("yrange" ) ) { // check other keywords so that order doesn't matter
                             annotation.setAnchorType( AnchorType.DATA );
                         } else {
                             annotation.setAnchorType( AnchorType.CANVAS ); //TODO: review AnchorType.PLOT
