@@ -2,6 +2,7 @@
 package external;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
 import org.python.core.Py;
 import org.python.core.PyInteger;
@@ -55,7 +56,7 @@ public class AnnotationCommand extends PyObject {
             + " <tr><td> anchorOffset </td><td>position relative to the anchor, like '1em,1em'</td></tr>"
             + " <tr><td> anchorType </td><td>PLOT means relative to the plot.<br>DATA means relative to xrange and yrange</td></tr>"
             + " <tr><td> xrange, yrange </td><td> anchor box when using data anchor</td></tr>"
-            + " <tr><td> plotId </td><td> ID of the plot containing axes.</td></tr>"    
+            + " <tr><td> plotId </td><td> ID of the plot containing axes.  This will set the anchorType to CANVAS, unless xrange or yrange is set.</td></tr>"    
             + " <tr><td> pointAt </td><td>comma separated X and Y to point the annotation arrow at.</td></tr>"
             + " <tr><td> pointAtX </td><td>X value to point the arrow at or to anchor the annotation.</td></tr>"
             + " <tr><td> pointAtX </td><td>Y value to point the arrow at or to anchor the annotation.</td></tr>"
@@ -191,7 +192,8 @@ public class AnnotationCommand extends PyObject {
         annotation.syncTo( new Annotation(), Arrays.asList( DomNode.PROP_ID, Annotation.PROP_PLOTID, Annotation.PROP_ROWID, Annotation.PROP_COLUMNID ) );
                 
         try {
-
+            List<String> keywordsList= Arrays.asList(keywords);
+            
             for ( int i=nparm; i<args.length; i++ ) { //HERE nargs
                 String kw= keywords[i-nparm];
                 PyObject val= args[i];
@@ -256,7 +258,11 @@ public class AnnotationCommand extends PyObject {
                         break;
                     case "plotId":
                         annotation.setPlotId(sval);
-                        annotation.setAnchorType( AnchorType.DATA );
+                        if ( keywordsList.contains("xrange") || keywordsList.contains("yrange" ) ) {
+                            annotation.setAnchorType( AnchorType.DATA );
+                        } else {
+                            annotation.setAnchorType( AnchorType.CANVAS ); //TODO: review AnchorType.PLOT
+                        }
                         DomNode p= DomUtil.getElementById(dom,sval);
                         if ( p instanceof Plot ) {
                             annotation.setRowId(((Plot)p).getRowId());
