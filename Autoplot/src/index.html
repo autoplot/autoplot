@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>New map image is available, copied from https://www.naturalearthdata.com and used in Autoplot with <a href="https://cottagesystems.com/data/maps/earth/NE1_50M_SR_W.png?xaxis=[-180,0,180,10800]&yaxis=[-90,0,90,5400]">this URI</a>. Existing outlines overlaid to verify.
+        <p><small><a href="https://github.com/das-developers/das2java/issues/47">Round of bugs</a> in Annotations corrected, where "move annotation" had sign errors for some anchorPositions.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -65,6 +65,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>AutoplotDataServer HAPI info response will set startDate and stopDate when they look reasonable, CDAWeb data source sets these based on all.xml.  Thanks, Bob!
             <li>Improvements to the Autoplot servlet, after seeing modern JavaScripts needed corrections to the code.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/796/">796</a>: improve support for second timerange parameter.  Thanks, Sadie!
         </ul>
