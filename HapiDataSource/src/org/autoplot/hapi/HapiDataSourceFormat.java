@@ -241,6 +241,16 @@ public class HapiDataSourceFormat implements DataSourceFormat {
         }
         
         DatumRange dr= DataSetUtil.asDatumRange( Ops.extent(dep0) );
+        
+        if ( dep0.property(QDataSet.VALID_MIN)!=null && dep0.property(QDataSet.VALID_MAX)!=null ) {
+            Units tu= SemanticOps.getUnits(dep0);
+            double vmin= (Double)dep0.property(QDataSet.VALID_MIN);
+            double vmax= (Double)dep0.property(QDataSet.VALID_MAX);
+            DatumRange drvalid= DatumRange.newRange( vmin, vmax, tu );
+            if ( drvalid.min().gt( tu.parse("1900-01-01") ) && drvalid.max().lt( tu.parse("2200-01-01") ) ) { // sanity check
+                dr= drvalid;
+            }
+        }
         jo.put( "startDate", dr.min().toString() );
         jo.put( "stopDate", dr.max().toString() );
         jo.put( "sampleStartDate", dr.min().toString() );
