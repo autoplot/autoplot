@@ -175,6 +175,8 @@ public class SimpleServlet extends HttpServlet {
         
         String qs= request.getQueryString();
         String cacheControl= request.getHeader("Cache-Control");
+        
+        String usecache= request.getParameter("usecache");
 
         synchronized ( this ) { // if a cached response is available, then use it.
             if ( ServletInfo.isCaching() && qs!=null ) {
@@ -192,7 +194,7 @@ public class SimpleServlet extends HttpServlet {
                     metaCacheFile= new File( s, hash + ".txt" );
                     logFile= new File( s, hash+".log" );
 
-                    if ( cacheFile.exists() && !"no-cache".equals(cacheControl) ) {
+                    if ( cacheFile.exists() && !( "no-cache".equals(cacheControl) || "false".equals(usecache) ) ) {
                         byte[] bb= Files.readAllBytes(metaCacheFile.toPath());
                         String qs0= new String( bb );
                         if ( qs0.equals(qs) ) {
