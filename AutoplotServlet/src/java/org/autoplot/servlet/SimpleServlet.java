@@ -181,18 +181,19 @@ public class SimpleServlet extends HttpServlet {
         synchronized ( this ) { // if a cached response is available, then use it.
             if ( ServletInfo.isCaching() && qs!=null ) {
                 String format = ServletUtil.getStringParameter(request, "format", "image/png");
+                String hash= request.getQueryString();
+                hash= String.format( "%04d", Math.abs( hash.hashCode() % 10000 ) );
+                File s= ServletInfo.getCacheDirectory();
+                logFile= new File( s, hash+".log" );
+                
                 if ( format.equals("image/png") ) {
-                    String hash= request.getQueryString();
-                    File s= ServletInfo.getCacheDirectory();
                     if ( !s.exists() ) {
                         if ( !s.mkdirs() ) {
                             throw new RuntimeException("Unable to make cache: "+s);
                         }
                     }
-                    hash= String.format( "%04d", Math.abs( hash.hashCode() % 10000 ) );
                     cacheFile= new File( s, hash + ".png" );
                     metaCacheFile= new File( s, hash + ".txt" );
-                    logFile= new File( s, hash+".log" );
 
                     if ( cacheFile.exists() && !( "no-cache".equals(cacheControl) || "false".equals(usecache) ) ) {
                         byte[] bb= Files.readAllBytes(metaCacheFile.toPath());
@@ -213,9 +214,6 @@ public class SimpleServlet extends HttpServlet {
 
                     }
                 }
-            } else { 
-                File s= ServletInfo.getCacheDirectory();
-                logFile= new File( s, "request.log" );
             }
         }
         
