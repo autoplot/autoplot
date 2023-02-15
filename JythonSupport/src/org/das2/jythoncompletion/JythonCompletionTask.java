@@ -1033,7 +1033,7 @@ public class JythonCompletionTask implements CompletionTask {
         int [] pos= new int[2];
         Map<String,Object> r= DataSetUrlCompletionTask.popString(editor,pos);
         String s= (String)r.get("string");
-        if (method.equals("getDataSet") || method.equals("plot") || method.equals("plotx") || method.equals("getCompletions") ) {
+        if (method.equals("getDataSet") || method.equals("getFile") || method.equals("plot") || method.equals("plotx") || method.equals("getCompletions") ) {
             DataSetUrlCompletionTask task = new DataSetUrlCompletionTask(editor);
             task.query(arg0);
         } else if ( method.equals("File") && s.startsWith("/") ) {
