@@ -893,7 +893,7 @@ public final class PlotController extends DomNodeController {
      */
     private Axis reluctantRanging( Axis axis, Axis newSettings ) {
         try {
-            if ( axis.getRange().rescale(-1,2).intersects( newSettings.getRange() ) ) {
+            if ( DatumRangeUtil.rescale( axis.getRange(),-1,2 ).intersects( newSettings.getRange() ) ) {
                 double d1= DatumRangeUtil.normalize( axis.getRange(), newSettings.getRange().min(), axis.isLog() );
                 double d2= DatumRangeUtil.normalize( axis.getRange(), newSettings.getRange().max(), axis.isLog() );
                 if ( Math.abs(d2-d1)>0.1 ) {
