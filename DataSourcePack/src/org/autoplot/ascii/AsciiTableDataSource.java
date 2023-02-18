@@ -90,7 +90,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
      */
     String[] timeFormats;
     /**
-     * the column containing times, or -1.
+     * the column containing times, or -1.  This will be the first column when the times span multiple columns.
      */
     int timeColumn = -1;
     DDataSet ds = null;
@@ -748,7 +748,6 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 p.setShowException(true); 
                 parser.setRecordParser( p );
             } else {
-                if ( delim.equals(",") ) delim="COMMA";
                 delim= delim.replaceAll("WHITESPACE", "\\s+");
                 delim= delim.replaceAll("SPACE", " ");
                 delim= delim.replaceAll("COMMA", ",");
@@ -911,6 +910,10 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 for ( int i=timeColumn; i<timeColumn+timeFormats.length; i++ ) {
                     parser.setFieldParser( i, timeFieldParser );
                     parser.setUnits( i, Units.dimensionless );
+                }
+                
+                if ( parser.getRecordParser() instanceof AsciiParser.DelimParser ) {
+                    ((AsciiParser.DelimParser)parser.getRecordParser()).setGuessUnits(false);
                 }
 
                 timeColumn= timeColumn + timeFormats.length - 1;
