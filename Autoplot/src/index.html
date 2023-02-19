@@ -28,8 +28,11 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-02-11 r26923):</p>
+        <p>Bugfixes (2023-02-19 r26939):</p>
         <ul> 
+            <li><a href="https://github.com/das-developers/das2java/issues/48">0048</a>: correct where new code broke test for cadence change.  Thanks, Keith!
+            <li>Corrections to directory listings with GitHubFileSystem.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2507">2507</a>: bug where ASCII reader would return data in different scheme with headers but no data.
             <li><a href="https://github.com/das-developers/das2java/issues/47">0047</a>: anchor type "plot" definition, underscore border type.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/1696">1696</a>: automatically anchor annotation to canvas when plot is specified.
             <li>fftPower has branch were factor of 4 was used where factor of 2 was appropriate.  Thanks, Keith!
@@ -65,6 +68,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>AutoplotDataServer has new usecache=false parameter.  Thanks, Bob!
             <li>AutoplotDataServer HAPI info response will set startDate and stopDate when they look reasonable, CDAWeb data source sets these based on all.xml.  Thanks, Bob!
             <li>Improvements to the Autoplot servlet, after seeing modern JavaScripts needed corrections to the code.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/796/">796</a>: improve support for second timerange parameter.  Thanks, Sadie!
