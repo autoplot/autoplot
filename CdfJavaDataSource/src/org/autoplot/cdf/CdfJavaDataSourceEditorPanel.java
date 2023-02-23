@@ -413,7 +413,6 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
         TreePath tp= evt.getPath();
         if ( isValidCDF ) {
             parameter= String.valueOf(tp.getPathComponent(1));
-            updateMetadata();
             String s;
             String slice1;
             s= getParamAndSubset(xParameterTree,"");
@@ -424,6 +423,7 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
             slice1= s.length()==0 ? "" : s.substring(xparameter.length());
             LinkedHashMap<String,CdfVariableDescription> yy= getCompatible( parameter, Y_PARAMETER );
             fillTree( yParameterTree, toDescriptions(yy), cdf, yparameter, slice1 );
+            updateMetadata();
         }
     }//GEN-LAST:event_parameterTreeValueChanged
 
