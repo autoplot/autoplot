@@ -1201,6 +1201,10 @@ public class CdfDataSource extends AbstractDataSource {
         
         if ( slice1>-1 ) {
             result.putProperty(QDataSet.NAME, svariable+"__"+slice1 );
+            QDataSet ll= (QDataSet)thisAttributes.get("slice1_labels");
+            if (ll!=null ) {
+                result.putProperty(QDataSet.LABEL,ll.slice(slice1).svalue());
+            }
             // note this will be replaced in caller code.
         } else {
             result.putProperty(QDataSet.NAME, svariable);

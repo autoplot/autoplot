@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.das2.datum.InconvertibleUnitsException;
 import org.das2.datum.UnitsConverter;
 import org.das2.datum.UnitsUtil;
@@ -1774,8 +1776,23 @@ public class CdfUtil {
             }
         }
         result.putProperty(QDataSet.FILL_VALUE, istpProps.get(QDataSet.FILL_VALUE));
-        result.putProperty(QDataSet.LABEL, istpProps.get(QDataSet.LABEL)  );
-        result.putProperty(QDataSet.TITLE, istpProps.get(QDataSet.TITLE)  );
+        if ( constraint==null ) {
+            result.putProperty(QDataSet.LABEL, istpProps.get(QDataSet.LABEL) );
+        } else if ( constraint.matches("\\[:\\,\\d+\\]") ) {
+            QDataSet labels= (QDataSet)attr1.get("slice1_labels");
+            if ( labels!=null ) {
+                Pattern p= Pattern.compile("\\[:\\,(\\d+)\\]");
+                Matcher m= p.matcher(constraint);
+                if ( m.matches() ) {
+                    result.putProperty(QDataSet.LABEL, labels.slice(Integer.parseInt(m.group(1))).svalue() );
+                }
+            } else {
+                result.putProperty(QDataSet.LABEL, istpProps.get(QDataSet.LABEL)  );
+            }
+        } else {
+            result.putProperty(QDataSet.LABEL, istpProps.get(QDataSet.LABEL) );
+        }
+        result.putProperty(QDataSet.TITLE, istpProps.get(QDataSet.TITLE) );
         result.putProperty(QDataSet.DESCRIPTION, istpProps.get(QDataSet.DESCRIPTION) );
         String renderType= (String)istpProps.get(QDataSet.RENDER_TYPE);
         if ( renderType!=null && renderType.equals( "time_series" ) ) {

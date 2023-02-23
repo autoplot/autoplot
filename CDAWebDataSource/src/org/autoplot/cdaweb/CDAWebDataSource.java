@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.autoplot.cdf.CdfDataSource;
 import org.autoplot.cdf.CdfUtil;
 import org.das2.dataset.NoDataInIntervalException;
@@ -206,7 +208,12 @@ public class CDAWebDataSource extends AbstractDataSource {
             } else {
                 virtuals= new String[metadatas.length];
                 for ( int i=0; i<metadatas.length; i++ ) {
-                    virtuals[i]= (String) metadatas[i].get( "VIRTUAL" );
+                    String s= (String) metadatas[i].get( "VIRTUAL" );
+                    if ( s!=null && s.trim().length()>0 ) {
+                        virtuals[i]= s;
+                    } else {
+                        virtuals[i]= null;
+                    }
                 }
             }
 
@@ -231,47 +238,23 @@ public class CDAWebDataSource extends AbstractDataSource {
                 MutablePropertyDataSet ds1=null;
                 try {
                     if ( virtual!=null && !virtual.equals("") ) {
-                        ds1 = readVirtualVariable(file, metadata, fileDataSourceFactory, ds1, t1);
+                        ds1 = readVirtualVariable(file, metadata, fileDataSourceFactory, t1);
                     } else if ( virtuals!=null ) {
                         QDataSet dss=null;
+                        String[] ids= id.split(";",-2);
                         for ( int i2=0; i2<metadatas.length; i2++ ) {
-                            ds1 = readVirtualVariable(file, metadatas[i2], fileDataSourceFactory, ds1, t1);
+                            if ( virtuals[i2]!=null ) {
+                                ds1 = readVirtualVariable(file, metadatas[i2], fileDataSourceFactory, t1);
+                            } else {
+                                ds1 = readVariable( file, ids[i2], metadatas[i2], fileDataSourceFactory, t1 );
+                            }
+                            
                             dss= Ops.bundle( dss, ds1 );
                         }
                         ds1= DataSetOps.makePropertiesMutable(dss);
                         
-                    } else {
-                        Map<String,String> fileParams= new HashMap(getParams());
-                        fileParams.remove( PARAM_TIMERANGE );
-                        fileParams.remove( PARAM_DS );
-                        URI file1;
-                        file1= DataSetURI.getURI( file + "?" + URISplit.formatParams(fileParams) );
-
-                        logger.log( Level.FINE, "loading {0}", file1);
-                        
-                        if ( file.endsWith(".nc") ) {
-                            NetCDFDataSource dataSource= (NetCDFDataSource)fileDataSourceFactory.getDataSource( file1 );
-                            try {
-                                ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1 ); //,metadata );
-                                CdfUtil.doApplyAttributes( metadata, ds1, null, null ); // assumes no slice1
-                                ds1.putProperty( QDataSet.METADATA, metadata );
-                                ds1.putProperty( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );
-                            } catch ( IllegalArgumentException ex ) {
-                                String p= params.get(PARAM_ID);
-                                logger.log(Level.INFO, "parameter not found for interval: {0}", p );
-                                throw new NoDataInIntervalException("parameter not found for interval: "+p );
-                            }
-                        } else { // typical case for 99.9% of data -- CDF files.
-                            CdfDataSource dataSource= (CdfDataSource)fileDataSourceFactory.getDataSource( file1 );
-                            try {
-                                ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1,metadata );
-                            } catch ( IllegalArgumentException ex ) {
-                                ex.printStackTrace();
-                                String p= params.get(PARAM_ID);
-                                logger.log(Level.INFO, "parameter not found for interval: {0}", p );
-                                throw new NoDataInIntervalException("parameter not found for interval: "+p );
-                            }
-                        }
+                    } else { // typical route
+                        ds1 = readVariable(file, id, metadata, fileDataSourceFactory, t1);
                         
                     }
                 } catch ( NoDataInIntervalException ex ) {
@@ -442,8 +425,53 @@ public class CDAWebDataSource extends AbstractDataSource {
 
     }
 
+    private MutablePropertyDataSet readVariable(String file, String id, Map<String,Object> lmetadata, DataSourceFactory fileDataSourceFactory, ProgressMonitor t1) throws URISyntaxException, Exception {
+        Map<String,String> fileParams= new HashMap(getParams());
+        fileParams.remove( PARAM_TIMERANGE );
+        fileParams.remove( PARAM_DS );
+        fileParams.put( "id", id );
+        URI file1;
+        file1= DataSetURI.getURI( file + "?" + URISplit.formatParams(fileParams) );
+        logger.log( Level.FINE, "loading {0}", file1);
+        MutablePropertyDataSet ds1;
+        if ( file.endsWith(".nc") ) {
+            NetCDFDataSource dataSource= (NetCDFDataSource)fileDataSourceFactory.getDataSource( file1 );
+            try {
+                ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1 ); //,metadata );
+                CdfUtil.doApplyAttributes( lmetadata, ds1, null, null ); // assumes no slice1
+                ds1.putProperty( QDataSet.METADATA, lmetadata );
+                ds1.putProperty( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );
+            } catch ( IllegalArgumentException ex ) {
+                String p= params.get(PARAM_ID);
+                logger.log(Level.INFO, "parameter not found for interval: {0}", p );
+                throw new NoDataInIntervalException("parameter not found for interval: "+p );
+            }
+        } else { // typical case for 99.9% of data -- CDF files.
+            CdfDataSource dataSource= (CdfDataSource)fileDataSourceFactory.getDataSource( file1 );
+            try {
+                ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1,lmetadata );
+            } catch ( IllegalArgumentException ex ) {
+                ex.printStackTrace();
+                String p= params.get(PARAM_ID);
+                logger.log(Level.INFO, "parameter not found for interval: {0}", p );
+                throw new NoDataInIntervalException("parameter not found for interval: "+p );
+            }
+        }
+        return ds1;
+    }
+
+    /**
+     * read the virtual variable identified in the metadata
+     * @param file the cdf file
+     * @param meta the metadata
+     * @param fileDataSourceFactory the data source which will do the reading
+     * @param t1
+     * @return the dataset
+     * @throws Exception 
+     */
     private MutablePropertyDataSet readVirtualVariable(String file, Map<String,Object> meta, 
-            DataSourceFactory fileDataSourceFactory, MutablePropertyDataSet ds1, ProgressMonitor t1) throws Exception {
+            DataSourceFactory fileDataSourceFactory, ProgressMonitor t1) throws Exception {
+        MutablePropertyDataSet ds1=null;
         int nc=0;
         List<QDataSet> comps= new ArrayList();
         String function= (String)meta.get( "FUNCTION" );
@@ -502,6 +530,7 @@ public class CDAWebDataSource extends AbstractDataSource {
         if ( "T".equals(this.savail) ) {
             return null;
         }
+        Pattern slicePattern= Pattern.compile(".+\\[:\\,(\\d+)\\]");
         if ( metadata==null && metadatas==null ) {
             mon.started();
             CDAWebDB db= CDAWebDB.getInstance();
@@ -521,17 +550,26 @@ public class CDAWebDataSource extends AbstractDataSource {
                     String m= URISplit.removeParam( master, URISplit.PARAM_ARG_0 ) + "?" + params[i];
                     DataSource cdf= getDelegateFactory(split.ext).getDataSource( DataSetURI.getURI(m) );
                     metadatas[i]= cdf.getMetadata(mon.getSubtaskMonitor("getMetadata for "+params[i]) );
+                    Matcher matcher=slicePattern.matcher(params[i]);
+                    if ( matcher.matches() ) {
+                        metadatas[i].put("slice1",matcher.group(1));
+                    }
                 }
             } else {
                 DataSource cdf= getDelegateFactory(split.ext).getDataSource( DataSetURI.getURI(master) );
                 metadata= cdf.getMetadata(mon.getSubtaskMonitor("getMetadata")); // note this is a strange branch, because usually we have read data first.
+                Matcher matcher=slicePattern.matcher(id);
+                if ( matcher.matches() ) {
+                    metadata.put("slice1",matcher.group(1));
+                }
             }
 
             String slice1= getParam("slice1","" ); // kludge to grab LABL_PTR_1 when slice1 is used.
             if ( !slice1.equals("") ) {
                 metadata.remove( "LABLAXIS" );
+                metadata.put("slice1",slice1);
                 String labelVar= (String)metadata.get("LABL_PTR_1");
-                if ( labelVar!=null ) {
+                if ( labelVar!=null ) { // TODO: I think this happens elsewhere.
                     String master1= db.getMasterFile( ds.toLowerCase(), mon.getSubtaskMonitor("getMasterFile") );
                     DataSource labelDss= getDelegateFactory(split.ext).getDataSource( DataSetURI.getURI(master1+"?"+labelVar) );
                     QDataSet labelDs= (MutablePropertyDataSet)labelDss.getDataSet( new NullProgressMonitor() );
