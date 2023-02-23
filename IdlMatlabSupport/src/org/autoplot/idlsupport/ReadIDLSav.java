@@ -17,6 +17,7 @@ import java.util.Map.Entry;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.qds.buffer.BufferDataSet;
 
 /**
  * Read data from IDL Save Files.  This was written using
@@ -138,6 +139,7 @@ public class ReadIDLSav {
     private static final int TYPECODE_STRUCT=8;
     private static final int TYPECODE_COMPLEX_DOUBLE=9;
     private static final int TYPECODE_INT64=14;
+    private static final int TYPECODE_UINT64=15;
 
     /**
      * return a string representing the type code, if supported.
@@ -188,7 +190,7 @@ public class ReadIDLSav {
      * @return 
      */
     private static int sizeOf( int typeCode ) {
-        int[] sizes= new int[] { 0, 4, 4, 4, 4,   8, 8, 1, 0, 16,   0, 0, 0, 0, 8 };
+        int[] sizes= new int[] { 0, 4, 4, 4, 4,   8, 8, 1, 0, 16,   0, 0, 0, 0, 8, 8 };
         return sizes[typeCode];
     }
     
@@ -504,9 +506,18 @@ public class ReadIDLSav {
                     return makeArrayData(result, offsetToFile+ offsToArray, result.length*4 );
                 }
                 case TYPECODE_INT64: {
-                    int[] result= new int[arrayDesc.nelements];
+                    //TODO: test me
+                    long[] result= new long[arrayDesc.nelements];
                     for ( int i=0; i<result.length; i++ ) {
-                        result[i]= buf.getInt(offsToArray+8*i);
+                        result[i]= buf.getLong(offsToArray+8*i);
+                    }
+                    return makeArrayData(result, offsetToFile+ offsToArray, result.length*8 );
+                }
+                case TYPECODE_UINT64: {
+                    logger.warning("unsigned longs handled with signed longs");
+                    long[] result= new long[arrayDesc.nelements];
+                    for ( int i=0; i<result.length; i++ ) {
+                        result[i]= buf.getLong(offsToArray+8*i);
                     }
                     return makeArrayData(result, offsetToFile+ offsToArray, result.length*8 );
                 }
@@ -516,7 +527,7 @@ public class ReadIDLSav {
                         result[i]= buf.getFloat(offsToArray+4*i);
                     }
                     return makeArrayData(result, offsetToFile+ offsToArray, result.length*4 );
-                }   
+                }
                 case TYPECODE_DOUBLE: {
                     double[] result= new double[arrayDesc.nelements];
                     for ( int i=0; i<result.length; i++ ) {
@@ -993,10 +1004,10 @@ public class ReadIDLSav {
     private TypeDesc readTypeDesc( ByteBuffer typeDescBuf ) {
         logger.log(Level.FINER, "readTypeDesc @ {0}", bufferOffsets.get(typeDescBuf));
         int typeCode= typeDescBuf.getInt(0);
-        if ( typeCode<0 || typeCode>14 ) {
+        int varFlags= typeDescBuf.getInt(4);
+        if ( typeCode<0 || typeCode>15 ) {
             throw new IllegalArgumentException("expected 0-14 for type code in readTypeDesc");
         }
-        int varFlags= typeDescBuf.getInt(4);
         if ( ( varFlags & VARFLAG_STRUCT ) == VARFLAG_STRUCT ) {
             return readTypeDescStructure(typeDescBuf);
         } else if ( ( varFlags & VARFLAG_ARRAY ) == VARFLAG_ARRAY ) {
