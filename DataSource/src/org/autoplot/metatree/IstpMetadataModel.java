@@ -469,7 +469,7 @@ public class IstpMetadataModel extends MetadataModel {
                         QDataSet lablDs= (QDataSet) attrs.get("slice1_labels");
                         if ( lablDs!=null ) { // TODO: I think this is trivially true.
                             Units u= (Units) lablDs.property(QDataSet.UNITS);
-                            label= u.createDatum(lablDs.value(islice)).toString();
+                            label= lablDs.slice(islice).svalue();
                         }
                     }
                 }
