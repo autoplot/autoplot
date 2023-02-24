@@ -1670,7 +1670,14 @@ public class CdfDataSource extends AbstractDataSource {
                     attributes.remove("DEPEND_3");
                     attributes.remove("DEPEND_4");
                 }
+                if ( map.containsKey(PARAM_X) ) {
+                    attributes.remove("DEPEND_0");
+                }
                 
+                if ( map.containsKey(PARAM_Y) ) {
+                    attributes.remove("DEPEND_1");
+                }
+
                 return attributes; // transient state
             } catch ( IOException | IllegalArgumentException ex ) {
                 if ( ex instanceof IllegalArgumentException ) {
