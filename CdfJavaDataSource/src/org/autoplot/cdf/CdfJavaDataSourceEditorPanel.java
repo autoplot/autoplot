@@ -58,6 +58,8 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
 
     private boolean isValidCDF= false;
     
+    private boolean listening = true;
+    
     /** Creates new form AggregatingDataSourceEditorPanel */
     public CdfJavaDataSourceEditorPanel() {
         initComponents();
@@ -411,7 +413,7 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
 
     private void parameterTreeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_parameterTreeValueChanged
         TreePath tp= evt.getPath();
-        if ( isValidCDF ) {
+        if ( isValidCDF && listening ) {
             parameter= String.valueOf(tp.getPathComponent(1));
             String s;
             String slice1;
@@ -742,11 +744,17 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
             cdfParameterInfo= org.autoplot.cdf.CdfUtil.getPlottable(cdf, options);
             
             String param= lparams.remove("arg_0");
-            if ( isSupportParameter( cdfParameterInfo, param ) ) {
-                this.showAllVarTypeCB.setSelected(true);
-                parameterDescriptions= org.autoplot.cdf.CdfUtil.getPlottable(cdf, 
-                    !this.showAllVarTypeCB.isSelected(), QDataSet.MAX_RANK, new HashMap<String,String>());
-                this.showAllVarTypeCB.setEnabled(false);
+            String[] params= null;
+            if ( param!=null ) {
+                params= param.split(";",-2);
+                for ( String p : params ) {
+                    if ( isSupportParameter( cdfParameterInfo, p ) ) {
+                        this.showAllVarTypeCB.setSelected(true);
+                        parameterDescriptions= org.autoplot.cdf.CdfUtil.getPlottable(cdf, 
+                            !this.showAllVarTypeCB.isSelected(), QDataSet.MAX_RANK, new HashMap<String,String>());
+                        this.showAllVarTypeCB.setEnabled(false);
+                    }   
+                }
             }
             
             String label;
@@ -803,7 +811,13 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
                 }
             }
             
-            fillTree( this.parameterTree, parameterInfo, cdf, param, slice1 );
+            listening= false;
+            if ( params!=null && params.length>1 ) {
+                fillTree( this.parameterTree, parameterInfo, cdf, param, slice1 );
+            } else {
+                fillTree( this.parameterTree, parameterInfo, cdf, param, slice1 );
+            }
+            listening= true;
             
             Map<String,String> parameterDescriptions2= org.autoplot.cdf.CdfUtil.getPlottable(cdf, false, 2 );
             String xparam= lparams.remove("depend0");
