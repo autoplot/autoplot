@@ -419,11 +419,11 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
             String slice1;
             s= getParamAndSubset(xParameterTree,"");
             slice1= s.length()==0 ? "" : s.substring(xparameter.length()); 
-            LinkedHashMap<String,CdfVariableDescription> xx= getCompatible( parameter, X_PARAMETER );
+            LinkedHashMap<String,CdfVariableDescription> xx= getCompatible( cdfParameterInfo, parameter, X_PARAMETER );
             fillTree( xParameterTree, toDescriptions(xx), cdf, xparameter, slice1 );
             s= getParamAndSubset(yParameterTree,"");
             slice1= s.length()==0 ? "" : s.substring(xparameter.length());
-            LinkedHashMap<String,CdfVariableDescription> yy= getCompatible( parameter, Y_PARAMETER );
+            LinkedHashMap<String,CdfVariableDescription> yy= getCompatible( cdfParameterInfo, parameter, Y_PARAMETER );
             fillTree( yParameterTree, toDescriptions(yy), cdf, yparameter, slice1 );
             updateMetadata();
         }
@@ -447,21 +447,22 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
      * return the list of variables which are compatible with this parameter, having the same number 
      * of records, etc.
      * @param parameter
-     * @param whichIndependentParameter
+     * @param whichIndependentParameter X_PARAMETER, Y_PARAMETER
      * @return a linked hash map of name to descriptions.
      */
-    private LinkedHashMap<String,CdfVariableDescription> getCompatible( String parameter, Object whichIndependentParameter ) {
+    public static LinkedHashMap<String,CdfVariableDescription> getCompatible( 
+            LinkedHashMap<String,org.autoplot.cdf.CdfUtil.CdfVariableDescription> cdfParameterInfo, String parameter, Object whichIndependentParameter ) {
         CdfVariableDescription dependent= cdfParameterInfo.get(parameter);
         LinkedHashMap<String,CdfVariableDescription> result= new LinkedHashMap<>();
         for ( Entry<String,CdfVariableDescription> cvds : cdfParameterInfo.entrySet() ) {
             CdfVariableDescription cvd = cvds.getValue();
-            if ( whichIndependentParameter==X_PARAMETER ) {
+            if ( dependent!=null && whichIndependentParameter==X_PARAMETER ) {
                 if ( cvd.numberOfRecords==dependent.numberOfRecords ) {
                     if ( cvd.dimensions.length==0 || ( cvd.dimensions.length==1 && cvd.dimensions[0]==2 ) ) {
                         result.put( cvd.name, cvd );
                     }
                 } 
-            } else if ( whichIndependentParameter==Y_PARAMETER) {
+            } else if ( dependent!=null && whichIndependentParameter==Y_PARAMETER) {
                 if ( cvd.dimensions.length==1 && dependent.dimensions.length==1 
                         && cvd.dimensions[0]==dependent.dimensions[0] ) {
                     if ( cvd.numberOfRecords==1 ) {
@@ -473,6 +474,8 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
                         && cvd.numberOfRecords==dependent.numberOfRecords ) {
                     result.put( cvd.name, cvd );
                 }
+            } else {
+                result.put( cvd.name, cvd );
             }
         }
         return result;
@@ -617,8 +620,8 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
     String xparameter;
     String yparameter;
 
-    private static final String X_PARAMETER = "X_PARAMETER";
-    private static final String Y_PARAMETER = "Y_PARAMETER";
+    public static final String X_PARAMETER = "X_PARAMETER";
+    public static final String Y_PARAMETER = "Y_PARAMETER";
     
     boolean showAllInitially= false;
     
@@ -1002,12 +1005,12 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
             
             if ( xCheckBox.isSelected() ) {
                 String p = getParamAndSubset(xParameterTree,"");
-                if ( p.length()>0 ) lparams.put( "x", p );
+                if ( p.length()>0 ) lparams.put( "X", p );
             }
 
             if ( yCheckBox.isSelected() ) {
                 String p= getParamAndSubset(yParameterTree,"");
-                if ( p.length()>0 ) lparams.put( "y", p );
+                if ( p.length()>0 ) lparams.put( "Y", p );
             }
             
             if ( noDep.isSelected() ) {
