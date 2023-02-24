@@ -16,6 +16,7 @@ import org.das2.qds.DataSetUtil;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.AbstractDataSource;
+import org.das2.qds.ops.Ops;
 
 /**
  * BinaryDataSource returns data backed by binary data files.  Data
@@ -267,6 +268,20 @@ public class BinaryDataSource extends AbstractDataSource {
             if ( first>fieldCount ) throw new IndexOutOfBoundsException("rank 2 index is greater than field count");
             if ( last>fieldCount ) throw new IndexOutOfBoundsException("rank 2 index is greater than field count");
         }
+        
+        int[] dims=null;
+        
+        o= params.get("dims");
+        if ( o!=null ) {
+            if ( o.startsWith("[") ) o=o.substring(1);
+            if ( o.endsWith("]") ) o=o.substring(0,o.length()-1);
+            String[] ss= o.split(",",-2);
+            dims= new int[ss.length];;
+            for ( int i=0; i<ss.length; i++ ) {
+                dims[i]= (int)parseLong(ss[i]);
+            }
+            rank2 = new int[]{0,DataSetUtil.product(dims)};
+        }
 
         int recOffset= getIntParameter( "recOffset", -1 );
         if ( recOffset==-1 ) {
@@ -366,8 +381,14 @@ public class BinaryDataSource extends AbstractDataSource {
             }
             ds.putProperty( QDataSet.FORMAT, s );
         }
-            
-        return ds;
+        
+        if ( dims!=null ) {
+            QDataSet dds= Ops.reform( ds, ds.length(), dims );
+            return dds;
+        } else {
+            return ds;
+        }
+        
     }
 
 }
