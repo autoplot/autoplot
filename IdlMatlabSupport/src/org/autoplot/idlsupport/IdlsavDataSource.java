@@ -211,6 +211,8 @@ public class IdlsavDataSource extends AbstractDataSource {
 
         String[] names;
         
+        int ndata;
+        
         if ( name.length()==0 ) {
             if ( z.length()>0 ) {
                 datas = new QDataSet[3];
@@ -230,21 +232,38 @@ public class IdlsavDataSource extends AbstractDataSource {
                 array= handleDs( array, x );
                 datas[0]= array;
             }
+            ndata= datas.length;
             
         } else {
             names = name.split(",");
-            datas = new QDataSet[names.length];
+            datas = new QDataSet[names.length+2];
             if ( names.length>4 ) {
                 throw new IllegalArgumentException("first argument can only"
                         + " contain four comma-separated names." );
             }
+            
+            int i=0;
+            if ( x.length()>0 ) {
+                if ( datas==null ) datas= new QDataSet[1];
+                QDataSet array= getArray( reader, buffer, x );
+                array= handleDs( array, x );
+                datas[i++]= array;
+            }
+            
+            if ( y.length()>0 ) {
+                if ( datas==null ) datas= new QDataSet[2];
+                QDataSet array= getArray( reader, buffer, y );
+                array= handleDs( array, y );
+                datas[i++]= array;
+            }
 
-            for ( int i=0; i<names.length; i++ ) {
-                QDataSet array= getArray( reader, buffer, names[i]);
-                array= handleDs( array, names[i] );
-                datas[i]= array;
+            for ( int j=0; j<names.length; j++ ) {
+                QDataSet array= getArray( reader, buffer, names[j]);
+                array= handleDs( array, names[j] );
+                datas[i++]= array;
 
             }
+            ndata= i;
         }
         
         String sxunits= getParam("xunits","");
@@ -265,11 +284,11 @@ public class IdlsavDataSource extends AbstractDataSource {
         String sunits= getParam("units", "" );
         if ( sunits.length()>0 ) {
             Units units= Units.lookupUnits(sunits);
-            int ids= datas.length-1;
+            int ids= ndata-1;
             datas[ids]= Ops.putProperty( datas[ids], QDataSet.UNITS, units );
         }
                 
-        switch( datas.length ) {
+        switch( ndata ) {
             case 1: {
                 return datas[0];
             }
