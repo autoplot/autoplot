@@ -30,15 +30,45 @@ public class BinaryDataSource extends AbstractDataSource {
         super(uri);
     }
 
+    private long parseLong( String sval ) {
+        String[] ssum= sval.split("\\+");
+        if ( ssum.length==1 ) {
+            String[] sprod= sval.split("\\*");
+            if ( sprod.length==1 ) {
+                int result = Integer.parseInt(sval);
+                return result;
+            } else {
+                long prod= parseLong(sprod[0]);
+                for ( int i=1; i<sprod.length; i++ ) {
+                    prod *= parseLong(sprod[i]);
+                }
+                return prod;
+            }
+        } else {
+            long sum=parseLong(ssum[0]);
+            for ( int i=1; i<ssum.length; i++ ) {
+                sum += parseLong(ssum[i]);
+            }
+            return sum;
+        }
+    }
+    
     private int getIntParameter(String name, int deflt) {
         String sval = params.get(name);
-        int result = sval == null ? deflt : Integer.parseInt(sval);
-        return result;
+        if ( sval==null ) {
+            return deflt;
+        } else {
+            long l= parseLong(sval);
+            if ( l>Integer.MAX_VALUE ) {
+                throw new IllegalArgumentException("parameter must be 32-bit integer: "+ name+"="+sval);
+            }
+            return (int)parseLong(sval);
+        }
     }
 
     private long getLongParameter(String name, long deflt) {
         String sval = params.get(name);
-        long result = sval == null ? deflt : Long.parseLong(sval);
+        long result = sval == null ? deflt : parseLong(sval);
         return result;
     }
 
@@ -224,10 +254,10 @@ public class BinaryDataSource extends AbstractDataSource {
             if (s.contains(":")) {
                 String[] ss = s.split(":",-2);
                 if (ss[0].length() > 0) {
-                    first = Integer.parseInt(ss[0]);
+                    first = (int) parseLong(ss[0]);
                 }
                 if (ss.length > 1 && ss[1].length() > 0) {
-                    last = Integer.parseInt(ss[1]);
+                    last = (int)parseLong(ss[1]);
                 }
             }
             if ( last==-999 ) last= fieldCount;
