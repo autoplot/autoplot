@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Very long title shows issue with the axis tab GUI.  It always takes up space based on the length of the title, and can even affect the plot size.
+        <p><small>CDF data variable "I" is used for X values instead of support variable Epoch, and axis is now properly labeled.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -30,10 +30,12 @@
                 
         <p>Bugfixes (2023-02-23 r26948):</p>
         <ul> 
+            <li>Spectrogram binAverage and nearestNeighbor modes will use rank 0 BIN_PLUS and other codes to do a better job of establishing cadence.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2501">2501</a>:Corrections to CDF editor panel and completions.  
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2501">2501</a>:CDF with X= would show the wrong label for X.
             <li>IDLSave X= and Y= parameters properly match the xunits parameter.
             <li>IDLSave files support unsigned longs, as long as they don't use the high bit.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2506">2506</a>: recent change to CDAWeb to allow multiple variable selections didn't consider non-virtual variables.  Thanks, Dante!
             <li><a href="https://github.com/das-developers/das2java/issues/48">0048</a>: Finally FFTPower translation is handled properly, where a second bug associated with translation was hiding in plain sight.  Thanks, Keith!
         </ul>
         <p>Older Bugfixes (2023-02-21 r26937):</p>
