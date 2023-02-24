@@ -12,6 +12,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -157,7 +158,65 @@ public class CdfJavaDataSourceFactory extends AbstractDataSourceFactory implemen
                     
                 }
                 return ccresult;
+            } else if (  parmname.equals("X") ) {
+                String file= CompletionContext.get( CompletionContext.CONTEXT_FILE, cc );
                 
+                File cdfFile= DataSetURI.getFile( DataSetURI.getURL(file), mon );
+                DataSetURI.checkLength(cdfFile);
+                String fileName= cdfFile.toString();
+                //if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
+                
+                CDFReader cdf;
+
+                cdf = CdfDataSource.getCdfFile(fileName);
+
+                LinkedHashMap<String,String> pp= URISplit.parseParams(cc.params);
+                String param0= pp.get("arg_0");
+                LinkedHashMap<String, CdfUtil.CdfVariableDescription> cdfParameterInfo= org.autoplot.cdf.CdfUtil.getPlottable( cdf, null );
+                LinkedHashMap<String, CdfUtil.CdfVariableDescription> compatible= 
+                        CdfJavaDataSourceEditorPanel.getCompatible( cdfParameterInfo, param0, 
+                                param0.trim().length()>0 ? CdfJavaDataSourceEditorPanel.X_PARAMETER : "" );
+                //cdf.close();
+                
+                List<CompletionContext> ccresult= new ArrayList<>();
+                for ( Entry<String,CdfUtil.CdfVariableDescription> ent:compatible.entrySet() ) {
+                    String key= ent.getKey();
+                    CompletionContext cc1= new CompletionContext( 
+                            CompletionContext.CONTEXT_PARAMETER_VALUE, key, this, null, key, ent.getValue().description, true  );
+                    ccresult.add(cc1);
+                }
+                
+                return ccresult;
+                
+            } else if (  parmname.equals("Y") ) {
+                String file= CompletionContext.get( CompletionContext.CONTEXT_FILE, cc );
+                
+                File cdfFile= DataSetURI.getFile( DataSetURI.getURL(file), mon );
+                DataSetURI.checkLength(cdfFile);
+                String fileName= cdfFile.toString();
+                //if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
+                
+                CDFReader cdf;
+                LinkedHashMap<String,String> pp= URISplit.parseParams(cc.params);
+                String param0= pp.get("arg_0");
+                
+                cdf = CdfDataSource.getCdfFile(fileName);
+
+                LinkedHashMap<String, CdfUtil.CdfVariableDescription> cdfParameterInfo= org.autoplot.cdf.CdfUtil.getPlottable( cdf, null );
+                LinkedHashMap<String, CdfUtil.CdfVariableDescription> compatible= 
+                        CdfJavaDataSourceEditorPanel.getCompatible( cdfParameterInfo, param0, 
+                                param0.trim().length()>0 ? CdfJavaDataSourceEditorPanel.Y_PARAMETER : "" );
+                //cdf.close();
+                
+                List<CompletionContext> ccresult= new ArrayList<>();
+                for ( Entry<String,CdfUtil.CdfVariableDescription> ent:compatible.entrySet() ) {
+                    String key= ent.getKey();
+                    CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, key, this, null, key, 
+                            ent.getValue().description, true  );
+                    ccresult.add(cc1);
+                }
+                
+                return ccresult;
             } else {
                 return Collections.emptyList();
             }
