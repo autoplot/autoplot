@@ -486,7 +486,7 @@ public class ReadIDLSav {
         Object readData( ByteBuffer buf ) {
             _lengthBytes= sizeOf(typeCode) * arrayDesc.nelements;
             
-            int offsetToFile= bufferOffsets.get(buf);
+            int offsetToFile= bufferOffsets.get(getKeyFor(buf));
             logger.log(Level.CONFIG, "readData @ {0,number,#}", offsetToFile+ offsToArray );
             
             switch (typeCode) {
@@ -873,7 +873,7 @@ public class ReadIDLSav {
     }
     
     private TypeDescScalar readTypeDescScalar( ByteBuffer rec ) {
-        logger.log(Level.FINER, "readTypeDescScalar @ {0}", bufferOffsets.get(rec));
+        logger.log(Level.FINER, "readTypeDescScalar @ {0}", bufferOffsets.get(getKeyFor(rec)));
         TypeDescScalar result= new TypeDescScalar();
         result.typeCode= rec.getInt(0);
         result.varFlags= rec.getInt(4);
@@ -881,7 +881,7 @@ public class ReadIDLSav {
     }
     
     private ArrayDesc readArrayDesc( ByteBuffer rec ) {
-        logger.log(Level.FINER, "readArrayDesc @ {0}", bufferOffsets.get(rec));
+        logger.log(Level.FINER, "readArrayDesc @ {0}", bufferOffsets.get(getKeyFor(rec)));
         ArrayDesc result= new ArrayDesc();
         if ( rec.getInt(0)!=8 ) {
             throw new IllegalArgumentException("expected 8 for ARRSTART");
@@ -900,7 +900,7 @@ public class ReadIDLSav {
     }
     
     public StructDesc readStructDesc( ByteBuffer rec ) {
-        logger.log(Level.FINER, "readStructDesc @ {0}", bufferOffsets.get(rec));
+        logger.log(Level.FINER, "readStructDesc @ {0}", bufferOffsets.get(getKeyFor(rec)));
         StructDesc result= new StructDesc();
         if ( rec.getInt(0)!=9 ) {
             throw new IllegalArgumentException("expected 9 for STRUCTSTART");
@@ -976,7 +976,7 @@ public class ReadIDLSav {
     }
     
     private TypeDescStructure readTypeDescStructure( ByteBuffer rec ) {
-        logger.log(Level.FINER, "readTypeDescStructure @ {0}", bufferOffsets.get(rec));
+        logger.log(Level.FINER, "readTypeDescStructure @ {0}", bufferOffsets.get(getKeyFor(rec)));
         TypeDescStructure result= new TypeDescStructure();
         result.typeCode= rec.getInt(0);
         result.varFlags= rec.getInt(4);
@@ -988,7 +988,7 @@ public class ReadIDLSav {
     }
     
     private TypeDescArray readTypeDescArray( ByteBuffer rec ) {
-        logger.log(Level.FINER, "readTypeDescStructure @ {0}", bufferOffsets.get(rec));
+        logger.log(Level.FINER, "readTypeDescStructure @ {0}", bufferOffsets.get(getKeyFor(rec)));
         TypeDescArray result= new TypeDescArray();
         result.typeCode= rec.getInt(0);
         result.varFlags= rec.getInt(4);
@@ -1002,7 +1002,7 @@ public class ReadIDLSav {
      * @return 
      */
     private TypeDesc readTypeDesc( ByteBuffer typeDescBuf ) {
-        logger.log(Level.FINER, "readTypeDesc @ {0}", bufferOffsets.get(typeDescBuf));
+        logger.log(Level.FINER, "readTypeDesc @ {0}", bufferOffsets.get(getKeyFor(typeDescBuf)));
         int typeCode= typeDescBuf.getInt(0);
         int varFlags= typeDescBuf.getInt(4);
         if ( typeCode<0 || typeCode>15 ) {
@@ -1027,7 +1027,7 @@ public class ReadIDLSav {
      * @return the read data.
      */
     private Object variable( ByteBuffer rec, int offset, Map<String,Object> vars) {
-        logger.log( Level.FINER, "variable @ {0}", bufferOffsets.get(rec) );
+        logger.log( Level.FINER, "variable @ {0}", bufferOffsets.get(getKeyFor(rec)) );
         int type= rec.getInt(0+offset);
         if ( type!=RECTYPE_VARIABLE ) {
             throw new IllegalArgumentException("not a variable");
@@ -1050,11 +1050,15 @@ public class ReadIDLSav {
         
     }
     
-    private static final Map<ByteBuffer,Integer> bufferOffsets= new HashMap<>();
-    private static final Map<ByteBuffer,String> bufferLabels= new HashMap<>();
+    private static final Map<Long,Integer> bufferOffsets= new HashMap<>();
+    private static final Map<Long,String> bufferLabels= new HashMap<>();
     
     private String nameFor( ByteBuffer buf ) {
-        return bufferLabels.get(buf);
+        return bufferLabels.get(getKeyFor(buf));
+    }
+    
+    private static Long getKeyFor( ByteBuffer buf ) {
+        return ((long)buf.limit())*Integer.MAX_VALUE + buf.position();
     }
     
     /**
@@ -1067,15 +1071,15 @@ public class ReadIDLSav {
      */
     private ByteBuffer slice( ByteBuffer src, int position, int limit, String type, String label ) {
         if ( label==null ) throw new IllegalArgumentException("no label");
-        Integer offset= bufferOffsets.get(src);
+        Integer offset= bufferOffsets.get(getKeyFor(src));
         if ( offset!=null ) {
             logger.log(Level.CONFIG, "slice {0} {1,number,#} {2,number,#} {3}", 
                     new Object[]{ type, position+offset, limit+offset, label });
         } else {
             logger.log(Level.CONFIG, "slice {0} {1,number,#} {2,number,#} {3}", new Object[]{ type, position, limit, label });
             offset=0;
-            if ( bufferLabels.get(src)==null ) {
-                bufferLabels.put( src,"file");
+            if ( bufferLabels.get(getKeyFor(src))==null ) {
+                bufferLabels.put(getKeyFor(src),"file");
             }
         }
         int position0= src.position();
@@ -1088,8 +1092,8 @@ public class ReadIDLSav {
         src.limit(limit0);
         src.position(position0);
         
-        bufferOffsets.put( r1, position+offset );
-        bufferLabels.put( r1, label );
+        bufferOffsets.put( getKeyFor(r1), position+offset );
+        bufferLabels.put( getKeyFor(r1), label );
         return r1;
     }
     
@@ -1233,8 +1237,8 @@ public class ReadIDLSav {
             logger.log(Level.CONFIG, "readVar {0} buffer size: {1,number,#}", new Object[] { name, in.limit() } );
         }
 
-        bufferOffsets.put( in, 0 );
-        bufferLabels.put( in, "<file>" );
+        bufferOffsets.put( getKeyFor(in), 0 );
+        bufferLabels.put( getKeyFor(in), "<file>" );
 
         int pos= 4;
         String name0= name; // keep name for reference.
@@ -1242,7 +1246,7 @@ public class ReadIDLSav {
         
         while ( rec!=null ) {
     
-            int offset = bufferOffsets.get(rec);
+            int offset = bufferOffsets.get(getKeyFor(rec));
         
             int type= rec.getInt(0);
             int nextPos= rec.getInt(4);
