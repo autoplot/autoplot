@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /*
  * CompletionsDataSourceEditor.java
@@ -64,6 +60,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
     JComboBox arg0Cbs=null;
     String arg0Extra=null;
     JTextField arg0ExtraTF=null;
+    Control arg0ComboBox=null;
 
     private static interface Control {
         String getValue();
@@ -230,6 +227,66 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
 
         boolean empty= true;
 
+        if ( arg0.size()>0 ) {
+            JPanel optPanel= new JPanel( new BorderLayout() );
+            empty= false;
+
+            String val= map.get("arg_0");
+            if ( val!=null ) {
+                int ib= val.indexOf("[");
+                if ( ib>-1 && val.endsWith("]") ) { // vap+hdf5:file:///home/jbf/Linux/Download/gnc_B_July_16_2012.hdf5.mat?EFW_Uncomp_U[0]
+                    arg0Extra= val.substring(ib);
+                }
+            }
+
+            int isel=-1;
+            List<String> arg0options= new ArrayList();
+            for ( int ii=0; ii<arg0.size(); ii++ ) {
+                if ( arg0.get(ii).completable.equals(arg0.get(ii).label) ) {
+                    arg0.get(ii).label= null;
+                }
+                if ( arg0.get(ii).completable.equals("") ) {
+                    String s= arg0.get(ii).label;
+                    if ( s!=null && s.trim().length()>0 ) {
+                        optPanel.add( BorderLayout.NORTH, new JLabel(s) );
+                    }
+                }
+                if ( arg0.get(ii).label!=null ) {
+                    arg0options.add( arg0.get(ii).completable + ": " +arg0.get(ii).label );
+                } else {
+                    arg0options.add( arg0.get(ii).completable );
+                }
+                if ( arg0.get(ii).completable.equals(val) ) {
+                    isel= ii;
+                }
+            }
+
+
+            JComboBox jopts= new JComboBox( arg0options.toArray() );
+            optPanel.add( BorderLayout.CENTER, jopts );
+            if ( isel!=-1 ) {
+                jopts.setSelectedIndex(isel);
+            }
+            
+            arg0ComboBox= getFromComboBox(jopts);
+            
+            if ( arg0Extra!=null ) {
+                arg0ExtraTF= new JTextField(12);
+                arg0ExtraTF.setText(arg0Extra);
+                arg0ExtraTF.setToolTipText( "subset specifier like [2:] or [-100:]");
+                optPanel.add( BorderLayout.EAST, arg0ExtraTF );
+            }
+
+            arg0Cbs= jopts;
+
+            optPanel.setMaximumSize( new Dimension(10000,16) );
+
+            optionsPanel.add( optPanel );
+            optionsPanel.add( Box.createVerticalStrut(8) );
+            
+        }
+        
+        
         for ( CompletionContext cc1: first ) {
 
             String ss= CompletionContext.insert(cc, cc1);
@@ -368,64 +425,6 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
             } else {
                 opsComboBoxes.add( null );
             }
-            
-        }
-
-        if ( arg0.size()>0 ) {
-            JPanel optPanel= new JPanel( new BorderLayout() );
-            empty= false;
-
-            String val= map.get("arg_0");
-            if ( val!=null ) {
-                int ib= val.indexOf("[");
-                if ( ib>-1 && val.endsWith("]") ) { // vap+hdf5:file:///home/jbf/Linux/Download/gnc_B_July_16_2012.hdf5.mat?EFW_Uncomp_U[0]
-                    arg0Extra= val.substring(ib);
-                }
-            }
-
-            int isel=-1;
-            List<String> arg0options= new ArrayList();
-            for ( int ii=0; ii<arg0.size(); ii++ ) {
-                if ( arg0.get(ii).completable.equals(arg0.get(ii).label) ) {
-                    arg0.get(ii).label= null;
-                }
-                if ( arg0.get(ii).completable.equals("") ) {
-                    String s= arg0.get(ii).label;
-                    if ( s!=null && s.trim().length()>0 ) {
-                        optPanel.add( BorderLayout.NORTH, new JLabel(s) );
-                    }
-                }
-                if ( arg0.get(ii).label!=null ) {
-                    arg0options.add( arg0.get(ii).completable + ": " +arg0.get(ii).label );
-                } else {
-                    arg0options.add( arg0.get(ii).completable );
-                }
-                if ( arg0.get(ii).completable.equals(val) ) {
-                    isel= ii;
-                }
-            }
-
-
-            JComboBox jopts= new JComboBox( arg0options.toArray() );
-            optPanel.add( BorderLayout.CENTER, jopts );
-            if ( isel!=-1 ) {
-                jopts.setSelectedIndex(isel);
-            }
-            opsComboBoxes.add( getFromComboBox(jopts) );
-            
-            if ( arg0Extra!=null ) {
-                arg0ExtraTF= new JTextField(12);
-                arg0ExtraTF.setText(arg0Extra);
-                arg0ExtraTF.setToolTipText( "subset specifier like [2:] or [-100:]");
-                optPanel.add( BorderLayout.EAST, arg0ExtraTF );
-            }
-
-            arg0Cbs= jopts;
-
-            optPanel.setMaximumSize( new Dimension(10000,16) );
-
-            optionsPanel.add( optPanel );
-            optionsPanel.add( Box.createVerticalStrut(8) );
             
         }
 
