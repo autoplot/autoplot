@@ -30,6 +30,7 @@
                 
         <p>Bugfixes (2023-02-23 r26948):</p>
         <ul> 
+            <li>Corrections to completions for IDLSave source and for its automatically-generated GUI control.
             <li>Spectrogram binAverage and nearestNeighbor modes will use rank 0 BIN_PLUS and other codes to do a better job of establishing cadence.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2501">2501</a>:Corrections to CDF editor panel and completions.  
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2501">2501</a>:CDF with X= would show the wrong label for X.
@@ -59,7 +60,9 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>IDLSav supports ulongs, as long as the ulongs don't use the highest bit.  Thanks, Cindy!
+            <li>BinaryDataSource URIs can now have control dims=[64,48].
+            <li>BinaryDataSource URIs can now allow simple calculations including * and +, for example rank2=0:48*64.
+            <li>IDLSav supports ulongs (type 15), as long as the ulongs don't use the highest bit.  Thanks, Cindy!
         </ul>
         <p>Less recent features:</p>
         <ul>
