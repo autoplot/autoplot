@@ -29,6 +29,7 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "byteLength=", "total number of bytes to read (limit 2G)" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "fieldCount=", "specify record length based on field type" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "rank2=", "start and stop indices for rank 2 data set" ) );
+            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "dims=", "like rank2, but allows for higher dimensions") );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "recCount=", "limit the number of records to read in" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "recLength=", "byte length of each record" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "recOffset=", "byte offset into each record") );
@@ -88,6 +89,12 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>:<int>", "first,last (exclusive) fields" ) );
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "0:", "return rank two to last field" ) );
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, ":", "as many as will fit in one record" ) );
+                    return result;
+                }
+                case "dims": {
+                    List<CompletionContext> result= new ArrayList<>();
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "[10]", "rank 2 ds[:,10]" ) );
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "[48,64]", "rank 3 ds[:,48,64]" ) );
                     return result;
                 }
                 case "type":
