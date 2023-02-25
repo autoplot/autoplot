@@ -193,10 +193,11 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
         if ( cc.context.equals(CompletionContext.CONTEXT_PARAMETER_NAME) ) {
             List<CompletionContext> ccresult= new ArrayList<>();
             File file= DataSetURI.getFile( cc.resourceURI, mon );
-            String completable= cc.params;
             ByteBuffer buf= ReadIDLSav.readFileIntoByteBuffer(file);
             String[] names= new ReadIDLSav().readVarNames(buf);
             ReadIDLSav reader= new ReadIDLSav();
+            Map<String,String> params= URISplit.parseParams(cc.params);
+            String completable= params.get(URISplit.PARAM_ARG_0);
             if ( completable.contains(".") ) {
                 int i= completable.lastIndexOf('.');
                 String root= completable.substring(0,i);
@@ -204,6 +205,10 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
                 if ( i2>-1 ) {
                     root= root.substring(i2+1);
                 }
+                //int i3= root.indexOf("=");
+                //if ( i3>-1 ) {
+                //    root= root.substring(i3+1);
+                //}
                 Object o= reader.readVar( buf, root );
                 if ( o instanceof Map ) {
                     Map<String,Object> m= (Map<String,Object>)o;
@@ -226,32 +231,7 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
                     logger.fine("not a Map, which was expected");
                 }
             } else {
-                for (String name : names) {
-                    String root= name;
-                    if ( reader.isStructure(buf, name ) ) {
-                        Object o= reader.readVar( buf, name );
-                        if ( o instanceof Map ) {
-                            Map<String,Object> m= (Map<String,Object>)o;
-                            for ( Entry<String,Object> e: m.entrySet() ) {
-                                if ( e.getValue() instanceof Map ) {
-                                    for ( Entry<String,Object> e2: ((Map<String,Object>)e.getValue()).entrySet() ) {
-                                        CompletionContext cc1= new CompletionContext( 
-                                            CompletionContext.CONTEXT_PARAMETER_NAME,
-                                            root + "." + e.getKey() + "."+ e2.getKey(), this, "arg_0", root + "." + e.getKey()+ "."+ e2.getKey(), "", true );
-                                        ccresult.add(cc1);                        
-                                    }
-                                } else {
-                                    CompletionContext cc1= new CompletionContext( 
-                                        CompletionContext.CONTEXT_PARAMETER_NAME,
-                                        root + "." + e.getKey(), this, "arg_0", root + "." + e.getKey(), "", true );
-                                    ccresult.add(cc1);
-                                }
-                            }
-                        }
-                    } else {
-                        addCompletions(reader, null, name, buf, ccresult);
-                    }
-                }
+                getCompletionsWithStructs(names, reader, buf, ccresult, null );
             }
             ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "xunits=", "units for the x values"));
             ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "yunits=", "units for the y values"));
@@ -269,11 +249,10 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
                 case "Z":
                     List<CompletionContext> ccresult= new ArrayList<>();
                     File file= DataSetURI.getFile( cc.resourceURI, mon );
-                    String completable= cc.params;
-                    String[] names= getVariableNames(file, completable);
-                    for ( String n: names ) {
-                        ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, n, "variable..." ) );
-                    }
+                    ByteBuffer buf= ReadIDLSav.readFileIntoByteBuffer(file);
+                    String[] names= new ReadIDLSav().readVarNames(buf);
+                    ReadIDLSav reader= new ReadIDLSav();
+                    getCompletionsWithStructs(names, reader, buf, ccresult, paramName);
                     return ccresult;
                 case "xunits":
                     List<CompletionContext> result = new ArrayList<>();
@@ -286,6 +265,51 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
             }
         } else {
             return super.getCompletions(cc, mon);
+        }
+    }
+
+    private void getCompletionsWithStructs(String[] names, ReadIDLSav reader, ByteBuffer buf, 
+            List<CompletionContext> ccresult, String paramName) throws IOException {
+        for (String name : names) {
+            String root= name;
+            if ( reader.isStructure(buf, name ) ) {
+                Object o= reader.readVar( buf, name );
+                if ( o instanceof Map ) {
+                    Map<String,Object> m= (Map<String,Object>)o;
+                    for ( Entry<String,Object> e: m.entrySet() ) {
+                        if ( e.getValue() instanceof Map ) {
+                            for ( Entry<String,Object> e2: ((Map<String,Object>)e.getValue()).entrySet() ) {
+                                if ( paramName==null ) {
+                                    CompletionContext cc1= new CompletionContext(
+                                            CompletionContext.CONTEXT_PARAMETER_NAME,
+                                            root + "." + e.getKey() + "."+ e2.getKey(), this, "arg_0", root + "." + e.getKey()+ "."+ e2.getKey(), "", true );
+                                    ccresult.add(cc1);
+                                } else {
+                                    CompletionContext cc1= new CompletionContext(
+                                            CompletionContext.CONTEXT_PARAMETER_VALUE,
+                                            root + "." + e.getKey() + "."+ e2.getKey(), this, paramName, root + "." + e.getKey()+ "."+ e2.getKey(), "", true );
+                                    ccresult.add(cc1);
+                                }
+                            }
+                        } else {
+                            if ( paramName==null ) {
+                                CompletionContext cc1= new CompletionContext(
+                                        CompletionContext.CONTEXT_PARAMETER_NAME,
+                                        root + "." + e.getKey(), this, "arg_0", root + "." + e.getKey(), "", true );
+                                ccresult.add(cc1);
+                            } else {
+                                CompletionContext cc1= new CompletionContext(
+                                        CompletionContext.CONTEXT_PARAMETER_VALUE,
+                                        root + "." + e.getKey(), this,  paramName, root + "." + e.getKey(), "", true );
+                                ccresult.add(cc1);
+                                
+                            }
+                        }
+                    }
+                }
+            } else {
+                addCompletions(reader, null, name, buf, ccresult);
+            }
         }
     }
 
