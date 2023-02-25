@@ -29,6 +29,11 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
 
     private static Logger logger= LoggerManager.getLogger("apdss.idlsav");
     
+    File file=null;
+    ByteBuffer buf= null;
+    String[] names;
+    ReadIDLSav reader;
+
     @Override
     public DataSource getDataSource(URI uri) throws Exception {
         return new IdlsavDataSource(uri);
@@ -190,12 +195,17 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
     
     @Override
     public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
+        
+        if ( file==null ) {
+            file= DataSetURI.getFile( cc.resourceURI, mon );
+            buf= ReadIDLSav.readFileIntoByteBuffer(file);
+            reader= new ReadIDLSav();
+            names= reader.readVarNames(buf);
+            
+        }
+
         if ( cc.context.equals(CompletionContext.CONTEXT_PARAMETER_NAME) ) {
             List<CompletionContext> ccresult= new ArrayList<>();
-            File file= DataSetURI.getFile( cc.resourceURI, mon );
-            ByteBuffer buf= ReadIDLSav.readFileIntoByteBuffer(file);
-            String[] names= new ReadIDLSav().readVarNames(buf);
-            ReadIDLSav reader= new ReadIDLSav();
             Map<String,String> params= URISplit.parseParams(cc.params);
             String completable= params.get(URISplit.PARAM_ARG_0);
             if ( completable.contains(".") ) {
@@ -217,7 +227,7 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
                             for ( Entry<String,Object> e2: ((Map<String,Object>)e.getValue()).entrySet() ) {
                                 CompletionContext cc1= new CompletionContext( 
                                     CompletionContext.CONTEXT_PARAMETER_NAME,
-                                    root + "." + e.getKey() + "."+ e2.getKey(), this, "arg_0", root + "." + e.getKey()+ "."+ e2.getKey(), "", true );
+                                    root + "." + e.getKey() + "."+ e2.getKey(), this, "arg_0", root + "." + e.getKey()+ "."+ e2.getKey(), "Dependent Variable", true );
                                 ccresult.add(cc1);                        
                             }
                         } else {
@@ -233,12 +243,12 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
             } else {
                 getCompletionsWithStructs(names, reader, buf, ccresult, null );
             }
-            ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "xunits=", "units for the x values"));
-            ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "yunits=", "units for the y values"));
-            ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "units=", "units for the values"));
             ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "X=", "variable for the x values"));
             ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "Y=", "variable for the y values"));
             ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "Z=", "variable for the z values"));
+            ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "xunits=", "units for the x values"));
+            ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "yunits=", "units for the y values"));
+            ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "units=", "units for the values"));
             
             return ccresult;
         } else if ( cc.context.equals(CompletionContext.CONTEXT_PARAMETER_VALUE ) ) {
@@ -248,10 +258,6 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
                 case "Y":
                 case "Z":
                     List<CompletionContext> ccresult= new ArrayList<>();
-                    File file= DataSetURI.getFile( cc.resourceURI, mon );
-                    ByteBuffer buf= ReadIDLSav.readFileIntoByteBuffer(file);
-                    String[] names= new ReadIDLSav().readVarNames(buf);
-                    ReadIDLSav reader= new ReadIDLSav();
                     getCompletionsWithStructs(names, reader, buf, ccresult, paramName);
                     return ccresult;
                 case "xunits":
@@ -282,7 +288,7 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
                                 if ( paramName==null ) {
                                     CompletionContext cc1= new CompletionContext(
                                             CompletionContext.CONTEXT_PARAMETER_NAME,
-                                            root + "." + e.getKey() + "."+ e2.getKey(), this, "arg_0", root + "." + e.getKey()+ "."+ e2.getKey(), "", true );
+                                            root + "." + e.getKey() + "."+ e2.getKey(), this, "arg_0", root + "." + e.getKey()+ "."+ e2.getKey(), "Dependent Parameter", true );
                                     ccresult.add(cc1);
                                 } else {
                                     CompletionContext cc1= new CompletionContext(
@@ -295,7 +301,7 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
                             if ( paramName==null ) {
                                 CompletionContext cc1= new CompletionContext(
                                         CompletionContext.CONTEXT_PARAMETER_NAME,
-                                        root + "." + e.getKey(), this, "arg_0", root + "." + e.getKey(), "", true );
+                                        root + "." + e.getKey(), this, "arg_0", root + "." + e.getKey(), "Dependent Parameter", true );
                                 ccresult.add(cc1);
                             } else {
                                 CompletionContext cc1= new CompletionContext(
