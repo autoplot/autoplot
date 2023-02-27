@@ -118,6 +118,14 @@ public class IdlsavDataSource extends AbstractDataSource {
             throw new IllegalArgumentException("Map is not supported, select one of its tags");
         } else if ( v instanceof String ) {
             return Ops.dataset( Units.nominal().createDatum(v) );
+        } else if ( v instanceof double[] && Array.getLength(v)==2 ) { //
+            ArrayDataSet result= ArrayDataSet.wrap( v, new int [] { 2 }, false );
+            result.putProperty( QDataSet.DEPEND_0, Schemes.complexCoordinateSystemDepend() );
+            return result;
+        } else if ( v instanceof float[] && Array.getLength(v)==2 ) { //
+            ArrayDataSet result= ArrayDataSet.wrap( v, new int [] { 2 }, false );
+            result.putProperty( QDataSet.DEPEND_0, Schemes.complexCoordinateSystemDepend() );
+            return result;
         } else {
             return Ops.dataset(v);
         }
