@@ -14,10 +14,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.das2.qds.buffer.BufferDataSet;
 
 /**
  * Read data from IDL Save Files.  This was written using
@@ -129,17 +127,18 @@ public class ReadIDLSav {
         return result;
     }
     
-    private static final int TYPECODE_BYTE=1;
-    private static final int TYPECODE_INT16=2;
-    private static final int TYPECODE_INT32=3;
-    private static final int TYPECODE_FLOAT=4;
-    private static final int TYPECODE_DOUBLE=5;
-    private static final int TYPECODE_COMPLEX_FLOAT=6;
-    private static final int TYPECODE_STRING=7;
-    private static final int TYPECODE_STRUCT=8;
-    private static final int TYPECODE_COMPLEX_DOUBLE=9;
-    private static final int TYPECODE_INT64=14;
-    private static final int TYPECODE_UINT64=15;
+    public static final int TYPECODE_COMPLEX_FLOAT_SCALAR=0;
+    public static final int TYPECODE_BYTE=1;
+    public static final int TYPECODE_INT16=2;
+    public static final int TYPECODE_INT32=3;
+    public static final int TYPECODE_FLOAT=4;
+    public static final int TYPECODE_DOUBLE=5;
+    public static final int TYPECODE_COMPLEX_FLOAT=6;
+    public static final int TYPECODE_STRING=7;
+    public static final int TYPECODE_STRUCT=8;
+    public static final int TYPECODE_COMPLEX_DOUBLE=9;
+    public static final int TYPECODE_INT64=14;
+    public static final int TYPECODE_UINT64=15;
 
     /**
      * return a string representing the type code, if supported.
@@ -190,7 +189,7 @@ public class ReadIDLSav {
      * @return 
      */
     private static int sizeOf( int typeCode ) {
-        int[] sizes= new int[] { 0, 4, 4, 4, 4,   8, 8, 1, 0, 16,   0, 0, 0, 0, 8, 8 };
+        int[] sizes= new int[] { 0, 4, 4, 4, 4,   8, 16, 1, 0, 32,   0, 0, 0, 0, 8, 8 };
         return sizes[typeCode];
     }
     
@@ -327,6 +326,10 @@ public class ReadIDLSav {
                     return buf.getFloat(offs);
                 case TYPECODE_DOUBLE:
                     return buf.getDouble(offs);
+                case TYPECODE_COMPLEX_FLOAT:
+                    return new float[] { buf.getFloat(offs), buf.getFloat(offs+4) };
+                case TYPECODE_COMPLEX_DOUBLE:
+                    return new double[] { buf.getDouble(offs), buf.getFloat(offs+8) };
                 case TYPECODE_STRING:
                     int len= buf.getInt(offs);
                     if ( len<0 || len>1024 ) {
@@ -370,6 +373,8 @@ public class ReadIDLSav {
          */
         int _fileOffset;
         
+        int typeCode;
+        
         public ArrayData() {
             logger.fine("new ArrayData");
         }
@@ -386,7 +391,9 @@ public class ReadIDLSav {
     }
     
     public static class ScalarDesc extends TagDesc {
-        
+        public String toString() {
+            return "ScalarDesc nbytes: " + this._lengthBytes + " typeCode: " + this.typecode;
+        }
     }
     
     public static class ArrayDesc extends TagDesc {
@@ -427,7 +434,7 @@ public class ReadIDLSav {
         int _lengthBytes;
         @Override
         public String toString() {
-            return "tagdesc "+offset+ " " +tagflags;
+            return "tagdesc  offset: "+offset+ "  tagflags: " +tagflags + "  typecode: " + typecode;
         }
     }
     
@@ -470,6 +477,7 @@ public class ReadIDLSav {
             result.dims= arrayDesc.dims;
             result._fileOffset= fileOffset;
             result._lengthBytes= lengthBytes;
+            result.typeCode= typeCode;
             return result;
         }
         
@@ -528,12 +536,28 @@ public class ReadIDLSav {
                     }
                     return makeArrayData(result, offsetToFile+ offsToArray, result.length*4 );
                 }
+                case TYPECODE_COMPLEX_FLOAT: {
+                    float[] result= new float[arrayDesc.nelements*2];
+                    for ( int i=0; i<arrayDesc.nelements; i++ ) {
+                        result[i*2]= buf.getFloat(offsToArray+8*i);
+                        result[i*2+1]= buf.getFloat(offsToArray+8*i+4);
+                    }
+                    return makeArrayData(result, offsetToFile+ offsToArray, result.length*8 );
+                }
                 case TYPECODE_DOUBLE: {
                     double[] result= new double[arrayDesc.nelements];
                     for ( int i=0; i<result.length; i++ ) {
                         result[i]= buf.getDouble(offsToArray+8*i);
                     }
                     return makeArrayData(result, offsetToFile+ offsToArray, result.length*8 );
+                }
+                case TYPECODE_COMPLEX_DOUBLE: {
+                    double[] result= new double[arrayDesc.nelements*2];
+                    for ( int i=0; i<arrayDesc.nelements; i++ ) {
+                        result[i*2]= buf.getDouble(offsToArray+16*i);
+                        result[i*2+1]= buf.getDouble(offsToArray+16*i+8);
+                    }
+                    return makeArrayData(result, offsetToFile+ offsToArray, result.length*16 );
                 }
                 case TYPECODE_STRING: {
                     String[] result= new String[arrayDesc.nelements];
@@ -633,6 +657,7 @@ public class ReadIDLSav {
                 if ( e.getValue() instanceof ArrayData ) {
                     ArrayData ad= (ArrayData)e.getValue(); // Java 14 is coming and we won't need a cast, so exciting.
                     ArrayData ac= new ArrayData();
+                    ac.typeCode= ad.typeCode;
                     ac.dims= new int[ad.dims.length+1];
                     ac.dims[0]= nj;
                     System.arraycopy( ad.dims, 0, ac.dims, 1, ad.dims.length );
