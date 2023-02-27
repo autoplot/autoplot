@@ -133,17 +133,27 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
             }
             
         } else if ( reader.isArray( buf, key ) ) {
-            ArrayDesc desc= (ArrayDesc)reader.readTagDesc( buf, key );
-            String stype = ReadIDLSav.decodeTypeCode(desc.typecode);
-            StringBuilder sqube= new StringBuilder(stype).append("[").append(String.valueOf(desc.dims[0]));
-            for ( int i=1; i<desc.ndims; i++ ) {
-                sqube.append(",").append(String.valueOf(desc.dims[i]));
+            TagDesc tagDesc= reader.readTagDesc( buf, key );
+            tagDesc.toString();
+            if ( tagDesc instanceof ArrayDesc ) {
+                ArrayDesc desc= (ArrayDesc)tagDesc;
+                String stype = ReadIDLSav.decodeTypeCode(desc.typecode);
+                StringBuilder sqube= new StringBuilder(stype).append("[").append(String.valueOf(desc.dims[0]));
+                for ( int i=1; i<desc.ndims; i++ ) {
+                    sqube.append(",").append(String.valueOf(desc.dims[i]));
+                }
+                sqube.append("]");
+                CompletionContext cc1= new CompletionContext( 
+                        CompletionContext.CONTEXT_PARAMETER_NAME,
+                        keyn, this, "arg_0", keyn+" " +sqube, "", true );
+                ccresult.add(cc1);
+            } else { // complex numbers
+                String stype = ReadIDLSav.decodeTypeCode(tagDesc.typecode);
+                CompletionContext cc1= new CompletionContext( 
+                        CompletionContext.CONTEXT_PARAMETER_NAME,
+                        keyn, this, "arg_0", keyn+" "+stype, "", true );
+                ccresult.add(cc1);
             }
-            sqube.append("]");
-            CompletionContext cc1= new CompletionContext( 
-                    CompletionContext.CONTEXT_PARAMETER_NAME,
-                    keyn, this, "arg_0", keyn+" " +sqube, "", true );
-            ccresult.add(cc1);
         } else {
             String so= "";
             try {
