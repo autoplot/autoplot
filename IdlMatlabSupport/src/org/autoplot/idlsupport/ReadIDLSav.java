@@ -329,7 +329,7 @@ public class ReadIDLSav {
                 case TYPECODE_COMPLEX_FLOAT:
                     return new float[] { buf.getFloat(offs), buf.getFloat(offs+4) };
                 case TYPECODE_COMPLEX_DOUBLE:
-                    return new double[] { buf.getDouble(offs), buf.getFloat(offs+8) };
+                    return new double[] { buf.getDouble(offs), buf.getDouble(offs+8) };
                 case TYPECODE_STRING:
                     int len= buf.getInt(offs);
                     if ( len<0 || len>1024 ) {
