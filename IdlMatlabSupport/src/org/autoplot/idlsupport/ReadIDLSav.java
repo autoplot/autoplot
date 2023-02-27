@@ -434,7 +434,7 @@ public class ReadIDLSav {
     private TagDesc readTagDesc( ByteBuffer rec ) {
         TagDesc result= new TagDesc();
         result.offset= rec.getInt(0);
-        result.fileOffset= bufferOffsets.get(rec) + result.offset;
+        result.fileOffset= bufferOffsets.get(getKeyFor(rec)) + result.offset;
         result.typecode= rec.getInt(4);
         result.tagflags= rec.getInt(8);
         return result;
