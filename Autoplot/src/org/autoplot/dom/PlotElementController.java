@@ -2627,7 +2627,7 @@ public class PlotElementController extends DomNodeController {
 
             peleCopy.getPlotDefaults().getXaxis().setLog(xdesc.log);
             if ( UnitsUtil.isOrdinalMeasurement( xdesc.range.getUnits() ) ) {
-                xdesc.range= DatumRangeUtil.newDimensionless( xdesc.range.min().doubleValue(xdesc.range.getUnits() ), xdesc.range.max().doubleValue(xdesc.range.getUnits()) );
+                xdesc.range= DatumRange.newRange( xdesc.range.min().doubleValue(xdesc.range.getUnits() ), xdesc.range.max().doubleValue(xdesc.range.getUnits()) );
             }
             peleCopy.getPlotDefaults().getXaxis().setRange(xdesc.range);
 
