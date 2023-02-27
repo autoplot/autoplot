@@ -1272,7 +1272,7 @@ public class AutoplotUtil {
                     spec = specPref;
                 }
             }
-        } else if ( fillds.rank()==0 || fillds.rank()==1 && SemanticOps.isBundle(fillds) ) {
+        } else if ( fillds.rank()==0 || fillds.rank()==1 && ( SemanticOps.isBundle(fillds) || Schemes.isComplexNumbers(fillds) ) ) {
             spec= RenderType.digital;
 
         } else if ( SemanticOps.getUnits(fillds) instanceof EnumerationUnits ) {
