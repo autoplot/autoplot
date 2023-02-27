@@ -20,11 +20,13 @@ import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.qds.ArrayDataSet;
 import org.das2.qds.DDataSet;
+import org.das2.qds.DataSetOps;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.IDataSet;
 import org.das2.qds.LDataSet;
 import org.das2.qds.QDataSet;
 import org.das2.qds.SDataSet;
+import org.das2.qds.examples.Schemes;
 import org.das2.qds.ops.Ops;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
@@ -99,7 +101,13 @@ public class IdlsavDataSource extends AbstractDataSource {
                 result.putProperty( QDataSet.USER_PROPERTIES, getUserProperties( arrayData ) );
                 return result;
             } else {
-                ArrayDataSet result= ArrayDataSet.wrap( arrayData.array, arrayData.dims, false );
+                ArrayDataSet result;
+                if ( arrayData.typeCode==ReadIDLSav.TYPECODE_COMPLEX_FLOAT || arrayData.typeCode==ReadIDLSav.TYPECODE_COMPLEX_DOUBLE ) {
+                    result= ArrayDataSet.wrap( arrayData.array, DataSetOps.addElement(arrayData.dims, 2), false );
+                    result.putProperty( QDataSet.DEPEND_1, Schemes.complexCoordinateSystemDepend() );
+                } else {
+                    result= ArrayDataSet.wrap( arrayData.array, arrayData.dims, false );
+                }
                 if ( result instanceof SDataSet || result instanceof IDataSet || result instanceof LDataSet ) {
                     result.putProperty( QDataSet.FORMAT, "%d" );
                 }
