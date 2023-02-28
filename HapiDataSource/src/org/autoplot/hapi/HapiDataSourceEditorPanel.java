@@ -39,6 +39,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -154,7 +155,11 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
         initComponents();
         filtersComboBox.setPreferenceNode("hapi.filters");
-        filtersComboBox.setEditor( new PromptComboBoxEditor("search regex") );
+        PromptComboBoxEditor editor= new PromptComboBoxEditor("search regex");
+        filtersComboBox.setEditor( editor );
+        ((JTextField)editor.getEditorComponent()).setColumns(10);
+        filtersComboBox.invalidate();
+        filtersComboBox.revalidate();
         timeRangeComboBox.setPreferenceNode(RecentComboBox.PREF_NODE_TIMERANGE);
         parametersScrollPane.getVerticalScrollBar().setUnitIncrement( parametersPanel.getFont().getSize() );
 
