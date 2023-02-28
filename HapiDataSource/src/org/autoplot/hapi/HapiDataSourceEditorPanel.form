@@ -303,7 +303,10 @@
             </Component>
             <Component class="org.autoplot.datasource.RecentComboBox" name="filtersComboBox">
               <Properties>
-                <Property name="toolTipText" type="java.lang.String" value="search bar"/>
+                <Property name="toolTipText" type="java.lang.String" value="search bar, any id or title containing regular expression (.* matches anything) is shown"/>
+                <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                  <Dimension value="[1028, 32767]"/>
+                </Property>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filtersComboBoxActionPerformed"/>

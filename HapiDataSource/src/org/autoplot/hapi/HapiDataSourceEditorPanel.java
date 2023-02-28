@@ -59,6 +59,7 @@ import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.RecentComboBox;
 import org.autoplot.datasource.TimeRangeTool;
 import org.autoplot.datasource.URISplit;
+import org.autoplot.datasource.ui.PromptComboBoxEditor;
 
 /**
  * Swing editor for HAPI URIs
@@ -153,6 +154,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
         initComponents();
         filtersComboBox.setPreferenceNode("hapi.filters");
+        filtersComboBox.setEditor( new PromptComboBoxEditor("search regex") );
         timeRangeComboBox.setPreferenceNode(RecentComboBox.PREF_NODE_TIMERANGE);
         parametersScrollPane.getVerticalScrollBar().setUnitIncrement( parametersPanel.getFont().getSize() );
 
@@ -424,7 +426,8 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         });
 
-        filtersComboBox.setToolTipText("search bar");
+        filtersComboBox.setToolTipText("search bar, any id or title containing regular expression (.* matches anything) is shown");
+        filtersComboBox.setMaximumSize(new java.awt.Dimension(1028, 32767));
         filtersComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 filtersComboBoxActionPerformed(evt);
