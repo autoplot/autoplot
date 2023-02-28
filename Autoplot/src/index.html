@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>CDF data variable "I" is used for X values instead of support variable Epoch, and axis is now properly labeled.
+        <p><small>Simple products and sums are now available and useful in the Binary Data Source URIs.  (See rank2=0:48*64 in the URI.)
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,12 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-02-23 r26948):</p>
+        <p>Bugfixes (2023-02-28 r26974):</p>
         <ul> 
+            <li>isUniformRatioMetricCadence (10% increase) will not return true when the data is not ratio data.
+            <li>ytitle position was shifted twice when axisOffset was used.  Thanks, James!
+            <li>untested branch in newRange when min>max, which is new code.  It now swaps the values as indicated in the documentation.
+            <li>rank 2 spectrograms which also had a BUNDLE_1 was treated as a bundle, which is the case for datasets just to label channels.
             <li>Corrections to completions for IDLSave source and for its automatically-generated GUI control.
             <li>Spectrogram binAverage and nearestNeighbor modes will use rank 0 BIN_PLUS and other codes to do a better job of establishing cadence.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2501">2501</a>:Corrections to CDF editor panel and completions.  
@@ -60,6 +64,11 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>HAPI source shows prompt in search dialog.
+            <li>reform( ds, nrec, qube ) now copies DEPEND_0 when first dimension length doesn't change
+            <li>nearestNeighbor rebinner will use rank 0 BIN_PLUS and BIN_MINUS to set the width. Thanks, Jon N!
+            <li>When generating GUIs based on completions, put the "arg_0" completion at the top, since it is important.
+            <li>IDLSav supports float and double complex numbers.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/797/">797</a> BinaryDataSource URIs can now have control dims=[64,48].
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/797/">797</a> https://sourceforge.net/p/autoplot/feature-requests/797/BinaryDataSource URIs can now allow simple calculations including * and +, for example rank2=0:48*64.
             <li>IDLSav supports ulongs (type 15), as long as the ulongs don't use the highest bit.  Thanks, Cindy!
