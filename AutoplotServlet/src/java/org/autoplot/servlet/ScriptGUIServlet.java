@@ -53,6 +53,7 @@ import org.das2.graph.DasCanvas;
 import org.das2.util.DasPNGConstants;
 import org.das2.util.DasPNGEncoder;
 import org.das2.util.FileUtil;
+import org.das2.util.awt.GraphicsOutput;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.python.core.PySystemState;
 import org.python.util.PythonInterpreter;
@@ -204,6 +205,29 @@ public class ScriptGUIServlet extends HttpServlet {
                 throw new IOException( "invalid key: "+key );
             } 
             writeOutputImage( key, response );
+
+        } else if ( "Print SVG".equals( request.getParameter("printsvg") ) ) {
+            String key= request.getParameter("key");
+            String[] ss= new String[ssparams.size()];
+            int i=0;
+            for ( Entry<String,String> e: ssparams.entrySet() ) {
+                ss[i] = e.getKey() + "=" + e.getValue();
+                i++;
+            }
+            
+            printScript( response, key, scriptURI, script, name, ss, pwd, "svg" );
+
+        } else if ( "Print PDF".equals( request.getParameter("printpdf") ) ) {
+            String key= request.getParameter("key");
+            String[] ss= new String[ssparams.size()];
+            int i=0;
+            for ( Entry<String,String> e: ssparams.entrySet() ) {
+                ss[i] = e.getKey() + "=" + e.getValue();
+                i++;
+            }
+            
+            printScript( response, key, scriptURI, script, name, ss, pwd, "pdf" );
+            
             
         } else if ( request.getParameter("text")!=null ) {
             
@@ -374,6 +398,114 @@ public class ScriptGUIServlet extends HttpServlet {
         return new File( keyhome, key+ ext );
     }
     
+    private void printScript( HttpServletResponse response, String key, String scriptURI, String script, 
+            String name, String[] aaparams, String pwd, String format ) throws IOException {
+        try {
+            File scriptLogArea= new File( ServletUtil.getServletHome(), "log" );
+            if ( !scriptLogArea.exists() ) {
+                if ( !scriptLogArea.mkdirs() ) {
+                    logger.warning("unable to make log area");
+                }
+            }
+            File scriptLogFile= new File( scriptLogArea, "ScriptGUIServlet.log" );
+            Datum n= TimeUtil.now();
+            TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
+            String s= tp.format( n ) + "\t" + key + "\t" + scriptURI ;
+            
+            try ( PrintWriter w= new PrintWriter( new FileWriter( scriptLogFile, scriptLogFile.exists() ) ) ) {
+                w.println(s);
+            }
+            
+            if ( !"true".equals(System.getProperty("java.awt.headless")) ) {
+                throw new IllegalArgumentException("java.awt.headless must be set to true");
+            }
+            
+            org.autoplot.jythonsupport.JythonUtil.ScriptDescriptor sd0= 
+                    org.autoplot.jythonsupport.JythonUtil.describeScript( null, script, null );
+            aaparams= interpretAsParams( sd0, aaparams );
+            
+            logger.fine("add fonts, which must be done with headless mode");
+            //System.getProperty("java.awt.headless");
+            org.autoplot.Util.addFonts(); // PROBLEMS
+            
+            ApplicationModel model = new ApplicationModel();
+            model.setExceptionHandler( new DumpRteExceptionHandler() );
+            model.addDasPeersToAppAndWait();
+            Application dom= model.getDom();
+            
+            logger.log(Level.FINE, "dom: {0}", dom);
+            logger.log(Level.FINE, "dom options: {0}", dom.getOptions());
+            
+            dom.getOptions().setAutolayout(false);
+            
+            PythonInterpreter interp = JythonUtil.createInterpreter( true, true );
+            interp.set("java",null);
+            interp.set("org",null);
+            interp.set("getFile",null);
+            interp.set("dom",dom);
+            interp.set("downloadResourceAsTempFile",null);
+            
+            LoggingOutputStream los1= new LoggingOutputStream( Logger.getLogger("autoplot.servlet.scriptservlet"), Level.INFO );
+            interp.setOut( los1 );
+            
+            script= JythonRefactory.fixImports(script);
+            
+            ScriptContext.setApplicationModel(model); // why must I do this???
+            
+            script= "def showMessageDialog(msg): \n    pass\n" + script;
+            
+            long t0= System.currentTimeMillis();
+            timelogger.log(Level.FINE, "begin runScript {0}", name);
+            
+            File consoleKeyFile= getKeyFile( key, ".txt.t" );
+                        
+            try ( OutputStream baos= new FileOutputStream( consoleKeyFile, true ) ) {
+                runScript( dom,
+                        new ByteArrayInputStream(script.getBytes("UTF-8")),
+                        baos,
+                        name,
+                        aaparams,
+                        pwd );
+            } catch ( Exception ex ) {
+                try ( PrintWriter write= new PrintWriter( new FileWriter( consoleKeyFile, true ) ) ) {
+                    ex.printStackTrace(write);
+                }
+            }
+            
+            long elapsedTime= System.currentTimeMillis()-t0;
+            timelogger.log(Level.FINE, "end printScript {0} ({1}ms)", new Object[]{name, elapsedTime });
+            
+            waitUntilIdle();
+            
+            if ( format.equals("svg") ) {
+                Class goClass = Class.forName("org.das2.util.awt.SvgGraphicsOutput");
+                GraphicsOutput go = (GraphicsOutput) goClass.newInstance();
+                
+                DasCanvas c = dom.getController().getApplicationModel().getCanvas();
+
+                c.writeToGraphicsOutput( response.getOutputStream(), go );
+                
+            } else {
+                Class goClass = Class.forName( "org.das2.util.awt.PdfGraphicsOutput" );
+                GraphicsOutput go = (GraphicsOutput) goClass.newInstance();
+                
+                DasCanvas c = dom.getController().getApplicationModel().getCanvas();
+
+                c.writeToGraphicsOutput( response.getOutputStream(), go );
+                
+            }
+            
+            
+        } catch (InstantiationException ex) {
+            Logger.getLogger(ScriptGUIServlet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(ScriptGUIServlet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(ScriptGUIServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    
     private void startScript( HttpServletRequest request, String key, String scriptURI, String script, String name, String[] aaparams, String pwd) throws IOException {
         
         File scriptLogArea= new File( ServletUtil.getServletHome(), "log" );
@@ -528,6 +660,26 @@ public class ScriptGUIServlet extends HttpServlet {
         return result;
     }
     
+    /**
+     * go through and convert "on" to "1", etc.  Note doubles will still be Strings, URIs will still be Strings, etc.
+     * ssparams will be modified and a copy is returned.
+     * @param sd0
+     * @param ssparams
+     * @return the map is returned as a string-object version for convenience.
+     */
+    private static String[] interpretAsParams( org.autoplot.jythonsupport.JythonUtil.ScriptDescriptor sd0, 
+            String[] ssparams ) {
+        for ( int i=0; i<ssparams.length; i++ ) {
+            if ( ssparams[i].endsWith("=on") ) {
+                ssparams[i]= ssparams[i].substring(0,ssparams[i].length()-3) + "=1";
+            } else if (ssparams[i].endsWith("=off") ) {
+                ssparams[i]= ssparams[i].substring(0,ssparams[i].length()-3) + "=0";
+            }
+        }
+        //TODO: much
+        return ssparams;
+    }
+
     private void writeParametersForm( String key, HttpServletResponse response, 
             String pwd, 
             String script, 
@@ -648,6 +800,8 @@ public class ScriptGUIServlet extends HttpServlet {
             
             out.println("<input type='hidden' name='script' value='"+scriptURI+"'>\n");
             out.println("<input type='submit' value='Submit'>\n");
+            out.println("<input type='submit' value='Print SVG' name='printsvg' value='svg'>\n");
+            out.println("<input type='submit' value='Print PDF' name='printpdf' value='pdf'>\n");
             out.println("</form>\n");
             out.println( "</td>\n");
             out.println( "<td valign='top'>\n");
