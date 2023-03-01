@@ -800,6 +800,7 @@ public class ScriptGUIServlet extends HttpServlet {
             
             out.println("<input type='hidden' name='script' value='"+scriptURI+"'>\n");
             out.println("<input type='submit' value='Submit'>\n");
+            out.println("<hr>\n");
             out.println("<input type='submit' value='Print SVG' name='printsvg' value='svg'>\n");
             out.println("<input type='submit' value='Print PDF' name='printpdf' value='pdf'>\n");
             out.println("</form>\n");
