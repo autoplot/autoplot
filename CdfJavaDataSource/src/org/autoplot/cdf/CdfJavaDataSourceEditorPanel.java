@@ -996,7 +996,6 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
         
         if ( isValidCDF ) {
             TreePath[] tps= parameterTree.getSelectionPaths();
-            StringBuilder arg0= new StringBuilder();
             
             if ( tps!=null ) {
                 String p= getParamAndSubset(parameterTree,subset);
