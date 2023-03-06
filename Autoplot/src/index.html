@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>CDF Editor Panel allows one parameter to be plotted against another.
+        <p><small>Testing component bounding boxes with data from new HAPI server visible.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,12 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-03-03 r26979):</p>
+        <p>Bugfixes (2023-03-06 r26982):</p>
         <ul> 
+            <li>rte0008993657: runtime error with ExpandToFillGaps editor when no DEPEND_0 is found.  Thanks, George!
+        </ul>
+        <p>Older Bugfixes (2023-03-03 r26979):</p>
+        <ul>
             <li>small and trivial FindBugs cleanup.
             <li>isUniformRatioMetricCadence (10% increase) will not return true when the data is not ratio data.
             <li>ytitle position was shifted twice when axisOffset was used.  Thanks, James!
@@ -44,26 +48,10 @@
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2506">2506</a>: recent change to CDAWeb to allow multiple variable selections didn't consider non-virtual variables.  Thanks, Dante!
             <li><a href="https://github.com/das-developers/das2java/issues/48">0048</a>: Finally FFTPower translation is handled properly, where a second bug associated with translation was hiding in plain sight.  Thanks, Keith!
         </ul>
-        <p>Older Bugfixes (2023-02-21 r26937):</p>
-        <ul>
-            <li><a href="https://github.com/das-developers/das2java/issues/48">0048</a>: FFTPower cadence changes are supported with no translation.
-            <li><a href="https://github.com/das-developers/das2java/issues/48">0048</a>: correct where new code broke test for cadence change in FFTPower.  Thanks, Keith!
-            <li>Corrections to directory listings with GitHubFileSystem.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2507">2507</a>: bug where ASCII reader would return data in different scheme with headers but no data.
-            <li><a href="https://github.com/das-developers/das2java/issues/47">0047</a>: anchor type "plot" definition, underscore border type.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/1696">1696</a>: automatically anchor annotation to canvas when plot is specified.
-            <li>fftPower has branch were factor of 4 was used where factor of 2 was appropriate.  Thanks, Keith!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2506">2506</a>: CDAWeb reader didn't handle multi-variable reads when virtual variables are used.  Thanks, Bob!
-            <li>corrections to HAPI server associated with non-ASCII unicode characters.  Thanks, Bob!
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/795/">rfe795</a>corrections to identifyContinuousBlocks. Thanks, Sadie!
-            <li>tweak where statistics are run on large datasets, which was causing pause before display.  Run large dataset stats in the background.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2504">2504</a>: loading a .vap with duplicate IDs results in very weird behavior.  Thanks, Bill!
-            <li>handle when getParam is called with the same parameter name twice, dialog is now resizable.
-            <li>"if(len(r_erg))" was included in simplified Jython script, causing runtime error.  Thanks, Sadie!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2501">2501</a>: clean up the X and Y parts of the CDF editor dialog, so that only compatible Xs and Ys are offered. don't allow EwEw&X=EwEw, etc.
-            <li>rte_1865701214: strange and annoying RTE associated with setting the status bar text.  Thanks, Bill!
-        </ul>
         <p>Features:</p>
+        <ul>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>DasPlot long titles property and debug bounds.
             <li>HAPI source shows prompt in search dialog.
@@ -74,13 +62,6 @@
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/797/">797</a> BinaryDataSource URIs can now have control dims=[64,48].
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/797/">797</a> https://sourceforge.net/p/autoplot/feature-requests/797/BinaryDataSource URIs can now allow simple calculations including * and +, for example rank2=0:48*64.
             <li>IDLSav supports ulongs (type 15), as long as the ulongs don't use the highest bit.  Thanks, Cindy!
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>AutoplotDataServer has new usecache=false parameter.  Thanks, Bob!
-            <li>AutoplotDataServer HAPI info response will set startDate and stopDate when they look reasonable, CDAWeb data source sets these based on all.xml.  Thanks, Bob!
-            <li>Improvements to the Autoplot servlet, after seeing modern JavaScripts needed corrections to the code.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/796/">796</a>: improve support for second timerange parameter.  Thanks, Sadie!
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
