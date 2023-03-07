@@ -422,10 +422,18 @@ public class PlotElementController extends DomNodeController {
                 String newv= (String)evt.getNewValue();
                 newv= DataSetOps.makeProcessStringCanonical(newv);
                 if ( DataSetOps.changesDimensions( oldv, newv ) ) { //TODO: why two methods see axisDimensionsChange 10 lines above
-                    logger.log(Level.FINER, "component property change requires we reset render and dimensions: {0}->{1}", new Object[]{(String) evt.getOldValue(), (String) evt.getNewValue()});
-                    setResetPlotElement(true);
-                    setResetRanges(true);
-                    if ( !dom.getController().isValueAdjusting() ) maybeSetPlotAutorange();
+                    if ( DataSetOps.changesIndependentDimensions( oldv,newv ) ) {
+                        logger.log(Level.FINER, "component property change requires we reset render and dimensions: {0}->{1}", new Object[]{(String) evt.getOldValue(), (String) evt.getNewValue()});
+                        setResetPlotElement(true);
+                        setResetRanges(true);
+                        if ( !dom.getController().isValueAdjusting() ) maybeSetPlotAutorange();
+                    } else {
+                        logger.log(Level.FINER, "component property change requires we reset just the y-axis: {0}->{1}", new Object[]{(String) evt.getOldValue(), (String) evt.getNewValue()});
+                        setResetRanges(true);
+                        if ( !dom.getController().isValueAdjusting() ) {
+                            maybeSetPlotYZAutorange();
+                        }
+                    }
                 }
                 if ( sliceAutoranges ) {
                     setResetRanges(true);
@@ -1448,38 +1456,6 @@ public class PlotElementController extends DomNodeController {
         }
     }
 
-    /**
-     * listen for changes in the parent's component property and propagate changes
-     * to children.
-     * @param plotElement
-     * @param ele
-     */
-    private void addParentComponentListener( PlotElement plotElement, final PlotElement ele ) {
-        PropertyChangeListener pcl= new PropertyChangeListener() { // need to listen for component changes for |slice1(x)|unbundle('A')
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                LoggerManager.logPropertyChangeEvent(evt,"addParentComponentListener");            
-                if ( evt.getPropertyName().equals(PlotElement.PROP_COMPONENT) ) {
-                    if ( DataSetOps.changesDimensions((String)evt.getOldValue(),(String)evt.getNewValue()) ) {
-                        return;
-                    }
-                    Object v= evt.getNewValue();
-                    int i= ele.getComponent().indexOf("|unbundle");
-                    if ( i==-1 ) {
-                        throw new IllegalArgumentException("expected to see unbundle");
-                    }
-                    String tail = ele.getComponent().substring(i);
-                    if ( i!=-1 ) {
-                        String sv= (String)v;
-                        ele.setComponent( sv+tail );
-                    }
-                }
-            }
-        };
-        plotElement.addPropertyChangeListener( pcl );
-
-        ele.getController().setParentComponentListener( pcl );
-    }
 
     /**
      * This is the heart of the PlotElementController, and to some degree Autoplot.  In this routine, we are given
@@ -1788,6 +1764,23 @@ public class PlotElementController extends DomNodeController {
         return isNotBound;
     }
 
+    /**
+     * we'd like the plot to autorange, so check to see if we are the only
+     * plotElement, and if so, set its autorange and autoLabel flags.
+     */
+    private void maybeSetPlotYZAutorange() {
+        Plot p= dom.controller.getPlotFor(plotElement);
+        if ( p==null ) return;
+        List<PlotElement> eles= dom.controller.getPlotElementsFor(p);
+        if ( DomUtil.oneFamily(eles) ) {
+            p.getYaxis().setAutoRange(true);
+            p.getZaxis().setAutoRange(true);
+            p.getYaxis().setAutoLabel(true);
+            p.getZaxis().setAutoLabel(true);
+            p.setAutoLabel(true);
+            p.setAutoBinding(true);
+        }
+    }    
     /**
      * we'd like the plot to autorange, so check to see if we are the only
      * plotElement, and if so, set its autorange and autoLabel flags.
