@@ -2247,8 +2247,14 @@ public class ApplicationController extends DomNodeController implements RunLater
                 p0.getController().getDasPlot().setYAxis(oldAxis);
             }
             p0.getXaxis().getController().getDasAxis().setTcaFunction(null);
-            p0.getXaxis().getController().getDasAxis().setReference("");
-            p0.getYaxis().getController().getDasAxis().setReference("");
+            p0.getXaxis().setReference("");
+            p0.getYaxis().setReference("");
+            p0.getXaxis().getController().getDasAxis().setAxisOffset("");
+            p0.getYaxis().getController().getDasAxis().setAxisOffset("");
+            p0.getZaxis().getController().getDasAxis().setAxisOffset("");
+            p0.getXaxis().getController().getDasAxis().setLabelOffset("");
+            p0.getYaxis().getController().getDasAxis().setLabelOffset("");
+            p0.getZaxis().getController().getDasAxis().setLabelOffset("");
             p0.getXaxis().setTickValues("");
             p0.getYaxis().setTickValues("");
             p0.getZaxis().setTickValues("");
