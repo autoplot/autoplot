@@ -52,6 +52,7 @@ import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.URISplit;
+import org.autoplot.datasource.ui.PromptComboBoxEditor;
 import org.autoplot.datasource.ui.Util;
 import org.das2.components.DasProgressLabel;
 import org.das2.qds.util.AsciiHeadersParser;
@@ -243,6 +244,8 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
     public AsciiTableDataSourceEditorPanel() {
         initComponents();
 
+        depend0unitsCB.setEditor( new PromptComboBoxEditor("Enter units, or see examples") );
+        
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "ascii_main");
         columnsComboBox.requestFocusInWindow();
 
