@@ -525,6 +525,9 @@ public class EditorTextPane extends JEditorPane {
             ss= suri;
         }
         Object oeditorPanel= DataSourceRegistry.getInstance().getDataSourceFormatEditorByExt(ss);
+        if ( oeditorPanel==null ) {
+            logger.log(Level.WARNING, "unable to find editor for: {0}", ss);
+        }
         DataSourceFormatEditorPanel editorPanel= (DataSourceFormatEditorPanel)DataSourceRegistry.getInstanceFromClassName( (String)oeditorPanel );
         editorPanel.setURI(suri);
         parent.add(editorPanel.getPanel());
@@ -554,6 +557,9 @@ public class EditorTextPane extends JEditorPane {
             i0= 0;
             
             if ( line.trim().startsWith("formatDataSet") ) {
+                if ( pos<line.length() && line.charAt(pos)=='\'' ) {
+                    pos= pos-1;
+                }
                 int i3= line.lastIndexOf("'",pos);
                 if ( i3>-1 ) i3= i3+1;
                 int i4= line.indexOf("'",i3);
