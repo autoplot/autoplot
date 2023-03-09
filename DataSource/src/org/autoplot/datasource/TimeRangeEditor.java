@@ -215,6 +215,10 @@ public class TimeRangeEditor extends javax.swing.JPanel {
      */
     public void setControlRange( final DatumRange value ) {
         if ( !UnitsUtil.isTimeLocation(value.getUnits()) ) return;
+        if ( value.width().value()==0 ) {
+            throw new IllegalArgumentException("range width cannot be zero.");
+        }
+        
         final DatumRange oldValue= this.controlRange;
         final DatumRange oldRange= this.range;
         this.controlRange= value;
