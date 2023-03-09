@@ -137,15 +137,6 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                     Map<String,String> params1= new HashMap<>();
                     params1.put( "timeType",params.get("timeType") );
                     addVariableRankN( cdf, dep0, name, true, params1, mon.getSubtaskMonitor("dep0") );
-                } else {
-                    String name= nameFor(dep0);
-                    Map<String,String> params1= new HashMap<>();
-                    params1.put( "timeType",params.get("timeType") );
-                    try {
-                        addVariableRankN( cdf, dep0, name, true, params1, mon.getSubtaskMonitor("dep0") );
-                    } catch ( Exception e ) {
-                        logger.fine("CDF Exception, presumably because the variable already exists.");
-                    }
                 }
             }
 
