@@ -63,6 +63,8 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         
         if ( name!=null ) {
             return name;
+        } else {
+            logger.warning("new variable: "+dep0);
         }
         
         name = (String) dep0.property(QDataSet.NAME);
@@ -111,6 +113,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 CDFReader read= ReaderFactory.getReader( ffile.toString() );
                 for ( String n : read.getVariableNames() ) {
                     namesRev.put( n,null );
+                    //TODO: there's a problem here, where it puts in a set of timetags for each variable.  https://sourceforge.net/p/autoplot/bugs/2514/
                 }
                 logger.log(Level.FINE, "call cdf= new CDFWriter( {0}, false )", ffile.toString() );
                 cdf = new CDFWriter( ffile.toString(), false ); // read in the old file first
