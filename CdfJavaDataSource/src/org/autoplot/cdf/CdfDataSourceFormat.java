@@ -130,13 +130,30 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             nameFor(data); // allocate a good name
 
             QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
-
+            String dep0name=null;
+            
             if ( dep0 != null ) {
                 if ( !append ) {
                     String name= nameFor(dep0);
+                    dep0name= name;
                     Map<String,String> params1= new HashMap<>();
                     params1.put( "timeType",params.get("timeType") );
                     addVariableRankN( cdf, dep0, name, true, params1, mon.getSubtaskMonitor("dep0") );
+                } else {
+                    String name = (String) dep0.property(QDataSet.NAME);
+                    if ( !namesRev.containsKey(name) ) { 
+                        name= nameFor(dep0);
+                        dep0name= name;
+                        Map<String,String> params1= new HashMap<>();
+                        params1.put( "timeType",params.get("timeType") );
+                        try {
+                            addVariableRankN( cdf, dep0, name, true, params1, mon.getSubtaskMonitor("dep0") );
+                        } catch ( Exception e ) {
+                            logger.fine("CDF Exception, presumably because the variable already exists.");
+                        }
+                    } else {
+                        dep0name= name; // https://sourceforge.net/p/autoplot/bugs/2514/ use the variable if it has the right name.
+                    }
                 }
             }
 
@@ -245,7 +262,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 for ( int i=0; i<bds.length(); i++ ) {
                     QDataSet data1= Ops.unbundle( data, i ) ;
                     addVariableRankN( cdf, data1, nameFor(data1), false, params, mon );
-                    if ( dep0!=null ) cdf.addVariableAttributeEntry( nameFor(data1), "DEPEND_0", CDFDataType.CHAR, nameFor(dep0) );
+                    if ( dep0!=null ) cdf.addVariableAttributeEntry( nameFor(data1), "DEPEND_0", CDFDataType.CHAR, dep0name );
                 }
                 
             } else if ( data.rank()==3 && data.property(QDataSet.BUNDLE_2)!=null && "T".equals(params.get("bundle")) ) {
@@ -253,14 +270,14 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 for ( int i=0; i<n; i++ ) {
                     QDataSet data1= Ops.slice2( data, i );
                     addVariableRankN( cdf, data1, nameFor(data1), false, params, mon );
-                    if ( dep0!=null ) cdf.addVariableAttributeEntry( nameFor(data1), "DEPEND_0", CDFDataType.CHAR, nameFor(dep0) );
+                    if ( dep0!=null ) cdf.addVariableAttributeEntry( nameFor(data1), "DEPEND_0", CDFDataType.CHAR, dep0name );
                 }
                 
             } else {
                 addVariableRankN( cdf, data, nameFor(data), false, params, mon );
 
                 try {
-                    if ( dep0!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_0", CDFDataType.CHAR, nameFor(dep0) );
+                    if ( dep0!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_0", CDFDataType.CHAR, dep0name );
                     if ( dep1!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_1", CDFDataType.CHAR, nameFor(dep1) );
                     if ( dep2!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_2", CDFDataType.CHAR, nameFor(dep2) );
                     if ( dep3!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_3", CDFDataType.CHAR, nameFor(dep3) );
