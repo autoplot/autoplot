@@ -255,7 +255,8 @@ public class CDAWebDataSource extends AbstractDataSource {
                                 for ( int j=0; j<n; j++ ) {
                                     QDataSet slice= Ops.slice1( ds1,j );
                                     if ( ll!=null ) {
-                                        slice= Ops.putProperty( slice, QDataSet.NAME, dslabel + " " + Ops.safeName(ll.slice(j).svalue()) );
+                                        slice= Ops.putProperty( slice, QDataSet.NAME, dslabel + "_" + Ops.safeName(ll.slice(j).svalue()) );
+                                        slice= Ops.putProperty( slice, QDataSet.LABEL, dslabel + " " + Ops.safeName(ll.slice(j).svalue()) );
                                     }
                                     dss= Ops.bundle( dss, slice );
                                 }
