@@ -248,8 +248,20 @@ public class CDAWebDataSource extends AbstractDataSource {
                             } else {
                                 ds1 = readVariable( file, ids[i2], metadatas[i2], fileDataSourceFactory, t1 );
                             }
-                            
-                            dss= Ops.bundle( dss, ds1 );
+                            if ( ds1.rank()==2 ) {
+                                int n= ds1.length(0);
+                                QDataSet ll= (QDataSet) ds1.property(QDataSet.DEPEND_1);
+                                String dslabel= Ops.guessName(ds1);
+                                for ( int j=0; j<n; j++ ) {
+                                    QDataSet slice= Ops.slice1( ds1,j );
+                                    if ( ll!=null ) {
+                                        slice= Ops.putProperty( slice, QDataSet.NAME, dslabel + " " + Ops.safeName(ll.slice(j).svalue()) );
+                                    }
+                                    dss= Ops.bundle( dss, slice );
+                                }
+                            } else {
+                                dss= Ops.bundle( dss, ds1 );
+                            }
                         }
                         ds1= DataSetOps.makePropertiesMutable(dss);
                         
