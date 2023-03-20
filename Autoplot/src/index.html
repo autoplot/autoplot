@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>dom.plots[0].yaxis.controller.dasAxis.axisOffset and dom.plots[0].visible properties make smart-looking display in <a href="https://github.com/autoplot/dev/blob/master/demos/2023/20230307/morefun.jy?nstars=100">this script</a>.
+        <p><small><a href="https://cottagesystems.com/server/ct/hapi">HAPI Server</a> serves images of the neighborhood creek.  Happy Spring!
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,9 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-03-09 r26990):</p>
+        <p>Bugfixes (2023-03-20 r26998):</p>
         <ul> 
+            <li>HAPI export flattens rank 2 data export to support use with prototype servers.
             <li>rte_0373978553: show nice error message when entered time range width is zero.  Thanks, trunali1131!
             <a href="https://sourceforge.net/p/autoplot/bugs/2514/">2514</a>: exporting data with append won't append DEPEND_0 if it looks like it's already in there.
             <a href="https://sourceforge.net/p/autoplot/bugs/2514/">2514</a>: depend0 units dialog has gray prompt when empty.
