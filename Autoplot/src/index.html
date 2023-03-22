@@ -9,7 +9,7 @@
         <br><a href="autoplot.jar"><img style="vertical-align: middle;" alt="" src="singlejar.png" height="28"> Single-Jar</a> : .jar files can be launched on Windows and Mac, and contain a shell script for launching on Unix computers.
         <br><a href="https://cottagesystems.com/~jbf/autoplot/build/autoplot-dev_macos_20230320a.dmg"><img style="vertical-align: middle;" alt="" src="mac.png" height="28"> dmg</a>: a self-contained installer for Mac computers.  This is unsigned and still being tested.
         <br><a href="https://cottagesystems.com/~jbf/autoplot/build/autoplot-dev_windows-x64_20230320a.exe"><img style="vertical-align: middle;" alt="" src="windows.png" height="28"> exe</a>: a self-contained installer for Windows computers. (<a href="http://autoplot.org/latest/">Production release</a> is signed properly)
-        <br>Built with <a href='https://www.ej-technologies.com/products/install4j/overview.html'>Install4J</a> multi-platform installer builder.  <a href="https://cottagesystems.com/~jbf/autoplot/build/autoplot-dev_linux.deb">deb</a> and <a href="https://cottagesystems.com/~jbf/autoplot/build/autoplot-dev_linux_20230320a.rpm">rpm</a> available as well.  Thanks, Install4J!
+        <br>Built with <a href='https://www.ej-technologies.com/products/install4j/overview.html'>Install4J</a> multi-platform installer builder and <a href="https://cottagesystems.com/~jbf/autoplot/build/autoplot-dev_linux.deb">deb</a> and <a href="https://cottagesystems.com/~jbf/autoplot/build/autoplot-dev_linux_20230320a.rpm">rpm</a> available as well.  Thanks, Install4J!
         
         <p>
         <img alt="screenshot"  src="screen.png">
@@ -30,6 +30,7 @@
                 
         <p>Bugfixes (2023-03-20 r26998):</p>
         <ul> 
+            <li>Das2Stream to QDataSet reader would fail when packet descriptors would introduce a join dimension.
             <li>HAPI export flattens rank 2 data export to support use with prototype servers.
             <li>rte_0373978553: show nice error message when entered time range width is zero.  Thanks, trunali1131!
             <a href="https://sourceforge.net/p/autoplot/bugs/2514/">2514</a>: exporting data with append won't append DEPEND_0 if it looks like it's already in there.
