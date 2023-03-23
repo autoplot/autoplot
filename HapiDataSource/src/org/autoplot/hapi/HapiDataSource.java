@@ -2718,7 +2718,21 @@ public final class HapiDataSource extends AbstractDataSource {
         
         boolean combineRank2Depend1= pds.length==3 && pds[1].dependName!=null;
         
-        QDataSet depend0= Ops.copy( Ops.slice1( ds,0 ) ); //TODO: this will be unnecessary after debugging.
+        if ( ds.rank()==2 ) {
+            QDataSet bds= (QDataSet)ds.property(QDataSet.BUNDLE_1);
+            if ( UnitsUtil.isTimeLocation( (Units)bds.property(QDataSet.UNITS,0) ) &&
+                    UnitsUtil.isTimeLocation( (Units)bds.property(QDataSet.UNITS,1) ) ) {
+                QDataSet start= Ops.slice1( ds,0 );
+                QDataSet stop= Ops.slice1( ds,1 );
+                
+                // It's an events dataset, but we better check that all stops are greater than starts!
+                if ( Ops.reduceMax( Ops.lt( stop, start ),0 ).value()==0 ) {
+                    return Ops.createEvents(ds);
+                }
+            }
+        }
+        
+        QDataSet depend0= Ops.slice1( ds,0 ); //TODO: this will be unnecessary after debugging.
         if ( ds.length(0)==2 ) {
             ds= Ops.copy( Ops.slice1( ds, 1 ) );
             ds= Ops.putProperty( ds, QDataSet.DEPEND_0, depend0 );
