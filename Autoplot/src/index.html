@@ -28,13 +28,15 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-03-22 r27000):</p>
+        <p>Bugfixes (2023-03-27 r27000):</p>
         <ul> 
+            <li>HAPI reader detects events dataset where start and stop time are returned and events bars are drawn.
+            <li>QDataSet Schemes detector code considers any dataset with first two columns start, stop times an events dataset.
             <li>Das2Stream to QDataSet reader would fail when packet descriptors would introduce a join dimension.
             <li>HAPI export flattens rank 2 data export to support use with prototype servers.
             <li>rte_0373978553: show nice error message when entered time range width is zero.  Thanks, trunali1131!
-            <a href="https://sourceforge.net/p/autoplot/bugs/2514/">2514</a>: exporting data with append won't append DEPEND_0 if it looks like it's already in there.
-            <a href="https://sourceforge.net/p/autoplot/bugs/2514/">2514</a>: depend0 units dialog has gray prompt when empty.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2514/">2514</a>: exporting data with append won't append DEPEND_0 if it looks like it's already in there.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2514/">2514</a>: depend0 units dialog has gray prompt when empty.
             <li>formatDataSet inspect URI action would RTE when carot was after the last character
             <li>rte_0008993657: runtime error with ExpandToFillGaps editor when no DEPEND_0 is found.  Thanks, George!
         </ul>
