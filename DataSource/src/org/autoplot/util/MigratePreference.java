@@ -2,18 +2,23 @@ package org.autoplot.util;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.NodeChangeListener;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
+import org.das2.datum.LoggerManager;
 
 /**
  * This allows a legacy preference to be used alongside a new preference,
- * keeping the users preferences.
+ * keeping the scientist's preferences.
  * @author jbf
  */
 public class MigratePreference extends Preferences {
 
+    private static final Logger logger= LoggerManager.getLogger("autoplot.util");
+    
     private final Preferences p1;
     private final Preferences p2;
 
@@ -32,8 +37,12 @@ public class MigratePreference extends Preferences {
     
     @Override
     public void put(String key, String value) {
-        this.p1.put( key, value );
-        this.p2.put( key, value );
+        try {
+            this.p1.put( key, value );
+            this.p2.put( key, value );
+        } catch ( NullPointerException ex ) { // rte_1329323008_*.xml
+            logger.log( Level.WARNING, ex.getMessage(), ex );
+        }
     }
 
     @Override
