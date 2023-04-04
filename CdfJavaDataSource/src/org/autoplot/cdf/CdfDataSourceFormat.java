@@ -6,6 +6,7 @@ import gov.nasa.gsfc.spdf.cdfj.CDFException;
 import gov.nasa.gsfc.spdf.cdfj.CDFReader;
 import gov.nasa.gsfc.spdf.cdfj.CDFWriter;
 import gov.nasa.gsfc.spdf.cdfj.ReaderFactory;
+import gov.nasa.gsfc.spdf.cdfj.SupportedTypes;
 import java.lang.reflect.Array;
 import org.autoplot.datasource.DataSourceUtil;
 import org.das2.datum.Units;
@@ -32,6 +33,7 @@ import org.das2.qds.DataSetOps;
 import org.das2.qds.SemanticOps;
 import org.das2.qds.examples.Schemes;
 import org.das2.qds.ops.Ops;
+import org.das2.util.monitor.NullProgressMonitor;
 
 /**
  * Format the QDataSet into CDF tables, using Nand Lal's library.
@@ -103,12 +105,38 @@ public class CdfDataSourceFormat implements DataSourceFormat {
 
             File ffile= new File( split.resourceUri.getPath() );
 
-            boolean append= "T".equals( params.get("append") ) ;
-
-            if ( ! append ) {
+            boolean append= "T".equals( params.get("append") );
+            boolean insert= "T".equals( params.get("insert") );
+            
+            if ( !append && !insert ) {
                 logger.log(Level.FINE, "create CDF file {0}", ffile);
                 logger.log(Level.FINE, "call cdf= new CDFWriter( false )");
                 cdf = new CDFWriter( false );
+            } else if ( insert ) {
+                //CDFReader read= ReaderFactory.getReader( ffile.toString() );
+                String name= (String)data.property(QDataSet.NAME);
+                if ( name==null ) name= params.get("arg_0");
+                if ( name==null ) {
+                    throw new IllegalArgumentException("dataset must have name found within CDF file.");
+                }
+                int itype= 21;
+                
+                String type= CdfUtil.getStringDataType(itype);
+                if ( type.equals("CDF_CHAR") ) {
+                    type="string";
+                } else if ( type.equals("CDF_DOUBLE") ) {
+                    type="double";
+                } else if ( type.equals("CDF_FLOAT") ) {
+                    type="float";
+                } else if ( type.equals("CDF_REAL4") ) {
+                    type="float";
+                } else if ( type.equals("CDF_UINT1") ) {
+                    type="short";
+                }
+                params.put("type",type);
+                logger.log(Level.FINE, "call cdf= new CDFWriter( {0}, false )", ffile.toString() );
+                cdf = new CDFWriter( ffile.toString(), false ); // read in the old file first
+                
             } else {
                 CDFReader read= ReaderFactory.getReader( ffile.toString() );
                 for ( String n : read.getVariableNames() ) {
@@ -131,6 +159,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
 
             QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
             String dep0name=null;
+            if ( insert ) dep0=null;
             
             if ( dep0 != null ) {
                 if ( !append ) {
@@ -158,7 +187,8 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             }
 
             QDataSet dep1 = (QDataSet) data.property(QDataSet.DEPEND_1);
-
+            if ( insert ) dep1=null;
+            
             if (dep1 != null) {
                 if ( !append ) {
                     String name= nameFor(dep1);
@@ -184,6 +214,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             }
 
             QDataSet dep2 = (QDataSet) data.property(QDataSet.DEPEND_2);
+            if ( insert ) dep2=null;
 
             if (dep2 != null) {
                 if ( !append ) {
@@ -210,6 +241,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             }
 
             QDataSet dep3 = (QDataSet) data.property(QDataSet.DEPEND_3);
+            if ( insert ) dep3=null;
 
             if (dep3 != null) {
                 if ( !append ) {
@@ -236,7 +268,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             }
             
             QDataSet bds= (QDataSet) data.property(QDataSet.BUNDLE_1);
-            if ( bds != null) {
+            if ( bds != null && insert==false ) {
                 if ( !append && data.rank()==2 ) {
                     if ( dep1==null ) {
                         logger.fine("writing bundled datasets to CDF separately.");
@@ -288,7 +320,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             }
 
             mon.setProgressMessage("writing file");
-            if ( !append ) {
+            if ( !( append || insert ) ) {
                 if ( ffile.exists() ) {
                     CdfDataSource.cdfCacheReset();
                     File tempFile= File.createTempFile( "deleteme",".cdf");
@@ -308,6 +340,10 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 } else {
                     write( cdf, ffile.toString() );
                 }
+            } else if ( insert ) {
+                CdfDataSource.cdfCacheReset();
+                cdf.write( ffile.toString() );
+                
             } else {
                 write( cdf, ffile.toString() );
             }
@@ -334,7 +370,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             //cdf.defineNRVVariable( name, type, new int[0], 0 );
             //cdf.createVariable( name, type, new int[0] );
             
-            Object array= dataSetToArray( ds, uc, type, mon );
+            Object array= CdfDataSourceFormat.datasetToArray( ds, uc, type, mon );
             logger.log(Level.FINE, "call cdf.addNRVVariable( {0},{1},{2})", 
                     new Object[]{name, logName(type), logName( new int[] { ds.length() } ), logName(array) });
             cdf.addNRVVariable( name, type, new int[] { ds.length() }, array );
@@ -469,6 +505,13 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 buf.put( encodeUINT1( uc.convert(iter.getValue(ds) ) ) );
             }
             export= buf;
+        } else if ( type==CDFDataType.CHAR ) {
+            int maxLenth= 1;
+            ByteBuffer buf= ByteBuffer.allocate( ds.length()*maxLenth );
+            for ( int i=0; i<ds.length(); i++ ) {
+                buf.put( (byte)ds.slice(i).svalue().charAt(0) );
+            }
+            export= buf;
 
         } else {
             throw new IllegalArgumentException("not supported: "+type);
@@ -565,11 +608,59 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             }
             export= bexport;
 
+        } else if ( type==CDFDataType.CHAR ) {
+            String[] s= new String[ ds.length() ];
+            for ( int i=0; i<ds.length(); i++ ) {
+                s[i]= ds.slice(i).svalue();
+            }
+            export= s;
+        
+        } else if ( type==CDFDataType.UINT1 ) {
+            short[] bexport= new short[ ds.length() ];
+            int i = 0;
+            while (iter.hasNext()) {
+                iter.next();
+                bexport[i++] = (short)uc.convert(iter.getValue(ds));
+            }
+            export= bexport;
+            
+        } else if ( type==CDFDataType.UINT2 ) {
+            int[] bexport= new int[ ds.length() ];
+            int i = 0;
+            while (iter.hasNext()) {
+                iter.next();
+                bexport[i++] = (short)uc.convert(iter.getValue(ds));
+            }
+            export= bexport;
+
+        } else if ( type==CDFDataType.UINT4 ) {
+            long[] bexport= new long[ ds.length() ];
+            int i = 0;
+            while (iter.hasNext()) {
+                iter.next();
+                bexport[i++] = (short)uc.convert(iter.getValue(ds));
+            }
+            export= bexport;
+
         } else {
             throw new IllegalArgumentException("not supported: "+type);
         }
         return export;
 
+    }
+
+    /**
+     * CDF library needs array in double or triple arrays.  
+     * 
+     * @param ds the dataset.
+     * @param uc UnitsConverter in case we need to handle times.
+     * @param itype the CDF data type, for example 21=float
+     * @param mon a progress monitor
+     * @return a 1,2,3,4-d array of double,long,float,int,short,byte.
+     */
+    public static Object datasetToArray( QDataSet ds, UnitsConverter uc, int itype, ProgressMonitor mon ){
+        CDFDataType type= SupportedTypes.cdfType(itype);
+        return CdfDataSourceFormat.datasetToArray(ds, uc, type, mon);
     }
     
     /**
@@ -578,11 +669,13 @@ public class CdfDataSourceFormat implements DataSourceFormat {
      * @param ds the dataset.
      * @param uc UnitsConverter in case we need to handle times.
      * @param type the data type.
+     * @param mon a progress monitor
      * @return a 1,2,3,4-d array of double,long,float,int,short,byte.
      */
-    private static Object dataSetToArray( QDataSet ds, UnitsConverter uc, CDFDataType type, ProgressMonitor mon ){
+    public static Object datasetToArray( QDataSet ds, UnitsConverter uc, CDFDataType type, ProgressMonitor mon ){
         Object oexport;
-
+        if ( uc==null ) uc= UnitsConverter.IDENTITY;
+        if ( mon==null ) mon= new NullProgressMonitor();
         switch (ds.rank()) {
             case 1:
                 return doIt1( ds, uc, type );
@@ -599,12 +692,24 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                     oexport= new short[ds.length()][];
                 } else if ( type==CDFDataType.INT1 ) {
                     oexport= new byte[ds.length()][];
+                } else if ( type==CDFDataType.CHAR ) {
+                    oexport= new String[ds.length()][];
+                } else if ( type==CDFDataType.UINT4 ) {
+                    oexport= new long[ds.length()][];
+                } else if ( type==CDFDataType.UINT2 ) {
+                    oexport= new int[ds.length()][];
+                } else if ( type==CDFDataType.UINT1 ) {
+                    oexport= new short[ds.length()][];
                 } else {
                     throw new IllegalArgumentException("type not supported: "+type);
                 }
+                mon.setTaskSize(ds.length());
+                mon.started();
                 for ( int i=0; i<ds.length(); i++ ) {
-                    Array.set( oexport, i, dataSetToArray( ds.slice(i), uc, type, mon ) );
+                    mon.setTaskProgress(i);
+                    Array.set(oexport, i, CdfDataSourceFormat.datasetToArray( ds.slice(i), uc, type, mon ) );
                 }
+                mon.finished();
                 return oexport;
             case 3:
                 if ( type==CDFDataType.DOUBLE ) {
@@ -623,7 +728,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                     throw new IllegalArgumentException("type not supported"+type);
                 }
                 for ( int i=0; i<ds.length(); i++ ) {
-                    Array.set( oexport, i, dataSetToArray( ds.slice(i), uc, type, mon ) );
+                    Array.set(oexport, i, CdfDataSourceFormat.datasetToArray( ds.slice(i), uc, type, mon ) );
                 }
                 return oexport;
             case 4:
@@ -643,7 +748,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                     throw new IllegalArgumentException("type not supported"+type);
                 }
                 for ( int i=0; i<ds.length(); i++ ) {
-                    Array.set( oexport, i, dataSetToArray( ds.slice(i), uc, type, mon ) );
+                    Array.set(oexport, i, CdfDataSourceFormat.datasetToArray( ds.slice(i), uc, type, mon ) );
                 }
                 return oexport;
             default:
@@ -656,45 +761,58 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             Map<String,String> params, org.das2.util.monitor.ProgressMonitor mon) throws Exception {
         Units units = (Units) ds.property(QDataSet.UNITS);
         CDFDataType type = CDFDataType.DOUBLE;
-
-        String t= params.get("type");
-        if ( t!=null ) {
-            switch (t) {
-                case "float":
-                    type= CDFDataType.FLOAT;
-                    break;
-                case "byte":
-                    type= CDFDataType.INT1;
-                    break;
-                case "int1":
-                    type= CDFDataType.INT1;
-                    break;
-                case "int2":
-                    type= CDFDataType.INT2;
-                    break;
-                case "int4":
-                    type= CDFDataType.INT4;
-                    break;
-                case "uint1":
-                    type= CDFDataType.UINT1;
-                    break;
-                case "uint2":
-                    type= CDFDataType.UINT2;
-                    break;
-                case "uint4":
-                    type= CDFDataType.UINT4;
-                    break;
-                case "double":
-                    type= CDFDataType.DOUBLE;
-                    break;
-                default:
-                    break;
-            }
+        
+        String sinsert=params.get("insert");
+        boolean insert= sinsert!=null && sinsert.startsWith("T");
+        
+        if ( insert ) {
+            type = cdf.getVariableType(name);
         } else {
-            if ( ds.rank()<3 ) {
-                type= CDFDataType.DOUBLE;
+
+            String t= params.get("type");
+            if ( t!=null ) {
+                switch (t) {
+                    case "float":
+                        type= CDFDataType.FLOAT;
+                        break;
+                    case "byte":
+                        type= CDFDataType.INT1;
+                        break;
+                    case "int1":
+                        type= CDFDataType.INT1;
+                        break;
+                    case "int2":
+                        type= CDFDataType.INT2;
+                        break;
+                    case "int4":
+                        type= CDFDataType.INT4;
+                        break;
+                    case "uint1":
+                        type= CDFDataType.UINT1;
+                        break;
+                    case "uint2":
+                        type= CDFDataType.UINT2;
+                        break;
+                    case "uint4":
+                        type= CDFDataType.UINT4;
+                        break;
+                    case "double":
+                        type= CDFDataType.DOUBLE;
+                        break;
+                    case "string":
+                        type= CDFDataType.CHAR;
+                        break;
+
+                    default:
+                        logger.log(Level.WARNING, "unsupported type, using double: {0}", t);
+                        break;
+                }
             } else {
-                type= CDFDataType.FLOAT;
+                if ( ds.rank()<3 ) {
+                    type= CDFDataType.DOUBLE;
+                } else {
+                    type= CDFDataType.FLOAT;
+                }
             }
         }
         
@@ -744,33 +862,42 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                     default:
                         break;
                 }
-                Object o= dataSetToArray( ds, uc, type, mon );
+                Object o= CdfDataSourceFormat.datasetToArray( ds, uc, type, mon );
                 addData( cdf, name, o );
             }
             
-        } else {
+        } else {            
             if ( ds.rank()==1 ) {
-                defineVariable( cdf, name, type, new int[0] );
-                addData( cdf, name, dataSetToNioArray( ds, uc, type, mon ) );
-            } else { // this branch doesn't use dataSetToNioArray
-                switch (ds.rank()) {
-                    case 2:
-                        defineVariable( cdf, name, type, new int[] { ds.length(0) } );
-                        break;
-                    case 3:
-                        defineVariable( cdf, name, type, new int[] { ds.length(0),ds.length(0,0) } );
-                        break;
-                    case 4:
-                        defineVariable( cdf, name, type, new int[] { ds.length(0),ds.length(0,0),ds.length(0,0,0) } );
-                        break;
-                    default:
-                        break;
+                if ( !insert ) {
+                    defineVariable( cdf, name, type, new int[0] );
+                    addData( cdf, name, dataSetToNioArray( ds, uc, type, mon ) );
+                } else {
+                    addData( cdf, name, doIt1( ds, uc, type ) );
                 }
-                addData( cdf, name, dataSetToArray( ds, uc, type, mon ) );
+                
+            } else { // this branch doesn't use dataSetToNioArray
+                if ( !insert ) {
+                    switch (ds.rank()) {
+                        case 2:
+                            defineVariable( cdf, name, type, new int[] { ds.length(0) } );
+                            break;
+                        case 3:
+                            defineVariable( cdf, name, type, new int[] { ds.length(0),ds.length(0,0) } );
+                            break;
+                        case 4:
+                            defineVariable( cdf, name, type, new int[] { ds.length(0),ds.length(0,0),ds.length(0,0,0) } );
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                addData(cdf, name, CdfDataSourceFormat.datasetToArray( ds, uc, type, mon ) );
             }
         }
 
-        copyMetadata( cdf, units, name, type, isSupport, ds );
+        if ( !insert ) {
+            copyMetadata( cdf, units, name, type, isSupport, ds );
+        }
         
     }
     
