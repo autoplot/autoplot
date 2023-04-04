@@ -505,14 +505,12 @@ public class CDFWriter extends GenericWriter {
             DataContainer container = dataContainers.get(vn);
             if (container != null) {
                 int _last = container.getLastRecord();
-                System.out.println("last: " + _last);
                 if (_last >= 0) {
                     _last++;
                     rr[0] += _last;
                     rr[1] += _last;
                 }
             }
-                System.out.println("rr: " + rr[0] + "," + rr[1]);
             if (cdf.rowMajority() == rowMajority) {
                 addData(vn, _container.getBuffer(), rr);
             } else {
