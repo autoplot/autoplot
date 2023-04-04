@@ -724,6 +724,25 @@ public class CDFWriter extends GenericWriter {
         return new Selector();
     }
 
+    /**
+     * return the type of the variable.
+     * @param name 
+     * @return  the CDFDataType of the variable.
+     */
+    public CDFDataType getVariableType(String name) {
+        Hashtable o= (Hashtable)variableMap.get(name);
+        if ( o!=null ) {
+            CDFDataType t= (CDFDataType)o.get("ctype");
+            if ( t==null ) {
+                throw new IllegalArgumentException("internal error, expected to see type for: "+name);
+            } else {
+                return t;
+            }
+        } else {
+            throw new IllegalArgumentException("variable with the name does not exist: "+name );
+        }
+    }
+
     static class Selector implements SelectedVariableCollection {
         HashMap<String, Boolean> map = new HashMap<String, Boolean>();
         HashMap<String, SparseRecordOption> smap = 
