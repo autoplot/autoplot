@@ -1644,7 +1644,9 @@ import java.util.zip.*;
         setByteOrder(byteOrder);
     }
 
-    public boolean isBigEndian() {return bigEndian;}
+    public boolean isBigEndian() {
+        return bigEndian;
+    }
 
     protected void setBuffer(ByteBuffer b) {buf = b;}
     protected ByteBuffer getBuffer() {return buf;}
