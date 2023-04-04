@@ -2720,14 +2720,17 @@ public final class HapiDataSource extends AbstractDataSource {
         
         if ( ds.rank()==2 ) {
             QDataSet bds= (QDataSet)ds.property(QDataSet.BUNDLE_1);
-            if ( UnitsUtil.isTimeLocation( (Units)bds.property(QDataSet.UNITS,0) ) &&
-                    UnitsUtil.isTimeLocation( (Units)bds.property(QDataSet.UNITS,1) ) ) {
-                QDataSet start= Ops.slice1( ds,0 );
-                QDataSet stop= Ops.slice1( ds,1 );
+            if ( bds!=null && bds.length()>1 ) {
+                Units u1= (Units)bds.property(QDataSet.UNITS,0);
+                Units u2= (Units)bds.property(QDataSet.UNITS,1);
+                if ( u1!=null && u2!=null && UnitsUtil.isTimeLocation( u1 ) && UnitsUtil.isTimeLocation( u2 ) ) {
+                    QDataSet start= Ops.slice1( ds,0 );
+                    QDataSet stop= Ops.slice1( ds,1 );
                 
-                // It's an events dataset, but we better check that all stops are greater than starts!
-                if ( Ops.reduceMax( Ops.lt( stop, start ),0 ).value()==0 ) {
-                    return Ops.createEvents(ds);
+                    // It's an events dataset, but we better check that all stops are greater than starts!
+                    if ( Ops.reduceMax( Ops.lt( stop, start ),0 ).value()==0 ) {
+                        return Ops.createEvents(ds);
+                    }
                 }
             }
         }
