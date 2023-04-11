@@ -426,9 +426,12 @@ public class PlotElementController extends DomNodeController {
                         logger.log(Level.FINER, "component property change requires we reset render and dimensions: {0}->{1}", new Object[]{(String) evt.getOldValue(), (String) evt.getNewValue()});
                         setResetPlotElement(true);
                         setResetRanges(true);
-                        if ( !dom.getController().isValueAdjusting() ) maybeSetPlotAutorange();
+                        if ( !dom.getController().isValueAdjusting() ) {
+                            maybeSetPlotAutorange();
+                        }
                     } else {
                         logger.log(Level.FINER, "component property change requires we reset just the y-axis: {0}->{1}", new Object[]{(String) evt.getOldValue(), (String) evt.getNewValue()});
+                        setResetPlotElement(true);
                         setResetRanges(true);
                         if ( !dom.getController().isValueAdjusting() ) {
                             maybeSetPlotYZAutorange();
