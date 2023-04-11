@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import org.das2.datum.Datum;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsConverter;
+import org.das2.datum.UnitsUtil;
 import org.python.core.Py;
 import org.python.core.PyFloat;
 import org.python.core.PyInteger;
@@ -54,7 +55,12 @@ public class PyDatum extends PyJavaInstance {
         } else if ( arg0 instanceof PyQDataSet ) {
             return arg0.__radd__(this);
         } else if ( arg0.isNumberType() ) {
-            return new PyDatum( datum.add( datum.getUnits().createDatum( arg0.__float__().getValue() ) ) );            
+            if ( UnitsUtil.isRatioMeasurement(datum.getUnits()) ) {
+                return new PyDatum( datum.add( datum.getUnits().createDatum( arg0.__float__().getValue() ) ) );            
+            } else {
+                // "2023-04-11T07:14" + 10 doesn't make sense.
+                throw new IllegalArgumentException("unable to add dimensionless number to location");
+            }
         } else {
             return new PyQDataSet( DataSetUtil.asDataSet(datum) ).__add__(arg0);
         }        
@@ -72,7 +78,12 @@ public class PyDatum extends PyJavaInstance {
         } else if ( arg0 instanceof PyQDataSet ) {
             return arg0.__rsub__(this);         
         } else if ( arg0.isNumberType() ) {
-            return new PyDatum( datum.subtract( datum.getUnits().createDatum( arg0.__float__().getValue() ) ) );                        
+            if ( UnitsUtil.isRatioMeasurement(datum.getUnits()) ) {
+                return new PyDatum( datum.subtract( datum.getUnits().createDatum( arg0.__float__().getValue() ) ) );                        
+            } else {
+                // "2023-04-11T07:14" + 10 doesn't make sense.
+                throw new IllegalArgumentException("unable to subtract dimensionless number from location");
+            }
         } else {
             return new PyQDataSet( DataSetUtil.asDataSet(datum) ).__sub__(arg0);
         }
