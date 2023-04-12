@@ -78,12 +78,14 @@ import org.autoplot.datasource.FileSystemUtil;
 import org.autoplot.datasource.GuiUtil;
 import org.autoplot.datasource.URISplit;
 import org.das2.components.DataPointRecorder;
+import org.das2.datum.Units;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.Painter;
 import org.das2.qds.DataSetOps;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.DataSetWrapper;
 import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.SemanticOps;
 import org.das2.qds.ops.Ops;
 import org.das2.qstream.SimpleStreamFormatter;
 import org.das2.qstream.StreamException;
@@ -624,10 +626,11 @@ public class ScriptContext extends PyJavaInstance {
     }
 
     /**
-     * returns a color table 
+     * returns a color table with the given name.  If the name is already registered,
+     * then the registered colortable is returned.
      * using QDataSets as inputs to make it easier to use in scripts.
      * 
-     * @param name the name for the colortable
+     * @param name the name for the colortable.   
      * @param index control points for the colors, or None
      * @param rgb dataset of ds[N,3] where N is the number of colors
      * @return object representing the color table.
@@ -643,14 +646,29 @@ public class ScriptContext extends PyJavaInstance {
         int[] red= new int[rgb.length()];
         int[] green= new int[rgb.length()];
         int[] blue= new int[rgb.length()];
+
         int bottom= 0;
         int top= 0;
-        for ( int i=0; i<iindex.length; i++ ) {
-            iindex[i]= (int)Math.round(index.value(i));
-            red[i]= (int)Math.round(rgb.value(i,0));
-            green[i]= (int)Math.round(rgb.value(i,1));
-            blue[i]= (int)Math.round(rgb.value(i,2));
-            top= Math.max( top, iindex[i] );
+        if ( rgb.rank()==1 ) {
+            if ( SemanticOps.getUnits(rgb)==Units.rgbColor ) {
+                for ( int i=0; i<iindex.length; i++ ) {
+                    iindex[i]= (int)Math.round(index.value(i));
+                    red[i]= ( (int)rgb.value(i) & 0xFF0000 ) >> 16;
+                    green[i]= ( (int)rgb.value(i) & 0x00FF00 ) >> 8;
+                    blue[i]= ( (int)rgb.value(i) & 0x0000FF );
+                    top= Math.max( top, iindex[i] );
+                }
+            } else {
+                throw new IllegalArgumentException("only rank 2 bundle of R,G,B or rank 1 data with Units.rgbColor.");
+            }
+        } else {
+            for ( int i=0; i<iindex.length; i++ ) {
+                iindex[i]= (int)Math.round(index.value(i));
+                red[i]= (int)Math.round(rgb.value(i,0));
+                green[i]= (int)Math.round(rgb.value(i,1));
+                blue[i]= (int)Math.round(rgb.value(i,2));
+                top= Math.max( top, iindex[i] );
+            }
         }
         if ( top>254 ) {
             if ( implicitWarn ) {
@@ -659,9 +677,16 @@ public class ScriptContext extends PyJavaInstance {
                 throw new IllegalArgumentException("the top index must be less than 254.");
             }
         } 
-        int[] tt= DasColorBar.Type.makeColorTable( iindex, red, green, blue, top, bottom, top );
-        return new DasColorBar.Type( name, tt );
-
+        try {
+            DasColorBar.Type t= DasColorBar.Type.parse( name );
+            return t;
+            
+        } catch ( IllegalArgumentException e ) {
+            logger.log(Level.FINE, "creating type \"{0}\"", name);
+            int[] tt= DasColorBar.Type.makeColorTable( iindex, red, green, blue, top, bottom, top );
+            return new DasColorBar.Type( name, tt );
+        }
+        
     }    
     
     private static MutablePropertyDataSet ensureMutable( QDataSet ds ) {
