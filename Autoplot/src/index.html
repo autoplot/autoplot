@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Binary data source used to look at the bytes of a CDF file, and <a href="https://github.com/autoplot/dev/blob/master/demos/formats/cdf/cdfLayout.jy">this script</a> labels the components.
+        <p><small>New color tables added.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,11 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-04-04 r27014):</p>
+        <p>Bugfixes (2023-04-12 r27019):</p>
         <ul> 
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2517/">2517</a>: new code preserving x-axis broke need-to-change-renderer check.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2516/">2516</a>: poor error message when adding dimensionless number to time location in Jython.
+            <li>Correction to 
             <li>vap+hapi:https://jfaden.net/HapiServerDemo/hapi?id=icwc&parameters=Conditions&timerange=2023-04-03 failed to load because of recent change looking for events lists.
         </ul>
         <p>Older Bugfixes (2023-03-03 r26979):</p>
@@ -47,6 +50,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li><a href="https://github.com/das-developers/das2java/issues/57">57</a>: new modulo red_cyan_blue_yellow_red colorbar, blue_white_orange, and blue_green_white_yellow_red.
         </ul>
         <p>Less recent features:</p>
         <ul>
