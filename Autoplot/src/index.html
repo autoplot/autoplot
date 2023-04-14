@@ -28,12 +28,12 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-04-12 r27019):</p>
+        <p>Bugfixes (2023-04-14 r27019):</p>
         <ul> 
+            <li><a href="https://github.com/das-developers/das2java/issues/58">58</a>: 255-step colorbars would load improperly, slightly shifting the colors.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2517/">2517</a>: new code preserving x-axis broke need-to-change-renderer check.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2516/">2516</a>: poor error message when adding dimensionless number to time location in Jython.
-            <li>Correction to 
-            <li>vap+hapi:https://jfaden.net/HapiServerDemo/hapi?id=icwc&parameters=Conditions&timerange=2023-04-03 failed to load because of recent change looking for events lists.
+            <li>vap+hapi:https://jfaden.net/HapiServerDemo/hapi?id=icwc&amp;parameters=Conditions&amp;timerange=2023-04-03 failed to load because of recent change looking for events lists.
         </ul>
         <p>Older Bugfixes (2023-03-03 r26979):</p>
         <ul>
@@ -51,6 +51,7 @@
         <p>Features:</p>
         <ul>
             <li><a href="https://github.com/das-developers/das2java/issues/57">57</a>: new modulo red_cyan_blue_yellow_red colorbar, blue_white_orange, and blue_green_white_yellow_red.
+            <li>makeColorTable supports Units.rgbColor.
         </ul>
         <p>Less recent features:</p>
         <ul>
