@@ -2929,6 +2929,10 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 String smin= dr==null ? "" : dr.min().toString();
                 String smax= dr==null ? "" : dr.max().toString();
                 String sdr= dr==null ? "" : dr.toString();
+                String caption= wi.getCaption(); // note captions can contain spaces when named $x fields are found.
+                if ( caption.contains(" ") ) {
+                    caption= "\"" + caption + "\"";
+                }
                 QualityControlRecord qcr= qcseq.getQualityControlRecord(i);
                 String lastComment = qcr==null ? "" : qcr.getLastComment();
                 String status = qcr==null ? "" : qcr.getStatus().toString();
@@ -2938,7 +2942,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     lastComment= "\""+lastComment+"\"";
                 }
                         
-                String line= String.format("%s,%s,%s,%s,%s,%s",smin,smax,sdr,wi.getCaption(),lastComment,status);
+                String line= String.format("%s,%s,%s,%s,%s,%s",smin,smax,sdr,caption,lastComment,status);
                 
                 pout.println(line);
 
