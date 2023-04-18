@@ -52,7 +52,8 @@ public class WalkUtil {
      * returns the last index of slash, splitting the FileSystem part from the template part.
      * See also FileStorageModel.splitIndex and AggregatingDataSource.splitIndex
      * @param surl
-     * @return
+     * @return the index of the last character of the url.
+     * @see FileStorageModel#splitIndex(java.lang.String) which does the same thing.
      */
     protected static int splitIndex(String surl) {
         int i= firstIndexOf( surl,Arrays.asList( "%Y","$Y","%y","$y","$(","%{","*") );

@@ -2915,7 +2915,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                                     
             logger.log(Level.FINE, "writeToCsv {1}", new Object[]{f.getName()});
             
-            pout.println( "start,stop,range,filename,lastQCMessage,QCStatus");
+            pout.println( "start,stop,label,filename,lastQCMessage,QCStatus");
             
             for ( int i= 0; i<this.seq.size(); i++ ) {
                 monitor.setTaskProgress(i);
@@ -2924,25 +2924,29 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 }
  
                 WalkImage wi= this.seq.imageAt(i);
+                String s= wi.getUri().toString();
+                URI rel= this.seq.getBaseUri().relativize(wi.getUri());
                 
                 DatumRange dr= wi.getDatumRange();
                 String smin= dr==null ? "" : dr.min().toString();
                 String smax= dr==null ? "" : dr.max().toString();
-                String sdr= dr==null ? "" : dr.toString();
-                String caption= wi.getCaption(); // note captions can contain spaces when named $x fields are found.
-                if ( caption.contains(" ") ) {
-                    caption= "\"" + caption + "\"";
+                String scaption= wi.getCaption();
+                if ( scaption.contains(" ") || scaption.contains(",") ) {
+                    scaption = "\"" + scaption + "\"";
                 }
-                QualityControlRecord qcr= qcseq.getQualityControlRecord(i);
+                String filename= rel.toString(); 
+                if ( filename.contains(" ") || filename.contains(",") ) {
+                    filename= "\"" + filename + "\"";
+                }
+                QualityControlRecord qcr= qcseq==null ? null : qcseq.getQualityControlRecord(i);
                 String lastComment = qcr==null ? "" : qcr.getLastComment();
-                String status = qcr==null ? "" : qcr.getStatus().toString();
-                if ( status.equals("Unknown") ) status="";
-                
                 if ( lastComment.trim().length()>0 ) {
                     lastComment= "\""+lastComment+"\"";
                 }
-                        
-                String line= String.format("%s,%s,%s,%s,%s,%s",smin,smax,sdr,caption,lastComment,status);
+                String status = qcr==null ? "" : qcr.getStatus().toString();
+                if ( status.equals("Unknown") ) status="";
+                                        
+                String line= String.format("%s,%s,%s,%s,%s,%s",smin,smax,scaption,filename,lastComment,status);
                 
                 pout.println(line);
 

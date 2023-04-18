@@ -68,6 +68,11 @@ public class WalkImageSequence implements PropertyChangeListener  {
      * template used to create list.  This may be null.
      */
     private final String template;
+    
+    /**
+     * the location of the base of the pngwalk.
+     */
+    private URI baseURI;
 
     private final PropertyChangeSupport pcs = new DebugPropertyChangeSupport(this);
 
@@ -95,6 +100,15 @@ public class WalkImageSequence implements PropertyChangeListener  {
      */
     public WalkImageSequence( String template ) {
         this.template= template;
+        int i= WalkUtil.splitIndex(template);
+        if ( i==-1 ) {
+            throw new IllegalArgumentException("template does not contain /.  Hrmph.");
+        }
+        try {
+            this.baseURI= new URI(template.substring(0,i));
+        } catch (URISyntaxException ex) {
+            throw new IllegalArgumentException(ex);
+        }
         //call initialLoad before any other methods.
     }
 
@@ -532,6 +546,14 @@ public class WalkImageSequence implements PropertyChangeListener  {
         } else {
             return existingImages.get(n);
         }
+    }
+    
+    /**
+     * return the location of the PNGWalk, which should contain the image files.
+     * @return 
+     */
+    public URI getBaseUri() {
+        return baseURI;
     }
     
     public URI getQCFolder() {
