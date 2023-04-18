@@ -569,7 +569,17 @@ public class WalkImage  {
             //System.err.println("download "+imgURI );
 
             URI fsRoot = DataSetURI.toUri( URISplit.parse(imgURI).path );
-            FileSystem fs = FileSystem.create(fsRoot);
+            FileSystem fs;
+            if ( fsRoot.getPath().length()==0 ) {
+                String s= imgURI.toASCIIString();
+                int i= s.lastIndexOf("/");
+                fs= FileSystem.create(s.substring(0,i));
+            } else {
+                // typical root.  See 
+                // file:/home/jbf/ct/hudson/artifacts/test141_file__home_jbf_ct_autoplot_release_trunk_JythonDataSource_build_classes_hudson.jyds_dir=%2527_var_local_hudson_jobs_autoplot-test050_builds_%2527.png
+                // for case that fails here.
+                fs = FileSystem.create(fsRoot);
+            }
 
             String s = DataSetURI.fromUri(imgURI);
             FileObject fo = fs.getFileObject(s.substring(s.lastIndexOf('/') + 1));
