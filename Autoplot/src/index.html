@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>New color tables added, and a bug which would slightly shift 255-step colorbars is corrected.
+        <p><small>Completions in script editor show results of trivial calculations.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,9 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-04-14 r27019):</p>
+        <p>Bugfixes (2023-04-18 r27028):</p>
         <ul> 
+            <li><a href="https://github.com/das-developers/das2java/issues/51">51</a>: New logic for log ticks considers axis height.
             <li><a href="https://github.com/das-developers/das2java/issues/58">58</a>: 255-step colorbars would load improperly, slightly shifting the colors.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2517/">2517</a>: new code preserving x-axis broke need-to-change-renderer check.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2516/">2516</a>: poor error message when adding dimensionless number to time location in Jython.
@@ -50,6 +51,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/802/">802</a>: PNGWalk export to csv for exports quality control information.
             <li><a href="https://github.com/das-developers/das2java/issues/57">57</a>: new modulo red_cyan_blue_yellow_red colorbar, blue_white_orange, and blue_green_white_yellow_red.
             <li>makeColorTable supports Units.rgbColor.
         </ul>
