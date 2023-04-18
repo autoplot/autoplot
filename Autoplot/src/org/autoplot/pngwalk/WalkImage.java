@@ -160,12 +160,20 @@ public class WalkImage  {
         this.caption = caption;
     }
 
+    /**
+     * the text displayed along with the image
+     * @return 
+     */
     public String getCaption() {
         return caption;
     }
 
     DatumRange dr;
 
+    /**
+     * get the time range for the image, or null if the timerange cannot be inferred.
+     * @return 
+     */
     public DatumRange getDatumRange() {
         return dr;
     }
