@@ -48,6 +48,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -1218,6 +1219,17 @@ public final class PngWalkTool extends javax.swing.JPanel {
         });
         writeHtml.setToolTipText("Write the visible images to an HTML file.");
         toolsMenu.add( writeHtml );
+        
+        final JMenuItem writeCsv= new JMenuItem( new AbstractAction( "Write to CSV..." ) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);        
+                tool.writeCsv();
+            }
+        });
+        writeCsv.setToolTipText("Write the visible images to a CSV file.");
+        toolsMenu.add( writeCsv );
+        
         
         result.add( toolsMenu );
         
@@ -2629,7 +2641,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
     }
     
     /**
-     * write the sequence to a PDF file, so that this can be used to produce
+     * write the sequence to a HTML file, so that this can be used to produce
      * worksheets.
      * 
      */
@@ -2861,6 +2873,80 @@ public final class PngWalkTool extends javax.swing.JPanel {
             };
             new Thread(run).start();
 
+        }
+    }
+    
+    /**
+     * write the sequence to a HTML file, so that this can be used to produce
+     * worksheets.
+     * 
+     */
+    public void writeCsv() {
+        JFileChooser choose= new JFileChooser();
+        
+        Preferences prefs= Preferences.userNodeForPackage(PngWalkTool.class);
+        String fname= prefs.get( "writeToCsv", "/tmp/pngwalk.csv" );
+        
+        choose.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        choose.setSelectedFile( new File(fname) );
+        choose.setFileFilter( new FileNameExtensionFilter("csv files", "csv" ));
+                
+        if ( choose.showSaveDialog(PngWalkTool.this)==JFileChooser.APPROVE_OPTION ) {
+            final File f= choose.getSelectedFile();
+            prefs.put( "writeToCsv", f.toString() );
+            final ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(this),"write csv");
+            Runnable run= () -> {
+                try {
+                    writeToCsvImmediately( mon , f );
+                } catch (FileNotFoundException ex) {
+                    logger.log(Level.SEVERE, null, ex);                    
+                }
+            };
+            new Thread(run).start();
+        }
+    }
+    
+    private void writeToCsvImmediately( ProgressMonitor monitor, File f ) throws FileNotFoundException {
+        try ( PrintWriter pout= new PrintWriter(f) ) {
+            monitor.setTaskSize(this.seq.size());
+            monitor.started();
+                      
+            QualityControlSequence qcseq= this.seq.getQualityControlSequence();
+                                    
+            logger.log(Level.FINE, "writeToCsv {1}", new Object[]{f.getName()});
+            
+            pout.println( "start,stop,range,filename,lastQCMessage,QCStatus");
+            
+            for ( int i= 0; i<this.seq.size(); i++ ) {
+                monitor.setTaskProgress(i);
+                if ( monitor.isCancelled() ) {
+                    break;
+                }
+ 
+                WalkImage wi= this.seq.imageAt(i);
+                
+                DatumRange dr= wi.getDatumRange();
+                String smin= dr==null ? "" : dr.min().toString();
+                String smax= dr==null ? "" : dr.max().toString();
+                String sdr= dr==null ? "" : dr.toString();
+                QualityControlRecord qcr= qcseq.getQualityControlRecord(i);
+                String lastComment = qcr==null ? "" : qcr.getLastComment();
+                String status = qcr==null ? "" : qcr.getStatus().toString();
+                if ( status.equals("Unknown") ) status="";
+                
+                if ( lastComment.trim().length()>0 ) {
+                    lastComment= "\""+lastComment+"\"";
+                }
+                        
+                String line= String.format("%s,%s,%s,%s,%s,%s",smin,smax,sdr,wi.getCaption(),lastComment,status);
+                
+                pout.println(line);
+
+            }
+                        
+        } finally {
+            monitor.finished();
+            
         }
     }
     
