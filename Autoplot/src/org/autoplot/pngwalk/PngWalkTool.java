@@ -2901,6 +2901,26 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 } catch (FileNotFoundException ex) {
                     logger.log(Level.SEVERE, null, ex);                    
                 }
+                final JPanel panel= new javax.swing.JPanel();
+                panel.setLayout( new BoxLayout(panel,BoxLayout.Y_AXIS ));
+                panel.add( new javax.swing.JLabel("wrote file "+f) );
+                JButton b= new JButton("Open in Browser");
+                b.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        AutoplotUtil.openBrowser(f.toURI().toString());
+                    }
+                } );
+                panel.add( b );
+                JButton b2= new JButton("Copy filename to clipboard");
+                b2.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        GuiSupport.setClipboard( f.toURI().toString() );
+                    }
+                });
+                panel.add( b2 );
+                JOptionPane.showMessageDialog( PngWalkTool.this,panel );
             };
             new Thread(run).start();
         }
