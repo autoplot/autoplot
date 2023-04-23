@@ -2961,6 +2961,8 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 QualityControlRecord qcr= qcseq==null ? null : qcseq.getQualityControlRecord(i);
                 String lastComment = qcr==null ? "" : qcr.getLastComment();
                 if ( lastComment.trim().length()>0 ) {
+                    int nl= lastComment.indexOf("\n");
+                    if ( nl>-1 ) lastComment= lastComment.substring(0,nl);
                     lastComment= "\""+lastComment+"\"";
                 }
                 String status = qcr==null ? "" : qcr.getStatus().toString();
