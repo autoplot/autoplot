@@ -44,6 +44,7 @@ public class APDataSet extends QDataSetBridge {
 
     /**
      * 1.4.1 clean up Das2Server source so that monitor is only called once.
+     * It is so common that certificates are mis-configured in our field just disable them for now.
      */
     public APDataSet() {
         super();
