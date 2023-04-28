@@ -158,10 +158,16 @@ public class AnnotationController extends DomNodeController {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 LoggerManager.logPropertyChangeEvent(evt);  
-                Plot pl= (Plot) DomUtil.getElementById( dom, (String)evt.getNewValue() );                
-                if ( pl!=null ) {
-                    DasPlot dasPlot= pl.getController().getDasPlot();
-                    p.setPlot( dasPlot );
+                if ( ((String)evt.getNewValue()).length()==0 ) {
+                    p.setPlot(null);
+                } else {
+                    Plot pl= (Plot) DomUtil.getElementById( dom, (String)evt.getNewValue() );                
+                    if ( pl!=null ) {
+                        DasPlot dasPlot= pl.getController().getDasPlot();
+                        p.setPlot( dasPlot );
+                    } else {
+                        p.setPlot( null );
+                    }
                 }
             }
         });
