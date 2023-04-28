@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>PNG Walk Tool now has Tools&rarr;"Write to CSV" action, which writes out PNG walk times and quality control information to one file.
+        <p><small>PNG Walk Tool used to find the capture where ducks were in the wading pool.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,37 +28,29 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-04-18 r27028):</p>
+        <p>Bugfixes (2023-04-28 r27035):</p>
         <ul> 
+            <li>Annotation plotId property can be reset to ""
+            <li>warnings about irregular timetags are limited.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2221">2221</a>: Ivar pointed out where a warning for LBL_PTR_1 length was incorrect.
+            <li><a href="https://github.com/das-developers/das2java/issues/51">51</a>: Corrections to LogLin ticks labeling.
+        </ul>
+        <p>Older Bugfixes (2023-04-18 r27028):</p>
+        <ul>
             <li><a href="https://github.com/das-developers/das2java/issues/51">51</a>: New logic for log ticks considers axis height.
             <li><a href="https://github.com/das-developers/das2java/issues/58">58</a>: 255-step colorbars would load improperly, slightly shifting the colors.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2517/">2517</a>: new code preserving x-axis broke need-to-change-renderer check.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2516/">2516</a>: poor error message when adding dimensionless number to time location in Jython.
             <li>vap+hapi:https://jfaden.net/HapiServerDemo/hapi?id=icwc&amp;parameters=Conditions&amp;timerange=2023-04-03 failed to load because of recent change looking for events lists.
         </ul>
-        <p>Older Bugfixes (2023-03-03 r26979):</p>
-        <ul>
-            <li>Runtime error when preferences is written on some platforms.  Thanks, Andrei!
-            <li>HAPI reader detects events dataset where start and stop time are returned and events bars are drawn.
-            <li>QDataSet Schemes detector code considers any dataset with first two columns start, stop times an events dataset.
-            <li>Das2Stream to QDataSet reader would fail when packet descriptors would introduce a join dimension.
-            <li>HAPI export flattens rank 2 data export to support use with prototype servers.
-            <li>rte_0373978553: show nice error message when entered time range width is zero.  Thanks, trunali1131!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2514/">2514</a>: exporting data with append won't append DEPEND_0 if it looks like it's already in there.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2514/">2514</a>: depend0 units dialog has gray prompt when empty.
-            <li>formatDataSet inspect URI action would RTE when carot was after the last character
-            <li>rte_0008993657: runtime error with ExpandToFillGaps editor when no DEPEND_0 is found.  Thanks, George!
-        </ul>
         <p>Features:</p>
+        <ul>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/802/">802</a>: PNGWalk "write to csv" action exports quality control information.
             <li><a href="https://github.com/das-developers/das2java/issues/57">57</a>: new modulo red_cyan_blue_yellow_red colorbar, blue_white_orange, and blue_green_white_yellow_red.
             <li>makeColorTable supports Units.rgbColor.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li><a href='https://sourceforge.net/p/autoplot/feature-requests/801/'>801</a>: Expose CdfDataSourceFormat.datasetToArray which is useful in scripts which fill an empty CDF.
-            <li><a href='https://sourceforge.net/p/autoplot/feature-requests/798/'>798</a>: preserve x-axis range when changing operations, only autoranging Y for "|multiply(5)".  Thanks, Cindy!
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
