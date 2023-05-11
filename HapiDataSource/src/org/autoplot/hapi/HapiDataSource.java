@@ -1074,7 +1074,6 @@ public final class HapiDataSource extends AbstractDataSource {
                 }
             }
             
-            //TODO: the parameters must also be sorted by position in stream.
             pds= subsetPds;   
 
             nparam= pds.length;            
@@ -1308,20 +1307,25 @@ public final class HapiDataSource extends AbstractDataSource {
             cacheReader= null;
         }
         
-        HttpURLConnection httpConnect;
+        HttpURLConnection httpConnect=null;
+        boolean gzip=false;  // Let Java decompress the stream
         if ( cacheReader==null ) {
             if ( FileSystem.settings().isOffline() ) {
                 throw new NoDataInIntervalException("HAPI server is offline.");
                 //throw new FileSystem.FileSystemOfflineException("file system is offline");
             } else {
-                loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );            
-                httpConnect= (HttpURLConnection)url.openConnection();
-                httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
-                httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
-                httpConnect.setRequestProperty( "Accept-Encoding", "gzip" );
-                httpConnect= (HttpURLConnection)HttpUtil.checkRedirect(httpConnect); // There's a problem, because it looks like the entire response is read here.
-                httpConnect.connect();
-                loggerUrl.log(Level.FINE, "--> {0} {1}", new Object[]{httpConnect.getResponseCode(), httpConnect.getResponseMessage()});
+                loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );   
+                boolean doAllowGZip= false;
+                if ( doAllowGZip ) {
+                    httpConnect= (HttpURLConnection)url.openConnection();
+                    httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
+                    httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
+                    httpConnect.setRequestProperty( "Accept-Encoding", "gzip" );
+                    httpConnect= (HttpURLConnection)HttpUtil.checkRedirect(httpConnect); // There's a problem, because it looks like the entire response is read here.
+                    httpConnect.connect();
+                    loggerUrl.log(Level.FINE, "--> {0} {1}", new Object[]{httpConnect.getResponseCode(), httpConnect.getResponseMessage()});
+                    gzip=true;
+                }
             }
         } else {
             httpConnect= null;
@@ -1333,7 +1337,6 @@ public final class HapiDataSource extends AbstractDataSource {
         boolean completeDay= tr.contains(currentDay);
 
         logger.log(Level.FINER, "parse {0}", cacheReader);
-        boolean gzip= cacheReader==null ? "gzip".equals( httpConnect.getContentEncoding() ) : false;
         
         boolean writeDataToCache= cacheIsEnabled && cacheReader==null;
         
@@ -1359,18 +1362,18 @@ public final class HapiDataSource extends AbstractDataSource {
                 throw new IllegalArgumentException("query must be specified, implementation error");
             }
         }
-        
+
         try (AbstractLineReader in = (cacheReader != null ? cacheReader
                 : new SingleFileBufferedReader(
                         new BufferedReader(
                                 new InputStreamReader(
-                                        gzip ? new GZIPInputStream(httpConnect.getInputStream())
-                                                : httpConnect.getInputStream(),
+                                        gzip ? new GZIPInputStream( httpConnect==null ? url.openStream() : httpConnect.getInputStream() )
+                                                : ( httpConnect==null ? url.openStream() : httpConnect.getInputStream() ),
                                         HapiServer.UTF8
                                 )
                         )
                 ))) {
-            
+
             String line= in.readLine();
             
             if ( line!=null && line.startsWith("{") ) {
