@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>ASCII file with last column used for comments now reads properly.
+        <p><small>Fun display of Juno data.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,10 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-05-10 r27040):</p>
+        <p>Bugfixes (2023-05-15 r27043):</p>
         <ul> 
+            <li>tweak the message where FFTPower complains because it doesn't have the timetags.
+            <li>HAPI specialized code for gzip is removed.  They way I was doing this by hand broke the progress feedback, and Java can do this itsself if it wants.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2519">2519</a>: CSV ASCII files can contain empty last column for comments.</li>
             <li>Annotation plotId property can be reset to "".
             <li>limit warnings about irregular timetags with FFTPower.
@@ -46,6 +48,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/803/">803</a>: more symbols included in "misc" tab of granny string editor.
             <li>Orbit number definitions now come from https://github.com/das-developers/das2meta/tree/main/orbits.
         </ul>
         <p>Less recent features:</p>
