@@ -273,7 +273,7 @@ public class Test024 {
      */
     public static void test10() throws Exception {
         System.err.println( "\n= test10 =\n");        
-        String uri= "vap+hapi:http://jfaden.net/HapiServerDemo/hapi?id=Iowa+City+Conditions&parameters=Time,Temperature,Humidity,Pressure&timerange=2017-May";
+        String uri= "vap+hapi:https://jfaden.net/HapiServerDemo/hapi?id=Iowa+City+Conditions&parameters=Time,Temperature,Humidity,Pressure&timerange=2017-May";
         org.autoplot.idlsupport.APDataSet apds  = new org.autoplot.idlsupport.APDataSet();
         apds.loadDataSet(uri);
         apds.setFillDouble(0);
