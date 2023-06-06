@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Fun display of Juno data.
+        <p><small>fillTexture control added to series renderer using the control "fillTexture=crosshash".
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,10 +28,11 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-05-16 r27044):</p>
+        <p>Bugfixes (2023-06-06 r27046):</p>
         <ul> 
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2522/">2522</a>: support fillTexture in SeriesRenderer.
             <li>tweak the message where FFTPower complains because it doesn't have the timetags.
-            <li>HAPI specialized code for gzip is removed.  They way I was doing this by hand broke the progress feedback, and Java can do this itsself if it wants.
+            <li>HAPI specialized code for gzip is removed.  They way I was doing this by hand broke the progress feedback, and Java can do this itself if it wants.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2519">2519</a>: CSV ASCII files can contain empty last column for comments.</li>
             <li>Annotation plotId property can be reset to "".
             <li>limit warnings about irregular timetags with FFTPower.
