@@ -907,7 +907,11 @@ public class DataSetSelector extends javax.swing.JPanel {
                         return;
                     }
 
-                    fedit.setURI(surl);
+                    try {
+                        fedit.setURI(surl);
+                    } catch ( Exception e ) {
+                        e.printStackTrace();
+                    }
                     
                     setCursor( Cursor.getDefaultCursor() );
                     

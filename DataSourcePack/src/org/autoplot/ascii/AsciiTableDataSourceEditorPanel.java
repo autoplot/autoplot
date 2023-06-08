@@ -1623,13 +1623,8 @@ private void guessTimeFormatButtonAP( int row, int first, int last ) {
             validMaxTextField.setText( getParam(params, "validMax" ));
             
             jTabbedPane1.setSelectedComponent(selectedTab);
-            try {
-                update();
-                checkHeaders();
-            } catch ( Exception ex ) {
-                ex.printStackTrace();
-            }
-            
+            update();
+            checkHeaders();
 
             if ( columns!=null ) {
                 whereParamList.setModel( new DefaultComboBoxModel( columns.values().toArray() ) );
