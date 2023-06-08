@@ -2880,8 +2880,20 @@ public class ApplicationController extends DomNodeController implements RunLater
         logger.log(Level.FINE, "{0} (status message)", status);
         String oldStatus = this.status;
         this.status = status;
+        this.statusUpdateTime= System.currentTimeMillis();
         propertyChangeSupport.firePropertyChange(PROP_STATUS, oldStatus, status);
     }
+    
+    private long statusUpdateTime=0L;
+    
+    /**
+     * return the number of milliseconds since the last status update
+     * @return the number of milliseconds since the last status update 
+     */
+    public long getStatusAgeMillis() {
+        return System.currentTimeMillis()-statusUpdateTime;
+    }
+    
     protected String focusUri = "";
     /**
      * property focusUri is the uri that has gained focus.  This can be the datasource uri, or the location of the .vap file.
