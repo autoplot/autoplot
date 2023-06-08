@@ -740,6 +740,8 @@ public class ScriptPanelSupport {
     private void executeScriptImmediately( int mode ) throws RuntimeException, Error {
         int offset = 0;
         int lineOffset= 0;
+
+        applicationController.setStatus("busy: running application script");
         
         //ProgressMonitor mon= //DasProgressPanel.createComponentPanel(model.getCanvas(),"running script");
         ProgressMonitor mon= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(panel), "running script");
@@ -939,7 +941,11 @@ public class ScriptPanelSupport {
                 }
                 setInterruptible( null );
                 if ( !mon.isFinished() ) mon.finished(); // bug1251: in case script didn't call finished
-                applicationController.setStatus("done executing script");
+                if ( applicationController.getStatusAgeMillis()>100 ) {
+                    applicationController.setStatus("done executing script");
+                } else {
+                    applicationController.setStatus(applicationController.getStatus()+" (done executing script)");
+                }
             } catch (IOException ex) {
                 if ( !mon.isFinished() ) mon.finished();
                 logger.log(Level.WARNING, ex.getMessage(), ex);
@@ -1043,7 +1049,6 @@ public class ScriptPanelSupport {
                 panel.setRunningScript(null);
 
             } else if (panel.getContext() == JythonScriptPanel.CONTEXT_APPLICATION) {
-                applicationController.setStatus("busy: running application script");
                 Runnable run = () -> {
                     executeScriptImmediately(mode);
                 };
