@@ -30,6 +30,7 @@
                 
         <p>Bugfixes (2023-06-10 r27051):</p>
         <ul> 
+            <li>correction to Run Batch Tool when running in parallel (shift+Go), where constant parameters were not set.
             <li>catch exception in ASCII GUI editor which would result in locking the inspect button.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2522/">2522</a>: support fillTexture in SeriesRenderer.
             <li>tweak the message where FFTPower complains because it doesn't have the timetags.
@@ -50,6 +51,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>new timeShift operator shifts the timetags to correct for non-GMT times.
             <li><a href="https://github.com/das-developers/das2java/issues/59">59</a>: data point recorder can save its data as CSV.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/806/">806</a>: preserve setStatus messages issued at the end of the script, not clobbering it with "done executing script" message.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/803/">803</a>: more symbols included in "misc" tab of granny string editor, and dialog for picking any html entity added.
