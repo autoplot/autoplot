@@ -1825,6 +1825,10 @@ public class RunBatchTool extends javax.swing.JPanel {
                         throw new IllegalArgumentException("param1Name not set");
                     }
                 }
+                for ( Entry<String,String> e: params.entrySet() ) {
+                    String pname= e.getKey();
+                    setParam( interp, pwd, parms.get(pname), pname, e.getValue() );
+                }
                 setParam( interp, pwd, parms.get(paramName), paramName, paramValue );
                 runResults.put(paramName,paramValue);
                 scriptParams.put(paramName,paramValue);
