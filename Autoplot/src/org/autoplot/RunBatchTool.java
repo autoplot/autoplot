@@ -1509,6 +1509,9 @@ public class RunBatchTool extends javax.swing.JPanel {
         switch (paramDescription.type) {
             case 'U':
             case 'R':
+                if ( f1.startsWith("'") && f1.endsWith("'") && f1.length()>1 ) {
+                    f1= f1.substring(1,f1.length()-1);
+                }
                 URI uri;
                 try {
                     URISplit split= URISplit.parse(f1);
@@ -1526,6 +1529,9 @@ public class RunBatchTool extends javax.swing.JPanel {
                 interp.exec("autoplot2017.params[\'"+paramName+"\']=URL(\'"+f1+"\')"); // JythonRefactory okay
                 break;
             case 'A':
+                if ( f1.startsWith("'") && f1.endsWith("'") && f1.length()>1 ) {
+                    f1= f1.substring(1,f1.length()-1);
+                }
                 interp.exec("autoplot2017.params[\'"+paramName+"\']=\'"+f1+"\'");// JythonRefactory okay
                 break;
             case 'T':
