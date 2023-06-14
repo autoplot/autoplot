@@ -4,9 +4,13 @@ package org.autoplot.csv;
 import com.csvreader.CsvWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.autoplot.ascii.AsciiTableDataSourceFormat;
 import org.autoplot.datasource.AbstractDataSourceFormat;
 import org.das2.datum.Datum;
 import org.das2.datum.Units;
@@ -16,8 +20,15 @@ import org.das2.qds.DataSetUtil;
 import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.URISplit;
+import org.das2.datum.EnumerationUnits;
+import org.das2.datum.TimeParser;
 import org.das2.datum.UnitsUtil;
+import org.das2.datum.format.DefaultDatumFormatter;
+import org.das2.datum.format.FormatStringFormatter;
+import org.das2.datum.format.TimeDatumFormatter;
+import org.das2.datum.format.TimeDatumFormatterFactory;
 import org.das2.qds.ops.Ops;
+import org.das2.util.LoggerManager;
 
 /**
  * Format data to CSV (comma separated values) file.
@@ -25,6 +36,125 @@ import org.das2.qds.ops.Ops;
  */
 public class CsvDataSourceFormat extends AbstractDataSourceFormat {
 
+    private static final Logger logger= LoggerManager.getLogger("apdss.ascii.csv");
+     
+        private DatumFormatter getTimeFormatter( ) {
+        DatumFormatter timeFormatter;
+        String tformat= getParam( "tformat", "ISO8601" );
+        String ft= tformat.toLowerCase();
+        String depend0Units= getParam( "depend0Units", "" );
+        Units dep0units= null;
+        
+        if ( depend0Units.length()>0 ) {
+            try {
+                dep0units= Units.lookupTimeUnits(depend0Units);
+            } catch (ParseException ex) {
+                Logger.getLogger(AsciiTableDataSourceFormat.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            final Units tu= dep0units;
+            if ( ft.equals("iso8601") ) ft=null;
+            final String sformat= ft;
+            timeFormatter= new DefaultDatumFormatter() {
+                @Override
+                public String format(Datum datum) {
+                    return format(datum, tu);
+                }
+                @Override
+                public String format(Datum datum, Units units) {
+                    if ( datum.isFill() ) {
+                        return "fill";
+                    } else {
+                        if ( sformat!=null && sformat.startsWith("%") ) {
+                            return String.format( sformat, datum.doubleValue(tu) );
+                        } else {
+                            return String.valueOf( datum.doubleValue(tu) );
+                        }
+                    }
+                }
+            };
+        } else if (ft.equals("iso8601")) {
+            timeFormatter = TimeDatumFormatterFactory.getInstance().defaultFormatter();
+            
+        } else if ( tformat.startsWith("%")
+                || ft.startsWith("$") ) {
+            if ( tformat.startsWith("$") ) { // provide convenient URI-friendly spec
+                tformat= tformat.replaceAll("\\$", "%");
+            }
+            tformat= tformat.replaceAll("\\+",getParam("delim",","));
+            try {
+                timeFormatter = new TimeDatumFormatter(tformat);
+            } catch (ParseException ex) {
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
+                try {
+                    timeFormatter = new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S");
+                } catch (ParseException ex1) {
+                    throw new RuntimeException(ex1);
+                }
+            }
+        } else {
+            try {
+                if (ft.equals("day")) {
+                    timeFormatter = new TimeDatumFormatter("%Y-%m-%d");
+                } else if (ft.equals("hour")) {
+                    timeFormatter = new TimeDatumFormatter("%Y-%m-%dT%H:%MZ");
+                } else if (ft.startsWith("min")) {
+                    timeFormatter =  new TimeDatumFormatter("%Y-%m-%dT%H:%MZ");
+                } else if (ft.startsWith("sec")) {
+                    timeFormatter =  new TimeDatumFormatter("%Y-%m-%dT%H:%M:%SZ");
+                } else if (ft.startsWith("millisec")) {
+                    final TimeParser tp= TimeParser.create("$Y-$m-$dT$H:$M:$S.$(subsec,places=3)");
+                    timeFormatter= new DatumFormatter() {
+                        @Override
+                        public String format(Datum datum) {
+                            return tp.format(datum);
+                        }
+                    };
+                    //timeFormatter =  new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S.%{milli}Z");
+                } else if (ft.startsWith("microsec")) {
+                    final TimeParser tp= TimeParser.create("$Y-$m-$dT$H:$M:$S.$(subsec,places=6)");
+                    timeFormatter= new DatumFormatter() {
+                        @Override
+                        public String format(Datum datum) {
+                            return tp.format(datum);
+                        }
+                    };
+                    //timeFormatter =  new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S.%{milli}%{micro}Z");
+                } else if (ft.startsWith("nanosec")) {
+                    final TimeParser tp= TimeParser.create("$Y-$m-$dT$H:$M:$S.$(subsec,places=9)");
+                    timeFormatter= new DatumFormatter() {
+                        @Override
+                        public String format(Datum datum) {
+                            return tp.format(datum);
+                        }
+                    };
+                    //timeFormatter =  new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S.%{milli}%{micro}Z");
+                } else {
+                    logger.log(Level.FINE, "not implemented: {0}", ft);
+                    timeFormatter = new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S");
+                }
+
+            } catch (ParseException ex) {
+                logger.log( Level.SEVERE, ex.getMessage(), ex);
+                timeFormatter = TimeDatumFormatterFactory.getInstance().defaultFormatter();
+                
+            }
+        }
+        return timeFormatter;
+
+    }
+        
+    private DatumFormatter getDataFormatter( String df, Units u ) {
+        try {
+            if ( !df.contains("%") ) df= "%"+df;
+            //TODO: would be nice if we could verify formatter.  I had %f5.2 instead of %5.2f and it wasn't telling me.
+            return new FormatStringFormatter( df, false );
+        } catch ( RuntimeException ex ) {
+            logger.log( Level.SEVERE, ex.getMessage(), ex);
+            return u.getDatumFormatterFactory().defaultFormatter();
+        }
+    }
+    
     @Override
     public void formatData(String uri, QDataSet data, ProgressMonitor mon) throws Exception {
         
@@ -141,10 +271,39 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
             writer.setForceQualifier(false);
             writer.setUseTextQualifier(true);
 
+            QDataSet bundleDesc= (QDataSet) data.property(QDataSet.BUNDLE_1);
+            
+            DatumFormatter tf= getTimeFormatter( );
+            
+            String df= getParam( "format", "" );
+            
             DatumFormatter[] formats= new DatumFormatter[dss.length];
-            for ( int ids=0; ids<dss.length; ids++ ) {
-                Units u= SemanticOps.getUnits(dss[ids]);
-                formats[ids]= u.getDatumFormatterFactory().defaultFormatter();
+            for ( int jj=0; jj<dss.length; jj++ ) {
+                Units u= SemanticOps.getUnits(dss[jj]);
+                Units uu_jj=u;
+                formats[jj]= u.getDatumFormatterFactory().defaultFormatter();
+                if ( !( uu_jj instanceof EnumerationUnits ) ) {
+                    String ff= (String) bundleDesc.property(QDataSet.FORMAT,jj);
+                    if ( df.equals("") ) {
+                        if ( ff==null ) {
+                            formats[jj]= uu_jj.createDatum(data.value(0,jj)).getFormatter();
+                        } else {
+                            formats[jj]= getDataFormatter( ff, uu_jj );
+                        }
+                    } else {
+                        if ( UnitsUtil.isTimeLocation( uu_jj ) ) {
+                            formats[jj]= tf;
+                        } else {
+                            if ( ff==null ) {
+                                formats[jj]= getDataFormatter( df, uu_jj );
+                            } else {
+                                formats[jj]= getDataFormatter( ff, uu_jj ); //TODO: what is user wants to override format? 
+                            }
+                        }
+                    }
+                } else {
+                    formats[jj]= uu_jj.createDatum(data.value(0,jj)).getFormatter();
+                }                
             }
 
             for ( int i=0; i<data.length(); i++ ) {
