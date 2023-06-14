@@ -30,6 +30,7 @@
                 
         <p>Bugfixes (2023-06-14 r27057):</p>
         <ul> 
+            <li>remove extra quotes which sometimes appear in script arguments, but should not be sent to scripts.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2522/">2522</a>: correction to bounds renderer, where setColor for the lines was removed with refactoring.
             <li>export to CSV checks for FORMAT in QDataSet, just like other ASCII formatters.
             <li>correction to Run Batch Tool when running in parallel (shift+Go), where constant parameters were not set.
