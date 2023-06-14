@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>More symbols have been added to the text editor.  Click on the small button on the right of the property editor to access the specialized text editor.
+        <p><small>Bug in boundsRender corrected, where for a few devel releases the bounding boxes were drawn even if the color was None.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,10 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-06-12 r27054):</p>
+        <p>Bugfixes (2023-06-14 r27057):</p>
         <ul> 
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2522/">2522</a>: correction to bounds renderer, where setColor for the lines was removed with refactoring.
+            <li>export to CSV checks for FORMAT in QDataSet, just like other ASCII formatters.
             <li>correction to Run Batch Tool when running in parallel (shift+Go), where constant parameters were not set.
             <li>catch exception in ASCII GUI editor which would result in locking the inspect button.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2522/">2522</a>: support fillTexture in SeriesRenderer.
