@@ -28,9 +28,9 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-06-14 r27057):</p>
+        <p>Bugfixes (2023-06-15 r27057):</p>
         <ul> 
-            <li>remove extra quotes which sometimes appear in script arguments, but should not be sent to scripts.
+            <li>remove extra quotes which sometimes appear in script arguments but should not be sent to scripts.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2522/">2522</a>: correction to bounds renderer, where setColor for the lines was removed with refactoring.
             <li>export to CSV checks for FORMAT in QDataSet, just like other ASCII formatters.
             <li>correction to Run Batch Tool when running in parallel (shift+Go), where constant parameters were not set.
@@ -54,6 +54,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Das2 DataPointRecorder supports load of Autoplot's export-to-csv files.
             <li>new timeShift operator shifts the timetags to correct for non-GMT times.
             <li><a href="https://github.com/das-developers/das2java/issues/59">59</a>: data point recorder can save its data as CSV.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/806/">806</a>: preserve setStatus messages issued at the end of the script, not clobbering it with "done executing script" message.
