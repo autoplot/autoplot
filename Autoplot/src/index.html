@@ -28,8 +28,9 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-06-15 r27057):</p>
+        <p>Bugfixes (2023-06-22 r27065):</p>
         <ul> 
+            <li>accum function preserves timetags, to match diff function.
             <li>remove extra quotes which sometimes appear in script arguments but should not be sent to scripts.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2522/">2522</a>: correction to bounds renderer, where setColor for the lines was removed with refactoring.
             <li>export to CSV checks for FORMAT in QDataSet, just like other ASCII formatters.
