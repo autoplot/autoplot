@@ -1233,7 +1233,10 @@ addBottomDecoration( dom.canvases[0], paint )
 
         if ( filename.contains("/") || filename.contains("\\") ) {
             URISplit split= URISplit.parse(filename);
-            if ( !split.scheme.equals("file") ) {
+            if ( split.path==null ) {
+                throw new IllegalArgumentException("something is wrong with the specified filename: "+filename);
+            }
+            if ( !"file".equals(split.scheme) ) {
                 throw new IllegalArgumentException("cannot write to "+filename+ " because it must be local file");
             }
             if ( fp.startsWith("file:") ) {
