@@ -2820,8 +2820,8 @@ APSplash.checkTime("init 52.9");
         final PersistentStateSupport stateSupport = new PersistentStateSupport(parent, null, "vap") {
 
             @Override
-            protected void saveImpl(File f,String scheme) throws IOException {
-                applicationModel.doSave(f,scheme);
+            protected void saveImpl(File f,String scheme,Map<String,Object> options) throws IOException {
+                applicationModel.doSave(f,scheme,options);
                 applicationModel.addRecent( DataSetURI.fromFile( f ));
                 parent.setStatus("saved " + f);
             }

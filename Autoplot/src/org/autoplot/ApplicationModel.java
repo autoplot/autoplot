@@ -1129,6 +1129,32 @@ public final class ApplicationModel {
         setVapFile( DataSetURI.fromFile(f) );
         addRecent( DataSetURI.fromFile(f) );
     }
+    
+    void doSave(File f, String scheme, Map<String,Object> options ) throws IOException {
+        Application app = createState(true);
+        if ( options.getOrDefault(PersistentStateSupport.LOCAL_PWD_REFERENCES,Boolean.FALSE)==Boolean.TRUE ) {
+            //app= (Application)app.copy();
+            File pp= f.getParentFile();
+            String spp= pp.getCanonicalPath();
+            for ( int i=0; i<app.getDataSourceFilters().length; i++ ) {
+                DataSourceFilter dsf= app.getDataSourceFilters(i);
+                //dsf= (DataSourceFilter)dsf.copy();
+                String uri= dsf.getUri();
+                URISplit split= URISplit.parse(uri);
+                if ( split.file.startsWith("file:") ) {
+                    File f1= new File( split.file.substring(5) ).getCanonicalFile();
+                    if ( f1.getCanonicalPath().startsWith(spp) ) {
+                        split.file= "%{PWD}"+f1.getCanonicalPath().substring(spp.length()+1);  // +1 is for the /, which PWD contains
+                        dsf.setUri( URISplit.format(split) );
+                        app.setDataSourceFilters(i,dsf);
+                    }
+                }
+            }
+        }
+        StatePersistence.saveState(f, app, scheme);
+        setVapFile( DataSetURI.fromFile(f) );
+        addRecent( DataSetURI.fromFile(f) );
+    }
 
     /**
      * Load the vap file at f, apply additional modifications to the DOM, then

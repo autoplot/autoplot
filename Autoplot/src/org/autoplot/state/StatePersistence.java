@@ -21,6 +21,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Formatter;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -99,7 +100,7 @@ public class StatePersistence {
     public static void saveState( File f, Object state, String sscheme ) throws IOException {
         saveState( new FileOutputStream(f), state, sscheme );
     }
-        
+    
     /**
      * Save the Object (DOM application) to a file.
      * @param out the output stream.

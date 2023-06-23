@@ -58,6 +58,14 @@ public class VapSchemeChooser extends javax.swing.JPanel {
         return this.onlyEmbedLocalCB.isSelected();
     }
     
+    /**
+     * return true if the local references to be relative when possible.
+     * @return 
+     */
+    public boolean isLocalPwdReferences() {
+        return this.localPwdReferences.isSelected();
+    }
+            
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -73,6 +81,7 @@ public class VapSchemeChooser extends javax.swing.JPanel {
         embedDataCheckBox = new javax.swing.JCheckBox();
         v1_09CB = new javax.swing.JRadioButton();
         onlyEmbedLocalCB = new javax.swing.JCheckBox();
+        localPwdReferences = new javax.swing.JCheckBox();
 
         buttonGroup1.add(currentVersionCB);
         currentVersionCB.setSelected(true);
@@ -91,6 +100,8 @@ public class VapSchemeChooser extends javax.swing.JPanel {
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, embedDataCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), onlyEmbedLocalCB, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
+        localPwdReferences.setText("Make local file references relative");
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -103,7 +114,8 @@ public class VapSchemeChooser extends javax.swing.JPanel {
                         .add(onlyEmbedLocalCB))
                     .add(currentVersionCB)
                     .add(embedDataCheckBox)
-                    .add(v1_09CB))
+                    .add(v1_09CB)
+                    .add(localPwdReferences))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -113,7 +125,9 @@ public class VapSchemeChooser extends javax.swing.JPanel {
                 .add(currentVersionCB)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(v1_09CB)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 109, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 82, Short.MAX_VALUE)
+                .add(localPwdReferences)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(embedDataCheckBox)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(onlyEmbedLocalCB))
@@ -127,6 +141,7 @@ public class VapSchemeChooser extends javax.swing.JPanel {
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JRadioButton currentVersionCB;
     private javax.swing.JCheckBox embedDataCheckBox;
+    private javax.swing.JCheckBox localPwdReferences;
     private javax.swing.JCheckBox onlyEmbedLocalCB;
     private javax.swing.JRadioButton v1_09CB;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;

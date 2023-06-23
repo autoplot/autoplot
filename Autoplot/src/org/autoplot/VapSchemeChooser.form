@@ -20,7 +20,7 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
+          <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
@@ -30,6 +30,7 @@
                   <Component id="currentVersionCB" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="embedDataCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="v1_09CB" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="localPwdReferences" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -42,7 +43,9 @@
               <Component id="currentVersionCB" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="v1_09CB" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="109" max="32767" attributes="0"/>
+              <EmptySpace pref="82" max="32767" attributes="0"/>
+              <Component id="localPwdReferences" min="-2" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="embedDataCheckBox" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="onlyEmbedLocalCB" min="-2" max="-2" attributes="0"/>
@@ -83,6 +86,11 @@
       <BindingProperties>
         <BindingProperty name="enabled" source="embedDataCheckBox" sourcePath="${selected}" target="onlyEmbedLocalCB" targetPath="enabled" updateStrategy="0" immediately="false"/>
       </BindingProperties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="localPwdReferences">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Make local file references relative"/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>

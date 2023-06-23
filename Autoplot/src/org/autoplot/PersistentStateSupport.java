@@ -235,8 +235,9 @@ public class PersistentStateSupport {
 
             String v= vapVersion.getScheme();
             Map<String,Object> optionsMap= new HashMap<>();
-            if ( vapVersion.isEmbedData() ) optionsMap.put( "embedData", true );
-            if ( vapVersion.isOnlyEmbedLocal() ) optionsMap.put( "onlyEmbedLocal", true );
+            if ( vapVersion.isEmbedData() ) optionsMap.put(EMBED_DATA, true );
+            if ( vapVersion.isOnlyEmbedLocal() ) optionsMap.put(ONLY_EMBED_LOCAL, true );
+            if ( vapVersion.isLocalPwdReferences() ) optionsMap.put(LOCAL_PWD_REFERENCES, true );
             
             if ( v.length()>0 ) {
                 save(new File( getCurrentFile()), v, optionsMap );
@@ -248,14 +249,18 @@ public class PersistentStateSupport {
         return result;
         
     }
+    public static final String EMBED_DATA = "embedData";
+    public static final String ONLY_EMBED_LOCAL = "onlyEmbedLocal";
+    public static final String LOCAL_PWD_REFERENCES = "localPwdReferences";
     
     /**
      * This is typically overriden, but an implementation is provided.
      * @param f the file
      * @param scheme the scheme, as in v1.7
+     * @param options additional options, which are ignored in this implementation.
      * @throws java.lang.Exception
      */
-    protected void saveImpl( File f, String scheme ) throws Exception {
+    protected void saveImpl( File f, String scheme, Map<String,Object> options ) throws Exception {
         try (OutputStream out = new FileOutputStream( f )) {
 
             Document document= DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
@@ -304,7 +309,7 @@ public class PersistentStateSupport {
                     ((AutoplotUI)component).setStatus("busy: writing to "+file);
                 }
                 
-                if ( saveOptions.containsKey("embedData") ) {
+                if ( saveOptions.containsKey(EMBED_DATA) ) {
                     if ( !f.getName().endsWith("zip") ) f= new File( f.getPath()+"zip" );
                 } else {
                     if ( !f.getName().endsWith(ext) ) f= new File( f.getPath()+ext );
@@ -321,16 +326,16 @@ public class PersistentStateSupport {
                     }
                 }
                 
-                boolean embedData= Boolean.TRUE.equals( saveOptions.get("embedData") );
+                boolean embedData= Boolean.TRUE.equals(saveOptions.get(EMBED_DATA) );
                 if ( embedData ) {
                     if ( component instanceof AutoplotUI ) {
                         Application dom= ((AutoplotUI)component).getDom();
-                        EmbedDataExperiment.save( dom, f, Boolean.TRUE.equals( saveOptions.get("onlyEmbedLocal")) );
+                        EmbedDataExperiment.save(dom, f, Boolean.TRUE.equals(saveOptions.get(ONLY_EMBED_LOCAL)) );
                     } else {
                         throw new IllegalArgumentException("Unable to embed data, please submit this error so the problem can be corrected");
                     }
                 } else {
-                    saveImpl(f,scheme);
+                    saveImpl(f,scheme,saveOptions);
                 }
                 
                 Preferences prefs= AutoplotSettings.settings().getPreferences( AutoplotSettings.class);
