@@ -28,9 +28,15 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-06-22 r27065):</p>
+        <p>Bugfixes (2023-07-01 r27071):</p>
         <ul> 
+            <li>"mod" function now appears in mash-up dialog's palette of functions.
+            <li><a href="https://github.com/das-developers/das2java/issues/60">60</a>: when a script manually initializes the DataPointRecorder, the new formatterArray was left uninitialized.  Thanks, Bill!
+            <li>improve error when "home/jbf/..." is used my mistake, instead of "/home/jbf/..."
             <li>accum function preserves timetags, to match diff function.
+        </ul>
+        <p>Older Bugfixes (2023-06-15 r27057):</p>
+        <ul>
             <li>remove extra quotes which sometimes appear in script arguments but should not be sent to scripts.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2522/">2522</a>: correction to bounds renderer, where setColor for the lines was removed with refactoring.
             <li>export to CSV checks for FORMAT in QDataSet, just like other ASCII formatters.
@@ -45,29 +51,18 @@
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2221">2221</a>: Ivar pointed out where a warning for LBL_PTR_1 length was incorrect.
             <li><a href="https://github.com/das-developers/das2java/issues/51">51</a>: Corrections to LogLin ticks labeling.
         </ul>
-        <p>Older Bugfixes (2023-04-18 r27028):</p>
-        <ul>
-            <li><a href="https://github.com/das-developers/das2java/issues/51">51</a>: New logic for log ticks considers axis height.
-            <li><a href="https://github.com/das-developers/das2java/issues/58">58</a>: 255-step colorbars would load improperly, slightly shifting the colors.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2517/">2517</a>: new code preserving x-axis broke need-to-change-renderer check.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2516/">2516</a>: poor error message when adding dimensionless number to time location in Jython.
-            <li>vap+hapi:https://jfaden.net/HapiServerDemo/hapi?id=icwc&amp;parameters=Conditions&amp;timerange=2023-04-03 failed to load because of recent change looking for events lists.
-        </ul>
         <p>Features:</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/807/">807</a>: save vap checkbox to make local file references relative to .vap file.
+        </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li><a href="https://github.com/das-developers/das2java/issues/59">59</a>: data point recorder supports load of Autoplot's export-to-csv files.
             <li>new timeShift operator shifts the timetags to correct for non-GMT times.
             <li><a href="https://github.com/das-developers/das2java/issues/59">59</a>: data point recorder can save its data as CSV.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/806/">806</a>: preserve setStatus messages issued at the end of the script, not clobbering it with "done executing script" message.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/803/">803</a>: more symbols included in "misc" tab of granny string editor, and dialog for picking any html entity added.
             <li>Orbit number definitions now come from https://github.com/das-developers/das2meta/tree/main/orbits.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/802/">802</a>: PNGWalk "write to csv" action exports quality control information.
-            <li><a href="https://github.com/das-developers/das2java/issues/57">57</a>: new modulo red_cyan_blue_yellow_red colorbar, blue_white_orange, and blue_green_white_yellow_red.
-            <li>makeColorTable supports Units.rgbColor.
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
