@@ -242,26 +242,27 @@
                             <Component class="javax.swing.JList" name="mathematicsList">
                               <Properties>
                                 <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.editors2.ListModelEditor">
-                                  <StringArray count="19">
+                                  <StringArray count="20">
                                     <StringItem index="0" value="add(x,y)"/>
                                     <StringItem index="1" value="subtract(x,y)"/>
                                     <StringItem index="2" value="multiply(x,y)"/>
                                     <StringItem index="3" value="divide(x,y)"/>
-                                    <StringItem index="4" value="pow(x,y)"/>
-                                    <StringItem index="5" value="log10(x)"/>
-                                    <StringItem index="6" value="sqrt(x)"/>
-                                    <StringItem index="7" value="abs(x): the absolute value of the data"/>
-                                    <StringItem index="8" value="magnitude(x): the lengths of the vectors"/>
-                                    <StringItem index="9" value="toRadians(x)"/>
-                                    <StringItem index="10" value="toDegrees(x)"/>
-                                    <StringItem index="11" value="sin(x)"/>
-                                    <StringItem index="12" value="cos(x)"/>
-                                    <StringItem index="13" value="tan(x)"/>
-                                    <StringItem index="14" value="asin(x)"/>
-                                    <StringItem index="15" value="acos(x)"/>
-                                    <StringItem index="16" value="atan2(y,x)"/>
-                                    <StringItem index="17" value="atan(x)"/>
-                                    <StringItem index="18" value="crossProduct(a,b)"/>
+                                    <StringItem index="4" value="mod(x,y)"/>
+                                    <StringItem index="5" value="pow(x,y)"/>
+                                    <StringItem index="6" value="log10(x)"/>
+                                    <StringItem index="7" value="sqrt(x)"/>
+                                    <StringItem index="8" value="abs(x): the absolute value of the data"/>
+                                    <StringItem index="9" value="magnitude(x): the lengths of the vectors"/>
+                                    <StringItem index="10" value="toRadians(x)"/>
+                                    <StringItem index="11" value="toDegrees(x)"/>
+                                    <StringItem index="12" value="sin(x)"/>
+                                    <StringItem index="13" value="cos(x)"/>
+                                    <StringItem index="14" value="tan(x)"/>
+                                    <StringItem index="15" value="asin(x)"/>
+                                    <StringItem index="16" value="acos(x)"/>
+                                    <StringItem index="17" value="atan2(y,x)"/>
+                                    <StringItem index="18" value="atan(x)"/>
+                                    <StringItem index="19" value="crossProduct(a,b)"/>
                                   </StringArray>
                                 </Property>
                                 <Property name="selectionMode" type="int" value="0"/>
