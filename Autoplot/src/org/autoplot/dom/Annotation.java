@@ -260,6 +260,20 @@ public class Annotation extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_ANCHOROFFSET, oldAnchorOffset, anchorOffset);
     }
 
+    
+    private boolean glow = false;
+
+    public static final String PROP_GLOW = "glow";
+
+    public boolean isGlow() {
+        return glow;
+    }
+
+    public void setGlow(boolean glow) {
+        boolean oldGlow = this.glow;
+        this.glow = glow;
+        propertyChangeSupport.firePropertyChange(PROP_GLOW, oldGlow, glow);
+    }
 
     private String plotId = "";
 

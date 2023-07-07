@@ -124,6 +124,7 @@ public class AnnotationController extends DomNodeController {
         ac.bind( annotation, "textColor", p, "textColor" );
         ac.bind( annotation, "foreground", p, "foreground" );
         ac.bind( annotation, "background", p, "background" );
+        ac.bind( annotation, "glow", p, "glow" );
         
         annotation.addPropertyChangeListener( Annotation.PROP_ROWID, new PropertyChangeListener() {
             @Override
