@@ -427,6 +427,7 @@ public class Annotation extends DomNode {
         if ( !exclude.contains( PROP_TEXTCOLOR ) ) this.setTextColor(that.getTextColor() );
         if ( !exclude.contains( PROP_FOREGROUND ) ) this.setForeground(that.getForeground() );
         if ( !exclude.contains( PROP_BACKGROUND ) ) this.setBackground(that.getBackground() );
+        if ( !exclude.contains( PROP_GLOW ) ) this.setGlow(that.isGlow() );
         if ( !exclude.contains( PROP_PLOTID ) ) this.setPlotId(that.getPlotId());
         if ( !exclude.contains( PROP_ROWID ) ) this.setRowId(that.getRowId());
         if ( !exclude.contains( PROP_COLUMNID ) ) this.setColumnId(that.getColumnId());
