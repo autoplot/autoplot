@@ -74,7 +74,7 @@ public class ScriptGUIServlet extends HttpServlet {
     /**
      * milliseconds within which script must run
      */
-    private static final int TIMEOUT_SCRIPT = 30000;
+    private static final int TIMEOUT_SCRIPT = 50000;
     
     static {
         timelogger= Logger.getLogger("autoplot.servlet.script.gui.timing");
@@ -179,6 +179,25 @@ public class ScriptGUIServlet extends HttpServlet {
                     + " to see if script could be run: "+script );
         }
         
+        String mode;
+        if ( request.getParameter("img")!=null ) {
+            mode= "img";
+        } else if ( "Print SVG".equals(request.getParameter("printsvg")) ) {
+            mode= "svg";
+        } else if ( "Print PDF".equals( request.getParameter("printpdf")) ) {
+            mode= "pdf";
+        } else if ( request.getParameter("text")!=null ) {
+            mode= "text";
+        } else {
+            mode= "init";
+        }
+        
+        long t0= System.currentTimeMillis();
+        String key= request.getParameter("key");
+        if ( key==null ) key="";
+        
+        logger.log( Level.INFO, "enter ScriptGUIServlet: {0} {1}", new Object[] { mode, key } );
+        
         Map params= request.getParameterMap();
         Map<String,String> ssparams= new LinkedHashMap<>();
         StringBuilder sbparams= new StringBuilder();
@@ -201,14 +220,12 @@ public class ScriptGUIServlet extends HttpServlet {
         
         if ( request.getParameter("img")!=null ) {
             
-            String key= request.getParameter("key");
             if ( !( getKeyFile( key,".png.t" ).exists() || getKeyFile( key,".png" ).exists() ) ) {
                 throw new IOException( "invalid key: "+key );
             } 
             writeOutputImage( key, response );
 
         } else if ( "Print SVG".equals( request.getParameter("printsvg") ) ) {
-            String key= request.getParameter("key");
             String[] ss= new String[ssparams.size()];
             int i=0;
             for ( Entry<String,String> e: ssparams.entrySet() ) {
@@ -219,7 +236,6 @@ public class ScriptGUIServlet extends HttpServlet {
             printScript( response, key, scriptURI, script, name, ss, pwd, "svg" );
 
         } else if ( "Print PDF".equals( request.getParameter("printpdf") ) ) {
-            String key= request.getParameter("key");
             String[] ss= new String[ssparams.size()];
             int i=0;
             for ( Entry<String,String> e: ssparams.entrySet() ) {
@@ -232,7 +248,6 @@ public class ScriptGUIServlet extends HttpServlet {
             
         } else if ( request.getParameter("text")!=null ) {
             
-            String key= request.getParameter("key");
             if ( !( getKeyFile( key,".txt.t" ).exists() || getKeyFile( key,".txt" ).exists() ) ) {
                 throw new IOException( "invalid key: "+key );
             } 
@@ -240,7 +255,7 @@ public class ScriptGUIServlet extends HttpServlet {
             
         } else {
 
-            String key= String.format( "%06d", (int)( Math.random() * 100000 ) );
+            key= String.format( "%06d", (int)( Math.random() * 100000 ) );
 
             writeParametersForm(key, response, pwd, script, ssparams, name, scriptURI, sparams);
             
@@ -251,14 +266,31 @@ public class ScriptGUIServlet extends HttpServlet {
                 i++;
             }
             
-            // create empty new files for placeholders.
-            File textKeyFile= getKeyFile( key, ".txt.t" );
-            if ( !textKeyFile.createNewFile() ) throw new IllegalArgumentException("unable to create file: "+textKeyFile);
-            File imageKeyFile =  getKeyFile( key, ".png.t" );
-            if ( !imageKeyFile.createNewFile() ) throw new IllegalArgumentException("unable to create file: "+imageKeyFile);
+            boolean runScript= true;
+            
+            File existingImageFile = getKeyFile( key, ".png" );
+            if ( existingImageFile.exists() ) {
+                long ageMillis= t0 - existingImageFile.lastModified();
+                if ( ageMillis<3600000 ) {
+                    runScript= false;
+                }
+            }
+            
+            if ( runScript ) {
+                // create empty new files for placeholders.
+                File textKeyFile= getKeyFile( key, ".txt.t" );
+                if ( !textKeyFile.createNewFile() ) throw new IllegalArgumentException("unable to create file: "+textKeyFile);
+                File imageKeyFile =  getKeyFile( key, ".png.t" );
+                if ( !imageKeyFile.createNewFile() ) throw new IllegalArgumentException("unable to create file: "+imageKeyFile);
         
-            startScript( request, key, scriptURI, script, name, ss, pwd );
+                startScript( request, key, scriptURI, script, name, ss, pwd );
+            }
+            
         }
+        
+        logger.log( Level.INFO, "exit ScriptGUIServlet: {0} {1} {2}",
+                new Object[] { mode, key, String.format("%.2f", (System.currentTimeMillis()-t0)/1000. ) } );
+        
     }
 
     /**
