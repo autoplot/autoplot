@@ -168,16 +168,6 @@ public class ScriptGUIServlet extends HttpServlet {
             throws ServletException, IOException {
  
         String script= request.getParameter("script");
-        Map params= request.getParameterMap();
-        Map<String,String> ssparams= new LinkedHashMap<>();
-        StringBuilder sbparams= new StringBuilder();
-        for ( Object o: params.entrySet() ) {
-            Entry e= (Entry)o;
-            String value= Array.get(e.getValue(),0).toString();
-            ssparams.put( e.getKey().toString(), value );
-            sbparams.append("&").append(e.getKey().toString()).append("=").append(value);
-        }
-        String sparams= sbparams.toString();
         
         if ( script==null ) {
             response.sendRedirect( "ScriptGUIServletPick" );
@@ -189,6 +179,17 @@ public class ScriptGUIServlet extends HttpServlet {
                     + " to see if script could be run: "+script );
         }
         
+        Map params= request.getParameterMap();
+        Map<String,String> ssparams= new LinkedHashMap<>();
+        StringBuilder sbparams= new StringBuilder();
+        for ( Object o: params.entrySet() ) {
+            Entry e= (Entry)o;
+            String value= Array.get(e.getValue(),0).toString();
+            ssparams.put( e.getKey().toString(), value );
+            sbparams.append("&").append(e.getKey().toString()).append("=").append(value);
+        }
+        String sparams= sbparams.toString();
+
         String scriptURI= script;
         
         URISplit split= URISplit.parse(script);
