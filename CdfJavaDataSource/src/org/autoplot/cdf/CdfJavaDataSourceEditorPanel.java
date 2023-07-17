@@ -751,7 +751,7 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
             if ( param!=null ) {
                 params= param.split(";",-2);
                 for ( String p : params ) {
-                    if ( isSupportParameter( cdfParameterInfo, p ) ) {
+                    if ( !dataParameterInfo.containsKey(p) ) {
                         this.showAllVarTypeCB.setSelected(true);
                         parameterDescriptions= org.autoplot.cdf.CdfUtil.getPlottable(cdf, 
                             !this.showAllVarTypeCB.isSelected(), QDataSet.MAX_RANK, new HashMap<String,String>());
