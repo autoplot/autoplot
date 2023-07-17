@@ -941,7 +941,8 @@ public class CdfUtil {
 
     /**
      * This is cdf.getDimensions( variableName ), but then check varies
-     * to see if varies[0] is false (for rvariables)
+     * to see if varies[0] is false (for rvariables).  This will return "new int[0]" for
+     * scalar quantities like density.
      * @param cdf
      * @param variableName
      * @return the dimensions for each record.
@@ -1558,11 +1559,8 @@ public class CdfUtil {
                 
                 dims = getDimensions(cdf, svar);
 
-                if (dims == null) {
-                    rank = 1;
-                } else {
-                    rank = dims.length + 1;
-                }
+                rank = dims.length + 1;
+                
                 if (rank > rankLimit) {
                     continue;
                 }
@@ -1665,10 +1663,10 @@ public class CdfUtil {
                         if (dep3desc.dep != null) {
                             desc += "," + maybeShorten( svar, dep3desc.dep ) + "=" + dep3desc.nrec + ( dep3desc.rank2 ? "*": "" );
                         } else if ( rank>3 ) {
-                            desc += ",...";
+                            desc += "," + DataSourceUtil.strjoin( Arrays.copyOfRange(dims,2,dims.length),"," );
                         }
                     } else if ( rank>2 ) {
-                        desc += ",...";
+                        desc += "," + DataSourceUtil.strjoin( Arrays.copyOfRange(dims,1,dims.length),"," );
                     }
                 } else if ( rank>1 ) {
                     desc += ","+DataSourceUtil.strjoin( dims, ",");
