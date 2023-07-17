@@ -1664,7 +1664,11 @@ public class CdfUtil {
                         desc += "," + maybeShorten( svar, dep2desc.dep ) + "=" + dep2desc.nrec + ( dep2desc.rank2 ? "*": "" );
                         if (dep3desc.dep != null) {
                             desc += "," + maybeShorten( svar, dep3desc.dep ) + "=" + dep3desc.nrec + ( dep3desc.rank2 ? "*": "" );
+                        } else if ( rank>3 ) {
+                            desc += ",...";
                         }
+                    } else if ( rank>2 ) {
+                        desc += ",...";
                     }
                 } else if ( rank>1 ) {
                     desc += ","+DataSourceUtil.strjoin( dims, ",");
