@@ -550,8 +550,10 @@ public class LogConsole extends javax.swing.JPanel {
      * remove this hook for listening to stdout and stderr messages.
      */
     public synchronized void undoLogConsoleMessages() {
-        System.setOut(oldStdOut);
-        System.setErr(oldStdErr);
+        if ( oldStdOut!=null ) 
+            System.setOut(oldStdOut);
+        if ( oldStdErr!=null )
+            System.setErr(oldStdErr);
     }
 
     /**
