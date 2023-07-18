@@ -546,6 +546,9 @@ public class LogConsole extends javax.swing.JPanel {
         System.setErr(new PrintStream(los, true));
     }
 
+    /**
+     * remove this hook for listening to stdout and stderr messages.
+     */
     public synchronized void undoLogConsoleMessages() {
         System.setOut(oldStdOut);
         System.setErr(oldStdErr);
