@@ -2204,6 +2204,7 @@ APSplash.checkTime("init 52.9");
                 org.das2.util.LoggerManager.logGuiEvent(ev);
                 if ( AppManager.getInstance().requestQuit() ) {
                     AutoplotUI.this.dispose();
+                    if ( logConsole!=null ) logConsole.undoLogConsoleMessages();
                     AppManager.getInstance().quit();
                 }
             }
@@ -4757,6 +4758,7 @@ private void updateFrameTitle() {
 
             if ( app!=null ) app.setStatus( READY_MESSAGE );
             if ( quit ) { 
+                if ( app!=null && app.logConsole!=null ) app.logConsole.undoLogConsoleMessages();
                 AppManager.getInstance().quit();
             }
         } catch ( IOException ex ) {
