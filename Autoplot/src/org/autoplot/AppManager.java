@@ -30,6 +30,11 @@ public class AppManager {
     
     private static AppManager instance;
 
+    private AppManager() {
+        
+    }
+    
+    
     public synchronized static AppManager getInstance() {
         if ( instance==null ) {
             instance= new AppManager();
@@ -102,8 +107,34 @@ public class AppManager {
         return this.apps.get(i);
     }
 
+    private boolean allowExit=true;
+    
+    /**
+     * if true, then the ApplicationManager may explicitly call System.exit.
+     * @return 
+     */
+    public boolean isAllowExit() {
+        return allowExit;
+    }
+    
+    /**
+     * some applications, like web applications and using Autoplot within Python, need to disable quitting 
+     * so that System.exit is not called.  Note that once an application does not allow quitting, it can 
+     * not be turned back on.
+     * @param allowExit 
+     */
+    public void setAllowExit( boolean allowExit ) {
+        if ( !this.allowExit && allowExit ) throw new IllegalArgumentException("allowExit cannot be turned on");
+        this.allowExit= allowExit;
+    }
+      
+    /**
+     * quit with the exit status of 0.
+     */
     public void quit(  ) {
-        System.exit(0); //TODO: findbugs DM_EXIT--and I wonder what happens when Autoplot is used on a Tomcat web server?  Otherwise this is appropriate for swing apps.
+        if ( this.allowExit ) {
+            System.exit(0); //TODO: findbugs DM_EXIT--and I wonder what happens when Autoplot is used on a Tomcat web server?  Otherwise this is appropriate for swing apps.
+        }
     }
     
     /**
@@ -111,7 +142,9 @@ public class AppManager {
      * @param status 
      */
     public void quit( int status ) {
-        System.exit(status); //TODO: findbugs DM_EXIT--and I wonder what happens when Autoplot is used on a Tomcat web server?  Otherwise this is appropriate for swing apps.
+        if ( this.allowExit ) {
+            System.exit(status); //TODO: findbugs DM_EXIT--and I wonder what happens when Autoplot is used on a Tomcat web server?  Otherwise this is appropriate for swing apps.
+        }
     }
     
 
