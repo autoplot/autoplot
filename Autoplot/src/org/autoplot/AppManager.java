@@ -176,7 +176,7 @@ public class AppManager {
         if ( closeCallbacks==null ) return true;
         for ( Entry<String,CloseCallback> ent: closeCallbacks.entrySet() ) {
             try {
-                if ( app instanceof Frame ) GuiSupport.raiseApplicationWindow( (Frame)app );
+                if ( app instanceof Frame && ((Frame)app).isDisplayable() ) GuiSupport.raiseApplicationWindow( (Frame)app );
                 okay= okay && ent.getValue().checkClose();
             } catch ( Exception e ) {
                 Object parent = this.apps.size()>0 ? this.apps.get(0) : null;
