@@ -114,7 +114,7 @@ public class AppManager {
      * @return 
      */
     public boolean isAllowExit() {
-        return allowExit;
+        return allowExit; 
     }
     
     /**
