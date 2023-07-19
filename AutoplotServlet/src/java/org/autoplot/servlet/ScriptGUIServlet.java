@@ -255,7 +255,8 @@ public class ScriptGUIServlet extends HttpServlet {
             
         } else {
 
-            key= String.format( "%06d", (int)( Math.random() * 100000 ) );
+            // key= String.format( "%06d", (int)( Math.random() * 100000 ) );
+            key = String.format( "%010d", Math.abs(sparams.hashCode()) );
 
             writeParametersForm(key, response, pwd, script, ssparams, name, scriptURI, sparams);
             
@@ -277,10 +278,30 @@ public class ScriptGUIServlet extends HttpServlet {
             }
             
             if ( runScript ) {
+                existingImageFile = getKeyFile( key, ".png.t" );
+                if ( existingImageFile.exists() ) {
+                    long ageMillis= t0 - existingImageFile.lastModified();
+                    if ( ageMillis<3600000 ) {
+                        runScript= false;
+                    }
+                }
+            }
+            
+            if ( runScript ) {
                 // create empty new files for placeholders.
                 File textKeyFile= getKeyFile( key, ".txt.t" );
+                if ( textKeyFile.exists() ) {
+                    if ( !textKeyFile.delete() ) {
+                        throw new IllegalArgumentException("unable to delete temporary key file.  Please refresh to try again.");
+                    }
+                }
                 if ( !textKeyFile.createNewFile() ) throw new IllegalArgumentException("unable to create file: "+textKeyFile);
                 File imageKeyFile =  getKeyFile( key, ".png.t" );
+                if ( imageKeyFile.exists() ) {
+                    if ( !imageKeyFile.delete() ) {
+                        throw new IllegalArgumentException("unable to delete temporary image file.  Please refresh to try again.");
+                    }
+                }
                 if ( !imageKeyFile.createNewFile() ) throw new IllegalArgumentException("unable to create file: "+imageKeyFile);
         
                 startScript( request, key, scriptURI, script, name, ss, pwd );
@@ -539,7 +560,7 @@ public class ScriptGUIServlet extends HttpServlet {
         
     }
     
-    private void startScript( HttpServletRequest request, String key, String scriptURI, String script, String name, String[] aaparams, String pwd) throws IOException {
+    private synchronized void startScript( HttpServletRequest request, String key, String scriptURI, String script, String name, String[] aaparams, String pwd) throws IOException {
         
         File scriptLogArea= new File( ServletUtil.getServletHome(), "log" );
         if ( !scriptLogArea.exists() ) {
@@ -601,6 +622,8 @@ public class ScriptGUIServlet extends HttpServlet {
 
         BufferedImage baseImage = c.getImage(width,height);
         
+        boolean success= false;
+        
         try ( OutputStream baos= new FileOutputStream( consoleKeyFile, true ) ) {
             runScript( dom,
                 new ByteArrayInputStream(script.getBytes("UTF-8")),
@@ -608,29 +631,46 @@ public class ScriptGUIServlet extends HttpServlet {
                 name,
                 aaparams,
                 pwd );
+            success= true;
         } catch ( Exception ex ) {
             try ( PrintWriter write= new PrintWriter( new FileWriter( consoleKeyFile, true ) ) ) {
                 ex.printStackTrace(write);
             }
         }
 
-        File imageKeyFile =  getKeyFile( key, ".png.t" );
-        try ( FileOutputStream out= new FileOutputStream( imageKeyFile, true ) ) {
-            Map<String,Object> params= new LinkedHashMap<>();
-            for ( int i=0; i<aaparams.length; i++ ) {
-                String p= aaparams[i];
-                if ( p.startsWith("script=") ) continue;
-                int ieq= p.indexOf("=");
-                if ( ieq>-1 ) params.put( p.substring(0,ieq), p.substring(ieq+1) );
+        if ( success ) {
+            File imageKeyFile =  getKeyFile( key, ".png.t" );
+            try ( FileOutputStream out= new FileOutputStream( imageKeyFile, true ) ) {
+                Map<String,Object> params= new LinkedHashMap<>();
+                for ( int i=0; i<aaparams.length; i++ ) {
+                    String p= aaparams[i];
+                    if ( p.startsWith("script=") ) continue;
+                    int ieq= p.indexOf("=");
+                    if ( ieq>-1 ) params.put( p.substring(0,ieq), p.substring(ieq+1) );
+                }
+                String suri= URISplit.format( "script", scriptURI, params );
+                writeToPng(dom, suri, baseImage, out );
             }
-            String suri= URISplit.format( "script", scriptURI, params );
-            writeToPng(dom, suri, baseImage, out );
-        }
-        if ( !imageKeyFile.renameTo( getKeyFile( key, ".png" ) ) ) {
-            throw new IllegalArgumentException("unable to rename file (.png)");
-        }
-        if ( !consoleKeyFile.renameTo( getKeyFile( key, ".txt" ) ) ) {
-            throw new IllegalArgumentException("unable to rename file (.txt)");
+            if ( !imageKeyFile.renameTo( getKeyFile( key, ".png" ) ) ) {
+                throw new IllegalArgumentException("unable to rename file (.png)");
+            }
+            if ( !consoleKeyFile.renameTo( getKeyFile( key, ".txt" ) ) ) {
+                throw new IllegalArgumentException("unable to rename file (.txt)");
+            }
+            
+        } else {
+            // clean up after ourselves...
+            File imageKeyFile =  getKeyFile( key, ".png.t" );
+            boolean throwException=false;
+            if ( ! imageKeyFile.delete() ) {
+                throwException= true;
+            } 
+            if ( !consoleKeyFile.delete() ) {
+                throwException= true;
+            }
+            if ( throwException ) {
+                throw new IOException("unable to delete png or console output, someone will have to deal with this...");
+            }
         }
         
         long elapsedTime= System.currentTimeMillis()-t0;
