@@ -1413,6 +1413,10 @@ public class ScriptPanelSupport {
     public static int markChanges( EditorAnnotationsSupport support, File fln ) throws IOException, InterruptedException {
 
         GitCommand.GitResponse diffOutput = new GitCommand(fln.getParentFile()).diff(fln);
+        if ( diffOutput.getExitCode()!=0 ) {
+            JOptionPane.showMessageDialog( null, diffOutput.getErrorResponse() );
+            return 0;
+        }
                 
         Patch<String> deltas = UnifiedDiffUtils.parseUnifiedDiff( Arrays.asList( diffOutput.getResponse().split("\n") ) );
 
