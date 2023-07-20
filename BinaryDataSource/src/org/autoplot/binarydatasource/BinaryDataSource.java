@@ -344,7 +344,7 @@ public class BinaryDataSource extends AbstractDataSource {
                 MutablePropertyDataSet dep0ds= new AbstractRank1DataSet(frecCount) {
                     @Override
                     public double value(int i) {
-                        return offset + finalRecOffset + i * finalRecSizeBytes;
+                        return offset + finalRecOffset + ((long)i) * finalRecSizeBytes;
                     }
                 };
                 dep0ds.putProperty( QDataSet.CADENCE, DataSetUtil.asDataSet((double)recSizeBits/8) );
