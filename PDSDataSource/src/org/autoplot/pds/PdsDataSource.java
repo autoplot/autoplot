@@ -28,6 +28,10 @@ import javax.xml.xpath.XPathFactory;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
+import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.DatumUtil;
+import org.das2.datum.NumberUnits;
+import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.qds.ArrayDataSet;
@@ -97,20 +101,31 @@ public class PdsDataSource extends AbstractDataSource {
                     dsb.setUnits(i, Units.us2000);
                     break;
                     //TODO: create timeparser 
+                case ASCII_STRING:
+                    dsb.setUnits(i, Units.nominal(fieldDescription.getName()) );
                 default:
                     dsb.setUnits(i, Units.dimensionless ); // TODO: how to get "unit" from label
             }
         }
         
+        boolean doTimeCheck= true; // allow ASCII_STRING to contain times, flipping from nominal units to time location units.
+        
         TableRecord r;
         while ( ( r= t.readNext())!=null ) {
             for ( int i=0; i<ncols; i++ ) {
                 try {
+                    if ( doTimeCheck ) {
+                        String s= r.getString(icols[i]+1);
+                        if ( DatumRangeUtil.parseISO8601(s)!=null && !( dsb.getUnits(i) instanceof NumberUnits ) ) {
+                            dsb.setUnits( i, Units.us2000 );
+                        }
+                    }
                     dsb.putValue( -1, i, r.getString(icols[i]+1) );
                 } catch (ParseException ex) {
                     dsb.putValue( -1, i, dsb.getUnits(i).getFillDatum() );
                 }
             }
+            doTimeCheck= false;
             dsb.nextRecord();
         }
         
