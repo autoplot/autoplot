@@ -132,13 +132,30 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
         for ( TableObject t : label.getObjects( TableObject.class) ) {
             //TODO: can there be more than one table?
             for ( FieldDescription fd: t.getFields() ) {
-                result.put( fd.getName(), fd.getName() );
+                result.put( fd.getName(), fd.getName() + " of a table" );
             }
         }
         
+        DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
+        domFactory.setNamespaceAware(false);
+        DocumentBuilder builder = domFactory.newDocumentBuilder();
+        Document doc = builder.parse(xmlfile);
+        
         for ( ArrayObject a: label.getObjects(ArrayObject.class) ) {
             //result.put( a.getName(), a.getDescription() ); //TODO: update PDS4 library
-            result.put( a.getName(), a.getName() );
+            String n= a.getName();
+            XPathExpression xp= XPathFactory.newInstance().newXPath().compile(
+                "//Product_Observational/File_Area_Observational/Array[name='"+n+"']");
+            org.w3c.dom.Node n1= (org.w3c.dom.Node)xp.evaluate(doc,XPathConstants.NODE);
+            XPathExpression xp2= XPathFactory.newInstance().newXPath().compile(
+                "Axis_Array/axis_name/text()");
+                
+            org.w3c.dom.NodeList nn= (org.w3c.dom.NodeList)xp2.evaluate(n1,XPathConstants.NODESET);
+            String[] ss= new String[nn.getLength()];
+            for ( int i=0; i<ss.length; i++ ) {
+                ss[i]= nn.item(i).getTextContent();
+            }
+            result.put( a.getName(), a.getName() + " ("+ String.join(",", ss)+")");
         }
         
         return result;

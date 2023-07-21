@@ -197,7 +197,7 @@ public class PdsDataSource extends AbstractDataSource {
      * This currently assumes the first node with this axisName is the 
      * independent axis.
      * 
-     * For example, with https://space.physics.uiowa.edu/voyager/data/voyager-2-pws-wf/data/1987/vg2_pws_wf_1987-04-21T17_v0.9.xml,
+     * For example, with https://space.physics.uiowa.edu/voyager/data/voyager-2-pws-wf/data/1987/vg2_pws_wf_1987-04-21T17_v1.0.xml,
      * if axisName=='time' then the result will be "Epoch"
      * 
      * This shows where this logic fails:
@@ -206,7 +206,7 @@ public class PdsDataSource extends AbstractDataSource {
      * 
      * @param doc the xml document
      * @param axisName the axis name
-     * @return the independent variable for the axis.
+     * @return null or the independent variable for the axis.
      * @throws javax.xml.xpath.XPathExpressionException
      */
     public static String resolveIndependentAxis( Document doc, String axisName ) throws XPathExpressionException {
@@ -230,9 +230,16 @@ public class PdsDataSource extends AbstractDataSource {
                 }
             }
             Node o=  oo.item(best);
-            String name = (String)xpath.evaluate( "name", o, XPathConstants.STRING );
+
+            String axes= (String)xpath.evaluate( "axes", o, XPathConstants.STRING );
             
-            return name;
+            if ( Integer.parseInt(axes)==1 ) {
+                String name = (String)xpath.evaluate( "name", o, XPathConstants.STRING );
+                return name;
+            } else {
+                return null;
+            }
+            
         }
         
         return null;
@@ -271,7 +278,7 @@ public class PdsDataSource extends AbstractDataSource {
                 String n2= resolveIndependentAxis( doc, axisNames.get(2) );
                 depend= new LinkedList<>(depend);
                 depend.add(0,n1);
-                if ( !n2.equals(name) ) {
+                if ( n2!=null && !n2.equals(name) ) {
                     depend.add(1,n2);
                 }
             } else if ( axisNames.get(1)!=null ) {
