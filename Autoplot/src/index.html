@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Color picker used to get just the right purple for old Apollo12 data from CDAWeb.
+        <p><small>Autoplot celebrates Iowa's <a href="https://ragbrai.com/">RAGBRAI</a>'s 50th Year.  Images from <a href='https://www.nationalgeographic.com/adventure/article/bike-ragbrai-iowa'>National Geographic</a> and <a href="https://ragbrai.com/maps/">ragbrai.com</a>.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -29,6 +29,11 @@
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
         <p>Bugfixes (2023-07-20 r27090):</p>
+        <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2533/">2533</a>: don't display warning message "slice on non-qube, dep1 has rank=2" when BINS_1="min,max" is used. 
+            <li>PDS4 variable dimensions are shown in GUI.
+        </ul>
+        <p>Older Bugfixes (2023-07-20 r27090):</p>
         <ul> 
             <li>indicate the error message when git diff results in error.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2530/">2530</a> AppManager can be told that no remaining applications state should not force System.exit, to support spawn from native Python.
@@ -40,37 +45,18 @@
             <li>improve error when "home/jbf/..." is used my mistake, instead of "/home/jbf/..."
             <li>accum function preserves timetags, to match diff function.
         </ul>
-        <p>Older Bugfixes (2023-06-15 r27057):</p>
-        <ul>
-            <li>remove extra quotes which sometimes appear in script arguments but should not be sent to scripts.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2522/">2522</a>: correction to bounds renderer, where setColor for the lines was removed with refactoring.
-            <li>export to CSV checks for FORMAT in QDataSet, just like other ASCII formatters.
-            <li>correction to Run Batch Tool when running in parallel (shift+Go), where constant parameters were not set.
-            <li>catch exception in ASCII GUI editor which would result in locking the inspect button.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2522/">2522</a>: support fillTexture in SeriesRenderer.
-            <li>tweak the message where FFTPower complains because it doesn't have the timetags.
-            <li>HAPI specialized code for gzip is removed.  They way I was doing this by hand broke the progress feedback, and Java can do this itself if it wants.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2519">2519</a>: CSV ASCII files can contain empty last column for comments.</li>
-            <li>Annotation plotId property can be reset to "".
-            <li>limit warnings about irregular timetags with FFTPower.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2221">2221</a>: Ivar pointed out where a warning for LBL_PTR_1 length was incorrect.
-            <li><a href="https://github.com/das-developers/das2java/issues/51">51</a>: Corrections to LogLin ticks labeling.
-        </ul>
         <p>Features:</p>
         <ul>
+            <li><a href="https://github.com/das-developers/das2java/issues/66">66</a>: add LegendPosition.OutsideSE so support Jim and 1-em-height events bars
+            <li><a href="https://github.com/das-developers/das2java/issues/65">65</a>: add new tcaRows property, which allocates space for ephemeris before ephemeris is loaded.
+            <li><a href="https://github.com/das-developers/das2java/issues/64">64</a>: add new xname and yname properties so the DataPointRecorder can name x and y columns.
+        </ul>
+        <p>Less recent features:</p>
+        <ul> 
             <li>allow PDS4 ASCII_STRING to contain ISO8601 times, to support CASSINI CAPS ELS data.
             <li><a href="https://github.com/das-developers/das2java/issues/61">61</a>: add "glow" property to annotations to provide contrast when no background is used.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/567/">567</a>: add some support for matrix operators.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/807/">807</a>: save vap checkbox to make local file references relative to .vap file location.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li><a href="https://github.com/das-developers/das2java/issues/59">59</a>: data point recorder supports load of Autoplot's export-to-csv files.
-            <li>new timeShift operator shifts the timetags to correct for non-GMT times.
-            <li><a href="https://github.com/das-developers/das2java/issues/59">59</a>: data point recorder can save its data as CSV.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/806/">806</a>: preserve setStatus messages issued at the end of the script, not clobbering it with "done executing script" message.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/803/">803</a>: more symbols included in "misc" tab of granny string editor, and dialog for picking any html entity added.
-            <li>Orbit number definitions now come from https://github.com/das-developers/das2meta/tree/main/orbits.
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
