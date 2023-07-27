@@ -57,7 +57,7 @@ public class Test023 {
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
             doTest( 0, "file:///home/jbf/ct/hudson/data.backup/h5/SourceAcronym_Subset1-1-v0.h5?ExtendibleArray" );
-            doTest( 1, "file:///home/jbf/ct/hudson/data/ncml/ap_service_provider_agg.ncml?Elastischer_Modul" );
+            //doTest( 1, "file:///home/jbf/ct/hudson/data/ncml/ap_service_provider_agg.ncml?Elastischer_Modul" ); // drop support for ncml
 
             System.exit(0);  // TODO: something is firing up the event thread
         } catch ( Exception ex ) {
