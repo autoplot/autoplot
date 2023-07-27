@@ -339,7 +339,12 @@ public class CDAWebDataSource extends AbstractDataSource {
                 if ( dep1p!=null && dep1p.containsKey("NAME") && result.rank()>1 ) {
                     String dep1= (String)dep1p.get("NAME");
                     String master= db.getMasterFile( ds.toUpperCase(), new NullProgressMonitor() );
-                    DataSource masterSource= fileDataSourceFactory.getDataSource( DataSetURI.getURI( master+"?"+dep1+"[0]&doDep=no" ) );
+                    DataSource masterSource;
+                    if ( master.endsWith(".cdf") ) {
+                        masterSource= new CdfDataSource( DataSetURI.getURI( master+"?"+dep1+"[0]&doDep=no" ) );
+                    } else  {
+                        throw new IllegalArgumentException("master should end in .cdf");
+                    }
                     QDataSet ds1= (MutablePropertyDataSet)masterSource.getDataSet( new NullProgressMonitor() );
                     result= Ops.putProperty( result, QDataSet.DEPEND_1, ds1 );
                 }
