@@ -29,11 +29,13 @@ import org.autoplot.datasource.URISplit;
 import static org.autoplot.netCDF.NetCDFDataSourceFactory.checkMatlab;
 import ucar.ma2.DataType;
 import ucar.nc2.Attribute;
+import ucar.nc2.AttributeContainer;
 import ucar.nc2.Dimension;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Structure;
 import ucar.nc2.Variable;
 import ucar.nc2.dataset.NetcdfDataset;
+import ucar.nc2.dataset.NetcdfDatasets;
 
 /**
  * Editor panel for HDF5 files.
@@ -458,27 +460,32 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
             String resource= fileName;
             
             checkMatlab( resource );
-            NetcdfFile f= NetcdfFile.open( resource );
-            NetcdfDataset dataset= new NetcdfDataset( f );
+            //NetcdfFile f= NetcdfFile.open( resource );
             
-            vars= (List<Variable>)dataset.getVariables();
-            dataset.close();
+            try (NetcdfDataset dataset = NetcdfDatasets.openDataset( resource ) ) {
+                vars= (List<Variable>)dataset.getVariables();
+            }
             
             allParameterInfo= new LinkedHashMap<>(vars.size());
                     
             for (Variable v : vars) {
+                
                 if ( v.getDimensions().isEmpty() ) continue;
+                
+                String name= v.getFullName();
+                
                 if ( v instanceof Structure ) {
                     
                     for ( Variable v2: ((Structure) v).getVariables() ) {
                         if ( !v2.getDataType().isNumeric() ) continue;
-                        StringBuilder description= new StringBuilder( v2.getName()+"[" );
+                        String v2name = v2.getFullName();
+                        StringBuilder description= new StringBuilder( v2name+"[" );
                         for ( int k=0; k<v2.getDimensions().size(); k++ ) {
                             Dimension d= v2.getDimension(k);
                             if ( k>0 ) description.append(",");
                             try {
                                 String n= d.getName();
-                                if ( n!=null && !n.equals(v2.getName()) ) {
+                                if ( n!=null && !n.equals(v2name) ) {
                                     description.append(d.getName()).append("=");
                                 }
                                 description.append(d.getLength());
@@ -488,23 +495,23 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                         }
                         description.append("]");
                         
-                        parameters.put( v2.getName(), description.toString() );
+                        parameters.put( v2name, description.toString() );
                     }
                     
                 } else {
                 
                     boolean isFormattedStringsOrTime= v.getDataType()==DataType.CHAR && v.getRank()==2;
                     if ( isFormattedStringsOrTime ) {
-                        logger.log(Level.FINE, "detected formatted time: {0}", v.getName());
+                        logger.log(Level.FINE, "detected formatted time: {0}", name);
                     }
                     if ( !isFormattedStringsOrTime && !v.getDataType().isNumeric() ) continue;
-                    StringBuilder description= new StringBuilder( v.getName()+"[" );
+                    StringBuilder description= new StringBuilder( v.getFullName()+"[" );
                     for ( int k=0; k<v.getDimensions().size(); k++ ) {
                         Dimension d= v.getDimension(k);
                         if ( k>0 ) description.append(",");
                         try {
                             String n= d.getName();
-                            if ( n!=null && !n.equals(v.getName()) ) {
+                            if ( n!=null && !n.equals(name) ) {
                                 description.append(d.getName()).append("=");
                             }
                             description.append(d.getLength());
@@ -515,22 +522,22 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                     description.append("]");
                     
                     // begin small kludge for CDAWeb.
-                    List<Attribute> as= v.getAttributes();
-                    for ( Attribute a: as ) {
+                    AttributeContainer ac= v.attributes();
+                    for ( Attribute a: ac ) {
                         if ( a.getName().equals("CATDESC") ) {
                             description.append("<br>").append(a.getStringValue());
                         }
                     }
                     // end small kludge for CDAWeb.
                     
-                    parameters.put( v.getName(), description.toString() );
+                    parameters.put( name, description.toString() );
                     
                 }
                 
                 StringBuilder info= new StringBuilder();
                 info.append(v.getDescription());
                 
-                allParameterInfo.put( v.getName(), info.toString() );
+                allParameterInfo.put( name, info.toString() );
             }
 
             //String label= "Select Parameter (%d parameters):";

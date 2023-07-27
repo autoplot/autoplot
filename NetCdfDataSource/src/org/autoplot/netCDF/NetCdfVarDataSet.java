@@ -30,6 +30,7 @@ import ucar.ma2.InvalidRangeException;
 import ucar.ma2.Range;
 import ucar.nc2.Variable;
 import ucar.nc2.Attribute;
+import ucar.nc2.AttributeContainer;
 import ucar.nc2.dataset.NetcdfDataset;
 
 /**
@@ -306,7 +307,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         mon.setProgressMessage("reading attributes");
 
         logger.finer("v.getAttributes()");
-        List attrs= v.getAttributes();
+        AttributeContainer attrs= v.attributes();
         for ( Iterator i= attrs.iterator(); i.hasNext(); ) {
             Attribute attr= (Attribute) i.next();
             if ( !attr.isArray() ) {
@@ -338,6 +339,11 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         if ( attributes.containsKey("units") ) {
             String unitsString= (String)attributes.get("units");
             
+            // try to find time_base, which is aparently case-insensitive
+            Object otb= attributes.get("TIME_BASE");
+            if ( otb==null ) otb= attributes.get("Time_Base");
+            String tb= otb==null ? null : otb.toString();
+            
             if ( unitsString.contains(" since ") ) {
                 Units u;
                 try {
@@ -348,6 +354,15 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                 
                 properties.put( QDataSet.UNITS, u );
                 properties.put( QDataSet.MONOTONIC, Boolean.TRUE );
+            } else if ( Units.lookupUnits(unitsString).isConvertibleTo(Units.seconds) && tb!=null ) {
+                if ( tb.equals("FIXED: 1970 (POSIX)") ) {
+                    try {
+                        properties.put( QDataSet.UNITS, Units.lookupTimeUnits( unitsString + " since 1970" ) );
+                    } catch (ParseException ex) {
+                        throw new RuntimeException(ex); // this shouldn't happen
+                    }
+                }
+                
             } else {
                 properties.put( QDataSet.UNITS, Units.lookupUnits(unitsString) );
             }

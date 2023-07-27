@@ -18,10 +18,12 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.LoggerManager;
@@ -262,6 +264,13 @@ public class NetCDFDataSourceFactory extends AbstractDataSourceFactory implement
 
             int depCount=0; // number of dependent variables--If there's just one, then we needn't identify it
             List<Variable> vars= (List<Variable>)dataset.getVariables();
+         
+            Set<Variable> coordVars= new HashSet<>();
+            for ( Variable var : vars ) {
+                if (var.isCoordinateVariable()) {
+                    coordVars.add(var);
+                }
+            }
             
             String svariable= (String)params.get("arg_0");
             
@@ -285,19 +294,20 @@ public class NetCDFDataSourceFactory extends AbstractDataSourceFactory implement
                 if ( v instanceof Structure ) {
                     for ( Variable v2: ((Structure) v).getVariables() ) {
                         if ( !v2.getDataType().isNumeric() ) continue;
-                        if ( v2.getName().replaceAll(" ","+").equals( svariable) ) haveIt= true;
+                        if ( v2.getFullName().replaceAll(" ","+").equals( svariable) ) haveIt= true;
                     }
                                         
                 } else {
-                    List l= v.getDimension(0).getCoordinateVariables();
-                    if ( l.size()>1 ) throw new IllegalArgumentException("Huh?");
-                    for ( int i=0; i<l.size(); i++ ) {
-                        Variable dv= (Variable) l.get(0);
-                        if ( dv!=v ) {
-                            depCount++;
-                        }
-                    }
-                    if ( v.getName().replaceAll(" ", "+").equals(svariable) ) haveIt= true;
+                    //TODO: something with coordVars?  I don't follow this code...
+                    //List l= v.getDimension(0).getCoordinateVariables();
+                    //if ( l.size()>1 ) throw new IllegalArgumentException("Huh?");
+                    //for ( int i=0; i<l.size(); i++ ) {
+                    //    Variable dv= (Variable) l.get(0);
+                    //    if ( dv!=v ) {
+                    //        depCount++;
+                    //    }
+                    //}
+                    if ( v.getFullName().replaceAll(" ", "+").equals(svariable) ) haveIt= true;
                 }
             }
 
