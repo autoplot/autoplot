@@ -290,10 +290,10 @@ for i in `cat ../temp-classes/META-INF/org.autoplot.datasource.DataSourceEditorP
    compilef $i.java
 done
 
-# NetCDF IOServiceProvider allows Autoplot URIs to be used in ncml files.
-echo "compile AbstractIOSP and APIOServiceProvider"
-compilef org/autoplot/netCDF/AbstractIOSP.java
-compilef org/autoplot/netCDF/APIOServiceProvider.java
+## NetCDF IOServiceProvider allows Autoplot URIs to be used in ncml files.
+#echo "compile AbstractIOSP and APIOServiceProvider"
+#compilef org/autoplot/netCDF/AbstractIOSP.java
+#compilef org/autoplot/netCDF/APIOServiceProvider.java
 
 cd ..
 echo "done compile sources."
