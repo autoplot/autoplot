@@ -28,8 +28,10 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-07-26 r27096):</p>
+        <p>Bugfixes (2023-07-27 r27096):</p>
         <ul>
+            <li>NetCDF library updated to support CDAWeb's ICON_l2-5_FUV_NIGHT.  Thanks, Gilda!
+            <li>QDataSet equivalent checks to see that the same indices are fill and valid.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2533/">2533</a>: don't display warning message "slice on non-qube, dep1 has rank=2" when BINS_1="min,max" is used. 
             <li>PDS4 variable dimensions are shown in GUI.
         </ul>
