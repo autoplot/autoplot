@@ -24,6 +24,7 @@ import org.das2.qds.ops.Ops;
 import org.autoplot.metatree.IstpMetadataModel;
 import org.autoplot.metatree.MetadataUtil;
 import org.das2.datum.EnumerationUnits;
+import org.das2.datum.TimeUtil;
 import org.das2.datum.UnitsUtil;
 import ucar.ma2.DataType;
 import ucar.ma2.InvalidRangeException;
@@ -338,7 +339,9 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         
         if ( attributes.containsKey("units") ) {
             String unitsString= (String)attributes.get("units");
-            
+            if ( "milliseconds".equalsIgnoreCase(unitsString) ) {
+                unitsString= Units.milliseconds.toString();
+            }
             // try to find time_base, which is aparently case-insensitive
             Object otb= attributes.get("TIME_BASE");
             if ( otb==null ) otb= attributes.get("Time_Base");
@@ -360,6 +363,12 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                         properties.put( QDataSet.UNITS, Units.lookupTimeUnits( unitsString + " since 1970" ) );
                     } catch (ParseException ex) {
                         throw new RuntimeException(ex); // this shouldn't happen
+                    }
+                } else if ( tb.equals("1970-01-01 00:00:00.000 UTC") ) {
+                    try {
+                        properties.put( QDataSet.UNITS, Units.lookupTimeUnits( unitsString + " since 1970-01-01T00:00Z" ) );
+                    } catch (ParseException ex) {
+                        Logger.getLogger(NetCdfVarDataSet.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
                 
