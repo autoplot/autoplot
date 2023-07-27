@@ -251,7 +251,7 @@ public class Test019 {
     }
     
     public static void testFileSystemListing() throws FileNotFoundException, FileSystem.FileSystemOfflineException, UnknownHostException, IOException {
-        FileSystem fs= FileSystem.create("https://emfisis-soc.physics.uiowa.edu/~jbf/20130912/");
+        FileSystem fs= FileSystem.create("https://cottagesystems.com/~jbf/autoplot/dan/");
         String[] ss= fs.listDirectory("/");
         FileObject fo= fs.getFileObject(ss[0]);
         System.err.println( fo.getSize() );
