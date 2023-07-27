@@ -399,13 +399,17 @@ public class CDAWebDataSource extends AbstractDataSource {
                 MutablePropertyDataSet dep0= (MutablePropertyDataSet) result.property(QDataSet.DEPEND_0);
                 if ( dep0!=null && range!=null ) {
                     Units dep0units= (Units) dep0.property(QDataSet.UNITS);
-                    dep0= Ops.putProperty( dep0, QDataSet.TYPICAL_MIN, range.min().doubleValue(dep0units) );
-                    dep0= Ops.putProperty( dep0, QDataSet.TYPICAL_MAX, range.max().doubleValue(dep0units) );
+                    if ( range.getUnits().isConvertibleTo(dep0units) ) {
+                        dep0= Ops.putProperty( dep0, QDataSet.TYPICAL_MIN, range.min().doubleValue(dep0units) );
+                        dep0= Ops.putProperty( dep0, QDataSet.TYPICAL_MAX, range.max().doubleValue(dep0units) );
+                    }
                     dep0= Ops.putProperty( dep0, QDataSet.CACHE_TAG, new CacheTag(range,null) );
                     try {
                         DatumRange extent= Ops.datumRange( CDAWebDB.getInstance().getTimeRange(ds) );
-                        dep0= Ops.putProperty( dep0, QDataSet.VALID_MIN, extent.min().doubleValue(dep0units) );
-                        dep0= Ops.putProperty( dep0, QDataSet.VALID_MAX, extent.max().doubleValue(dep0units) );
+                        if ( extent.getUnits().isConvertibleTo(dep0units) ) {
+                            dep0= Ops.putProperty( dep0, QDataSet.VALID_MIN, extent.min().doubleValue(dep0units) );
+                            dep0= Ops.putProperty( dep0, QDataSet.VALID_MAX, extent.max().doubleValue(dep0units) );
+                        }
                     } catch ( IllegalArgumentException ex ) {
                         // do what we did before.
                     }
