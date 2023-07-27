@@ -346,6 +346,12 @@ public class CDAWebDataSource extends AbstractDataSource {
                         throw new IllegalArgumentException("master should end in .cdf");
                     }
                     QDataSet ds1= (MutablePropertyDataSet)masterSource.getDataSet( new NullProgressMonitor() );
+                    int[] qube= DataSetUtil.qubeDims(result);
+                    // kludge for ICON_L25_VER_map_z1
+                    if ( qube.length>1 && qube[1]==ds1.length()-1 && ds1.rank()==1 ) {
+                        logger.info("off-by-one error in DEPEND_1, replacing with findgen");
+                        ds1= Ops.findgen(qube[1]);
+                    }
                     result= Ops.putProperty( result, QDataSet.DEPEND_1, ds1 );
                 }
             }
