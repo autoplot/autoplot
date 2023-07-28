@@ -272,6 +272,9 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         boolean isCoordinateVariable= false;
         
         for ( int ir=0; ir<a.getRank(); ir++ ) {
+            if ( v.getFullName().contains("Temperature") && ir==1 ) { 
+                System.err.println("Here stop Jeremy");
+            }
             if ( !slice[ir] ) {
                 logger.log(Level.FINER, "v.getDimension({0})", ir);
                 ucar.nc2.Dimension d= v.getDimension(ir);
@@ -339,7 +342,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         
         if ( attributes.containsKey("units") ) {
             String unitsString= (String)attributes.get("units");
-            if ( "milliseconds".equalsIgnoreCase(unitsString) ) {
+            if ( "milliseconds".equalsIgnoreCase(unitsString) ) { // vap+cdaweb:ds=ICON_L2-4_FUV_DAY&filter=icon&id=ICON_L24_Disk_Latitude&timerange=2021-11-02+21:01+to+21:30
                 unitsString= Units.milliseconds.toString();
             }
             // try to find time_base, which is aparently case-insensitive
@@ -370,6 +373,8 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                     } catch (ParseException ex) {
                         Logger.getLogger(NetCdfVarDataSet.class.getName()).log(Level.SEVERE, null, ex);
                     }
+                } else {
+                    Logger.getLogger(NetCdfVarDataSet.class.getName()).log(Level.SEVERE, null, "missing support for this time type: "+tb);
                 }
                 
             } else {
