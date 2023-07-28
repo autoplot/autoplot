@@ -377,7 +377,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                     QDataSet labelDs= (MutablePropertyDataSet)labelDss.getDataSet( new NullProgressMonitor() );
                     if ( labelDs!=null ) {
                         if ( labelDs.rank()>1 && labelDs.length()==1 ) labelDs= labelDs.slice(0);
-                        //result= Ops.putProperty( result, QDataSet.BUNDLE_1, DataSetUtil.toBundleDs(labelDs));
+                        result= Ops.putProperty( result, QDataSet.BUNDLE_1, DataSetUtil.toBundleDs(labelDs));
                         //TODO: why doesn't this work?!?!?
                     }
                 }
