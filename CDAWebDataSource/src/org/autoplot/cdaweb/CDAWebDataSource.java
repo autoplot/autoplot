@@ -345,14 +345,20 @@ public class CDAWebDataSource extends AbstractDataSource {
                     } else  {
                         throw new IllegalArgumentException("master should end in .cdf");
                     }
-                    QDataSet ds1= (MutablePropertyDataSet)masterSource.getDataSet( new NullProgressMonitor() );
-                    int[] qube= DataSetUtil.qubeDims(result);
-                    // kludge for ICON_L25_VER_map_z1
-                    if ( qube.length>1 && qube[1]==ds1.length()-1 && ds1.rank()==1 ) {
-                        logger.info("off-by-one error in DEPEND_1, replacing with findgen");
-                        ds1= Ops.findgen(qube[1]);
+                    try { 
+                        // you can't pull non-time-varying records from the master CDF!
+                        QDataSet ds1= (MutablePropertyDataSet)masterSource.getDataSet( new NullProgressMonitor() );
+                        int[] qube= DataSetUtil.qubeDims(result);
+                        // kludge for ICON_L25_VER_map_z1
+                        if ( qube.length>1 && qube[1]==ds1.length()-1 && ds1.rank()==1 ) {
+                            logger.info("off-by-one error in DEPEND_1, replacing with findgen");
+                            ds1= Ops.findgen(qube[1]);
+                        }
+                        result= Ops.putProperty( result, QDataSet.DEPEND_1, ds1 );
+                    } catch ( NoDataInIntervalException ex ) {
+                        logger.info("DEPEND_1 refers to time varying quantity.  (Something went wrong, DEPEND_1 should have been "+
+                                "loaded along with the data");
                     }
-                    result= Ops.putProperty( result, QDataSet.DEPEND_1, ds1 );
                 }
             }
             
