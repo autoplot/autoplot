@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Autoplot celebrates Iowa's <a href="https://ragbrai.com/">RAGBRAI</a>'s 50th Year.  The Great Bike Ride Across Iowa goes 500 miles this year over seven days in typically hot and sticky Iowa weather.  Images from <a href='https://www.nationalgeographic.com/adventure/article/bike-ragbrai-iowa'>National Geographic</a> and <a href="https://ragbrai.com/maps/">ragbrai.com</a>.
+        <p><small>An updated NetCDF library supports ICON files at CDAWeb.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -30,6 +30,9 @@
                 
         <p>Bugfixes (2023-07-27 r27096):</p>
         <ul>
+            <li><a href="https://github.com/das-developers/das2java/issues/68">68</a>: put in a check for self.putProperty('DEPEND_0',self) which would cause strange problems.
+            <li><a href="https://github.com/das-developers/das2java/issues/70">70</a>: support
+            <li>vap+cdaweb:ds=DN_MAGN-L2-HIRES_G17&filter=DN_MA&id=b_eci gets labels from the master CDF file
             <li>NetCDF library updated to support CDAWeb's ICON_l2-5_FUV_NIGHT.  Thanks, Gilda!
             <li>QDataSet equivalent checks to see that the same indices are fill and valid.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2533/">2533</a>: don't display warning message "slice on non-qube, dep1 has rank=2" when BINS_1="min,max" is used. 
@@ -49,6 +52,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>apl_color_quantization colorbar added.
             <li><a href="https://github.com/das-developers/das2java/issues/66">66</a>: add LegendPosition.OutsideSE so support Jim and 1-em-height events bars
             <li><a href="https://github.com/das-developers/das2java/issues/65">65</a>: add new tcaRows property, which allocates space for ephemeris before ephemeris is loaded.
             <li><a href="https://github.com/das-developers/das2java/issues/64">64</a>: add new xname and yname properties so the DataPointRecorder can name x and y columns.
