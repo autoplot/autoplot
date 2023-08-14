@@ -520,7 +520,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
             }
             
-            if ( productFile==null ) {
+            if ( productFile==null && i0>-1 ) {
                 productFile = template.substring(0, i0) + ".vap";
             }
             
