@@ -203,6 +203,11 @@ public final class ContourStylePanel extends javax.swing.JPanel implements PlotS
                 lineThickSpinnerStateChanged(evt);
             }
         });
+        lineThickSpinner.addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+            public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
+                lineThickSpinnerMouseWheelMoved(evt);
+            }
+        });
 
         levelsTextField.setText("0");
         levelsTextField.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -402,6 +407,13 @@ public final class ContourStylePanel extends javax.swing.JPanel implements PlotS
     private void labelOrientationComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_labelOrientationComboBoxItemStateChanged
         update();
     }//GEN-LAST:event_labelOrientationComboBoxItemStateChanged
+
+    private void lineThickSpinnerMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_lineThickSpinnerMouseWheelMoved
+        double n= ((Double)lineThickSpinner.getValue()) + evt.getWheelRotation() * 0.2;
+        if ( n>20 ) n=20;
+        if ( n<0 ) n=0;
+        lineThickSpinner.setValue( n );
+    }//GEN-LAST:event_lineThickSpinnerMouseWheelMoved
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

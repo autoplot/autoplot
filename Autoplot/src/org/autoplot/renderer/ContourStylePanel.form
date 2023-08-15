@@ -186,6 +186,7 @@
           </Properties>
           <Events>
             <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="lineThickSpinnerStateChanged"/>
+            <EventHandler event="mouseWheelMoved" listener="java.awt.event.MouseWheelListener" parameters="java.awt.event.MouseWheelEvent" handler="lineThickSpinnerMouseWheelMoved"/>
           </Events>
         </Component>
         <Component class="javax.swing.JTextField" name="levelsTextField">
