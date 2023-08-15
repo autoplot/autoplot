@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>An updated NetCDF library supports ICON files at CDAWeb.
+        <p><small>Jython editor Static Code Analysis detects where variable is assigned but new value is not used, often a tell-tale sign of a bug.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -30,8 +30,11 @@
                 
         <p>Bugfixes (2023-08-09 r27096):</p>
         <ul>
-            <li><a href="https://github.com/das-developers/das2java/issues/68">68</a>: put in a check for self.putProperty('DEPEND_0',self) which would cause strange problems.
-            <li><a href="https://github.com/das-developers/das2java/issues/70">70</a>: support $Y$m$d_$(H;delta=6) (and MMS files which each contain six hours of data).
+            <li>GitHub/GitLabs ETAGs were used to identify fresh cache files, but not to reload cached files.
+            <li>clean up StringSchemeEditors so that setContext can be used.
+            <li>when PNG Walk was accessed with *.PNG and files of different lengths were used, a runtime error could occur.
+            <li><a href="https://github.com/das-developers/das2java/issues/68">68</a>: put in a check for self.putProperty('DEPEND_0',self) which would cause strange problems.  Thanks, Jim!
+            <li><a href="https://github.com/das-developers/das2java/issues/70">70</a>: support $Y$m$d_$(H;delta=6) (and MMS files which each contain six hours of data).  Thanks, Sadie!
             <li>vap+cdaweb:ds=DN_MAGN-L2-HIRES_G17&filter=DN_MA&id=b_eci gets labels from the master CDF file
             <li>NetCDF library updated to support CDAWeb's ICON_l2-5_FUV_NIGHT.  Thanks, Gilda!
             <li>QDataSet equivalent checks to see that the same indices are fill and valid.
@@ -52,11 +55,13 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>apl_color_quantization colorbar added.
-            <li>improve support for flatten and flattenWaveform to support https://cdaweb.gsfc.nasa.gov/sp_phys/data/psp/fields/l2/dfb_dbm_dvac/
-            <li><a href="https://github.com/das-developers/das2java/issues/66">66</a>: add LegendPosition.OutsideSE so support Jim and 1-em-height events bars
+            <li>sense mouse wheel events on symbolSize and lineThick GUIs, to remove tedium of many mouse clicks.
+            <li>DasAxis format property has a specialized GUI editor now.  Thanks, Jim!
+            <li>apl_color_quantization colorbar added.  Thanks, Jim!
+            <li>improve support for flatten and flattenWaveform to support https://cdaweb.gsfc.nasa.gov/sp_phys/data/psp/fields/l2/dfb_dbm_dvac/.  Thanks, Sadie!
+            <li><a href="https://github.com/das-developers/das2java/issues/66">66</a>: add LegendPosition.OutsideSE so support Jim and 1-em-height events bars.  Thanks, Jim!
             <li><a href="https://github.com/das-developers/das2java/issues/65">65</a>: add new tcaRows property, which allocates space for ephemeris before ephemeris is loaded.
-            <li><a href="https://github.com/das-developers/das2java/issues/64">64</a>: add new xname and yname properties so the DataPointRecorder can name x and y columns.
+            <li><a href="https://github.com/das-developers/das2java/issues/64">64</a>: add new xname and yname properties so the DataPointRecorder can name x and y columns.  Thanks, Bill!
         </ul>
         <p>Less recent features:</p>
         <ul> 
