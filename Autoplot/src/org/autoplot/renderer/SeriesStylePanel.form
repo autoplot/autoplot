@@ -167,6 +167,9 @@
         <Component class="javax.swing.JSpinner" name="lineThickSpinner">
         </Component>
         <Component class="javax.swing.JSpinner" name="symSizeSpinner">
+          <Events>
+            <EventHandler event="mouseWheelMoved" listener="java.awt.event.MouseWheelListener" parameters="java.awt.event.MouseWheelEvent" handler="symSizeSpinnerMouseWheelMoved"/>
+          </Events>
         </Component>
         <Container class="javax.swing.JPanel" name="colorPanel">
 
@@ -270,7 +273,6 @@
         </Component>
         <Component class="javax.swing.JCheckBox" name="showErrorCheckBox">
           <Properties>
-            <Property name="selected" type="boolean" value="false"/>
             <Property name="text" type="java.lang.String" value="Show Error Bars"/>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>

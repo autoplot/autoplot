@@ -224,6 +224,12 @@ public final class SeriesStylePanel extends javax.swing.JPanel implements PlotSt
         jLabel2.setText("Symbol Size:");
         jLabel2.setToolTipText("size of the plot symbols");
 
+        symSizeSpinner.addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+            public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
+                symSizeSpinnerMouseWheelMoved(evt);
+            }
+        });
+
         colorPanel.setLayout(new java.awt.BorderLayout());
 
         jLabel6.setText("Color:");
@@ -269,7 +275,6 @@ public final class SeriesStylePanel extends javax.swing.JPanel implements PlotSt
         fillDirectionComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "above", "below", "both" }));
         fillDirectionComboBox.setSelectedIndex(2);
 
-        showErrorCheckBox.setSelected(false);
         showErrorCheckBox.setText("Show Error Bars");
         showErrorCheckBox.setEnabled(false);
         showErrorCheckBox.addActionListener(new java.awt.event.ActionListener() {
@@ -407,6 +412,14 @@ public final class SeriesStylePanel extends javax.swing.JPanel implements PlotSt
         errorBarStyle.getCustomEditor().setEnabled( enabled );
         styleLabel.setEnabled( enabled );
     }//GEN-LAST:event_showErrorCheckBoxActionPerformed
+
+    private void symSizeSpinnerMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_symSizeSpinnerMouseWheelMoved
+        double n= ((Double)symSizeSpinner.getValue()) + evt.getWheelRotation() * 0.2;
+        if ( n>20 ) n=20;
+        if ( n<0 ) n=0;
+        symSizeSpinner.setValue( n );
+        
+    }//GEN-LAST:event_symSizeSpinnerMouseWheelMoved
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel colorPanel;
