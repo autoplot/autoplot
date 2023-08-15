@@ -224,6 +224,12 @@ public final class SeriesStylePanel extends javax.swing.JPanel implements PlotSt
         jLabel2.setText("Symbol Size:");
         jLabel2.setToolTipText("size of the plot symbols");
 
+        lineThickSpinner.addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+            public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
+                lineThickSpinnerMouseWheelMoved(evt);
+            }
+        });
+
         symSizeSpinner.addMouseWheelListener(new java.awt.event.MouseWheelListener() {
             public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
                 symSizeSpinnerMouseWheelMoved(evt);
@@ -420,6 +426,13 @@ public final class SeriesStylePanel extends javax.swing.JPanel implements PlotSt
         symSizeSpinner.setValue( n );
         
     }//GEN-LAST:event_symSizeSpinnerMouseWheelMoved
+
+    private void lineThickSpinnerMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_lineThickSpinnerMouseWheelMoved
+        double n= ((Double)lineThickSpinner.getValue()) + evt.getWheelRotation() * 0.2;
+        if ( n>20 ) n=20;
+        if ( n<0 ) n=0;
+        lineThickSpinner.setValue( n );
+    }//GEN-LAST:event_lineThickSpinnerMouseWheelMoved
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel colorPanel;

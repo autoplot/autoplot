@@ -165,6 +165,9 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JSpinner" name="lineThickSpinner">
+          <Events>
+            <EventHandler event="mouseWheelMoved" listener="java.awt.event.MouseWheelListener" parameters="java.awt.event.MouseWheelEvent" handler="lineThickSpinnerMouseWheelMoved"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JSpinner" name="symSizeSpinner">
           <Events>
