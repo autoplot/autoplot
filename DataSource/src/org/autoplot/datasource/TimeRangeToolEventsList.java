@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -148,6 +149,27 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
             }
         }
     }
+    
+    private void fillTableWarningMessage( String msg ) {
+        final DefaultTableModel tm;
+        tm= new DefaultTableModel( new String[] { "Range", "Label" }, 3 );        
+        fillWithEmpty( tm );
+        if ( tsb==null ) {
+            tm.setValueAt( msg, 0, 0 );                
+        } else {
+            tm.setValueAt( "Load Previous Set...", 0, 0 );
+            tm.setValueAt( "(" + msg + ")", 0, 0 );    
+            tm.setValueAt( "Load Next Set...", 2, 0 );
+        }
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                jTable1.setModel(tm);
+                jTable1.setDefaultRenderer( Object.class, tableCellRenderer );
+            }
+        });
+    }
+    
     /**
      * populate the list.
      */
@@ -647,6 +669,9 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
                         }
                     }
                     fillList( );
+                } catch ( FileNotFoundException ex ) {
+                    fillTableWarningMessage(ex.getLocalizedMessage());
+                    
                 } catch (Exception ex) {                    
                     throw new RuntimeException(ex);
                 } finally {
