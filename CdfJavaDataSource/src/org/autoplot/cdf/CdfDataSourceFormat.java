@@ -200,7 +200,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                     }
                 } else {
                     String name = (String) dep1.property(QDataSet.NAME);
-                    if ( !namesRev.containsKey(name) ) { 
+                    if ( !namesRev.containsKey(name) ) {  
                         name= nameFor(dep1);
                         Map<String,String> params1= new HashMap<>();
                         try {
