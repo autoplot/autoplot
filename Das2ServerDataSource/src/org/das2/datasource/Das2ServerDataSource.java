@@ -58,6 +58,7 @@ import org.das2.DasException;
 import org.das2.client.AccessDeniedException;
 import org.das2.client.DasServerException;
 import org.das2.datum.DatumVector;
+import org.das2.datum.TimeUtil;
 import org.das2.qds.ops.Ops;
 import org.das2.qstream.QDataSetStreamHandler;
 import org.das2.stream.PacketDescriptor;
@@ -270,8 +271,12 @@ public final class Das2ServerDataSource extends AbstractDataSource {
 
         params2.put("server", "dataset");
         if (timeRange != null) {
-            params2.put("start_time", URLEncoder.encode(timeRange.min().toString(), "US-ASCII"));
-            params2.put("end_time", URLEncoder.encode(timeRange.max().toString(), "US-ASCII"));
+            int[] timemin= TimeUtil.fromDatum( timeRange.min() );
+            timemin[6]= (int)( Math.floor( timemin[6] / 1000000. ) ) * 1000000;
+            int[] timemax= TimeUtil.fromDatum( timeRange.max() );
+            timemax[6]= (int)( Math.ceil( timemax[6] / 1000000. ) ) * 1000000;
+            params2.put("start_time", URLEncoder.encode( TimeUtil.toDatum(timemin).toString(), "US-ASCII"));
+            params2.put("end_time", URLEncoder.encode(  TimeUtil.toDatum(timemax).toString(), "US-ASCII"));
         } else {
             throw new IllegalArgumentException("timeRange is null");
         }
