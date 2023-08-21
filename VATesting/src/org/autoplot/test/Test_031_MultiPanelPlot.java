@@ -52,26 +52,28 @@ public class Test_031_MultiPanelPlot implements Scenario {
         try {
             ScriptContext.createGui();
             
+            System.err.println("here line 55");
             AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
             
             JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
-            
+            System.err.println("here line 59");
             JFrameOperator mainFrame = new JFrameOperator(app);
             
             // wait for the application to be in the "ready" state.
             new JLabelOperator(mainFrame).waitText( AutoplotUI.READY_MESSAGE );
-            
+            System.err.println("here line 63");
             Thread.sleep(500);
             
+            System.err.println("here line 67");
             JMenuBarOperator menuBar = new JMenuBarOperator( mainFrame );
             menuBar.pushMenu("Options|Enable Feature|Layout Panel", "|");
-            
+            System.err.println("here line 70");
             ScriptContext.waitUntilIdle();
-            
+            System.err.println("here line 72");
             new JTabbedPaneOperator( app.getTabs() ).selectPage("layout");
             
             ScriptContext.waitUntilIdle();
-            
+            System.err.println("here line 76");
             JButtonOperator tallerB = new JButtonOperator( mainFrame, "Taller" );
             tallerB.clickMouse(4); // This is the number of clicks, for example 2 is double-click.
             
@@ -83,7 +85,7 @@ public class Test_031_MultiPanelPlot implements Scenario {
             
             JPopupMenuOperator popup = new JPopupMenuOperator();
             popup.pushMenuNoBlock("Plot|Add Plots", "|"); // I think because this is a "modal" dialog.
-            
+            System.err.println("here line 88");
             Thread.sleep(200);
 
             DialogOperator frame = new DialogOperator( new RegexComponentChooser( "Add Plots") );
@@ -100,7 +102,11 @@ public class Test_031_MultiPanelPlot implements Scenario {
                 Thread.sleep(100);  // Why does the press take so long???
             }
             
+            Thread.sleep(1000);
+            
             ScriptContext.plot(1,"vap+fits:http://autoplot.org/data/hsi_qlimg_5050601_001.fits"); // small cheat
+            Thread.sleep(1000);
+            ScriptContext.waitUntilIdle();
             
             //for mac 
             //mainFrame.clickMouse(clickPoint.x+50, clickPoint.y-130); 
