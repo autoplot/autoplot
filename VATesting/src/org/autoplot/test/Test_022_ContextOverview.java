@@ -49,9 +49,9 @@ public class Test_022_ContextOverview implements Scenario {
             AutoplotUI app = (AutoplotUI) getViewWindow();
             JFrameOperator mainFrame = new JFrameOperator(app);
             waitUntilIdle();
-            
+            System.err.println("here line 52");
             JMenuBarOperator menuop= new JMenuBarOperator(mainFrame);
-
+            System.err.println("here line 54");
             JMenuItem check= menuop.pushMenu( 
                     new ComponentChooser[] { new RegexComponentChooser("Bookmarks"),
                     new RegexComponentChooser("Demos"), new RegexComponentChooser("Demo 5: .*") } );
