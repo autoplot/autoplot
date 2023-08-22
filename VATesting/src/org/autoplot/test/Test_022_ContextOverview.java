@@ -55,8 +55,10 @@ public class Test_022_ContextOverview implements Scenario {
             JMenuItem check= menuop.pushMenu( 
                     new ComponentChooser[] { new RegexComponentChooser("Bookmarks"),
                     new RegexComponentChooser("Demos"), new RegexComponentChooser("Demo 5: .*") } );
-
+            
+            System.err.println("here line 59");
             Util.waitUntilBusy(2000,app.getDom());
+            System.err.println("here line 61");
             waitUntilIdle();
 
             DatumRange range0= dom.getPlots(0).getXaxis().getRange();
