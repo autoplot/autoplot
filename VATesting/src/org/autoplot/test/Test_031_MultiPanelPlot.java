@@ -62,9 +62,9 @@ public class Test_031_MultiPanelPlot implements Scenario {
             // wait for the application to be in the "ready" state.
             new JLabelOperator(mainFrame).waitText( AutoplotUI.READY_MESSAGE );
             System.err.println("here line 63");
-            Thread.sleep(500);
+            Thread.sleep(1500);
             
-            System.err.println("here line 67");
+            System.err.println("here line 67, about to add the layout panel");
             JMenuBarOperator menuBar = new JMenuBarOperator( mainFrame );
             menuBar.pushMenu("Options|Enable Feature|Layout Panel", "|");
             System.err.println("here line 70");
