@@ -279,14 +279,16 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
             
             DatumFormatter[] formats= new DatumFormatter[dss.length];
             for ( int jj=0; jj<dss.length; jj++ ) {
-                Units u= SemanticOps.getUnits(dss[jj]);
+                QDataSet dssjj=dss[jj];
+                Units u= SemanticOps.getUnits(dssjj);
                 Units uu_jj=u;
                 formats[jj]= u.getDatumFormatterFactory().defaultFormatter();
                 if ( !( uu_jj instanceof EnumerationUnits ) ) {
                     String ff= bundleDesc!=null ? (String) bundleDesc.property(QDataSet.FORMAT,jj) : null;
                     if ( df.equals("") ) {
                         if ( ff==null ) {
-                            formats[jj]= uu_jj.createDatum(data.value(0,jj)).getFormatter();
+                            double d1= dssjj.rank()==1 ? dssjj.value(0) : dssjj.value(0,0);
+                            formats[jj]= uu_jj.createDatum(d1).getFormatter();
                         } else {
                             formats[jj]= getDataFormatter( ff, uu_jj );
                         }
@@ -302,7 +304,7 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
                         }
                     }
                 } else {
-                    formats[jj]= uu_jj.createDatum(data.value(0,jj)).getFormatter();
+                    formats[jj]= uu_jj.createDatum( dssjj.rank()==1 ? dssjj.value(0) : dssjj.value(0,0) ).getFormatter();
                 }                
             }
 
