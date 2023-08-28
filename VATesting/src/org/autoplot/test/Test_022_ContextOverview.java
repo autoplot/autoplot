@@ -48,6 +48,7 @@ public class Test_022_ContextOverview implements Scenario {
             
             AutoplotUI app = (AutoplotUI) getViewWindow();
             JFrameOperator mainFrame = new JFrameOperator(app);
+            sleep(3000); // remote bookmarks can take a little while to load
             waitUntilIdle();
             System.err.println("here line 52");
             JMenuBarOperator menuop= new JMenuBarOperator(mainFrame);
