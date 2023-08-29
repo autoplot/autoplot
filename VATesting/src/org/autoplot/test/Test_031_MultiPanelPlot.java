@@ -63,13 +63,16 @@ public class Test_031_MultiPanelPlot implements Scenario {
             new JLabelOperator(mainFrame).waitText( AutoplotUI.READY_MESSAGE );
             System.err.println("here line 63");
             Thread.sleep(1500);
-            
-            System.err.println("here line 67, about to add the layout panel");
+
             JMenuBarOperator menuBar = new JMenuBarOperator( mainFrame );
-            menuBar.pushMenu("Options|Enable Feature|Layout Panel", "|");
-            System.err.println("here line 70");
-            ScriptContext.waitUntilIdle();
-            System.err.println("here line 72");
+            
+            if ( app.getTabs().getTabByTitle("layout")==null ) {
+                System.err.println("here line 67, about to add the layout panel");
+                menuBar.pushMenu("Options|Enable Feature|Layout Panel", "|");
+                System.err.println("here line 70");
+                ScriptContext.waitUntilIdle();
+                System.err.println("here line 72");
+            }
             new JTabbedPaneOperator( app.getTabs() ).selectPage("layout");
             
             ScriptContext.waitUntilIdle();
