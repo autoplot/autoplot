@@ -45,11 +45,15 @@ public class Test_039_OperationsCacheReset implements Scenario {
             new JLabelOperator(mainFrame).waitText( AutoplotUI.READY_MESSAGE );
             
             Thread.sleep(500);
-            new JMenuBarOperator(mainFrame).pushMenu("Options|Enable Feature|Data Panel", "|");
+            if ( app.getTabs().getTabByTitle("data")==null ) {
+                new JMenuBarOperator(mainFrame).pushMenu("Options|Enable Feature|Data Panel", "|");
+            }
             
             Thread.sleep(300);
             
-            new JMenuBarOperator(mainFrame).pushMenu("Options|Enable Feature|Log Console", "|");
+            if ( app.getTabs().getTabByTitle("console")==null ) {
+                new JMenuBarOperator(mainFrame).pushMenu("Options|Enable Feature|Log Console", "|");
+            }
             
             Thread.sleep(500);
             

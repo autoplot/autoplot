@@ -46,8 +46,10 @@ public class Test_051_HanningFilter implements Scenario {
             JFrameOperator mainFrame = new JFrameOperator(app);
             // wait for the application to be in the "ready" state.
             new JLabelOperator(mainFrame).waitText( AutoplotUI.READY_MESSAGE );
-
-            new JMenuBarOperator( mainFrame ).pushMenu("Options|Enable Feature|Data Panel", "|");
+            
+            if ( app.getTabs().getTabByTitle("layout")==null ) {
+                new JMenuBarOperator( mainFrame ).pushMenu("Options|Enable Feature|Data Panel", "|");
+            }
             
             Thread.sleep(3000);
 

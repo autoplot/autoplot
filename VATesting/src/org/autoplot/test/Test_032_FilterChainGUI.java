@@ -61,7 +61,9 @@ public class Test_032_FilterChainGUI implements Scenario {
             new JTextFieldOperator(app.getDataSetSelector().getEditor()).setText("vap+inline:ripples(100,110)+randn(100)/50+outerProduct(ones(100),randn(110)/50)");
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
             
-            new JMenuBarOperator( mainFrame ).pushMenu("Options|Enable Feature|Data Panel", "|");
+            if ( app.getTabs().getTabByTitle("data")==null ) {
+                new JMenuBarOperator( mainFrame ).pushMenu("Options|Enable Feature|Data Panel", "|");
+            }
             
             Thread.sleep(500);
             new JLabelOperator(mainFrame).waitText( AutoplotUI.READY_MESSAGE );
