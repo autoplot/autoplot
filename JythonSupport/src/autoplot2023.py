@@ -56,7 +56,8 @@ def getParam( name, deflt, doc='', constraint='' ):
 <li>name is the name of the input parameter.
 <li>deflt is the default value for the input parameter.
 <li>doc is any documentation for the parameter.
-<li>constraint is used to declare any constraints, presently one of: a list of enumerated values, or a dictionary with any of min, max, examples, values, and regex.<ul>"""
+<li>constraint is used to declare any constraints, presently one of: a list of enumerated values, or a dictionary with any of 
+min, max, examples, values, and regex.<ul>"""
     if type(name).__name__ == 'int':
         name = 'arg_%d' % name
     _paramMap[name] = [name, deflt, doc, constraint]
@@ -120,8 +121,15 @@ _outputParamSort= []
 # name is the name of the output parameter.
 # value is the value of the output parameter.
 # doc is any documentation for the output parameter.
-# constraint is used to declare any constraints, presently one of: a list of enumerated values, or a dictionary with VALID_MIN, VALID_MAX and other relevant QDataSet properties.
+# constraint is used to declare any constraints, presently one of: a list of enumerated values, or a dictionary with min, max, examples, values, and units.
 def setOutputParam( name, value, doc='', constraint='' ):
+  """<html>set the output parameter for use by those calling the script.<ul>
+<li>name is the name of the output parameter.
+<li>deflt is the value for the output parameter.
+<li>doc is any documentation for the parameter.
+<li>constraint is used to declare any constraints, presently one of: a list of enumerated values, or a dictionary with any of 
+min, max, examples, values, regex, and units.  Validation of output parameter may be performed before passing it on to those calling 
+the script.<ul>"""
   global _outputParamMap, _outputParamSort, outputParams
   _outputParamMap[ name ]= [ name, value, doc, constraint ]
   _outputParamSort.append( name )
