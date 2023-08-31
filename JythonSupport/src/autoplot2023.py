@@ -68,6 +68,10 @@ def getParam( name, deflt, doc='', constraint='' ):
             if isinstance(constraint, list):
                 if v not in constraint:
                     raise Exception('value is not one of allowed values: %s %s' % (name, v))
+                if t==int:
+                    for c in constraint:
+                        if type(c)!=int:
+                            raise Exception('value in example values list is not an int, but default value is: %s %s %s' % (name, c, deflt))
             elif isinstance(constraint, dict):
                 if 'regex' in constraint:
                     if not re.match(constraint['regex'], v):
