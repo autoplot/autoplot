@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Chandrayaan-2’s Atmospheric Composition Explorer Data from the Indian Space Center.  Congratulations to the people of India for the Chandrayaan-3 moon landing!
+        <p><small>New Jython demo shows a <a href="https://github.com/autoplot/dev/blob/master/demos/2023/20230817/robustMeanDemo.jy">robust mean</a> example.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,9 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-08-29 r27145):</p>
+        <p>Bugfixes (2023-08-29 r27149):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2541/">2541</a>: check for non-int in examples list for integer parameter.
             <li><a href="https://github.com/das-developers/das2java/issues/78">78</a>: account for DasAxis property for multi-line format when positioning labels. Thanks, James!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2539/">2539</a>: format to CSV for rank 1 N(T).
             <li><a href="https://github.com/das-developers/das2java/issues/70">70</a>:Copy-n-paste data from DataPointRecorder didn't properly use formatter.  Thanks, Masafumi!
