@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>New Jython demo shows a <a href="https://github.com/autoplot/dev/blob/master/demos/2023/20230817/robustMeanDemo.jy">robust mean</a> example.
+        <p><small><a href="https://github.com/autoplot/dev/blob/master/demos/2023/20230909/demoCreateEvent.jy">Script</a> added to demonstrate append and eventsDiff functions.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,12 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-08-29 r27149):</p>
+        <p>Bugfixes (2023-09-09 r27149):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2542/">2542</a>: Javadoc improvements 
+        </ul>
+        <p>Older Bugfixes (2023-08-29 r27149):</p>
+        <ul> 
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2541/">2541</a>: check for non-int in examples list for integer parameter.
             <li><a href="https://github.com/das-developers/das2java/issues/78">78</a>: account for DasAxis property for multi-line format when positioning labels. Thanks, James!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2539/">2539</a>: format to CSV for rank 1 N(T).
@@ -47,20 +51,11 @@
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2533/">2533</a>: don't display warning message "slice on non-qube, dep1 has rank=2" when BINS_1="min,max" is used. 
             <li>PDS4 variable dimensions are shown in GUI.
         </ul>
-        <p>Older Bugfixes (2023-07-20 r27090):</p>
-        <ul> 
-            <li>indicate the error message when git diff results in error.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2530/">2530</a> AppManager can be told that no remaining applications state should not force System.exit, to support spawn from native Python.
-            <li>Correction to "show all" checkbox in CDF GUI.  Thanks, Ivar!
-            <li>Corrections to CDF GUI when rank 3 variable didn't have DEPEND_2, and other corner cases.  Thanks, Ivar!
-            <li><a href="https://github.com/das-developers/das2java/issues/38">38</a>: correct cadence on Juno/WAV/Survey.
-            <li>"mod" function now appears in mash-up dialog's palette of functions.
-            <li><a href="https://github.com/das-developers/das2java/issues/60">60</a>: when a script manually initializes the DataPointRecorder, the new formatterArray was left uninitialized.  Thanks, Bill!
-            <li>improve error when "home/jbf/..." is used my mistake, instead of "/home/jbf/..."
-            <li>accum function preserves timetags, to match diff function.
-        </ul>
         <p>Features:</p>
         <ul>
+        </ul>
+        <p>Less recent features:</p>
+        <ul> 
             <li>Das2 DasAxis object getAxisBounds is now public.  Thanks, Jim!
             <li>Support sub-millisecond Das2Server data requests.  Thanks, Masafumi!
             <li>DataPointRecorder timeFormat parameter supported, supporting sub-microsecond time resolution.  Thanks, Masafumi!
@@ -71,13 +66,6 @@
             <li><a href="https://github.com/das-developers/das2java/issues/66">66</a>: add LegendPosition.OutsideSE so support Jim and 1-em-height events bars.  Thanks, Jim!
             <li><a href="https://github.com/das-developers/das2java/issues/65">65</a>: add new tcaRows property, which allocates space for ephemeris before ephemeris is loaded.
             <li><a href="https://github.com/das-developers/das2java/issues/64">64</a>: add new xname and yname properties so the DataPointRecorder can name x and y columns.  Thanks, Bill!
-        </ul>
-        <p>Less recent features:</p>
-        <ul> 
-            <li>allow PDS4 ASCII_STRING to contain ISO8601 times, to support CASSINI CAPS ELS data.
-            <li><a href="https://github.com/das-developers/das2java/issues/61">61</a>: add "glow" property to annotations to provide contrast when no background is used.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/567/">567</a>: add some support for matrix operators.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/807/">807</a>: save vap checkbox to make local file references relative to .vap file location.
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
