@@ -54,6 +54,7 @@ import org.das2.qds.ops.Ops;
 import org.autoplot.metatree.MetadataUtil;
 import org.das2.qds.DataSetIterator;
 import org.das2.qds.QubeDataSetIterator;
+import org.das2.util.DasMath;
 
 /**
  * CDF data source based on Nand Lal's pure-Java
@@ -876,6 +877,11 @@ public class CdfDataSource extends AbstractDataSource {
                         if ( val.getClass().isArray() && Array.getLength(val)==1 ) {
                             val= Array.get(val, 0);
                         }
+                        if ( vv1.equals("VALIDMAX") || vv1.equals("VALIDMIN") || vv1.equals("FILLVAL")) {                            
+                            if ( val instanceof Double && Math.abs(((Double)val))>1e20 ) {
+                                val= DasMath.roundNSignificantDigits((Double)val,7);
+                            }
+                        }                        
                         props.put(vv1, val);
                     }
                 }
