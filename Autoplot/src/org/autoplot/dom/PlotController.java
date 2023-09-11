@@ -1314,7 +1314,7 @@ public final class PlotController extends DomNodeController {
     PlotElement plotElement;
     
     /**
-     * return the plotElement we are listening to.
+     * return the plotElement we are listening to.  
      * @return 
      */
     public PlotElement getPlotElement() {
@@ -1351,6 +1351,7 @@ public final class PlotController extends DomNodeController {
             dasPlot.getYAxis().setLabel( (String)yaxisLabelConverter.convertForward( plot.getYaxis().getLabel() ) );
             dasPlot.getXAxis().setLabel( (String)xaxisLabelConverter.convertForward( plot.getXaxis().getLabel() ) );
             QDataSet pds= plotElement.getController().getDataSet();
+            setActiveDataSet( pds );
             logger.log( Level.FINE, "{0} dataSetListener", plot);
             if ( pds!=null && UnitsUtil.isIntervalOrRatioMeasurement(SemanticOps.getUnits(pds)) ) {
                 updateNextPrevious( plot.getXaxis().getRange(), pds );
@@ -1647,6 +1648,21 @@ public final class PlotController extends DomNodeController {
 //                if ( cc instanceof DasColorBar ) System.err.println(cc);
 //            }
 //        }
+    }
+
+    
+    private QDataSet activeDataSet = null;
+
+    public static final String PROP_ACTIVEDATASET = "activeDataSet";
+
+    public QDataSet getActiveDataSet() {
+        return activeDataSet;
+    }
+
+    public void setActiveDataSet(QDataSet activeDataSet) {
+        QDataSet oldActiveDataSet = this.activeDataSet;
+        this.activeDataSet = activeDataSet;
+        propertyChangeSupport.firePropertyChange(PROP_ACTIVEDATASET, oldActiveDataSet, activeDataSet);
     }
 
     /**
@@ -2034,7 +2050,7 @@ public final class PlotController extends DomNodeController {
         final DasCanvas c= p.getCanvas();
         p.getDasMouseInputAdapter().setFeedback( DasMouseInputAdapter.NULL_FEEDBACK );
         if ( c!=null ) {
-            SwingUtilities.invokeLater( new Runnable() {
+            SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     c.remove(p);
