@@ -92,39 +92,40 @@ public class AnnotationController extends DomNodeController {
         };
     }
     
-
-    private void bindTo( final DasAnnotation p ) {
+    PropertyChangeListener contextPropertyChangeListener;
+        
+    private void bindTo( final DasAnnotation dasAnnotation ) {
         ApplicationController ac = dom.controller;
-        p.setFontSize( 0.f );
+        dasAnnotation.setFontSize( 0.f );
         
         String plotId= annotation.getPlotId();
         if ( plotId!=null && plotId.length()>0 ) {
             LabelConverter lc= new LabelConverter( dom, (Plot)DomUtil.getElementById( dom, plotId  ), null, null, annotation );
-            ac.bind( annotation, Annotation.PROP_TEXT, p, "text", lc );
+            ac.bind( annotation, Annotation.PROP_TEXT, dasAnnotation, "text", lc );
         } else {
-            ac.bind( annotation, Annotation.PROP_TEXT, p, "text");
+            ac.bind( annotation, Annotation.PROP_TEXT, dasAnnotation, "text");
         }
-        ac.bind( annotation, Annotation.PROP_URL, p, "url" );
-        ac.bind( annotation, "fontSize", p, "fontSize", getFontConverter(p) );
-        ac.bind( annotation, "scale", p, "scale" );
-        ac.bind( annotation, "borderType", p, "borderType" );
-        ac.bind( annotation, "anchorPosition", p, "anchorPosition" );
-        ac.bind( annotation, Annotation.PROP_ANCHORTYPE, p, DasAnnotation.PROP_ANCHORTYPE );
-        ac.bind( annotation, Annotation.PROP_SPLITANCHORTYPE, p, DasAnnotation.PROP_SPLITANCHORTYPE );
-        ac.bind( annotation, Annotation.PROP_VERTICALANCHORTYPE, p, DasAnnotation.PROP_VERTICALANCHORTYPE );
-        ac.bind( annotation, Annotation.PROP_ANCHOROFFSET, p, DasAnnotation.PROP_ANCHOROFFSET );
-        ac.bind( annotation, "anchorBorderType", p, "anchorBorderType");
-        ac.bind( annotation, "xrange", p, "xrange" );
-        ac.bind( annotation, "yrange", p, "yrange" );
-        ac.bind( annotation, "pointAtX", p, "pointAtX" );
-        ac.bind( annotation, "pointAtY", p, "pointAtY" );
-        ac.bind( annotation, Annotation.PROP_POINTATOFFSET, p, DasAnnotation.PROP_POINTATOFFSET );
-        ac.bind( annotation, "showArrow", p, "showArrow" );
-        ac.bind( annotation, "overrideColors", p, "overrideColors" );
-        ac.bind( annotation, "textColor", p, "textColor" );
-        ac.bind( annotation, "foreground", p, "foreground" );
-        ac.bind( annotation, "background", p, "background" );
-        ac.bind( annotation, "glow", p, "glow" );
+        ac.bind( annotation, Annotation.PROP_URL, dasAnnotation, "url" );
+        ac.bind( annotation, "fontSize", dasAnnotation, "fontSize", getFontConverter(dasAnnotation) );
+        ac.bind( annotation, "scale", dasAnnotation, "scale" );
+        ac.bind( annotation, "borderType", dasAnnotation, "borderType" );
+        ac.bind( annotation, "anchorPosition", dasAnnotation, "anchorPosition" );
+        ac.bind( annotation, Annotation.PROP_ANCHORTYPE, dasAnnotation, DasAnnotation.PROP_ANCHORTYPE );
+        ac.bind( annotation, Annotation.PROP_SPLITANCHORTYPE, dasAnnotation, DasAnnotation.PROP_SPLITANCHORTYPE );
+        ac.bind( annotation, Annotation.PROP_VERTICALANCHORTYPE, dasAnnotation, DasAnnotation.PROP_VERTICALANCHORTYPE );
+        ac.bind( annotation, Annotation.PROP_ANCHOROFFSET, dasAnnotation, DasAnnotation.PROP_ANCHOROFFSET );
+        ac.bind( annotation, "anchorBorderType", dasAnnotation, "anchorBorderType");
+        ac.bind( annotation, "xrange", dasAnnotation, "xrange" );
+        ac.bind( annotation, "yrange", dasAnnotation, "yrange" );
+        ac.bind( annotation, "pointAtX", dasAnnotation, "pointAtX" );
+        ac.bind( annotation, "pointAtY", dasAnnotation, "pointAtY" );
+        ac.bind( annotation, Annotation.PROP_POINTATOFFSET, dasAnnotation, DasAnnotation.PROP_POINTATOFFSET );
+        ac.bind( annotation, "showArrow", dasAnnotation, "showArrow" );
+        ac.bind( annotation, "overrideColors", dasAnnotation, "overrideColors" );
+        ac.bind( annotation, "textColor", dasAnnotation, "textColor" );
+        ac.bind( annotation, "foreground", dasAnnotation, "foreground" );
+        ac.bind( annotation, "background", dasAnnotation, "background" );
+        ac.bind( annotation, "glow", dasAnnotation, "glow" );
         
         annotation.addPropertyChangeListener( Annotation.PROP_ROWID, new PropertyChangeListener() {
             @Override
@@ -134,9 +135,9 @@ public class AnnotationController extends DomNodeController {
                 Row r=null;
                 if ( id.length()>0 ) r= (Row) DomUtil.getElementById( dom.getCanvases(0), (String)evt.getNewValue() );
                 if ( r!=null ) {
-                    p.setRow(r.controller.getDasRow());
+                    dasAnnotation.setRow(r.controller.getDasRow());
                 } else {
-                    p.setRow(allRow);
+                    dasAnnotation.setRow(allRow);
                 }
             }
         });
@@ -148,9 +149,9 @@ public class AnnotationController extends DomNodeController {
                 Column r= null;
                 if ( id.length()>0 ) r = (Column) DomUtil.getElementById( dom.getCanvases(0), (String)evt.getNewValue() );
                 if ( r!=null ) {
-                    p.setColumn(r.controller.getDasColumn());
+                    dasAnnotation.setColumn(r.controller.getDasColumn());
                 } else {
-                    p.setColumn(allColumn);
+                    dasAnnotation.setColumn(allColumn);
                 }
             }
         });
@@ -159,15 +160,30 @@ public class AnnotationController extends DomNodeController {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 LoggerManager.logPropertyChangeEvent(evt);  
+                ac.unbind( annotation, Annotation.PROP_TEXT, dasAnnotation, "text" );
+
                 if ( ((String)evt.getNewValue()).length()==0 ) {
-                    p.setPlot(null);
+                    dasAnnotation.setPlot(null);
                 } else {
-                    Plot pl= (Plot) DomUtil.getElementById( dom, (String)evt.getNewValue() );                
-                    if ( pl!=null ) {
-                        DasPlot dasPlot= pl.getController().getDasPlot();
-                        p.setPlot( dasPlot );
+                    Plot oldPlot= (Plot) DomUtil.getElementById( dom, (String)evt.getOldValue() ); 
+                    if ( oldPlot!=null && contextPropertyChangeListener!=null ) {
+                        oldPlot.removePropertyChangeListener( PlotController.PROP_ACTIVEDATASET, contextPropertyChangeListener );
+                    }
+                    Plot plot= (Plot) DomUtil.getElementById( dom, (String)evt.getNewValue() );                
+                    if ( plot!=null && plot.getId().length()>0 ) {
+                        LabelConverter lc= new LabelConverter( dom, plot, null, null, annotation );
+                        contextPropertyChangeListener = (PropertyChangeEvent evt1) -> {
+                            dasAnnotation.setText( (String)lc.convertForward(annotation.getText()) );
+                        };
+                        plot.getController().addPropertyChangeListener( PlotController.PROP_ACTIVEDATASET, contextPropertyChangeListener );
                     } else {
-                        p.setPlot( null );
+                        ac.bind( annotation, Annotation.PROP_TEXT, dasAnnotation, "text");
+                    }
+                    if ( plot!=null ) {
+                        DasPlot dasPlot= plot.getController().getDasPlot();
+                        dasAnnotation.setPlot( dasPlot );
+                    } else {
+                        dasAnnotation.setPlot( null );
                     }
                 }
             }
