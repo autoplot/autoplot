@@ -762,6 +762,20 @@ public final class AggregatingDataSource extends AbstractDataSource {
                     if ( doThrow ) {
                         throw ex;
                     }
+                    if ( ss.length==1 && ex.getMessage().startsWith("CDFException CDF does not hava a variable named") ) {
+                        String ff= getFsm().getRepresentativeFile(mon.getSubtaskMonitor(0,5,"get representative file"));
+                        ff= ff + "?" + sparams;
+                        delegateDataSource = delegateDataSourceFactory.getDataSource(new URI(ff));
+                        try {
+                            delegateDataSource.getDataSet(mon.getSubtaskMonitor("getting delegate to see if variable should exist"));
+                        } catch ( Exception edelegate ) {
+                            if ( edelegate.getMessage().startsWith("CDFException CDF does not hava a variable named") ) {
+                                throw ex;
+                            } else {
+                                ex= new NoDataInIntervalException("one found file does not contain variable");
+                            }
+                        }
+                    }
                     if ( ex instanceof NoDataInIntervalException && ss.length>1 ) {
                         logger.log(Level.FINE, "no data found in {0}", delegateUri);
                         // do nothing
