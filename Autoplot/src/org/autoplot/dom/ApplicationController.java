@@ -3268,6 +3268,8 @@ public class ApplicationController extends DomNodeController implements RunLater
     public void setSelectedPlotsArray( Plot[] selectedPlots ) {
         if ( selectedPlots.length==0 ) {
             setSelectedPlots("");
+        } else if ( selectedPlots[0]==null ) {
+            setSelectedPlots("");
         } else {
             StringBuilder sb= new StringBuilder(selectedPlots[0].id);
             for ( int i=1; i<selectedPlots.length; i++ ) {
