@@ -2478,8 +2478,8 @@ APSplash.checkTime("init 52.9");
      * problem where a loaded vap doesn't appear as it does when it was saved because
      * the canvas is resized.
      * 
-     * @param w the width
-     * @param h the height
+     * @param w the width of the canvas
+     * @param h the height of the canvas
      * @return nominal scale factor
      */
     public double resizeForCanvasSize( int w, int h ) {
@@ -2490,8 +2490,8 @@ APSplash.checkTime("init 52.9");
      * resize the outer GUI attempting to get a fitted canvas size.  This fixes the
      * problem where a loaded vap doesn't appear as it does when it was saved because
      * the canvas is resized.
-     * @param w
-     * @param h
+     * @param w the width of the canvas
+     * @param h the height of the canvas
      * @param extraW extra width needed by the GUI
      * @param extraH extra height needed by the GUI
      * @return 
