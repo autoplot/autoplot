@@ -762,7 +762,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                     if ( doThrow ) {
                         throw ex;
                     }
-                    if ( ss.length==1 && ex.getMessage().startsWith("CDFException CDF does not hava a variable named") ) {
+                    if ( ss.length==1 && ex.getMessage()!=null && ex.getMessage().startsWith("CDFException CDF does not hava a variable named") ) {
                         String ff= getFsm().getRepresentativeFile(mon.getSubtaskMonitor(0,5,"get representative file"));
                         ff= ff + "?" + sparams;
                         delegateDataSource = delegateDataSourceFactory.getDataSource(new URI(ff));
