@@ -14,7 +14,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small><a href="https://github.com/autoplot/dev/blob/master/demos/2023/20230909/demoApplyIndex.jy">Script</a> verifies applyIndex function.  Image from https://thatartteacher.com/2019/05/09/daily-doodle-easiest-hydrangea-painting-ever/.
+        <p><small>Experiment with new <a href="https://github.com/autoplot/dev/blob/master/demos/2023/20230911/triCluster.jy">triCluster</a> routine, which identifies close points in two dimensions.
             </small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -28,8 +28,10 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-09-15 r27158):</p>
+        <p>Bugfixes (2023-09-20 r27162):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2546/">2546</a>: Aggregation when CDF file is missing a variable.  Thanks, Kris!
+            <li>rte_0338377624: null can get into array causing runtime exception.  Thanks admin!
             <li>%{CONTEXT} macro in annotations properly listens to updates in the plot's focus dataset.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2542/">2542</a>: Javadoc improvements 
         </ul>
