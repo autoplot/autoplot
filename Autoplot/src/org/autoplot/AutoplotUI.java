@@ -2497,7 +2497,8 @@ APSplash.checkTime("init 52.9");
      * @return 
      */
     public double resizeForCanvasSize( int w, int h, int extraW, int extraH ) {
-        resizeLogger.log(Level.FINE, "resizeForCanvasSize({0,number,#},{1,number,#})", new Object[]{w, h});
+        resizeLogger.log(Level.FINE, "resizeForCanvasSize({0,number,#},{1,number,#},{2,number,#},{3,number,#})", 
+                new Object[]{w, h, extraW, extraH});
         Component parentToAdjust;
         if ( SwingUtilities.isDescendingFrom( applicationModel.getCanvas(), this ) ) {
             parentToAdjust= this;
@@ -2506,7 +2507,8 @@ APSplash.checkTime("init 52.9");
         }
         boolean fitted= this.applicationModel.dom.getCanvases(0).isFitted();
         Dimension dout= parentToAdjust.getSize();
-        resizeLogger.log(Level.FINER, "old parentToAdjust.getSize: {0,number,#}x{1,number,#}", new Object[]{dout.width, dout.height});
+        resizeLogger.log(Level.FINER, "old parentToAdjust.getSize: {0,number,#}x{1,number,#}", 
+                new Object[]{dout.width, dout.height});
         Dimension din= this.applicationModel.getCanvas().getSize();
         Dimension desiredAppSize= new Dimension();
 
@@ -2517,7 +2519,7 @@ APSplash.checkTime("init 52.9");
         boolean maximize= false;
         
         if ( fitted ) {
-            int maximizedPixelGain= 0; // the number of pixels gained by maximizing.  Windows doesn't draw borders when window is maximized.
+            int maximizedPixelGain= 0; // number of pixels gained by maximizing. Windows doesn't draw borders when window is maximized.
             String osName= System.getProperty("os.name");
             if ( osName.startsWith("Windows") ) { // TODO: figure out how to measure this.
                 maximizedPixelGain= 8;
@@ -2528,7 +2530,8 @@ APSplash.checkTime("init 52.9");
             windowExtraHeight= extraH;
             windowExtraWidth= extraW;
                         
-            resizeLogger.log(Level.FINER, "windowExtraWidth={0} windowExtraHeight={1}", new Object[] { windowExtraWidth, windowExtraHeight } );
+            resizeLogger.log(Level.FINER, "windowExtraWidth={0} windowExtraHeight={1}", 
+                    new Object[] { windowExtraWidth, windowExtraHeight } );
             desiredAppSize.width= w + windowExtraWidth ;
             desiredAppSize.height= h + windowExtraHeight;
             
@@ -2559,7 +2562,8 @@ APSplash.checkTime("init 52.9");
                 this.applicationModel.dom.getCanvases(0).setFitted(false);
                 this.applicationModel.dom.getCanvases(0).setHeight(h);
                 this.applicationModel.dom.getCanvases(0).setWidth(w);
-                resizeLogger.log(Level.FINER, "resizeForCanvasSize resets canvas fitted=false {0,number,#}x{1,number,#}", new Object[]{ w, h } );
+                resizeLogger.log(Level.FINER, "resizeForCanvasSize resets canvas fitted=false {0,number,#}x{1,number,#}", 
+                        new Object[]{ w, h } );
             }
             
         } else if ( desiredAppSize.width>screenSize.getWidth() || desiredAppSize.height>screenSize.getHeight() ) {
@@ -2593,7 +2597,8 @@ APSplash.checkTime("init 52.9");
                     int newW=  nw + ( dout.width - din.width );
                     int newH=  nh + ( dout.height - din.height );
                     parentToAdjust.setSize( newW, newH );
-                    resizeLogger.log(Level.FINE, "resizeForCanvasSize parentToAdjust.setSize (scaling): {0,number,#}x{1,number,#}", new Object[]{ newW, newH });
+                    resizeLogger.log(Level.FINE, "resizeForCanvasSize parentToAdjust.setSize (scaling): {0,number,#}x{1,number,#}", 
+                            new Object[]{ newW, newH });
 
                 } else if ( i==1 ) { // scrollbars option.
                     this.applicationModel.dom.getCanvases(0).setFitted(false);
@@ -2604,7 +2609,8 @@ APSplash.checkTime("init 52.9");
                 }
             }
         } else {
-            resizeLogger.log(Level.FINE, "resizeForCanvasSize parentToAdjust.setSize  {0,number,#}x{1,number,#}", new Object[]{ desiredAppSize.width, desiredAppSize.height });
+            resizeLogger.log(Level.FINE, "resizeForCanvasSize parentToAdjust.setSize  {0,number,#}x{1,number,#}", 
+                    new Object[]{ desiredAppSize.width, desiredAppSize.height });
             parentToAdjust.setSize( desiredAppSize.width, desiredAppSize.height );
             if ( parentToAdjust.getSize().getWidth()!=desiredAppSize.width ) {
                 this.applicationModel.dom.getCanvases(0).setFitted(false);
