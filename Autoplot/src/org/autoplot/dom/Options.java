@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.dom;
 
 import java.awt.Color;
@@ -12,7 +9,8 @@ import org.autoplot.MouseModuleType;
 import org.das2.graph.DasColorBar;
 
 /**
- * Bean for holding AP configuration options.  Note there are a few AutoplotUI prefs here that shouldn't be.
+ * Bean for holding Autoplot configuration options.  Note there are a few AutoplotUI prefs here that shouldn't be,
+ * like scriptVisible which indicates if the script tab is shown.
  * @author jbf
  */
 public final class Options extends DomNode {
