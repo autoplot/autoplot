@@ -91,8 +91,8 @@ public final class OptionsPrefsController {
         File config= new File( f, "config" );
         //transition from Java-prefs (which is opaque to most scientists) to autoplot_data/config area.  This should be removed by Oct 2019.
         Preferences p1= new PropertiesFilePreferences( config, "options.properties" );
-        Preferences p2= AutoplotSettings.getPreferences(options.getClass());
-        prefs = new MigratePreference(p2,p1);
+        //Preferences p2= AutoplotSettings.getPreferences(options.getClass());
+        prefs = p1; // new MigratePreference(p2,p1);
         this.options= options;
         this.loadPersistentPreferences= !model.isHeadless();        
         options.setController( this );
