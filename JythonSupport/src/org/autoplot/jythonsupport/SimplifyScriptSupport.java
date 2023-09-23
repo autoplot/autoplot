@@ -3,6 +3,7 @@ package org.autoplot.jythonsupport;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -450,7 +451,7 @@ public class SimplifyScriptSupport {
         for (int istatement = 0; istatement < stmts.length; istatement++) {
             stmtType o = stmts[istatement];
             String theLine = getSourceForStatement(ss, o);
-            int lineCount = theLine.split("\n", -2).length;
+                int lineCount = theLine.split("\n", -2).length;
 
             if (depth == 0) {
                 logger.finest(theLine); //breakpoint here.
@@ -472,19 +473,34 @@ public class SimplifyScriptSupport {
             if (beginLine > lastLine) {
                 continue;
             }
-            if (o instanceof Assign && !simplifyScriptToGetCompletionsOkay(o, variableNames) ) {
-                // check for method calls where we know the type.
-                Assign a = (Assign) o;
-                String cl = maybeIdentifyType(a, importedNames);
-                if (cl != null) {
-                    if (acceptLine > -1) {
-                        for (int i = acceptLine; i < beginLine; i++) {
-                            appendToResult(result, ss[i]).append("\n");
+            if (o instanceof Assign ) {
+                if ( !simplifyScriptToGetCompletionsOkay(o, variableNames,importedNames) ) {
+                    // check for method calls where we know the type.
+                    Assign a = (Assign) o;
+                    String cl = maybeIdentifyType(a, importedNames);
+                    if (cl != null) {
+                        if (acceptLine > -1) {
+                            for (int i = acceptLine; i < beginLine; i++) {
+                                appendToResult(result, ss[i]).append("\n");
+                            }
                         }
+                        appendToResult(result, getIndent(theLine) + cl).append("\n") ;
+                        acceptLine = -1;
+                        continue;
                     }
-                    appendToResult(result, getIndent(theLine) + cl).append("\n") ;
-                    acceptLine = -1;
-                    continue;
+                } else {
+                    Assign a = (Assign) o;
+                    String cl = maybeIdentifyType(a, importedNames);
+                    if (cl != null) {
+                        if (acceptLine > -1) {
+                            for (int i = acceptLine; i < beginLine; i++) {
+                                appendToResult(result, ss[i]).append("\n");
+                            }
+                        }
+                        appendToResult(result, getIndent(theLine) + cl).append("\n") ;
+                        acceptLine = -1;
+                        continue;
+                    }
                 }
             }
 
@@ -595,7 +611,7 @@ public class SimplifyScriptSupport {
                     }       
                 }
             } else { // Assign, etc
-                if (simplifyScriptToGetCompletionsOkay(o, variableNames)) {
+                if (simplifyScriptToGetCompletionsOkay(o, variableNames,importedNames)) {
                     if (acceptLine < 0) {
                         acceptLine = beginLine;
                         for (int i = currentLine + 1; i < acceptLine; i++) {
@@ -747,9 +763,10 @@ public class SimplifyScriptSupport {
      * </ul>
      * @param o the statement, for example an import or an assignment
      * @param variableNames known symbol names
+     * @param importedNames map of name to path
      * @return true if we can include this in the script without a huge performance penalty.
      */
-    private static boolean simplifyScriptToGetCompletionsOkay(stmtType o, HashSet<String> variableNames) {
+    private static boolean simplifyScriptToGetCompletionsOkay(stmtType o, HashSet<String> variableNames,Map<String,String> importedNames) {
         logger.log(Level.FINEST, "simplify script line: {0}", o.beginLine);
         if ((o instanceof org.python.parser.ast.ImportFrom)) {
             org.python.parser.ast.ImportFrom importFrom = (org.python.parser.ast.ImportFrom) o;
@@ -811,6 +828,10 @@ public class SimplifyScriptSupport {
                         variableNames.add(id);
                         logger.log(Level.FINEST, "assign to variable {0}", id);
                         //TODO: can we identify type?  Insert <id>__CLASSTYPE=... for completions.
+                        if ( a.value instanceof Call ) {
+                            String type= maybeIdentifyReturnType( id, (Call)a.value, importedNames );
+                            logger.log(Level.INFO, "id type: {0}__CLASSTYPE= {1}", new Object[]{id, type});
+                        }
                     } else if (et instanceof Attribute) {
                         return false;
 //                        Attribute at = (Attribute) et;
@@ -992,7 +1013,8 @@ public class SimplifyScriptSupport {
      * placeholder for code which identifies constructors. This is fragile and misguided code, which looks for the Java convention
      * of uppercase letter starting.
      *
-     * @param name
+     * @param name the name, like GrannyTextRenderer
+     * @param importedNames map from name to path "GrannyTextRenderer" &rarr; "org.das2.util"
      * @return true if the name is known to be a constructor call.
      */
     private static boolean isConstructor(String name, Map<String, String> importedNames) {
@@ -1007,8 +1029,8 @@ public class SimplifyScriptSupport {
     /**
      * return the class for the name.
      *
-     * @param name
-     * @param importedNames
+     * @param name the name, like GrannyTextRenderer
+     * @param importedNames map from name to path "GrannyTextRenderer" &rarr; "org.das2.util"
      * @return
      */
     private static Class getClassFor(String name, Map<String, String> importedNames) {
@@ -1040,9 +1062,9 @@ public class SimplifyScriptSupport {
     /**
      * return the line of code needed to use the result, or null.
      *
-     * @param id
-     * @param c
-     * @param importedNames
+     * @param id the identifier being assigned the value
+     * @param c the function being called
+     * @param importedNames the list of names and types
      * @return
      */
     private static String maybeIdentifyReturnType(String id, Call c, Map<String, String> importedNames) {
@@ -1195,23 +1217,23 @@ public class SimplifyScriptSupport {
                                 if ( att.attr.equals("plots") ) {
                                     String rclzn = "org.autoplot.dom.Plot";
                                     return "import org.autoplot.dom.Plot\n"
-                                    + id + JythonCompletionTask.__CLASSTYPE + " = " + rclzn + "  # (spot line955)\n";
+                                    + id + JythonCompletionTask.__CLASSTYPE + " = " + rclzn + "  # (spot line955 a)\n";
                                 } else if ( att.attr.equals("canvases") ) {
                                     String rclzn = "org.autoplot.dom.Canvas";
                                     return "import org.autoplot.dom.Canvas\n"
-                                    + id + JythonCompletionTask.__CLASSTYPE + " = " + rclzn + "  # (spot line955)\n";
+                                    + id + JythonCompletionTask.__CLASSTYPE + " = " + rclzn + "  # (spot line955 b)\n";
                                 } else if ( att.attr.equals("plotElements") ) {
                                     String rclzn = "org.autoplot.dom.PlotElement";
                                     return "import org.autoplot.dom.PlotElement\n"
-                                    + id + JythonCompletionTask.__CLASSTYPE + " = " + rclzn + "  # (spot line955)\n";
+                                    + id + JythonCompletionTask.__CLASSTYPE + " = " + rclzn + "  # (spot line955 c)\n";
                                 }
                             }
                         }
                     } else if ( s.value instanceof Name ) {
-                        return id + JythonCompletionTask.__CLASSTYPE + " = QDataSet  # (spot line1014)\n";
+                        return id + JythonCompletionTask.__CLASSTYPE + " = QDataSet  # (spot line1014 a)\n";
                     }
                 } else if ( a.value instanceof BinOp ) { // just go ahead and assume it's a QDataSet
-                    return id + JythonCompletionTask.__CLASSTYPE + " = QDataSet  # (spot line1014)\n";
+                    return id + JythonCompletionTask.__CLASSTYPE + " = QDataSet  # (spot line1014 b)\n";
                 }
             }
         }
