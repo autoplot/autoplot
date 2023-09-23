@@ -451,7 +451,7 @@ public class SimplifyScriptSupport {
         for (int istatement = 0; istatement < stmts.length; istatement++) {
             stmtType o = stmts[istatement];
             String theLine = getSourceForStatement(ss, o);
-                int lineCount = theLine.split("\n", -2).length;
+            int lineCount = theLine.split("\n", -2).length;
 
             if (depth == 0) {
                 logger.finest(theLine); //breakpoint here.
@@ -1161,15 +1161,24 @@ public class SimplifyScriptSupport {
                 if (x != null) {
                     int i = x.indexOf("=");
                     try {
-                        Class clz = Class.forName(x.substring(i + 1).trim());
-                        try {
-                            Method m = clz.getMethod(at.attr); //TODO: this is only single-argument calls
-                            Class rclz = m.getReturnType();
-                            String rclzn = rclz.getSimpleName();
-                            return "from " + rclz.getPackage().getName() + " import " + rclzn + "\n"
-                                    + id + JythonCompletionTask.__CLASSTYPE + " = " + rclzn + "   # (spot line826)";
-                        } catch (NoSuchMethodException | SecurityException ex) {
-                            logger.log(Level.SEVERE, null, ex);
+                        String s= x.substring(i + 1);
+                        int i2= s.indexOf('#');
+                        if ( i2>-1 ) {
+                            s= s.substring(0,i2);
+                        }
+                        s= s.trim();
+                        if ( importedNames.containsKey(s) ) {
+                            String packg= importedNames.get(s);
+                            Class clz = Class.forName(packg+"."+s);
+                            try {
+                                Method m = clz.getMethod(at.attr); //TODO: this is only single-argument calls
+                                Class rclz = m.getReturnType();
+                                String rclzn = rclz.getSimpleName();
+                                return "from " + rclz.getPackage().getName() + " import " + rclzn + "\n"
+                                        + id + JythonCompletionTask.__CLASSTYPE + " = " + rclzn + "   # (spot line826)";
+                            } catch (NoSuchMethodException | SecurityException ex) {
+                                logger.log(Level.SEVERE, null, ex);
+                            }
                         }
                     } catch (ClassNotFoundException ex) {
                         logger.log(Level.SEVERE, null, ex);
