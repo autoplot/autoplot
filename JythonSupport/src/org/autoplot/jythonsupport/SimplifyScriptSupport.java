@@ -762,8 +762,8 @@ public class SimplifyScriptSupport {
      * <li>dom.plots[1].rowId= dom.plots[0].rowId  is not okay.
      * </ul>
      * @param o the statement, for example an import or an assignment
-     * @param variableNames known symbol names
-     * @param importedNames map of name to path
+     * @param variableNames known symbol names 
+     * @param importedNames map of name to path (DatumRange &rarr; org.das2.datum)
      * @return true if we can include this in the script without a huge performance penalty.
      */
     private static boolean simplifyScriptToGetCompletionsOkay(stmtType o, HashSet<String> variableNames,Map<String,String> importedNames) {
@@ -1064,8 +1064,8 @@ public class SimplifyScriptSupport {
      *
      * @param id the identifier being assigned the value
      * @param c the function being called
-     * @param importedNames the list of names and types
-     * @return
+     * @param importedNames map of name to path (DatumRange &rarr; org.das2.datum)
+     * @return the assignment and possibly an additional import statement
      */
     private static String maybeIdentifyReturnType(String id, Call c, Map<String, String> importedNames) {
         if (c.func instanceof Name) {
