@@ -106,6 +106,14 @@ public class DataSourceRecognizer {
                 case "Product_Observational":
                     type= "vap+pds4";
                     throw new RuntimeException(ID_XML_TYPE); // abort from parsing
+                
+                case "Product_Collection":
+                    type= "vap+pds4";
+                    throw new RuntimeException(ID_XML_TYPE); // abort from parsing
+
+                case "Product_Bundle":
+                    type= "vap+pds4";
+                    throw new RuntimeException(ID_XML_TYPE); // abort from parsing
                     
                 default:
                     throw new IllegalArgumentException("Unrecognized XML type: "+uri);
