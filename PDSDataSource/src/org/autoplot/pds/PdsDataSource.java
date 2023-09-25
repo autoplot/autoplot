@@ -305,7 +305,6 @@ public class PdsDataSource extends AbstractDataSource {
      * @throws Exception 
      */
     public org.das2.qds.QDataSet getDataSetFromBundle(Document doc,ProgressMonitor mon) throws Exception {
-       
         
         XPathExpression xp= XPathFactory.newInstance().newXPath().compile(
                 "//Product_Bundle/Bundle_Member_Entry/lidvid_reference/text()");
