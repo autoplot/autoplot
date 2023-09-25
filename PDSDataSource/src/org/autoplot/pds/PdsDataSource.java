@@ -23,6 +23,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.autoplot.datasource.AbstractDataSource;
@@ -293,20 +294,76 @@ public class PdsDataSource extends AbstractDataSource {
         
         return depend;
     }
-            
+     
+    /**
+     * given the bundle, figure out which files should be loaded to implement the time range.  This will call recursively
+     * into this code for each item.  This unimplemented stub returns an empty dataset.
+     * //TODO: implement me
+     * @param doc the xml document
+     * @param mon progress monitor
+     * @return rank 0 stub
+     * @throws Exception 
+     */
+    public org.das2.qds.QDataSet getDataSetFromBundle(Document doc,ProgressMonitor mon) throws Exception {
+       
+        
+        XPathExpression xp= XPathFactory.newInstance().newXPath().compile(
+                "//Product_Bundle/Bundle_Member_Entry/lidvid_reference/text()");
+        String lidvid= (String)xp.evaluate( doc, XPathConstants.STRING );
+        
+        if ( lidvid.trim().length()==0 ) {
+            throw new IllegalArgumentException("lidvid is empty or not found at "+
+                    "//Product_Bundle/Bundle_Member_Entry/lidvid_reference/text()");
+        }
+        
+        return Ops.dataset(lidvid,Units.nominal());
+    }
+    
+    /**
+     * given the collection, figure out which files should be loaded to implement the time range.  This will call recursively
+     * into this code for each item.  This unimplemented stub returns an empty dataset.
+     * //TODO: implement me
+     * @param doc the xml document
+     * @param mon progress monitor
+     * @return rank 0 stub
+     * @throws Exception 
+     */
+    public org.das2.qds.QDataSet getDataSetFromCollection(Document doc,ProgressMonitor mon) throws Exception {
+        
+        XPathExpression xp= XPathFactory.newInstance().newXPath().compile(
+                "//Product_Collection/File_Area_Inventory/File/file_name/text()");
+        String csvfile= (String)xp.evaluate( doc, XPathConstants.STRING );
+        
+        if ( csvfile.trim().length()==0 ) {
+            throw new IllegalArgumentException("file name is empty or not found at "+
+                "//Product_Collection/File_Area_Inventory/File/file_name/text()");
+        }
+        
+        return Ops.dataset(csvfile,Units.nominal());
+    }
+    
+    
     @Override
     public org.das2.qds.QDataSet getDataSet(ProgressMonitor mon) throws Exception {
         String name= getParam("arg_0","");
         
         URISplit split= URISplit.parse( getURI() );
             
-        URL fileUrl= PdsDataSourceFactory.getFileResource( split.resourceUri.toURL(), mon );
         File xmlfile = DataSetURI.getFile( split.resourceUri.toURL() ,new NullProgressMonitor());
+        Document doc= readXML(xmlfile);
+        
+        if ( doc.getDocumentElement().getNodeName().equals("Product_Bundle") ) {
+            return getDataSetFromBundle(doc,mon);
+        }
+        
+        if ( doc.getDocumentElement().getNodeName().equals("Product_Collection")) {
+            return getDataSetFromCollection(doc,mon);
+        }
+        
+        URL fileUrl= PdsDataSourceFactory.getFileResource( split.resourceUri.toURL(), mon );
         DataSetURI.getFile(fileUrl,mon );
                     
         Label label = Label.open( xmlfile.toURI().toURL() ); 
-        
-        Document doc= readXML(xmlfile);
                 
         List<String> names= new ArrayList<>();
         String X= getParam("X","");
