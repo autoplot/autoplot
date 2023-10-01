@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Review images in folder of creek pictures,taken over the course of the year.  Happy Fall!</small></p>
+        <p><small>10,000,000 points are plotted interactively from (native) Python to Autoplot using JPype.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,10 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-09-20 r27162):</p>
+        <p>Bugfixes (2023-10-01 r27183):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2550/">2550</a>: show more digits when timetags are sub-millisecond cadence.  Thanks, Connor!
+            <li>don't hide the "show all" button with the CDAWeb editor, since some PSP_FLD_L2_DFB_DBM_DVAC variables are support but are still interesting.  Thanks, Sadie!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2319/">2319</a>: Jython completions using Java Types, support x=X.Y.c(), gtr2= GrannyTextRenderer()
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2546/">2546</a>: Aggregation when CDF file is missing a variable.  Thanks, Kris!
             <li>rte_0338377624: null can get into array causing runtime exception.  Thanks admin!
