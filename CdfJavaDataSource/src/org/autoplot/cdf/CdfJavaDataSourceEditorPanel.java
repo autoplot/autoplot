@@ -641,7 +641,7 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
     public void setShowAdvancedSubpanel( boolean v ) {
         noDep.setVisible(v);
         noInterpMeta.setVisible(v);
-        showAllVarTypeCB.setVisible(v);
+        //showAllVarTypeCB.setVisible(v);
     }
     
     @Override
