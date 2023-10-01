@@ -311,6 +311,8 @@ public class SimplifyScriptSupport {
         variableNames.add("URL");
         variableNames.add("PWD");
         variableNames.add("dom"); // TODO: only true for .jy scripts.
+        variableNames.add("True");
+        variableNames.add("False");
 
         try {
             Module n = null;
