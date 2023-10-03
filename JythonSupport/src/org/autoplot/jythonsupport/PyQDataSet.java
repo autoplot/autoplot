@@ -823,6 +823,7 @@ public final class PyQDataSet extends PyJavaInstance {
         } else { // arg0.isSequenceType
             PySequence slices = (PySequence) arg0;
             QDataSet[] lists= new QDataSet[slices.__len__()];
+            int maxRank=0;
             boolean allLists= true;
             int[] qubedims= DataSetUtil.qubeDims(ds);
             for (int i = 0; i < slices.__len__(); i++) {
@@ -843,7 +844,9 @@ public final class PyQDataSet extends PyJavaInstance {
                     }
                     lists[i] = DataSetUtil.asDataSet(idx);
                 } else {
-                    lists[i] = ((PyQDataSet) a).rods;
+                    QDataSet rods1= ((PyQDataSet) a).rods;
+                    lists[i] = rods1;
+                    if ( rods1.rank()>maxRank ) maxRank=rods1.rank();
                 }
             }
             if (allLists) {
@@ -868,7 +871,31 @@ public final class PyQDataSet extends PyJavaInstance {
                         }
                     }
                 }
-                setItemAllLists( ds, lists, val);
+                
+                if ( maxRank==0 ) {
+                    switch ( ds.rank() ) {
+                        case 0:
+                            ds.putValue(val.value());
+                            break;
+                        case 1:
+                            ds.putValue(((int)lists[0].value()),val.value());
+                            break;
+                        case 2:
+                            ds.putValue(((int)lists[0].value()),((int)lists[1].value()),val.value());
+                            break;
+                        case 3:
+                            ds.putValue(((int)lists[0].value()),((int)lists[1].value()),((int)lists[2].value()),val.value());
+                            break;
+                        case 4:
+                            ds.putValue(((int)lists[0].value()),
+                                    ((int)lists[1].value()),
+                                    ((int)lists[2].value()),
+                                    ((int)lists[3].value()),val.value());
+                            break;
+                    }
+                } else {
+                    setItemAllLists( ds, lists, val);
+                }
 
                 return;
 
