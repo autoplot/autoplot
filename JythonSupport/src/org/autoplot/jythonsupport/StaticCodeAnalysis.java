@@ -203,15 +203,22 @@ public class StaticCodeAnalysis {
                     for ( stmtType sst: ist.body ) {
                         handleStmtType(sst);
                     }
-                    //for ( stmtType sst: ist.orelse ) {
-                    //    handleStmtType(sst);
-                    //}
+                    if ( ist.orelse!=null ) {
+                        for ( stmtType sst: ist.orelse ) {
+                            handleStmtType(sst);
+                        }
+                    }
                 } else if ( st instanceof For ) {
                     For fst= ((For) st);
                     handleExprTypeRead(fst.iter);
                     handleExprTypeAssign(fst.target);
                     for ( stmtType sst: fst.body ) {
                         handleStmtType(sst);
+                    }
+                    if ( fst.orelse!=null ) {
+                        for ( stmtType sst: fst.orelse ) {
+                            handleStmtType(sst);
+                        }
                     }
                 } else if ( st instanceof While ) {
                     While fst= ((While) st);
