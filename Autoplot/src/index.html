@@ -30,8 +30,10 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-10-01 r27183):</p>
+        <p>Bugfixes (2023-10-05 r27186):</p>
         <ul>
+            <li>Static Code Analysis inspects else clause for usages.
+            <li>histogram editor panel had a bug in regex, breaking it in most cases.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2550/">2550</a>: show more digits when timetags are sub-millisecond cadence.  Thanks, Connor!
             <li>don't hide the "show all" button with the CDAWeb editor, since some PSP_FLD_L2_DFB_DBM_DVAC variables are support but are still interesting.  Thanks, Sadie!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2319/">2319</a>: Jython completions using Java Types, support x=X.Y.c(), gtr2= GrannyTextRenderer()
@@ -61,6 +63,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>SeriesRenderer gets kludgey "moduloY" control which will avoid a connection from 24 to 0 hours.
+            <li>Jython __setItem__ has special branch for when all indices are numbers, improving performance by using simpler code.
             <li>legacy storage for options like width and height are no longer imported from Autoplot versions older than five years ago.
             <li>"Display Data" mouse action shows the number of selected records, useful for counting.
             <li>Round the valid min, valid max, and fill value from CDF files to seven decimal places to make them more legible, since the CDF library converts floats to doubles.
