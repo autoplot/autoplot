@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -395,7 +396,19 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     private void updateDataSetSelected( final URL url ) {
         InputStream in= null;
         try {
-            in = url.openStream();
+            HttpURLConnection httpConn= (HttpURLConnection)url.openConnection();
+            int nStatus= httpConn.getResponseCode();
+            if ( nStatus==301 ) {
+                String newUrl= httpConn.getHeaderField("Location");
+                httpConn.disconnect(); //TODO: this is sloppy.  The buffer needs to be emptied.
+                if ( newUrl==null ) {
+                    throw new IllegalArgumentException("301 response but no new location");
+                }
+                httpConn=  (HttpURLConnection) new URL(newUrl).openConnection();
+                nStatus= ((HttpURLConnection) httpConn).getResponseCode();
+                //if ( conn.getHeaderField("Strict-Transport-Security"))
+            }
+            in = httpConn.getInputStream();
             StringBuilder sb = new StringBuilder();
             int by = in.read();
             while (by != -1) {
