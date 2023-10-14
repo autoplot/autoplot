@@ -1171,6 +1171,14 @@ public class JythonCompletionTask implements CompletionTask {
         //throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    /**
+     * get the locals completions, populating the result set
+     * @param interp the interpreter
+     * @param cc the completion context
+     * @param rs the result set object which will contain the completions
+     * @return the number of completions found.
+     * @see #getLocalsCompletions(org.python.util.PythonInterpreter, org.das2.jythoncompletion.CompletionContext) 
+     */
     public static int getLocalsCompletions(PythonInterpreter interp, CompletionContext cc, CompletionResultSet rs) {
         int count= 0;
         List<DefaultCompletionItem> rr= getLocalsCompletions( interp, cc );
@@ -1466,8 +1474,15 @@ public class JythonCompletionTask implements CompletionTask {
         }
     }
 
+    /**
+     * get the list of available names at this point in the code.
+     * @param interp the interpreter
+     * @param cc the completion context
+     * @return the list of completions.
+     */
     public static List<DefaultCompletionItem> getLocalsCompletions(PythonInterpreter interp, CompletionContext cc) {
         
+        logger.log(Level.FINE, "get local completions for completable: {0}", cc.completable);
         List<DefaultCompletionItem> result= new ArrayList();
         
         PyStringMap locals = (PyStringMap) interp.getLocals();
