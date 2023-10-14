@@ -175,9 +175,11 @@ public class Test038 {
             QDataSet line= Ops.slice1(rr,0);
             QDataSet column= Ops.slice1(rr,1);
             QDataSet count= Ops.slice1(rr,2);
+            QDataSet positionsds= Ops.dataset(positions).trim(0,count.length());
             ScriptContext.formatDataSet( line, "test038."+f.getName()+".cdf?linenum" );
             ScriptContext.formatDataSet( column, "test038."+f.getName()+".cdf?column&append=T" );
             ScriptContext.formatDataSet( count, "test038."+f.getName()+".cdf?count&append=T" );
+            ScriptContext.formatDataSet( positionsds, "test038."+f.getName()+".cdf?position&append=T" );
             
             ScriptContext.plot(Ops.slice1(rr,0), Ops.slice1(rr,1), Ops.lesserOf(Ops.slice1(rr,2), MAX_COMPLETION_COUNT) );
             QDataSet r= Ops.where( Ops.eq( count, -99 ) );
@@ -291,7 +293,8 @@ public class Test038 {
     }
     
     public static void main( String[] args ) throws IOException {
-    
+        doTests("002","/home/jbf/ct/hudson/script/test038/demoParms1.jy");
+        
         long t0= System.currentTimeMillis();
         PythonInterpreter interp= JythonUtil.createInterpreter(true);
         interp.eval("1+2");
