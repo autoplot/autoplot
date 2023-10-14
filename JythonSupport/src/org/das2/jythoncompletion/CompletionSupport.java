@@ -44,12 +44,21 @@ public class CompletionSupport {
         return result.toString();
     }
     
+    /**
+     * return true if this line is a continuation of the previous line.
+     * @param possible the previous line
+     * @param tail the line which we are to test if it is a continuation.
+     * @return true if this line is a continuation of the previous line.
+     */
     private static boolean isContinuation( String possible, String tail ) {
         if ( possible.trim().endsWith("\\") ) {
             return true;
         } else {
             int ipos1= 0;
             while ( ipos1<possible.length() && Character.isWhitespace( possible.charAt(ipos1) ) ) ipos1++;
+            if ( possible.trim().length()==0 ) {
+                return false;
+            }
             int ipos2= 0;
             while ( ipos2<tail.length() && Character.isWhitespace( tail.charAt(ipos2) ) ) ipos2++;
             return ipos1<ipos2;
