@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,14 +36,11 @@ import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.Converter;
 import org.autoplot.dom.ChangesSupport.DomLock;
-import static org.autoplot.dom.DomOps.fixHorizontalLayout;
 import org.autoplot.state.StatePersistence;
 import org.das2.components.propertyeditor.Displayable;
 import org.das2.graph.DasColumn;
-import org.das2.graph.DasRow;
 import org.das2.qds.QDataSet;
 import org.das2.util.ColorUtil;
-import org.das2.util.GrannyTextRenderer;
 
 /**
  * operations for the DOM, such as search-for-node and child properties
@@ -607,15 +603,17 @@ public class DomUtil {
      * @return the index or -1.
      */
     public static int indexOf(List<Object> nodes, Object node) {
+        if ( node==null ) throw new NullPointerException("node is null");
         boolean isDomNode = node instanceof DomNode;
         if (!isDomNode) {
             return nodes.indexOf(node);
         } else {
+            String findId= ((DomNode) node).id;
             for (int i = 0; i < nodes.size(); i++) {
                 DomNode n1 = (DomNode) nodes.get(i);
                 if (n1 == node) return i;
                 String id = n1.getId();
-                if (!id.equals("") && id.equals(((DomNode) node).id)) {
+                if (!id.equals("") && id.equals(findId)) {
                     return i;
                 }
             }
@@ -904,11 +902,11 @@ public class DomUtil {
     }
 
     private static void checkIds( HashSet<String> ids, DomNode[] n, List<String> problems ) {
-        for ( int i=0; i<n.length; i++ ) {
-            if ( ids.contains(n[i].id) ) {
-                problems.add("multiple nodes have the same id: "+n[i].id);
+        for (DomNode n1 : n) {
+            if (ids.contains(n1.id)) {
+                problems.add("multiple nodes have the same id: " + n1.id);
             }
-            ids.add(n[i].id);
+            ids.add(n1.id);
         }
     }
     
@@ -971,7 +969,7 @@ public class DomUtil {
                     problems.add("unable to find column "+p.getColumnId()+" for plot  "+p.getId());
             }
             
-            HashSet<String> ids= new HashSet<String>();
+            HashSet<String> ids= new HashSet<>();
             checkIds( ids, application.getPlots(), problems );
             checkIds( ids, application.getPlotElements(), problems );
             checkIds( ids, application.getDataSourceFilters(), problems );
