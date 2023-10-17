@@ -390,25 +390,35 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     }
     
     /**
+     * open a connection to retrieve the URL, possibly handling one redirect.
+     * @param url the URL, such as http://jupiter.physics.uiowa.edu/das/server?server=logo
+     * @return the input stream.
+     * @throws IOException 
+     */
+    private InputStream openConnection( URL url ) throws IOException {
+        HttpURLConnection httpConn= (HttpURLConnection)url.openConnection();
+        int nStatus= httpConn.getResponseCode();
+        if ( nStatus==301 ) {
+            String newUrl= httpConn.getHeaderField("Location");
+            httpConn.disconnect(); //TODO: this is sloppy.  The buffer needs to be emptied.
+            if ( newUrl==null ) {
+                throw new IllegalArgumentException("301 response but no new location");
+            }
+            httpConn=  (HttpURLConnection) new URL(newUrl).openConnection();
+            nStatus= ((HttpURLConnection) httpConn).getResponseCode();
+            //if ( conn.getHeaderField("Strict-Transport-Security"))
+        }
+        return httpConn.getInputStream();        
+    }
+    
+    /**
      * this is called off the event thread for the web transaction, then hop back on it to populate the GUI.
      * @param url
      */
     private void updateDataSetSelected( final URL url ) {
         InputStream in= null;
         try {
-            HttpURLConnection httpConn= (HttpURLConnection)url.openConnection();
-            int nStatus= httpConn.getResponseCode();
-            if ( nStatus==301 ) {
-                String newUrl= httpConn.getHeaderField("Location");
-                httpConn.disconnect(); //TODO: this is sloppy.  The buffer needs to be emptied.
-                if ( newUrl==null ) {
-                    throw new IllegalArgumentException("301 response but no new location");
-                }
-                httpConn=  (HttpURLConnection) new URL(newUrl).openConnection();
-                nStatus= ((HttpURLConnection) httpConn).getResponseCode();
-                //if ( conn.getHeaderField("Strict-Transport-Security"))
-            }
-            in = httpConn.getInputStream();
+            in= openConnection(url);
             StringBuilder sb = new StringBuilder();
             int by = in.read();
             while (by != -1) {
@@ -860,7 +870,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     private void showDsdf( URL url ) {
       InputStream in= null ;
         try {
-            in = url.openStream();
+            in = openConnection(url);
 
             StringBuilder sb= new StringBuilder();
 
