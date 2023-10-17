@@ -378,11 +378,11 @@ public class DomOps {
      * @param dom
      */
     public static void newCanvasLayout( Application dom ) {
-        fixLayout( dom );
+        fixLayout( dom, Collections.emptyMap() );
         
     }
 
-    /**
+/**
      * New layout mechanism which fixes a number of shortcomings of the old layout mechanism, 
      * newCanvasLayout.  This one:<ul>
      * <li> Removes extra whitespace
@@ -394,7 +394,27 @@ public class DomOps {
      * This should also be idempotent, where calling this a second time should have no effect.
      * @param dom an application state, with controller nodes. TODO: remove dependence on controller nodes.
      */
-    public static void fixLayout( Application dom ) {
+    public static void fixLayout( Application dom) {
+        fixLayout( dom, Collections.emptyMap() );
+    }
+        
+    /**
+     * New layout mechanism which fixes a number of shortcomings of the old layout mechanism, 
+     * newCanvasLayout.  This one:<ul>
+     * <li> Removes extra whitespace
+     * <li> Preserves relative size weights.
+     * <li> Preserves em heights, to support components which should not be rescaled. (Not yet supported.)
+     * <li> Preserves space taken by strange objects, to support future canvas components.
+     * <li> Renormalizes the margin row, so it is nice. (Not yet supported.  This should consider font size, where large fonts don't need so much space.)
+     * </ul>
+     * This should also be idempotent, where calling this a second time should have no effect.
+     * Additional options include:<ul>
+     * <li>interPlotVerticalSpacing - 1em
+     * </ul>
+     * @param dom an application state, with controller nodes. TODO: remove dependence on controller nodes.
+     * @param options additional options, including interPlotVerticalSpacing.
+     */
+    public static void fixLayout( Application dom, Map<String,String> options  ) {
         Logger logger= LoggerManager.getLogger("autoplot.dom.layout");
         logger.fine( "enter fixLayout" );
                 
