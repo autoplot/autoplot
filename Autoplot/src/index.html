@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Fun blooper when X and Y values were exchanged.</small></p>
+        <p><small>Barrel mission SSPC data is used to demonstrate vertical slice.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,9 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-10-05 r27186):</p>
+        <p>Bugfixes (2023-10-17 r27186):</p>
         <ul>
+            <li>setLayout(2,2) would create two columns incorrectly indicating the marginRow is their parent, instead of the marginColumn.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2553/">2553</a>: Das2Server support for 301 redirects with list and landing page.
             <li>Static Code Analysis inspects else clause for usages.
             <li>histogram editor panel had a bug in regex, breaking it in most cases.
@@ -64,6 +65,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>rfe811: add map to fixLayout call which will support a dialog of options.  Add methods to support fixLayout on any DOM, not necessary the "live" one.
             <li>SeriesRenderer gets kludgey "moduloY" control which will avoid a connection from 24 to 0 hours.
             <li>Jython __setItem__ has special branch for when all indices are numbers, improving performance by using simpler code.
             <li>legacy storage for options like width and height are no longer imported from Autoplot versions older than five years ago.
