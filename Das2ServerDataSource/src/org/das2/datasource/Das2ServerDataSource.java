@@ -246,7 +246,7 @@ public final class Das2ServerDataSource extends AbstractDataSource {
         //&start_time=1980-11-12T05%3A00%3A00.000Z
         //&end_time=1980-11-12T06%3A25%3A01.000Z
         //&server=dataset
-        //&interval=300.0    // interval in seconds
+        //&interval=300.0    // interval in seconds 
         //&ascii=1'
         mon.started();
 
