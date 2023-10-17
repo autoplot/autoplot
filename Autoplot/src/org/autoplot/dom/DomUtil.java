@@ -3,6 +3,7 @@ package org.autoplot.dom;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Rectangle;
 import java.beans.IndexedPropertyDescriptor;
 import java.beans.IntrospectionException;
 import java.beans.PropertyChangeSupport;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,10 +37,14 @@ import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.Converter;
 import org.autoplot.dom.ChangesSupport.DomLock;
+import static org.autoplot.dom.DomOps.fixHorizontalLayout;
 import org.autoplot.state.StatePersistence;
 import org.das2.components.propertyeditor.Displayable;
+import org.das2.graph.DasColumn;
+import org.das2.graph.DasRow;
 import org.das2.qds.QDataSet;
 import org.das2.util.ColorUtil;
+import org.das2.util.GrannyTextRenderer;
 
 /**
  * operations for the DOM, such as search-for-node and child properties
@@ -1111,6 +1117,70 @@ public class DomUtil {
         return template;
     }
 
+    /**
+     * convert the layout to the pixel position if the top of the row.
+     * @param dom the layout containing the column
+     * @param row the row
+     * @param position a string like "100%-1em+1px"
+     * @return 
+     */
+    public static int getRowPositionPixels( Application dom, Row row, String position  ) {
+        Canvas c= dom.getCanvases(0);
+        Font f= Font.decode(c.getFont());
+        String parent= row.getParent();
+        double dpos;
+        if ( parent.length()>0 ) {
+            Row parentRow= (Row) getElementById( dom, parent );
+            int pmin= getRowPositionPixels( dom, parentRow, parentRow.getTop() );
+            int pmax= getRowPositionPixels( dom, parentRow, parentRow.getBottom() );
+            dpos= pmin + DasColumn.parseLayoutStr( position, f.getSize2D(), pmax-pmin, -1 );
+        } else {
+            dpos= DasColumn.parseLayoutStr( position, f.getSize2D(), c.getHeight(), -1 );
+        }
+        return (int)dpos;
+    }
+    
+    /**
+     * convert the layout to the pixel position if the left side of the column.  The one
+     * and only canvas is used for the width.
+     * @param dom the layout containing the column
+     * @param col the column
+     * @param  position a string like "100%-5em"
+     * @return 
+     */
+    public static int getColumnPositionPixels( Application dom, Column col, String position ) {
+        Canvas c= dom.getCanvases(0);
+        Font f= Font.decode(c.getFont());
+        String parent= col.getParent();
+        double dpos;
+        if ( parent.length()>0 ) {
+            Column parentColumn= (Column) getElementById( dom, parent );
+            int pmin= getColumnPositionPixels( dom, parentColumn, parentColumn.getLeft() );
+            int pmax= getColumnPositionPixels( dom, parentColumn, parentColumn.getRight() );
+            dpos= pmin + DasColumn.parseLayoutStr( position, f.getSize2D(), pmax-pmin, -1 );
+        } else {
+            dpos= DasColumn.parseLayoutStr( position, f.getSize2D(), c.getWidth(), -1 );
+        }
+        return (int)dpos;
+    }
+    
+    /**
+     * return the bounds for the plot.  This is not intuitively difficult to do, but since one Row is generally
+     * relative to another row, this is not trivial.
+     * @param dom the layout containing the plot
+     * @param p the plot
+     * @return the bounds 
+     */
+    public static Rectangle getBoundsForPlot( Application dom, Plot p ) {
+        Row row= (Row)getElementById( dom, p.getRowId() );
+        Column col= (Column)getElementById( dom, p.getColumnId() );
+        int c0= (int)getColumnPositionPixels( dom, col, col.getLeft() );
+        int c1= (int)getColumnPositionPixels( dom, col, col.getRight() );
+        int r0= (int)getRowPositionPixels( dom, row, row.getTop() );
+        int r1= (int)getRowPositionPixels( dom, row, row.getBottom() );
+        return new Rectangle( c0, r0, c1-c0, r1-r0 );
+    }
+    
     /**
      * Find the binding, if it exists.  All bindingImpls are symmetric, so the src and dst order is ignored in this
      * search.
