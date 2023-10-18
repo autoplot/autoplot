@@ -32,10 +32,11 @@
                 
         <p>Bugfixes (2023-10-18 r27186):</p>
         <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2555/">2555</a>: orbit plot handles "+2hr/4" when there are multiple passes that are distant in time.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/1469/">1469</a>: ASCII parser dropped a record when "where" was used and non-records followed the data.  Thanks, Bill!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2555/">2555</a>: orbit plot handles "+2hr/4" when there are multiple passes that are distant in time.  Thanks, Sadie!
             <li>TimeUtil.ceil(TimeUtil.HOUR,datum('2023-10-17T16:45')) corrected.
             <li>setLayout(2,2) would create two columns incorrectly indicating the marginRow is their parent, instead of the marginColumn.
-            <li>https Das2Servers are offered as defaults, not the old http addresses.
+            <li>https Das2Servers are offered as defaults, not the old http addresses.  Thanks, Chris!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2553/">2553</a>: Das2Server support for 301 redirects with list and landing page.
             <li>Static Code Analysis inspects else clause for usages.
             <li>histogram editor panel had a bug in regex, breaking it in most cases.
