@@ -2,6 +2,7 @@
 package org.autoplot.dom;
 
 import java.awt.Rectangle;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -445,16 +446,20 @@ public class DomOps {
                rm.add( rows[i] );
            }
         }
-        for ( Row r : rm ) {
-            canvas.getController().deleteRow(r);
-        }
+        
+        List<Row> rowsList= new ArrayList<>(Arrays.asList(rows));
+        rm.forEach((r) -> {
+            rowsList.remove(r);
+        });
+        canvas.setRows( rowsList.toArray(new Row[rowsList.size()]));
+        
         rows= canvas.getRows();
         nrow= rows.length;
  
         // sort rows, which is a refactoring.
         Arrays.sort( rows, (Row r1, Row r2) -> {
-            int d1= r1.getController().getDasRow().getDMinimum();
-            int d2= r2.getController().getDasRow().getDMinimum();
+            int d1= DomUtil.getRowPositionPixels( dom, r1, r1.getTop() );
+            int d2= DomUtil.getRowPositionPixels( dom, r2, r2.getTop() );
             return d1-d2;
         });
         
@@ -505,8 +510,9 @@ public class DomOps {
 
         double [] relativePlotHeight= new double[ nrow ];
         for ( int i=0; i<nrow; i++ ) {
-            DasRow dasRow= rows[i].getController().dasRow;
-            relativePlotHeight[i]= 1.0 * dasRow.getHeight() / totalPlotHeightPixels;
+            int r0= DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getTop() );
+            int r1= DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getBottom() );
+            relativePlotHeight[i]= 1.0 * (r1-r0) / totalPlotHeightPixels;
         }
         
         double newPlotTotalHeightPixels= canvas.height;
@@ -521,12 +527,24 @@ public class DomOps {
 
         double[] normalPlotHeight= new double[ nrow ];
 
-        double height= dom.getCanvases(0).getMarginRow().getController().getDasRow().getHeight();
+        Row row= dom.getCanvases(0).getMarginRow();
+        int r0= DomUtil.getRowPositionPixels( dom, row, row.getTop() );
+        int r1= DomUtil.getRowPositionPixels( dom, row, row.getBottom() );
+        double height= r1-r0;
         
-        double marginHeightPixels= 
-                ( dom.getCanvases(0).getMarginRow().getController().getDasRow().getEmMinimum() -
-                dom.getCanvases(0).getMarginRow().getController().getDasRow().getEmMaximum() ) * emToPixels ;
-        
+        double[] pptop,ppbot;
+        try {
+            pptop= DasRow.parseLayoutStr(dom.getCanvases(0).getMarginRow().getTop());
+        } catch ( ParseException ex ) {
+            pptop= new double[] {0,0,0};
+        }
+        try {
+            ppbot= DasRow.parseLayoutStr(dom.getCanvases(0).getMarginRow().getBottom());
+        }catch ( ParseException ex ) {
+            ppbot= new double[] {0,0,0};
+        }
+        double marginHeightPixels= ( pptop[1] - ppbot[1] ) * emToPixels;
+                
         if ( nrow==1 ) {
             normalPlotHeight[0]= ( newPlotHeight[0] + MaxUp[0] + MaxDown[0] ) / ( height + marginHeightPixels );
         } else {
