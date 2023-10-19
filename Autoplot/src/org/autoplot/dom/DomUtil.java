@@ -1116,11 +1116,12 @@ public class DomUtil {
     }
 
     /**
-     * convert the layout to the pixel position if the top of the row.
-     * @param dom the layout containing the column
+     * convert the layout to the pixel position if the top of the row.  Note
+     * this is not trivial, because the parent must be considered as well.
+     * @param dom the layout containing the row, and canvases[0] is used.
      * @param row the row
      * @param position a string like "100%-1em+1px"
-     * @return 
+     * @return the position in pixels
      */
     public static int getRowPositionPixels( Application dom, Row row, String position  ) {
         Canvas c= dom.getCanvases(0);
@@ -1140,11 +1141,12 @@ public class DomUtil {
     
     /**
      * convert the layout to the pixel position if the left side of the column.  The one
-     * and only canvas is used for the width.
-     * @param dom the layout containing the column
+     * and only canvas is used for the width.  Note
+     * this is not trivial, because the parent must be considered as well.
+     * @param dom the layout containing the column, and canvases[0] is used.
      * @param col the column
      * @param  position a string like "100%-5em"
-     * @return 
+     * @return the position in pixels.
      */
     public static int getColumnPositionPixels( Application dom, Column col, String position ) {
         Canvas c= dom.getCanvases(0);
