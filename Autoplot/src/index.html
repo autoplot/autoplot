@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Barrel mission SSPC data is used to demonstrate vertical slice.</small></p>
+        <p><small>Plot ephemerisLineCount property allows the size of the plot to be calculated before the ephemeris are loaded.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,9 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-10-20 r27219):</p>
+        <p>Bugfixes (2023-10-20 r27220):</p>
         <ul>
+            <li>remove old test which unnecessarily abandoned the tick bounds calculation when more lines were requested for ticks than needed.
         </ul>
         <p>Older Bugfixes (2023-08-29 r27149):</p>
         <ul> 
