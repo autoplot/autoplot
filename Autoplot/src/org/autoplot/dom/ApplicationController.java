@@ -2357,6 +2357,8 @@ public class ApplicationController extends DomNodeController implements RunLater
 
             application.setTimeRange( Application.DEFAULT_TIME_RANGE );
             application.getPlots(0).setTicksURI("");
+            application.getPlots(0).setEphemerisLabels("");
+            application.getPlots(0).setEphemerisLineCount(-1);
             application.getPlots(0).setContext( application.getPlots(0).getXaxis().getRange() );
 
             application.setEventsListUri("");
