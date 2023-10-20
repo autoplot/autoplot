@@ -468,8 +468,9 @@ public class DomOps {
            List<Plot> plots= DomOps.getPlotsFor( dom, rows[i], true );
 
            if ( plots.size()>0 ) {
-               DasRow dasRow= rows[i].getController().dasRow;
-               totalPlotHeightPixels= totalPlotHeightPixels + dasRow.getHeight();
+               int d1 = DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getTop() );
+               int d2 = DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getBottom() );
+               totalPlotHeightPixels= totalPlotHeightPixels + ( d2-d1 );
            }
         }
         
@@ -497,8 +498,8 @@ public class DomOps {
                             new Object[]{plotj.getId(), addLines, plotj.isDisplayTitle(), lc});
                     //if (MaxUpJEm>0 ) MaxUpJEm= MaxUpJEm+1;
                     MaxUp[i]= Math.max( MaxUp[i], MaxUpJEm*emToPixels );
-                    Rectangle plot= plotj.getController().getDasPlot().getBounds();
-                    Rectangle axis= plotj.getXaxis().getController().getDasAxis().getBounds();
+                    Rectangle plot= DomUtil.getBoundsForPlot( dom, plotj );
+                    Rectangle axis= DomUtil.getBoundsForXAxis( dom, plotj );
                     MaxDownPx= ( ( axis.getY() + axis.getHeight() ) - ( plot.getY() + plot.getHeight() ) + 1 * emToPixels );
                     MaxDown[i]= Math.max( MaxDown[i], MaxDownPx );
                     doAdjust[i]= true;
@@ -562,8 +563,11 @@ public class DomOps {
                 position+= normalPlotHeight[i];
                 String newBottom= String.format( Locale.US, "%.2f%%%+.2fem", 100*position, -1 * MaxDown[i] * pixelsToEm );
                 rows[i].setBottom( newBottom );
-                DasRow dasRow= rows[i].getController().dasRow;
-                logger.log(Level.FINE, "row {0}: {1},{2} ({3} pixels)", new Object[]{i, newTop, newBottom, dasRow.getHeight() });
+                if ( logger.isLoggable( Level.FINE ) ) {
+                    r0= (int)DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getTop() );
+                    r1= (int)DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getBottom() );
+                    logger.log(Level.FINE, "row {0}: {1},{2} ({3} pixels)", new Object[]{i, newTop, newBottom, r1-r0 });
+                }
             } else {
                 logger.log(Level.FINE, "row {0} is not adjusted", i );
             }

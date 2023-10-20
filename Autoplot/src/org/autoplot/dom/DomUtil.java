@@ -1165,11 +1165,14 @@ public class DomUtil {
     }
     
     /**
-     * return the bounds for the plot.  This is not intuitively difficult to do, but since one Row is generally
+     * return the bounds for the plot, including the space needed for the title but not the space
+     * needed for the axes.  This is not intuitively difficult to do, but since one Row is generally
      * relative to another row, this is not trivial.
      * @param dom the layout containing the plot
      * @param p the plot
      * @return the bounds 
+     * @see #getRowPositionPixels(org.autoplot.dom.Application, org.autoplot.dom.Row, java.lang.String) 
+     * @see #getColumnPositionPixels(org.autoplot.dom.Application, org.autoplot.dom.Column, java.lang.String) 
      */
     public static Rectangle getBoundsForPlot( Application dom, Plot p ) {
         Row row= (Row)getElementById( dom, p.getRowId() );
@@ -1177,10 +1180,41 @@ public class DomUtil {
         int c0= (int)getColumnPositionPixels( dom, col, col.getLeft() );
         int c1= (int)getColumnPositionPixels( dom, col, col.getRight() );
         int r0= (int)getRowPositionPixels( dom, row, row.getTop() );
+        int titleHeightLines= p.getTitle().trim().split("\n|\\<br\\>|\\!c",2).length;
+        int ems= Font.decode(dom.getCanvases(0).font).getSize(); //TODO: verify this is ems
+        r0= r0-titleHeightLines*ems;
         int r1= (int)getRowPositionPixels( dom, row, row.getBottom() );
         return new Rectangle( c0, r0, c1-c0, r1-r0 );
     }
     
+    /**
+     * return the bounds for the plot, including the space needed for the title but not the space
+     * needed for the axes.  This is not intuitively difficult to do, but since one Row is generally
+     * relative to another row, this is not trivial.
+     * @param dom the layout containing the plot
+     * @param p the plot
+     * @return the bounds 
+     * @see #getRowPositionPixels(org.autoplot.dom.Application, org.autoplot.dom.Row, java.lang.String) 
+     * @see #getColumnPositionPixels(org.autoplot.dom.Application, org.autoplot.dom.Column, java.lang.String) 
+     */
+    public static Rectangle getBoundsForXAxis( Application dom, Plot p ) {
+        Axis xaxis= p.getXaxis();
+        Row row= (Row)getElementById( dom, p.getRowId() );
+        Column col= (Column)getElementById( dom, p.getColumnId() );
+        int c0= (int)getColumnPositionPixels( dom, col, col.getLeft() );
+        int c1= (int)getColumnPositionPixels( dom, col, col.getRight() );
+        int r1= (int)getRowPositionPixels( dom, row, row.getBottom() );
+        int r0= r1;
+        int axisLines= 1 + xaxis.getLabel().trim().split("\n|\\<br\\>|\\!c",2).length;
+        if ( p.getTicksURI().trim().length()>0 ) {
+            int nominalNumberOfTicksLines= 5;
+            axisLines+= nominalNumberOfTicksLines;
+        }
+        int ems= Font.decode(dom.getCanvases(0).font).getSize(); //TODO: verify this is ems
+        r1= r1+axisLines*ems;
+        return new Rectangle( c0, r0, c1-c0, r1-r0 );
+    }
+        
     /**
      * Find the binding, if it exists.  All bindingImpls are symmetric, so the src and dst order is ignored in this
      * search.
