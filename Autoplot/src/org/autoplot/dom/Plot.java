@@ -371,7 +371,7 @@ public class Plot extends DomNode {
     }
 
     /**
-     * explicitly set the label for each line of ephemeris
+     * explicitly set the label for each line of ephemeris, using a semi-colon delimited list of labels.
      * @param ephemerisLabels 
      */
     public void setEphemerisLabels(String ephemerisLabels) {
