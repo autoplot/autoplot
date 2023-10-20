@@ -30,8 +30,11 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-10-18 r27186):</p>
+        <p>Bugfixes (2023-10-20 r27219):</p>
         <ul>
+        </ul>
+        <p>Older Bugfixes (2023-08-29 r27149):</p>
+        <ul> 
             <li><a href="https://sourceforge.net/p/autoplot/bugs/1469/">1469</a>: ASCII parser dropped a record when "where" was used and non-records followed the data.  Thanks, Bill!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2555/">2555</a>: orbit plot handles "+2hr/4" when there are multiple passes that are distant in time.  Thanks, Sadie!
             <li>TimeUtil.ceil(TimeUtil.HOUR,datum('2023-10-17T16:45')) corrected.
@@ -48,27 +51,12 @@
             <li>%{CONTEXT} macro in annotations properly listens to updates in the plot's focus dataset.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2542/">2542</a>: Javadoc improvements 
         </ul>
-        <p>Older Bugfixes (2023-08-29 r27149):</p>
-        <ul> 
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2541/">2541</a>: check for non-int in examples list for integer parameter.
-            <li><a href="https://github.com/das-developers/das2java/issues/78">78</a>: account for DasAxis property for multi-line format when positioning labels. Thanks, James!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2539/">2539</a>: format to CSV for rank 1 N(T).
-            <li><a href="https://github.com/das-developers/das2java/issues/70">70</a>:Copy-n-paste data from DataPointRecorder didn't properly use formatter.  Thanks, Masafumi!
-            <li>Export-to-CDF with append detects that DEPEND_1 and DEPEND_2 can be reused.  Thanks, Kristoff!
-            <li>DasCanvas topDecorators were drawn twice when a png was requested.
-            <li>GitHub/GitLabs ETAGs were used to identify fresh cache files, but not to reload cached files.  Thanks, Bill!
-            <li>clean up StringSchemeEditors so that setContext can be used.  Thanks, Jim!
-            <li>when PNG Walk was accessed with *.PNG and files of different lengths were used, a runtime error could occur.
-            <li><a href="https://github.com/das-developers/das2java/issues/68">68</a>: put in a check for self.putProperty('DEPEND_0',self) which would cause strange problems.  Thanks, Jim!
-            <li><a href="https://github.com/das-developers/das2java/issues/70">70</a>: support $Y$m$d_$(H;delta=6) (and MMS files which each contain six hours of data).  Thanks, Sadie!
-            <li>vap+cdaweb:ds=DN_MAGN-L2-HIRES_G17&filter=DN_MA&id=b_eci gets labels from the master CDF file
-            <li>NetCDF library updated to support CDAWeb's ICON_l2-5_FUV_NIGHT.  Thanks, Gilda!
-            <li>QDataSet equivalent checks to see that the same indices are fill and valid.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2533/">2533</a>: don't display warning message "slice on non-qube, dep1 has rank=2" when BINS_1="min,max" is used. 
-            <li>PDS4 variable dimensions are shown in GUI.
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>plot.ephemerisLineCount property added, so that the layout can be done before ephemeris is loaded.
+        </ul>
+        <p>Less recent features:</p>
+        <ul> 
             <li>Identify dataset scheme T&rarr;Y&rarr;X, which should be phased out.
             <li>rfe811: add map to fixLayout call which will support a dialog of options.  Add methods to support fixLayout on any DOM, not necessary the "live" one.
             <li>SeriesRenderer gets kludgey "moduloY" control which will avoid a connection from 24 to 0 hours.
@@ -76,19 +64,6 @@
             <li>legacy storage for options like width and height are no longer imported from Autoplot versions older than five years ago.
             <li>"Display Data" mouse action shows the number of selected records, useful for counting.
             <li>Round the valid min, valid max, and fill value from CDF files to seven decimal places to make them more legible, since the CDF library converts floats to doubles.
-        </ul>
-        <p>Less recent features:</p>
-        <ul> 
-            <li>Das2 DasAxis object getAxisBounds is now public.  Thanks, Jim!
-            <li>Support sub-millisecond Das2Server data requests.  Thanks, Masafumi!
-            <li>DataPointRecorder timeFormat parameter supported, supporting sub-microsecond time resolution.  Thanks, Masafumi!
-            <li>sense mouse wheel events on symbolSize and lineThick GUIs, to remove tedium of many mouse clicks.  Thanks, Connor!
-            <li>DasAxis format property has a specialized GUI editor now.  Thanks, Jim!
-            <li>apl_color_quantization colorbar added.  Thanks, Jim!
-            <li>improve support for flatten and flattenWaveform to support https://cdaweb.gsfc.nasa.gov/sp_phys/data/psp/fields/l2/dfb_dbm_dvac/.  Thanks, Sadie!
-            <li><a href="https://github.com/das-developers/das2java/issues/66">66</a>: add LegendPosition.OutsideSE so support Jim and 1-em-height events bars.  Thanks, Jim!
-            <li><a href="https://github.com/das-developers/das2java/issues/65">65</a>: add new tcaRows property, which allocates space for ephemeris before ephemeris is loaded.
-            <li><a href="https://github.com/das-developers/das2java/issues/64">64</a>: add new xname and yname properties so the DataPointRecorder can name x and y columns.  Thanks, Bill!
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
