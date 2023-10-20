@@ -2087,6 +2087,7 @@ public final class PlotController extends DomNodeController {
         ac.bind( this.plot, Plot.PROP_CONTEXT, p, DasPlot.PROP_CONTEXT, plotContextConverter );
         ac.bind( this.plot, Plot.PROP_BACKGROUND, p, DasPlot.PROP_DRAWBACKGROUND );
         ac.bind(this.plot, Plot.PROP_EPHEMERIS_LABELS, p.getXAxis(), DasAxis.PROP_TCALABELS );
+        ac.bind( this.plot, Plot.PROP_EPHEMERISLINECOUNT, p.getXAxis(), DasAxis.PROP_TCAROWS );
         
     }
 
