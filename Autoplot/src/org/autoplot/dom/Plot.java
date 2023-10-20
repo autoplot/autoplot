@@ -419,6 +419,7 @@ public class Plot extends DomNode {
         if (!exclude.contains(PROP_CONTEXT)) this.setContext(that.getContext());
         if (!exclude.contains(PROP_TICKS_URI)) this.setTicksURI(that.getTicksURI());
         if (!exclude.contains(PROP_EPHEMERIS_LABELS)) this.setEphemerisLabels(that.getEphemerisLabels());
+        if (!exclude.contains(PROP_EPHEMERISLINECOUNT)) this.setEphemerisLineCount(that.getEphemerisLineCount());
         if (!exclude.contains(PROP_LEGENDPOSITION)) this.setLegendPosition(that.getLegendPosition());
         if (!exclude.contains(PROP_COLORBARCOLUMNPOSITION)) this.setColorbarColumnPosition( that.getColorbarColumnPosition() );
         if (!exclude.contains(PROP_FONTSIZE) ) this.setFontSize(that.getFontSize());
@@ -473,6 +474,8 @@ public class Plot extends DomNode {
         if (!b) result.add(new PropertyChangeDiff(PROP_TICKS_URI, that.ticksURI, this.ticksURI));
         b= that.ephemerisLabels.equals(this.ephemerisLabels);
         if (!b) result.add(new PropertyChangeDiff(PROP_EPHEMERIS_LABELS, that.ephemerisLabels, this.ephemerisLabels));
+        b= that.ephemerisLineCount==this.ephemerisLineCount;
+        if (!b) result.add(new PropertyChangeDiff(PROP_EPHEMERISLINECOUNT, that.ephemerisLineCount, this.ephemerisLineCount));
         b= that.legendPosition.equals(this.legendPosition);
         if (!b) result.add(new PropertyChangeDiff(PROP_LEGENDPOSITION, that.legendPosition, this.legendPosition ));
         b= that.colorbarColumnPosition.equals(this.colorbarColumnPosition);
