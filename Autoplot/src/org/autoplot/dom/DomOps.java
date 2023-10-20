@@ -393,7 +393,7 @@ public class DomOps {
      * <li> Renormalizes the margin row, so it is nice. (Not yet supported.  This should consider font size, where large fonts don't need so much space.)
      * </ul>
      * This should also be idempotent, where calling this a second time should have no effect.
-     * @param dom an application state, with controller nodes. TODO: remove dependence on controller nodes.
+     * @param dom an application state. 
      */
     public static void fixLayout( Application dom) {
         fixLayout( dom, Collections.emptyMap() );
@@ -412,7 +412,7 @@ public class DomOps {
      * Additional options include:<ul>
      * <li>interPlotVerticalSpacing - 1em
      * </ul>
-     * @param dom an application state, with controller nodes. TODO: remove dependence on controller nodes.
+     * @param dom an application state.
      * @param options additional options, including interPlotVerticalSpacing.
      */
     public static void fixLayout( Application dom, Map<String,String> options  ) {
@@ -585,7 +585,7 @@ public class DomOps {
      * <li> Renormalizes the margin row, so it is nice. (Not yet supported.  This should consider font size, where large fonts don't need so much space.)
      * </ul>
      * This should also be idempotent, where calling this a second time should have no effect.
-     * @param dom an application state, with controller nodes. TODO: remove dependence on controller nodes.
+     * @param dom an application state, with controller nodes. 
      * @see #fixLayout(org.autoplot.dom.Application) 
      */
     public static void fixHorizontalLayout( Application dom ) {
