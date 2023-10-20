@@ -1206,8 +1206,14 @@ public class DomUtil {
         int r0= r1;
         int axisLines= 1 + xaxis.getLabel().trim().split("\n|\\<br\\>|\\!c",2).length;
         if ( p.getTicksURI().trim().length()>0 ) {
-            int nominalNumberOfTicksLines= 5;
-            axisLines+= nominalNumberOfTicksLines;
+            if ( p.getEphemerisLineCount()>-1 ) {
+                axisLines+= p.getEphemerisLineCount();
+            } else if ( p.getEphemerisLabels().trim().length()>0 ) {
+                axisLines+= p.getEphemerisLabels().split(";").length;
+            } else {
+                int nominalNumberOfTicksLines= 5;
+                axisLines+= nominalNumberOfTicksLines;
+            }
         }
         int ems= Font.decode(dom.getCanvases(0).font).getSize(); //TODO: verify this is ems
         r1= r1+axisLines*ems;
