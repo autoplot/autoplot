@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.5" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+  </AuxValues>
+
+  <Layout>
+    <DimensionLayout dim="0">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" attributes="0">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="12" pref="12" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="moveLegendsToOutsideNECheckBox" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Component id="verticalSpacingCheckBox" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="verticalSpacingComboBox" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Component id="hideTimeAxesCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="hideTitlesCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+              </Group>
+              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+    <DimensionLayout dim="1">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="verticalSpacingCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="verticalSpacingComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="hideTitlesCheckBox" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="hideTimeAxesCheckBox" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="moveLegendsToOutsideNECheckBox" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="0" pref="184" max="32767" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+  </Layout>
+  <SubComponents>
+    <Component class="javax.swing.JLabel" name="jLabel1">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Fix Layout"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="verticalSpacingCheckBox">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Vertical spacing between plots:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="verticalSpacingComboBox">
+      <Properties>
+        <Property name="editable" type="boolean" value="true"/>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="5">
+            <StringItem index="0" value="0em"/>
+            <StringItem index="1" value="0.5em"/>
+            <StringItem index="2" value="1em"/>
+            <StringItem index="3" value="2em"/>
+            <StringItem index="4" value=" "/>
+          </StringArray>
+        </Property>
+      </Properties>
+      <BindingProperties>
+        <BindingProperty name="enabled" source="verticalSpacingCheckBox" sourcePath="${selected}" target="verticalSpacingComboBox" targetPath="enabled" updateStrategy="0" immediately="false"/>
+      </BindingProperties>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+      </AuxValues>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="moveLegendsToOutsideNECheckBox">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Move legends to outside NE"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="hideTimeAxesCheckBox">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Hide time (X) axes"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="hideTitlesCheckBox">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Hide Titles"/>
+      </Properties>
+    </Component>
+  </SubComponents>
+</Form>
