@@ -335,6 +335,33 @@ public class Plot extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_TICKS_URI, old, ticksURI );
     }
 
+    /**
+     * -1 or the number of lines to allocate space for ephemeris.
+     */
+    private int ephemerisLineCount = -1;
+
+    public static final String PROP_EPHEMERISLINECOUNT = "ephemerisLineCount";
+
+    /**
+     * 0 or the number of lines to allocate space for ephemeris.  Note this is set automatically when the ephemeris is
+     * loaded.  This was introduced so that fixLayout could be performed without knowing what the TCA dataset contains.
+     * @return the line count or -1 if no lines are allocated.
+     */
+    public int getEphemerisLineCount() {
+        return ephemerisLineCount;
+    }
+
+    /**
+     * 0 or the number of lines to allocate space for ephemeris.  Note this is set automatically when the ephemeris is
+     * loaded.
+     * @param ephemerisLineCount 
+     */
+    public void setEphemerisLineCount(int ephemerisLineCount) {
+        int oldEphemerisLineCount = this.ephemerisLineCount;
+        this.ephemerisLineCount = ephemerisLineCount;
+        propertyChangeSupport.firePropertyChange(PROP_EPHEMERISLINECOUNT, oldEphemerisLineCount, ephemerisLineCount);
+    }
+
     private String ephemerisLabels="";
 
     public static final String PROP_EPHEMERIS_LABELS = "ephemerisLabels";
