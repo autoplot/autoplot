@@ -619,26 +619,28 @@ public class DomOps {
                rm.add( columns[i] );
            }
         }
+        ArrayList columnsList= new ArrayList(Arrays.asList(columns));
         rm.forEach((r) -> {
-            canvas.getController().deleteColumn(r);
+            columnsList.remove(r);
         });
+        canvas.setColumns((Column[]) columnsList.toArray( new Column[columnsList.size()]));
         columns= canvas.getColumns();
         ncolumn= columns.length;
  
         // sort rows, which is a refactoring.
-        Arrays.sort( columns, (Column r1, Column r2) -> {
-            int d1= r1.getController().getDasColumn().getDMinimum();
-            int d2= r2.getController().getDasColumn().getDMinimum();
-            return d1-d2;
-        });
+        Arrays.sort( columns, (Column c1, Column c2) -> {
+            int d1= DomUtil.getColumnPositionPixels( dom, c1, c1.getLeft() );
+            int d2= DomUtil.getColumnPositionPixels( dom, c2, c2.getLeft() );
+            return d1-d2;        });
         
         double totalPlotSizePixels= 0;
         for ( int i=0; i<ncolumn; i++ ) {           
            List<Plot> plots= DomOps.getPlotsFor( dom, columns[i], true );
 
            if ( plots.size()>0 ) {
-               DasColumn dasColumn= columns[i].getController().dasColumn;
-               totalPlotSizePixels= totalPlotSizePixels + dasColumn.getWidth();
+               int d1 = DomUtil.getColumnPositionPixels( dom, columns[i], columns[i].getLeft() );
+               int d2 = DomUtil.getColumnPositionPixels( dom, columns[i], columns[i].getRight() );
+               totalPlotSizePixels= totalPlotSizePixels + ( d2-d1 );
            }
         }
         
@@ -668,8 +670,8 @@ public class DomOps {
                         new Object[]{plotj.getId(), addLines, plotj.isDisplayTitle(), lc});
                 //if (MaxUpJEm>0 ) MaxUpJEm= MaxUpJEm+1;
                 maxLeft[i]= Math.max( maxLeft[i], maxLeftPx );
-                Rectangle plot= plotj.getController().getDasPlot().getBounds();
-                Rectangle axis= plotj.getZaxis().getController().getDasAxis().getBounds();
+                Rectangle plot= DomUtil.getBoundsForPlot( dom, plotj );
+                Rectangle axis= DomUtil.getBoundsForZAxis( dom, plotj );
                 maxRightPx= ( ( axis.getX() + axis.getWidth() ) - ( plot.getX() + plot.getWidth() ) + 1 * emToPixels );
                 maxRight[i]= Math.max( maxRight[i], maxRightPx );
             }
@@ -693,11 +695,23 @@ public class DomOps {
 
         double[] normalPlotSize= new double[ ncolumn ];
 
-        double width= dom.getCanvases(0).getMarginColumn().getController().getDasColumn().getWidth();
+        Column row= dom.getCanvases(0).getMarginColumn();
+        int c0= DomUtil.getColumnPositionPixels( dom, row, row.getLeft() );
+        int c1= DomUtil.getColumnPositionPixels( dom, row, row.getRight() );        
+        double width= c1-c0;
         
-        double marginHeightPixels= 
-                ( dom.getCanvases(0).getMarginColumn().getController().getDasColumn().getEmMinimum() -
-                dom.getCanvases(0).getMarginColumn().getController().getDasColumn().getEmMaximum() ) * emToPixels ;
+        double[] ppleft,ppright;
+        try {
+            ppleft= DasRow.parseLayoutStr(row.getLeft());
+        } catch ( ParseException ex ) {
+            ppleft= new double[] {0,0,0};
+        }
+        try {
+            ppright= DasRow.parseLayoutStr(row.getRight());
+        }catch ( ParseException ex ) {
+            ppright= new double[] {0,0,0};
+        }
+        double marginHeightPixels= ( ppleft[1] - ppright[1] ) * emToPixels;
         
         if ( ncolumn==1 ) {
             normalPlotSize[0]= ( newPlotWidth[0] + maxLeft[0] + maxRight[0] ) / ( width + marginHeightPixels );
@@ -710,13 +724,16 @@ public class DomOps {
         double position=0;
 
         for ( int i=0; i<ncolumn; i++ ) {
-            String newTop=  String.format( Locale.US, "%.2f%%%+.2fem", 100*position, maxLeft[i] * pixelsToEm );
-            columns[i].setLeft( newTop );
+            String newLeft=  String.format( Locale.US, "%.2f%%%+.2fem", 100*position, maxLeft[i] * pixelsToEm );
+            columns[i].setLeft( newLeft );
             position+= normalPlotSize[i];
-            String newBottom= String.format( Locale.US, "%.2f%%%+.2fem", 100*position, -1 * maxRight[i] * pixelsToEm );
-            columns[i].setRight( newBottom );
-            DasColumn dasRow= columns[i].getController().dasColumn;
-            logger.log(Level.FINE, "row {0}: {1},{2} ({3} pixels)", new Object[]{i, newTop, newBottom, dasRow.getWidth() });
+            String newRight= String.format( Locale.US, "%.2f%%%+.2fem", 100*position, -1 * maxRight[i] * pixelsToEm );
+            columns[i].setRight( newRight );
+            if ( logger.isLoggable( Level.FINE ) ) {
+                c0= DomUtil.getColumnPositionPixels( dom,  columns[i],  columns[i].getLeft() );
+                c1= DomUtil.getColumnPositionPixels( dom,  columns[i],  columns[i].getRight() );    
+                logger.log(Level.FINE, "column {0}: {1},{2} ({3} pixels)", new Object[]{i, newLeft, newRight, c1-c0 });
+            }
         }
 
 
