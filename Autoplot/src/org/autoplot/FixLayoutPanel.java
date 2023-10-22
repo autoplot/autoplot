@@ -73,13 +73,15 @@ public class FixLayoutPanel extends javax.swing.JPanel {
         moveLegendsToOutsideNECheckBox = new javax.swing.JCheckBox();
         hideTimeAxesCheckBox = new javax.swing.JCheckBox();
         hideTitlesCheckBox = new javax.swing.JCheckBox();
+        jLabel2 = new javax.swing.JLabel();
 
         jLabel1.setText("Fix Layout");
 
         verticalSpacingCheckBox.setText("Vertical spacing between plots:");
 
         verticalSpacingComboBox.setEditable(true);
-        verticalSpacingComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0em", "0.5em", "1em", "2em", " " }));
+        verticalSpacingComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0em", "0.5em", "1em", "2em", "3em", "4em", "5em" }));
+        verticalSpacingComboBox.setSelectedIndex(5);
 
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, verticalSpacingCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), verticalSpacingComboBox, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
@@ -90,15 +92,22 @@ public class FixLayoutPanel extends javax.swing.JPanel {
 
         hideTitlesCheckBox.setText("Hide Titles");
 
+        jLabel2.setText("<html>Fix Layout will try to recover empty spots and overlaps to make the layout easier to read.  You can also turn off titles and axis labels to recover more room.");
+        jLabel2.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(0, 12, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addGap(329, 329, 329))
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(12, 12, 12)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(moveLegendsToOutsideNECheckBox)
                             .addGroup(layout.createSequentialGroup()
@@ -106,14 +115,16 @@ public class FixLayoutPanel extends javax.swing.JPanel {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(verticalSpacingComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(hideTimeAxesCheckBox)
-                            .addComponent(hideTitlesCheckBox))))
-                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(hideTitlesCheckBox))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(verticalSpacingCheckBox)
                     .addComponent(verticalSpacingComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -123,7 +134,7 @@ public class FixLayoutPanel extends javax.swing.JPanel {
                 .addComponent(hideTimeAxesCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(moveLegendsToOutsideNECheckBox)
-                .addGap(0, 184, Short.MAX_VALUE))
+                .addGap(0, 101, Short.MAX_VALUE))
         );
 
         bindingGroup.bind();
@@ -134,6 +145,7 @@ public class FixLayoutPanel extends javax.swing.JPanel {
     private javax.swing.JCheckBox hideTimeAxesCheckBox;
     private javax.swing.JCheckBox hideTitlesCheckBox;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JCheckBox moveLegendsToOutsideNECheckBox;
     private javax.swing.JCheckBox verticalSpacingCheckBox;
     private javax.swing.JComboBox<String> verticalSpacingComboBox;
