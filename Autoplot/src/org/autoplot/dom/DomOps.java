@@ -15,10 +15,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import org.das2.graph.DasRow;
 import org.das2.util.LoggerManager;
 import org.autoplot.datasource.DataSourceUtil;
 import org.das2.graph.DasColumn;
+import org.das2.graph.LegendPosition;
 
 /**
  * Many operations are defined within the DOM object controllers that needn't
@@ -400,6 +402,14 @@ public class DomOps {
     }
         
     /**
+     * See https://sourceforge.net/p/autoplot/feature-requests/811/
+     */
+    public static final String OPTION_FIX_LAYOUT_HIDE_TITLES = "hideTitles";
+    public static final String OPTION_FIX_LAYOUT_HIDE_TIME_AXES = "hideTimeAxes";
+    public static final String OPTION_FIX_LAYOUT_MOVE_LEGENDS_TO_OUTSIDE_NE = "moveLegendsToOutsideNE";
+    public static final String OPTION_FIX_LAYOUT_VERTICAL_SPACING = "verticalSpacing";
+    
+    /**
      * New layout mechanism which fixes a number of shortcomings of the old layout mechanism, 
      * newCanvasLayout.  This one:<ul>
      * <li> Removes extra whitespace
@@ -462,6 +472,44 @@ public class DomOps {
             int d2= DomUtil.getRowPositionPixels( dom, r2, r2.getTop() );
             return d1-d2;
         });
+        
+        String topRowId= rows[0].getId();
+        String bottomRowId= rows[rows.length-1].getId();
+        
+        if ( options.getOrDefault( OPTION_FIX_LAYOUT_HIDE_TITLES, "false" ).equals("true") ) {
+            for ( Plot p: dom.plots ) {
+                if ( p.getRowId().equals(topRowId) ) {
+                    logger.fine("not hiding top plot's title");
+                } else {
+                    p.setDisplayTitle(false);
+                }
+            }
+        }
+        
+        if ( options.getOrDefault( OPTION_FIX_LAYOUT_HIDE_TIME_AXES, "false" ).equals("true") ) {
+            for ( Plot p: dom.plots ) {
+                if ( p.getRowId().equals(bottomRowId) ) {
+                    logger.fine("not hiding bottom plot's time axis"); 
+                } else {
+                    // TODO: check bindings to see that this axis is bound to the timerange
+                    p.xaxis.setDrawTickLabels(false);
+                }
+            }
+        }
+        
+        if ( options.getOrDefault( OPTION_FIX_LAYOUT_MOVE_LEGENDS_TO_OUTSIDE_NE, "false" ).equals("true") ) {
+            for ( Plot p: dom.plots ) {
+                if ( p.isDisplayLegend() ) {
+                    if ( !p.getZaxis().isVisible() ) {
+                        p.setLegendPosition(LegendPosition.OutsideNE);
+                    }
+                }
+            }
+        }
+        
+        String verticalSpacing=  options.getOrDefault( OPTION_FIX_LAYOUT_VERTICAL_SPACING, "" );
+        // not sure what to do with this yet...
+        
         
         double totalPlotHeightPixels= 0;
         for ( int i=0; i<nrow; i++ ) {           
@@ -554,6 +602,17 @@ public class DomOps {
             }
         }
 
+        if ( verticalSpacing.trim().length()>0 ) {
+            Pattern p= Pattern.compile("([0-9\\.]*)em");
+            if ( p.matcher(verticalSpacing).matches() ) {
+                Double d= Double.parseDouble(verticalSpacing.substring(0,verticalSpacing.length()-2));
+                for ( int i=0; i<MaxDown.length; i++ ) {
+                    MaxUp[i]= 0;
+                    MaxDown[i]= d/pixelsToEm;
+                }
+            }
+        }
+        
         double position=0;
 
         for ( int i=0; i<nrow; i++ ) {
