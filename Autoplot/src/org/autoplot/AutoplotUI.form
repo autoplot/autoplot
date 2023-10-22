@@ -558,6 +558,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="jMenuItem6">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Events List"/>
+                <Property name="toolTipText" type="java.lang.String" value="Use an events list to control time range"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem6ActionPerformed"/>
@@ -568,7 +569,7 @@
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
                   <KeyStroke key="Ctrl+F"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Fix Layout"/>
+                <Property name="text" type="java.lang.String" value="Fix Layout..."/>
                 <Property name="toolTipText" type="java.lang.String" value="Run new layout routine that removes spaces between plots"/>
               </Properties>
               <Events>

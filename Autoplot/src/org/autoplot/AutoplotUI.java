@@ -3443,8 +3443,8 @@ APSplash.checkTime("init 52.9");
         toolsMenu.add(cacheMenu);
         toolsMenu.add(jSeparator3);
 
-        pngWalkMenuItem.setText("PNG Walk Tool");
-        pngWalkMenuItem.setToolTipText("Bring up the PNG Walk Tool to browse a set of images.");
+        pngWalkMenuItem.setText("PNG Walk Viewer");
+        pngWalkMenuItem.setToolTipText("Bring up the PNG Walk tool to browse a set of images.");
         pngWalkMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 pngWalkMenuItemActionPerformed(evt);
@@ -3471,6 +3471,7 @@ APSplash.checkTime("init 52.9");
         toolsMenu.add(jSeparator2);
 
         jMenuItem6.setText("Events List");
+        jMenuItem6.setToolTipText("Use an events list to control time range");
         jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem6ActionPerformed(evt);
@@ -3479,7 +3480,7 @@ APSplash.checkTime("init 52.9");
         toolsMenu.add(jMenuItem6);
 
         fixLayoutMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, java.awt.event.InputEvent.CTRL_MASK));
-        fixLayoutMenuItem.setText("Fix Layout");
+        fixLayoutMenuItem.setText("Fix Layout...");
         fixLayoutMenuItem.setToolTipText("Run new layout routine that removes spaces between plots");
         fixLayoutMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -4163,13 +4164,20 @@ private void editOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 
 private void fixLayoutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fixLayoutMenuItemActionPerformed
     org.das2.util.LoggerManager.logGuiEvent(evt);
-    Runnable run= new Runnable() {
-        @Override
-        public void run() {
-                org.autoplot.dom.DomOps.newCanvasLayout(dom);
-        }
-    };
-    new Thread(run,"canvas layout").start();
+    FixLayoutPanel flp= new FixLayoutPanel();
+    if ( JOptionPane.OK_OPTION==
+            JOptionPane.showConfirmDialog( this, flp, "Fix Layout Options",
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE ) ) {
+        final Map<String,String> options=flp.getOptions();
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                org.autoplot.dom.DomOps.fixLayout(dom,options);
+            }
+        };
+        new Thread(run,"canvas layout").start();
+    }
+
 }//GEN-LAST:event_fixLayoutMenuItemActionPerformed
 
 private void resetXMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetXMenuItemActionPerformed
