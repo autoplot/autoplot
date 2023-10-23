@@ -138,10 +138,10 @@
               <StringArray count="9">
                 <StringItem index="0" value="$Y-$m-$d"/>
                 <StringItem index="1" value="$Y"/>
-                <StringItem index="2" value="$Y-$(m,span=3)"/>
-                <StringItem index="3" value="$Y-$m"/>
-                <StringItem index="4" value="$Y_$j"/>
-                <StringItem index="5" value="$Y-$m-$dT$H/PT1H"/>
+                <StringItem index="2" value="$Y-$m"/>
+                <StringItem index="3" value="$Y_$j"/>
+                <StringItem index="4" value="$Y-$m-$dT$H/PT1H"/>
+                <StringItem index="5" value="$Y-$m-$dT$(H;delta=6)/PT6H"/>
                 <StringItem index="6" value="$Y-$m-$dT$H$M/PT1M"/>
                 <StringItem index="7" value="$Y-$m-$dT$H$M$S/PT1S"/>
                 <StringItem index="8" value="$(o;id=rbspa-pp)"/>

@@ -387,7 +387,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         timeRangeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Jun 2000", "2000", "2000-01-01/03-01", "2000-2016" }));
 
         timeFormatComboBox.setEditable(true);
-        timeFormatComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "$Y-$m-$d", "$Y", "$Y-$(m,span=3)", "$Y-$m", "$Y_$j", "$Y-$m-$dT$H/PT1H", "$Y-$m-$dT$H$M/PT1M", "$Y-$m-$dT$H$M$S/PT1S", "$(o;id=rbspa-pp)" }));
+        timeFormatComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "$Y-$m-$d", "$Y", "$Y-$m", "$Y_$j", "$Y-$m-$dT$H/PT1H", "$Y-$m-$dT$(H;delta=6)/PT6H", "$Y-$m-$dT$H$M/PT1M", "$Y-$m-$dT$H$M$S/PT1S", "$(o;id=rbspa-pp)" }));
         timeFormatComboBox.setToolTipText("Use the droplist to select from options, and make edits if necessary.");
 
         jLabel3.setText("Time Format:");
