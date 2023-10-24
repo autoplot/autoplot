@@ -89,7 +89,7 @@
             <StringItem index="6" value="5em"/>
           </StringArray>
         </Property>
-        <Property name="selectedIndex" type="int" value="5"/>
+        <Property name="selectedIndex" type="int" value="1"/>
       </Properties>
       <BindingProperties>
         <BindingProperty name="enabled" source="verticalSpacingCheckBox" sourcePath="${selected}" target="verticalSpacingComboBox" targetPath="enabled" updateStrategy="0" immediately="false"/>

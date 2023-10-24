@@ -81,7 +81,7 @@ public class FixLayoutPanel extends javax.swing.JPanel {
 
         verticalSpacingComboBox.setEditable(true);
         verticalSpacingComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0em", "0.5em", "1em", "2em", "3em", "4em", "5em" }));
-        verticalSpacingComboBox.setSelectedIndex(5);
+        verticalSpacingComboBox.setSelectedIndex(1);
 
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, verticalSpacingCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), verticalSpacingComboBox, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
