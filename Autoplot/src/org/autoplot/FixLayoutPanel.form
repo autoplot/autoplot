@@ -74,6 +74,9 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Vertical spacing between plots:"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="verticalSpacingCheckBoxActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JComboBox" name="verticalSpacingComboBox">
       <Properties>
@@ -94,6 +97,9 @@
       <BindingProperties>
         <BindingProperty name="enabled" source="verticalSpacingCheckBox" sourcePath="${selected}" target="verticalSpacingComboBox" targetPath="enabled" updateStrategy="0" immediately="false"/>
       </BindingProperties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="verticalSpacingComboBoxActionPerformed"/>
+      </Events>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
       </AuxValues>
@@ -102,16 +108,25 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Move legends to outside NE"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="moveLegendsToOutsideNECheckBoxActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JCheckBox" name="hideTimeAxesCheckBox">
       <Properties>
         <Property name="text" type="java.lang.String" value="Hide time (X) axes"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="hideTimeAxesCheckBoxActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JCheckBox" name="hideTitlesCheckBox">
       <Properties>
         <Property name="text" type="java.lang.String" value="Hide Titles"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="hideTitlesCheckBoxActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel2">
       <Properties>

@@ -4164,18 +4164,20 @@ private void editOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 
 private void fixLayoutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fixLayoutMenuItemActionPerformed
     org.das2.util.LoggerManager.logGuiEvent(evt);
+    Application dom0= (Application)dom.copy();
     FixLayoutPanel flp= new FixLayoutPanel();
+    flp.setPreview(dom);
     if ( JOptionPane.OK_OPTION==
             JOptionPane.showConfirmDialog( this, flp, "Fix Layout Options",
                     JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE ) ) {
+        dom.syncTo(dom0);
         final Map<String,String> options=flp.getOptions();
-        Runnable run= new Runnable() {
-            @Override
-            public void run() {
-                org.autoplot.dom.DomOps.fixLayout(dom,options);
-            }
+        Runnable run= () -> {
+            org.autoplot.dom.DomOps.fixLayout(dom,options);
         };
         new Thread(run,"canvas layout").start();
+    } else {
+        dom.syncTo(dom0);
     }
 
 }//GEN-LAST:event_fixLayoutMenuItemActionPerformed
