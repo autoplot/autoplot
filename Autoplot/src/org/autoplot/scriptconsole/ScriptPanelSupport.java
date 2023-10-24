@@ -610,22 +610,15 @@ public class ScriptPanelSupport {
      * @param interp null or the interp for further queries.
      */
     public void annotateError(PyException ex, int offset, final PythonInterpreter interp) {
-        if (ex instanceof PySyntaxError) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-            int lineno = offset + ((PyInteger) ex.value.__getitem__(1).__getitem__(1)).getValue();
-            //String filename= String.valueOf( (ex.value.__getitem__(1).__getitem__(3)) );
-            //int col = ((PyInteger) ex.value.__getitem__(1).__getitem__(2)).getValue();
-            annotationsSupport.annotateLine(lineno, "error", ex.toString(),interp);
-        } else {
-            //logger.log(Level.SEVERE, ex.getMessage(), ex);
-            PyObject otraceback= ex.traceback;
-            int line=0;
-            final int STACK_LIMIT=7;
-            
-            int count=0; // just in case limit to STACK_LIMIT, because of recursion, etc.
-            //PyFrame theFrame= null;
-            while ( otraceback instanceof PyTraceback && count<STACK_LIMIT ) {
-                PyTraceback traceback= ((PyTraceback)otraceback);
+        //logger.log(Level.SEVERE, ex.getMessage(), ex);
+        PyObject otraceback= ex.traceback;
+        int line=0;
+        final int STACK_LIMIT=7;
+
+        int count=0; // just in case limit to STACK_LIMIT, because of recursion, etc.
+        //PyFrame theFrame= null;
+        while ( otraceback instanceof PyTraceback && count<STACK_LIMIT ) {
+            PyTraceback traceback= ((PyTraceback)otraceback);
 //                if ( theFrame==null ) { //TODO: check that we don't switch files.  this code doesn't work...
 //                    theFrame= traceback.tb_frame;
 //                } else {
@@ -633,45 +626,44 @@ public class ScriptPanelSupport {
 //                        break;
 //                    }
 //                }
-                if ( traceback.tb_frame==null ) { // this happens with invokeLater and Java exception
-                    PyObject o= ex.value;
-                    if ( o!=null ) {
-                        //findbugs pointed out the absurd code I had here.
-                        logger.info("when does 574 happen?");
-                    }
+            if ( traceback.tb_frame==null ) { // this happens with invokeLater and Java exception
+                PyObject o= ex.value;
+                if ( o!=null ) {
+                    //findbugs pointed out the absurd code I had here.
+                    logger.info("when does 574 happen?");
+                }
+                otraceback= traceback.tb_next;
+            } else { // typical
+                String fn= traceback.tb_frame.f_code.co_filename;
+                if ( fn!=null && ( fn.equals("<iostream>") || ( fn.equals("<string>") && file==null ) || ( file!=null && fn.equals( file.getName() ) ) ) ) { 
+                    annotationsSupport.annotateLine(offset + traceback.tb_lineno, "error", ex.toString(),interp);
+                    line=  traceback.tb_lineno-1;
                     otraceback= traceback.tb_next;
-                } else { // typical
-                    String fn= traceback.tb_frame.f_code.co_filename;
-                    if ( fn!=null && ( fn.equals("<iostream>") || fn.equals("<string>") || ( file!=null && fn.equals( file.getName() ) ) ) ) { 
-                        annotationsSupport.annotateLine(offset + traceback.tb_lineno, "error", ex.toString(),interp);
-                        line=  traceback.tb_lineno-1;
-                        otraceback= traceback.tb_next;
-                        count++;
-                    } else {
-                        otraceback= traceback.tb_next;
-                    }
+                    count++;
+                } else {
+                    otraceback= traceback.tb_next;
                 }
             }
-            //System.err.println("***");
-            //System.err.println("line="+line);
-            
-            if ( line<0 ) {
-                logger.log(Level.WARNING, "no trace information available for error {0}", ex.getMessage());
-                line=0;
-            }
-            final int fline= line;
-            final JEditorPane textArea= panel.getEditorPanel();
-            SwingUtilities.invokeLater(() -> {
-                Element element= textArea.getDocument().getDefaultRootElement().getElement(Math.max(0,fline-5)); // 5 lines of context.
-                if ( element!=null ) textArea.setCaretPosition(element.getStartOffset());
-                SwingUtilities.invokeLater(() -> {
-                    Element element1 = textArea.getDocument().getDefaultRootElement().getElement(fline); // 5 lines of context.
-                    if (element1 != null) {
-                        textArea.setCaretPosition(element1.getStartOffset());
-                    }
-                });
-            });
         }
+        //System.err.println("***");
+        //System.err.println("line="+line);
+
+        if ( line<0 ) {
+            logger.log(Level.WARNING, "no trace information available for error {0}", ex.getMessage());
+            line=0;
+        }
+        final int fline= line;
+        final JEditorPane textArea= panel.getEditorPanel();
+        SwingUtilities.invokeLater(() -> {
+            Element element= textArea.getDocument().getDefaultRootElement().getElement(Math.max(0,fline-5)); // 5 lines of context.
+            if ( element!=null ) textArea.setCaretPosition(element.getStartOffset());
+            SwingUtilities.invokeLater(() -> {
+                Element element1 = textArea.getDocument().getDefaultRootElement().getElement(fline); // 5 lines of context.
+                if (element1 != null) {
+                    textArea.setCaretPosition(element1.getStartOffset());
+                }
+            });
+        });
     }
 
     protected void executeScript() {
