@@ -207,27 +207,15 @@ public class JythonOps {
     
     /**
      * coerce Python objects like arrays Lists and Arrays into a QDataSet.
-     * @param arg0
-     * @param u unit context, which may be ignored for Datums, etc.
-     * @return 
+     * @param arg0 a PyQDataSet, PyList, PyArray, PyTuple, PyInteger, PyLong, PyFloat, Datum, DatumRange, or String.
+     * @param u unit context
+     * @return the dataset
      * @see Ops#dataset(java.lang.Object, org.das2.datum.Units) 
      */
     public static QDataSet dataset( PyObject arg0, Units u ) {
         if ( arg0 instanceof PyQDataSet ) {
             QDataSet result= ((PyQDataSet)arg0).rods;
-            if ( UnitsUtil.isTimeLocation(u) ) {
-                result= Ops.putProperty( result, QDataSet.FORMAT, null ); // dataset( indgen(100), units=Units.cdfTT2000 )
-            }
-            Units u0= SemanticOps.getUnits(result);
-            if ( u0.isConvertibleTo(u) ) {
-                return Ops.convertUnitsTo( result, u );
-            } else {
-                if ( u0==Units.dimensionless ) {
-                    return Ops.putProperty( result, QDataSet.UNITS, u );
-                } else {
-                    throw new InconvertibleUnitsException(u0,u);
-                }
-            }
+            return Ops.dataset( result, u );
         } else if ( arg0 instanceof PyList ) {
             PyList pl= (PyList)arg0;
             DataSetBuilder builder= new DataSetBuilder( 1, pl.__len__() );
@@ -251,9 +239,12 @@ public class JythonOps {
         } else if ( arg0 instanceof PyFloat ) {
             return DataSetUtil.asDataSet( ((Double)arg0.__tojava__( Double.class )).doubleValue(), u );
         } else if ( arg0 instanceof PyJavaInstance && ( ((PyJavaInstance)arg0).__tojava__(Datum.class) instanceof Datum ) ) {
-            return DataSetUtil.asDataSet( (Datum)((PyJavaInstance)arg0).__tojava__(org.das2.datum.Datum.class) );
+            Datum d= (Datum)((PyJavaInstance)arg0).__tojava__(org.das2.datum.Datum.class);
+            return Ops.dataset( d, u );
+
         } else if ( arg0 instanceof PyJavaInstance && ( ((PyJavaInstance)arg0).__tojava__(DatumRange.class) instanceof DatumRange ) ) {
-            return DataSetUtil.asDataSet( (DatumRange)((PyJavaInstance)arg0).__tojava__(org.das2.datum.DatumRange.class) );
+            DatumRange dr= (DatumRange)((PyJavaInstance)arg0).__tojava__(org.das2.datum.DatumRange.class);
+            return Ops.dataset( dr, u );
 
         } else if ( arg0 instanceof PyString ) {
             try {
