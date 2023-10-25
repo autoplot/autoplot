@@ -508,8 +508,6 @@ public class DomOps {
         }
         
         String verticalSpacing=  options.getOrDefault( OPTION_FIX_LAYOUT_VERTICAL_SPACING, "" );
-        // not sure what to do with this yet...
-        
         
         double totalPlotHeightPixels= 0;
         for ( int i=0; i<nrow; i++ ) {           
@@ -521,9 +519,18 @@ public class DomOps {
                totalPlotHeightPixels= totalPlotHeightPixels + ( d2-d1 );
            }
         }
+
+        double [] relativePlotHeight= new double[ nrow ];
+        for ( int i=0; i<nrow; i++ ) {
+            int r0= DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getTop() );
+            int r1= DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getBottom() );
+            relativePlotHeight[i]= 1.0 * (r1-r0) / totalPlotHeightPixels;
+        }
         
         double [] MaxUp= new double[ nrow ];
         double [] MaxDown= new double[ nrow ];
+        double [] MaxUpEm= new double[ nrow ];
+        double [] MaxDownEm= new double[ nrow ];
 
 //        double[] emHeight= new double[ nrow ];
 //        for ( int i=0; i<nrow; i++ ) {
@@ -541,30 +548,26 @@ public class DomOps {
                     String content= title; // title.replaceAll("(\\!c|\\!C|\\<br\\>)", " ");
                     boolean addLines= plotj.isDisplayTitle() && content.trim().length()>0;
                     int lc= lineCount(title);
-                    MaxUpJEm= addLines ? Math.max( 2, lc ) : 0.;
+                    MaxUpJEm= addLines ? lc : 0.;
                     logger.log(Level.FINE, "{0} addLines: {1}  isDiplayTitle: {2}  lineCount(title): {3}", 
                             new Object[]{plotj.getId(), addLines, plotj.isDisplayTitle(), lc});
                     //if (MaxUpJEm>0 ) MaxUpJEm= MaxUpJEm+1;
                     MaxUp[i]= Math.max( MaxUp[i], MaxUpJEm*emToPixels );
+                    MaxUpEm[i]= Math.max( MaxUpEm[i], MaxUpJEm );
                     Rectangle plot= DomUtil.getBoundsForPlot( dom, plotj );
                     Rectangle axis= DomUtil.getBoundsForXAxis( dom, plotj );
-                    MaxDownPx= ( ( axis.getY() + axis.getHeight() ) - ( plot.getY() + plot.getHeight() ) + 1 * emToPixels );
+                    MaxDownPx= ( ( axis.getY() + axis.getHeight() ) - ( plot.getY() + plot.getHeight() ) );
                     MaxDown[i]= Math.max( MaxDown[i], MaxDownPx );
+                    MaxDownEm[i]= MaxDown[i]/emToPixels;
                     doAdjust[i]= true;
                 } else {
                     doAdjust[i]= false;
                 }
             }
         }
-
-        double [] relativePlotHeight= new double[ nrow ];
-        for ( int i=0; i<nrow; i++ ) {
-            int r0= DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getTop() );
-            int r1= DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getBottom() );
-            relativePlotHeight[i]= 1.0 * (r1-r0) / totalPlotHeightPixels;
-        }
         
-        double newPlotTotalHeightPixels= canvas.height;
+        double canvasHeight= canvas.height;
+        double newPlotTotalHeightPixels= canvasHeight;
         for ( int i=0; i<nrow; i++ ) {
             newPlotTotalHeightPixels = newPlotTotalHeightPixels - MaxUp[i] - MaxDown[i];
         }
@@ -573,32 +576,14 @@ public class DomOps {
         for ( int i=0; i<nrow; i++ ) {
             newPlotHeight[i]= newPlotTotalHeightPixels * relativePlotHeight[i];
         }
-
-        double[] normalPlotHeight= new double[ nrow ];
-
-        Row row= dom.getCanvases(0).getMarginRow();
-        int r0= DomUtil.getRowPositionPixels( dom, row, row.getTop() );
-        int r1= DomUtil.getRowPositionPixels( dom, row, row.getBottom() );
-        double height= r1-r0;
         
-        double[] pptop,ppbot;
-        try {
-            pptop= DasRow.parseLayoutStr(dom.getCanvases(0).getMarginRow().getTop());
-        } catch ( ParseException ex ) {
-            pptop= new double[] {0,0,0};
-        }
-        try {
-            ppbot= DasRow.parseLayoutStr(dom.getCanvases(0).getMarginRow().getBottom());
-        }catch ( ParseException ex ) {
-            ppbot= new double[] {0,0,0};
-        }
-        double marginHeightPixels= ( pptop[1] - ppbot[1] ) * emToPixels;
-                
+        double[] normalPlotHeight= new double[ nrow ];
+        
         if ( nrow==1 ) {
-            normalPlotHeight[0]= ( newPlotHeight[0] + MaxUp[0] + MaxDown[0] ) / ( height + marginHeightPixels );
+            normalPlotHeight[0]= ( newPlotHeight[0] + MaxUp[0] + MaxDown[0] ) / ( canvasHeight );
         } else {
             for ( int i=0; i<nrow; i++ ) {
-                 normalPlotHeight[i]= ( newPlotHeight[i] + MaxUp[i] + MaxDown[i] ) / ( height + marginHeightPixels );
+                 normalPlotHeight[i]= ( newPlotHeight[i] + MaxUp[i] + MaxDown[i] ) / ( canvasHeight );
             }
         }
 
@@ -623,8 +608,8 @@ public class DomOps {
                 String newBottom= String.format( Locale.US, "%.2f%%%+.2fem", 100*position, -1 * MaxDown[i] * pixelsToEm );
                 rows[i].setBottom( newBottom );
                 if ( logger.isLoggable( Level.FINE ) ) {
-                    r0= (int)DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getTop() );
-                    r1= (int)DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getBottom() );
+                    int r0= (int)DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getTop() );
+                    int r1= (int)DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getBottom() );
                     logger.log(Level.FINE, "row {0}: {1},{2} ({3} pixels)", new Object[]{i, newTop, newBottom, r1-r0 });
                 }
             } else {
