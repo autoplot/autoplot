@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -39,6 +40,7 @@ import org.autoplot.dom.ChangesSupport.DomLock;
 import org.autoplot.state.StatePersistence;
 import org.das2.components.propertyeditor.Displayable;
 import org.das2.graph.DasColumn;
+import org.das2.graph.DasDevicePosition;
 import org.das2.qds.QDataSet;
 import org.das2.util.ColorUtil;
 
@@ -1198,25 +1200,44 @@ public class DomUtil {
      */
     public static Rectangle getBoundsForXAxis( Application dom, Plot p ) {
         Axis xaxis= p.getXaxis();
+        int emToPix= Font.decode(dom.getCanvases(0).font).getSize(); 
         Row row= (Row)getElementById( dom, p.getRowId() );
         Column col= (Column)getElementById( dom, p.getColumnId() );
         int c0= (int)getColumnPositionPixels( dom, col, col.getLeft() );
         int c1= (int)getColumnPositionPixels( dom, col, col.getRight() );
         int r1= (int)getRowPositionPixels( dom, row, row.getBottom() );
         int r0= r1;
-        int axisLines= 1 + xaxis.getLabel().trim().split("\n|\\<br\\>|\\!c",2).length;
-        if ( p.getTicksURI().trim().length()>0 ) {
-            if ( p.getEphemerisLineCount()>-1 ) {
-                axisLines+= p.getEphemerisLineCount();
-            } else if ( p.getEphemerisLabels().trim().length()>0 ) {
-                axisLines+= p.getEphemerisLabels().split(";").length;
-            } else {
-                int nominalNumberOfTicksLines= 5;
-                axisLines+= nominalNumberOfTicksLines;
-            }
+        
+        double[] tickLenEmPx;
+        try {
+            tickLenEmPx = DasDevicePosition.parseLayoutStr(dom.getOptions().getTicklen());
+        } catch (ParseException ex) {
+            tickLenEmPx= new double[] { 0,0,0 };
         }
-        int ems= Font.decode(dom.getCanvases(0).font).getSize(); //TODO: verify this is ems
-        r1= r1+axisLines*ems;
+        // make independent from row layout for initialization, ignoring normalized length.
+        int tickLen = Math.max( 0, (int) ( Math.round( tickLenEmPx[1]*emToPix + tickLenEmPx[2] ) ) ); 
+        
+        int axisLines;
+        if ( xaxis.isVisible() ) {
+            if ( xaxis.isDrawTickLabels() ) { 
+                axisLines= 1;
+                String label= xaxis.getLabel().trim();
+                if ( label.length()>0 ) axisLines += ( 1 + label.split("\n|\\<br\\>|\\!c",2).length ); // 1 is for odd gap.
+                if ( p.getTicksURI().trim().length()>0 ) {
+                    if ( p.getEphemerisLineCount()>-1 ) {
+                        axisLines+= p.getEphemerisLineCount();
+                    } else if ( p.getEphemerisLabels().trim().length()>0 ) {
+                        axisLines+= p.getEphemerisLabels().split(";").length;
+                    } else {
+                        int nominalNumberOfTicksLines= 5;
+                        axisLines+= nominalNumberOfTicksLines;
+                    }
+                }
+            } else {
+                axisLines= 0;
+            }
+            r1= r1 + axisLines*emToPix + tickLen;
+        }
         return new Rectangle( c0, r0, c1-c0, r1-r0 );
     }
         
