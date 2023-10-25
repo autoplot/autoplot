@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Plot ephemerisLineCount property allows the size of the plot to be calculated before the ephemeris are loaded, a necessary step for <a href="https://sourceforge.net/p/autoplot/feature-requests/811/">rfe811</a>.</small></p>
+        <p><small>Test .vap used to develop the new [menubar]&rarr;Tools&rarr;"fix layout..." action.  DST colors from <a href="https://github.com/autoplot/dev/blob/master/rfe/sf/811/dstBar.jyds">dstBar.jyds</a>.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,11 @@
 
         <p>Run with 1GB of memory to support 32-bit Java versions, and run off of ci-pw build server: <a href="autoplot_1GB.jnlp">autoplot_1GB.jnlp</a></p>
                 
-        <p>Bugfixes (2023-10-20 r27220):</p>
+        <p>Bugfixes (2023-10-25 r27233):</p>
         <ul>
+            <li>make sure all time generators in Run Batch generate times which Run Batch can use. Thanks, Sadie!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2556/">2556</a>: support rank 2 waveform with units of seconds in metadata tab.  Thanks, Sadie!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2556/">2556</a>: correction to Jython editor error highliting, where extra line was drawn.  Thanks, Sadie!
             <li>remove old test which unnecessarily abandoned the tick bounds calculation when more lines were requested for ticks than needed.
         </ul>
         <p>Older Bugfixes (2023-08-29 r27149):</p>
@@ -54,12 +57,14 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>improve support for long-array-backed CDF_TT2000 timetags, properly handling times to nanosecond resolution.
+            <li>rfe811: new dialog for fix layout includes options to move legends and remove gaps, show preview.
             <li>plot.ephemerisLineCount property added, so that the layout can be done before ephemeris is loaded.
         </ul>
         <p>Less recent features:</p>
         <ul> 
             <li>Identify dataset scheme T&rarr;Y&rarr;X, which should be phased out.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/811/"rfe811</a>: add map to fixLayout call which will support a dialog of options.  Add methods to support fixLayout on any DOM, not necessary the "live" one.
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/811/">rfe811</a>: add map to fixLayout call which will support a dialog of options.  Add methods to support fixLayout on any DOM, not necessary the "live" one.
             <li>SeriesRenderer gets kludgey "moduloY" control which will avoid a connection from 24 to 0 hours.
             <li>Jython __setItem__ has special branch for when all indices are numbers, improving performance by using simpler code.
             <li>legacy storage for options like width and height are no longer imported from Autoplot versions older than five years ago.
