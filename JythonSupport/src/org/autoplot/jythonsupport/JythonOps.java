@@ -35,7 +35,11 @@ import org.das2.qds.DataSetUtil;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.URISplit;
+import org.das2.datum.InconvertibleUnitsException;
+import org.das2.datum.UnitsConverter;
+import org.das2.datum.UnitsUtil;
 import org.das2.jythoncompletion.JavadocLookup;
+import org.das2.qds.SemanticOps;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.DataSetBuilder;
 import org.das2.util.filesystem.FileSystem;
@@ -210,7 +214,20 @@ public class JythonOps {
      */
     public static QDataSet dataset( PyObject arg0, Units u ) {
         if ( arg0 instanceof PyQDataSet ) {
-            return ((PyQDataSet)arg0).rods;
+            QDataSet result= ((PyQDataSet)arg0).rods;
+            if ( UnitsUtil.isTimeLocation(u) ) {
+                result= Ops.putProperty( result, QDataSet.FORMAT, null ); // dataset( indgen(100), units=Units.cdfTT2000 )
+            }
+            Units u0= SemanticOps.getUnits(result);
+            if ( u0.isConvertibleTo(u) ) {
+                return Ops.convertUnitsTo( result, u );
+            } else {
+                if ( u0==Units.dimensionless ) {
+                    return Ops.putProperty( result, QDataSet.UNITS, u );
+                } else {
+                    throw new InconvertibleUnitsException(u0,u);
+                }
+            }
         } else if ( arg0 instanceof PyList ) {
             PyList pl= (PyList)arg0;
             DataSetBuilder builder= new DataSetBuilder( 1, pl.__len__() );
