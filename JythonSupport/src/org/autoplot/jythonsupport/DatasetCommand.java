@@ -11,15 +11,12 @@ import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyString;
 import org.das2.qds.QDataSet;
-import org.autoplot.jythonsupport.JythonOps;
-import org.autoplot.jythonsupport.PyQDataSet;
 import org.das2.datum.Units;
 import org.das2.qds.ops.Ops;
 import org.python.core.PyDictionary;
 import org.python.core.PyFloat;
 import org.python.core.PyInteger;
 import org.python.core.PyJavaInstance;
-import org.python.core.PySingleton;
 
 /**
  * new implementation of the dataset command allows for keywords in the
