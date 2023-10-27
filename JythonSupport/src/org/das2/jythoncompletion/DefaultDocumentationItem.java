@@ -93,8 +93,24 @@ public class DefaultDocumentationItem implements CompletionDocumentation {
             int i= link.indexOf("#");
             if ( i==-1 ){
                 url= DefaultDocumentationItem.class.getResource(link);
+                if ( url==null ) {
+                    try {
+                        // second chance to use a local file:... reference
+                        url= new URL(link);
+                    } catch (MalformedURLException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
             } else {
                 url= DefaultDocumentationItem.class.getResource(link.substring(0,i));
+                if ( url==null ) {
+                    try {
+                        // second chance to use a local file:... reference
+                        url= new URL(link.substring(0,i));
+                    } catch (MalformedURLException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
                 try {
                     url = new URL(url, link.substring(i) );
                 } catch (MalformedURLException ex) {

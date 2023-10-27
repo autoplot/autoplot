@@ -98,7 +98,14 @@ public class JavadocLookup {
                         return s + signature.replaceAll("[\\(\\)\\,]", "-");
                     } else {
                         if ( s.endsWith("/") ) {
-                            return s + signature.replaceAll(",", ", ");
+                            if ( s.startsWith("file:") ) {
+                                if ( !signature.endsWith(".html") ) {
+                                    signature= signature+ ".html";
+                                }
+                                return s + signature.replaceAll(",", ", ");
+                            } else {
+                                return s + signature.replaceAll(",", ", ");
+                            }
                         } else {
                             // Note .zip files do not work!  I thought they did...
                             return s + "/" + signature.replaceAll(",", ", ");
