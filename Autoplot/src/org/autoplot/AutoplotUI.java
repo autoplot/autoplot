@@ -2572,8 +2572,8 @@ APSplash.checkTime("init 52.9");
             String defaultOption= System.getProperty("resizeOption","");
             logger.log(Level.FINE, "System property resizeOption set to \"{0}\"", defaultOption);
             if ( defaultOption.equals("") ) {
-                String[] options= new String[] { "Scale to fit display", "Use scrollbars" };
-                i= JOptionPane.showOptionDialog( this, "Canvas size doesn't fit well on this display.", "Incompatible Canvas Size", 
+                String[] options= new String[] { "Scale to fit display", "Use scrollbars","Always use scrollbars" };
+                i= JOptionPane.showOptionDialog( this, "Canvas size doesn't fit well on this display.  See http://autoplot.org/resizeOption", "Incompatible Canvas Size", 
                         JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE, ERROR_ICON,
                         options, options[1] );
             } else {
@@ -2601,6 +2601,13 @@ APSplash.checkTime("init 52.9");
                             new Object[]{ newW, newH });
 
                 } else if ( i==1 ) { // scrollbars option.
+                    this.applicationModel.dom.getCanvases(0).setFitted(false);
+                    this.applicationModel.dom.getCanvases(0).setHeight(h);
+                    this.applicationModel.dom.getCanvases(0).setWidth(w);
+                    resizeLogger.log(Level.FINE, "resizeForCanvasSize (scrollbars) {0,number,#}x{1,number,#}", new Object[]{ w, h });
+                    
+                } else if ( i==2 ) { // always scrollbars
+                    System.setProperty("resizeOption", "scrollbars");
                     this.applicationModel.dom.getCanvases(0).setFitted(false);
                     this.applicationModel.dom.getCanvases(0).setHeight(h);
                     this.applicationModel.dom.getCanvases(0).setWidth(w);
