@@ -534,12 +534,12 @@ public class DomOps {
                 double extraEms=0;
                 for ( int i=0; i<MaxDown.length; i++ ) {
                     MaxUp[i]= 0;
-                    MaxDown[i]= -d/pixelsToEm;
+                    MaxDown[i]= -d*emToPixels;
                     double[] dd1,dd2; 
                     dd1= parseLayoutStr( rows[i].top, new double[] { 0, 0, 0 } );
                     dd2= parseLayoutStr( rows[i].bottom, new double[] { 0, 0, 0 } );
                     if ( dd1[0]==dd2[0] ) {
-                        double h=(dd2[1]-dd1[0]);
+                        double h=(dd2[1]-dd1[1]);
                         dd1[1]= extraEms;
                         dd2[1]= extraEms+h;
                         extraEms+= h+d;
@@ -582,12 +582,10 @@ public class DomOps {
                 
         double [] relativePlotHeight= new double[ nrow ];
         for ( int i=0; i<nrow; i++ ) {
-            int r0= DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getTop() );
-            int r1= DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getBottom() );
             if ( isEmRow[i] ) {
                 relativePlotHeight[i]= 0.0;
             } else {
-                relativePlotHeight[i]= 1.0 * (r1-r0) / totalPlotHeightPixels;
+                relativePlotHeight[i]= 1.0 * resizablePixels[i] / totalPlotHeightPixels;
             }
         }
         
@@ -626,55 +624,71 @@ public class DomOps {
 //                }
 //            }
             doAdjust[i]= true;
-            MaxDownEm[i]= emsDownSize[i];
+            if ( verticalSpacing.trim().length()>0 ) {
+                MaxDownEm[i]= emsDownSize[i];
+                MaxUpEm[i]= emsUpSize[i];
+            } else {
+                MaxDownEm[i]= emsDownSize[i]-emsUpSize[i];
+                MaxUpEm[i]= 0.;
+            }
             MaxDown[i]= emsDownSize[i]*emToPixels;
-            MaxUpEm[i]= emsUpSize[i];
             MaxUp[i]= emsUpSize[i]*emToPixels;
             
         }
         
         double canvasHeight= canvas.height;
-        double newPlotTotalHeightPixels= canvasHeight; // this will be the pixels available to divide amungst the plots.
+        int d1= DomUtil.getRowPositionPixels( dom, canvas.marginRow, canvas.marginRow.top );
+        int d2= DomUtil.getRowPositionPixels( dom, canvas.marginRow, canvas.marginRow.bottom );
+        double marginHeight= d2-d1;
+        
+        double newPlotTotalHeightPixels= marginHeight; // this will be the pixels available to divide amungst the plots.
         for ( int i=0; i<nrow; i++ ) {
             newPlotTotalHeightPixels = newPlotTotalHeightPixels - MaxUp[i] - MaxDown[i];
         }
 
+        // newPlotHeight is the height of each plot in pixels.
         double [] newPlotHeight= new double[ nrow ];
         for ( int i=0; i<nrow; i++ ) {
-            newPlotHeight[i]= newPlotTotalHeightPixels * relativePlotHeight[i];
+            newPlotHeight[i]= newPlotTotalHeightPixels * relativePlotHeight[i]; 
         }
         
+        // normalPlotHeight will be the normalized size of each plot, which includes the em offsets.
         double[] normalPlotHeight= new double[ nrow ];
         
         if ( nrow==1 ) {
-            normalPlotHeight[0]= ( newPlotHeight[0] + MaxUp[0] + MaxDown[0] ) / ( canvasHeight );
+            normalPlotHeight[0]= ( newPlotHeight[0] - MaxUp[0] - MaxDown[0] ) / ( marginHeight );
         } else {
             for ( int i=0; i<nrow; i++ ) {
                 if ( relativePlotHeight[i]==0 ) {
                     normalPlotHeight[i]= 0.0;
                 } else {
-                    normalPlotHeight[i]= ( newPlotHeight[i] + MaxUp[i] + MaxDown[i] ) / ( canvasHeight );
+                    normalPlotHeight[i]= ( newPlotHeight[i] - MaxUp[i] - MaxDown[i] ) / ( marginHeight );
                 }
             }
         }
         
         double position= 0;
         double extraEms= 0;
-
+        
+        // guess the spacing expected between plots, for when this is not explicit.
+        double nominalSpacingEms= -MaxDownEm[0]+MaxUpEm[0];
+        
         for ( int i=0; i<nrow; i++ ) {
             if ( doAdjust[i] ) {
                 String newTop;
                 String newBottom;                
-                if ( normalPlotHeight[i]>0.01 ) {
-                    newTop=  String.format( Locale.US, "%.2f%%%+.2fem", 100*position, (MaxUp[i]+extraEms) * pixelsToEm );
+                if ( !isEmRow[i] ) {
+                    newTop=  String.format( Locale.US, "%.2f%%%+.2fem", 100*position, (MaxUpEm[i]+extraEms) );
                     position+= normalPlotHeight[i];
-                    newBottom = String.format( Locale.US, "%.2f%%%+.2fem", 100*position, (MaxDown[i]+extraEms) * pixelsToEm );
-                    position+= ( MaxDown[i] + MaxUp[i] ) / canvasHeight;
+                    newBottom = String.format( Locale.US, "%.2f%%%+.2fem", 100*position, (MaxDownEm[i]+extraEms) );
                 } else {
-                    newTop=  String.format( Locale.US, "%.2f%%%+.2fem", 100*position, (MaxUp[i]+extraEms) * pixelsToEm );
-                    newBottom = String.format( Locale.US, "%.2f%%%+.2fem", 100*position, (MaxDown[i]+extraEms) * pixelsToEm );
-                    position+= ( MaxDown[i] + MaxUp[i] ) / canvasHeight;
-                    extraEms+= ( MaxDownEm[i] + MaxUpEm[i] );
+                    newTop=  String.format( Locale.US, "%.2f%%%+.2fem", 100*position, (MaxUpEm[i]+extraEms) );
+                    newBottom = String.format( Locale.US, "%.2f%%%+.2fem", 100*position, (MaxDownEm[i]+extraEms) );
+                    if ( verticalSpacing.trim().length()>0 ) {
+                        logger.finer("we already accounted for this.");
+                    } else {
+                        extraEms+= nominalSpacingEms + ( MaxDownEm[i] + MaxUpEm[i] );
+                    }
                 }
                 rows[i].setTop( newTop );                
                 rows[i].setBottom( newBottom );
