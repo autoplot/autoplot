@@ -1128,15 +1128,16 @@ public class DomUtil {
     public static int getRowPositionPixels( Application dom, Row row, String position  ) {
         Canvas c= dom.getCanvases(0);
         Font f= Font.decode(c.getFont());
+        double em= f.getSize2D();
         String parent= row.getParent();
         double dpos;
         if ( parent.length()>0 ) {
             Row parentRow= (Row) getElementById( dom, parent );
             int pmin= getRowPositionPixels( dom, parentRow, parentRow.getTop() );
             int pmax= getRowPositionPixels( dom, parentRow, parentRow.getBottom() );
-            dpos= pmin + DasColumn.parseLayoutStr( position, f.getSize2D(), pmax-pmin, -1 );
+            dpos= pmin + DasColumn.parseLayoutStr( position, em, pmax-pmin, -1 );
         } else {
-            dpos= DasColumn.parseLayoutStr( position, f.getSize2D(), c.getHeight(), -1 );
+            dpos= DasColumn.parseLayoutStr( position, em, c.getHeight(), -1 );
         }
         return (int)dpos;
     }
