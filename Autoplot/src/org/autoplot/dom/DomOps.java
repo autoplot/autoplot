@@ -549,7 +549,7 @@ public class DomOps {
                     }
                     rows[i].top= DasDevicePosition.formatLayoutStr(dd1);
                     rows[i].bottom= DasDevicePosition.formatLayoutStr(dd2);
-                    System.err.println( "line552: "+rows[i].top+","+rows[i].bottom);
+                    logger.log(Level.FINE, "line552: {0},{1}", new Object[]{rows[i].top, rows[i].bottom});
                 }
             }
         }
