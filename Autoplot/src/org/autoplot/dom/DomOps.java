@@ -555,7 +555,7 @@ public class DomOps {
         }
 
         double[] resizablePixels= new double[nrow];
-        double[] normalSize= new double[nrow];
+        boolean[] isEmRow= new boolean[nrow];
         double[] emsUpSize= new double[nrow];
         double[] emsDownSize= new double[nrow];
         
@@ -569,10 +569,10 @@ public class DomOps {
                 resizablePixels[i]= ( d2-d1 );
                 double[] rr1= parseLayoutStr(rows[i].getTop(),new double[3]);
                 double[] rr2= parseLayoutStr(rows[i].getBottom(),new double[3]);
-                normalSize[i]= Math.abs( rr1[0]-rr2[0] );
+                isEmRow[i]= Math.abs( rr1[0]-rr2[0] )<0.001;
                 emsUpSize[i]= rr1[1];
                 emsDownSize[i]= rr2[1];
-                if ( normalSize[i]<0.001 ) {
+                if ( isEmRow[i] ) {
                     logger.fine("here's an events bar row!");
                 } else {
                     totalPlotHeightPixels= totalPlotHeightPixels + resizablePixels[i];
@@ -584,7 +584,7 @@ public class DomOps {
         for ( int i=0; i<nrow; i++ ) {
             int r0= DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getTop() );
             int r1= DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getBottom() );
-            if ( normalSize[i]<0.001 ) {
+            if ( isEmRow[i] ) {
                 relativePlotHeight[i]= 0.0;
             } else {
                 relativePlotHeight[i]= 1.0 * (r1-r0) / totalPlotHeightPixels;
@@ -625,6 +625,7 @@ public class DomOps {
 //                    doAdjust[i]= false;
 //                }
 //            }
+            doAdjust[i]= true;
             MaxDownEm[i]= emsDownSize[i];
             MaxDown[i]= emsDownSize[i]*emToPixels;
             MaxUpEm[i]= emsUpSize[i];
