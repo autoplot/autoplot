@@ -437,6 +437,9 @@ public class DomOps {
     public static void fixLayout( Application dom, Map<String,String> options  ) {
         Logger logger= LoggerManager.getLogger("autoplot.dom.layout");
         logger.fine( "enter fixLayout" );
+        
+        boolean autoLayout= dom.options.isAutolayout();
+        dom.options.setAutolayout(false);
                 
         Canvas canvas= dom.getCanvases(0);
 
@@ -553,6 +556,29 @@ public class DomOps {
                 }
             }
         }
+
+        // reset marginRow.  define nup to be the number of lines above the top plot row.  define nbottom to be the number
+        // of lines below the bottom row.
+        double ntopEm=0, nbottomEm=0;
+        for ( int i=0; i<dom.plots.size(); i++ ) {
+            Plot p= dom.plots.get(i);
+            if ( p.getRowId().equals(topRowId) ) {
+                ntopEm= Math.max( ntopEm, lineCount( p.getTitle() ) );
+            }
+            if ( p.getRowId().equals(bottomRowId) ) {
+                if ( p.getXaxis().isDrawTickLabels() ) {
+                    if ( p.getEphemerisLineCount()>-1 ) {
+                        nbottomEm= Math.max( nbottomEm, p.getEphemerisLineCount()+1 );  // +1 is for ticks
+                    } else {
+                        nbottomEm= Math.max( nbottomEm, 2 );
+                    }
+                } else {
+                    nbottomEm= Math.max( nbottomEm, 1 );
+                }
+            }
+        }
+        canvas.getMarginRow().setTop( String.format( "0%%+%.1fem", ntopEm+2 ) );
+        canvas.getMarginRow().setBottom( String.format( "100%%-%.1fem", nbottomEm ) );
 
         double[] resizablePixels= new double[nrow];
         boolean[] isEmRow= new boolean[nrow];
@@ -707,6 +733,8 @@ public class DomOps {
         }
 
         fixHorizontalLayout( dom ); //comment while fixing jenkins tests
+        
+        dom.options.setAutolayout(autoLayout);
     }
 
     /**
