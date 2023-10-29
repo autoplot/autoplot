@@ -440,301 +440,305 @@ public class DomOps {
         
         boolean autoLayout= dom.options.isAutolayout();
         dom.options.setAutolayout(false);
+        
+        try {
                 
-        Canvas canvas= dom.getCanvases(0);
+            Canvas canvas= dom.getCanvases(0);
 
-        double emToPixels= java.awt.Font.decode(dom.getCanvases(0).font).getSize();
-        double pixelsToEm= 1/emToPixels;
+            double emToPixels= java.awt.Font.decode(dom.getCanvases(0).font).getSize();
+            double pixelsToEm= 1/emToPixels;
 
-        Row[] rows= canvas.getRows();
-        int nrow= rows.length;
-        boolean[] doAdjust= new boolean[nrow];
+            Row[] rows= canvas.getRows();
+            int nrow= rows.length;
+            boolean[] doAdjust= new boolean[nrow];
 
-        //kludge: check for duplicate names of rows.  Use the first one found.
-        Map<String,Row> rowsCheck= new HashMap();
-        List<Row> rm= new ArrayList<>();
-        for ( int i=0; i<nrow; i++ ) {           
-           List<Plot> plots= DomOps.getPlotsFor( dom, rows[i], true );
+            //kludge: check for duplicate names of rows.  Use the first one found.
+            Map<String,Row> rowsCheck= new HashMap();
+            List<Row> rm= new ArrayList<>();
+            for ( int i=0; i<nrow; i++ ) {           
+               List<Plot> plots= DomOps.getPlotsFor( dom, rows[i], true );
 
-           if ( plots.size()>0 ) {
-               if ( rowsCheck.containsKey(rows[i].getId()) ) {
-                   logger.log(Level.FINE, "duplicate row id: {0}", rows[i].getId());
+               if ( plots.size()>0 ) {
+                   if ( rowsCheck.containsKey(rows[i].getId()) ) {
+                       logger.log(Level.FINE, "duplicate row id: {0}", rows[i].getId());
+                       rm.add( rows[i] );
+                   } else {
+                       rowsCheck.put( rows[i].getId(), rows[i] );
+                   }
+                } else {
+                   logger.log(Level.FINE, "unused row: {0}", rows[i]);
                    rm.add( rows[i] );
-               } else {
-                   rowsCheck.put( rows[i].getId(), rows[i] );
                }
-            } else {
-               logger.log(Level.FINE, "unused row: {0}", rows[i]);
-               rm.add( rows[i] );
-           }
-        }
-        
-        List<Row> rowsList= new ArrayList<>(Arrays.asList(rows));
-        rm.forEach((r) -> {
-            rowsList.remove(r);
-        });
-        canvas.setRows( rowsList.toArray(new Row[rowsList.size()]));
-        
-        rows= new Row[ rowsList.size() ];
-        nrow= rows.length;
-        for ( int i=0; i<nrow; i++ ) {
-            rows[i]= new Row();
-            rows[i].syncTo( canvas.getRows(i) );
-        }
- 
-        // sort rows, which is a refactoring.
-        Arrays.sort( rows, (Row r1, Row r2) -> {
-            int d1= DomUtil.getRowPositionPixels( dom, r1, r1.getTop() );
-            int d2= DomUtil.getRowPositionPixels( dom, r2, r2.getTop() );
-            return d1-d2;
-        });
-        
-        String topRowId= rows[0].getId();
-        String bottomRowId= rows[rows.length-1].getId();
-        
-        if ( options.getOrDefault( OPTION_FIX_LAYOUT_HIDE_TITLES, "false" ).equals("true") ) {
-            for ( Plot p: dom.plots ) {
-                if ( p.getRowId().equals(topRowId) ) {
-                    logger.fine("not hiding top plot's title");
-                } else {
-                    p.setDisplayTitle(false);
-                }
             }
-        }
-        
-        if ( options.getOrDefault( OPTION_FIX_LAYOUT_HIDE_TIME_AXES, "false" ).equals("true") ) {
-            for ( Plot p: dom.plots ) {
-                if ( p.getRowId().equals(bottomRowId) ) {
-                    logger.fine("not hiding bottom plot's time axis"); 
-                } else {
-                    // TODO: check bindings to see that this axis is bound to the timerange
-                    p.xaxis.setDrawTickLabels(false);
-                }
-            }
-        }
-        
-        if ( options.getOrDefault( OPTION_FIX_LAYOUT_MOVE_LEGENDS_TO_OUTSIDE_NE, "false" ).equals("true") ) {
-            for ( Plot p: dom.plots ) {
-                if ( p.isDisplayLegend() ) {
-                    if ( !p.getZaxis().isVisible() ) {
-                        p.setLegendPosition(LegendPosition.OutsideNE);
-                    }
-                }
-            }
-        }
-        
-        String verticalSpacing=  options.getOrDefault( OPTION_FIX_LAYOUT_VERTICAL_SPACING, "" );
-        
-        double [] MaxUp= new double[ nrow ];
-        double [] MaxDown= new double[ nrow ];
-        double [] MaxUpEm= new double[ nrow ];
-        double [] MaxDownEm= new double[ nrow ];
-        
-        if ( verticalSpacing.trim().length()>0 ) {
-            Pattern p= Pattern.compile("([0-9\\.]*)em");
-            if ( p.matcher(verticalSpacing).matches() ) {
-                Double d= Double.parseDouble(verticalSpacing.substring(0,verticalSpacing.length()-2));
-                double extraEms=0;
-                for ( int i=0; i<MaxDown.length; i++ ) {
-                    MaxUp[i]= 0;
-                    MaxDown[i]= -d*emToPixels;
-                    double[] dd1,dd2; 
-                    dd1= parseLayoutStr( rows[i].top, new double[] { 0, 0, 0 } );
-                    dd2= parseLayoutStr( rows[i].bottom, new double[] { 0, 0, 0 } );
-                    if ( dd1[0]==dd2[0] ) {
-                        double h=(dd2[1]-dd1[1]);
-                        dd1[1]= extraEms;
-                        dd2[1]= extraEms+h;
-                        extraEms+= h+d;
-                    } else {
-                        dd1[1]= extraEms;
-                        dd2[1]= extraEms-d;
-                    }
-                    rows[i].top= DasDevicePosition.formatLayoutStr(dd1);
-                    rows[i].bottom= DasDevicePosition.formatLayoutStr(dd2);
-                    logger.log(Level.FINE, "line552: {0},{1}", new Object[]{rows[i].top, rows[i].bottom});
-                }
-            }
-        }
 
-        // reset marginRow.  define nup to be the number of lines above the top plot row.  define nbottom to be the number
-        // of lines below the bottom row.
-        double ntopEm=0, nbottomEm=0;
-        for ( int i=0; i<dom.plots.size(); i++ ) {
-            Plot p= dom.plots.get(i);
-            if ( p.getRowId().equals(topRowId) ) {
-                ntopEm= Math.max( ntopEm, lineCount( p.getTitle() ) );
-            }
-            if ( p.getRowId().equals(bottomRowId) ) {
-                if ( p.getXaxis().isDrawTickLabels() ) {
-                    if ( p.getEphemerisLineCount()>-1 ) {
-                        nbottomEm= Math.max( nbottomEm, p.getEphemerisLineCount()+1 );  // +1 is for ticks
-                    } else {
-                        nbottomEm= Math.max( nbottomEm, 2 );
-                    }
-                } else {
-                    nbottomEm= Math.max( nbottomEm, 1 );
-                }
-            }
-        }
-        canvas.getMarginRow().setTop( String.format( "0%%+%.1fem", ntopEm+2 ) );
-        canvas.getMarginRow().setBottom( String.format( "100%%-%.1fem", nbottomEm ) );
+            List<Row> rowsList= new ArrayList<>(Arrays.asList(rows));
+            rm.forEach((r) -> {
+                rowsList.remove(r);
+            });
+            canvas.setRows( rowsList.toArray(new Row[rowsList.size()]));
 
-        double[] resizablePixels= new double[nrow];
-        boolean[] isEmRow= new boolean[nrow];
-        double[] emsUpSize= new double[nrow];
-        double[] emsDownSize= new double[nrow];
-        
-        double totalPlotHeightPixels= 0;
-        for ( int i=0; i<nrow; i++ ) {           
-            List<Plot> plots= DomOps.getPlotsFor( dom, rows[i], true );
-
-            if ( plots.size()>0 ) {
-                int d1 = DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getTop() );
-                int d2 = DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getBottom() );
-                resizablePixels[i]= ( d2-d1 );
-                double[] rr1= parseLayoutStr(rows[i].getTop(),new double[3]);
-                double[] rr2= parseLayoutStr(rows[i].getBottom(),new double[3]);
-                isEmRow[i]= Math.abs( rr1[0]-rr2[0] )<0.001;
-                emsUpSize[i]= rr1[1];
-                emsDownSize[i]= rr2[1];
-                if ( isEmRow[i] ) {
-                    logger.fine("here's an events bar row!");
-                } else {
-                    totalPlotHeightPixels= totalPlotHeightPixels + resizablePixels[i];
-                }
-            }
-        }
-                
-        double [] relativePlotHeight= new double[ nrow ];
-        for ( int i=0; i<nrow; i++ ) {
-            if ( isEmRow[i] ) {
-                relativePlotHeight[i]= 0.0;
-            } else {
-                relativePlotHeight[i]= 1.0 * resizablePixels[i] / totalPlotHeightPixels;
-            }
-        }
-        
-
-
-//        double[] emHeight= new double[ nrow ];
-//        for ( int i=0; i<nrow; i++ ) {
-//            DasRow dasRow= rows[i].getController().dasRow;
-//            emHeight[i]= ( dasRow.getEmMaximum() - dasRow.getEmMinimum() );
-//        }// I know there's some check we can do with this to preserve 1-em high plots.
-        
-        for ( int i=0; i<nrow; i++ ) {
-//            List<Plot> plots= DomOps.getPlotsFor( dom, rows[i], true );
-//            double MaxUpJEm;
-//            double MaxDownPx;
-//            for ( Plot plotj : plots ) {
-//                if ( true ) { //TODO: this was a check against the margin column.  Why?
-//                    String title= plotj.getTitle();
-//                    String content= title; // title.replaceAll("(\\!c|\\!C|\\<br\\>)", " ");
-//                    boolean addLines= plotj.isDisplayTitle() && content.trim().length()>0;
-//                    int lc= lineCount(title);
-//                    MaxUpJEm= addLines ? lc : 0.;
-//                    logger.log(Level.FINE, "{0} addLines: {1}  isDiplayTitle: {2}  lineCount(title): {3}", 
-//                            new Object[]{plotj.getId(), addLines, plotj.isDisplayTitle(), lc});
-//                    //if (MaxUpJEm>0 ) MaxUpJEm= MaxUpJEm+1;
-//                    MaxUp[i]= Math.max( MaxUp[i], MaxUpJEm*emToPixels );
-//                    MaxUpEm[i]= Math.max( MaxUpEm[i], MaxUpJEm );
-//                    Rectangle plot= DomUtil.getBoundsForPlot( dom, plotj );
-//                    Rectangle axis= DomUtil.getBoundsForXAxis( dom, plotj );
-//                    MaxDownPx= ( ( axis.getY() + axis.getHeight() ) - ( plot.getY() + plot.getHeight() ) );
-//                    //MaxDown[i]= Math.max( MaxDown[i], MaxDownPx );
-//                    //MaxDownEm[i]= MaxDown[i]/emToPixels;
-//                    doAdjust[i]= true;
-//                } else {
-//                    doAdjust[i]= false;
-//                }
-//            }
-            doAdjust[i]= true;
-            if ( verticalSpacing.trim().length()>0 ) {
-                MaxDownEm[i]= emsDownSize[i];
-                MaxUpEm[i]= emsUpSize[i];
-            } else {
-                MaxDownEm[i]= emsDownSize[i]-emsUpSize[i];
-                MaxUpEm[i]= 0.;
-            }
-            MaxDown[i]= emsDownSize[i]*emToPixels;
-            MaxUp[i]= emsUpSize[i]*emToPixels;
-            
-        }
-        
-        double canvasHeight= canvas.height;
-        int d1= DomUtil.getRowPositionPixels( dom, canvas.marginRow, canvas.marginRow.top );
-        int d2= DomUtil.getRowPositionPixels( dom, canvas.marginRow, canvas.marginRow.bottom );
-        double marginHeight= d2-d1;
-        
-        double newPlotTotalHeightPixels= marginHeight; // this will be the pixels available to divide amungst the plots.
-        for ( int i=0; i<nrow; i++ ) {
-            newPlotTotalHeightPixels = newPlotTotalHeightPixels - MaxUp[i] - MaxDown[i];
-        }
-
-        // newPlotHeight is the height of each plot in pixels.
-        double [] newPlotHeight= new double[ nrow ];
-        for ( int i=0; i<nrow; i++ ) {
-            newPlotHeight[i]= newPlotTotalHeightPixels * relativePlotHeight[i]; 
-        }
-        
-        // normalPlotHeight will be the normalized size of each plot, which includes the em offsets.
-        double[] normalPlotHeight= new double[ nrow ];
-        
-        if ( nrow==1 ) {
-            normalPlotHeight[0]= ( newPlotHeight[0] - MaxUp[0] - MaxDown[0] ) / ( marginHeight );
-        } else {
+            rows= new Row[ rowsList.size() ];
+            nrow= rows.length;
             for ( int i=0; i<nrow; i++ ) {
-                if ( relativePlotHeight[i]==0 ) {
-                    normalPlotHeight[i]= 0.0;
-                } else {
-                    normalPlotHeight[i]= ( newPlotHeight[i] - MaxUp[i] - MaxDown[i] ) / ( marginHeight );
-                }
+                rows[i]= new Row();
+                rows[i].syncTo( canvas.getRows(i) );
             }
-        }
-        
-        double position= 0;
-        double extraEms= 0;
-        
-        // guess the spacing expected between plots, for when this is not explicit.
-        double nominalSpacingEms= -MaxDownEm[0]+MaxUpEm[0];
-        
-        for ( int i=0; i<nrow; i++ ) {
-            if ( doAdjust[i] ) {
-                String newTop;
-                String newBottom;                
-                if ( !isEmRow[i] ) {
-                    newTop=  String.format( Locale.US, "%.2f%%%+.2fem", 100*position, (MaxUpEm[i]+extraEms) );
-                    position+= normalPlotHeight[i];
-                    newBottom = String.format( Locale.US, "%.2f%%%+.2fem", 100*position, (MaxDownEm[i]+extraEms) );
-                } else {
-                    newTop=  String.format( Locale.US, "%.2f%%%+.2fem", 100*position, (MaxUpEm[i]+extraEms) );
-                    newBottom = String.format( Locale.US, "%.2f%%%+.2fem", 100*position, (MaxDownEm[i]+extraEms) );
-                    if ( verticalSpacing.trim().length()>0 ) {
-                        logger.finer("we already accounted for this.");
+
+            // sort rows, which is a refactoring.
+            Arrays.sort( rows, (Row r1, Row r2) -> {
+                int d1= DomUtil.getRowPositionPixels( dom, r1, r1.getTop() );
+                int d2= DomUtil.getRowPositionPixels( dom, r2, r2.getTop() );
+                return d1-d2;
+            });
+
+            String topRowId= rows[0].getId();
+            String bottomRowId= rows[rows.length-1].getId();
+
+            if ( options.getOrDefault( OPTION_FIX_LAYOUT_HIDE_TITLES, "false" ).equals("true") ) {
+                for ( Plot p: dom.plots ) {
+                    if ( p.getRowId().equals(topRowId) ) {
+                        logger.fine("not hiding top plot's title");
                     } else {
-                        extraEms+= nominalSpacingEms + ( MaxDownEm[i] + MaxUpEm[i] );
+                        p.setDisplayTitle(false);
                     }
                 }
-                rows[i].setTop( newTop );                
-                rows[i].setBottom( newBottom );
-                if ( logger.isLoggable( Level.FINE ) ) {
-                    int r0= (int)DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getTop() );
-                    int r1= (int)DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getBottom() );
-                    logger.log(Level.FINE, "row {0}: {1},{2} ({3} pixels)", new Object[]{i, newTop, newBottom, r1-r0 });
-                }
-            } else {
-                logger.log(Level.FINE, "row {0} is not adjusted", i );
             }
-        }
-        
-        for ( int i=0; i<rows.length; i++ ) {
-            canvas.getRows(i).syncTo(rows[i]);
-        }
 
-        fixHorizontalLayout( dom ); //comment while fixing jenkins tests
-        
-        dom.options.setAutolayout(autoLayout);
+            if ( options.getOrDefault( OPTION_FIX_LAYOUT_HIDE_TIME_AXES, "false" ).equals("true") ) {
+                for ( Plot p: dom.plots ) {
+                    if ( p.getRowId().equals(bottomRowId) ) {
+                        logger.fine("not hiding bottom plot's time axis"); 
+                    } else {
+                        // TODO: check bindings to see that this axis is bound to the timerange
+                        p.xaxis.setDrawTickLabels(false);
+                    }
+                }
+            }
+
+            if ( options.getOrDefault( OPTION_FIX_LAYOUT_MOVE_LEGENDS_TO_OUTSIDE_NE, "false" ).equals("true") ) {
+                for ( Plot p: dom.plots ) {
+                    if ( p.isDisplayLegend() ) {
+                        if ( !p.getZaxis().isVisible() ) {
+                            p.setLegendPosition(LegendPosition.OutsideNE);
+                        }
+                    }
+                }
+            }
+
+            String verticalSpacing=  options.getOrDefault( OPTION_FIX_LAYOUT_VERTICAL_SPACING, "" );
+
+            double [] MaxUp= new double[ nrow ];
+            double [] MaxDown= new double[ nrow ];
+            double [] MaxUpEm= new double[ nrow ];
+            double [] MaxDownEm= new double[ nrow ];
+
+            if ( verticalSpacing.trim().length()>0 ) {
+                Pattern p= Pattern.compile("([0-9\\.]*)em");
+                if ( p.matcher(verticalSpacing).matches() ) {
+                    Double d= Double.parseDouble(verticalSpacing.substring(0,verticalSpacing.length()-2));
+                    double extraEms=0;
+                    for ( int i=0; i<MaxDown.length; i++ ) {
+                        MaxUp[i]= 0;
+                        MaxDown[i]= -d*emToPixels;
+                        double[] dd1,dd2; 
+                        dd1= parseLayoutStr( rows[i].top, new double[] { 0, 0, 0 } );
+                        dd2= parseLayoutStr( rows[i].bottom, new double[] { 0, 0, 0 } );
+                        if ( dd1[0]==dd2[0] ) {
+                            double h=(dd2[1]-dd1[1]);
+                            dd1[1]= extraEms;
+                            dd2[1]= extraEms+h;
+                            extraEms+= h+d;
+                        } else {
+                            dd1[1]= extraEms;
+                            dd2[1]= extraEms-d;
+                        }
+                        rows[i].top= DasDevicePosition.formatLayoutStr(dd1);
+                        rows[i].bottom= DasDevicePosition.formatLayoutStr(dd2);
+                        logger.log(Level.FINE, "line552: {0},{1}", new Object[]{rows[i].top, rows[i].bottom});
+                    }
+                }
+            }
+
+            // reset marginRow.  define nup to be the number of lines above the top plot row.  define nbottom to be the number
+            // of lines below the bottom row.
+            double ntopEm=0, nbottomEm=0;
+            for ( int i=0; i<dom.plots.size(); i++ ) {
+                Plot p= dom.plots.get(i);
+                if ( p.getRowId().equals(topRowId) ) {
+                    ntopEm= Math.max( ntopEm, lineCount( p.getTitle() ) );
+                }
+                if ( p.getRowId().equals(bottomRowId) ) {
+                    if ( p.getXaxis().isDrawTickLabels() ) {
+                        if ( p.getEphemerisLineCount()>-1 ) {
+                            nbottomEm= Math.max( nbottomEm, p.getEphemerisLineCount()+1 );  // +1 is for ticks
+                        } else {
+                            nbottomEm= Math.max( nbottomEm, 2 );
+                        }
+                    } else {
+                        nbottomEm= Math.max( nbottomEm, 1 );
+                    }
+                }
+            }
+            canvas.getMarginRow().setTop( String.format( "0%%+%.1fem", ntopEm+2 ) );
+            canvas.getMarginRow().setBottom( String.format( "100%%-%.1fem", nbottomEm ) );
+
+            double[] resizablePixels= new double[nrow];
+            boolean[] isEmRow= new boolean[nrow];
+            double[] emsUpSize= new double[nrow];
+            double[] emsDownSize= new double[nrow];
+
+            double totalPlotHeightPixels= 0;
+            for ( int i=0; i<nrow; i++ ) {           
+                List<Plot> plots= DomOps.getPlotsFor( dom, rows[i], true );
+
+                if ( plots.size()>0 ) {
+                    int d1 = DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getTop() );
+                    int d2 = DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getBottom() );
+                    resizablePixels[i]= ( d2-d1 );
+                    double[] rr1= parseLayoutStr(rows[i].getTop(),new double[3]);
+                    double[] rr2= parseLayoutStr(rows[i].getBottom(),new double[3]);
+                    isEmRow[i]= Math.abs( rr1[0]-rr2[0] )<0.001;
+                    emsUpSize[i]= rr1[1];
+                    emsDownSize[i]= rr2[1];
+                    if ( isEmRow[i] ) {
+                        logger.fine("here's an events bar row!");
+                    } else {
+                        totalPlotHeightPixels= totalPlotHeightPixels + resizablePixels[i];
+                    }
+                }
+            }
+
+            double [] relativePlotHeight= new double[ nrow ];
+            for ( int i=0; i<nrow; i++ ) {
+                if ( isEmRow[i] ) {
+                    relativePlotHeight[i]= 0.0;
+                } else {
+                    relativePlotHeight[i]= 1.0 * resizablePixels[i] / totalPlotHeightPixels;
+                }
+            }
+
+
+
+    //        double[] emHeight= new double[ nrow ];
+    //        for ( int i=0; i<nrow; i++ ) {
+    //            DasRow dasRow= rows[i].getController().dasRow;
+    //            emHeight[i]= ( dasRow.getEmMaximum() - dasRow.getEmMinimum() );
+    //        }// I know there's some check we can do with this to preserve 1-em high plots.
+
+            for ( int i=0; i<nrow; i++ ) {
+    //            List<Plot> plots= DomOps.getPlotsFor( dom, rows[i], true );
+    //            double MaxUpJEm;
+    //            double MaxDownPx;
+    //            for ( Plot plotj : plots ) {
+    //                if ( true ) { //TODO: this was a check against the margin column.  Why?
+    //                    String title= plotj.getTitle();
+    //                    String content= title; // title.replaceAll("(\\!c|\\!C|\\<br\\>)", " ");
+    //                    boolean addLines= plotj.isDisplayTitle() && content.trim().length()>0;
+    //                    int lc= lineCount(title);
+    //                    MaxUpJEm= addLines ? lc : 0.;
+    //                    logger.log(Level.FINE, "{0} addLines: {1}  isDiplayTitle: {2}  lineCount(title): {3}", 
+    //                            new Object[]{plotj.getId(), addLines, plotj.isDisplayTitle(), lc});
+    //                    //if (MaxUpJEm>0 ) MaxUpJEm= MaxUpJEm+1;
+    //                    MaxUp[i]= Math.max( MaxUp[i], MaxUpJEm*emToPixels );
+    //                    MaxUpEm[i]= Math.max( MaxUpEm[i], MaxUpJEm );
+    //                    Rectangle plot= DomUtil.getBoundsForPlot( dom, plotj );
+    //                    Rectangle axis= DomUtil.getBoundsForXAxis( dom, plotj );
+    //                    MaxDownPx= ( ( axis.getY() + axis.getHeight() ) - ( plot.getY() + plot.getHeight() ) );
+    //                    //MaxDown[i]= Math.max( MaxDown[i], MaxDownPx );
+    //                    //MaxDownEm[i]= MaxDown[i]/emToPixels;
+    //                    doAdjust[i]= true;
+    //                } else {
+    //                    doAdjust[i]= false;
+    //                }
+    //            }
+                doAdjust[i]= true;
+                if ( verticalSpacing.trim().length()>0 ) {
+                    MaxDownEm[i]= emsDownSize[i];
+                    MaxUpEm[i]= emsUpSize[i];
+                } else {
+                    MaxDownEm[i]= emsDownSize[i]-emsUpSize[i];
+                    MaxUpEm[i]= 0.;
+                }
+                MaxDown[i]= emsDownSize[i]*emToPixels;
+                MaxUp[i]= emsUpSize[i]*emToPixels;
+
+            }
+
+            double canvasHeight= canvas.height;
+            int d1= DomUtil.getRowPositionPixels( dom, canvas.marginRow, canvas.marginRow.top );
+            int d2= DomUtil.getRowPositionPixels( dom, canvas.marginRow, canvas.marginRow.bottom );
+            double marginHeight= d2-d1;
+
+            double newPlotTotalHeightPixels= marginHeight; // this will be the pixels available to divide amungst the plots.
+            for ( int i=0; i<nrow; i++ ) {
+                newPlotTotalHeightPixels = newPlotTotalHeightPixels - MaxUp[i] - MaxDown[i];
+            }
+
+            // newPlotHeight is the height of each plot in pixels.
+            double [] newPlotHeight= new double[ nrow ];
+            for ( int i=0; i<nrow; i++ ) {
+                newPlotHeight[i]= newPlotTotalHeightPixels * relativePlotHeight[i]; 
+            }
+
+            // normalPlotHeight will be the normalized size of each plot, which includes the em offsets.
+            double[] normalPlotHeight= new double[ nrow ];
+
+            if ( nrow==1 ) {
+                normalPlotHeight[0]= ( newPlotHeight[0] - MaxUp[0] - MaxDown[0] ) / ( marginHeight );
+            } else {
+                for ( int i=0; i<nrow; i++ ) {
+                    if ( relativePlotHeight[i]==0 ) {
+                        normalPlotHeight[i]= 0.0;
+                    } else {
+                        normalPlotHeight[i]= ( newPlotHeight[i] - MaxUp[i] - MaxDown[i] ) / ( marginHeight );
+                    }
+                }
+            }
+
+            double position= 0;
+            double extraEms= 0;
+
+            // guess the spacing expected between plots, for when this is not explicit.
+            double nominalSpacingEms= -MaxDownEm[0]+MaxUpEm[0];
+
+            for ( int i=0; i<nrow; i++ ) {
+                if ( doAdjust[i] ) {
+                    String newTop;
+                    String newBottom;                
+                    if ( !isEmRow[i] ) {
+                        newTop=  String.format( Locale.US, "%.2f%%%+.2fem", 100*position, (MaxUpEm[i]+extraEms) );
+                        position+= normalPlotHeight[i];
+                        newBottom = String.format( Locale.US, "%.2f%%%+.2fem", 100*position, (MaxDownEm[i]+extraEms) );
+                    } else {
+                        newTop=  String.format( Locale.US, "%.2f%%%+.2fem", 100*position, (MaxUpEm[i]+extraEms) );
+                        newBottom = String.format( Locale.US, "%.2f%%%+.2fem", 100*position, (MaxDownEm[i]+extraEms) );
+                        if ( verticalSpacing.trim().length()>0 ) {
+                            logger.finer("we already accounted for this.");
+                        } else {
+                            extraEms+= nominalSpacingEms + ( MaxDownEm[i] + MaxUpEm[i] );
+                        }
+                    }
+                    rows[i].setTop( newTop );                
+                    rows[i].setBottom( newBottom );
+                    if ( logger.isLoggable( Level.FINE ) ) {
+                        int r0= (int)DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getTop() );
+                        int r1= (int)DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getBottom() );
+                        logger.log(Level.FINE, "row {0}: {1},{2} ({3} pixels)", new Object[]{i, newTop, newBottom, r1-r0 });
+                    }
+                } else {
+                    logger.log(Level.FINE, "row {0} is not adjusted", i );
+                }
+            }
+
+            for ( int i=0; i<rows.length; i++ ) {
+                canvas.getRows(i).syncTo(rows[i]);
+            }
+
+            fixHorizontalLayout( dom ); //comment while fixing jenkins tests
+
+        } finally {
+            dom.options.setAutolayout(autoLayout);
+        }
     }
 
     /**
