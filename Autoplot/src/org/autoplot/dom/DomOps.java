@@ -444,7 +444,8 @@ public class DomOps {
         try {
                 
             Canvas canvas= dom.getCanvases(0);
-
+            Row marginRow= canvas.getMarginRow();
+            
             double emToPixels= java.awt.Font.decode(dom.getCanvases(0).font).getSize();
             double pixelsToEm= 1/emToPixels;
 
@@ -579,8 +580,9 @@ public class DomOps {
                     }
                 }
             }
-            canvas.getMarginRow().setTop( String.format( "0%%+%.1fem", ntopEm+2 ) );
-            canvas.getMarginRow().setBottom( String.format( "100%%-%.1fem", nbottomEm ) );
+            nbottomEm= 0;
+            marginRow.setTop( String.format( "0%%+%.1fem", ntopEm+2 ) );
+            marginRow.setBottom( String.format( "100%%-%.1fem", nbottomEm ) );
 
             double[] resizablePixels= new double[nrow];
             boolean[] isEmRow= new boolean[nrow];
@@ -617,7 +619,7 @@ public class DomOps {
                 }
             }
 
-
+            // assert the sum of relativePlotHeight is 1.0
 
     //        double[] emHeight= new double[ nrow ];
     //        for ( int i=0; i<nrow; i++ ) {
@@ -626,41 +628,51 @@ public class DomOps {
     //        }// I know there's some check we can do with this to preserve 1-em high plots.
 
             for ( int i=0; i<nrow; i++ ) {
-    //            List<Plot> plots= DomOps.getPlotsFor( dom, rows[i], true );
-    //            double MaxUpJEm;
-    //            double MaxDownPx;
-    //            for ( Plot plotj : plots ) {
-    //                if ( true ) { //TODO: this was a check against the margin column.  Why?
-    //                    String title= plotj.getTitle();
-    //                    String content= title; // title.replaceAll("(\\!c|\\!C|\\<br\\>)", " ");
-    //                    boolean addLines= plotj.isDisplayTitle() && content.trim().length()>0;
-    //                    int lc= lineCount(title);
-    //                    MaxUpJEm= addLines ? lc : 0.;
-    //                    logger.log(Level.FINE, "{0} addLines: {1}  isDiplayTitle: {2}  lineCount(title): {3}", 
-    //                            new Object[]{plotj.getId(), addLines, plotj.isDisplayTitle(), lc});
-    //                    //if (MaxUpJEm>0 ) MaxUpJEm= MaxUpJEm+1;
-    //                    MaxUp[i]= Math.max( MaxUp[i], MaxUpJEm*emToPixels );
-    //                    MaxUpEm[i]= Math.max( MaxUpEm[i], MaxUpJEm );
-    //                    Rectangle plot= DomUtil.getBoundsForPlot( dom, plotj );
-    //                    Rectangle axis= DomUtil.getBoundsForXAxis( dom, plotj );
-    //                    MaxDownPx= ( ( axis.getY() + axis.getHeight() ) - ( plot.getY() + plot.getHeight() ) );
-    //                    //MaxDown[i]= Math.max( MaxDown[i], MaxDownPx );
-    //                    //MaxDownEm[i]= MaxDown[i]/emToPixels;
-    //                    doAdjust[i]= true;
-    //                } else {
-    //                    doAdjust[i]= false;
-    //                }
-    //            }
-                doAdjust[i]= true;
-                if ( verticalSpacing.trim().length()>0 ) {
+                if ( isEmRow[i] ) {
                     MaxDownEm[i]= emsDownSize[i];
                     MaxUpEm[i]= emsUpSize[i];
+                    MaxDown[i]= emsDownSize[i]*emToPixels;
+                    MaxUp[i]= emsUpSize[i]*emToPixels;
+                    doAdjust[i]= true;
+                    
                 } else {
-                    MaxDownEm[i]= emsDownSize[i]-emsUpSize[i];
-                    MaxUpEm[i]= 0.;
+                    List<Plot> plots= DomOps.getPlotsFor( dom, rows[i], true );
+                    double MaxUpJEm;
+                    double MaxDownPx;
+                    for ( Plot plotj : plots ) {
+                        if ( rows[i].parent.equals(marginRow.id) ) { 
+                            String title= plotj.getTitle();
+                            String content= title; // title.replaceAll("(\\!c|\\!C|\\<br\\>)", " ");
+                            boolean addLines= plotj.isDisplayTitle() && content.trim().length()>0;
+                            int lc= lineCount(title);
+                            MaxUpJEm= addLines ? lc : 0.;
+                            logger.log(Level.FINE, "{0} addLines: {1}  isDiplayTitle: {2}  lineCount(title): {3}", 
+                                    new Object[]{plotj.getId(), addLines, plotj.isDisplayTitle(), lc});
+                            MaxUp[i]= Math.max( MaxUp[i], MaxUpJEm*emToPixels );
+                            MaxUpEm[i]= Math.max( MaxUpEm[i], MaxUpJEm );
+                            if ( plotj.getXaxis().isDrawTickLabels() ) {
+                                if ( plotj.getEphemerisLineCount()>-1 ) {
+                                    nbottomEm= -(plotj.getEphemerisLineCount()+1);  // +1 is for ticks
+                                } else {
+                                    nbottomEm= -(2+1);
+                                }
+                            } else {
+                                nbottomEm= -1;
+                            }
+                            MaxDownEm[i]= Math.min( MaxDownEm[i], nbottomEm );
+                            MaxDown[i]= MaxDownEm[i]*emToPixels;
+
+                            doAdjust[i]= true;
+                        } else {
+                            doAdjust[i]= false;
+                        }
+                    }
+                    if ( verticalSpacing.trim().length()>0 ) {
+                        MaxDownEm[i]= emsDownSize[i]-emsUpSize[i];
+                        MaxUpEm[i]= 0.;
+                    }
+                
                 }
-                MaxDown[i]= emsDownSize[i]*emToPixels;
-                MaxUp[i]= emsUpSize[i]*emToPixels;
 
             }
 
@@ -671,26 +683,29 @@ public class DomOps {
 
             double newPlotTotalHeightPixels= marginHeight; // this will be the pixels available to divide amungst the plots.
             for ( int i=0; i<nrow; i++ ) {
-                newPlotTotalHeightPixels = newPlotTotalHeightPixels - MaxUp[i] - MaxDown[i];
+                if ( isEmRow[i] ) {
+                    newPlotTotalHeightPixels = newPlotTotalHeightPixels - MaxUp[i] + MaxDown[i];
+                }
             }
 
             // newPlotHeight is the height of each plot in pixels.
-            double [] newPlotHeight= new double[ nrow ];
+            double [] newPlotHeightPixels= new double[ nrow ];
             for ( int i=0; i<nrow; i++ ) {
-                newPlotHeight[i]= newPlotTotalHeightPixels * relativePlotHeight[i]; 
+                newPlotHeightPixels[i]= newPlotTotalHeightPixels * relativePlotHeight[i]; 
             }
 
             // normalPlotHeight will be the normalized size of each plot, which includes the em offsets.
             double[] normalPlotHeight= new double[ nrow ];
 
             if ( nrow==1 ) {
-                normalPlotHeight[0]= ( newPlotHeight[0] - MaxUp[0] - MaxDown[0] ) / ( marginHeight );
+                normalPlotHeight[0]= ( newPlotHeightPixels[0] ) / ( marginHeight );
             } else {
                 for ( int i=0; i<nrow; i++ ) {
                     if ( relativePlotHeight[i]==0 ) {
                         normalPlotHeight[i]= 0.0;
                     } else {
-                        normalPlotHeight[i]= ( newPlotHeight[i] - MaxUp[i] - MaxDown[i] ) / ( marginHeight );
+                        //normalPlotHeight[i]= ( newPlotHeight[i] - MaxUp[i] - MaxDown[i] ) / ( marginHeight );
+                        normalPlotHeight[i]= newPlotHeightPixels[i] / ( marginHeight );
                     }
                 }
             }
