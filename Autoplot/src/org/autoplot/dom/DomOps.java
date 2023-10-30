@@ -590,6 +590,12 @@ public class DomOps {
             double[] emsDownSize= new double[nrow];
 
             for ( int i=0; i<nrow; i++ ) {
+                double[] rr1= parseLayoutStr(rows[i].getTop(),new double[3]); // whoo hoo let's parse this too many times!
+                double[] rr2= parseLayoutStr(rows[i].getBottom(),new double[3]);
+                isEmRow[i]= Math.abs( rr1[0]-rr2[0] )<0.001;
+                emsUpSize[i]= rr1[1];
+                emsDownSize[i]= rr2[1];
+                
                 if ( isEmRow[i] ) {
                     MaxDownEm[i]= emsDownSize[i];
                     MaxUpEm[i]= emsUpSize[i];
@@ -653,11 +659,6 @@ public class DomOps {
                     int d1 = DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getTop() );
                     int d2 = DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getBottom() );
                     resizablePixels[i]= ( d2-d1 );
-                    double[] rr1= parseLayoutStr(rows[i].getTop(),new double[3]);
-                    double[] rr2= parseLayoutStr(rows[i].getBottom(),new double[3]);
-                    isEmRow[i]= Math.abs( rr1[0]-rr2[0] )<0.001;
-                    emsUpSize[i]= rr1[1];
-                    emsDownSize[i]= rr2[1];
                     if ( isEmRow[i] ) {
                         logger.fine("here's an events bar row!");
                     } else {
