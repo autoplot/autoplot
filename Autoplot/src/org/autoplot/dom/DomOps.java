@@ -589,44 +589,6 @@ public class DomOps {
             double[] emsUpSize= new double[nrow];
             double[] emsDownSize= new double[nrow];
 
-            double totalPlotHeightPixels= 0;
-            for ( int i=0; i<nrow; i++ ) {           
-                List<Plot> plots= DomOps.getPlotsFor( dom, rows[i], true );
-
-                if ( plots.size()>0 ) {
-                    int d1 = DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getTop() );
-                    int d2 = DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getBottom() );
-                    resizablePixels[i]= ( d2-d1 );
-                    double[] rr1= parseLayoutStr(rows[i].getTop(),new double[3]);
-                    double[] rr2= parseLayoutStr(rows[i].getBottom(),new double[3]);
-                    isEmRow[i]= Math.abs( rr1[0]-rr2[0] )<0.001;
-                    emsUpSize[i]= rr1[1];
-                    emsDownSize[i]= rr2[1];
-                    if ( isEmRow[i] ) {
-                        logger.fine("here's an events bar row!");
-                    } else {
-                        totalPlotHeightPixels= totalPlotHeightPixels + resizablePixels[i];
-                    }
-                }
-            }
-
-            double [] relativePlotHeight= new double[ nrow ];
-            for ( int i=0; i<nrow; i++ ) {
-                if ( isEmRow[i] ) {
-                    relativePlotHeight[i]= 0.0;
-                } else {
-                    relativePlotHeight[i]= 1.0 * resizablePixels[i] / totalPlotHeightPixels;
-                }
-            }
-
-            // assert the sum of relativePlotHeight is 1.0
-
-    //        double[] emHeight= new double[ nrow ];
-    //        for ( int i=0; i<nrow; i++ ) {
-    //            DasRow dasRow= rows[i].getController().dasRow;
-    //            emHeight[i]= ( dasRow.getEmMaximum() - dasRow.getEmMinimum() );
-    //        }// I know there's some check we can do with this to preserve 1-em high plots.
-
             for ( int i=0; i<nrow; i++ ) {
                 if ( isEmRow[i] ) {
                     MaxDownEm[i]= emsDownSize[i];
@@ -645,7 +607,12 @@ public class DomOps {
                             String content= title; // title.replaceAll("(\\!c|\\!C|\\<br\\>)", " ");
                             boolean addLines= plotj.isDisplayTitle() && content.trim().length()>0;
                             int lc= lineCount(title);
-                            MaxUpJEm= addLines ? lc : 0.;
+                            if ( i==0 ) {
+                                MaxUpJEm= ( addLines ? lc : 0. ) - ntopEm;
+                            } else {
+                                MaxUpJEm= addLines ? lc : 0.;
+                            }
+                            
                             logger.log(Level.FINE, "{0} addLines: {1}  isDiplayTitle: {2}  lineCount(title): {3}", 
                                     new Object[]{plotj.getId(), addLines, plotj.isDisplayTitle(), lc});
                             MaxUp[i]= Math.max( MaxUp[i], MaxUpJEm*emToPixels );
@@ -675,7 +642,39 @@ public class DomOps {
                 }
 
             }
+            
+            // assert the sum of relativePlotHeight is 1.0
+            
+            double totalPlotHeightPixels= 0;
+            for ( int i=0; i<nrow; i++ ) {           
+                List<Plot> plots= DomOps.getPlotsFor( dom, rows[i], true );
 
+                if ( plots.size()>0 ) {
+                    int d1 = DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getTop() );
+                    int d2 = DomUtil.getRowPositionPixels( dom, rows[i], rows[i].getBottom() );
+                    resizablePixels[i]= ( d2-d1 );
+                    double[] rr1= parseLayoutStr(rows[i].getTop(),new double[3]);
+                    double[] rr2= parseLayoutStr(rows[i].getBottom(),new double[3]);
+                    isEmRow[i]= Math.abs( rr1[0]-rr2[0] )<0.001;
+                    emsUpSize[i]= rr1[1];
+                    emsDownSize[i]= rr2[1];
+                    if ( isEmRow[i] ) {
+                        logger.fine("here's an events bar row!");
+                    } else {
+                        totalPlotHeightPixels= totalPlotHeightPixels + resizablePixels[i] + MaxUp[i] - MaxDown[i];
+                    }
+                }
+            }
+
+            double [] relativePlotHeight= new double[ nrow ];
+            for ( int i=0; i<nrow; i++ ) {
+                if ( isEmRow[i] ) {
+                    relativePlotHeight[i]= 0.0;
+                } else {
+                    relativePlotHeight[i]= (double)(resizablePixels[i]+MaxUp[i]-MaxDown[i]) / totalPlotHeightPixels;
+                }
+            }
+            
             double canvasHeight= canvas.height;
             int d1= DomUtil.getRowPositionPixels( dom, canvas.marginRow, canvas.marginRow.top );
             int d2= DomUtil.getRowPositionPixels( dom, canvas.marginRow, canvas.marginRow.bottom );
