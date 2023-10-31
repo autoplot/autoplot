@@ -850,9 +850,12 @@ public class DomOps {
                         new Object[]{plotj.getId(), addLines, plotj.isDisplayTitle(), lc});
                 //if (MaxUpJEm>0 ) MaxUpJEm= MaxUpJEm+1;
                 maxLeft[i]= Math.max( maxLeft[i], maxLeftPx );
-                Rectangle plot= DomUtil.getBoundsForPlot( dom, plotj );
-                Rectangle axis= DomUtil.getBoundsForZAxis( dom, plotj );
-                maxRightPx= ( ( axis.getX() + axis.getWidth() ) - ( plot.getX() + plot.getWidth() ) + 1 * emToPixels );
+                
+                if ( plotj.zaxis.isVisible() ) {
+                    maxRightPx= 7 * emToPixels;
+                } else {
+                    maxRightPx= 2 * emToPixels;
+                }
                 maxRight[i]= Math.max( maxRight[i], maxRightPx );
             }
         }
