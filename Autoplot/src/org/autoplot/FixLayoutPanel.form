@@ -33,7 +33,11 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="verticalSpacingComboBox" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="hideTimeAxesCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="hideTimeAxesCheckBox" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                              <Component id="hideYAxesCheckBox" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <Component id="hideTitlesCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
@@ -56,7 +60,10 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="hideTitlesCheckBox" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="hideTimeAxesCheckBox" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="hideTimeAxesCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="hideYAxesCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="moveLegendsToOutsideNECheckBox" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="0" pref="101" max="32767" attributes="0"/>
@@ -72,7 +79,7 @@
     </Component>
     <Component class="javax.swing.JCheckBox" name="verticalSpacingCheckBox">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Vertical spacing between plots:"/>
+        <Property name="text" type="java.lang.String" value="Spacing between plots:"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="verticalSpacingCheckBoxActionPerformed"/>
@@ -137,6 +144,14 @@
         <Property name="text" type="java.lang.String" value="&lt;html&gt;Fix Layout will try to recover empty spots and overlaps to make the layout easier to read.  You can also turn off titles and axis labels to recover more room."/>
         <Property name="verticalAlignment" type="int" value="1"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="hideYAxesCheckBox">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Hide Y axes"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="hideYAxesCheckBoxActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

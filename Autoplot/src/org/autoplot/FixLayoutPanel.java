@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.autoplot.dom.Application;
+import org.autoplot.dom.DomOps;
 
 /**
  *
@@ -26,17 +27,20 @@ public class FixLayoutPanel extends javax.swing.JPanel {
     public void setOptions( Map<String,String> options ) {
         for ( Entry<String,String> e: options.entrySet() ) {
             switch ( e.getKey() ) {
-                case "hideTitles":
+                case DomOps.OPTION_FIX_LAYOUT_HIDE_TITLES:
                     hideTitlesCheckBox.setSelected(Boolean.valueOf(e.getValue()));
                     break;
-                case "hideTimeAxes":
+                case DomOps.OPTION_FIX_LAYOUT_HIDE_TIME_AXES:
                     hideTimeAxesCheckBox.setSelected(Boolean.valueOf(e.getValue()));
                     break;
-                case "verticalSpacing":
+                case DomOps.OPTION_FIX_LAYOUT_HIDE_Y_AXES:
+                    hideYAxesCheckBox.setSelected(Boolean.valueOf(e.getValue()));
+                    break;
+                case DomOps.OPTION_FIX_LAYOUT_VERTICAL_SPACING:
                     verticalSpacingCheckBox.setSelected(true);
                     verticalSpacingComboBox.setSelectedItem(e.getValue());
                     break;
-                case "moveLegendsToOutsideNE":
+                case DomOps.OPTION_FIX_LAYOUT_MOVE_LEGENDS_TO_OUTSIDE_NE:
                     moveLegendsToOutsideNECheckBox.setSelected(Boolean.valueOf(e.getValue()));
                     break;
             }
@@ -46,16 +50,20 @@ public class FixLayoutPanel extends javax.swing.JPanel {
     public Map<String,String> getOptions() {
         HashMap<String,String> result= new HashMap<>();
         if ( hideTitlesCheckBox.isSelected() ) {
-            result.put( "hideTitles", "true" );
+            result.put( DomOps.OPTION_FIX_LAYOUT_HIDE_TITLES, "true" );
         }
         if ( hideTimeAxesCheckBox.isSelected() ) {
-            result.put( "hideTimeAxes", "true" );
+            result.put( DomOps.OPTION_FIX_LAYOUT_HIDE_TIME_AXES, "true" );
+        }
+        if ( hideYAxesCheckBox.isSelected() ) {
+            result.put( DomOps.OPTION_FIX_LAYOUT_HIDE_Y_AXES, "true" );
         }
         if ( verticalSpacingCheckBox.isSelected() ) {
-            result.put( "verticalSpacing", verticalSpacingComboBox.getSelectedItem().toString() );
+            result.put( DomOps.OPTION_FIX_LAYOUT_VERTICAL_SPACING, verticalSpacingComboBox.getSelectedItem().toString() );
+            result.put( DomOps.OPTION_FIX_LAYOUT_HORIZONTAL_SPACING, verticalSpacingComboBox.getSelectedItem().toString() );
         }
         if ( moveLegendsToOutsideNECheckBox.isSelected() ) {
-            result.put( "moveLegendsToOutsideNE", "true" );
+            result.put( DomOps.OPTION_FIX_LAYOUT_MOVE_LEGENDS_TO_OUTSIDE_NE, "true" );
         }
         return result;
     }
@@ -95,10 +103,11 @@ public class FixLayoutPanel extends javax.swing.JPanel {
         hideTimeAxesCheckBox = new javax.swing.JCheckBox();
         hideTitlesCheckBox = new javax.swing.JCheckBox();
         jLabel2 = new javax.swing.JLabel();
+        hideYAxesCheckBox = new javax.swing.JCheckBox();
 
         jLabel1.setText("Fix Layout");
 
-        verticalSpacingCheckBox.setText("Vertical spacing between plots:");
+        verticalSpacingCheckBox.setText("Spacing between plots:");
         verticalSpacingCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 verticalSpacingCheckBoxActionPerformed(evt);
@@ -143,6 +152,13 @@ public class FixLayoutPanel extends javax.swing.JPanel {
         jLabel2.setText("<html>Fix Layout will try to recover empty spots and overlaps to make the layout easier to read.  You can also turn off titles and axis labels to recover more room.");
         jLabel2.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
+        hideYAxesCheckBox.setText("Hide Y axes");
+        hideYAxesCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                hideYAxesCheckBoxActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -162,7 +178,10 @@ public class FixLayoutPanel extends javax.swing.JPanel {
                                 .addComponent(verticalSpacingCheckBox)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(verticalSpacingComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(hideTimeAxesCheckBox)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(hideTimeAxesCheckBox)
+                                .addGap(18, 18, 18)
+                                .addComponent(hideYAxesCheckBox))
                             .addComponent(hideTitlesCheckBox))
                         .addGap(0, 0, Short.MAX_VALUE))))
         );
@@ -179,7 +198,9 @@ public class FixLayoutPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(hideTitlesCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(hideTimeAxesCheckBox)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(hideTimeAxesCheckBox)
+                    .addComponent(hideYAxesCheckBox))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(moveLegendsToOutsideNECheckBox)
                 .addGap(0, 101, Short.MAX_VALUE))
@@ -208,10 +229,15 @@ public class FixLayoutPanel extends javax.swing.JPanel {
         updatePreview();
     }//GEN-LAST:event_verticalSpacingComboBoxActionPerformed
 
+    private void hideYAxesCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hideYAxesCheckBoxActionPerformed
+        updatePreview();
+    }//GEN-LAST:event_hideYAxesCheckBoxActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox hideTimeAxesCheckBox;
     private javax.swing.JCheckBox hideTitlesCheckBox;
+    private javax.swing.JCheckBox hideYAxesCheckBox;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JCheckBox moveLegendsToOutsideNECheckBox;
