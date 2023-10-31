@@ -852,7 +852,7 @@ public class DomOps {
                 maxLeft[i]= Math.max( maxLeft[i], maxLeftPx );
                 
                 if ( plotj.zaxis.isVisible() ) {
-                    maxRightPx= 4 * emToPixels;
+                    maxRightPx= 6 * emToPixels;
                 } else {
                     maxRightPx= 2 * emToPixels;
                 }
