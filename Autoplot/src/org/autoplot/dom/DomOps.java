@@ -950,14 +950,14 @@ public class DomOps {
                 double MaxRightPx;
                 for ( Plot plotj : plots ) {
                     if ( columns[i].parent.equals(marginColumn.id) ) { 
-                        String title= plotj.getTitle();
-                        String content= title; // title.replaceAll("(\\!c|\\!C|\\<br\\>)", " ");
-                        boolean addLines= plotj.isDisplayTitle() && content.trim().length()>0;
+                        String title= plotj.getYaxis().getLabel();
+                        boolean addLines= plotj.getYaxis().isDrawTickLabels();
                         int lc= lineCount(title);
+                        int lcPlusTicks= lc + 4;
                         if ( i==0 ) {
-                            MaxLeftJEm= ( addLines ? lc : 0. ) - nleftEm;
+                            MaxLeftJEm= ( addLines ? lcPlusTicks : 0. ) - nleftEm;
                         } else {
-                            MaxLeftJEm= addLines ? lc : 0.;
+                            MaxLeftJEm= addLines ? lcPlusTicks : 0.;
                         }
 
                         logger.log(Level.FINE, "{0} addLines: {1}  isDiplayTitle: {2}  lineCount(title): {3}", 
