@@ -21,12 +21,10 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
@@ -162,7 +160,7 @@ public class JythonCompletionTask implements CompletionTask {
     public int doQuery( CompletionContext cc, CompletionResultSet resultSet ) {
         int c=0;
         try {
-                switch (cc.contextType) {
+            switch (cc.contextType) {
                 case CompletionContext.MODULE_NAME:
                     c= queryModules(cc, resultSet);
                     break;
