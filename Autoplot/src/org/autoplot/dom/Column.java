@@ -85,4 +85,9 @@ public class Column extends DomNode {
         DomUtil.syncTo(this,n,exclude);
     }
 
+    @Override
+    public String toString() {
+        return super.toString() + " (" + getLeft() + "," + getRight() + ")";
+    }
+
 }

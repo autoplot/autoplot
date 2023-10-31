@@ -92,5 +92,9 @@ public class Row extends DomNode {
         DomUtil.syncTo(this,n,exclude);
     }
 
+    @Override
+    public String toString() {
+        return super.toString() + " (" + getTop() + "," + getBottom() + ")";
+    }
 
 }
