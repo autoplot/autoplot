@@ -904,10 +904,10 @@ public class DomOps {
         double nleftEm=0, nrightEm=0;
         for ( int i=0; i<dom.plots.size(); i++ ) {
             Plot p= dom.plots.get(i);
-            if ( p.getColumnId().equals(leftColumnId) ) {
+            if ( p.getColumnId().equals(leftColumnId) || p.getColumnId().equals(marginColumn.id) ) {
                 nleftEm= Math.max( nleftEm, lineCount( p.getTitle() ) );
             }
-            if ( p.getColumnId().equals(rightColumnId) ) {
+            if ( p.getColumnId().equals(rightColumnId) || p.getColumnId().equals(marginColumn.id) ) {
                 if ( p.getZaxis().isVisible() ) {
                     nrightEm= Math.max( nrightEm, 4 ); //TODO: label is showing, etc
                 } else {
@@ -915,9 +915,15 @@ public class DomOps {
                 }
             }
         }
-        nrightEm= 0; 
+        if ( ncolumn>0 ) nrightEm= 0; 
+        
         marginColumn.setLeft( String.format( "0%%+%.1fem", nleftEm+2 ) );
         marginColumn.setRight( String.format( "100%%-%.1fem", nrightEm ) );
+        
+        if ( ncolumn==0 ) {
+            logger.finer("No adjustable columns.");
+            return;
+        }
         
         double[] resizablePixels= new double[ncolumn];
         boolean[] isEmColumn= new boolean[ncolumn];
