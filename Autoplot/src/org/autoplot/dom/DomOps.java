@@ -407,8 +407,11 @@ public class DomOps {
      */
     public static final String OPTION_FIX_LAYOUT_HIDE_TITLES = "hideTitles";
     public static final String OPTION_FIX_LAYOUT_HIDE_TIME_AXES = "hideTimeAxes";
+    public static final String OPTION_FIX_LAYOUT_HIDE_Y_AXES = "hideYAxes"; 
     public static final String OPTION_FIX_LAYOUT_MOVE_LEGENDS_TO_OUTSIDE_NE = "moveLegendsToOutsideNE";
     public static final String OPTION_FIX_LAYOUT_VERTICAL_SPACING = "verticalSpacing";
+    public static final String OPTION_FIX_LAYOUT_HORIZONTAL_SPACING = "horizontalSpacing";
+    
     
     private static double[] parseLayoutStr( String s, double[] deflt ) {
         try {
@@ -445,6 +448,7 @@ public class DomOps {
                 
             Canvas canvas= dom.getCanvases(0);
             Row marginRow= canvas.getMarginRow();
+            Column marginColumn= canvas.getMarginColumn();
             
             double emToPixels= java.awt.Font.decode(dom.getCanvases(0).font).getSize();
             double pixelsToEm= 1/emToPixels;
@@ -453,6 +457,9 @@ public class DomOps {
             int nrow= rows.length;
             boolean[] doAdjust= new boolean[nrow];
 
+            Column[] columns= canvas.getColumns();
+            int ncolumn= columns.length;
+            
             //kludge: check for duplicate names of rows.  Use the first one found.
             Map<String,Row> rowsCheck= new HashMap();
             List<Row> rm= new ArrayList<>();
@@ -491,10 +498,12 @@ public class DomOps {
                 int d2= DomUtil.getRowPositionPixels( dom, r2, r2.getTop() );
                 return d1-d2;
             });
-
+            
             String topRowId= rows[0].getId();
             String bottomRowId= rows[rows.length-1].getId();
-
+            
+            String leftColumnId= columns.length>0 ? columns[0].getId() : "";
+            
             if ( options.getOrDefault( OPTION_FIX_LAYOUT_HIDE_TITLES, "false" ).equals("true") ) {
                 for ( Plot p: dom.plots ) {
                     if ( p.getRowId().equals(topRowId) ) {
@@ -512,6 +521,19 @@ public class DomOps {
                     } else {
                         // TODO: check bindings to see that this axis is bound to the timerange
                         p.xaxis.setDrawTickLabels(false);
+                    }
+                }
+            }
+
+            if ( options.getOrDefault( OPTION_FIX_LAYOUT_HIDE_Y_AXES, "false" ).equals("true") ) {
+                if ( columns.length!=0 ) {
+                    for ( Plot p: dom.plots ) {
+                        if ( p.getColumnId().equals(leftColumnId) || p.getColumnId().equals(marginColumn.getId()) ) {
+                            logger.fine("not hiding leftmost plot's Y axis"); 
+                        } else {
+                            // TODO: check bindings to see that this axis is bound to the timerange
+                            p.yaxis.setDrawTickLabels(false);
+                        }
                     }
                 }
             }
@@ -769,6 +791,23 @@ public class DomOps {
      * @see #fixLayout(org.autoplot.dom.Application) 
      */
     public static void fixHorizontalLayout( Application dom ) {
+        fixHorizontalLayout( dom, Collections.emptyMap() );
+    } 
+    
+    /**
+     * This is the new layout mechanism (fixLayout), but changed from vertical layout to horizontal.  This one:<ul>
+     * <li> Removes extra whitespace
+     * <li> Preserves relative size weights.
+     * <li> Preserves em heights, to support components which should not be rescaled. (Not yet supported.)
+     * <li> Preserves space taken by strange objects, to support future canvas components.
+     * <li> Renormalizes the margin row, so it is nice. (Not yet supported.  This should consider font size, where large fonts don't need so much space.)
+     * </ul>
+     * This should also be idempotent, where calling this a second time should have no effect.
+     * @param dom an application state, with controller nodes. 
+     * @param options 
+     * @see #fixLayout(org.autoplot.dom.Application) 
+     */    
+    public static void fixHorizontalLayout( Application dom, Map<String,String> options ) {
         Logger logger= LoggerManager.getLogger("autoplot.dom.layout");
         logger.fine( "enter fixHorizontalLayout" );
                 
@@ -778,7 +817,8 @@ public class DomOps {
         double pixelsToEm= 1/emToPixels;
 
         Column[] columns= canvas.getColumns();
-        
+        Column marginColumn= canvas.getMarginColumn();
+                
         int ncolumn= columns.length;
 
         //kludge: check for duplicate names of rows.  Use the first one found.
@@ -813,6 +853,68 @@ public class DomOps {
             int d2= DomUtil.getColumnPositionPixels( dom, c2, c2.getLeft() );
             return d1-d2;        });
         
+        String leftColumnId= ncolumn>0 ? columns[0].id : "";
+        String rightColumnId= ncolumn>0 ? columns[columns.length-1].id : "";
+
+        double [] maxLeft= new double[ ncolumn ];
+        double [] maxRight= new double[ ncolumn ];
+        
+        String horizontalSpacing=  options.getOrDefault( OPTION_FIX_LAYOUT_HORIZONTAL_SPACING, "" );
+
+        double [] MaxUp= new double[ ncolumn ];
+        double [] MaxDown= new double[ ncolumn ];
+
+        if ( horizontalSpacing.trim().length()>0 ) {
+            Pattern p= Pattern.compile("([0-9\\.]*)em");
+            if ( p.matcher(horizontalSpacing).matches() ) {
+                Double d= Double.parseDouble(horizontalSpacing.substring(0,horizontalSpacing.length()-2));
+                double extraEms=0;
+                for ( int i=0; i<MaxDown.length; i++ ) {
+                    MaxUp[i]= 0;
+                    MaxDown[i]= -d*emToPixels;
+                    double[] dd1,dd2; 
+                    dd1= parseLayoutStr( columns[i].left, new double[] { 0, 0, 0 } );
+                    dd2= parseLayoutStr( columns[i].right, new double[] { 0, 0, 0 } );
+                    if ( dd1[0]==dd2[0] ) {
+                        double h=(dd2[1]-dd1[1]);
+                        dd1[1]= extraEms;
+                        dd2[1]= extraEms+h;
+                        extraEms+= h+d;
+                    } else {
+                        dd1[1]= extraEms;
+                        dd2[1]= extraEms-d;
+                    }
+                    columns[i].left= DasDevicePosition.formatLayoutStr(dd1);
+                    columns[i].right= DasDevicePosition.formatLayoutStr(dd2);
+                    logger.log(Level.FINE, "line552: {0},{1}", new Object[]{columns[i].left, columns[i].right});
+                }
+            }
+        }
+        
+        // reset marginColumn.  define nup to be the number of lines above the leftmost plot column.  define nright to be the number
+        // of lines to the right of the rightmost column.
+        double nleftEm=0, nrightEm=0;
+        for ( int i=0; i<dom.plots.size(); i++ ) {
+            Plot p= dom.plots.get(i);
+            if ( p.getRowId().equals(leftColumnId) ) {
+                nleftEm= Math.max( nleftEm, lineCount( p.getTitle() ) );
+            }
+            if ( p.getRowId().equals(rightColumnId) ) {
+                if ( p.getXaxis().isDrawTickLabels() ) {
+                    if ( p.getEphemerisLineCount()>-1 ) {
+                        nrightEm= Math.max( nrightEm, p.getEphemerisLineCount()+1 );  // +1 is for ticks
+                    } else {
+                        nrightEm= Math.max( nrightEm, 2 );
+                    }
+                } else {
+                    nrightEm= Math.max( nrightEm, 1 );
+                }
+            }
+        }
+        nrightEm= 0;
+        marginColumn.setLeft( String.format( "0%%+%.1fem", nleftEm+2 ) );
+        marginColumn.setRight( String.format( "100%%-%.1fem", nrightEm ) );        
+        
         double totalPlotSizePixels= 0;
         for ( int i=0; i<ncolumn; i++ ) {           
            List<Plot> plots= DomOps.getPlotsFor( dom, columns[i], true );
@@ -824,9 +926,6 @@ public class DomOps {
            }
         }
         
-        double [] maxLeft= new double[ ncolumn ];
-        double [] maxRight= new double[ ncolumn ];
-
 //        double[] emHeight= new double[ nrow ];
 //        for ( int i=0; i<nrow; i++ ) {
 //            DasRow dasRow= rows[i].getController().dasRow;
@@ -842,9 +941,6 @@ public class DomOps {
                 String content= title; // title.replaceAll("(\\!c|\\!C|\\<br\\>)", " ");
                 boolean addLines= true;
                 int lc= lineCount(plotj.yaxis.label);
-                if ( plotj.zaxis.isVisible() ) {
-                    lc+=2+lineCount(plotj.zaxis.getLabel());
-                }
                 maxLeftPx= ( addLines ? Math.max( 2, lc ) : 0. ) * emToPixels;
                 logger.log(Level.FINE, "{0} addLines: {1}  isDiplayTitle: {2}  lineCount(title): {3}", 
                         new Object[]{plotj.getId(), addLines, plotj.isDisplayTitle(), lc});
