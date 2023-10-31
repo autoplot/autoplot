@@ -486,7 +486,14 @@ public class SimplifyScriptSupport {
                                 appendToResult(result, ss[i]).append("\n");
                             }
                         }
-                        appendToResult(result, getIndent(theLine) + cl).append("\n") ;
+                        if ( cl.contains("\n") ) {
+                            String[] cls= cl.split("\n");
+                            for ( String cl1: cls ) {
+                                appendToResult(result, getIndent(theLine) + cl1).append("\n") ;
+                            }
+                        } else {
+                            appendToResult(result, getIndent(theLine) + cl).append("\n") ;
+                        }
                         acceptLine = -1;
                         continue;
                     }
@@ -1245,6 +1252,28 @@ public class SimplifyScriptSupport {
                     }
                 } else if ( a.value instanceof BinOp ) { // just go ahead and assume it's a QDataSet
                     return id + JythonCompletionTask.__CLASSTYPE + " = QDataSet  # (spot line1014 b)\n";
+                } else if ( a.value instanceof Num ) {
+                    return id + " = " + ((Num)a.value).n;
+                } else if ( a.value instanceof Str ) {
+                    return id + " = \"\"\"" + ((Str)a.value).s + "\"\"\"";
+                }
+            } else if ( et instanceof Tuple && a.value instanceof Tuple ) {  // lowCut_toggle, highcut_toggle, filttype_toggle, order_toggle = 0.5, 20, 'Bandpass', 4 # filter toggles LOW FLYER
+                Tuple targetTuple= (Tuple)et;
+                Tuple valueTuple= (Tuple)a.value;
+                if ( targetTuple.elts.length== valueTuple.elts.length ) {
+                    StringBuilder result= new StringBuilder();
+                    for ( int i=0; i<targetTuple.elts.length; i++ ) {
+                        if ( targetTuple.elts[i] instanceof Name ) {
+                            Assign a1= new Assign( new exprType[] { targetTuple.elts[i] }, valueTuple.elts[i] );
+                            String line= maybeIdentifyType( a1, importedNames );
+                            if ( line!=null ) {
+                                result.append(line).append("\n");
+                            }
+                        }
+                    }
+                    if ( result.length()>0 ) {
+                        return result.toString();
+                    }
                 }
             }
         }
