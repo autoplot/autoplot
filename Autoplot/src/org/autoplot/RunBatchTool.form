@@ -538,12 +538,15 @@
       <Properties>
         <Property name="editable" type="boolean" value="true"/>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="5">
+          <StringArray count="8">
             <StringItem index="0" value="/tmp/ap/$x.png"/>
             <StringItem index="1" value="/tmp/ap/$x_$x.png"/>
             <StringItem index="2" value="/tmp/ap/$x.pdf"/>
             <StringItem index="3" value="/tmp/ap/$x_$x.pdf"/>
-            <StringItem index="4" value=" "/>
+            <StringItem index="4" value="/tmp/ap/%s_%s.pdf"/>
+            <StringItem index="5" value="/tmp/ap/%s_%s_%02d.png"/>
+            <StringItem index="6" value=" "/>
+            <StringItem index="7" value=" "/>
           </StringArray>
         </Property>
       </Properties>

@@ -119,6 +119,11 @@ public class RunBatchTool extends javax.swing.JPanel {
     
     private JLabel[] param1JLabels= null;
     
+    /**
+     * 1, 2, or more than 2 params.
+     */
+    private org.autoplot.jythonsupport.Param[] parameterDescriptions;
+    
     private Map<JLabel,String> jobs= new HashMap<>();
     
     public static final int HTML_LINE_LIMIT = 50;
@@ -600,7 +605,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         writeCheckBox.setToolTipText("After each iteration, write the file, where $x is replaced");
 
         writeFilenameCB.setEditable(true);
-        writeFilenameCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "/tmp/ap/$x.png", "/tmp/ap/$x_$x.png", "/tmp/ap/$x.pdf", "/tmp/ap/$x_$x.pdf", " " }));
+        writeFilenameCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "/tmp/ap/$x.png", "/tmp/ap/$x_$x.png", "/tmp/ap/$x.pdf", "/tmp/ap/$x_$x.pdf", "/tmp/ap/%s_%s.pdf", "/tmp/ap/%s_%s_%02d.png", " ", " " }));
 
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, writeCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), writeFilenameCB, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
@@ -748,7 +753,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                 if ( ( evt.getModifiers() & KeyEvent.SHIFT_MASK ) == KeyEvent.SHIFT_MASK ) {
                     String warning="<html><p>Multi-thread mode is only stable when each process<br>"
                         + "is independent, use with caution.  For example, if the script plots<br>"
-                        + "data, then two concurrent invocations will interfere with one another.<br><br>"
+                        + "data, then running multiple threads will interfere with one another.<br><br>"
                         + "Proceed?</p></html>";
                     JPanel p= new JPanel( );
                     p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
@@ -1591,6 +1596,16 @@ public class RunBatchTool extends javax.swing.JPanel {
      * @throws IOException 
      */
     private String doWrite( String f1, String f2, String uri, Application dom) throws IOException {
+        if ( !writeCheckBox.isSelected() ) {
+            return null;
+        }
+                
+        String template= writeFilenameCB.getSelectedItem().toString();
+        Preferences prefs= Preferences.userNodeForPackage( RunBatchTool.class );
+        prefs.put( "lastTemplate", template );
+
+        template= template.replaceAll("\\$x","%s");
+        
         f1= f1.replaceAll("/", "_");
         f2= f2.replaceAll("/", "_");
         f1= f1.replaceAll(" ", "_");
@@ -1598,38 +1613,68 @@ public class RunBatchTool extends javax.swing.JPanel {
         f1= f1.replaceAll(":", "_"); // times
         f2= f2.replaceAll(":", "_");
         
-        if ( writeCheckBox.isSelected() ) {
-            String template= writeFilenameCB.getSelectedItem().toString();
-            Preferences prefs= Preferences.userNodeForPackage( RunBatchTool.class );
-            prefs.put( "lastTemplate", template );
-            String[] ss= template.split("\\$x",-2);
-            StringBuilder f= new StringBuilder(ss[0]);
-            if ( ss.length>1 ) {
-                f.append(f1).append(ss[1]);
+        List<String> argList= new ArrayList<>();
+        if ( f1.contains(";") ) {
+            String[] ss= f1.split("\\;",-2);
+            for ( String s: ss ) {
+                argList.add(s);
             }
-            if ( ss.length>2 ) {
-                f.append(f2.trim()).append(ss[2]);
-            }
-            for ( int i=3; i<ss.length; i++ ) {
-                f.append( ss[i] );
-            }
-            String s= f.toString();
-            if ( s.endsWith(".png") ) {
-                BufferedImage bufferedImage = ScriptContext.writeToBufferedImage(); 
-                Map<String,String> metadata= new LinkedHashMap<>();
-                metadata.put( "ScriptURI",uri );
-                if ( dom!=null ) {
-                    metadata.put( DasPNGConstants.KEYWORD_PLOT_INFO, 
-                        dom.getController().getApplicationModel().canvas.getImageMetadata() );
-                }
-                ScriptContext.writeToPng(bufferedImage,s,metadata);
-            } else if ( s.endsWith(".pdf") ) {
-                ScriptContext.writeToPdf(s);
-            } 
-            return s;
         } else {
-            return null;
+            argList.add(f1);
         }
+        if ( f2.contains(";") ) {
+            String[] ss= f2.split("\\;",-2);
+            for ( String s: ss ) {
+                argList.add(s);
+            }
+        } else {
+            argList.add(f2);
+        }
+        
+        // now the tricky part will be to pull out all the fields from the template.
+        String[] ss= template.split("\\%");
+        
+        if ( argList.size() != ss.length-1 ) {
+            throw new IllegalArgumentException("template and number of parameters don't match");
+        }
+
+        Object[] args= new Object[argList.size()];
+        for ( int i=0; i<argList.size(); i++ ) {
+            if ( parameterDescriptions[i].type=='F' ) {
+                String spec= ss[i+1];
+                int firstLetter= 0;
+                while ( firstLetter<spec.length() && Character.isDigit(spec.charAt(firstLetter)) ) {
+                    firstLetter++;
+                }
+                if ( firstLetter==spec.length() ) {
+                    throw new IllegalArgumentException("expected to see non-digit in template after %");
+                }
+                if ( spec.charAt(firstLetter)=='d' ) {
+                    args[i]= Integer.parseInt(argList.get(i));
+                } else {
+                    args[i]= Double.parseDouble(argList.get(i));
+                }
+            } else {
+                args[i]= argList.get(i);
+            }
+        }
+                
+        String s= String.format( template, args );
+
+        if ( s.endsWith(".png") ) {
+            BufferedImage bufferedImage = ScriptContext.writeToBufferedImage(); 
+            Map<String,String> metadata= new LinkedHashMap<>();
+            metadata.put( "ScriptURI",uri );
+            if ( dom!=null ) {
+                metadata.put( DasPNGConstants.KEYWORD_PLOT_INFO, 
+                    dom.getController().getApplicationModel().canvas.getImageMetadata() );
+            }
+            ScriptContext.writeToPng(bufferedImage,s,metadata);
+        } else if ( s.endsWith(".pdf") ) {
+            ScriptContext.writeToPdf(s);
+        } 
+        return s;
+
     }
     
     private static final Icon ICON_QUEUED= new ImageIcon(RunBatchTool.class.getResource("/resources/grey.gif"));
@@ -2187,6 +2232,35 @@ public class RunBatchTool extends javax.swing.JPanel {
             
             Map<String,org.autoplot.jythonsupport.Param> parms= Util.getParams( env, script, params, new NullProgressMonitor() );
 
+            int parameterCount= 0;
+            String params1= String.valueOf( param1NameCB.getSelectedItem() );
+            String params2= String.valueOf( param2NameCB.getSelectedItem() );
+
+            List<Param> parameterDescriptionsList= new ArrayList<>();
+            
+            if ( params1.contains(";") ) {
+                String[] ss= params1.split("\\;",-2);
+                parameterCount+=ss.length;
+                for ( int i=0; i<ss.length; i++ ) {
+                    parameterDescriptionsList.add(parms.get(ss[i]));
+                }
+            } else {
+                parameterCount+=1;
+                parameterDescriptionsList.add(parms.get(params1));
+            }
+            
+            if ( params2.contains(";") ) {
+                String[] ss= params2.split("\\;",-2);
+                parameterCount+=ss.length;
+                for ( int i=0; i<ss.length; i++ ) {
+                    parameterDescriptionsList.add(parms.get(ss[i]));
+                }
+            } else {
+                parameterCount+=1;
+                parameterDescriptionsList.add(parms.get(params2));
+            }
+            parameterDescriptions= parameterDescriptionsList.toArray( new Param[parameterDescriptionsList.size()] );
+            
             InteractiveInterpreter interp;
 
             if ( writeCheckBox.isSelected() ) {
