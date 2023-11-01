@@ -581,7 +581,7 @@ public class DomOps {
                 }
             }
 
-            // reset marginRow.  define nup to be the number of lines above the top plot row.  define nbottom to be the number
+            // 1. Reset marginRow.  define nup to be the number of lines above the top plot row.  define nbottom to be the number
             // of lines below the bottom row.
             double ntopEm=0, nbottomEm=0;
             for ( int i=0; i<dom.plots.size(); i++ ) {
@@ -610,6 +610,7 @@ public class DomOps {
             double[] emsUpSize= new double[nrow];
             double[] emsDownSize= new double[nrow];
 
+            // 2. For each row, identify the number of lines above and below each plot.
             for ( int i=0; i<nrow; i++ ) {
                 double[] rr1= parseLayoutStr(rows[i].getTop(),new double[3]); // whoo hoo let's parse this too many times!
                 double[] rr2= parseLayoutStr(rows[i].getBottom(),new double[3]);
@@ -670,8 +671,7 @@ public class DomOps {
 
             }
             
-            // assert the sum of relativePlotHeight is 1.0
-            
+            // 3. identify the number of pixels in each of the rows which are resizable.
             double totalPlotHeightPixels= 0;
             for ( int i=0; i<nrow; i++ ) {           
                 List<Plot> plots= DomOps.getPlotsFor( dom, rows[i], true );
@@ -688,6 +688,7 @@ public class DomOps {
                 }
             }
 
+            // 4. express this as a fraction of all the pixels which could be resized.
             double [] relativePlotHeight= new double[ nrow ];
             for ( int i=0; i<nrow; i++ ) {
                 if ( isEmRow[i] ) {
@@ -697,6 +698,7 @@ public class DomOps {
                 }
             }
             
+            // 5. Calculate the number of pixels available for resized plots on the canvas.
             double canvasHeight= canvas.height;
             int d1= DomUtil.getRowPositionPixels( dom, canvas.marginRow, canvas.marginRow.top );
             int d2= DomUtil.getRowPositionPixels( dom, canvas.marginRow, canvas.marginRow.bottom );
@@ -709,12 +711,13 @@ public class DomOps {
                 }
             }
 
-            // newPlotHeight is the height of each plot in pixels.
+            // 6. newPlotHeight is the height of each plot in pixels.
             double [] newPlotHeightPixels= new double[ nrow ];
             for ( int i=0; i<nrow; i++ ) {
                 newPlotHeightPixels[i]= newPlotTotalHeightPixels * relativePlotHeight[i]; 
             }
 
+            // 7. Now calculate the layout string (e.g. 50%+1em,100%-3em) for each row.
             // normalPlotHeight will be the normalized size of each plot, which includes the em offsets.
             double[] normalPlotHeight= new double[ nrow ];
 
@@ -731,6 +734,7 @@ public class DomOps {
                 }
             }
 
+            // 8. calculate each row's new layout string, possibly adding additional ems for rows which are not resized.
             double position= 0;
             double extraEms= 0;
 
@@ -766,11 +770,12 @@ public class DomOps {
                 }
             }
 
+            // 9. reset the rows to this new location.
             for ( int i=0; i<rows.length; i++ ) {
                 canvas.getRows(i).syncTo(rows[i]);
             }
 
-            fixHorizontalLayout( dom,options ); //comment while fixing jenkins tests
+            fixHorizontalLayout( dom,options ); 
 
         } finally {
             dom.options.setAutolayout(autoLayout);
