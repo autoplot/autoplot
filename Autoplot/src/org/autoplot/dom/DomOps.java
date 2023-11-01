@@ -610,7 +610,7 @@ public class DomOps {
             double[] emsUpSize= new double[nrow];
             double[] emsDownSize= new double[nrow];
 
-            // 2. For each row, identify the number of lines above and below each plot.
+            // 2. For each row, identify the number of lines above and below each plot in MaxUp and MaxDown (MaxUpEm is just expressed in ems).
             for ( int i=0; i<nrow; i++ ) {
                 double[] rr1= parseLayoutStr(rows[i].getTop(),new double[3]); // whoo hoo let's parse this too many times!
                 double[] rr2= parseLayoutStr(rows[i].getBottom(),new double[3]);
@@ -646,8 +646,9 @@ public class DomOps {
                             MaxUp[i]= Math.max( MaxUp[i], MaxUpJEm*emToPixels );
                             MaxUpEm[i]= Math.max( MaxUpEm[i], MaxUpJEm );
                             if ( plotj.getXaxis().isDrawTickLabels() ) {
+                                lc= lineCount(plotj.getXaxis().getLabel());
                                 if ( plotj.getEphemerisLineCount()>-1 ) {
-                                    nbottomEm= -(plotj.getEphemerisLineCount()+1);  // +1 is for ticks
+                                    nbottomEm= -(plotj.getEphemerisLineCount()+1+lc);  // +1 is for ticks
                                 } else {
                                     int nlabel= lineCount( plotj.getXaxis().getLabel() );
                                     nbottomEm= -(2+1+nlabel);
