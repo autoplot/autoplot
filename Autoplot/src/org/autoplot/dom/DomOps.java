@@ -649,7 +649,8 @@ public class DomOps {
                                 if ( plotj.getEphemerisLineCount()>-1 ) {
                                     nbottomEm= -(plotj.getEphemerisLineCount()+1);  // +1 is for ticks
                                 } else {
-                                    nbottomEm= -(2+1);
+                                    int nlabel= lineCount( plotj.getXaxis().getLabel() );
+                                    nbottomEm= -(2+1+nlabel);
                                 }
                             } else {
                                 nbottomEm= -1;
