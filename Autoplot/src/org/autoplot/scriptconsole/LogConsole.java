@@ -450,6 +450,8 @@ public class LogConsole extends javax.swing.JPanel {
                     }
                     
                     if ( searchTextPattern!=null && searchTextPattern.matcher(recMsg).find() ) {
+                        // secret feature that the stack trace of the last highlited text will be 
+                        // shown as a tooltip of the "AP>" prompt.
                         ByteArrayOutputStream baos= new ByteArrayOutputStream();
                         try (PrintWriter pw = new PrintWriter(baos)) {
                             new Exception().printStackTrace(pw);
@@ -463,8 +465,7 @@ public class LogConsole extends javax.swing.JPanel {
                             }
                             sb.append("</html>");
                             String msg= sb.toString();
-                            logTextArea.setToolTipText(msg);
-                            apLabel.setToolTipText(msg);
+                            apLabel.setToolTipText(msg); // Shh! Secret feature...
                         } catch (UnsupportedEncodingException ex) {
                             logger.log( Level.WARNING, ex.getMessage(), ex );
                         }
