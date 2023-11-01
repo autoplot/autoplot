@@ -904,7 +904,7 @@ public class DomOps {
             }
         }
         
-        // reset marginColumn.  define nup to be the number of lines above the leftmost plot column.  define nright to be the number
+        // 1. reset marginColumn.  define nup to be the number of lines above the leftmost plot column.  define nright to be the number
         // of lines to the right of the rightmost column.
         double nleftEm=0, nrightEm=0;
         for ( int i=0; i<dom.plots.size(); i++ ) {
@@ -934,7 +934,8 @@ public class DomOps {
         boolean[] isEmColumn= new boolean[ncolumn];
         double[] emsLeftSize= new double[ncolumn];
         double[] emsRightSize= new double[ncolumn];
-            
+        
+        // 2. For each column, identify the space to the left and right of each plot.      
         for ( int i=0; i<ncolumn; i++ ) {
             double[] rr1= parseLayoutStr(columns[i].getLeft(),new double[3]); // whoo hoo let's parse this too many times!
             double[] rr2= parseLayoutStr(columns[i].getRight(),new double[3]);
@@ -991,6 +992,7 @@ public class DomOps {
 
         }
             
+        // 3. identify the number of pixels in each of the columns which are resizable.
         double totalPlotWidthPixels= 0;
         for ( int i=0; i<ncolumn; i++ ) {           
             List<Plot> plots= DomOps.getPlotsFor( dom, columns[i], true );
@@ -1007,6 +1009,7 @@ public class DomOps {
             }
         }
         
+        // 4. express this as a fraction of all the pixels which could be resized.
         double [] relativePlotWidth= new double[ ncolumn ];
         for ( int i=0; i<ncolumn; i++ ) {
             if ( isEmColumn[i] ) {
@@ -1016,6 +1019,7 @@ public class DomOps {
             }
         }
          
+        // 5. Calculate the number of pixels available for resized plots on the canvas.
         double canvasWidth= canvas.width;
         int d1= DomUtil.getColumnPositionPixels( dom, canvas.marginColumn, canvas.marginColumn.left );
         int d2= DomUtil.getColumnPositionPixels( dom, canvas.marginColumn, canvas.marginColumn.right );
@@ -1028,11 +1032,13 @@ public class DomOps {
             }
         }
 
+        // 6. newPlotHeight is the height of each plot in pixels.
         double [] newPlotWidthPixels= new double[ ncolumn ];
         for ( int i=0; i<ncolumn; i++ ) {
             newPlotWidthPixels[i]= newPlotTotalWidthPixels * relativePlotWidth[i];
         }
 
+        // 7. Now calculate the layout string (e.g. 50%+1em,100%-3em) for each column.
         // normalPlotWidth will be the normalized size of each plot, which includes the em offsets.
         double[] normalPlotWidth= new double[ ncolumn ];
 
@@ -1048,6 +1054,7 @@ public class DomOps {
             }
         }
         
+        // 8. calculate each columns's new layout string, possibly adding additional ems for columns which are not resized.
         double position= 0;
         double extraEms= 0;
 
