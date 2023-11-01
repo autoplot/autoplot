@@ -912,12 +912,15 @@ public class DomOps {
             Plot p= dom.plots.get(i);
             if ( p.getColumnId().equals(leftColumnId) || p.getColumnId().equals(marginColumn.id) ) {
                 nleftEm= Math.max( nleftEm, lineCount( p.getTitle() ) );
+                //nleftEm= Math.max( nleftEm, lineCount( p.getTitle() )+4 );
             }
             if ( p.getColumnId().equals(rightColumnId) || p.getColumnId().equals(marginColumn.id) ) {
                 if ( p.getZaxis().isVisible() ) {
                     nrightEm= Math.max( nrightEm, 4 ); //TODO: label is showing, etc
+                    //nrightEm= Math.max( nrightEm, 6 ); //TODO: label is showing, etc
                 } else {
                     nrightEm= Math.max( nrightEm, 1 );
+                    //nrightEm= Math.max( nrightEm, 2 );                    
                 }
             }
         }
