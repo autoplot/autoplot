@@ -975,6 +975,13 @@ public class DomOps {
                         } else {
                             nrightEm= -1;
                         }
+                        if ( plotj.getLegendPosition()==LegendPosition.OutsideNE ||
+                                plotj.getLegendPosition()==LegendPosition.OutsideSE ) {
+                            if ( plotj.isDisplayLegend() ) {
+                                double legendWidthEms= -8;
+                                nrightEm= Math.min( nrightEm, legendWidthEms );
+                            }
+                        }
                         MaxRightEm[i]= Math.min( MaxRightEm[i], nrightEm );
                         MaxRight[i]= MaxRightEm[i]*emToPixels;
 
