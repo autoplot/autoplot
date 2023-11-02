@@ -675,6 +675,7 @@ public class AxisPanel extends javax.swing.JPanel {
         jPanel1.setToolTipText("click title for help");
 
         titleTextField.setText("title will go here");
+        titleTextField.setMaximumSize(new java.awt.Dimension(700, 2147483647));
         titleTextField.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 titleMouseAction(evt);
@@ -741,7 +742,7 @@ public class AxisPanel extends javax.swing.JPanel {
                             .add(jPanel1Layout.createSequentialGroup()
                                 .add(titleCB)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(titleTextField))
+                                .add(titleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .add(jPanel1Layout.createSequentialGroup()
                                 .add(legendEnableCheckbox)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
