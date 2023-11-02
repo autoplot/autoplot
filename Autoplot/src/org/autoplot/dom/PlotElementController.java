@@ -2048,7 +2048,8 @@ public class PlotElementController extends DomNodeController {
 
                 doMetadata(peleCopy, props, fillDs );
 
-                String appliedFilters = dsc.getAppliedFiltersString().trim();
+                String appliedFilters = dsc.getAppliedFiltersString();
+                if ( appliedFilters!=null ) appliedFilters= appliedFilters.trim();
                 String title = peleCopy.getPlotDefaults().getTitle();
                 if ( fillDs.property(QDataSet.CONTEXT_0)!=null && dsc.reduceDataSetString!=null ) { 
                     title += "!c%{CONTEXT}";
