@@ -1033,7 +1033,9 @@ public class RunBatchTool extends javax.swing.JPanel {
     }//GEN-LAST:event_editParamsButtonActionPerformed
 
     private void pngWalkToolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pngWalkToolButtonActionPerformed
-        PngWalkTool.start( writeFilenameCB.getSelectedItem().toString(), SwingUtilities.getWindowAncestor(this) );
+        String template= writeFilenameCB.getSelectedItem().toString();
+        template= convertStringFormatToUriTemplate( template );
+        PngWalkTool.start( template, SwingUtilities.getWindowAncestor(this) );
     }//GEN-LAST:event_pngWalkToolButtonActionPerformed
 
     private void jList2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jList2MouseClicked
@@ -1620,7 +1622,9 @@ public class RunBatchTool extends javax.swing.JPanel {
                 argList.add(s);
             }
         } else {
-            argList.add(f1);
+            if ( f1.trim().length()>0 ) {
+                argList.add(f1);
+            }
         }
         if ( f2.contains(";") ) {
             String[] ss= f2.split("\\;",-2);
@@ -1628,7 +1632,9 @@ public class RunBatchTool extends javax.swing.JPanel {
                 argList.add(s);
             }
         } else {
-            argList.add(f2);
+            if ( f2.trim().length()>0 ) {
+                argList.add(f2);
+            }
         }
         
         // now the tricky part will be to pull out all the fields from the template.
@@ -1640,26 +1646,38 @@ public class RunBatchTool extends javax.swing.JPanel {
 
         Object[] args= new Object[argList.size()];
         for ( int i=0; i<argList.size(); i++ ) {
-            if ( parameterDescriptions[i].type=='F' ) {
-                String spec= ss[i+1];
-                int firstLetter= 0;
-                while ( firstLetter<spec.length() && Character.isDigit(spec.charAt(firstLetter)) ) {
-                    firstLetter++;
-                }
-                if ( firstLetter==spec.length() ) {
-                    throw new IllegalArgumentException("expected to see non-digit in template after %");
-                }
-                if ( spec.charAt(firstLetter)=='d' ) {
-                    args[i]= Integer.parseInt(argList.get(i));
-                } else {
-                    args[i]= Double.parseDouble(argList.get(i));
-                }
-            } else {
+            String spec= ss[i+1];
+            int idx= 0; // find the first letter
+            char c= spec.length()>0 ? spec.charAt(0) : ' ';
+            while ( idx<spec.length() && ( c=='-' || c=='.' || Character.isDigit(c) ) ) {
+                idx++;
+                c= spec.length()>0 ? spec.charAt(idx) : ' ';
+            }
+            if ( idx==spec.length() ) {
+                throw new IllegalArgumentException("expected to see non-digit in template after %");
+            }
+            char letter= spec.charAt(idx);
+            if ( letter=='s' ) {
                 args[i]= argList.get(i);
+            } else {
+                switch (letter) {
+                    case 'd':
+                        args[i]= Integer.parseInt(argList.get(i));
+                        break;
+                    case 'f':
+                    case 'e':
+                        args[i]= Double.parseDouble(argList.get(i));
+                        break;
+                    default:
+                        args[i]= argList.get(i);
+                        break;
+                }
             }
         }
                 
         String s= String.format( template, args );
+        
+        s= s.replaceAll(" ","_"); 
 
         if ( s.endsWith(".png") ) {
             BufferedImage bufferedImage = ScriptContext.writeToBufferedImage(); 
@@ -2785,6 +2803,29 @@ public class RunBatchTool extends javax.swing.JPanel {
         interp.set( "PWD", pwd );
 
         return interp;
+
+    }
+
+    /**
+     * replace %d etc with $x
+     * @param template like data_%05d.png
+     * @return uri template like data_$x.png
+     */
+    private String convertStringFormatToUriTemplate(String template) {
+                
+        String[] ss= template.split("\\%");
+        StringBuilder uriTemplate= new StringBuilder(ss[0]);
+        for ( int i=1; i<ss.length; i++ ) {
+            String spec= ss[i];
+            int firstLetter= 0;
+            while ( firstLetter<spec.length() 
+                && ( spec.charAt(firstLetter)=='-' || spec.charAt(firstLetter)=='.' || Character.isDigit(spec.charAt(firstLetter)) ) ) {
+                firstLetter++;
+            }
+            uriTemplate.append("$x");
+            uriTemplate.append(spec.substring(firstLetter+1));
+        }
+        return uriTemplate.toString();
 
     }
 
