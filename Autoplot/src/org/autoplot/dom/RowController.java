@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.DasNameException;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasDevicePosition;
 import org.das2.graph.DasRow;
@@ -84,7 +85,11 @@ public class RowController extends DomNodeController {
     protected void createDasPeer( Canvas canvas, DasRow parent ) {
         DasCanvas c= canvas.controller.getDasCanvas();
         dasRow= DasRow.create( c, parent, row.getTop(), row.getBottom() );
-
+        try {
+            if ( this.row.getId().length()>0 ) dasRow.setDasName( this.row.getId() );
+        } catch (DasNameException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
         final List<String> minList= Arrays.asList( DasDevicePosition.PROP_MINIMUM, DasDevicePosition.PROP_EMMINIMUM, DasDevicePosition.PROP_PTMINIMUM );
         final List<String> maxList= Arrays.asList( DasDevicePosition.PROP_MAXIMUM, DasDevicePosition.PROP_EMMAXIMUM, DasDevicePosition.PROP_PTMAXIMUM );
 
