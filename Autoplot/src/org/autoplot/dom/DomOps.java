@@ -929,6 +929,7 @@ public class DomOps {
         
         marginColumn.setLeft( String.format( "0%%+%.1fem", nleftEm+2 ) );
         marginColumn.setRight( String.format( "100%%-%.1fem", nrightEm ) );
+        marginColumn.controller.dasColumn.setMaxLayout(marginColumn.getRight() );
         
         if ( ncolumn==0 ) {
             logger.finer("No adjustable columns.");
@@ -961,9 +962,9 @@ public class DomOps {
                 double MaxRightPx;
                 for ( Plot plotj : plots ) {
                     if ( columns[i].parent.equals(marginColumn.id) ) { 
-                        String title= plotj.getYaxis().getLabel();
+                        String label= plotj.getYaxis().getLabel();
                         boolean addLines= plotj.getYaxis().isDrawTickLabels();
-                        int lc= lineCount(title);
+                        int lc= lineCount(label);
                         int lcPlusTicks= lc + 4;
                         if ( i==0 ) {
                             MaxLeftJEm= ( addLines ? lcPlusTicks : 0. ) - nleftEm;
@@ -1027,7 +1028,7 @@ public class DomOps {
             if ( isEmColumn[i] ) {
                 relativePlotWidth[i]= 0.0;
             } else {
-                relativePlotWidth[i]= (double)(resizablePixels[i]+MaxLeft[i]-MaxRight[i]) / totalPlotWidthPixels;
+                relativePlotWidth[i]= (double)(resizablePixels[i]) / totalPlotWidthPixels;
             }
         }
          
