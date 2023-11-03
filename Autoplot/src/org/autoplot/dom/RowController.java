@@ -25,10 +25,12 @@ public class RowController extends DomNodeController {
     Row row;
     DasRow dasRow;
     Canvas canvas;
-
-    RowController( Row row ) {
+    ApplicationController applicationController;
+ 
+    RowController( ApplicationController applicationController, Row row ) {
         super(row);
         this.row= row;
+        this.applicationController= applicationController;
         row.controller= this;
     }
 
@@ -90,15 +92,9 @@ public class RowController extends DomNodeController {
         } catch (DasNameException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
-        final List<String> minList= Arrays.asList( DasDevicePosition.PROP_MINIMUM, DasDevicePosition.PROP_EMMINIMUM, DasDevicePosition.PROP_PTMINIMUM );
-        final List<String> maxList= Arrays.asList( DasDevicePosition.PROP_MAXIMUM, DasDevicePosition.PROP_EMMAXIMUM, DasDevicePosition.PROP_PTMAXIMUM );
-
-        dasRowPosListener= createDasRowPosListener( minList, maxList);
-        dasRow.addPropertyChangeListener(dasRowPosListener);
-
-        rowPosListener= createRowPosListener();
-        row.addPropertyChangeListener(Row.PROP_BOTTOM,rowPosListener);
-        row.addPropertyChangeListener(Row.PROP_TOP,rowPosListener);
+        applicationController.bind( row, Row.PROP_TOP, dasRow, DasDevicePosition.PROP_MINLAYOUT );
+        applicationController.bind( row, Row.PROP_BOTTOM, dasRow, DasDevicePosition.PROP_MAXLAYOUT );
+        
         this.canvas= canvas;
     }
     
@@ -118,9 +114,7 @@ public class RowController extends DomNodeController {
     }    
 
     public void removeBindings() {
-        dasRow.removePropertyChangeListener(dasRowPosListener);
-        row.removePropertyChangeListener(Column.PROP_LEFT,rowPosListener);
-        row.removePropertyChangeListener(Column.PROP_RIGHT,rowPosListener);
+        applicationController.unbind(row);
     }
     
     public void removeReferences() {

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.DasNameException;
+import org.das2.graph.DasAxis;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasColumn;
 import org.das2.graph.DasDevicePosition;
@@ -29,10 +30,12 @@ public class ColumnController extends DomNodeController {
     Column column;
     DasColumn dasColumn;
     Canvas canvas;
+    ApplicationController applicationController;
 
-    ColumnController( Column column ) {
+    ColumnController( ApplicationController applicationController, Column column ) {
         super(column);
         this.column= column;
+        this.applicationController= applicationController;
         column.controller= this;
     }
 
@@ -85,16 +88,10 @@ public class ColumnController extends DomNodeController {
             if ( this.column.getId().length()>0 ) dasColumn.setDasName( this.column.getId() );
         } catch (DasNameException ex) {
             logger.log(Level.SEVERE, null, ex);
-        }
-        final List<String> minList= Arrays.asList( DasDevicePosition.PROP_MINIMUM, DasDevicePosition.PROP_EMMINIMUM, DasDevicePosition.PROP_PTMINIMUM );
-        final List<String> maxList= Arrays.asList( DasDevicePosition.PROP_MAXIMUM, DasDevicePosition.PROP_EMMAXIMUM, DasDevicePosition.PROP_PTMAXIMUM );
+        }                
+        applicationController.bind( column, Column.PROP_LEFT, dasColumn, DasDevicePosition.PROP_MINLAYOUT );
+        applicationController.bind( column, Column.PROP_RIGHT, dasColumn, DasDevicePosition.PROP_MAXLAYOUT );
         
-        dasColumnPosListener= createDasColumnPosListener( minList, maxList );
-        dasColumn.addPropertyChangeListener(dasColumnPosListener);
-        
-        columnPosListener= createColomnPosListener();
-        column.addPropertyChangeListener(Column.PROP_LEFT,columnPosListener);
-        column.addPropertyChangeListener(Column.PROP_RIGHT,columnPosListener);
         this.canvas= canvas;
     }
 
@@ -114,9 +111,7 @@ public class ColumnController extends DomNodeController {
     }
     
     public void removeBindings() {
-        dasColumn.removePropertyChangeListener(dasColumnPosListener);
-        column.removePropertyChangeListener(Column.PROP_LEFT,columnPosListener);
-        column.removePropertyChangeListener(Column.PROP_RIGHT,columnPosListener);
+        applicationController.unbind(column);
     }
     
     public void removeReferences() {

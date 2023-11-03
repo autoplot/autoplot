@@ -554,7 +554,7 @@ public class CanvasController extends DomNodeController {
         lock.lock("Add Insert Row");
         try {
             row.setParent(canvas.getMarginRow().getId());
-            new RowController(row).createDasPeer(this.canvas, canvas.getMarginRow().getController().getDasRow());
+            new RowController(dom.controller,row).createDasPeer(this.canvas, canvas.getMarginRow().getController().getDasRow());
 
             this.dom.getController().assignId(row);
             if (trow != null && ( position==LayoutConstants.ABOVE || position==LayoutConstants.BELOW ) ) {
@@ -598,7 +598,7 @@ public class CanvasController extends DomNodeController {
         try {
 
             column.setParent(canvas.getMarginColumn().getId());
-            new ColumnController(column).createDasPeer(this.canvas, canvas.getMarginColumn().getController().getDasColumn());
+            new ColumnController(dom.controller,column).createDasPeer(this.canvas, canvas.getMarginColumn().getController().getDasColumn());
 
             if (tcolumn != null) {
                 insertGapFor(column, tcolumn, position);
@@ -712,7 +712,7 @@ public class CanvasController extends DomNodeController {
 
                 column.setParent(canvas.getMarginColumn().getId());  // revert this from getMarginColumn while it might be causing problems
 
-                new ColumnController(column).createDasPeer(this.canvas, canvas.getMarginColumn().getController().getDasColumn());
+                new ColumnController(dom.controller,column).createDasPeer(this.canvas, canvas.getMarginColumn().getController().getDasColumn());
                 this.dom.getController().assignId(column);
                 result.add(column);
 
@@ -802,12 +802,12 @@ public class CanvasController extends DomNodeController {
         }
         for (Row r : this.canvas.getRows()) {
             if (r.controller == null) {
-                new RowController(r).createDasPeer(this.canvas, this.canvas.getMarginRow().getController().getDasRow());
+                new RowController(dom.controller,r).createDasPeer(this.canvas, this.canvas.getMarginRow().getController().getDasRow());
             }
         }
         for (Column r : this.canvas.getColumns()) {
             if (r.controller == null) {
-                new ColumnController(r).createDasPeer(this.canvas, this.canvas.getMarginColumn().getController().getDasColumn());
+                new ColumnController(dom.controller,r).createDasPeer(this.canvas, this.canvas.getMarginColumn().getController().getDasColumn());
             }
         }
     }
@@ -971,7 +971,7 @@ public class CanvasController extends DomNodeController {
         lock.lock("Maybe Add Column");
         try {
             column.setParent("");
-            new ColumnController(column).createDasPeer(this.canvas, null );
+            new ColumnController(dom.controller,column).createDasPeer(this.canvas, null );
 
             this.dom.getController().assignId(column);
 
@@ -1014,7 +1014,7 @@ public class CanvasController extends DomNodeController {
         lock.lock("Maybe Add Row");
         try {
             row.setParent("");
-            new RowController(row).createDasPeer(this.canvas, null );
+            new RowController(dom.controller,row).createDasPeer(this.canvas, null );
 
             this.dom.getController().assignId(row);
 

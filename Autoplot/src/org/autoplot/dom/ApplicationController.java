@@ -859,8 +859,8 @@ public class ApplicationController extends DomNodeController implements RunLater
         
         new CanvasController(application, lcanvas).setDasCanvas(dasCanvas);
 
-        new RowController( lcanvas.getMarginRow() ).createDasPeer( lcanvas, null );
-        new ColumnController( lcanvas.getMarginColumn() ).createDasPeer( lcanvas, null );
+        new RowController( this, lcanvas.getMarginRow() ).createDasPeer( lcanvas, null );
+        new ColumnController( this, lcanvas.getMarginColumn() ).createDasPeer( lcanvas, null );
 
         layoutListener = new LayoutListener(model);
 
