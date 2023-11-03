@@ -906,7 +906,8 @@ public class DomOps {
             }
         }
         
-        // 1. reset marginColumn.  define nup to be the number of lines above the leftmost plot column.  define nright to be the number
+        // 1. reset marginColumn.  define nleftEm to be the number of lines 
+        // above the leftmost plot column.  define nrightEm to be the number
         // of lines to the right of the rightmost column.
         double nleftEm=0, nrightEm=0;
         for ( int i=0; i<dom.plots.size(); i++ ) {
@@ -922,6 +923,13 @@ public class DomOps {
                 } else {
                     nrightEm= Math.max( nrightEm, 1 );
                     //nrightEm= Math.max( nrightEm, 2 );                    
+                }
+                if ( p.isDisplayLegend() ) {
+                    if ( p.getLegendPosition()==LegendPosition.OutsideNE || 
+                            p.getLegendPosition()==LegendPosition.OutsideSE ) {
+                        double arbitaryRightEms= 10;
+                        nrightEm= Math.max( nrightEm, arbitaryRightEms ); 
+                    }
                 }
             }
         }
