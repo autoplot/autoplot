@@ -26,7 +26,7 @@ public class LayoutListener implements PropertyChangeListener {
 
     ApplicationModel model;  
     Timer t;
-    private static final Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.dom.layout");
+    private static final Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.dom.layout.listener");
     public static final String PENDING_CHANGE_AUTOLAYOUT= "autolayout";
 
     public LayoutListener(ApplicationModel model) {
