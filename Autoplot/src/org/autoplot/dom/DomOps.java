@@ -609,6 +609,8 @@ public class DomOps {
             double[] emsUpSize= new double[nrow];
             double[] emsDownSize= new double[nrow];
 
+            logger.log(Level.FINER, "1. new settings for the margin row:{0} {1}", new Object[]{marginRow.getTop(), marginRow.getBottom()});
+                  
             // 2. For each row, identify the number of lines above and below each plot in MaxUp and MaxDown (MaxUpEm is just expressed in ems).
             for ( int i=0; i<nrow; i++ ) {
                 double[] rr1= parseLayoutStr(rows[i].getTop(),new double[3]); // whoo hoo let's parse this too many times!
@@ -669,6 +671,12 @@ public class DomOps {
                 }
 
             }
+            if ( logger.isLoggable(Level.FINER) ) {
+                logger.log(Level.FINER, "2. space needed to the top and bottom of each plot:" );
+                for ( int i=0; i<nrow; i++ ) {
+                    logger.log(Level.FINER, "  {0}em {1}em", new Object[]{MaxUpEm[i], MaxDownEm[i]});
+                }
+            }            
             
             // 3. identify the number of pixels in each of the rows which are resizable.
             double totalPlotHeightPixels= 0;
@@ -682,10 +690,11 @@ public class DomOps {
                     if ( isEmRow[i] ) {
                         logger.fine("here's an events bar row!");
                     } else {
-                        totalPlotHeightPixels= totalPlotHeightPixels + resizablePixels[i] + MaxUp[i] - MaxDown[i];
+                        totalPlotHeightPixels= totalPlotHeightPixels + resizablePixels[i];
                     }
                 }
             }
+            logger.log(Level.FINER, "3. number of pixels used by plots which are resizable: {0}", totalPlotHeightPixels);        
 
             // 4. express this as a fraction of all the pixels which could be resized.
             double [] relativePlotHeight= new double[ nrow ];
@@ -696,6 +705,12 @@ public class DomOps {
                     relativePlotHeight[i]= (double)(resizablePixels[i]+MaxUp[i]-MaxDown[i]) / totalPlotHeightPixels;
                 }
             }
+            if ( logger.isLoggable(Level.FINER) ) {
+                logger.finer("4. relative sizes of the rows: ");
+                for ( int i=0; i<nrow; i++ ) {
+                    logger.log(Level.FINER, "  {0}", relativePlotHeight[i]);
+                }
+            }            
             
             // 5. Calculate the number of pixels available for resized plots on the canvas.
             double canvasHeight= canvas.height;
@@ -705,16 +720,22 @@ public class DomOps {
 
             double newPlotTotalHeightPixels= marginHeight; // this will be the pixels available to divide amungst the plots.
             for ( int i=0; i<nrow; i++ ) {
-                if ( isEmRow[i] ) {
-                    newPlotTotalHeightPixels = newPlotTotalHeightPixels - MaxUp[i] + MaxDown[i];
-                }
+                newPlotTotalHeightPixels = newPlotTotalHeightPixels - MaxUp[i] + MaxDown[i];
             }
+            logger.log(Level.FINER, "5. number of pixels available to the plots which can resize: {0}", newPlotTotalHeightPixels);
+            
 
             // 6. newPlotHeight is the height of each plot in pixels.
             double [] newPlotHeightPixels= new double[ nrow ];
             for ( int i=0; i<nrow; i++ ) {
                 newPlotHeightPixels[i]= newPlotTotalHeightPixels * relativePlotHeight[i]; 
             }
+            if ( logger.isLoggable(Level.FINER) ) {
+                logger.finer("6. new resizable plot heights in pixels: ");
+                for ( int i=0; i<nrow; i++ ) {
+                    logger.log(Level.FINER, "  {0}", newPlotHeightPixels[i]);
+                }
+            }            
 
             // 7. Now calculate the layout string (e.g. 50%+1em,100%-3em) for each row.
             // normalPlotHeight will be the normalized size of each plot, which includes the em offsets.
@@ -728,10 +749,16 @@ public class DomOps {
                         normalPlotHeight[i]= 0.0;
                     } else {
                         //normalPlotHeight[i]= ( newPlotHeight[i] - MaxUp[i] - MaxDown[i] ) / ( marginHeight );
-                        normalPlotHeight[i]= newPlotHeightPixels[i] / ( marginHeight );
+                        normalPlotHeight[i]= ( newPlotHeightPixels[i] + MaxUp[i] - MaxDown[i] ) / ( marginHeight );
                     }
                 }
             }
+            if ( logger.isLoggable(Level.FINER) ) {
+                logger.finer("7. new plot heights, which also include the em offsets: ");
+                for ( int i=0; i<nrow; i++ ) {
+                    logger.log(Level.FINER, "  {0}", normalPlotHeight[i]);
+                }
+            }            
 
             // 8. calculate each row's new layout string, possibly adding additional ems for rows which are not resized.
             double position= 0;
@@ -768,7 +795,13 @@ public class DomOps {
                     logger.log(Level.FINE, "row {0} is not adjusted", i );
                 }
             }
-
+            if ( logger.isLoggable(Level.FINER) ) {
+                logger.finer("8. new layout strings: ");
+                for ( int i=0; i<nrow; i++ ) {
+                    logger.log(Level.FINER, "  {0} {1}", new Object[]{ rows[i].getTop(), rows[i].getBottom() } );
+                }
+            }
+        
             // 9. reset the rows to this new location.
             for ( int i=0; i<rows.length; i++ ) {
                 canvas.getRows(i).syncTo(rows[i]);
@@ -1024,7 +1057,7 @@ public class DomOps {
                 if ( isEmColumn[i] ) {
                     logger.fine("here's a fixed-width column!");
                 } else {
-                    totalPlotWidthPixels= totalPlotWidthPixels + ( d2-d1 );
+                    totalPlotWidthPixels= totalPlotWidthPixels + resizablePixels[i];
                 }
             }
         }
@@ -1132,7 +1165,8 @@ public class DomOps {
                 logger.log(Level.FINER, "  {0} {1}", new Object[]{ columns[i].getLeft(), columns[1].getRight() } );
             }
         }
-            
+        
+        // 9. reset the columns to this new location.
         for ( int i=0; i<columns.length; i++ ) {
             canvas.getColumns(i).syncTo(columns[i]);
         }  
