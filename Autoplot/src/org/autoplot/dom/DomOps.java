@@ -702,7 +702,7 @@ public class DomOps {
                 if ( isEmRow[i] ) {
                     relativePlotHeight[i]= 0.0;
                 } else {
-                    relativePlotHeight[i]= (double)(resizablePixels[i]+MaxUp[i]-MaxDown[i]) / totalPlotHeightPixels;
+                    relativePlotHeight[i]= (double)(resizablePixels[i]) / totalPlotHeightPixels;
                 }
             }
             if ( logger.isLoggable(Level.FINER) ) {
