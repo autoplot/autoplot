@@ -438,7 +438,7 @@ public class DomOps {
      * @param options additional options, including interPlotVerticalSpacing.
      */
     public static void fixLayout( Application dom, Map<String,String> options  ) {
-        Logger logger= LoggerManager.getLogger("autoplot.dom.layout");
+        Logger logger= LoggerManager.getLogger("autoplot.dom.layout.fixlayout");
         logger.fine( "enter fixLayout" );
         
         boolean autoLayout= dom.options.isAutolayout();
@@ -576,7 +576,6 @@ public class DomOps {
                         }
                         rows[i].top= DasDevicePosition.formatLayoutStr(dd1);
                         rows[i].bottom= DasDevicePosition.formatLayoutStr(dd2);
-                        logger.log(Level.FINE, "line552: {0},{1}", new Object[]{rows[i].top, rows[i].bottom});
                     }
                 }
             }
@@ -641,8 +640,6 @@ public class DomOps {
                                 MaxUpJEm= addLines ? lc : 0.;
                             }
                             
-                            logger.log(Level.FINE, "{0} addLines: {1}  isDiplayTitle: {2}  lineCount(title): {3}", 
-                                    new Object[]{plotj.getId(), addLines, plotj.isDisplayTitle(), lc});
                             MaxUp[i]= Math.max( MaxUp[i], MaxUpJEm*emToPixels );
                             MaxUpEm[i]= Math.max( MaxUpEm[i], MaxUpJEm );
                             if ( plotj.getXaxis().isDrawTickLabels() ) {
@@ -814,7 +811,7 @@ public class DomOps {
      * @see #fixLayout(org.autoplot.dom.Application) 
      */    
     public static void fixHorizontalLayout( Application dom, Map<String,String> options ) {
-        Logger logger= LoggerManager.getLogger("autoplot.dom.layout");
+        Logger logger= LoggerManager.getLogger("autoplot.dom.layout.fixlayout");
         logger.fine( "enter fixHorizontalLayout" );
                 
         Canvas canvas= dom.getCanvases(0);
@@ -940,7 +937,7 @@ public class DomOps {
         marginColumn.controller.dasColumn.setMaxLayout(marginColumn.getRight() );
         
         if ( ncolumn==0 ) {
-            logger.finer("No adjustable columns.");
+            logger.finer("0. No adjustable columns, returning!");
             return;
         }
         
@@ -948,6 +945,8 @@ public class DomOps {
         boolean[] isEmColumn= new boolean[ncolumn];
         double[] emsLeftSize= new double[ncolumn];
         double[] emsRightSize= new double[ncolumn];
+        
+        logger.log(Level.FINER, "1. new settings for the margin column:{0} {1}", new Object[]{marginColumn.getLeft(), marginColumn.getRight()});
         
         // 2. For each column, identify the space to the left and right of each plot.      
         for ( int i=0; i<ncolumn; i++ ) {
@@ -979,9 +978,6 @@ public class DomOps {
                         } else {
                             MaxLeftJEm= addLines ? lcPlusTicks : 0.;
                         }
-
-                        logger.log(Level.FINE, "{0} addLines: {1}  isDiplayTitle: {2}  lineCount(title): {3}", 
-                                new Object[]{plotj.getId(), addLines, plotj.isDisplayTitle(), lc});
                         MaxLeft[i]= Math.max( MaxLeft[i], MaxLeftJEm*emToPixels );
                         MaxLeftEm[i]= Math.max( MaxLeftEm[i], MaxLeftJEm );
                         if ( plotj.getZaxis().isVisible() ) {
@@ -1012,6 +1008,12 @@ public class DomOps {
             }
 
         }
+        if ( logger.isLoggable(Level.FINER) ) {
+            logger.log(Level.FINER, "2. space needed to the right and left of each plot:" );
+            for ( int i=0; i<ncolumn; i++ ) {
+                logger.log(Level.FINER, "  {0}em {1}em", new Object[]{MaxLeftEm[i], MaxRightEm[i]});
+            }
+        }
             
         // 3. identify the number of pixels in each of the columns which are resizable.
         double totalPlotWidthPixels= 0;
@@ -1029,6 +1031,7 @@ public class DomOps {
                 }
             }
         }
+        logger.log(Level.FINER, "3. number of pixels used by plots which are resizable: {0}", totalPlotWidthPixels);
         
         // 4. express this as a fraction of all the pixels which could be resized.
         double [] relativePlotWidth= new double[ ncolumn ];
@@ -1037,6 +1040,12 @@ public class DomOps {
                 relativePlotWidth[i]= 0.0;
             } else {
                 relativePlotWidth[i]= (double)(resizablePixels[i]) / totalPlotWidthPixels;
+            }
+        }
+        if ( logger.isLoggable(Level.FINER) ) {
+            logger.finer("4. number of pixels available to the plots which can resize: ");
+            for ( int i=0; i<ncolumn; i++ ) {
+                logger.log(Level.FINER, "  {0}", relativePlotWidth[i]);
             }
         }
          
@@ -1048,18 +1057,23 @@ public class DomOps {
             
         double newPlotTotalWidthPixels= marginWidth;
         for ( int i=0; i<ncolumn; i++ ) {
-            if ( isEmColumn[i] ) {
-                newPlotTotalWidthPixels = newPlotTotalWidthPixels - maxLeft[i] + maxRight[i];
-            }
+            newPlotTotalWidthPixels = newPlotTotalWidthPixels - maxLeft[i] + maxRight[i];
         }
+        logger.log(Level.FINER, "5. number of pixels available to the plots which can resize: {0}", newPlotTotalWidthPixels);
 
-        // 6. newPlotHeight is the height of each plot in pixels.
+        // 6. newPlotWidth is the width of each plot in pixels.
         double [] newPlotWidthPixels= new double[ ncolumn ];
         for ( int i=0; i<ncolumn; i++ ) {
             newPlotWidthPixels[i]= newPlotTotalWidthPixels * relativePlotWidth[i];
         }
+        if ( logger.isLoggable(Level.FINER) ) {
+            logger.finer("6. new resizable plot widths in pixels: ");
+            for ( int i=0; i<ncolumn; i++ ) {
+                logger.log(Level.FINER, "  {0}", newPlotWidthPixels[i]);
+            }
+        }
 
-        // 7. Now calculate the layout string (e.g. 50%+1em,100%-3em) for each column.
+        // 7. Now calculate the total width in pixels of each plot.
         // normalPlotWidth will be the normalized size of each plot, which includes the em offsets.
         double[] normalPlotWidth= new double[ ncolumn ];
 
@@ -1072,6 +1086,12 @@ public class DomOps {
                 } else {
                     normalPlotWidth[i]= newPlotWidthPixels[i] / ( marginWidth );
                 }
+            }
+        }
+        if ( logger.isLoggable(Level.FINER) ) {
+            logger.finer("7. new plot widths, which also include the em offsets: ");
+            for ( int i=0; i<ncolumn; i++ ) {
+                logger.log(Level.FINER, "  {0}", normalPlotWidth[i]);
             }
         }
         
@@ -1094,7 +1114,7 @@ public class DomOps {
                     newLeft=  String.format( Locale.US, "%.2f%%%+.2fem", 100*position, (MaxLeftEm[i]+extraEms) );
                     newRight = String.format( Locale.US, "%.2f%%%+.2fem", 100*position, (MaxRightEm[i]+extraEms) );
                     if ( horizontalSpacing.trim().length()>0 ) {
-                        logger.finer("we already accounted for this.");
+                        logger.finest("we already accounted for this.");
                     } else {
                         extraEms+= nominalSpacingEms + ( MaxRightEm[i] + MaxLeftEm[i] );
                     }
@@ -1104,17 +1124,24 @@ public class DomOps {
                 if ( logger.isLoggable( Level.FINE ) ) {
                     int r0= (int)DomUtil.getColumnPositionPixels( dom, columns[i], columns[i].getLeft() );
                     int r1= (int)DomUtil.getColumnPositionPixels( dom, columns[i], columns[i].getRight() );
-                    logger.log(Level.FINE, "row {0}: {1},{2} ({3} pixels)", new Object[]{i, newLeft, newRight, r1-r0 });
                 }
             } else {
-                logger.log(Level.FINE, "row {0} is not adjusted", i );
+                logger.log(Level.FINEST, "row {0} is not adjusted", i );
+            }
+        }
+        if ( logger.isLoggable(Level.FINER) ) {
+            logger.finer("8. new layout strings: ");
+            for ( int i=0; i<ncolumn; i++ ) {
+                logger.log(Level.FINER, "  {0} {1}", new Object[]{ columns[i].getLeft(), columns[1].getRight() } );
             }
         }
             
         for ( int i=0; i<columns.length; i++ ) {
             canvas.getColumns(i).syncTo(columns[i]);
         }  
-            
+        
+        logger.log(Level.FINEST, "done" );
+        
     }
     
     /**
