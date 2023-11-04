@@ -865,9 +865,6 @@ public class DomOps {
         
         String leftColumnId= ncolumn>0 ? columns[0].id : "";
         String rightColumnId= ncolumn>0 ? columns[columns.length-1].id : "";
-
-        double [] maxLeft= new double[ ncolumn ];
-        double [] maxRight= new double[ ncolumn ];
         
         String horizontalSpacing=  options.getOrDefault( OPTION_FIX_LAYOUT_HORIZONTAL_SPACING, "" );
 
@@ -1043,7 +1040,7 @@ public class DomOps {
             }
         }
         if ( logger.isLoggable(Level.FINER) ) {
-            logger.finer("4. number of pixels available to the plots which can resize: ");
+            logger.finer("4. relative sizes of the rows: ");
             for ( int i=0; i<ncolumn; i++ ) {
                 logger.log(Level.FINER, "  {0}", relativePlotWidth[i]);
             }
@@ -1057,7 +1054,7 @@ public class DomOps {
             
         double newPlotTotalWidthPixels= marginWidth;
         for ( int i=0; i<ncolumn; i++ ) {
-            newPlotTotalWidthPixels = newPlotTotalWidthPixels - maxLeft[i] + maxRight[i];
+            newPlotTotalWidthPixels = newPlotTotalWidthPixels - MaxLeft[i] + MaxRight[i];
         }
         logger.log(Level.FINER, "5. number of pixels available to the plots which can resize: {0}", newPlotTotalWidthPixels);
 
@@ -1073,7 +1070,7 @@ public class DomOps {
             }
         }
 
-        // 7. Now calculate the total width in pixels of each plot.
+        // 7. Now calculate the total width in normalized widths of each plot.
         // normalPlotWidth will be the normalized size of each plot, which includes the em offsets.
         double[] normalPlotWidth= new double[ ncolumn ];
 
@@ -1084,7 +1081,7 @@ public class DomOps {
                 if ( relativePlotWidth[i]==0 ) {
                     normalPlotWidth[i]= 0.0;
                 } else {
-                    normalPlotWidth[i]= newPlotWidthPixels[i] / ( marginWidth );
+                    normalPlotWidth[i]= ( newPlotWidthPixels[i] + MaxLeft[i] - MaxRight[i] ) / ( marginWidth );
                 }
             }
         }
