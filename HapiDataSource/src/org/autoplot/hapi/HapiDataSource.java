@@ -1616,6 +1616,14 @@ public final class HapiDataSource extends AbstractDataSource {
             int nparam, int[] nfields, String useCacheUriParam ) throws IllegalArgumentException, Exception, IOException {
 
         DataSetBuilder builder = new DataSetBuilder(2, 100, totalFields);
+        int icol=0;
+        for ( int i=0; i<pds.length; i++ ) {
+            ParamDescription pds1= pds[i];
+            for ( int j=0; j<pds1.nFields; j++ ) {
+                builder.setUnits( icol, pds1.units );
+                icol++;
+            }
+        }
         monitor.setProgressMessage("reading data");
         monitor.setTaskProgress(20);
         long t0 = System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
