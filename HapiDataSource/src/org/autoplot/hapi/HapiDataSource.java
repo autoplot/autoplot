@@ -1494,7 +1494,7 @@ public final class HapiDataSource extends AbstractDataSource {
                         try {
                             String s= ss[ifield];
                             if ( pds[i].units instanceof EnumerationUnits ) {
-                                builder.putValue( -1, ifield, ((EnumerationUnits)pds[i].units).createDatum(s).doubleValue(pds[i].units) );
+                                builder.putValue( -1, ifield, ((EnumerationUnits)pds[i].units).createDatum(s) );
                             } else {
                                 builder.putValue( -1, ifield, pds[i].units.parse(s) );
                             }
