@@ -447,15 +447,10 @@ public class DomOps {
         try {
                 
             Canvas canvas= dom.getCanvases(0);
-            Row marginRow= canvas.getMarginRow();
             Column marginColumn= canvas.getMarginColumn();
             
-            double emToPixels= java.awt.Font.decode(dom.getCanvases(0).font).getSize();
-            double pixelsToEm= 1/emToPixels;
-
             Row[] rows= canvas.getRows();
             int nrow= rows.length;
-            boolean[] doAdjust= new boolean[nrow];
 
             Column[] columns= canvas.getColumns();
             
@@ -547,13 +542,66 @@ public class DomOps {
                 }
             }
 
-            String verticalSpacing=  options.getOrDefault( OPTION_FIX_LAYOUT_VERTICAL_SPACING, "" );
+            fixVerticalLayout( dom, options );
 
+            fixHorizontalLayout( dom, options ); 
+
+        } finally {
+            dom.options.setAutolayout(autoLayout);
+        }
+    }
+
+    /**
+     * This is the new layout mechanism (fixLayout), but changed from vertical layout to horizontal.  This one:<ul>
+     * <li> Removes extra whitespace
+     * <li> Preserves relative size weights.
+     * <li> Preserves em heights, to support components which should not be rescaled. (Not yet supported.)
+     * <li> Preserves space taken by strange objects, to support future canvas components.
+     * <li> Renormalizes the margin row, so it is nice. (Not yet supported.  This should consider font size, where large fonts don't need so much space.)
+     * </ul>
+     * This should also be idempotent, where calling this a second time should have no effect.
+     * @param dom an application state, with controller nodes. 
+     * @see #fixLayout(org.autoplot.dom.Application) 
+     */
+    public static void fixVerticalLayout( Application dom ) {
+        fixVerticalLayout( dom, Collections.emptyMap() );
+    } 
+    
+    /**
+     * This is the new layout mechanism (fixLayout), but changed from vertical layout to horizontal.  This one:<ul>
+     * <li> Removes extra whitespace
+     * <li> Preserves relative size weights.
+     * <li> Preserves em heights, to support components which should not be rescaled. (Not yet supported.)
+     * <li> Preserves space taken by strange objects, to support future canvas components.
+     * <li> Renormalizes the margin row, so it is nice. (Not yet supported.  This should consider font size, where large fonts don't need so much space.)
+     * </ul>
+     * This should also be idempotent, where calling this a second time should have no effect.
+     * @param dom an application state, with controller nodes. 
+     * @param options 
+     * @see #fixLayout(org.autoplot.dom.Application) 
+     */    
+    public static void fixVerticalLayout( Application dom, Map<String,String> options ) {
+
+        Canvas canvas= dom.getCanvases(0);
+        Row marginRow= canvas.getMarginRow();
+        
+        double emToPixels= java.awt.Font.decode(dom.getCanvases(0).font).getSize();
+        
+        Row[] rows= canvas.getRows();
+        int nrow= rows.length;
+        boolean[] doAdjust= new boolean[nrow];
+
+        String topRowId= rows[0].getId();
+        String bottomRowId= rows[rows.length-1].getId();
+        
+        try {
             double [] MaxUp= new double[ nrow ];
             double [] MaxDown= new double[ nrow ];
             double [] MaxUpEm= new double[ nrow ];
             double [] MaxDownEm= new double[ nrow ];
 
+            String verticalSpacing=  options.getOrDefault( OPTION_FIX_LAYOUT_VERTICAL_SPACING, "" );
+            
             if ( verticalSpacing.trim().length()>0 ) {
                 Pattern p= Pattern.compile("([0-9\\.]*)em");
                 if ( p.matcher(verticalSpacing).matches() ) {
@@ -805,15 +853,12 @@ public class DomOps {
             // 9. reset the rows to this new location.
             for ( int i=0; i<rows.length; i++ ) {
                 canvas.getRows(i).syncTo(rows[i]);
-            }
-
-            fixHorizontalLayout( dom,options ); 
-
+            }   
         } finally {
-            dom.options.setAutolayout(autoLayout);
+            
         }
     }
-
+    
     /**
      * This is the new layout mechanism (fixLayout), but changed from vertical layout to horizontal.  This one:<ul>
      * <li> Removes extra whitespace
@@ -851,14 +896,13 @@ public class DomOps {
         Column marginColumn= canvas.getMarginColumn();
 
         double emToPixels= java.awt.Font.decode(dom.getCanvases(0).font).getSize();
-        double pixelsToEm= 1/emToPixels;
 
         Column[] columns= canvas.getColumns();
                 
         int ncolumn= columns.length;
         boolean[] doAdjust= new boolean[ncolumn];
 
-        //kludge: check for duplicate names of rows.  Use the first one found.
+        //kludge: check for duplicate names of columns.  Use the first one found.
         Map<String,Column> columnCheck= new HashMap();
         List<Column> rm= new ArrayList<>();
         for ( int i=0; i<ncolumn; i++ ) {           
