@@ -639,18 +639,17 @@ public class DomOps {
                 if ( p.getRowId().equals(bottomRowId) ) {
                     if ( p.getXaxis().isDrawTickLabels() ) {
                         if ( p.getEphemerisLineCount()>-1 ) {
-                            nbottomEm= Math.max( nbottomEm, p.getEphemerisLineCount()+1 );  // +1 is for ticks
+                            nbottomEm= Math.max( nbottomEm, p.getEphemerisLineCount()+2 );  // +2 is for ticks
                         } else {
-                            nbottomEm= Math.max( nbottomEm, 2 );
+                            nbottomEm= Math.max( nbottomEm, 4 );
                         }
                     } else {
                         nbottomEm= Math.max( nbottomEm, 1 );
                     }
                 }
             }
-            nbottomEm= 0; // this is because the plot will pick this up.
-            marginRow.setTop( String.format( "0%%+%.1fem", ntopEm+2 ) );
-            marginRow.setBottom( String.format( "100%%-%.1fem", nbottomEm ) );
+            marginRow.setTop( DasDevicePosition.formatLayoutStr( new double[] { 0, ntopEm+2, 0 } ) );
+            marginRow.setBottom( DasDevicePosition.formatLayoutStr( new double[] { 1.0, -nbottomEm, 0 } ) );
 
             double[] resizablePixels= new double[nrow];
             boolean[] isEmRow= new boolean[nrow];
@@ -984,21 +983,20 @@ public class DomOps {
         for ( int i=0; i<dom.plots.size(); i++ ) {
             Plot p= dom.plots.get(i);
             if ( p.getColumnId().equals(leftColumnId) || p.getColumnId().equals(marginColumn.id) ) {
-                nleftEm= Math.max( nleftEm, lineCount( p.getTitle() ) );
-                //nleftEm= Math.max( nleftEm, lineCount( p.getTitle() )+4 );
+                nleftEm= Math.max( nleftEm, lineCount( p.getYaxis().getLabel() ) + 5 );
             }
             if ( p.getColumnId().equals(rightColumnId) || p.getColumnId().equals(marginColumn.id) ) {
                 if ( p.getZaxis().isVisible() ) {
-                    nrightEm= Math.max( nrightEm, 4 ); //TODO: label is showing, etc
+                    nrightEm= Math.max( nrightEm, 14 ); //TODO: label is showing, etc
                     //nrightEm= Math.max( nrightEm, 6 ); //TODO: label is showing, etc
                 } else {
-                    nrightEm= Math.max( nrightEm, 1 );
+                    nrightEm= Math.max( nrightEm, 8 );
                     //nrightEm= Math.max( nrightEm, 2 );                    
                 }
                 if ( p.isDisplayLegend() ) {
                     if ( p.getLegendPosition()==LegendPosition.OutsideNE || 
                             p.getLegendPosition()==LegendPosition.OutsideSE ) {
-                        double arbitaryRightEms= 10;
+                        double arbitaryRightEms= 13;
                         nrightEm= Math.max( nrightEm, arbitaryRightEms ); 
                     }
                 }
@@ -1006,8 +1004,8 @@ public class DomOps {
         }
         if ( ncolumn>0 ) nrightEm= 0; 
         
-        marginColumn.setLeft( String.format( "0%%+%.1fem", nleftEm+2 ) );
-        marginColumn.setRight( String.format( "100%%-%.1fem", nrightEm ) );
+        marginColumn.setLeft( DasDevicePosition.formatLayoutStr( new double[] { 0, nleftEm+2, 0 } ) );
+        marginColumn.setRight( DasDevicePosition.formatLayoutStr( new double[] { 1, -nrightEm, 0 } ) );
         marginColumn.controller.dasColumn.setMaxLayout(marginColumn.getRight() );
         
         if ( ncolumn==0 ) {
