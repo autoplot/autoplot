@@ -552,7 +552,7 @@ public class DomOps {
     }
 
     /**
-     * This is the new layout mechanism (fixLayout), but changed from vertical layout to horizontal.  This one:<ul>
+     * This is the new layout mechanism (fixLayout), correcting the layout in the vertical direction.  This one:<ul>
      * <li> Removes extra whitespace
      * <li> Preserves relative size weights.
      * <li> Preserves em heights, to support components which should not be rescaled. (Not yet supported.)
@@ -568,7 +568,7 @@ public class DomOps {
     } 
     
     /**
-     * This is the new layout mechanism (fixLayout), but changed from vertical layout to horizontal.  This one:<ul>
+     * This is the new layout mechanism (fixLayout), correcting the layout in the vertical direction.  This one:<ul>
      * <li> Removes extra whitespace
      * <li> Preserves relative size weights.
      * <li> Preserves em heights, to support components which should not be rescaled. (Not yet supported.)
@@ -578,7 +578,7 @@ public class DomOps {
      * This should also be idempotent, where calling this a second time should have no effect.
      * @param dom an application state, with controller nodes. 
      * @param options 
-     * @see #fixLayout(org.autoplot.dom.Application) 
+     * @see #fixLayout(org.autoplot.dom.Application, java.util.Map) 
      */    
     public static void fixVerticalLayout( Application dom, Map<String,String> options ) {
 
