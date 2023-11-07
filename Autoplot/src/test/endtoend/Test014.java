@@ -148,9 +148,9 @@ public class Test014 {
             ds= Util.getDataSet( "file:///home/jbf/ct/hudson/data/qds/cadence.qds" );
             doTest( 9, "file:///home/jbf/ct/hudson/data/qds/cadence.qds", ds );
 
-            ds= Util.getDataSet( "vap+cdf:file:///home/jbf/ct/lanl/hudson/LANL_LANL-97A_H3_SOPA_20060505_V01.cdf?FEDU" );
+            ds= Util.getDataSet( "vap+cdf:file:///home/jbf/ct/jenkins/data/cdf/LANL_LANL-97A_H3_SOPA_20060505_V01.cdf?FEDU" );
             ds= (QDataSet) ds.property( QDataSet.DEPEND_1 );
-            doTest( 6, "depend 1 of vap+cdf:file:///home/jbf/ct/lanl/hudson/LANL_LANL-97A_H3_SOPA_20060505_V01.cdf?FEDU", ds );
+            doTest( 6, "depend 1 of vap+cdf:file:///home/jbf/ct/jenkins/data/cdf/LANL_LANL-97A_H3_SOPA_20060505_V01.cdf?FEDU", ds );
 
             ds= Util.getDataSet( "vap+cdf:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/2000/po_h0_hyd_20000109_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX" );
             ds= DataSetOps.slice0(ds, 10);

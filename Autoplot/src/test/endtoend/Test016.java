@@ -128,7 +128,7 @@ public class Test016 {
             }
             
             {
-                ds= Util.getDataSet( "vap:file:///home/jbf/ct/lanl/hudson/LANL_LANL-97A_H3_SOPA_20060505_V01.cdf?FEDU" );
+                ds= Util.getDataSet( "vap:file:///home/jbf/ct/jenkins/data/cdf/LANL_LANL-97A_H3_SOPA_20060505_V01.cdf?FEDU" );
                 mm= MetadataUtil.getMetadataModel( (String) ds.property(QDataSet.METADATA_MODEL));
                 metaraw= (Map<String, Object>) ds.property(QDataSet.METADATA);
                 meta= mm.properties(metaraw);
