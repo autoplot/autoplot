@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 import org.das2.graph.DasRow;
 import org.das2.util.LoggerManager;
 import org.autoplot.datasource.DataSourceUtil;
+import org.das2.graph.DasAxis;
 import org.das2.graph.DasColumn;
 import org.das2.graph.DasDevicePosition;
 import org.das2.graph.LegendPosition;
@@ -552,6 +553,38 @@ public class DomOps {
     }
 
     /**
+     * return the number of lines taken by the x-axis, including the ticks.
+     * @param plotj
+     * @return 
+     */
+    private static int getXAxisLines( Plot plotj ) {
+        if ( !plotj.getXaxis().isDrawTickLabels() ) {
+            return 1;
+        }
+        int lc= lineCount(plotj.getXaxis().getLabel());
+        int ephemerisLineCount;
+        if ( plotj.getEphemerisLineCount()>-1 ) {
+            ephemerisLineCount= plotj.getEphemerisLineCount();
+        } else {
+            if ( plotj.getTicksURI().trim().length()>0 ) {
+                if ( plotj.getXaxis().getController()!=null ) {
+                    DasAxis a= plotj.getXaxis().getController().getDasAxis();
+                    ephemerisLineCount= a.getTickLines();
+                } else {
+                    ephemerisLineCount= 5; // complete guess
+                }
+            } else {
+                if ( lc==0 ) { // without the label used to label the range, midnights will be indicated with the date, so add one em.
+                    lc=1;
+                }
+                ephemerisLineCount= 0;                
+            }
+        }
+        ephemerisLineCount+= Math.ceil(ephemerisLineCount/4.); // there's an extra 25% added, see DasAxis.getLineSpacing!
+        return ephemerisLineCount+2+1+lc;  // +1 is for ticks        
+    }
+    
+    /**
      * This is the new layout mechanism (fixLayout), correcting the layout in the vertical direction.  This one:<ul>
      * <li> Removes extra whitespace
      * <li> Preserves relative size weights.
@@ -637,15 +670,7 @@ public class DomOps {
                     ntopEm= Math.max( ntopEm, lineCount( p.getTitle() ) );
                 }
                 if ( p.getRowId().equals(bottomRowId) ) {
-                    if ( p.getXaxis().isDrawTickLabels() ) {
-                        if ( p.getEphemerisLineCount()>-1 ) {
-                            nbottomEm= Math.max( nbottomEm, p.getEphemerisLineCount()+2 );  // +2 is for ticks
-                        } else {
-                            nbottomEm= Math.max( nbottomEm, 4 );
-                        }
-                    } else {
-                        nbottomEm= Math.max( nbottomEm, 1 );
-                    }
+                    nbottomEm= Math.max( nbottomEm, getXAxisLines(p) );
                 }
             }
             marginRow.setTop( DasDevicePosition.formatLayoutStr( new double[] { 0, ntopEm+2, 0 } ) );
@@ -691,16 +716,10 @@ public class DomOps {
                             
                             MaxUp[i]= Math.max( MaxUp[i], MaxUpJEm*emToPixels );
                             MaxUpEm[i]= Math.max( MaxUpEm[i], MaxUpJEm );
-                            if ( plotj.getXaxis().isDrawTickLabels() ) {
-                                lc= lineCount(plotj.getXaxis().getLabel());
-                                if ( plotj.getEphemerisLineCount()>-1 ) {
-                                    nbottomEm= -(plotj.getEphemerisLineCount()+1+lc);  // +1 is for ticks
-                                } else {
-                                    int nlabel= lineCount( plotj.getXaxis().getLabel() );
-                                    nbottomEm= -(2+1+nlabel);
-                                }
+                            if ( plotj.getRowId().equals(bottomRowId) ) {
+                                nbottomEm= -3; // hope this matches the other plots.
                             } else {
-                                nbottomEm= -1;
+                                nbottomEm= -getXAxisLines(plotj);
                             }
                             MaxDownEm[i]= Math.min( MaxDownEm[i], nbottomEm );
                             MaxDown[i]= MaxDownEm[i]*emToPixels;
