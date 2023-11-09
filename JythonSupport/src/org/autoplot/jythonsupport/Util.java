@@ -6,12 +6,14 @@ package org.autoplot.jythonsupport;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
@@ -56,6 +58,8 @@ import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.qds.ops.Ops;
+import org.das2.util.filesystem.FileObject;
+import org.das2.util.filesystem.FileSystemUtil;
 import org.das2.util.monitor.AlertNullProgressMonitor;
 import org.das2.util.monitor.CancelledOperationException;
 import org.python.core.Py;
@@ -731,13 +735,21 @@ public class Util {
      * This is introduced to avoid imports of java.io.File.
      * @param file file or local file Autoplot URI
      * @return true if the file exists.
-     * //TODO: this could support remote file systems
      */
     public static boolean fileExists( String file ) {
+        file= file.trim();
         if ( file.startsWith("file:") ) {
             file= file.substring(5);
-        } else {
-            
+        } else if ( file.startsWith("http:") || file.startsWith("https:") || file.startsWith("ftp://") || file.startsWith("sftp://") ) {
+            try {
+                URI fileUri= new URI(file);
+                URI parent= FileSystemUtil.getParentUri(fileUri);
+                FileSystem fs= FileSystem.create(parent);
+                FileObject fo= fs.getFileObject( parent.relativize(fileUri).getPath() );
+                return fo.exists();
+            } catch (URISyntaxException | FileSystem.FileSystemOfflineException | UnknownHostException | FileNotFoundException ex) {
+                return false;
+            }
         }
         return new File(file).exists();
     }
