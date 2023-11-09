@@ -759,13 +759,20 @@ public class Util {
      * This is introduced to avoid imports of java.io.File.
      * @param file the file or directory.
      * @return true if the file can be read.
-     * //TODO: this could support remote file systems
      */
     public static boolean fileCanRead( String file ) {
         if ( file.startsWith("file:") ) {
             file= file.substring(5);
-        } else {
-            
+        } else if ( file.startsWith("http:") || file.startsWith("https:") || file.startsWith("ftp://") || file.startsWith("sftp://") ) {
+            try {
+                URI fileUri= new URI(file);
+                URI parent= FileSystemUtil.getParentUri(fileUri);
+                FileSystem fs= FileSystem.create(parent);
+                FileObject fo= fs.getFileObject( parent.relativize(fileUri).getPath() );
+                return fo.exists();
+            } catch (URISyntaxException | FileSystem.FileSystemOfflineException | UnknownHostException | FileNotFoundException ex) {
+                return false;
+            }
         }
         return new File(file).canRead();
     }
