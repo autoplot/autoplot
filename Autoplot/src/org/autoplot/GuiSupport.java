@@ -146,6 +146,8 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.xml.sax.SAXException;
 import ZoeloeSoft.projects.JFontChooser.JFontChooser;
+import org.das2.components.propertyeditor.EnumerationEditor;
+import org.das2.graph.DasColorBar;
 
 /**
  * Extra methods to support AutoplotUI.
@@ -1531,6 +1533,24 @@ public class GuiSupport {
             expertMenuItems.add( addPlotMenu );
         }
 
+        if (axis == plot.getZaxis()) {
+            JMenuItem addPlotMenu = new JMenuItem( new AbstractAction("Set Colorbar...") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    org.das2.util.LoggerManager.logGuiEvent(e);
+                    EnumerationEditor edit = new EnumerationEditor();
+                    edit.setValue( ((DasColorBar)dasAxis).getType() );
+                    if ( JOptionPane.OK_OPTION
+                            ==JOptionPane.showConfirmDialog( dasAxis.getCanvas(), edit.getCustomEditor(), "Set Colortable", JOptionPane.OK_CANCEL_OPTION ) ) {
+                        ((DasColorBar)dasAxis).setType((DasColorBar.Type) edit.getValue());
+                    }
+                }
+            });
+            item.setToolTipText("reset the colorbar");
+            mouseAdapter.addMenuItem(addPlotMenu);
+            expertMenuItems.add( addPlotMenu );
+        }
+        
         JMenu bindingMenu = new JMenu("Binding");
 
         mouseAdapter.addMenuItem(bindingMenu);
