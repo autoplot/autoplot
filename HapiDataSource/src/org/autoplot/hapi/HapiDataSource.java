@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -1269,6 +1270,36 @@ public final class HapiDataSource extends AbstractDataSource {
         return useCache;
     }
     
+    private static AbstractLineReader getCsvReader( AbstractLineReader cacheReader, URL url, HttpURLConnection httpConnect, boolean gzip ) throws IOException {
+        if ( cacheReader!=null ) {
+            return cacheReader;
+        } else {
+            InputStream ins1;
+            if ( httpConnect!=null ) {
+                ins1= httpConnect.getInputStream();
+            } else {
+                httpConnect= ((HttpURLConnection) url.openConnection());
+                if ( httpConnect.getResponseCode()==HttpURLConnection.HTTP_MOVED_PERM ||
+                       httpConnect.getResponseCode()==HttpURLConnection.HTTP_MOVED_TEMP ) {
+                    String newLocation = httpConnect.getHeaderField("Location");
+                    if ( !newLocation.contains("?") ) {
+                        String args= url.getQuery();
+                        newLocation= newLocation + args;
+                    }
+                    url= new URL( newLocation );
+                    httpConnect= ((HttpURLConnection) url.openConnection());
+                }
+                ins1= httpConnect.getInputStream();
+            }
+            if ( gzip ) {
+               ins1 = new GZIPInputStream( ins1 );
+            }
+            InputStreamReader isread= new InputStreamReader( ins1, HapiServer.UTF8 );
+            AbstractLineReader result= new SingleFileBufferedReader( new BufferedReader(isread) );
+            return result;
+        }
+    }
+    
     /**
      * read the interval using CSV.
      * @param totalFields
@@ -1363,16 +1394,7 @@ public final class HapiDataSource extends AbstractDataSource {
             }
         }
 
-        try (AbstractLineReader in = (cacheReader != null ? cacheReader
-                : new SingleFileBufferedReader(
-                        new BufferedReader(
-                                new InputStreamReader(
-                                        gzip ? new GZIPInputStream( httpConnect==null ? url.openStream() : httpConnect.getInputStream() )
-                                                : ( httpConnect==null ? url.openStream() : httpConnect.getInputStream() ),
-                                        HapiServer.UTF8
-                                )
-                        )
-                ))) {
+        try ( AbstractLineReader in = getCsvReader(cacheReader,url,httpConnect,gzip) ) {
 
             String line= in.readLine();
             
