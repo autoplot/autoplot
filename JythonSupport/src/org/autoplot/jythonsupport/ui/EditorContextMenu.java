@@ -2,25 +2,33 @@
 package org.autoplot.jythonsupport.ui;
 
 import ZoeloeSoft.projects.JFontChooser.JFontChooser;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import org.das2.components.propertyeditor.PropertyEditor;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.print.PrinterException;
 import java.beans.PropertyChangeEvent;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
@@ -34,6 +42,7 @@ import jsyntaxpane.actions.ActionUtils;
 import jsyntaxpane.actions.IndentAction;
 import jsyntaxpane.actions.RedoAction;
 import jsyntaxpane.actions.UndoAction;
+import org.autoplot.datasource.AutoplotSettings;
 import org.das2.jythoncompletion.CompletionSettings;
 import org.das2.jythoncompletion.JythonCompletionProvider;
 import org.das2.util.LoggerManager;
@@ -789,6 +798,65 @@ public final class EditorContextMenu {
                 }
             } );
             mi.setToolTipText("Reload editor colors from autoplot_data/config/jsyntaxpane.properties");
+            settingsMenu.add( mi );
+
+            mi= new JMenuItem( new AbstractAction("Edit Syntax Colors") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        LoggerManager.logGuiEvent(e);
+                        File configFile= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA)+ "/config/jsyntaxpane.properties" );
+                        SyntaxColorBean bean= new SyntaxColorBean();
+                        bean.readFromConfig(configFile);
+                        PropertyEditor edit = new org.das2.components.propertyeditor.PropertyEditor(bean);
+                        JPanel p= new JPanel();
+                        p.setLayout( new BorderLayout() );
+                        p.add( edit, BorderLayout.CENTER );
+                        JButton loadButton= new JButton("Load...");
+                        JButton saveButton= new JButton("Save...");
+                        JPanel actionsPanel= new JPanel();
+                        actionsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+                        actionsPanel.add(loadButton);
+                        actionsPanel.add(saveButton);
+                        p.add( actionsPanel, BorderLayout.SOUTH );
+                        loadButton.addActionListener((ActionEvent e1) -> {
+                            JFileChooser choose= new JFileChooser();
+                            choose.setCurrentDirectory(configFile.getParentFile());
+                            int returnValue = choose.showOpenDialog(p);
+                            if ( returnValue==JFileChooser.APPROVE_OPTION ) {
+                                try {
+                                    bean.readFromConfig(choose.getSelectedFile());
+                                    edit.refresh();
+                                } catch (IOException ex) {
+                                    logger.log(Level.SEVERE, null, ex);
+                                }
+                            }
+                        });
+                        saveButton.addActionListener((ActionEvent e1) -> {
+                            JFileChooser choose= new JFileChooser();
+                            choose.setCurrentDirectory(configFile.getParentFile());
+                            int returnValue = choose.showSaveDialog(p);
+                            if ( returnValue==JFileChooser.APPROVE_OPTION ) {
+                                try {
+                                    bean.writeToConfig(choose.getSelectedFile());
+                                } catch (IOException ex) {
+                                    logger.log(Level.SEVERE, null, ex);
+                                }
+                            }
+                        });
+                        if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( (Component)e.getSource(), p, "Editor Colors", JOptionPane.OK_CANCEL_OPTION ) ) {
+                            String s= editor.getText();
+                            bean.writeToConfig(configFile);
+                            editor.setEditorKit(null);
+                            editor.getInitializeRunnable().run();
+                            editor.setText(s);            
+                        }
+                    } catch (IOException ex) {
+                        Logger.getLogger(EditorContextMenu.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            } );
+            mi.setToolTipText("Edit the colors used in autoplot_data/config/jsyntaxpane.properties");
             settingsMenu.add( mi );
             
             mi = new JMenuItem(new AbstractAction("Keyboard Shortcuts...") {
