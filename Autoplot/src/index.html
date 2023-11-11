@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>The new fix layout code is working at least as well as the old code worked!</small></p>
+        <p><small>The new fix layout code is working fairly well.  Grid inspired by Clairfontaine notebooks drawn by <a href="https://github.com/autoplot/dev/blob/master/demos/2019/20190716/graphPaper.jy">a script</a>.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -32,6 +32,7 @@
                 
         <p>Bugfixes (2023-11-10 r27303):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2564/">2563</a>: resize plot when binding scales resets range instead of scales.
             <li>toTimeDataSet(1999,12,31,0,0,0,0) (all rank 0 scalars) works now.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2564/">2564</a>: HAPI CSV redirect was failing.
             <li>Valid ISO8601 range 20000101T1300Z/1400Z now parses.
@@ -66,7 +67,7 @@
         <ul>
             <li>simple editor colors GUI also loads and saves configurations.
             <li>Jython fileExists function supports remote filesystems.
-            <li>Colorbar has context menu item to switch to different colorbar.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2564/">2563</a>: Colorbar has context menu item to switch to different colorbar.
             <li>DasAxis format supports %04X for hexidecimal ticks.
             <li><a href="https://github.com/das-developers/das2java/issues/82">82</a>: DasRow and DasColumn now have top/bottom right/left control string property, minLayout/,maxLayout, simplifying Autoplot and contains complexity within one Das2 class.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/814/">rfe814</a>: support run batch output file with file_%04d.png for template, allowing more control over formatting.  Thanks, Sadie!
