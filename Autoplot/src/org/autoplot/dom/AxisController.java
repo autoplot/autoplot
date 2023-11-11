@@ -332,6 +332,7 @@ public class AxisController extends DomNodeController {
     private final PropertyChangeListener scaleListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
+            logger.finer("scaleListener");
             int npixels;
             if ( dasAxis==null ) {
                 return;
@@ -346,8 +347,22 @@ public class AxisController extends DomNodeController {
             } else {
                 w= axis.getRange().width();
             }
+            boolean rangeWasChanged= evt.getPropertyName().equals(Axis.PROP_RANGE);
+            
             Datum scale= w.divide(npixels);
-            axis.setScale( scale );
+            if ( !axis.getScale().equals(scale) ) {
+                // when scale is bound, change the range.  When it is not bound, go ahead and just reset the scale
+                List<BindingModel> bms= dom.getController().findBindings( axis, Axis.PROP_SCALE );
+                if ( !rangeWasChanged && bms.size()>0 ) {
+                    logger.log(Level.FINEST, "{0}: the scale is bound, so adjust the range instead", axis.id);
+                    DatumRange dr= axis.getRange();
+                    Datum newW= axis.getScale().multiply(npixels);
+                    DatumRange newRange= DatumRangeUtil.createCentered( dr.middle(), newW );
+                    axis.setRange(newRange);
+                } else {
+                    axis.setScale( scale );
+                }
+            }
         }
 
         @Override
