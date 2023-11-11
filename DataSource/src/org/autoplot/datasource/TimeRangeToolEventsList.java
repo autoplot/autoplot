@@ -9,15 +9,12 @@ import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
@@ -61,27 +58,23 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
     public TimeRangeToolEventsList() {
         initComponents();
         fillList();
-        jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-
-            @Override
-            public void valueChanged(ListSelectionEvent evt) {
-                if (evt.getValueIsAdjusting()) {
-                    logger.finest("value is adjusting");
-                } else {
-                    ListSelectionModel lsm= jTable1.getSelectionModel();                        
-                    if (tsb != null) {
-                        if (lsm.getMinSelectionIndex() == 0) {
-                            loadTsb(-1);
-                        } else if (lsm.getMaxSelectionIndex() == jTable1.getRowCount() - 1) {
-                            loadTsb(1);
-                        }
+        jTable1.getSelectionModel().addListSelectionListener((ListSelectionEvent evt) -> {
+            if (evt.getValueIsAdjusting()) {
+                logger.finest("value is adjusting");
+            } else {
+                ListSelectionModel lsm= jTable1.getSelectionModel();
+                if (tsb != null) {
+                    if (lsm.getMinSelectionIndex() == 0) {
+                        loadTsb(-1);
+                    } else if (lsm.getMaxSelectionIndex() == jTable1.getRowCount() - 1) {
+                        loadTsb(1);
                     }
-                    fireTableSelection();
-                    Rectangle r = jTable1.getCellRect( lsm.getMinSelectionIndex(), 0, false );
-                    r= r.union(  jTable1.getCellRect( lsm.getMaxSelectionIndex(), 0, false ) );
-                    if (r != null) {
-                        jTable1.scrollRectToVisible(r);
-                    }
+                }
+                fireTableSelection();
+                Rectangle r = jTable1.getCellRect( lsm.getMinSelectionIndex(), 0, false );
+                r= r.union(  jTable1.getCellRect( lsm.getMaxSelectionIndex(), 0, false ) );
+                if (r != null) {
+                    jTable1.scrollRectToVisible(r);
                 }
             }
         });
@@ -161,12 +154,9 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
             tm.setValueAt( "(" + msg + ")", 0, 0 );    
             tm.setValueAt( "Load Next Set...", 2, 0 );
         }
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                jTable1.setModel(tm);
-                jTable1.setDefaultRenderer( Object.class, tableCellRenderer );
-            }
+        SwingUtilities.invokeLater(() -> {
+            jTable1.setModel(tm);
+            jTable1.setDefaultRenderer( Object.class, tableCellRenderer );
         });
     }
     
@@ -192,16 +182,14 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
                 tm.setValueAt( "Load Previous Set...", 0, 0 );
                 tm.setValueAt( "", 0, 1 );
             }
-            QDataSet bds= (QDataSet) currentDataSet.property(QDataSet.BUNDLE_1);
-            Units eu= (Units) bds.property(QDataSet.UNITS,3);
             for ( int i=0; i<currentDataSet.length(); i++ ) {
                 DatumRange r= getRange(i);
                 if ( r instanceof OrbitDatumRange ) {
                     Units u= r.getUnits();
-                    r= DatumRange.newDatumRange( r.min().doubleValue(u), r.max().doubleValue(u), u );
+                    r= DatumRange.newRange( r.min().doubleValue(u), r.max().doubleValue(u), u );
                 }
                 tm.setValueAt( r.toString(), i+offset, 0 );
-                String s= eu.createDatum( currentDataSet.slice(i).value(3) ).toString();    
+                String s= currentDataSet.slice(i).slice(3).svalue();
                 tm.setValueAt( s, i+offset, 1 );
             }
             if ( tsb!=null ) {
@@ -210,12 +198,9 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
             }
         }
         
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                jTable1.setModel(tm);
-                jTable1.setDefaultRenderer( Object.class, tableCellRenderer );
-            }
+        SwingUtilities.invokeLater(() -> {
+            jTable1.setModel(tm);
+            jTable1.setDefaultRenderer( Object.class, tableCellRenderer );
         });
         
         
@@ -265,9 +250,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
                 return result; //?????
             }
             
-            QDataSet bds= (QDataSet) currentDataSet.property(QDataSet.BUNDLE_1);
-            Units eu= (Units) bds.property(QDataSet.UNITS,3);
-            String s= eu.createDatum(rec.value(3)).toString();            
+            String s= rec.slice(3).svalue();
             
             if ( column==0 ) {
                 result.setText( String.valueOf(value) );
@@ -569,20 +552,17 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
      */
     private void loadTsb(final int dir) {
         jTable1.setEnabled(false);
-        Runnable run= new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    DatumRange current= tsb.getTimeRange();
-                    if ( dir==-1 ) {
-                        current= current.previous();
-                    } else {
-                        current= current.next();
-                    }
-                    loadViaTsb( current, dir );
-                } finally {
-                    jTable1.setEnabled(true);
+        Runnable run= () -> {
+            try {
+                DatumRange current= tsb.getTimeRange();
+                if ( dir==-1 ) {
+                    current= current.previous();
+                } else {
+                    current= current.next();
                 }
+                loadViaTsb( current, dir );
+            } finally {
+                jTable1.setEnabled(true);
             }
         };
         new Thread(run).start();
@@ -607,77 +587,81 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
             mon.finished();
             fillList();
             final int i;
-            if ( dir==-1 ) {
-                i= jTable1.getRowCount()-2;
-            } else if ( dir==1 ) {
-                i= 1;
-            } else {
-                i= -1;
-                // don't set anything
+            switch (dir) {
+                case -1:
+                    i= jTable1.getRowCount()-2;
+                    break;
+                case 1:
+                    i= 1;
+                    break;
+                default:
+                    i= -1;
+                    // don't set anything
+                    break;
             }
-            Runnable run= new Runnable() {
-                public void run() {
-                    if ( i>0 ) {
-                        if ( currentDataSet!=null && currentDataSet.length()>0 ) {
-                            jTable1.getSelectionModel().setSelectionInterval(i,i);
-                            jTable1.setEnabled(true);
-                        }
+            Runnable run= () -> {
+                if ( i>0 ) {
+                    if ( currentDataSet!=null && currentDataSet.length()>0 ) {
+                        jTable1.getSelectionModel().setSelectionInterval(i,i);
+                        jTable1.setEnabled(true);
                     }
-                    timeRangeTF.setText( range.toString() );
                 }
+                timeRangeTF.setText( range.toString() );
             };
             SwingUtilities.invokeLater(run);
         }
     }
     private void currentDataSetSelectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_currentDataSetSelectorActionPerformed
         final String uri= (String)currentDataSetSelector.getValue();
-        Runnable run= new Runnable() {
-            @Override
-            public void run() {
-                ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(TimeRangeToolEventsList.this),"Loading Events File...");
-                try {
-                    if ( isOrbitsFile(uri)) { // we'l read it twice but at least it's on the same thread.
-                        Orbits.resetOrbitsFor(uri);
-                        logger.fine("range events will be treated as orbits range events");
-                    }
-                    TimeRangeToolEventsList.this.tsb= null;
-                    DataSource dsource = DataSetURI.getDataSource(uri);
-                    dss= dsource;
-                    QDataSet currentDataSet1= dss.getDataSet(mon);
-                    tsb= dsource.getCapability( TimeSeriesBrowse.class );
-                    if ( tsb!=null ) {
-                        timeRangeTF.setText(tsb.getTimeRange().toString());
-                        timeRangeTF.setEnabled(true);
-                        timeRangeButton.setEnabled(true);
-                    } else {
-                        timeRangeTF.setText("");
-                        timeRangeTF.setEnabled(false);
-                        timeRangeButton.setEnabled(false);
-                    }
-                    currentDataSet1= makeCanonical(currentDataSet1);
-                    if ( tsb!=null ) {
-                        currentDataSet1= SemanticOps.trim( currentDataSet1, tsb.getTimeRange(), null );
-                    }
-                    currentDataSet= currentDataSet1;
-                    hasIcons= false;
-                    if ( currentDataSet.length()>0 ) {
-                        double color0= currentDataSet.value(0,2);
-                        for ( int i=0; i<currentDataSet.length(); i++ ) {
-                            if ( currentDataSet.value(i,2)!=color0 ) {
-                                hasIcons= true;
-                            }
+        Runnable run= () -> {
+            ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(TimeRangeToolEventsList.this),"Loading Events File...");
+            try {
+                if ( isOrbitsFile(uri)) { // we'l read it twice but at least it's on the same thread.
+                    Orbits.resetOrbitsFor(uri);
+                    logger.fine("range events will be treated as orbits range events");
+                }
+                TimeRangeToolEventsList.this.tsb= null;
+                DataSource dsource = DataSetURI.getDataSource(uri);
+                dss= dsource;
+                QDataSet currentDataSet1= dss.getDataSet(mon);
+                tsb= dsource.getCapability( TimeSeriesBrowse.class );
+                if ( tsb!=null ) {
+                    timeRangeTF.setText(tsb.getTimeRange().toString());
+                    timeRangeTF.setEnabled(true);
+                    timeRangeButton.setEnabled(true);
+                } else {
+                    timeRangeTF.setText("");
+                    timeRangeTF.setEnabled(false);
+                    timeRangeButton.setEnabled(false);
+                }
+                currentDataSet1= makeCanonical(currentDataSet1);
+                if ( tsb!=null ) {
+                    currentDataSet1= SemanticOps.trim( currentDataSet1, tsb.getTimeRange(), null );
+                }
+                currentDataSet= currentDataSet1;
+                hasIcons= false;
+                if ( currentDataSet.length()>0 ) {
+                    double color0= currentDataSet.value(0,2);
+                    for ( int i=0; i<currentDataSet.length(); i++ ) {
+                        if ( currentDataSet.value(i,2)!=color0 ) {
+                            hasIcons= true;
                         }
                     }
-                    fillList( );
-                } catch ( FileNotFoundException ex ) {
-                    fillTableWarningMessage(ex.getLocalizedMessage());
-                    
-                } catch (Exception ex) {                    
-                    throw new RuntimeException(ex);
-                } finally {
-                    currentDataSetSelector.setEnabled(true);
-                    if ( !mon.isFinished() ) mon.finished();
                 }
+                QDataSet bds= (QDataSet) currentDataSet1.property(QDataSet.BUNDLE_1);
+                Units eu= bds==null ? null : (Units) bds.property(QDataSet.UNITS,3);
+                if ( eu==null ) {
+                    logger.warning("unable to find nominal units");
+                }
+                fillList( );
+            } catch ( FileNotFoundException ex ) {
+                fillTableWarningMessage(ex.getLocalizedMessage());
+                
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            } finally {
+                currentDataSetSelector.setEnabled(true);
+                if ( !mon.isFinished() ) mon.finished();
             }
         };
         currentDataSetSelector.setEnabled(false);
@@ -695,11 +679,8 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
             tf.setText(tt.getSelectedRange());
             String str= timeRangeTF.getText();
             final DatumRange drtr= DatumRangeUtil.parseTimeRangeValid(str);
-            Runnable run= new Runnable() {
-                @Override
-                public void run() {
-                    loadViaTsb( drtr, 0 );
-                }
+            Runnable run= () -> {
+                loadViaTsb( drtr, 0 );
             };
             new Thread(run).start();   
         }
@@ -709,11 +690,8 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         try {
             String str= timeRangeTF.getText();
             final DatumRange drtr= DatumRangeUtil.parseTimeRange(str);
-            Runnable run= new Runnable() {
-                @Override
-                public void run() {
-                    loadViaTsb( drtr, 0 );
-                }
+            Runnable run= () -> {
+                loadViaTsb( drtr, 0 );
             };
             new Thread(run).start();
             
