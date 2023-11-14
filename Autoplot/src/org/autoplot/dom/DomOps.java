@@ -487,7 +487,7 @@ public class DomOps {
                 rows[i].syncTo( canvas.getRows(i) );
             }
 
-            // sort rows, which is a refactoring.
+            // sort rows, which is a refactoring.  TODO: I think there are still issues here
             Arrays.sort( rows, (Row r1, Row r2) -> {
                 int d1= DomUtil.getRowPositionPixels( dom, r1, r1.getTop() );
                 int d2= DomUtil.getRowPositionPixels( dom, r2, r2.getTop() );
@@ -721,11 +721,8 @@ public class DomOps {
                             
                             MaxUp[i]= Math.max( MaxUp[i], MaxUpJEm*emToPixels );
                             MaxUpEm[i]= Math.max( MaxUpEm[i], MaxUpJEm );
-                            if ( plotj.getRowId().equals(bottomRowId) ) {
-                                nbottomEm= -3; // hope this matches the other plots.
-                            } else {
-                                nbottomEm= -getXAxisLines(plotj);
-                            }
+                            nbottomEm= -getXAxisLines(plotj);
+                            
                             MaxDownEm[i]= Math.min( MaxDownEm[i], nbottomEm );
                             MaxDown[i]= MaxDownEm[i]*emToPixels;
 
@@ -746,6 +743,28 @@ public class DomOps {
                 logger.log(Level.FINER, "2. space needed to the top and bottom of each plot:" );
                 for ( int i=0; i<nrow; i++ ) {
                     logger.log(Level.FINER, "  {0}em {1}em", new Object[]{MaxUpEm[i], MaxDownEm[i]});
+                }
+            }            
+            
+            // 2.5 see if we can tweak the marginRow to make the row em offsets more similar.  Note for two rows this can
+            // always be done.
+            if ( rows.length>1 ) {
+                boolean adjust=true;
+                double em= MaxUpEm[1];
+                for ( int i=2; i<rows.length; i++ ) {
+                    if ( em!=MaxUpEm[i] ) {
+                        adjust= false;
+                    }
+                }
+                if ( adjust ) {
+                    if ( MaxUpEm[0]!=em ) {
+                        double toMarginEms= MaxUpEm[0]-em;
+                        MaxUpEm[0]=em;
+                        MaxUp[0]=em*emToPixels;
+                        double[] dd1= parseLayoutStr( marginRow.top, new double[] { 0, 0, 0 } );
+                        dd1[1]+=toMarginEms;
+                        marginRow.top= DasDevicePosition.formatLayoutStr(dd1);
+                    }
                 }
             }            
             
@@ -831,27 +850,6 @@ public class DomOps {
                 }
             }            
 
-            
-            // 7.5 see if we can tweak the marginRow to make the row em offsets more similar.  Note for two rows this can
-            // always be done.
-            if ( false && rows.length>1 ) {
-                boolean adjust=true;
-                double em= MaxUpEm[1];
-                for ( int i=2; i<rows.length; i++ ) {
-                    if ( em!=MaxUpEm[i] ) {
-                        adjust= false;
-                    }
-                }
-                if ( adjust ) {
-                    if ( MaxUpEm[0]!=em ) {
-                        double toMarginEms= MaxUpEm[0]-em;
-                        MaxUpEm[0]=em;
-                        double[] dd1= parseLayoutStr( marginRow.top, new double[] { 0, 0, 0 } );
-                        dd1[1]+=toMarginEms;
-                        marginRow.top= DasDevicePosition.formatLayoutStr(dd1);
-                    }
-                }
-            }
             
             // 8. calculate each row's new layout string, possibly adding additional ems for rows which are not resized.
             double position= 0;
