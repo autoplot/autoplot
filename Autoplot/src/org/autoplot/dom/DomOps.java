@@ -786,7 +786,7 @@ public class DomOps {
                         marginRow.bottom= DasDevicePosition.formatLayoutStr(dd1);
                     }
                 }                
-            }            
+            }
             
             // 3. identify the number of pixels in each of the rows which are resizable.
             double totalPlotHeightPixels= 0;
@@ -1043,7 +1043,7 @@ public class DomOps {
         }
         
         // 1. reset marginColumn.  define nleftEm to be the number of lines 
-        // above the leftmost plot column.  define nrightEm to be the number
+        // to the left of the leftmost plot column.  define nrightEm to be the number
         // of lines to the right of the rightmost column.
         double nleftEm=0, nrightEm=0;
         for ( int i=0; i<dom.plots.size(); i++ ) {
@@ -1110,26 +1110,23 @@ public class DomOps {
                         boolean addLines= plotj.getYaxis().isDrawTickLabels();
                         int lc= lineCount(label);
                         int lcPlusTicks= lc + 4;
-                        if ( i==0 ) {
-                            MaxLeftJEm= ( addLines ? lcPlusTicks : 0. ) - nleftEm;
-                        } else {
-                            MaxLeftJEm= addLines ? lcPlusTicks : 0.;
-                        }
+                        MaxLeftJEm= addLines ? lcPlusTicks : 0.;
                         MaxLeft[i]= Math.max( MaxLeft[i], MaxLeftJEm*emToPixels );
                         MaxLeftEm[i]= Math.max( MaxLeftEm[i], MaxLeftJEm );
+                        double nnrightEm;
                         if ( plotj.getZaxis().isVisible() ) {
-                            nrightEm= -4;
+                            nnrightEm= -4;
                         } else {
-                            nrightEm= -1;
+                            nnrightEm= -1;
                         }
                         if ( plotj.getLegendPosition()==LegendPosition.OutsideNE ||
                                 plotj.getLegendPosition()==LegendPosition.OutsideSE ) {
                             if ( plotj.isDisplayLegend() ) {
                                 double legendWidthEms= -8;
-                                nrightEm= Math.min( nrightEm, legendWidthEms );
+                                nnrightEm= Math.min( nnrightEm, legendWidthEms );
                             }
                         }
-                        MaxRightEm[i]= Math.min( MaxRightEm[i], nrightEm );
+                        MaxRightEm[i]= Math.min( MaxRightEm[i], nnrightEm );
                         MaxRight[i]= MaxRightEm[i]*emToPixels;
 
                         doAdjust[i]= true;
@@ -1151,6 +1148,49 @@ public class DomOps {
                 logger.log(Level.FINER, "  {0}em {1}em", new Object[]{MaxLeftEm[i], MaxRightEm[i]});
             }
         }
+
+            // 2.5 see if we can tweak the marginRow to make the row em offsets more similar.  Note for two rows this can
+            // always be done.
+            if ( columns.length>1 ) {
+                // when all but the top have the equal ems, moving ems to the marginColumn if will make things equal
+                boolean adjust=true;
+                double em= MaxLeftEm[1];
+                for ( int i=2; i<columns.length; i++ ) {
+                    if ( em!=MaxLeftEm[i] ) {
+                        adjust= false;
+                    }
+                }
+                if ( adjust ) {
+                    if ( MaxLeftEm[0]!=em ) {
+                        double toMarginEms= MaxLeftEm[0]-em;
+                        MaxLeftEm[0]=em;
+                        MaxLeft[0]=em*emToPixels;
+                        double[] dd1= parseLayoutStr( marginColumn.left, new double[] { 0, 0, 0 } );
+                        dd1[1]= toMarginEms;
+                        marginColumn.left= DasDevicePosition.formatLayoutStr(dd1);
+                    }
+                }
+                // now do the same thing but with the right, moving ems to the marginColumn when it will make things equal
+                adjust=true;
+                em= MaxRightEm[0];
+                for ( int i=0; i<columns.length-1; i++ ) {
+                    if ( em!=MaxRightEm[i] ) {
+                        adjust= false;
+                    }
+                }
+                if ( adjust ) {
+                    int last= MaxRightEm.length-1;
+                    if ( MaxRightEm[last]!=em ) {
+                        double toMarginEms= MaxRightEm[0]-em;
+                        MaxRightEm[last]=em;
+                        MaxRight[last]=em*emToPixels;
+                        double[] dd1= parseLayoutStr( marginColumn.right, new double[] { 0, 0, 0 } );
+                        dd1[1]+=toMarginEms;
+                        marginColumn.right= DasDevicePosition.formatLayoutStr(dd1);
+                    }
+                }                
+            }
+            
             
         // 3. identify the number of pixels in each of the columns which are resizable.
         double totalPlotWidthPixels= 0;
