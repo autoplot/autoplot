@@ -602,11 +602,11 @@ public class DomOps {
     
     /**
      * This is the new layout mechanism (fixLayout), correcting the layout in the vertical direction.  This one:<ul>
+     * <li> Renormalizes the margin row, so it is nice. 
      * <li> Removes extra whitespace
-     * <li> Preserves relative size weights.
-     * <li> Preserves em heights, to support components which should not be rescaled. (Not yet supported.)
-     * <li> Preserves space taken by strange objects, to support future canvas components.
-     * <li> Renormalizes the margin row, so it is nice. (Not yet supported.  This should consider font size, where large fonts don't need so much space.)
+     * <li> Preserves relative size heights.
+     * <li> Preserves em heights, to support components which should not be rescaled. 
+     * <li> Try to make each row's em offsets similar, using the marginRow, so that fonts can be scaled.
      * </ul>
      * This should also be idempotent, where calling this a second time should have no effect.
      * @param dom an application state, with controller nodes. 
@@ -620,8 +620,13 @@ public class DomOps {
         
         double emToPixels= java.awt.Font.decode(dom.getCanvases(0).font).getSize();
         
-        Row[] rows= canvas.getRows();
+        Row[] rows= canvas.getRows(); // note this is a shallow copy
         int nrow= rows.length;
+        for ( int i=0; i<rows.length; i++ ) {
+            rows[i]= (Row)rows[i].copy(); // deep copy
+        }
+        
+        
         boolean[] doAdjust= new boolean[nrow];
 
         String topRowId= rows[0].getId();
@@ -826,6 +831,28 @@ public class DomOps {
                 }
             }            
 
+            
+            // 7.5 see if we can tweak the marginRow to make the row em offsets more similar.  Note for two rows this can
+            // always be done.
+            if ( false && rows.length>1 ) {
+                boolean adjust=true;
+                double em= MaxUpEm[1];
+                for ( int i=2; i<rows.length; i++ ) {
+                    if ( em!=MaxUpEm[i] ) {
+                        adjust= false;
+                    }
+                }
+                if ( adjust ) {
+                    if ( MaxUpEm[0]!=em ) {
+                        double toMarginEms= MaxUpEm[0]-em;
+                        MaxUpEm[0]=em;
+                        double[] dd1= parseLayoutStr( marginRow.top, new double[] { 0, 0, 0 } );
+                        dd1[1]+=toMarginEms;
+                        marginRow.top= DasDevicePosition.formatLayoutStr(dd1);
+                    }
+                }
+            }
+            
             // 8. calculate each row's new layout string, possibly adding additional ems for rows which are not resized.
             double position= 0;
             double extraEms= 0;
@@ -895,11 +922,11 @@ public class DomOps {
     
     /**
      * This is the new layout mechanism (fixLayout), but changed from vertical layout to horizontal.  This one:<ul>
+     * <li> Renormalizes the margin column, so it is nice. 
      * <li> Removes extra whitespace
      * <li> Preserves relative size weights.
-     * <li> Preserves em heights, to support components which should not be rescaled. (Not yet supported.)
-     * <li> Preserves space taken by strange objects, to support future canvas components.
-     * <li> Renormalizes the margin row, so it is nice. (Not yet supported.  This should consider font size, where large fonts don't need so much space.)
+     * <li> Preserves em widths, to support components which should not be rescaled. 
+     * <li> Try to make each column's em offsets similar, using the marginColumn, so that fonts can be scaled.
      * </ul>
      * This should also be idempotent, where calling this a second time should have no effect.
      * @param dom an application state, with controller nodes. 
