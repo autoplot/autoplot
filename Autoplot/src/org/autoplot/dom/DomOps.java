@@ -782,7 +782,7 @@ public class DomOps {
                         MaxDownEm[last]=em;
                         MaxDown[last]=em*emToPixels;
                         double[] dd1= parseLayoutStr( marginRow.bottom, new double[] { 0, 0, 0 } );
-                        dd1[1]+=toMarginEms;
+                        dd1[1]=toMarginEms;
                         marginRow.bottom= DasDevicePosition.formatLayoutStr(dd1);
                     }
                 }                
@@ -823,9 +823,8 @@ public class DomOps {
             }            
             
             // 5. Calculate the number of pixels available for resized plots on the canvas.
-            double canvasHeight= canvas.height;
-            int d1= DomUtil.getRowPositionPixels( dom, canvas.marginRow, canvas.marginRow.top );
-            int d2= DomUtil.getRowPositionPixels( dom, canvas.marginRow, canvas.marginRow.bottom );
+            int d1= DomUtil.getRowPositionPixels( dom, marginRow, marginRow.top );
+            int d2= DomUtil.getRowPositionPixels( dom, marginRow, marginRow.bottom );
             double marginHeight= d2-d1;
 
             double newPlotTotalHeightPixels= marginHeight; // this will be the pixels available to divide amungst the plots.
@@ -1228,8 +1227,8 @@ public class DomOps {
          
         // 5. Calculate the number of pixels available for resized plots on the canvas.
         double canvasWidth= canvas.width;
-        int d1= DomUtil.getColumnPositionPixels( dom, canvas.marginColumn, canvas.marginColumn.left );
-        int d2= DomUtil.getColumnPositionPixels( dom, canvas.marginColumn, canvas.marginColumn.right );
+        int d1= DomUtil.getColumnPositionPixels( dom, marginColumn, marginColumn.left );
+        int d2= DomUtil.getColumnPositionPixels( dom, marginColumn, marginColumn.right );
         double marginWidth= d2-d1;
             
         double newPlotTotalWidthPixels= marginWidth;
