@@ -749,6 +749,7 @@ public class DomOps {
             // 2.5 see if we can tweak the marginRow to make the row em offsets more similar.  Note for two rows this can
             // always be done.
             if ( rows.length>1 ) {
+                // when all but the top have the equal ems, moving ems to the marginRow if will make things equal
                 boolean adjust=true;
                 double em= MaxUpEm[1];
                 for ( int i=2; i<rows.length; i++ ) {
@@ -766,6 +767,25 @@ public class DomOps {
                         marginRow.top= DasDevicePosition.formatLayoutStr(dd1);
                     }
                 }
+                // now do the same thing but with the bottom, moving ems to the marginRow when it will make things equal
+                adjust=true;
+                em= MaxDownEm[0];
+                for ( int i=0; i<rows.length-1; i++ ) {
+                    if ( em!=MaxDownEm[i] ) {
+                        adjust= false;
+                    }
+                }
+                if ( adjust ) {
+                    int last= MaxDownEm.length-1;
+                    if ( MaxDownEm[last]!=em ) {
+                        double toMarginEms= MaxUpEm[0]-em;
+                        MaxDownEm[last]=em;
+                        MaxDown[last]=em*emToPixels;
+                        double[] dd1= parseLayoutStr( marginRow.bottom, new double[] { 0, 0, 0 } );
+                        dd1[1]+=toMarginEms;
+                        marginRow.bottom= DasDevicePosition.formatLayoutStr(dd1);
+                    }
+                }                
             }            
             
             // 3. identify the number of pixels in each of the rows which are resizable.
