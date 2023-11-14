@@ -838,12 +838,12 @@ public class DomOps {
                     String newTop;
                     String newBottom;                
                     if ( !isEmRow[i] ) {
-                        newTop=  String.format( Locale.US, "%.2f%%%+.2fem", 100*position, (MaxUpEm[i]+extraEms) );
+                        newTop=  DasDevicePosition.formatLayoutStr( new double[] { position, MaxUpEm[i]+extraEms, 0 } );
                         position+= normalPlotHeight[i];
-                        newBottom = String.format( Locale.US, "%.2f%%%+.2fem", 100*position, (MaxDownEm[i]+extraEms) );
+                        newBottom = DasDevicePosition.formatLayoutStr( new double[] { position, MaxDownEm[i]+extraEms, 0 } );
                     } else {
-                        newTop=  String.format( Locale.US, "%.2f%%%+.2fem", 100*position, (MaxUpEm[i]+extraEms) );
-                        newBottom = String.format( Locale.US, "%.2f%%%+.2fem", 100*position, (MaxDownEm[i]+extraEms) );
+                        newTop=  DasDevicePosition.formatLayoutStr( new double[] { position, MaxUpEm[i]+extraEms, 0 } );
+                        newBottom = DasDevicePosition.formatLayoutStr( new double[] { position, MaxDownEm[i]+extraEms, 0 } );
                         if ( verticalSpacing.trim().length()>0 ) {
                             logger.finer("we already accounted for this.");
                         } else {
@@ -1198,12 +1198,12 @@ public class DomOps {
                 String newLeft;
                 String newRight;                
                 if ( !isEmColumn[i] ) {
-                    newLeft=  String.format( Locale.US, "%.2f%%%+.2fem", 100*position, (MaxLeftEm[i]+extraEms) );
+                    newLeft =  DasDevicePosition.formatLayoutStr( new double [] { position, (MaxLeftEm[i]+extraEms), 0 } );
                     position+= normalPlotWidth[i];
-                    newRight = String.format( Locale.US, "%.2f%%%+.2fem", 100*position, (MaxRightEm[i]+extraEms) );
+                    newRight = DasDevicePosition.formatLayoutStr( new double [] { position, (MaxRightEm[i]+extraEms), 0 } );
                 } else {
-                    newLeft=  String.format( Locale.US, "%.2f%%%+.2fem", 100*position, (MaxLeftEm[i]+extraEms) );
-                    newRight = String.format( Locale.US, "%.2f%%%+.2fem", 100*position, (MaxRightEm[i]+extraEms) );
+                    newLeft = DasDevicePosition.formatLayoutStr( new double [] { position, 100*position, (MaxLeftEm[i]+extraEms), 0 } );
+                    newRight = DasDevicePosition.formatLayoutStr( new double [] { position, 100*position, (MaxRightEm[i]+extraEms), 0 } );
                     if ( horizontalSpacing.trim().length()>0 ) {
                         logger.finest("we already accounted for this.");
                     } else {
