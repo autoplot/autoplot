@@ -679,7 +679,7 @@ public class DomOps {
                 }
             }
             marginRow.setTop( DasDevicePosition.formatLayoutStr( new double[] { 0, ntopEm+2, 0 } ) );
-            marginRow.setBottom( DasDevicePosition.formatLayoutStr( new double[] { 1.0, -nbottomEm, 0 } ) );
+            marginRow.setBottom( DasDevicePosition.formatLayoutStr( new double[] { 1.0, -(nbottomEm+2), 0 } ) );
 
             double[] resizablePixels= new double[nrow];
             boolean[] isEmRow= new boolean[nrow];
@@ -713,7 +713,7 @@ public class DomOps {
                             String content= title; // title.replaceAll("(\\!c|\\!C|\\<br\\>)", " ");
                             boolean addLines= plotj.isDisplayTitle() && content.trim().length()>0;
                             int lc= lineCount(title);
-                            if ( i==0 ) {
+                            if ( rows[i].id.equals(topRowId) ) {
                                 MaxUpJEm= ( addLines ? lc : 0. ) - ntopEm;
                             } else {
                                 MaxUpJEm= addLines ? lc : 0.;
@@ -721,9 +721,12 @@ public class DomOps {
                             
                             MaxUp[i]= Math.max( MaxUp[i], MaxUpJEm*emToPixels );
                             MaxUpEm[i]= Math.max( MaxUpEm[i], MaxUpJEm );
-                            nbottomEm= -getXAxisLines(plotj);
                             
-                            MaxDownEm[i]= Math.min( MaxDownEm[i], nbottomEm );
+                            if ( rows[i].id.equals(bottomRowId) ) {
+                                MaxDownEm[i]= Math.min( MaxDownEm[i], 0 );
+                            } else {
+                                MaxDownEm[i]= Math.min( MaxDownEm[i], -getXAxisLines(plotj) );
+                            }
                             MaxDown[i]= MaxDownEm[i]*emToPixels;
 
                             doAdjust[i]= true;
@@ -782,7 +785,7 @@ public class DomOps {
                         MaxDownEm[last]=em;
                         MaxDown[last]=em*emToPixels;
                         double[] dd1= parseLayoutStr( marginRow.bottom, new double[] { 0, 0, 0 } );
-                        dd1[1]=toMarginEms;
+                        dd1[1]=-toMarginEms;
                         marginRow.bottom= DasDevicePosition.formatLayoutStr(dd1);
                     }
                 }                
