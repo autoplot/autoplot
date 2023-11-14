@@ -616,7 +616,7 @@ public class DomOps {
     public static void fixVerticalLayout( Application dom, Map<String,String> options ) {
 
         Canvas canvas= dom.getCanvases(0);
-        Row marginRow= canvas.getMarginRow();
+        Row marginRow= (Row)canvas.getMarginRow().copy();
         
         double emToPixels= java.awt.Font.decode(dom.getCanvases(0).font).getSize();
         
@@ -916,7 +916,9 @@ public class DomOps {
             // 9. reset the rows to this new location.
             for ( int i=0; i<rows.length; i++ ) {
                 canvas.getRows(i).syncTo(rows[i]);
-            }   
+            }
+            dom.getCanvases(0).getMarginRow().syncTo(marginRow);
+            
         } finally {
             
         }
