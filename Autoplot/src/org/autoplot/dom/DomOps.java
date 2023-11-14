@@ -958,7 +958,7 @@ public class DomOps {
         logger.fine( "enter fixHorizontalLayout" );
                 
         Canvas canvas= dom.getCanvases(0);
-        Column marginColumn= canvas.getMarginColumn();
+        Column marginColumn= (Column)canvas.getMarginColumn().copy();
 
         double emToPixels= java.awt.Font.decode(dom.getCanvases(0).font).getSize();
 
@@ -1072,7 +1072,6 @@ public class DomOps {
         
         marginColumn.setLeft( DasDevicePosition.formatLayoutStr( new double[] { 0, nleftEm+2, 0 } ) );
         marginColumn.setRight( DasDevicePosition.formatLayoutStr( new double[] { 1, -nrightEm, 0 } ) );
-        marginColumn.controller.dasColumn.setMaxLayout(marginColumn.getRight() );
         
         if ( ncolumn==0 ) {
             logger.finer("0. No adjustable columns, returning!");
@@ -1277,7 +1276,8 @@ public class DomOps {
         // 9. reset the columns to this new location.
         for ( int i=0; i<columns.length; i++ ) {
             canvas.getColumns(i).syncTo(columns[i]);
-        }  
+        }
+        canvas.getMarginColumn().syncTo(marginColumn);
         
         logger.log(Level.FINEST, "done" );
         
