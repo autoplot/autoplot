@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>The new fix layout code is working fairly well.  Grid inspired by Clairfontaine notebooks drawn by <a href="https://github.com/autoplot/dev/blob/master/demos/2019/20190716/graphPaper.jy">a script</a>.</small></p>
+        <p><small>Large plot symbols with transparent color draws the nodes of a <a href="https://cottagesystems.com/autoplot/data/annotations/all-coastlines.dat">coastlines data set.</a></small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,10 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2023-11-10 r27303):</p>
+        <p>Bugfixes (2023-11-15 r27319):</p>
         <ul>
+            <li><a href="https://github.com/das-developers/das2java/issues/83">83</a>: LogLin tick positions mode for log axes had a bug.  Thanks, James!
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/811/">811</a>: copy of rows and marginRow needed to do this correctly.
             <li><a href="https://github.com/das-developers/das2java/issues/66">66</a>: OutsideSE Legend with multiple lines fixed.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2563/">2563</a>: resize plot when binding scales resets range instead of scales.
             <li>toTimeDataSet(1999,12,31,0,0,0,0) (all rank 0 scalars) works now.
