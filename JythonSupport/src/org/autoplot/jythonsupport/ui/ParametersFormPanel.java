@@ -158,6 +158,26 @@ public class ParametersFormPanel {
     }
     
     /**
+     * there's nasty code which looks for "val1:explaination of val" , and this
+     * destroys URL values.  Check to see if these look like URLs.
+     * @param s
+     * @return 
+     */
+    private static boolean appearsToBeUrl( String s ) {
+        s= s.trim();
+        if ( s.startsWith("vap+") ||
+                s.startsWith("file:") ||
+                s.startsWith("http:") ||
+                s.startsWith("https:") ||
+                s.startsWith("ftp:") ||
+                s.startsWith("sftp:") ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    /**
      * extract the data from the form into params. Note, strings and URIs are 
      * quoted, not sure why.
      * @param fd form data containing GUI references
@@ -180,10 +200,14 @@ public class ParametersFormPanel {
                 }
                 int i= value.indexOf(':');
                 if ( i>-1 ) {
-                    if ( fd.typesList.get(j).equals('T') ) { //TODO: jupiter: 2029-02-02T00:00 to  2029-02-12T00:00  
-                        value= value.trim();
+                    if ( appearsToBeUrl(value) ) {
+                        value= value.trim(); // Yeah kludge code, but for sure someone (me) is going to do this. --JF
                     } else {
-                        value= value.substring(0,i).trim();
+                        if ( fd.typesList.get(j).equals('T') || fd.typesList.get(j).equals('A') ) { //TODO: jupiter: 2029-02-02T00:00 to  2029-02-12T00:00  
+                            value= value.trim();
+                        } else {
+                            value= value.substring(0,i).trim();
+                        }
                     }
                 }
             } else if ( jc instanceof JCheckBox ) {
