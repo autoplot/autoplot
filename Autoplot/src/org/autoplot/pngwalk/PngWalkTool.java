@@ -747,6 +747,49 @@ public final class PngWalkTool extends javax.swing.JPanel {
     }
     
     /**
+     * Write a pngwalk file describing the current pngwalk.
+     * http://autoplot.org/PNG_Walks
+     * @param parent
+     * @param ssrc
+     * @throws java.io.IOException
+     */
+    protected static void savePngwalkFile( PngWalkTool parent, String ssrc ) throws IOException {
+        Preferences prefs = AutoplotSettings.getPreferences(PngWalkTool.class);
+        String srecent = prefs.get( PngWalkTool.PREF_RECENT, System.getProperty("user.home") );
+        JFileChooser chooser= new JFileChooser( srecent );
+        chooser.setFileFilter( new FileNameExtensionFilter( "pngwalk files", "pngwalk" ) );
+        chooser.setMultiSelectionEnabled(false);
+        if ( JFileChooser.APPROVE_OPTION==chooser.showSaveDialog(parent) ) {
+            File f= chooser.getSelectedFile();
+            if ( !f.getName().endsWith(".pngwalk") ) {
+                f= new File( f.getAbsolutePath() + ".pngwalk" );
+            }
+            try ( PrintWriter w= new PrintWriter(f) ) {
+                w.println( "baseurl="+parent.baseurl);
+                w.println( "product="+parent.product);
+                // filePattern
+                if ( parent.baseurl.length()>0 ) {
+                    String s= parent.getTemplate().substring(parent.baseurl.length()+parent.product.length()+1);
+                    if ( s.endsWith(".png") ) {
+                        s= s.substring(0,s.length()-4);
+                    }
+                    w.println( "timeFormat="+s );
+                } else {
+                    String s= parent.getTemplate();
+                    if ( s.endsWith(".png") ) {
+                        s= s.substring(0,s.length()-4);
+                    }
+                    w.println( "timeFormat="+s );
+                }
+                if ( parent.getQCTUrl()!=null && parent.getQCTUrl().length()>0 ) {
+                    w.println( "qcturl="+parent.getQCTUrl() );
+                }
+                w.println( "pwd="+ chooser.getSelectedFile().getParent() );
+            }
+        }
+    }
+    
+    /**
      * save a copy of the current selection to a local disk.
      * @param parent dialog parent
      * @param ssrc the file
@@ -895,13 +938,26 @@ public final class PngWalkTool extends javax.swing.JPanel {
         JMenuBar result= new JMenuBar();
         JMenu fileMenu= new JMenu("File");
 
-        fileMenu.add( new AbstractAction( "Save Local Copy..." ) {
+        fileMenu.add( new AbstractAction( "Save Local Copy of Image..." ) {
             @Override
             public void actionPerformed( ActionEvent e ) {
                 LoggerManager.logGuiEvent(e);        
                 saveLocalCopy(tool,tool.getSelectedFile());
             }
         } );
+        fileMenu.add( new AbstractAction( "Save .pngwalk File..." ) {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                LoggerManager.logGuiEvent(e);  
+                try {
+                    savePngwalkFile(tool,tool.getSelectedFile());
+                } catch ( IOException ex ) {
+                    throw new RuntimeException(ex);
+                }
+            }
+
+        } );
+
         fileMenu.add( new AbstractAction( "Show Autoplot" ) {
             @Override
             public void actionPerformed(ActionEvent ae) {
@@ -2666,7 +2722,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 try {
                     writeToHtmlImmediately( mon , f, hoo.getTitle() );
                 } catch (FileNotFoundException ex) {
-                    logger.log(Level.SEVERE, null, ex);                    
+                    throw new RuntimeException(ex);
                 }
             };
             new Thread(run).start();
