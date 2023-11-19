@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Large plot symbols with transparent color draws the nodes of a <a href="https://cottagesystems.com/autoplot/data/annotations/all-coastlines.dat">coastlines data set.</a></small></p>
+        <p><small>Contour plot overplotted on a spectrogram of fake data.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -32,6 +32,7 @@
                 
         <p>Bugfixes (2023-11-17 r27321):</p>
         <ul>
+            <li><a href="https://github.com/das-developers/das2java/issues/84">84</a>: Correct "java.lang.IllegalStateException: Already connected" when getting a second file listing of restricted web site.  Thanks, Bill!
             <li>bugfix in Das2Server where very large DSDF could cause runtime error.  Thanks, Chris!
             <li>bugfix when string parameter is "https://....", where it mistook the parameter in logic to handle "opt1: opt1 explanation". 
             <li><a href="https://github.com/das-developers/das2java/issues/83">83</a>: LogLin tick positions mode for log axes had a bug.  Thanks, James!
