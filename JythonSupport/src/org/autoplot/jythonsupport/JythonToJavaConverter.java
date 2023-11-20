@@ -52,6 +52,7 @@ import org.python.parser.ast.UnaryOp;
 import org.python.parser.ast.VisitorBase;
 import org.python.parser.ast.While;
 import org.python.parser.ast.exprType;
+import org.python.parser.ast.keywordType;
 import org.python.parser.ast.sliceType;
 import org.python.parser.ast.stmtType;
 
@@ -906,7 +907,20 @@ public class JythonToJavaConverter {
                 traverse("", cc.args[i], true);
             }
             this.builder.append(")");
+            for ( int i=0; i<cc.keywords.length; i++ ) {
+                this.builder.append(" //" );
+                handleKeywordType( cc.keywords[i], true );
+            }
 
+        }
+        
+        private void handleKeywordType( keywordType kw, boolean inline ) {
+            this.builder.append(kw.arg).append("=");
+            try {
+                traverse( "", kw.value, true );
+            } catch (Exception ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
         }
 
         private void handleBody( stmtType[] body, String thisIndent ) throws Exception {
