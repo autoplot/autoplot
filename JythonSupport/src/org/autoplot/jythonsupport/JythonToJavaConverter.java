@@ -50,10 +50,12 @@ import org.python.parser.ast.Return;
 import org.python.parser.ast.Slice;
 import org.python.parser.ast.Str;
 import org.python.parser.ast.Subscript;
+import org.python.parser.ast.TryExcept;
 import org.python.parser.ast.Tuple;
 import org.python.parser.ast.UnaryOp;
 import org.python.parser.ast.VisitorBase;
 import org.python.parser.ast.While;
+import org.python.parser.ast.excepthandlerType;
 import org.python.parser.ast.exprType;
 import org.python.parser.ast.keywordType;
 import org.python.parser.ast.sliceType;
@@ -572,7 +574,7 @@ public class JythonToJavaConverter {
             if (includeLineNumbers && (this.builder.length() == 0 || builder.charAt(this.builder.length() - 1) == '\n')) {
                 this.builder.append(String.format("%04d: ", lineNumber));
             }
-            while (sn.beginLine > lineNumber) {
+            while ( !(sn instanceof  TryExcept) && sn.beginLine > lineNumber) {
                 this.builder.append("\n");
                 lineNumber++;
                 if (includeLineNumbers) {
@@ -787,6 +789,7 @@ public class JythonToJavaConverter {
                 }
                 this.builder.append(" } ");
             } else if ( sn instanceof org.python.parser.ast.Subscript ) {
+                //TODO: this is now a repeat I think
                 org.python.parser.ast.Subscript ss= (org.python.parser.ast.Subscript)sn;
                 traverse( "", ss.value, true );
                 this.builder.append("[");
@@ -815,6 +818,31 @@ public class JythonToJavaConverter {
                         this.builder.append(sn.toString()).append("\n");
                         break;
                 }
+            } else if( sn instanceof TryExcept ) {
+                TryExcept te= (TryExcept)sn;
+                System.err.println(""+indent.length()+" length");
+                builder.append(indent).append("try {\n");
+                handleBody( te.body, indent+spaces4 );
+                builder.append(indent).append("} catch ( Exception e ) {").append("\n");
+                for ( int i=0; i<te.handlers.length; i++ ) {
+                    if ( te.handlers[i] instanceof excepthandlerType ) {
+                        handleBody( ((excepthandlerType)te.handlers[i]).body, indent + spaces4 );
+                        if ( te.handlers.length>1 ) {
+                            this.builder.append( "not sure line830");
+                        }
+                    } else {
+                        this.builder.append( "not sure line833");
+                    }
+                }
+                if ( te.orelse==null ) {
+                    
+                } else {
+                    this.builder.append( "not sure line839");
+                    handleBody( te.orelse, indent+spaces4 );
+                    this.builder.append( "not sure line832");
+                }
+                builder.append(indent).append("}");
+                
             } else {
                 this.builder.append(sn.toString()).append("\n");
                 lineNumber++;
