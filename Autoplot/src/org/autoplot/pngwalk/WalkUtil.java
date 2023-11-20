@@ -56,7 +56,7 @@ public class WalkUtil {
      * @see FileStorageModel#splitIndex(java.lang.String) which does the same thing.
      */
     protected static int splitIndex(String surl) {
-        int i= firstIndexOf( surl,Arrays.asList( "%Y","$Y","%y","$y","$(","%{","*") );
+        int i= firstIndexOf( surl,Arrays.asList( "%Y","$Y","%y","$y","$(","%{","*","$x") );
         if ( i!=-1 ) {
             i = surl.lastIndexOf('/', i);
         } else {
