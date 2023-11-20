@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,6 +29,7 @@ import org.python.parser.ast.Assign;
 import org.python.parser.ast.Attribute;
 import org.python.parser.ast.AugAssign;
 import org.python.parser.ast.BinOp;
+import org.python.parser.ast.BoolOp;
 import org.python.parser.ast.Call;
 import org.python.parser.ast.ClassDef;
 import org.python.parser.ast.Compare;
@@ -651,6 +653,21 @@ public class JythonToJavaConverter {
                     if ( sop==null ) sop= " ?? ";
                     this.builder.append( sop );
                     traverse("", as.right, true);
+                }
+            } else if ( sn instanceof BoolOp ) {
+                BoolOp as = ((BoolOp) sn);
+                if ( as.op==1 ) {
+                    this.builder.append("(");
+                    traverse("", as.values[0], true);
+                    this.builder.append(")");
+                    for ( exprType o: Arrays.copyOfRange( as.values, 1, as.values.length ) ) {
+                        this.builder.append(" && ");
+                        this.builder.append("(");
+                        traverse("", o, true);
+                        this.builder.append(")");
+                    }
+                } else {
+                    throw new IllegalArgumentException("not supported BoolOp as.op="+as.op);
                 }
             } else if (sn instanceof Assign) {
                 handleAssign( (Assign)sn, indent, inline );
