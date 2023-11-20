@@ -49,6 +49,7 @@ import org.python.parser.ast.Raise;
 import org.python.parser.ast.Return;
 import org.python.parser.ast.Slice;
 import org.python.parser.ast.Str;
+import org.python.parser.ast.Subscript;
 import org.python.parser.ast.Tuple;
 import org.python.parser.ast.UnaryOp;
 import org.python.parser.ast.VisitorBase;
@@ -739,7 +740,36 @@ public class JythonToJavaConverter {
             } else if (sn instanceof Slice) {
                 Slice s= (Slice)sn;
                 this.builder.append( String.valueOf(s.lower)+":"+ String.valueOf(s.upper)+":"+ String.valueOf(s.step) );
-
+            } else if (sn instanceof Subscript ) {
+                Subscript s= (Subscript)sn;
+                traverse( "", s.value, true );
+                String t= getJavaExprType( s.value );
+                if ( t.equals("Object") && ( s.value instanceof Name ) ) {
+                    String n= ((Name)s.value).id ;
+                    if ( targetTypes.containsKey(n))
+                    t= targetTypes.get(n);
+                }
+                sliceType st= s.slice;
+                if ( st instanceof Slice ) {
+                    Slice slice= (Slice)st;
+                    if ( t.equals("String") ) {
+                        this.builder.append(".substring(");
+                        traverse("",slice.lower,true);
+                        this.builder.append(",");
+                        traverse("",slice.upper,true);
+                        this.builder.append(")");
+                    } else {
+                        traverse("",slice,true);
+                    }
+                } else if ( st instanceof Index ) {
+                    this.builder.append("[");
+                    traverse("",((Index)st).value,true);
+                    this.builder.append("]");
+                } else {
+                    this.builder.append("[");
+                    traverse("",st,true);
+                    this.builder.append("]");
+                }
             } else if (sn instanceof Attribute) {
                 Attribute at = ((Attribute) sn);
                 traverse("", at.value, true);
