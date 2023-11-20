@@ -752,7 +752,7 @@ public class JythonToJavaConverter {
                 sliceType st= s.slice;
                 if ( st instanceof Slice ) {
                     Slice slice= (Slice)st;
-                    if ( t.equals("String") ) {
+                    if ( t.equals("String") ) { 
                         this.builder.append(".substring(");
                         traverse("",slice.lower,true);
                         this.builder.append(",");
