@@ -764,17 +764,17 @@ public final class PngWalkTool extends javax.swing.JPanel {
             if ( !f.getName().endsWith(".pngwalk") ) {
                 f= new File( f.getAbsolutePath() + ".pngwalk" );
             }
+            
             try ( PrintWriter w= new PrintWriter(f) ) {
-                w.println( "baseurl="+parent.baseurl);
-                w.println( "product="+parent.product);
-                // filePattern
-                if ( parent.baseurl.length()>0 ) {
-                    String s= parent.getTemplate().substring(parent.baseurl.length()+parent.product.length()+1);
-                    if ( s.endsWith(".png") ) {
-                        s= s.substring(0,s.length()-4);
-                    }
-                    w.println( "timeFormat="+s );
+                if ( parent.baseurl.length()==0 ) {
+                    String t= parent.getTemplate();
+                    int i= WalkUtil.splitIndex( t );
+                    w.println( "baseurl="+t.substring(0,i+1));
+                    String filePattern= t.substring(i+1);
+                    w.println( "filePattern="+filePattern);
                 } else {
+                    w.println( "baseurl="+parent.baseurl);
+                    w.println( "product="+parent.product);
                     String s= parent.getTemplate();
                     if ( s.endsWith(".png") ) {
                         s= s.substring(0,s.length()-4);
