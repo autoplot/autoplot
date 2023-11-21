@@ -583,13 +583,13 @@ public class JythonToJavaConverter {
             if (includeLineNumbers && (this.builder.length() == 0 || builder.charAt(this.builder.length() - 1) == '\n')) {
                 this.builder.append(String.format("%04d: ", lineNumber));
             }
-            while ( !(sn instanceof  TryExcept) && sn.beginLine > lineNumber) {
-                this.builder.append("\n");
-                lineNumber++;
-                if (includeLineNumbers) {
-                    this.builder.append(String.format("%04d: ", lineNumber));
-                }
-            }
+//            while ( !(sn instanceof  TryExcept) && sn.beginLine > lineNumber) {
+//                this.builder.append("\n");
+//                lineNumber++;
+//                if (includeLineNumbers) {
+//                    this.builder.append(String.format("%04d: ", lineNumber));
+//                }
+//            }
 
             if ( !inline ) this.builder.append(indent);
 
@@ -1069,7 +1069,7 @@ public class JythonToJavaConverter {
                             traverse("", c.args[0], true);
                             this.builder.append("; ");
                             traverse("", ff.target, true);
-                            this.builder.append("++ ) {");
+                            this.builder.append("++ ) {\n");
                             handleBody(ff.body, spaces4+ indent );
                             this.builder.append(indent).append("}\n");
                             return;
@@ -1082,7 +1082,7 @@ public class JythonToJavaConverter {
                             traverse("", c.args[1], true);
                             this.builder.append("; ");
                             traverse("", ff.target, true);
-                            this.builder.append("++ ) {");
+                            this.builder.append("++ ) {\n");
                             handleBody(ff.body, spaces4+ indent );
                             this.builder.append(indent).append("}\n");
                             return;
