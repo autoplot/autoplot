@@ -76,6 +76,8 @@ public class JythonToJavaConverter {
     
     private static Map<String,String> packages= null;
     
+    public static String TYPE_INT="int";
+    
     public static String TYPE_STRING="String";
     
     public static String TYPE_OBJECT="Object";
@@ -537,10 +539,12 @@ public class JythonToJavaConverter {
             Call cc= (Call)iter;
             if ( cc.func instanceof Name ) {
                 Name n= (Name)cc.func;
-                if ( n.id.equals("range") ) {
-                    return "int";
+                if ( n.id.equals("int") ) {
+                    return TYPE_INT;
+                } else if ( n.id.equals("range") ) {
+                    return "Stream<int>";
                 } else if ( n.id.equals("xrange") ) {
-                    return "int";
+                    return "Stream<int>";
                 } else if ( n.id.equals("getDataSet") ) {
                     return "QDataSet";
                 } else if ( n.id.equals("getParam") ) {
@@ -812,7 +816,12 @@ public class JythonToJavaConverter {
             } else if (sn instanceof Subscript ) {
                 Subscript s= (Subscript)sn;
                 traverse( "", s.value, true );
-                String t= getJavaExprType( s.value );
+                String t;
+                if ( s.value instanceof Subscript ) {
+                    t= guessType( ((Subscript)s.value).value );
+                } else {
+                    t= guessType( s.value );
+                }
                 if ( t.equals("Object") && ( s.value instanceof Name ) ) {
                     String n= ((Name)s.value).id ;
                     if ( targetTypes.containsKey(n))
@@ -824,8 +833,13 @@ public class JythonToJavaConverter {
                     if ( t.equals(TYPE_STRING) ) { 
                         this.builder.append(".substring(");
                         traverse("",slice.lower,true);
-                        this.builder.append(",");
-                        traverse("",slice.upper,true);
+                        if ( slice.step!=null ) {
+                            this.builder.append("[ERR slice.step!=null]");
+                        }
+                        if ( slice.upper!=null ) {
+                            this.builder.append(",");
+                            traverse("",slice.upper,true);
+                        }
                         this.builder.append(")");
                     } else {
                         traverse("",slice,true);
@@ -856,7 +870,6 @@ public class JythonToJavaConverter {
                 }
                 this.builder.append(" } ");
             } else if ( sn instanceof org.python.parser.ast.Subscript ) {
-                //TODO: this is now a repeat I think
                 org.python.parser.ast.Subscript ss= (org.python.parser.ast.Subscript)sn;
                 traverse( "", ss.value, true );
                 this.builder.append("[");
@@ -963,13 +976,37 @@ public class JythonToJavaConverter {
             } else if ( ex instanceof Name ) {
                 String s= targetTypes.get(((Name)ex).id);
                 if ( s==null ) {
+                    //TODO: static
                     return TYPE_OBJECT;
                 } else {
                     return s;
                 }
+            } else if ( ex instanceof Call ) {
+                Call call= (Call)ex;
+                if ( call.func instanceof Attribute ) {
+                    Attribute attr= (Attribute)call.func;
+                    String type= guessType( attr.value );
+                    if ( type==TYPE_STRING ) {
+                        if ( attr.attr.equals("find") ) {
+                            return TYPE_INT;
+                        } else if ( attr.attr.equals("substring") ) {
+                            return TYPE_STRING;
+                        }
+                    }
+                }
+                return TYPE_OBJECT;
             } else {
                 return TYPE_OBJECT;
             }
+        }
+        
+        /**
+         * assert that the symbol has the name
+         * @param name
+         * @param type type, including String or Stream&lt;String&gt;
+         */
+        private void assertType( String name, String type ) {
+            targetTypes.put( name, type );
         }
         
         private String guessReturnType( stmtType[] statements ) {
@@ -1036,8 +1073,11 @@ public class JythonToJavaConverter {
                 String typeOf1= targetTypes.get( ((Name)as.targets[0]).id );
                 if ( typeOf1==null ) {
                     String typeOf= getJavaExprType( as.value );
+                    if ( typeOf==TYPE_OBJECT ) {
+                        typeOf=guessType(as.value);
+                    }
                     this.builder.append(typeOf).append(" ");
-                    targetTypes.put( ((Name)as.targets[0]).id, typeOf );
+                    assertType( ((Name)as.targets[0]).id, typeOf );
                 }
             } 
             for (int i = 0; i < as.targets.length; i++) {
@@ -1066,8 +1106,14 @@ public class JythonToJavaConverter {
 
         private void handleCall(Call cc, String indent, boolean inline) throws Exception {
             if (cc.func instanceof Name) {
-                if (Character.isUpperCase(((Name) cc.func).id.charAt(0))) {
+                String name = ((Name) cc.func).id;
+                if (Character.isUpperCase(name.charAt(0))) {
                     this.builder.append("new").append(" ");
+                } else if ( name.equals("int") ) {
+                    this.builder.append("(int)(");
+                    traverse("",cc.args[0],true);
+                    this.builder.append(")");
+                    return;
                 }
             }
             traverse("", cc.func, true);
@@ -1104,6 +1150,9 @@ public class JythonToJavaConverter {
         private void handleFor(For ff, String indent, boolean inline) throws Exception {
             logger.log(Level.FINE, "handleFor at {0}", ff.beginLine);
             String typeOf= getJavaIterExprType( ff.iter );
+            if ( ff.target instanceof Name ) {
+                assertType( ((Name)ff.target).id, typeOf );
+            }
             if ( ff.iter instanceof Call ) {
                 Call c= (Call)ff.iter;
                 if (c.func instanceof Name ) {
