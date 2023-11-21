@@ -503,6 +503,8 @@ public class JythonToJavaConverter {
                         exprType arg1= cc.args[1];
                         return getJavaExprType(arg1);
                     }      
+                } else if ( Character.isUpperCase(n.id.charAt(0)) ) {
+                    return n.id; // assume it's a constructor
                 }
             }
         } else if ( iter instanceof Str ) {
@@ -1053,6 +1055,41 @@ public class JythonToJavaConverter {
 
         private void handleFor(For ff, String indent, boolean inline) throws Exception {
             String typeOf= getJavaExprType( ff.iter );
+            if ( ff.iter instanceof Call ) {
+                Call c= (Call)ff.iter;
+                if (c.func instanceof Name ) {
+                    Name n= ((Name)c.func);
+                    if ( n.id.equals("xrange") ) {
+                        this.builder.append("for ( ").append(typeOf).append(" ");
+                        traverse("", ff.target, true);
+                        if ( c.args.length==1 ) {
+                            this.builder.append("=").append("0; " );
+                            traverse("", ff.target, true);
+                            this.builder.append("<");
+                            traverse("", c.args[0], true);
+                            this.builder.append("; ");
+                            traverse("", ff.target, true);
+                            this.builder.append("++ ) {");
+                            handleBody(ff.body, spaces4+ indent );
+                            this.builder.append(indent).append("}\n");
+                            return;
+                        } else if ( c.args.length==2 ) {
+                            this.builder.append("=");
+                            traverse("", c.args[0], true);
+                            this.builder.append("; " );
+                            traverse("", ff.target, true);
+                            this.builder.append("<");
+                            traverse("", c.args[1], true);
+                            this.builder.append("; ");
+                            traverse("", ff.target, true);
+                            this.builder.append("++ ) {");
+                            handleBody(ff.body, spaces4+ indent );
+                            this.builder.append(indent).append("}\n");
+                            return;
+                        }
+                    }
+                }
+            }
             this.builder.append("for ( ").append(typeOf).append(" ");
             traverse("", ff.target, true);
             this.builder.append(" : ");
