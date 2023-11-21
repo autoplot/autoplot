@@ -220,6 +220,7 @@ public class JavaJythonConverter extends javax.swing.JPanel {
                 String java= JythonToJavaConverter.convert(jython);
                 javaEditorPane.setText(java);
             } catch (Exception ex) {
+                ex.printStackTrace();
                 JOptionPane.showMessageDialog(this,ex.toString());
             }
         }
