@@ -78,6 +78,8 @@ public class JythonToJavaConverter {
     
     public static String TYPE_INT="int";
     
+    public static String TYPE_FLOAT="float";
+    
     public static String TYPE_STRING="String";
     
     public static String TYPE_OBJECT="Object";
@@ -563,20 +565,28 @@ public class JythonToJavaConverter {
                 Attribute attr= (Attribute)cc.func;
                 String staticClass= "";
                 if ( attr.value instanceof Name ) {
-                    staticClass= ((Name)attr.value).id;
+                    if ( Character.isUpperCase(((Name)attr.value).id.charAt(0)) ) {
+                        staticClass= ((Name)attr.value).id;
+                    }
+                }
+                if (attr instanceof Attribute ) {
+                    Attribute attr2= (Attribute)attr;
+                    if ( attr2.attr.equals("strip") ) {
+                        return TYPE_STRING;
+                    }
                 }
                 if ( staticClass.equals("FileUtil") && attr.attr.equals("readFileToString") ) {
-                    return "String";
+                    return TYPE_STRING;
                 }
             }
         } else if ( iter instanceof Str ) {
-            return "String";
+            return TYPE_STRING;
         } else if ( iter instanceof Name ) {
             Name n= (Name)iter;
             if ( n.id.equals("False") || n.id.equals("True")) {
                 return "boolean";
             } else {
-                return "Object";
+                return TYPE_OBJECT;
             }
         } else if ( iter instanceof Num ) {
             Num n= (Num)iter;
@@ -836,6 +846,14 @@ public class JythonToJavaConverter {
                         this.builder.append("trim");
                         return;
                     } 
+                } else {
+                    if ( at.attr.equals("strip") && ( at.value instanceof Name ) ) {
+                        traverse("", at.value, true);
+                        this.builder.append(".");
+                        this.builder.append("trim");
+                        assertType(((Name)at.value).id, TYPE_STRING );
+                        return;
+                    } 
                 }
                 traverse("", at.value, true);
                 this.builder.append(".");
@@ -955,6 +973,13 @@ public class JythonToJavaConverter {
         private String guessType( exprType ex ) {
             if ( ex instanceof Str ) {
                 return TYPE_STRING;
+            } else if ( ex instanceof Num ) {
+                Num n1= ((Num)ex);
+                if ( n1.n instanceof PyInteger ) {
+                    return TYPE_INT;
+                } else {
+                    return TYPE_FLOAT;
+                }
             } else if ( ex instanceof Name ) {
                 String s= targetTypes.get(((Name)ex).id);
                 if ( s==null ) {
@@ -977,8 +1002,24 @@ public class JythonToJavaConverter {
                             return TYPE_STRING;
                         }
                     }
+                } else if ( call.func instanceof Name ) {
+                    Name n= (Name)call.func;
+                    if ( n.id.equals("len") ) {
+                        return TYPE_INT;
+                    }
                 }
                 return TYPE_OBJECT;
+            } else if ( ex instanceof BinOp ) {
+                BinOp bo= (BinOp)ex;
+                String t1= guessType( bo.left );
+                String t2= guessType( bo.right );
+                if ( t1==TYPE_INT && t2==TYPE_INT ) {
+                    return TYPE_INT;
+                } else if ( t1==TYPE_STRING && t2==TYPE_STRING ) {
+                    return TYPE_STRING;
+                } else {
+                    return TYPE_OBJECT;
+                }
             } else if ( ex instanceof Subscript ) {
                 return guessType( ((Subscript)ex).value );
                         
