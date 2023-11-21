@@ -40,6 +40,7 @@ import org.python.parser.ast.For;
 import org.python.parser.ast.FunctionDef;
 import org.python.parser.ast.Global;
 import org.python.parser.ast.If;
+import org.python.parser.ast.Import;
 import org.python.parser.ast.ImportFrom;
 import org.python.parser.ast.Index;
 import org.python.parser.ast.Name;
@@ -55,6 +56,7 @@ import org.python.parser.ast.Tuple;
 import org.python.parser.ast.UnaryOp;
 import org.python.parser.ast.VisitorBase;
 import org.python.parser.ast.While;
+import org.python.parser.ast.aliasType;
 import org.python.parser.ast.excepthandlerType;
 import org.python.parser.ast.exprType;
 import org.python.parser.ast.keywordType;
@@ -63,7 +65,8 @@ import org.python.parser.ast.stmtType;
 
 /**
  * experiment with code which converts the Jython AST (syntax tree) into Java
- * code.
+ * code.  See also https://cottagesystems.com/JavaJythonConverter/ which goes
+ * the other way.
  *
  * @author jbf
  */
@@ -72,6 +75,10 @@ public class JythonToJavaConverter {
     private static final Logger logger= LoggerManager.getLogger("jython");
     
     private static Map<String,String> packages= null;
+    
+    public static String TYPE_STRING="String";
+    
+    public static String TYPE_OBJECT="Object";
     
     /**
      * scan through the list of imports in /importLookup.jy, to see
@@ -616,7 +623,7 @@ public class JythonToJavaConverter {
             } else if (sn instanceof ImportFrom) {
                 ImportFrom ff = ((ImportFrom) sn);
                 for (int i = 0; i < ff.names.length; i++) {
-                    this.builder.append("import ").append(ff.module).append('.').append(ff.names[i].name);
+                    this.builder.append("import ").append(ff.module).append('.').append(ff.names[i].name).append(";\n");
                 }
             } else if (sn instanceof Str) {
                 Str ss = (Str) sn;
@@ -696,6 +703,17 @@ public class JythonToJavaConverter {
 
             } else if (sn instanceof Compare) {
                 Compare cp = (Compare) sn;
+                if ( cp.ops.length==1 && cp.ops[0]==Compare.In && cp.comparators.length==1 ) {
+                    String t1= guessType(cp.left);
+                    String t2= guessType(cp.comparators[0]);
+                    if ( t1==TYPE_STRING && t2==TYPE_STRING ) {                        
+                        traverse("",cp.comparators[0],true);
+                        this.builder.append(".contains(");
+                        traverse("",cp.left,true);
+                        this.builder.append(")");
+                        return;
+                    }
+                }
                 traverse("", cp.left, true);
                 for ( int i : cp.ops ) {
                     switch (i) {
@@ -754,7 +772,7 @@ public class JythonToJavaConverter {
                 sliceType st= s.slice;
                 if ( st instanceof Slice ) {
                     Slice slice= (Slice)st;
-                    if ( t.equals("String") ) { 
+                    if ( t.equals(TYPE_STRING) ) { 
                         this.builder.append(".substring(");
                         traverse("",slice.lower,true);
                         this.builder.append(",");
@@ -842,7 +860,20 @@ public class JythonToJavaConverter {
                     this.builder.append( "not sure line832");
                 }
                 builder.append(indent).append("}");
-                
+            } else if ( sn instanceof Import ) {
+                Import imp= (Import)sn;
+                builder.append( indent ).append( "import " );
+                for ( aliasType a: imp.names ) {
+                    traverse( "", a, true );
+                    builder.append(",");
+                }
+            } else if ( sn instanceof ImportFrom ) {
+                ImportFrom imp= (ImportFrom)sn;
+                builder.append( indent ).append( "import " ) .append( imp.module );
+            } else if ( sn instanceof aliasType ) {
+                aliasType at= (aliasType)sn;
+                builder.append( indent ).append( at.name );
+                                
             } else {
                 this.builder.append(sn.toString()).append("\n");
                 lineNumber++;
@@ -872,8 +903,24 @@ public class JythonToJavaConverter {
             return visitNameFail;
         }
 
+        /**
+         * return "String" or "Object
+         * @param ex
+         * @return 
+         */
         private String guessType( exprType ex ) {
-            return "Object";
+            if ( ex instanceof Str ) {
+                return TYPE_STRING;
+            } else if ( ex instanceof Name ) {
+                String s= targetTypes.get(((Name)ex).id);
+                if ( s==null ) {
+                    return TYPE_OBJECT;
+                } else {
+                    return s;
+                }
+            } else {
+                return TYPE_OBJECT;
+            }
         }
         
         private String guessReturnType( stmtType[] statements ) {
