@@ -547,6 +547,8 @@ public class JythonToJavaConverter {
                     return "Stream<int>";
                 } else if ( n.id.equals("getDataSet") ) {
                     return "QDataSet";
+                } else if ( n.id.equals("downloadResourceAsTempFile") ) {
+                    return "File";
                 } else if ( n.id.equals("getParam") ) {
                     if ( cc.args.length>1 ) {
                         exprType arg1= cc.args[1];
@@ -556,6 +558,15 @@ public class JythonToJavaConverter {
                     return n.id; // assume it's a constructor
                 } else if ( n.id.equals("open") ) {
                     return "Stream<String>";
+                }
+            } else if ( cc.func instanceof Attribute ) { 
+                Attribute attr= (Attribute)cc.func;
+                String staticClass= "";
+                if ( attr.value instanceof Name ) {
+                    staticClass= ((Name)attr.value).id;
+                }
+                if ( staticClass.equals("FileUtil") && attr.attr.equals("readFileToString") ) {
+                    return "String";
                 }
             }
         } else if ( iter instanceof Str ) {
@@ -812,11 +823,20 @@ public class JythonToJavaConverter {
                 }
             } else if (sn instanceof Slice) {
                 Slice s= (Slice)sn;
-                this.builder.append( String.valueOf(s.lower)+":"+ String.valueOf(s.upper)+":"+ String.valueOf(s.step) );
+                this.builder.append( "[" + String.valueOf(s.lower)+":"+ String.valueOf(s.upper)+":"+ String.valueOf(s.step) + "]" );
             } else if (sn instanceof Subscript ) {
                 handleSubscript( (Subscript)sn, indent, inline );
             } else if (sn instanceof Attribute) {
                 Attribute at = ((Attribute) sn);
+                String type= guessType(at.value);
+                if ( type.equals("String") ) {
+                    if ( at.attr.equals("strip") ) {
+                        traverse("", at.value, true);
+                        this.builder.append(".");
+                        this.builder.append("trim");
+                        return;
+                    } 
+                }
                 traverse("", at.value, true);
                 this.builder.append(".");
                 this.builder.append(at.attr);
