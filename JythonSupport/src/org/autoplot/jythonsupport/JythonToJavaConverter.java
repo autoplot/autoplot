@@ -814,45 +814,7 @@ public class JythonToJavaConverter {
                 Slice s= (Slice)sn;
                 this.builder.append( String.valueOf(s.lower)+":"+ String.valueOf(s.upper)+":"+ String.valueOf(s.step) );
             } else if (sn instanceof Subscript ) {
-                Subscript s= (Subscript)sn;
-                traverse( "", s.value, true );
-                String t;
-                if ( s.value instanceof Subscript ) {
-                    t= guessType( ((Subscript)s.value).value );
-                } else {
-                    t= guessType( s.value );
-                }
-                if ( t.equals("Object") && ( s.value instanceof Name ) ) {
-                    String n= ((Name)s.value).id ;
-                    if ( targetTypes.containsKey(n))
-                    t= targetTypes.get(n);
-                }
-                sliceType st= s.slice;
-                if ( st instanceof Slice ) {
-                    Slice slice= (Slice)st;
-                    if ( t.equals(TYPE_STRING) ) { 
-                        this.builder.append(".substring(");
-                        traverse("",slice.lower,true);
-                        if ( slice.step!=null ) {
-                            this.builder.append("[ERR slice.step!=null]");
-                        }
-                        if ( slice.upper!=null ) {
-                            this.builder.append(",");
-                            traverse("",slice.upper,true);
-                        }
-                        this.builder.append(")");
-                    } else {
-                        traverse("",slice,true);
-                    }
-                } else if ( st instanceof Index ) {
-                    this.builder.append("[");
-                    traverse("",((Index)st).value,true);
-                    this.builder.append("]");
-                } else {
-                    this.builder.append("[");
-                    traverse("",st,true);
-                    this.builder.append("]");
-                }
+                handleSubscript( (Subscript)sn, indent, inline );
             } else if (sn instanceof Attribute) {
                 Attribute at = ((Attribute) sn);
                 traverse("", at.value, true);
@@ -991,10 +953,15 @@ public class JythonToJavaConverter {
                             return TYPE_INT;
                         } else if ( attr.attr.equals("substring") ) {
                             return TYPE_STRING;
+                        } else if ( attr.attr.equals("strip") ) {
+                            return TYPE_STRING;
                         }
                     }
                 }
                 return TYPE_OBJECT;
+            } else if ( ex instanceof Subscript ) {
+                return guessType( ((Subscript)ex).value );
+                        
             } else {
                 return TYPE_OBJECT;
             }
@@ -1070,8 +1037,8 @@ public class JythonToJavaConverter {
         private void handleAssign(Assign as, String indent, boolean inline ) throws Exception {
             logger.log(Level.FINE, "handleAssign at {0}", as.beginLine);
             if ( as.targets.length==1 && ( as.targets[0] instanceof Name ) )  {
-                String typeOf1= targetTypes.get( ((Name)as.targets[0]).id );
-                if ( typeOf1==null ) {
+                String typeOf1= guessType( ((Name)as.targets[0]) );
+                if ( typeOf1==null || typeOf1==TYPE_OBJECT ) {
                     String typeOf= getJavaExprType( as.value );
                     if ( typeOf==TYPE_OBJECT ) {
                         typeOf=guessType(as.value);
@@ -1223,6 +1190,49 @@ public class JythonToJavaConverter {
                 handleBody(ff.orelse, spaces4+ indent );
                 this.builder.append(indent).append("}");
             }
+        }
+        
+        private void handleSubscript( Subscript s, String indent, boolean inline ) throws Exception {
+            logger.log(Level.FINE, "Subscript at line {0}", ((Subscript) s).beginLine);
+                
+                traverse( "", s.value, true );
+                String t;
+                if ( s.value instanceof Subscript ) {
+                    t= guessType( ((Subscript)s.value).value );
+                } else {
+                    t= guessType( s.value );
+                }
+                if ( t.equals("Object") && ( s.value instanceof Name ) ) {
+                    String n= ((Name)s.value).id ;
+                    if ( targetTypes.containsKey(n))
+                    t= targetTypes.get(n);
+                }
+                sliceType st= s.slice;
+                if ( st instanceof Slice ) {
+                    Slice slice= (Slice)st;
+                    if ( t.equals(TYPE_STRING) ) { 
+                        this.builder.append(".substring(");
+                        traverse("",slice.lower,true);
+                        if ( slice.step!=null ) {
+                            this.builder.append("[ERR slice.step!=null]");
+                        }
+                        if ( slice.upper!=null ) {
+                            this.builder.append(",");
+                            traverse("",slice.upper,true);
+                        }
+                        this.builder.append(")");
+                    } else {
+                        traverse("",slice,true);
+                    }
+                } else if ( st instanceof Index ) {
+                    this.builder.append("[");
+                    traverse("",((Index)st).value,true);
+                    this.builder.append("]");
+                } else {
+                    this.builder.append("[");
+                    traverse("",st,true);
+                    this.builder.append("]");
+                }
         }
 
     }
