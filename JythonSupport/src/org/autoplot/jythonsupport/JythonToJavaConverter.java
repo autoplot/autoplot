@@ -487,6 +487,51 @@ public class JythonToJavaConverter {
         }
     }
 
+    /**
+     * this returns the type of objects the iterator iterates over.
+     * @param iter
+     * @return 
+     */
+    private static String getJavaIterExprType(exprType iter) {
+        if ( iter instanceof Call ) {
+            Call cc= (Call)iter;
+            if ( cc.func instanceof Name ) {
+                Name n= (Name)cc.func;
+                if ( n.id.equals("range") ) {
+                    return "int";
+                } else if ( n.id.equals("xrange") ) {
+                    return "int";
+                } else if ( n.id.equals("getDataSet") ) {
+                    return "QDataSet";
+                } else if ( n.id.equals("getParam") ) {
+                    if ( cc.args.length>1 ) {
+                        exprType arg1= cc.args[1];
+                        return getJavaExprType(arg1);
+                    }      
+                }
+            } else if ( cc.func instanceof Attribute ) {
+                Attribute att= (Attribute)cc.func;
+                if ( att.value instanceof Name ) {
+                    Name n= (Name)att.value;
+                    String ftype= getJavaExprType(n); // ideally this would be file
+                    if ( att.attr.equals("readlines") ) {
+                        return TYPE_STRING;
+                    } else if ( att.attr.equals("splitlines") ) {
+                        return TYPE_STRING;
+                    }
+                }
+                
+            }
+        }
+        return "Object";
+    }
+    
+    /**
+     * there's an issue here where for iter==Call, this is returning the
+     * object which the iterator returns.
+     * @param iter
+     * @return 
+     */
     private static String getJavaExprType(exprType iter) {
         if ( iter instanceof Call ) {
             Call cc= (Call)iter;
@@ -505,6 +550,8 @@ public class JythonToJavaConverter {
                     }      
                 } else if ( Character.isUpperCase(n.id.charAt(0)) ) {
                     return n.id; // assume it's a constructor
+                } else if ( n.id.equals("open") ) {
+                    return "Stream<String>";
                 }
             }
         } else if ( iter instanceof Str ) {
@@ -984,6 +1031,7 @@ public class JythonToJavaConverter {
         }
 
         private void handleAssign(Assign as, String indent, boolean inline ) throws Exception {
+            logger.log(Level.FINE, "handleAssign at {0}", as.beginLine);
             if ( as.targets.length==1 && ( as.targets[0] instanceof Name ) )  {
                 String typeOf1= targetTypes.get( ((Name)as.targets[0]).id );
                 if ( typeOf1==null ) {
@@ -1054,7 +1102,8 @@ public class JythonToJavaConverter {
         }
 
         private void handleFor(For ff, String indent, boolean inline) throws Exception {
-            String typeOf= getJavaExprType( ff.iter );
+            logger.log(Level.FINE, "handleFor at {0}", ff.beginLine);
+            String typeOf= getJavaIterExprType( ff.iter );
             if ( ff.iter instanceof Call ) {
                 Call c= (Call)ff.iter;
                 if (c.func instanceof Name ) {
