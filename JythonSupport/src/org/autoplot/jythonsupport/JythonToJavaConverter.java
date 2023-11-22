@@ -663,8 +663,14 @@ public class JythonToJavaConverter {
 //                    this.builder.append(String.format("%04d: ", lineNumber));
 //                }
 //            }
-
-            if ( !inline ) this.builder.append(indent);
+            
+            if ( !inline ) {
+                boolean endsWithIndent= 
+                        this.builder.indexOf( indent, this.builder.length()-indent.length() ) >-1;
+                if (!endsWithIndent) {
+                    this.builder.append(indent);
+                }
+            }
 
             //if ( lineNumber==4 ) {
             //    System.err.println("here line number breakpoint at line "+lineNumber );
@@ -769,6 +775,7 @@ public class JythonToJavaConverter {
                                     exprType a2 = cc.args[1];
                                     if ( a2 instanceof Name ) {
                                         assertType( ((Name) a1).id, ((Name) a2).id );
+                                        return;
                                     }
                                 }
                             }
