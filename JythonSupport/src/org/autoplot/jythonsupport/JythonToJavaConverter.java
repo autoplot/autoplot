@@ -25,6 +25,7 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.python.core.PyFloat;
 import org.python.core.PyInteger;
 import org.python.parser.SimpleNode;
+import org.python.parser.ast.Assert;
 import org.python.parser.ast.Assign;
 import org.python.parser.ast.Attribute;
 import org.python.parser.ast.AugAssign;
@@ -755,7 +756,25 @@ public class JythonToJavaConverter {
                 }
             } else if (sn instanceof Assign) {
                 handleAssign( (Assign)sn, indent, inline );
-                
+            } else if ( sn instanceof Assert ) {
+                Assert a= (Assert)sn;
+                if (a.test instanceof Call) {
+                    org.python.parser.ast.Call cc = (org.python.parser.ast.Call) a.test;
+                    exprType f = cc.func;
+                    if (f instanceof Name) {
+                        if (((Name) f).id.equals("isinstance")) {
+                            if (cc.args.length == 2) {
+                                exprType a1 = cc.args[0];
+                                if (a1 instanceof Name ) {
+                                    exprType a2 = cc.args[1];
+                                    if ( a2 instanceof Name ) {
+                                        assertType( ((Name) a1).id, ((Name) a2).id );
+                                    }
+                                }
+                            }
+                        }
+                    }   
+                }                
             } else if (sn instanceof Name) {
                 handleName( (Name)sn, indent, inline );
 
