@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Contour plot overplotted on a spectrogram of fake data.</small></p>
+        <p><small>PNG Walk of images created long ago.  The PNG Walk Tool now has an option to save a .pngwalk file whose URL can be shared with others.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,13 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2023-11-17 r27321):</p>
+        <p>Bugfixes (2023-11-22 r27346):</p>
         <ul>
+            <li>Don't treat %Y the same as $Y.  Reserve percents for Python string formatting.
+            <li>Improvements and bugfixes with Jython to Java converter.
+        </ul>
+        <p>Older Bugfixes (2023-11-17 r27321):</p>
+        <ul> 
             <li><a href="https://github.com/das-developers/das2java/issues/84">84</a>: Correct "java.lang.IllegalStateException: Already connected" when getting a second file listing of restricted web site.  Thanks, Bill!
             <li>bugfix in Das2Server where very large DSDF could cause runtime error.  Thanks, Chris!
             <li>bugfix when string parameter is "https://....", where it mistook the parameter in logic to handle "opt1: opt1 explanation". 
@@ -51,26 +56,12 @@
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2556/">2556</a>: correction to Jython editor error highliting, where extra line was drawn.  Thanks, Sadie!
             <li>remove old test which unnecessarily abandoned the tick bounds calculation when more lines were requested for ticks than needed.
         </ul>
-        <p>Older Bugfixes (2023-08-29 r27149):</p>
-        <ul> 
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/1469/">1469</a>: ASCII parser dropped a record when "where" was used and non-records followed the data.  Thanks, Bill!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2555/">2555</a>: orbit plot handles "+2hr/4" when there are multiple passes that are distant in time.  Thanks, Sadie!
-            <li>TimeUtil.ceil(TimeUtil.HOUR,datum('2023-10-17T16:45')) corrected.
-            <li>setLayout(2,2) would create two columns incorrectly indicating the marginRow is their parent, instead of the marginColumn.
-            <li>https Das2Servers are offered as defaults, not the old http addresses.  Thanks, Chris!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2553/">2553</a>: Das2Server support for 301 redirects with list and landing page.
-            <li>Static Code Analysis inspects else clause for usages.
-            <li>histogram editor panel had a bug in regex, breaking it in most cases.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2550/">2550</a>: show more digits when timetags are sub-millisecond cadence.  Thanks, Connor!
-            <li>don't hide the "show all" button with the CDAWeb editor, since some PSP_FLD_L2_DFB_DBM_DVAC variables are support but are still interesting.  Thanks, Sadie!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2319/">2319</a>: Jython completions using Java Types, support x=X.Y.c(), gtr2= GrannyTextRenderer()
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2546/">2546</a>: Aggregation when CDF file is missing a variable.  Thanks, Kris!
-            <li>rte_0338377624: null can get into array causing runtime exception.  Thanks admin!
-            <li>%{CONTEXT} macro in annotations properly listens to updates in the plot's focus dataset.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2542/">2542</a>: Javadoc improvements 
-        </ul>
         <p>Features:</p>
         <ul>
+            <li><a href="https://github.com/das-developers/das2docs/issues/3">3</a>: Initial support for Das2Server parameters GUI.
+        </ul>
+        <p>Less recent features:</p>
+        <ul> 
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/816/">rfe816</a>: add save-to-pngwalk action.
             <li>simple editor colors GUI also loads and saves configurations.
             <li>Jython fileExists function supports remote filesystems.
@@ -82,16 +73,6 @@
             <li>"file:" locations for scripting documentation now works.  Thanks, Kristoff!
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/811/">rfe811</a>: new dialog for fix layout includes options to move legends and remove gaps, show preview.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/811/">rfe811</a>: plot.ephemerisLineCount property added, so that the layout can be done before ephemeris is loaded.
-        </ul>
-        <p>Less recent features:</p>
-        <ul> 
-            <li>Identify dataset scheme T&rarr;Y&rarr;X, which should be phased out.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/811/">rfe811</a>: add map to fixLayout call which will support a dialog of options.  Add methods to support fixLayout on any DOM, not necessary the "live" one.
-            <li>SeriesRenderer gets kludgey "moduloY" control which will avoid a connection from 24 to 0 hours.
-            <li>Jython __setItem__ has special branch for when all indices are numbers, improving performance by using simpler code.
-            <li>legacy storage for options like width and height are no longer imported from Autoplot versions older than five years ago.
-            <li>"Display Data" mouse action shows the number of selected records, useful for counting.
-            <li>Round the valid min, valid max, and fill value from CDF files to seven decimal places to make them more legible, since the CDF library converts floats to doubles.
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
