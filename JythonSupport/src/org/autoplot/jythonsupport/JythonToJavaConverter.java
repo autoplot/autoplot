@@ -1312,10 +1312,15 @@ public class JythonToJavaConverter {
             if ( ff.orelse==null ) {
                 this.builder.append(indent).append("}");
             } else {
-                this.builder.append(indent).append("} else {\n");
                 lineNumber++;
-                handleBody(ff.orelse, spaces4+ indent );
-                this.builder.append(indent).append("}");
+                if ( ff.orelse.length==1 && ff.orelse[0] instanceof If ) {
+                    this.builder.append(indent).append("} else ");
+                    handleBody(ff.orelse, indent );
+                } else {
+                    this.builder.append(indent).append("} else {\n");
+                    handleBody(ff.orelse, spaces4+indent );
+                    this.builder.append(indent).append("}");
+                }
             }
         }
         
