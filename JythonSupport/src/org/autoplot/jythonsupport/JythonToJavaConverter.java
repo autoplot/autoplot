@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -82,6 +83,8 @@ public class JythonToJavaConverter {
     public static String TYPE_FLOAT="float";
     
     public static String TYPE_STRING="String";
+    
+    public static String TYPE_STRING_ARRAY="String[]";
     
     public static String TYPE_OBJECT="Object";
     
@@ -774,7 +777,11 @@ public class JythonToJavaConverter {
                                 if (a1 instanceof Name ) {
                                     exprType a2 = cc.args[1];
                                     if ( a2 instanceof Name ) {
-                                        assertType( ((Name) a1).id, ((Name) a2).id );
+                                        if ( ((Name) a2).id.equals("str") ) {
+                                            assertType( ((Name) a1).id, "String" );
+                                        } else {
+                                            assertType( ((Name) a1).id, ((Name) a2).id );
+                                        }
                                         return;
                                     }
                                 }
@@ -871,7 +878,27 @@ public class JythonToJavaConverter {
                         this.builder.append(".");
                         this.builder.append("trim");
                         return;
-                    } 
+                    } else if ( at.attr.equals("splitlines") ) {
+                        traverse("", at.value, true);
+                        this.builder.append(".");
+                        this.builder.append("split(\"\\n\")");
+                        return;
+                    } else if ( at.attr.equals("find") ) {
+                        traverse("", at.value, true);
+                        this.builder.append(".");
+                        this.builder.append("indexOf");
+                        return;
+                    } else if ( at.attr.equals("startswith") ) {
+                        traverse("", at.value, true);
+                        this.builder.append(".");
+                        this.builder.append("startsWith");
+                        return;
+                    } else if ( at.attr.equals("endswith") ) {
+                        traverse("", at.value, true);
+                        this.builder.append(".");
+                        this.builder.append("endsWith");
+                        return;
+                    }
                 } else {
                     if ( at.attr.equals("strip") && ( at.value instanceof Name ) ) {
                         traverse("", at.value, true);
@@ -1026,6 +1053,8 @@ public class JythonToJavaConverter {
                             return TYPE_STRING;
                         } else if ( attr.attr.equals("strip") ) {
                             return TYPE_STRING;
+                        } else if ( attr.attr.equals("splitlines") ) {
+                            return TYPE_STRING_ARRAY;
                         }
                     }
                 } else if ( call.func instanceof Name ) {
@@ -1085,6 +1114,17 @@ public class JythonToJavaConverter {
         
         private void handleFunctionDef( FunctionDef fd, String indent, boolean inline ) throws Exception {
             String returnType= guessReturnType(fd.body );
+            // check for single-line documentation string
+            if ( fd.body.length>0 && fd.body[0] instanceof Expr ) {
+                Expr expr= (Expr)fd.body[0];
+                if ( expr.value instanceof Str ) {
+                    this.builder
+                            .append(indent).append("/**\n")
+                            .append(indent).append(" * ").append(((Str)expr.value).s).append("\n")
+                            .append(indent).append(" */\n");
+                    fd.body= Arrays.copyOfRange( fd.body, 1, fd.body.length );
+                }
+            }
             this.builder.append("private ").append(returnType).append(" ").append(fd.name).append("(");
             for (int i = 0; i < fd.args.args.length; i++) {
                 if (i > 0) {
@@ -1133,7 +1173,7 @@ public class JythonToJavaConverter {
                     this.builder.append(typeOf).append(" ");
                     assertType( ((Name)as.targets[0]).id, typeOf );
                 }
-            } 
+            }
             for (int i = 0; i < as.targets.length; i++) {
                 if (i > 0) {
                     this.builder.append(",");
