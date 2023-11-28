@@ -610,19 +610,21 @@ public class ScriptPanelSupport {
      * @param interp null or the interp for further queries.
      */
     public void annotateError(PyException ex, int offset, final PythonInterpreter interp) {
+        PyObject otraceback= ex.traceback;
+        int line=0;
+        final int STACK_LIMIT=7;
+        int count=0; // just in case limit to STACK_LIMIT, because of recursion, etc.
+
         if (ex instanceof PySyntaxError) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             int lineno = offset + ((PyInteger) ex.value.__getitem__(1).__getitem__(1)).getValue();
             //String filename= String.valueOf( (ex.value.__getitem__(1).__getitem__(3)) );
             //int col = ((PyInteger) ex.value.__getitem__(1).__getitem__(2)).getValue();
-            annotationsSupport.annotateLine(lineno, "error", ex.toString(),interp);
+            annotationsSupport.annotateLine(lineno, EditorAnnotationsSupport.ANNO_MAYBE_ERROR, ex.toString(),interp);
         } else {
         //logger.log(Level.SEVERE, ex.getMessage(), ex);
-        PyObject otraceback= ex.traceback;
-        int line=0;
-        final int STACK_LIMIT=7;
 
-        int count=0; // just in case limit to STACK_LIMIT, because of recursion, etc.
+        
         //PyFrame theFrame= null;
         while ( otraceback instanceof PyTraceback && count<STACK_LIMIT ) {
             PyTraceback traceback= ((PyTraceback)otraceback);

@@ -19,6 +19,7 @@ import javax.swing.text.Document;
 import javax.swing.text.Element;
 import jsyntaxpane.components.Markers;
 import jsyntaxpane.components.Markers.SimpleMarker;
+import org.das2.util.ColorUtil;
 import org.python.core.PyException;
 import org.python.core.PyIgnoreMethodTag;
 import org.python.core.PyInteger;
@@ -46,6 +47,12 @@ public class EditorAnnotationsSupport {
      * error marked in the code
      */
     public static final String ANNO_ERROR = "error";
+
+    /**
+     * error marked in the code with some uncertainty.  We had a problem where
+     * this was mismarked, and we killed an hour very confused.
+     */
+    public static final String ANNO_MAYBE_ERROR = "maybe_error";
 
     /**
      * current interpreter position
@@ -397,6 +404,9 @@ public class EditorAnnotationsSupport {
                 case ANNO_ERROR:
                     mark= new SimpleMarker( lightBackground ? Color.PINK : new Color(120,80,80));
                     break;
+                case ANNO_MAYBE_ERROR:
+                    mark= new SimpleMarker( lightBackground ? ColorUtil.PURPLE :  ColorUtil.PURPLE  );
+                    break;                    
                 case ANNO_PROGRAM_COUNTER:
                     mark=  new SimpleMarker( lightBackground ? new Color( 0,255,0,80 ) :  new Color( 0,200,0,80 ) );
                     break;
@@ -419,6 +429,15 @@ public class EditorAnnotationsSupport {
                 case ANNO_ERROR:
                     {
                         SquigglePainter red= new SquigglePainter( Color.RED );
+                        try {
+                            highlightInfo= editorPanel.getHighlighter().addHighlight(i0, i1, red);
+                        } catch (BadLocationException ex) {
+                            Logger.getLogger(EditorAnnotationsSupport.class.getName()).log(Level.SEVERE, null, ex);
+                        }       break;
+                    }
+                case ANNO_MAYBE_ERROR:
+                    {
+                        SquigglePainter red= new SquigglePainter( mark.getColor() );
                         try {
                             highlightInfo= editorPanel.getHighlighter().addHighlight(i0, i1, red);
                         } catch (BadLocationException ex) {
