@@ -621,7 +621,8 @@ public class ScriptPanelSupport {
             //String filename= String.valueOf( (ex.value.__getitem__(1).__getitem__(3)) );
             //int col = ((PyInteger) ex.value.__getitem__(1).__getitem__(2)).getValue();
             annotationsSupport.annotateLine(lineno, EditorAnnotationsSupport.ANNO_MAYBE_ERROR, ex.toString(),interp);
-        } else {
+        } 
+        //else {
         //logger.log(Level.SEVERE, ex.getMessage(), ex);
 
         
@@ -673,7 +674,7 @@ public class ScriptPanelSupport {
                 }
             });
         });
-        }
+        
     }
 
     protected void executeScript() {
