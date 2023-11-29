@@ -42,8 +42,11 @@ import org.das2.jythoncompletion.JavadocLookup;
 import org.das2.qds.SemanticOps;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.DataSetBuilder;
+import org.das2.util.JsonUtil;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.ProgressMonitor;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Contains operations that are only available to Jython code, and is dependent
@@ -528,13 +531,27 @@ public class JythonOps {
     /**
      * converts types often seen in Jython codes to the correct type.  For
      * example, ds= putProperty( ds, 'UNITS', 'seconds since 2012-01-01').
+     * Note USER_PROPERTIES can be a Python dictionary and it will be converted
+     * to a Java Map.
      * 
-     * @param ds
-     * @param name
-     * @param value
+     * @param ds the dataset
+     * @param name the name of the property, such as UNITS or USER_PROPERTIES
+     * @param value the value of the property
      * @return the dataset, possibly converted to a mutable dataset.
      */
-    public static MutablePropertyDataSet putProperty( QDataSet ds, String name, Object value ) {   
+    public static MutablePropertyDataSet putProperty( QDataSet ds, String name, Object value ) {
+        String type= DataSetUtil.getPropertyType(name);
+        if ( type.equals(DataSetUtil.PROPERTY_TYPE_MAP) ) {
+            if ( !( value instanceof Map ) ) {
+                try {
+                    String json= value.toString(); // Python Dictionary
+                    JSONObject obj= new JSONObject(json);
+                    value= JsonUtil.jsonToMap(obj);
+                } catch (JSONException ex) {
+                    logger.log(Level.SEVERE, "type is not supported for PROPERTY TYPE MAP: "+value, ex);
+                }
+            }
+        }
         return Ops.putProperty( ds, name, value );
     }
     
