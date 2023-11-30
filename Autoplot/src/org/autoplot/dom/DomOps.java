@@ -442,6 +442,8 @@ public class DomOps {
         Logger logger= LoggerManager.getLogger("autoplot.dom.layout.fixlayout");
         logger.fine( "enter fixLayout" );
         
+        dom.getController().waitUntilIdle();
+        
         boolean autoLayout= dom.options.isAutolayout();
         dom.options.setAutolayout(false);
         
