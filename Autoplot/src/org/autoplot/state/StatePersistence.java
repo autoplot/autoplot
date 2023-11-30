@@ -61,6 +61,7 @@ import org.jdesktop.beansbinding.Bindings;
 import org.autoplot.dom.Axis;
 import org.autoplot.dom.BindingModel;
 import org.autoplot.dom.Canvas;
+import org.autoplot.dom.Column;
 import org.autoplot.dom.DomUtil;
 import org.autoplot.dom.Plot;
 import org.autoplot.dom.Row;
@@ -382,6 +383,13 @@ public class StatePersistence {
         if ( c.getMarginRow().getId().equals("") ) c.getMarginRow().setId("marginRow_0");
         if ( c.getMarginColumn().getId().equals("") ) c.getMarginColumn().setId("marginColumn_0");
 
+        // There was a bug where addPlots(3,3) would incorrectly set the parent, but it still worked, oddly.
+        for ( Column col: state.getCanvases(0).getColumns() ) {
+            if ( col.getParent().equals( c.getMarginRow().getId() ) ) {
+                col.setParent( c.getMarginColumn().getId() );
+            }
+        }
+        
         if ( state.getPlots(0).getRowId().equals("") ) {
             int n= state.getPlots().length;
             Row[] rows= new Row[n];

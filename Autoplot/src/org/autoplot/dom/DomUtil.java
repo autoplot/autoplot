@@ -1132,7 +1132,8 @@ public class DomUtil {
         String parent= row.getParent();
         double dpos;
         if ( parent.length()>0 ) {
-            Row parentRow= (Row) getElementById( dom, parent );
+            DomNode n= getElementById( dom, parent );
+            Row parentRow= (Row) n;
             int pmin= getRowPositionPixels( dom, parentRow, parentRow.getTop() );
             int pmax= getRowPositionPixels( dom, parentRow, parentRow.getBottom() );
             dpos= pmin + DasColumn.parseLayoutStr( position, em, pmax-pmin, -1 );
@@ -1157,7 +1158,8 @@ public class DomUtil {
         String parent= col.getParent();
         double dpos;
         if ( parent.length()>0 ) {
-            Column parentColumn= (Column) getElementById( dom, parent );
+            DomNode n= getElementById( dom, parent );
+            Column parentColumn= (Column) n; // there was a bug where addPlots(3,3) would use a row for the parent, not the column.
             int pmin= getColumnPositionPixels( dom, parentColumn, parentColumn.getLeft() );
             int pmax= getColumnPositionPixels( dom, parentColumn, parentColumn.getRight() );
             dpos= pmin + DasColumn.parseLayoutStr( position, f.getSize2D(), pmax-pmin, -1 );
@@ -1665,17 +1667,20 @@ public class DomUtil {
         }
         List<Column> cc= new ArrayList( dom.getCanvases(0).columns );
         cc.add( dom.getCanvases(0).marginColumn );
-        for ( DomNode n: cc ) {
+        for ( Column n: cc ) {
             DomNode n1= ids.get(n.id);
             if ( n1!=null ) {
                 problems.add( "Column id is already taken by "+n1+"." );
             } else {
                 ids.put( n.id, n );
             }
+            if ( n.getParent().equals(dom.getCanvases(0).marginRow.id) ) {
+                problems.add( "Column parent is a row: "+n.id+"." );
+            }
         }
         List<Row> rr= new ArrayList( dom.getCanvases(0).rows );
         rr.add( dom.getCanvases(0).marginRow );
-        for ( DomNode n: rr ) {
+        for ( Row n: rr ) {
             DomNode n1= ids.get(n.id);
             if ( n1!=null ) {
                 problems.add( "Row id is already taken by "+n1+"." );
