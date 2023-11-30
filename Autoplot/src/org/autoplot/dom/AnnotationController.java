@@ -101,9 +101,9 @@ public class AnnotationController extends DomNodeController {
         String plotId= annotation.getPlotId();
         if ( plotId!=null && plotId.length()>0 ) {
             LabelConverter lc= new LabelConverter( dom, (Plot)DomUtil.getElementById( dom, plotId  ), null, null, annotation );
-            ac.bind( annotation, Annotation.PROP_TEXT, dasAnnotation, "text", lc );
+            ac.bind( annotation, Annotation.PROP_TEXT, dasAnnotation, DasAnnotation.PROP_TEXT, lc );
         } else {
-            ac.bind( annotation, Annotation.PROP_TEXT, dasAnnotation, "text");
+            ac.bind( annotation, Annotation.PROP_TEXT, dasAnnotation, DasAnnotation.PROP_TEXT );
         }
         ac.bind( annotation, Annotation.PROP_URL, dasAnnotation, "url" );
         ac.bind( annotation, "fontSize", dasAnnotation, "fontSize", getFontConverter(dasAnnotation) );
@@ -176,6 +176,7 @@ public class AnnotationController extends DomNodeController {
                             dasAnnotation.setText( (String)lc.convertForward(annotation.getText()) );
                         };
                         plot.getController().addPropertyChangeListener( PlotController.PROP_ACTIVEDATASET, contextPropertyChangeListener );
+                        ac.bind( annotation, Annotation.PROP_TEXT, dasAnnotation, DasAnnotation.PROP_TEXT, lc );                        
                     } else {
                         ac.bind( annotation, Annotation.PROP_TEXT, dasAnnotation, "text");
                     }
