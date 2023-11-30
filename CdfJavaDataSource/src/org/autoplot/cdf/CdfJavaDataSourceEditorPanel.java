@@ -417,12 +417,18 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
             parameter= String.valueOf(tp.getPathComponent(1));
             String s;
             String slice1;
+            slice1= "";
             s= getParamAndSubset(xParameterTree,"");
-            slice1= s.length()==0 ? "" : s.substring(xparameter.length()); 
+            if ( xparameter!=null && xparameter.length()<=s.length() ) {
+                slice1= s.substring(xparameter.length());
+            }
             LinkedHashMap<String,CdfVariableDescription> xx= getCompatible( cdfParameterInfo, parameter, X_PARAMETER );
             fillTree( xParameterTree, toDescriptions(xx), cdf, xparameter, slice1 );
             s= getParamAndSubset(yParameterTree,"");
-            slice1= s.length()==0 ? "" : s.substring(xparameter.length());
+            slice1= "";
+            if ( yparameter!=null && yparameter.length()<=s.length() ) {
+                slice1= s.substring(yparameter.length());
+            }
             LinkedHashMap<String,CdfVariableDescription> yy= getCompatible( cdfParameterInfo, parameter, Y_PARAMETER );
             fillTree( yParameterTree, toDescriptions(yy), cdf, yparameter, slice1 );
             updateMetadata();
