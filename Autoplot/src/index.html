@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>PNG Walk of images created long ago.  The PNG Walk Tool now has an option to save a .pngwalk file whose URL can be shared with others.</small></p>
+        <p><small>Bug where changing the plot for an annotation didn't properly rebind the text property is fixed. <a href="https://github.com/autoplot/dev/blob/master/demos/2023/20231130/demoBug2567.2.jy">This script</a> demos.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,16 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2023-11-22 r27346):</p>
+        <p>Bugfixes (2023-11-30 r27358):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2567/">2567</a>: correct loaded vaps where column has marginRow as parent, which happened for years but wasn't noticed.  Thanks, Connor!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2567/">2567</a>: where text property wasn't re-bound after the plotId changed.  Thanks, Connor!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2567/">2567</a>: clipping of the ephemeris labels.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2556/">2556</a>: march through the stack trace looking for lines to annotate.  Introduce new purple error squiggle to indicate some uncertainty in the location.
+            <li>rte_0611117604: sloppy code with X and Y in editor.  Thanks, Connor!
+            <li>Correct where Ops.java had references to JSON but shouldn't have.  This is handled in the calling code now, where Jython dictionaries are converted to maps for QDataSet.
+            <li>expandToFillGaps doesn't assume that timetags are monotonic now, when finding shortest interval.  Thanks, George!
+            <li><a href="https://github.com/das-developers/das2java/issues/86">86</a>: longTitles property would miscalculate width when yaxis was on right.  Thanks, James!
             <li>Don't treat %Y the same as $Y.  Reserve percents for Python string formatting.
             <li>Improvements and bugfixes with Jython to Java converter.
         </ul>
@@ -58,6 +66,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>various improvements to Jython to Java converter.
             <li><a href="https://github.com/das-developers/das2docs/issues/3">3</a>: Initial support for Das2Server parameters GUI.
         </ul>
         <p>Less recent features:</p>
