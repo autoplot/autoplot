@@ -79,6 +79,11 @@ public class LabelConverter extends Converter {
         PlotElement pe= getFocusPlotElement();
         
         String title= (String)value;
+        
+        if ( title.length()==0 ) {
+            return title;
+        }
+        
         boolean done= false;
         
         while ( !done ) {
@@ -274,6 +279,10 @@ public class LabelConverter extends Converter {
     @Override
     public Object convertReverse(Object value) {
         String title= (String)value;
+        
+        if ( title.length()==0 ) {
+            return title;
+        }
         
         String ptitle;
         if ( annotation!=null ) {
