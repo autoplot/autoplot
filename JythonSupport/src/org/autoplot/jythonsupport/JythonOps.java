@@ -541,7 +541,7 @@ public class JythonOps {
      */
     public static MutablePropertyDataSet putProperty( QDataSet ds, String name, Object value ) {
         String type= DataSetUtil.getPropertyType(name);
-        if ( type.equals(DataSetUtil.PROPERTY_TYPE_MAP) ) {
+        if ( type!=null && type.equals(DataSetUtil.PROPERTY_TYPE_MAP) ) {
             if ( !( value instanceof Map ) ) {
                 try {
                     String json= value.toString(); // Python Dictionary
