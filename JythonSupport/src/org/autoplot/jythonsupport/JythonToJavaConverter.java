@@ -577,6 +577,8 @@ public class JythonToJavaConverter {
                     Attribute attr2= (Attribute)attr;
                     if ( attr2.attr.equals("strip") ) {
                         return TYPE_STRING;
+                    } else if ( attr2.attr.equals("split") ) {
+                        return TYPE_STRING_ARRAY;
                     }
                 }
                 if ( staticClass.equals("FileUtil") && attr.attr.equals("readFileToString") ) {
@@ -1249,8 +1251,14 @@ public class JythonToJavaConverter {
         private void handleFor(For ff, String indent, boolean inline) throws Exception {
             logger.log(Level.FINE, "handleFor at {0}", ff.beginLine);
             String typeOf= getJavaIterExprType( ff.iter );
+            if ( typeOf==TYPE_OBJECT ) {
+                String t= guessType( ff.iter );
+                if ( t==TYPE_STRING_ARRAY ) {
+                    typeOf= TYPE_STRING;
+                }
+            }
             if ( ff.target instanceof Name ) {
-                assertType( ((Name)ff.target).id, typeOf );
+                assertType( ((Name)ff.target).id, typeOf ); 
             }
             if ( ff.iter instanceof Call ) {
                 Call c= (Call)ff.iter;
