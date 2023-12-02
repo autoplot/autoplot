@@ -30,14 +30,16 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2023-11-30 r27358):</p>
+        <p>Bugfixes (2023-12-02 r27360):</p>
         <ul>
+            <li>PngWalkTool address bar records .pngwalk files in its history.
+            <li>NetCDF data editor panel didn't update description as X and Y parameters were selected.  
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2567/">2567</a>: correct loaded vaps where column has marginRow as parent, which happened for years but wasn't noticed.  Thanks, Connor!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2567/">2567</a>: where text property wasn't re-bound after the plotId changed.  Thanks, Connor!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2567/">2567</a>: clipping of the ephemeris labels.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2567/">2567</a>: clipping of the ephemeris labels.  Thanks, Connor!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2556/">2556</a>: march through the stack trace looking for lines to annotate.  Introduce new purple error squiggle to indicate some uncertainty in the location.
             <li>rte_0611117604: sloppy code with X and Y in editor.  Thanks, Connor!
-            <li>Correct where Ops.java had references to JSON but shouldn't have.  This is handled in the calling code now, where Jython dictionaries are converted to maps for QDataSet.
+            <li>Correct where Ops.java had references to JSON but shouldn't have.  This is handled in the calling code now, where Jython dictionaries are converted to maps for QDataSet.  
             <li>expandToFillGaps doesn't assume that timetags are monotonic now, when finding shortest interval.  Thanks, George!
             <li><a href="https://github.com/das-developers/das2java/issues/86">86</a>: longTitles property would miscalculate width when yaxis was on right.  Thanks, James!
             <li>Don't treat %Y the same as $Y.  Reserve percents for Python string formatting.
