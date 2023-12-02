@@ -648,7 +648,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         }
         r.add(value);
 
-        while ( r.size()>MAX_RECENT ) {
+        while ( r.size()>MAX_RECENT ) { // Note: this has no effect. TODO: why?
             r.remove(0);
         }
 
@@ -2598,6 +2598,25 @@ private void dataSetSelectorComboBoxPopupMenuCanceled(javax.swing.event.PopupMen
             }
         }
         return null;
+    }
+
+    /**
+     * This makes sense to me, where you can just add a URL to the selector.
+     * I haven't looked at this class in ten years, and it's bizarre how complex
+     * it is.  I'm making this a method so that this is done in one place.  This
+     * contains the logic which was in the pngwalkTool.  If 
+     * there are other things to be done, it will be done here.
+     * @param suri 
+     */
+    public void addToRecent(String suri ) {
+        List<String> urls = new ArrayList<>();
+        List<String> recent = new ArrayList(getRecent());
+        recent.removeAll( Collections.singleton( suri ) );
+        for (String b : recent) {
+            urls.add( b );
+        }
+        urls.add( suri );
+        setRecent(urls);     
     }
     
 }
