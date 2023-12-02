@@ -269,6 +269,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
      * <li>product - the base used to create file names &lt;product&gt;_$Y$m$d.png
      * <li>template - the template for files, like product_$Y$m$d.png
      * <li>pwd - the location of the .pngwalk file.
+     * <li>qcturl - optional location of the quality control files, "" if not specified.
      * </ul>
      * @param template
      * @return the map
@@ -311,7 +312,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 split.path= checkRelativeBaseurl( baseurl, pwd, product );
             }
             
-            qcturl= p.getProperty("qcturl",pwd); // allow the qc data to come from a different place
+            qcturl= p.getProperty("qcturl",""); // allow the qc data to come from a different place
             
             String t;
             if ( !p.getProperty("filePattern","").equals("") ) {
@@ -414,10 +415,19 @@ public final class PngWalkTool extends javax.swing.JPanel {
         vapfile= map.get("vapfile");
         version= map.get("version");
         baseurl= checkRelativeBaseurl( baseurl, file, product );
-        qcturl= checkRelativeBaseurl( qcturl, pwd, product );
+        boolean doStartQC=false;
+        if ( !"".equals(map.get("qcturl")) ) {
+            qcturl= checkRelativeBaseurl( qcturl, pwd, product );
+            doStartQC= true;
+        } else {
+            qcturl= pwd;
+        }
         vapfile= checkRelativeBaseurl( vapfile, pwd, product );
         String template= map.get("template");  
         this.setTemplate(template); 
+        if ( doStartQC ) {
+            this.startQC();
+        }
     }
     
     /**
