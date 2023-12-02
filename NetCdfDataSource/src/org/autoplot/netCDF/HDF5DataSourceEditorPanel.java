@@ -283,10 +283,12 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
     private void xParameterTreeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_xParameterTreeValueChanged
         xCheckBox.setSelected(true);
+        updateMetadata(1);
     }//GEN-LAST:event_xParameterTreeValueChanged
 
     private void yParameterTreeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_yParameterTreeValueChanged
         yCheckBox.setSelected(true);
+        updateMetadata(2);
     }//GEN-LAST:event_yParameterTreeValueChanged
 
     private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
