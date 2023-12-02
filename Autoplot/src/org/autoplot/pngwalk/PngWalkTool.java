@@ -428,6 +428,16 @@ public final class PngWalkTool extends javax.swing.JPanel {
         if ( doStartQC ) {
             this.startQC();
         }
+        boolean addToRecent=true;
+        if ( addToRecent ) {
+            SwingUtilities.invokeLater( new Runnable() {
+                @Override
+                public void run() {
+                    dataSetSelector1.addToRecent(file);
+                }
+            });
+        }
+        
     }
     
     /**
@@ -441,6 +451,18 @@ public final class PngWalkTool extends javax.swing.JPanel {
         final PngWalkTool tool = new PngWalkTool();
         tool.parentWindow= parent;
 
+        String sdeft= DEFAULT_BOOKMARKS;
+
+        List<Bookmark> deft=null;
+        try {
+            deft = Bookmark.parseBookmarks(sdeft);
+
+        } catch (BookmarksException | SAXException | IOException ex) {
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
+        }
+
+        Util.loadRecent( "pngwalkRecent", tool.dataSetSelector1, deft );
+        
         if ( template!=null ) {
             URISplit split= URISplit.parse(template);
             if ( split.file.endsWith(".pngwalk") ) {
@@ -456,18 +478,6 @@ public final class PngWalkTool extends javax.swing.JPanel {
             tool.product= "";
             tool.baseurl= "";
         }
-
-        String sdeft= DEFAULT_BOOKMARKS;
-
-        List<Bookmark> deft=null;
-        try {
-            deft = Bookmark.parseBookmarks(sdeft);
-
-        } catch (BookmarksException | SAXException | IOException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        }
-
-        Util.loadRecent( "pngwalkRecent", tool.dataSetSelector1, deft );
 
         Runnable run= () -> {
             addFileEnabler(tool,parent);
@@ -1665,14 +1675,8 @@ public final class PngWalkTool extends javax.swing.JPanel {
      * initial settings to be performed on the event thread.
      */
     private void updateInitialGui() {
-        List<String> urls = new ArrayList<>();
-        List<String> recent = dataSetSelector1.getRecent();
-        recent.removeAll( Collections.singleton( seq.getTemplate() ) );
-        for (String b : recent) {
-            urls.add( b );
-        }
-        urls.add( seq.getTemplate() );
-        dataSetSelector1.setRecent(urls);
+
+        dataSetSelector1.addToRecent( seq.getTemplate() );
 
         useRangeCheckBox.setEnabled(seq.getTimeSpan() != null);
 
