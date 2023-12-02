@@ -878,6 +878,11 @@ public class JythonToJavaConverter {
                         this.builder.append(".");
                         this.builder.append("trim");
                         return;
+                    } else if ( at.attr.equals("split") ) {
+                        traverse("", at.value, true);
+                        this.builder.append(".");
+                        this.builder.append("trim().split(\"\\\\s+\")");
+                        return;
                     } else if ( at.attr.equals("splitlines") ) {
                         traverse("", at.value, true);
                         this.builder.append(".");
