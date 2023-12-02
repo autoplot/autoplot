@@ -750,7 +750,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
      * Write a pngwalk file describing the current pngwalk.
      * http://autoplot.org/PNG_Walks
      * @param parent
-     * @param ssrc
+     * @param ssrc the focus file 
      * @throws java.io.IOException
      */
     protected static void savePngwalkFile( PngWalkTool parent, String ssrc ) throws IOException {
@@ -764,7 +764,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
             if ( !f.getName().endsWith(".pngwalk") ) {
                 f= new File( f.getAbsolutePath() + ".pngwalk" );
             }
-            
+            prefs.put( PngWalkTool.PREF_RECENT, f.getName() );
             try ( PrintWriter w= new PrintWriter(f) ) {
                 if ( parent.baseurl.length()==0 ) {
                     String t= parent.getTemplate();
@@ -774,9 +774,11 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     w.println( "filePattern="+filePattern);
                 } else {
                     w.println( "baseurl="+parent.baseurl);
-                    w.println( "product="+parent.product);
+                    if ( parent.product!=null ) {
+                        w.println( "product="+parent.product);
+                    }
                     String s= parent.getTemplate();
-                    if ( s.endsWith(".png") ) {
+                    if ( parent.product!=null && s.endsWith(".png") ) {
                         s= s.substring(0,s.length()-4);
                     }
                     w.println( "timeFormat="+s );
