@@ -509,6 +509,9 @@ public class JythonToJavaConverter {
         int lineNumber = 1;
         boolean includeLineNumbers = false;
 
+        // when a Return is encountered, make a note of the return type.
+        String lastReturnType= "";
+        
         Stack<Context> contexts= new Stack<>();
 
         MyVisitorBase(StringBuilder builder) {
@@ -597,7 +600,9 @@ public class JythonToJavaConverter {
                 if ( rt.value!=null ) {
                     builder.append(" ");
                     traverse(builder,"", rt.value, true);
+                    lastReturnType= guessType(rt.value);
                 }
+                
             } else if (sn instanceof ImportFrom) {
                 ImportFrom ff = ((ImportFrom) sn);
                 for (int i = 0; i < ff.names.length; i++) {
@@ -1153,29 +1158,14 @@ public class JythonToJavaConverter {
         }
         
         private String guessReturnType( stmtType[] statements ) {
+            this.lastReturnType= "Object";
             StringBuilder dummy= new StringBuilder();
             try {
                 handleBody(dummy,statements,"");
             } catch (Exception ex) {
                 Logger.getLogger(JythonToJavaConverter.class.getName()).log(Level.SEVERE, null, ex);
             }
-            String returnType= "void";
-            for ( stmtType s : statements ) {
-                if ( s instanceof If ) {
-                    String s1= guessReturnType(((If)s).body);
-                    if ( !s1.equals("void") ) {
-                        returnType= s1;
-                    }
-                } else if ( s instanceof For ) {
-                    String s1= guessReturnType(((For)s).body);
-                    if ( !s1.equals("void") ) {
-                        returnType= s1;
-                    }
-                } else if ( s instanceof Return ) {
-                    return guessType( ((Return)s).value );
-                }
-            }
-            return returnType;
+            return this.lastReturnType;
         }
         
         private void handleFunctionDef( StringBuilder builder, FunctionDef fd, String indent, boolean inline ) throws Exception {
@@ -1469,8 +1459,8 @@ public class JythonToJavaConverter {
 
         //String furi= "/home/jbf/project/autoplot/script/lookAtUserComments.jy";
         //String furi= "/home/jbf/project/autoplot/script/curveFitting.jy";
-        String furi = "/home/jbf/project/autoplot/script/addLabelToPng.jy";
-
+        //String furi = "/home/jbf/project/autoplot/script/addLabelToPng.jy";
+        String furi = "/home/jbf/ct/autoplot/git/dev/demos/2023/20231115/demoDas2Gui.jy";
         File src = DataSetURI.getFile(furi, new NullProgressMonitor());
 
         try (FileReader reader = new FileReader(src)) {
