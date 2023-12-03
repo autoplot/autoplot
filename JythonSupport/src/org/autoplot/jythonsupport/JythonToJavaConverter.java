@@ -494,121 +494,6 @@ public class JythonToJavaConverter {
             }
         }
     }
-
-    /**
-     * this returns the type of objects the iterator iterates over.
-     * @param iter
-     * @return 
-     */
-    private static String getJavaIterExprType(exprType iter) {
-        if ( iter instanceof Call ) {
-            Call cc= (Call)iter;
-            if ( cc.func instanceof Name ) {
-                Name n= (Name)cc.func;
-                if ( n.id.equals("range") ) {
-                    return "int";
-                } else if ( n.id.equals("xrange") ) {
-                    return "int";
-                } else if ( n.id.equals("getDataSet") ) {
-                    return "QDataSet";
-                } else if ( n.id.equals("getParam") ) {
-                    if ( cc.args.length>1 ) {
-                        exprType arg1= cc.args[1];
-                        return getJavaExprType(arg1);
-                    }      
-                }
-            } else if ( cc.func instanceof Attribute ) {
-                Attribute att= (Attribute)cc.func;
-                if ( att.value instanceof Name ) {
-                    Name n= (Name)att.value;
-                    String ftype= getJavaExprType(n); // ideally this would be file
-                    if ( att.attr.equals("readlines") ) {
-                        return TYPE_STRING;
-                    } else if ( att.attr.equals("splitlines") ) {
-                        return TYPE_STRING;
-                    }
-                }
-                
-            }
-        }
-        return "Object";
-    }
-    
-    /**
-     * there's an issue here where for iter==Call, this is returning the
-     * object which the iterator returns.
-     * @param iter
-     * @return 
-     */
-    private static String getJavaExprType(exprType iter) {
-        if ( iter instanceof Call ) {
-            Call cc= (Call)iter;
-            if ( cc.func instanceof Name ) {
-                Name n= (Name)cc.func;
-                if ( n.id.equals("int") ) {
-                    return TYPE_INT;
-                } else if ( n.id.equals("range") ) {
-                    return "Stream<int>";
-                } else if ( n.id.equals("xrange") ) {
-                    return "Stream<int>";
-                } else if ( n.id.equals("getDataSet") ) {
-                    return "QDataSet";
-                } else if ( n.id.equals("downloadResourceAsTempFile") ) {
-                    return "File";
-                } else if ( n.id.equals("getParam") ) {
-                    if ( cc.args.length>1 ) {
-                        exprType arg1= cc.args[1];
-                        return getJavaExprType(arg1);
-                    }      
-                } else if ( Character.isUpperCase(n.id.charAt(0)) ) {
-                    return n.id; // assume it's a constructor
-                } else if ( n.id.equals("open") ) {
-                    return "Stream<String>";
-                }
-            } else if ( cc.func instanceof Attribute ) { 
-                Attribute attr= (Attribute)cc.func;
-                String staticClass= "";
-                if ( attr.value instanceof Name ) {
-                    if ( Character.isUpperCase(((Name)attr.value).id.charAt(0)) ) {
-                        staticClass= ((Name)attr.value).id;
-                    }
-                }
-                if (attr instanceof Attribute ) {
-                    Attribute attr2= (Attribute)attr;
-                    if ( attr2.attr.equals("strip") ) {
-                        return TYPE_STRING;
-                    } else if ( attr2.attr.equals("split") ) {
-                        return TYPE_STRING_ARRAY;
-                    }
-                }
-                if ( staticClass.equals("FileUtil") && attr.attr.equals("readFileToString") ) {
-                    return TYPE_STRING;
-                }
-            }
-        } else if ( iter instanceof Str ) {
-            return TYPE_STRING;
-        } else if ( iter instanceof Name ) {
-            Name n= (Name)iter;
-            if ( n.id.equals("False") || n.id.equals("True")) {
-                return "boolean";
-            } else {
-                return TYPE_OBJECT;
-            }
-        } else if ( iter instanceof Num ) {
-            Num n= (Num)iter;
-            if ( n.n instanceof PyFloat ) {
-                return "float";
-            } else if ( n.n instanceof PyInteger ) {
-                return "int"; 
-            } else {
-                return "Number";
-            }
-
-        } else if ( iter instanceof Str ) {
-            return "String";
-        }
-        return "Object";
-    }
     
     private static class MyVisitorBase<R> extends VisitorBase {
 
@@ -1090,6 +975,149 @@ public class JythonToJavaConverter {
                 return TYPE_OBJECT;
             }
         }
+        
+        /**
+         * this returns the type of objects the iterator iterates over.
+         * @param iter
+         * @return 
+         */
+        private String getJavaIterExprType(exprType iter) {
+            if ( iter instanceof Call ) {
+                Call cc= (Call)iter;
+                if ( cc.func instanceof Name ) {
+                    Name n= (Name)cc.func;
+                    if ( n.id.equals("range") ) {
+                        return "int";
+                    } else if ( n.id.equals("xrange") ) {
+                        return "int";
+                    } else if ( n.id.equals("getDataSet") ) {
+                        return "QDataSet";
+                    } else if ( n.id.equals("getParam") ) {
+                        if ( cc.args.length>1 ) {
+                            exprType arg1= cc.args[1];
+                            return getJavaExprType(arg1);
+                        }      
+                    }
+                } else if ( cc.func instanceof Attribute ) {
+                    Attribute att= (Attribute)cc.func;
+                    if ( att.value instanceof Name ) {
+                        Name n= (Name)att.value;
+                        String ftype= getJavaExprType(n); // ideally this would be file
+                        if ( att.attr.equals("readlines") ) {
+                            return TYPE_STRING;
+                        } else if ( att.attr.equals("splitlines") ) {
+                            return TYPE_STRING;
+                        }
+                    }
+
+                }
+            }
+            return "Object";
+        }
+
+        /**
+         * there's an issue here where for iter==Call, this is returning the
+         * object which the iterator returns.
+         * @param iter
+         * @return 
+         */
+        private String getJavaExprType(exprType iter) {
+            if ( iter instanceof Call ) {
+                Call cc= (Call)iter;
+                if ( cc.func instanceof Name ) {
+                    Name n= (Name)cc.func;
+                    if ( n.id.equals("int") ) {
+                        return TYPE_INT;
+                    } else if ( n.id.equals("range") ) {
+                        return "Stream<int>";
+                    } else if ( n.id.equals("xrange") ) {
+                        return "Stream<int>";
+                    } else if ( n.id.equals("getDataSet") ) {
+                        return "QDataSet";
+                    } else if ( n.id.equals("downloadResourceAsTempFile") ) {
+                        return "File";
+                    } else if ( n.id.equals("getParam") ) {
+                        if ( cc.args.length>1 ) {
+                            exprType arg1= cc.args[1];
+                            return getJavaExprType(arg1);
+                        }      
+                    } else if ( Character.isUpperCase(n.id.charAt(0)) ) {
+                        return n.id; // assume it's a constructor
+                    } else if ( n.id.equals("open") ) {
+                        return "Stream<String>";
+                    }
+                } else if ( cc.func instanceof Attribute ) { 
+                    Attribute attr= (Attribute)cc.func;
+                    String staticClass= "";
+                    if ( attr.value instanceof Name ) {
+                        if ( Character.isUpperCase(((Name)attr.value).id.charAt(0)) ) {
+                            staticClass= ((Name)attr.value).id;
+                        }
+                    }
+                    if (attr instanceof Attribute ) {
+                        Attribute attr2= (Attribute)attr;
+                        if ( attr2.attr.equals("strip") ) {
+                            return TYPE_STRING;
+                        } else if ( attr2.attr.equals("split") ) {
+                            return TYPE_STRING_ARRAY;
+                        }
+                    }
+                    if ( staticClass.equals("FileUtil") && attr.attr.equals("readFileToString") ) {
+                        return TYPE_STRING;
+                    }
+                }
+            } else if ( iter instanceof Str ) {
+                return TYPE_STRING;
+            } else if ( iter instanceof Name ) {
+                Name n= (Name)iter;
+                if ( n.id.equals("False") || n.id.equals("True")) {
+                    return "boolean";
+                } else {
+                    return TYPE_OBJECT;
+                }
+            } else if ( iter instanceof Num ) {
+                Num n= (Num)iter;
+                if ( n.n instanceof PyFloat ) {
+                    return "float";
+                } else if ( n.n instanceof PyInteger ) {
+                    return "int"; 
+                } else {
+                    return "Number";
+                }
+
+            } else if ( iter instanceof Str ) {
+                return "String";
+            } else if ( iter instanceof org.python.parser.ast.List ) {
+                org.python.parser.ast.List l = (org.python.parser.ast.List)iter;
+                String t0=null;
+                for ( exprType e1 : l.elts ) {
+                    String t1= getJavaExprType(e1);
+                    if ( t0==null ) {
+                        t0= t1;
+                    } else if ( !t0.equals(t1) ) {
+                        return "Object[]";
+                    }
+                }
+                if ( t0==null ) {
+                    return "Object[]";
+                } else {
+                    return t0+"[]";
+                }
+            } else if ( iter instanceof Subscript ) {
+                Subscript s= (Subscript)iter;
+                String type= guessType(s.value);
+                if ( type.equals( TYPE_OBJECT ) ) {
+                    type= getJavaExprType( s.value );
+                }
+                if ( type.endsWith("[]") ) {
+                    return type.substring(0,type.length()-2).intern();
+                } else {
+                    return TYPE_OBJECT;
+                }
+            }
+            return "Object";
+        }
+        
         
         /**
          * assert that the symbol has the name
