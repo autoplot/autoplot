@@ -709,7 +709,8 @@ public class JythonToJavaConverter {
             } else if (sn instanceof ImportFrom) {
                 ImportFrom ff = ((ImportFrom) sn);
                 for (int i = 0; i < ff.names.length; i++) {
-                    this.builder.append("import ").append(ff.module).append('.').append(ff.names[i].name).append(";\n");
+                    this.builder.append("import ").append(ff.module).append('.').append(ff.names[i].name);
+                    if ( i<ff.names.length-1 ) this.builder.append(";\n");
                 }
             } else if (sn instanceof Str) {
                 Str ss = (Str) sn;
