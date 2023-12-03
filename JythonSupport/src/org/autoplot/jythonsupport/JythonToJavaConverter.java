@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -495,6 +496,10 @@ public class JythonToJavaConverter {
         }
     }
     
+    private static class Context {
+        Map<String,String> names= new HashMap<>();
+    }
+    
     private static class MyVisitorBase<R> extends VisitorBase {
 
         boolean looksOkay = true;
@@ -504,8 +509,11 @@ public class JythonToJavaConverter {
         int lineNumber = 1;
         boolean includeLineNumbers = false;
 
+        Stack<Context> contexts= new Stack<>();
+
         MyVisitorBase(StringBuilder builder) {
             this.builder = builder;
+            contexts.push( new Context() );
         }
 
         @Override
@@ -539,8 +547,6 @@ public class JythonToJavaConverter {
         };
                 
         private static final String spaces4 = "    ";
-
-        private Map<String,String> targetTypes= new LinkedHashMap<>();
 
         public void traverse(String indent, SimpleNode sn, boolean inline) throws Exception {
             if (includeLineNumbers && (this.builder.length() == 0 || builder.charAt(this.builder.length() - 1) == '\n')) {
@@ -912,6 +918,26 @@ public class JythonToJavaConverter {
         }
 
         /**
+         * return the type for the name, if the name is known, or null.  This
+         * climbs up the stack of contexts, looking for the name
+         * @param name
+         * @return 
+         */
+        private String getTypeForName( String name ) {
+            for ( int i=contexts.size()-1; i>=0; i-- ) {
+                if ( i>= contexts.size() ) {
+                    System.err.println("here stop");
+                }
+                Context c= contexts.get(i);
+                String ss= c.names.get(name);
+                if ( ss!=null ) {
+                    return ss;
+                }
+            }
+            return null;
+        }
+        
+        /**
          * return "String" or "Object
          * @param ex
          * @return 
@@ -927,7 +953,7 @@ public class JythonToJavaConverter {
                     return TYPE_FLOAT;
                 }
             } else if ( ex instanceof Name ) {
-                String s= targetTypes.get(((Name)ex).id);
+                String s= getTypeForName(((Name)ex).id);
                 if ( s==null ) {
                     //TODO: static
                     return TYPE_OBJECT;
@@ -1125,7 +1151,7 @@ public class JythonToJavaConverter {
          * @param type type, including String or Stream&lt;String&gt;
          */
         private void assertType( String name, String type ) {
-            targetTypes.put( name, type );
+            contexts.peek().names.put( name, type );
         }
         
         private String guessReturnType( stmtType[] statements ) {
@@ -1272,9 +1298,11 @@ public class JythonToJavaConverter {
         }
 
         private void handleBody( stmtType[] body, String thisIndent ) throws Exception {
+            contexts.push( new Context() );
             for (int i = 0; i < body.length; i++) {
                 traverse(thisIndent, body[i], false);
             }
+            contexts.pop( );
         }
 
         private void handleFor(For ff, String indent, boolean inline) throws Exception {
@@ -1378,8 +1406,10 @@ public class JythonToJavaConverter {
                 }
                 if ( t.equals("Object") && ( s.value instanceof Name ) ) {
                     String n= ((Name)s.value).id ;
-                    if ( targetTypes.containsKey(n))
-                    t= targetTypes.get(n);
+                    t= getTypeForName(n);
+                    if ( t==null ) {
+                        t= "Object";
+                    }
                 }
                 sliceType st= s.slice;
                 if ( st instanceof Slice ) {
