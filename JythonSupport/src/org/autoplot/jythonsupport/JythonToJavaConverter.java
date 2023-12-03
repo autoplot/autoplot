@@ -512,7 +512,7 @@ public class JythonToJavaConverter {
         Stack<Context> contexts= new Stack<>();
 
         MyVisitorBase(StringBuilder builder) {
-            this.builder = builder;
+            this.builder= builder;
             contexts.push( new Context() );
         }
 
@@ -533,7 +533,8 @@ public class JythonToJavaConverter {
 
         @Override
         public void traverse(SimpleNode sn) throws Exception {
-            traverse("", sn, false);
+            StringBuilder builder= this.builder;
+            traverse( builder,"", sn, false);
         }
 
         private static final Map<Integer,String> ops= new HashMap<>();
@@ -548,23 +549,23 @@ public class JythonToJavaConverter {
                 
         private static final String spaces4 = "    ";
 
-        public void traverse(String indent, SimpleNode sn, boolean inline) throws Exception {
-            if (includeLineNumbers && (this.builder.length() == 0 || builder.charAt(this.builder.length() - 1) == '\n')) {
-                this.builder.append(String.format("%04d: ", lineNumber));
+        public void traverse( StringBuilder builder, String indent, SimpleNode sn, boolean inline) throws Exception {
+            if (includeLineNumbers && (builder.length() == 0 || builder.charAt(builder.length() - 1) == '\n')) {
+                builder.append(String.format("%04d: ", lineNumber));
             }
 //            while ( !(sn instanceof  TryExcept) && sn.beginLine > lineNumber) {
-//                this.builder.append("\n");
+//                builder.append("\n");
 //                lineNumber++;
 //                if (includeLineNumbers) {
-//                    this.builder.append(String.format("%04d: ", lineNumber));
+//                    builder.append(String.format("%04d: ", lineNumber));
 //                }
 //            }
             
             if ( !inline ) {
                 boolean endsWithIndent= 
-                        this.builder.indexOf( indent, this.builder.length()-indent.length() ) >-1;
+                        builder.indexOf( indent, builder.length()-indent.length() ) >-1;
                 if (!endsWithIndent) {
-                    this.builder.append(indent);
+                    builder.append(indent);
                 }
             }
 
@@ -572,93 +573,93 @@ public class JythonToJavaConverter {
             //    System.err.println("here line number breakpoint at line "+lineNumber );
             //}
             if (sn instanceof FunctionDef) {
-                handleFunctionDef( (FunctionDef)sn, indent, inline );
+                handleFunctionDef( builder,(FunctionDef)sn, indent, inline );
 
             } else if (sn instanceof ClassDef ) {
-                handleClassDef( (ClassDef)sn, indent, inline );
+                handleClassDef(builder, (ClassDef)sn, indent, inline );
 
             } else if (sn instanceof Global) {
                 Global g= (Global)sn;
-                this.builder.append("// global ");
+                builder.append("// global ");
                 for ( int i=0; i<g.names.length; i++ ){
-                    if ( i>0 ) this.builder.append(",");
-                    this.builder.append(g.names[i]);
+                    if ( i>0 ) builder.append(",");
+                    builder.append(g.names[i]);
                 }
 
             } else if (sn instanceof Expr) {
                 Expr ex = (Expr) sn;
-                traverse("", ex.value, true);
+                traverse(builder,"", ex.value, true);
             } else if (sn instanceof Print) {
-                handlePrint( (Print)sn, indent, inline );
+                handlePrint( builder, (Print)sn, indent, inline );
             } else if (sn instanceof Return) {
                 Return rt = ((Return) sn);
-                this.builder.append("return");
+                builder.append("return");
                 if ( rt.value!=null ) {
-                    this.builder.append(" ");
-                    traverse("", rt.value, true);
+                    builder.append(" ");
+                    traverse(builder,"", rt.value, true);
                 }
             } else if (sn instanceof ImportFrom) {
                 ImportFrom ff = ((ImportFrom) sn);
                 for (int i = 0; i < ff.names.length; i++) {
-                    this.builder.append("import ").append(ff.module).append('.').append(ff.names[i].name);
-                    if ( i<ff.names.length-1 ) this.builder.append(";\n");
+                    builder.append("import ").append(ff.module).append('.').append(ff.names[i].name);
+                    if ( i<ff.names.length-1 ) builder.append(";\n");
                 }
             } else if (sn instanceof Str) {
                 Str ss = (Str) sn;
-                this.builder.append("\"");
+                builder.append("\"");
                 String s= ss.s.replaceAll("\n", "\\\\n");
-                this.builder.append(s);
-                this.builder.append("\"");
+                builder.append(s);
+                builder.append("\"");
             } else if (sn instanceof Num) {
                 Num ex = (Num) sn;
-                this.builder.append(ex.n);
+                builder.append(ex.n);
             } else if (sn instanceof UnaryOp) {
                 UnaryOp op= ((UnaryOp)sn);
                 switch (op.op) {
                     case UnaryOp.UAdd:
-                        this.builder.append("+");
-                        traverse("",op.operand,true);
+                        builder.append("+");
+                        traverse(builder,"",op.operand,true);
                         break;
                     case UnaryOp.USub:
-                        this.builder.append("-");
-                        traverse("",op.operand,true);
+                        builder.append("-");
+                        traverse(builder,"",op.operand,true);
                         break;
                     default:
-                        this.builder.append(op.toString());
+                        builder.append(op.toString());
                         break;
                 }
             } else if (sn instanceof BinOp) {
                 BinOp as = ((BinOp) sn);
                 if (as.left instanceof Str && as.op == 5) {
-                    this.builder.append("String.format(");
-                    traverse("", as.left, true);
-                    this.builder.append(",");
-                    traverse("", as.right, true);
-                    this.builder.append(")");
+                    builder.append("String.format(");
+                    traverse(builder,"", as.left, true);
+                    builder.append(",");
+                    traverse(builder,"", as.right, true);
+                    builder.append(")");
                 } else {
-                    traverse("", as.left, true);
+                    traverse(builder,"", as.left, true);
                     String sop= ops.get(as.op);
                     if ( sop==null ) sop= " ?? ";
-                    this.builder.append( sop );
-                    traverse("", as.right, true);
+                    builder.append( sop );
+                    traverse(builder,"", as.right, true);
                 }
             } else if ( sn instanceof BoolOp ) {
                 BoolOp as = ((BoolOp) sn);
                 if ( as.op==1 ) {
-                    this.builder.append("(");
-                    traverse("", as.values[0], true);
-                    this.builder.append(")");
+                    builder.append("(");
+                    traverse(builder,"", as.values[0], true);
+                    builder.append(")");
                     for ( exprType o: Arrays.copyOfRange( as.values, 1, as.values.length ) ) {
-                        this.builder.append(" && ");
-                        this.builder.append("(");
-                        traverse("", o, true);
-                        this.builder.append(")");
+                        builder.append(" && ");
+                        builder.append("(");
+                        traverse(builder,"", o, true);
+                        builder.append(")");
                     }
                 } else {
                     throw new IllegalArgumentException("not supported BoolOp as.op="+as.op);
                 }
             } else if (sn instanceof Assign) {
-                handleAssign( (Assign)sn, indent, inline );
+                handleAssign(builder, (Assign)sn, indent, inline );
             } else if ( sn instanceof Assert ) {
                 Assert a= (Assert)sn;
                 if (a.test instanceof Call) {
@@ -684,23 +685,23 @@ public class JythonToJavaConverter {
                     }   
                 }                
             } else if (sn instanceof Name) {
-                handleName( (Name)sn, indent, inline );
+                handleName( builder,(Name)sn, indent, inline );
 
             } else if (sn instanceof Call) {
-                handleCall( (Call)sn, indent, inline );
+                handleCall( builder,(Call)sn, indent, inline );
 
             } else if ( sn instanceof Index ) {
                 Index id= (Index)sn;
-                traverse("", id.value, true);
+                traverse(builder,"", id.value, true);
                 
             } else if (sn instanceof For) {
-                handleFor( (For)sn, indent, inline );
+                handleFor( builder,(For)sn, indent, inline );
 
             } else if (sn instanceof While) {
-                handleWhile( (While)sn, indent, inline );
+                handleWhile(builder, (While)sn, indent, inline );
 
             } else if (sn instanceof If) {
-                handleIf( (If)sn, indent, inline );
+                handleIf( builder,(If)sn, indent, inline );
 
             } else if (sn instanceof Compare) {
                 Compare cp = (Compare) sn;
@@ -708,177 +709,177 @@ public class JythonToJavaConverter {
                     String t1= guessType(cp.left);
                     String t2= guessType(cp.comparators[0]);
                     if ( t1==TYPE_STRING && t2==TYPE_STRING ) {                        
-                        traverse("",cp.comparators[0],true);
-                        this.builder.append(".contains(");
-                        traverse("",cp.left,true);
-                        this.builder.append(")");
+                        traverse(builder,"",cp.comparators[0],true);
+                        builder.append(".contains(");
+                        traverse(builder,"",cp.left,true);
+                        builder.append(")");
                         return;
                     }
                 }
-                traverse("", cp.left, true);
+                traverse(builder,"", cp.left, true);
                 for ( int i : cp.ops ) {
                     switch (i) {
                         case Compare.Gt:
-                            this.builder.append(">");
+                            builder.append(">");
                             break;
                         case Compare.GtE:
-                            this.builder.append(">=");
+                            builder.append(">=");
                             break;
                         case Compare.Lt:
-                            this.builder.append("<");
+                            builder.append("<");
                             break;
                         case Compare.LtE:
-                            this.builder.append("<=");
+                            builder.append("<=");
                             break;
                         case Compare.Eq:
-                            this.builder.append("==");
+                            builder.append("==");
                             break;
                         case Compare.NotEq:
-                            this.builder.append("!=");
+                            builder.append("!=");
                             break;
                         default:
-                            this.builder.append("?in?");
+                            builder.append("?in?");
                             break;
                     }   
                 }
                 for (exprType t : cp.comparators) {
-                    traverse("", t, inline);
+                    traverse(builder,"", t, inline);
                 }
             } else if (sn instanceof Continue) {
-                this.builder.append("continue");
+                builder.append("continue");
             } else if (sn instanceof Raise) {
                 Raise r= (Raise)sn;
-                this.builder.append("throw ");
-                traverse("", r.type, true );
+                builder.append("throw ");
+                traverse(builder,"", r.type, true );
 
             } else if (sn instanceof ExtSlice ) {
                 ExtSlice r= (ExtSlice)sn;
                 for ( int i=0; i<r.dims.length; i++ ) {
-                    if ( i>0 ) this.builder.append(",");
+                    if ( i>0 ) builder.append(",");
                     sliceType st= r.dims[i];
-                    traverse("", st, true );
+                    traverse(builder,"", st, true );
                 }
             } else if (sn instanceof Slice) {
                 Slice s= (Slice)sn;
-                this.builder.append( "[" + String.valueOf(s.lower)+":"+ String.valueOf(s.upper)+":"+ String.valueOf(s.step) + "]" );
+                builder.append( "[" + String.valueOf(s.lower)+":"+ String.valueOf(s.upper)+":"+ String.valueOf(s.step) + "]" );
             } else if (sn instanceof Subscript ) {
-                handleSubscript( (Subscript)sn, indent, inline );
+                handleSubscript( builder,(Subscript)sn, indent, inline );
             } else if (sn instanceof Attribute) {
                 Attribute at = ((Attribute) sn);
                 String type= guessType(at.value);
                 if ( type.equals("String") ) {
                     if ( at.attr.equals("strip") ) {
-                        traverse("", at.value, true);
-                        this.builder.append(".");
-                        this.builder.append("trim");
+                        traverse(builder,"", at.value, true);
+                        builder.append(".");
+                        builder.append("trim");
                         return;
                     } else if ( at.attr.equals("split") ) {
-                        traverse("", at.value, true);
-                        this.builder.append(".");
-                        this.builder.append("trim().split(\"\\\\s+\")");
+                        traverse(builder,"", at.value, true);
+                        builder.append(".");
+                        builder.append("trim().split(\"\\\\s+\")");
                         return;
                     } else if ( at.attr.equals("splitlines") ) {
-                        traverse("", at.value, true);
-                        this.builder.append(".");
-                        this.builder.append("split(\"\\n\")");
+                        traverse(builder,"", at.value, true);
+                        builder.append(".");
+                        builder.append("split(\"\\n\")");
                         return;
                     } else if ( at.attr.equals("find") ) {
-                        traverse("", at.value, true);
-                        this.builder.append(".");
-                        this.builder.append("indexOf");
+                        traverse(builder,"", at.value, true);
+                        builder.append(".");
+                        builder.append("indexOf");
                         return;
                     } else if ( at.attr.equals("startswith") ) {
-                        traverse("", at.value, true);
-                        this.builder.append(".");
-                        this.builder.append("startsWith");
+                        traverse(builder,"", at.value, true);
+                        builder.append(".");
+                        builder.append("startsWith");
                         return;
                     } else if ( at.attr.equals("endswith") ) {
-                        traverse("", at.value, true);
-                        this.builder.append(".");
-                        this.builder.append("endsWith");
+                        traverse(builder,"", at.value, true);
+                        builder.append(".");
+                        builder.append("endsWith");
                         return;
                     }
                 } else {
                     if ( at.attr.equals("strip") && ( at.value instanceof Name ) ) {
-                        traverse("", at.value, true);
-                        this.builder.append(".");
-                        this.builder.append("trim");
+                        traverse(builder,"", at.value, true);
+                        builder.append(".");
+                        builder.append("trim");
                         assertType(((Name)at.value).id, TYPE_STRING );
                         return;
                     } 
                 }
-                traverse("", at.value, true);
-                this.builder.append(".");
-                this.builder.append(at.attr);
+                traverse(builder,"", at.value, true);
+                builder.append(".");
+                builder.append(at.attr);
             } else if ( sn instanceof org.python.parser.ast.List ) {
                 org.python.parser.ast.List ll = ((org.python.parser.ast.List) sn);
                 String open= getJavaListType( ll );
-                this.builder.append(open);
-                this.builder.append(" { ");
+                builder.append(open);
+                builder.append(" { ");
                 
                 for ( int i=0; i<ll.elts.length; i++ ) {
-                    if ( i>0 ) this.builder.append(",");
-                    traverse("", ll.elts[i], true);
+                    if ( i>0 ) builder.append(",");
+                    traverse(builder,"", ll.elts[i], true);
                 }
-                this.builder.append(" } ");
+                builder.append(" } ");
             } else if ( sn instanceof org.python.parser.ast.Subscript ) {
                 org.python.parser.ast.Subscript ss= (org.python.parser.ast.Subscript)sn;
-                traverse( "", ss.value, true );
-                this.builder.append("[");
-                traverse( "", ss.slice, true );
-                this.builder.append("]");
+                traverse( builder,"", ss.value, true );
+                builder.append("[");
+                traverse( builder,"", ss.slice, true );
+                builder.append("]");
             } else if ( sn instanceof Tuple ) {
                 org.python.parser.ast.Tuple ss= (org.python.parser.ast.Tuple)sn;
                 for ( int i=0; i<ss.elts.length; i++ ) {
-                    if ( i>0 ) this.builder.append(',');
-                    traverse( "", ss.elts[i], true );
+                    if ( i>0 ) builder.append(',');
+                    traverse( builder,"", ss.elts[i], true );
                 }
             } else if ( sn instanceof AugAssign ) {
                 AugAssign a1= (AugAssign)sn;
                 switch (a1.op) {
                     case AugAssign.Add:
-                        traverse("", a1.target, true);
-                        this.builder.append("+=");
-                        traverse("", a1.value, true);
+                        traverse(builder,"", a1.target, true);
+                        builder.append("+=");
+                        traverse(builder,"", a1.value, true);
                         break;
                     case AugAssign.Sub:
-                        traverse("", a1.target, true);
-                        this.builder.append("+=");
-                        traverse("", a1.value, true);   
+                        traverse(builder,"", a1.target, true);
+                        builder.append("+=");
+                        traverse(builder,"", a1.value, true);   
                         break;
                     default:
-                        this.builder.append(sn.toString()).append("\n");
+                        builder.append(sn.toString()).append("\n");
                         break;
                 }
             } else if( sn instanceof TryExcept ) {
                 TryExcept te= (TryExcept)sn;
                 System.err.println(""+indent.length()+" length");
                 builder.append(indent).append("try {\n");
-                handleBody( te.body, indent+spaces4 );
+                handleBody( builder, te.body, indent+spaces4 );
                 builder.append(indent).append("} catch ( Exception e ) {").append("\n");
                 for ( int i=0; i<te.handlers.length; i++ ) {
                     if ( te.handlers[i] instanceof excepthandlerType ) {
-                        handleBody( ((excepthandlerType)te.handlers[i]).body, indent + spaces4 );
+                        handleBody( builder,((excepthandlerType)te.handlers[i]).body, indent + spaces4 );
                         if ( te.handlers.length>1 ) {
-                            this.builder.append( "not sure line830");
+                            builder.append( "not sure line830");
                         }
                     } else {
-                        this.builder.append( "not sure line833");
+                        builder.append( "not sure line833");
                     }
                 }
                 if ( te.orelse==null ) {
                     
                 } else {
-                    this.builder.append( "not sure line839");
-                    handleBody( te.orelse, indent+spaces4 );
-                    this.builder.append( "not sure line832");
+                    builder.append( "not sure line839");
+                    handleBody(builder,te.orelse, indent+spaces4 );
+                    builder.append( "not sure line832");
                 }
                 builder.append(indent).append("}");
             } else if ( sn instanceof Import ) {
                 Import imp= (Import)sn;
                 builder.append( indent ).append( "import " );
                 for ( aliasType a: imp.names ) {
-                    traverse( "", a, true );
+                    traverse( builder,"", a, true );
                     builder.append(",");
                 }
             } else if ( sn instanceof ImportFrom ) {
@@ -889,16 +890,16 @@ public class JythonToJavaConverter {
                 builder.append( indent ).append( at.name );
                                 
             } else {
-                this.builder.append(sn.toString()).append("\n");
+                builder.append(sn.toString()).append("\n");
                 lineNumber++;
             }
             
             if ( !inline ) {
-                String ss= this.builder.toString().trim();
+                String ss= builder.toString().trim();
                 if ( ss.charAt(ss.length()-1)=='}' ) {
-                    this.builder.append("\n");
+                    builder.append("\n");
                 } else {
-                    this.builder.append(";\n");
+                    builder.append(";\n");
                 }
                 lineNumber++;
             }
@@ -925,9 +926,6 @@ public class JythonToJavaConverter {
          */
         private String getTypeForName( String name ) {
             for ( int i=contexts.size()-1; i>=0; i-- ) {
-                if ( i>= contexts.size() ) {
-                    System.err.println("here stop");
-                }
                 Context c= contexts.get(i);
                 String ss= c.names.get(name);
                 if ( ss!=null ) {
@@ -1155,6 +1153,12 @@ public class JythonToJavaConverter {
         }
         
         private String guessReturnType( stmtType[] statements ) {
+            StringBuilder dummy= new StringBuilder();
+            try {
+                handleBody(dummy,statements,"");
+            } catch (Exception ex) {
+                Logger.getLogger(JythonToJavaConverter.class.getName()).log(Level.SEVERE, null, ex);
+            }
             String returnType= "void";
             for ( stmtType s : statements ) {
                 if ( s instanceof If ) {
@@ -1174,56 +1178,56 @@ public class JythonToJavaConverter {
             return returnType;
         }
         
-        private void handleFunctionDef( FunctionDef fd, String indent, boolean inline ) throws Exception {
+        private void handleFunctionDef( StringBuilder builder, FunctionDef fd, String indent, boolean inline ) throws Exception {
             String returnType= guessReturnType(fd.body );
             // check for single-line documentation string
             if ( fd.body.length>0 && fd.body[0] instanceof Expr ) {
                 Expr expr= (Expr)fd.body[0];
                 if ( expr.value instanceof Str ) {
-                    this.builder
+                    builder
                             .append(indent).append("/**\n")
                             .append(indent).append(" * ").append(((Str)expr.value).s).append("\n")
                             .append(indent).append(" */\n");
                     fd.body= Arrays.copyOfRange( fd.body, 1, fd.body.length );
                 }
             }
-            this.builder.append("private ").append(returnType).append(" ").append(fd.name).append("(");
+            builder.append("private ").append(returnType).append(" ").append(fd.name).append("(");
             for (int i = 0; i < fd.args.args.length; i++) {
                 if (i > 0) {
-                    this.builder.append(",");
+                    builder.append(",");
                 }
-                traverse( "", fd.args.args[i], true );
+                traverse( builder,"", fd.args.args[i], true );
             }
-            this.builder.append(") {\n");
+            builder.append(") {\n");
             lineNumber++;
-            handleBody( fd.body, indent+spaces4 );
-            this.builder.append(indent).append("}");
+            handleBody(builder, fd.body, indent+spaces4 );
+            builder.append(indent).append("}");
         }
 
-        private void handlePrint( Print pr, String indent, boolean inline) throws Exception {
-            this.builder.append("System.out.println(");
+        private void handlePrint( StringBuilder builder, Print pr, String indent, boolean inline) throws Exception {
+            builder.append("System.out.println(");
             for (int i = 0; i < pr.values.length; i++) {
                 if (i > 0) {
-                    this.builder.append(",");
+                    builder.append(",");
                 }
-                traverse("", pr.values[i], true);
+                traverse(builder,"", pr.values[i], true);
             }
-            this.builder.append(")");
+            builder.append(")");
         }
         
-        private void handleClassDef( ClassDef classDef, String indent, boolean inline) throws Exception {
+        private void handleClassDef( StringBuilder builder, ClassDef classDef, String indent, boolean inline) throws Exception {
             if ( classDef.bases.length>0 ) {
-                this.builder.append("private class ").append(classDef.name).append(" extends ");
-                traverse( indent, classDef.bases[0], true );
-                this.builder.append(" {");
+                builder.append("private class ").append(classDef.name).append(" extends ");
+                traverse( builder, indent, classDef.bases[0], true );
+                builder.append(" {");
             } else {
-                this.builder.append("private class ").append(classDef.name).append(" {");
+                builder.append("private class ").append(classDef.name).append(" {");
             }
-            handleBody(classDef.body, indent+spaces4 );
-            this.builder.append("}");
+            handleBody( builder,classDef.body, indent+spaces4 );
+            builder.append("}");
         }
 
-        private void handleAssign(Assign as, String indent, boolean inline ) throws Exception {
+        private void handleAssign(StringBuilder builder, Assign as, String indent, boolean inline) throws Exception {
             logger.log(Level.FINE, "handleAssign at {0}", as.beginLine);
             if ( as.targets.length==1 && ( as.targets[0] instanceof Name ) )  {
                 String typeOf1= guessType( ((Name)as.targets[0]) );
@@ -1232,80 +1236,80 @@ public class JythonToJavaConverter {
                     if ( typeOf==TYPE_OBJECT ) {
                         typeOf=guessType(as.value);
                     }
-                    this.builder.append(typeOf).append(" ");
+                    builder.append(typeOf).append(" ");
                     assertType( ((Name)as.targets[0]).id, typeOf );
                 }
             }
             for (int i = 0; i < as.targets.length; i++) {
                 if (i > 0) {
-                    this.builder.append(",");
+                    builder.append(",");
                 }
-                traverse("", as.targets[i], true);
+                traverse(builder,"", as.targets[i], true);
             }
-            this.builder.append(" = ");
-            traverse("", as.value, true);
+            builder.append(" = ");
+            traverse(builder,"", as.value, true);
 
         }
 
-        private void handleName(Name nn, String indent, boolean inline) {
+        private void handleName(StringBuilder builder, Name nn, String indent, boolean inline) {
             String name= nn.id;
             if ( name.equals("False") ) {
-                this.builder.append("false");
+                builder.append("false");
             } else if ( name.equals("True") ) {
-                this.builder.append("true");
+                builder.append("true");
             } else if ( name.equals("None") ) {
-                this.builder.append("null");
+                builder.append("null");
             } else {
-                this.builder.append(nn.id);
+                builder.append(nn.id);
             }
         }
 
-        private void handleCall(Call cc, String indent, boolean inline) throws Exception {
+        private void handleCall(StringBuilder builder, Call cc, String indent, boolean inline) throws Exception {
             if (cc.func instanceof Name) {
                 String name = ((Name) cc.func).id;
                 if (Character.isUpperCase(name.charAt(0))) {
-                    this.builder.append("new").append(" ");
+                    builder.append("new").append(" ");
                 } else if ( name.equals("int") ) {
-                    this.builder.append("(int)(");
-                    traverse("",cc.args[0],true);
-                    this.builder.append(")");
+                    builder.append("(int)(");
+                    traverse(builder,"",cc.args[0],true);
+                    builder.append(")");
                     return;
                 }
             }
-            traverse("", cc.func, true);
-            this.builder.append("(");
+            traverse(builder,"", cc.func, true);
+            builder.append("(");
             for (int i = 0; i < cc.args.length; i++) {
                 if (i > 0) {
-                    this.builder.append(",");
+                    builder.append(",");
                 }
-                traverse("", cc.args[i], true);
+                traverse(builder,"", cc.args[i], true);
             }
-            this.builder.append(")");
+            builder.append(")");
             for ( int i=0; i<cc.keywords.length; i++ ) {
-                this.builder.append(" //" );
-                handleKeywordType( cc.keywords[i], true );
+                builder.append(" //" );
+                handleKeywordType( builder, cc.keywords[i], true );
             }
 
         }
         
-        private void handleKeywordType( keywordType kw, boolean inline ) {
-            this.builder.append(kw.arg).append("=");
+        private void handleKeywordType( StringBuilder builder, keywordType kw, boolean inline ) {
+            builder.append(kw.arg).append("=");
             try {
-                traverse( "", kw.value, true );
+                traverse( builder,"", kw.value, true );
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
         }
 
-        private void handleBody( stmtType[] body, String thisIndent ) throws Exception {
+        private void handleBody( StringBuilder builder, stmtType[] body, String thisIndent ) throws Exception {
             contexts.push( new Context() );
             for (int i = 0; i < body.length; i++) {
-                traverse(thisIndent, body[i], false);
+                traverse(builder,thisIndent, body[i], false);
             }
             contexts.pop( );
         }
 
-        private void handleFor(For ff, String indent, boolean inline) throws Exception {
+        private void handleFor(StringBuilder builder, For ff, String indent, boolean inline) throws Exception {
             logger.log(Level.FINE, "handleFor at {0}", ff.beginLine);
             String typeOf= getJavaIterExprType( ff.iter );
             if ( typeOf==TYPE_OBJECT ) {
@@ -1322,82 +1326,82 @@ public class JythonToJavaConverter {
                 if (c.func instanceof Name ) {
                     Name n= ((Name)c.func);
                     if ( n.id.equals("xrange") ) {
-                        this.builder.append("for ( ").append(typeOf).append(" ");
-                        traverse("", ff.target, true);
+                        builder.append("for ( ").append(typeOf).append(" ");
+                        traverse(builder,"", ff.target, true);
                         if ( c.args.length==1 ) {
-                            this.builder.append("=").append("0; " );
-                            traverse("", ff.target, true);
-                            this.builder.append("<");
-                            traverse("", c.args[0], true);
-                            this.builder.append("; ");
-                            traverse("", ff.target, true);
-                            this.builder.append("++ ) {\n");
-                            handleBody(ff.body, spaces4+ indent );
-                            this.builder.append(indent).append("}\n");
+                            builder.append("=").append("0; " );
+                            traverse(builder,"", ff.target, true);
+                            builder.append("<");
+                            traverse(builder,"", c.args[0], true);
+                            builder.append("; ");
+                            traverse(builder,"", ff.target, true);
+                            builder.append("++ ) {\n");
+                            handleBody(builder,ff.body, spaces4+ indent );
+                            builder.append(indent).append("}\n");
                             return;
                         } else if ( c.args.length==2 ) {
-                            this.builder.append("=");
-                            traverse("", c.args[0], true);
-                            this.builder.append("; " );
-                            traverse("", ff.target, true);
-                            this.builder.append("<");
-                            traverse("", c.args[1], true);
-                            this.builder.append("; ");
-                            traverse("", ff.target, true);
-                            this.builder.append("++ ) {\n");
-                            handleBody(ff.body, spaces4+ indent );
-                            this.builder.append(indent).append("}\n");
+                            builder.append("=");
+                            traverse(builder,"", c.args[0], true);
+                            builder.append("; " );
+                            traverse(builder,"", ff.target, true);
+                            builder.append("<");
+                            traverse(builder,"", c.args[1], true);
+                            builder.append("; ");
+                            traverse(builder,"", ff.target, true);
+                            builder.append("++ ) {\n");
+                            handleBody(builder,ff.body, spaces4+ indent );
+                            builder.append(indent).append("}\n");
                             return;
                         }
                     }
                 }
             }
-            this.builder.append("for ( ").append(typeOf).append(" ");
-            traverse("", ff.target, true);
-            this.builder.append(" : ");
-            traverse("", ff.iter, true);
-            this.builder.append(" ) {\n");
+            builder.append("for ( ").append(typeOf).append(" ");
+            traverse(builder,"", ff.target, true);
+            builder.append(" : ");
+            traverse(builder,"", ff.iter, true);
+            builder.append(" ) {\n");
             lineNumber++;
-            handleBody(ff.body, spaces4+ indent );
-            this.builder.append(indent).append("}\n");
-            lineNumber++;
-        }
-
-        private void handleWhile(While ff, String indent, boolean inline) throws Exception {
-            this.builder.append("while ( ");
-            traverse( "", ff.test, true );
-            this.builder.append(" ) {\n");
-            lineNumber++;
-            handleBody(ff.body, spaces4+ indent );
-            this.builder.append(indent).append("}\n");
+            handleBody(builder,ff.body, spaces4+ indent );
+            builder.append(indent).append("}\n");
             lineNumber++;
         }
 
-        private void handleIf(If ff, String indent, boolean inline) throws Exception {
-            this.builder.append("if ( ");
-            traverse("", ff.test, true);
-            this.builder.append(" ) {\n");
+        private void handleWhile(StringBuilder builder, While ff, String indent, boolean inline) throws Exception {
+            builder.append("while ( ");
+            traverse(builder,"", ff.test, true );
+            builder.append(" ) {\n");
             lineNumber++;
-            handleBody(ff.body,spaces4+ indent ); 
+            handleBody(builder,ff.body, spaces4+ indent );
+            builder.append(indent).append("}\n");
+            lineNumber++;
+        }
+
+        private void handleIf(StringBuilder builder, If ff, String indent, boolean inline) throws Exception {
+            builder.append("if ( ");
+            traverse(builder,"", ff.test, true);
+            builder.append(" ) {\n");
+            lineNumber++;
+            handleBody(builder,ff.body,spaces4+ indent ); 
             if ( ff.orelse==null ) {
-                this.builder.append(indent).append("}");
+                builder.append(indent).append("}");
             } else {
                 lineNumber++;
                 if ( ff.orelse.length==1 && ff.orelse[0] instanceof If ) {
-                    this.builder.append(indent).append("} else ");
-                    handleBody(ff.orelse, indent );
+                    builder.append(indent).append("} else ");
+                    handleBody(builder,ff.orelse, indent );
                 } else {
-                    this.builder.append(indent).append("} else {\n");
-                    handleBody(ff.orelse, spaces4+indent );
-                    this.builder.append(indent).append("}");
+                    builder.append(indent).append("} else {\n");
+                    handleBody( builder, ff.orelse, spaces4+indent );
+                    builder.append(indent).append("}");
                 }
             }
         }
         
-        private void handleSubscript( Subscript s, String indent, boolean inline ) throws Exception {
+        private void handleSubscript( StringBuilder builder, Subscript s, String indent, boolean inline ) throws Exception {
             logger.log(Level.FINE, "Subscript at line {0}", ((Subscript) s).beginLine);
                 
-                traverse( "", s.value, true );
+                traverse( builder,"", s.value, true );
                 String t;
                 if ( s.value instanceof Subscript ) {
                     t= guessType( ((Subscript)s.value).value );
@@ -1415,27 +1419,27 @@ public class JythonToJavaConverter {
                 if ( st instanceof Slice ) {
                     Slice slice= (Slice)st;
                     if ( t.equals(TYPE_STRING) ) { 
-                        this.builder.append(".substring(");
-                        traverse("",slice.lower,true);
+                        builder.append(".substring(");
+                        traverse(builder,"",slice.lower,true);
                         if ( slice.step!=null ) {
-                            this.builder.append("[ERR slice.step!=null]");
+                            builder.append("[ERR slice.step!=null]");
                         }
                         if ( slice.upper!=null ) {
-                            this.builder.append(",");
-                            traverse("",slice.upper,true);
+                            builder.append(",");
+                            traverse(builder,"",slice.upper,true);
                         }
-                        this.builder.append(")");
+                        builder.append(")");
                     } else {
-                        traverse("",slice,true);
+                        traverse(builder,"",slice,true);
                     }
                 } else if ( st instanceof Index ) {
-                    this.builder.append("[");
-                    traverse("",((Index)st).value,true);
-                    this.builder.append("]");
+                    builder.append("[");
+                    traverse(builder,"",((Index)st).value,true);
+                    builder.append("]");
                 } else {
-                    this.builder.append("[");
-                    traverse("",st,true);
-                    this.builder.append("]");
+                    builder.append("[");
+                    traverse(builder,"",st,true);
+                    builder.append("]");
                 }
         }
 
