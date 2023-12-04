@@ -1888,7 +1888,7 @@ public class GuiSupport {
      * <code>theVap</code>.  This should be called from the event thread.
      * @param app GUI component used as the client for the lock.
      * @param controller
-     * @param newP the plot to insert plot elements.
+     * @param targetPlot the plot to insert plot elements.
      * @param theVap string containing a single-plot vap.
      * @throws HeadlessException
      * @throws IOException 
@@ -1897,7 +1897,7 @@ public class GuiSupport {
     private static void insertStringVapIntoPlot( 
             Component app, 
             ApplicationController controller, 
-            Plot newP, 
+            Plot targetPlot, 
             String theVap ) throws HeadlessException, IOException, IllegalArgumentException {
         Application state;
         
@@ -1912,58 +1912,58 @@ public class GuiSupport {
             lock.lock("pasting plot");
             controller.performingChange( app, lockObject );
 
-            List<PlotElement> pes= controller.getPlotElementsFor(newP);
+            List<PlotElement> pes= controller.getPlotElementsFor(targetPlot);
             pes.forEach((pe) -> {
                 controller.deletePlotElement(pe);
             });
 
-            Plot p= state.getPlots(0);
+            Plot srcPlot= state.getPlots(0);
             List<String> exclude= Arrays.asList(Plot.PROP_ID,
                     Axis.PROP_DRAWTICKLABELS, Axis.PROP_VISIBLE, Axis.PROP_OPPOSITE );
-            if ( newP.getXaxis().getRange().getUnits().isConvertibleTo( p.getXaxis().getRange().getUnits() ) ) {
-                p.getXaxis().setRange(newP.getXaxis().getRange());
-                p.getXaxis().setLog(newP.getXaxis().isLog());
+            if ( targetPlot.getXaxis().getRange().getUnits().isConvertibleTo( srcPlot.getXaxis().getRange().getUnits() ) ) {
+                srcPlot.getXaxis().setRange(targetPlot.getXaxis().getRange());
+                srcPlot.getXaxis().setLog(targetPlot.getXaxis().isLog());
             }
-            newP.getXaxis().syncTo( p.getXaxis(), exclude );
+            targetPlot.getXaxis().syncTo( srcPlot.getXaxis(), exclude );
             
-            if ( newP.getYaxis().getRange().getUnits().isConvertibleTo( p.getYaxis().getRange().getUnits() ) ) {
-                if ( !newP.getYaxis().isAutoRange() ) {
-                    p.getYaxis().setRange(newP.getYaxis().getRange());
-                    p.getYaxis().setLog(newP.getYaxis().isLog());
+            if ( targetPlot.getYaxis().getRange().getUnits().isConvertibleTo( srcPlot.getYaxis().getRange().getUnits() ) ) {
+                if ( !targetPlot.getYaxis().isAutoRange() ) {
+                    srcPlot.getYaxis().setRange(targetPlot.getYaxis().getRange());
+                    srcPlot.getYaxis().setLog(targetPlot.getYaxis().isLog());
                 }
             }
-            newP.getYaxis().syncTo( p.getYaxis(), exclude );
+            targetPlot.getYaxis().syncTo( srcPlot.getYaxis(), exclude );
             
             exclude= Arrays.asList(Plot.PROP_ID,
                     Plot.PROP_ROWID,Plot.PROP_COLUMNID,
                     Plot.PROP_TICKS_URI,
                     Plot.PROP_EPHEMERIS_LABELS,Plot.PROP_EPHEMERISLINECOUNT,
                     Plot.PROP_XAXIS, Plot.PROP_YAXIS );
-            newP.syncTo( p,exclude );
-            newP.setTicksURI("");
-            newP.setEphemerisLabels("");
-            newP.setEphemerisLineCount(-1);
+            targetPlot.syncTo( srcPlot,exclude );
+            targetPlot.setTicksURI("");
+            targetPlot.setEphemerisLabels("");
+            targetPlot.setEphemerisLineCount(-1);
             
             // if everything else is bound, then bind this one too.
             Application dom= controller.getApplication();
             boolean doBindX= dom.getController().findBindings( dom, Application.PROP_TIMERANGE ).size()>0 &&
-                    dom.getController().findBindings( newP, Plot.PROP_CONTEXT ).isEmpty() &&
-                    UnitsUtil.isTimeLocation( newP.getXaxis().getRange().getUnits() ) &&
+                    dom.getController().findBindings( targetPlot, Plot.PROP_CONTEXT ).isEmpty() &&
+                    UnitsUtil.isTimeLocation( targetPlot.getXaxis().getRange().getUnits() ) &&
                     UnitsUtil.isTimeLocation( dom.getTimeRange().getUnits() );
             if ( doBindX ) {
-                newP.getXaxis().setRange( dom.getTimeRange() );
-                controller.getApplication().getController().bind( dom, Application.PROP_TIMERANGE, newP.getXaxis(), Axis.PROP_RANGE );
+                targetPlot.getXaxis().setRange( dom.getTimeRange() );
+                controller.getApplication().getController().bind( dom, Application.PROP_TIMERANGE, targetPlot.getXaxis(), Axis.PROP_RANGE );
             } else {
-                if ( dom.getController().findBindings( dom, Application.PROP_TIMERANGE, newP, Plot.PROP_CONTEXT ).size()==1 &&
-                    UnitsUtil.isTimeLocation( newP.getXaxis().getRange().getUnits() ) ) {
-                    dom.setTimeRange( newP.getXaxis().getRange() );
-                    controller.getApplication().getController().unbind( dom, Application.PROP_TIMERANGE, newP, Plot.PROP_CONTEXT );
-                    controller.getApplication().getController().bind( dom, Application.PROP_TIMERANGE, newP.getXaxis(), Axis.PROP_RANGE );
+                if ( dom.getController().findBindings( dom, Application.PROP_TIMERANGE, targetPlot, Plot.PROP_CONTEXT ).size()==1 &&
+                    UnitsUtil.isTimeLocation( targetPlot.getXaxis().getRange().getUnits() ) ) {
+                    dom.setTimeRange( targetPlot.getXaxis().getRange() );
+                    controller.getApplication().getController().unbind( dom, Application.PROP_TIMERANGE, targetPlot, Plot.PROP_CONTEXT );
+                    controller.getApplication().getController().bind( dom, Application.PROP_TIMERANGE, targetPlot.getXaxis(), Axis.PROP_RANGE );
                 }
             }
             
             Map<String,String> nameMap= new HashMap<>();
-            nameMap.put( p.getId(), newP.getId() );
+            nameMap.put( srcPlot.getId(), targetPlot.getId() );
             //List<DataSourceFilter> unresolved= new ArrayList<>();
             for ( int i=0; i<state.getDataSourceFilters().length; i++ ) {
                 DataSourceFilter newDsf= controller.addDataSourceFilter();
