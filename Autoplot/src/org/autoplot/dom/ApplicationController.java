@@ -1151,16 +1151,22 @@ public class ApplicationController extends DomNodeController implements RunLater
                         int rx= r.x + r.width/2;
                         int ry= r.y + r.height/2;
                         String anchorOffset;
-                        if ( annotation.getAnchorPosition()==AnchorPosition.NE ) {
-                            anchorOffset = String.format( "%fem,%fem", -1*(rx-ix)/em, (ry-iy)/em );
-                        } else if ( annotation.getAnchorPosition()==AnchorPosition.NW ) {
-                            anchorOffset = String.format( "%fem,%fem", (rx-ix)/em, (ry-iy)/em );
-                        } else if ( annotation.getAnchorPosition()==AnchorPosition.SW ) {
-                            anchorOffset = String.format( "%fem,%fem", (rx-ix)/em, -1*(ry-iy)/em );
-                        } else if ( annotation.getAnchorPosition()==AnchorPosition.SE ) {
-                            anchorOffset = String.format( "%fem,%fem", -1*(rx-ix)/em, -1*(ry-iy)/em );
-                        } else {
-                            anchorOffset = annotation.getAnchorOffset();
+                        switch (annotation.getAnchorPosition()) {
+                            case NE:
+                                anchorOffset = String.format( "%fem,%fem", -1*(rx-ix)/em, (ry-iy)/em );
+                                break;
+                            case NW:
+                                anchorOffset = String.format( "%fem,%fem", (rx-ix)/em, (ry-iy)/em );
+                                break;
+                            case SW:
+                                anchorOffset = String.format( "%fem,%fem", (rx-ix)/em, -1*(ry-iy)/em );
+                                break;
+                            case SE:
+                                anchorOffset = String.format( "%fem,%fem", -1*(rx-ix)/em, -1*(ry-iy)/em );
+                                break;
+                            default:
+                                anchorOffset = annotation.getAnchorOffset();
+                                break;
                         }
                         annotation.setAnchorOffset( anchorOffset );
                     } else {
