@@ -1918,7 +1918,15 @@ public class GuiSupport {
             });
 
             Plot p= state.getPlots(0);
-            newP.syncTo( p,Arrays.asList(Plot.PROP_ID,Plot.PROP_ROWID,Plot.PROP_COLUMNID,Plot.PROP_TICKS_URI,Plot.PROP_EPHEMERIS_LABELS,Plot.PROP_EPHEMERISLINECOUNT) );
+            if ( newP.getXaxis().isAutoRange() ) {
+                newP.getXaxis().syncTo( p.getXaxis(), Collections.singletonList(Axis.PROP_DRAWTICKLABELS ) );
+            }
+            List<String> exclude= Arrays.asList(Plot.PROP_ID,
+                    Plot.PROP_ROWID,Plot.PROP_COLUMNID,
+                    Plot.PROP_TICKS_URI,
+                    Plot.PROP_EPHEMERIS_LABELS,Plot.PROP_EPHEMERISLINECOUNT,
+                    Plot.PROP_XAXIS);
+            newP.syncTo( p,exclude );
             newP.setTicksURI("");
             newP.setEphemerisLabels("");
             newP.setEphemerisLineCount(-1);
