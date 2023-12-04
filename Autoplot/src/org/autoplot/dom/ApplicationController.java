@@ -1137,15 +1137,43 @@ public class ApplicationController extends DomNodeController implements RunLater
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);                
                 if ( ((JCheckBoxMenuItem)e.getSource()).isSelected() ) {
-                    Rectangle r= impl.getActiveRegion().getBounds();
-                    Datum x1= plot.getController().getDasPlot().getXAxis().invTransform(r.x);
-                    Datum y1= plot.getController().getDasPlot().getYAxis().invTransform(r.y);
-                    Datum x2= plot.getController().getDasPlot().getXAxis().invTransform(r.x+r.width);
-                    Datum y2= plot.getController().getDasPlot().getYAxis().invTransform(r.y+r.height);                   
-                    annotation.setXrange( DatumRangeUtil.union(x1,x2) );
-                    annotation.setYrange( DatumRangeUtil.union(y1,y2) );
-                    //annotation.setAnchorPosition(AnchorPosition.W);
-                    annotation.setAnchorOffset("");
+                    if ( annotation.isShowArrow() ) {
+                        Datum x= annotation.getPointAtX();
+                        Datum y= annotation.getPointAtY();
+                        annotation.setXrange( DatumRangeUtil.union(x,x) );
+                        annotation.setYrange( DatumRangeUtil.union(y,y) );
+                        //annotation.setAnchorPosition(AnchorPosition.W);
+                        double ix= plot.getController().getDasPlot().getXAxis().transform( x );
+                        double iy= plot.getController().getDasPlot().getYAxis().transform( y );
+                        double em= 12; //plot.getFontSize();
+
+                        Rectangle r= impl.getActiveRegion().getBounds();
+                        int rx= r.x + r.width/2;
+                        int ry= r.y + r.height/2;
+                        String anchorOffset;
+                        if ( annotation.getAnchorPosition()==AnchorPosition.NE ) {
+                            anchorOffset = String.format( "%fem,%fem", -1*(rx-ix)/em, (ry-iy)/em );
+                        } else if ( annotation.getAnchorPosition()==AnchorPosition.NW ) {
+                            anchorOffset = String.format( "%fem,%fem", (rx-ix)/em, (ry-iy)/em );
+                        } else if ( annotation.getAnchorPosition()==AnchorPosition.SW ) {
+                            anchorOffset = String.format( "%fem,%fem", (rx-ix)/em, -1*(ry-iy)/em );
+                        } else if ( annotation.getAnchorPosition()==AnchorPosition.SE ) {
+                            anchorOffset = String.format( "%fem,%fem", -1*(rx-ix)/em, -1*(ry-iy)/em );
+                        } else {
+                            anchorOffset = annotation.getAnchorOffset();
+                        }
+                        annotation.setAnchorOffset( anchorOffset );
+                    } else {
+                        Rectangle r= impl.getActiveRegion().getBounds();
+                        Datum x1= plot.getController().getDasPlot().getXAxis().invTransform(r.x);
+                        Datum y1= plot.getController().getDasPlot().getYAxis().invTransform(r.y);
+                        Datum x2= plot.getController().getDasPlot().getXAxis().invTransform(r.x+r.width);
+                        Datum y2= plot.getController().getDasPlot().getYAxis().invTransform(r.y+r.height);                   
+                        annotation.setXrange( DatumRangeUtil.union(x1,x2) );
+                        annotation.setYrange( DatumRangeUtil.union(y1,y2) );
+                        //annotation.setAnchorPosition(AnchorPosition.W);
+                        annotation.setAnchorOffset("");
+                    }
                     annotation.setAnchorType(AnchorType.DATA);
                 } else {
                     annotation.setAnchorType(AnchorType.CANVAS);
