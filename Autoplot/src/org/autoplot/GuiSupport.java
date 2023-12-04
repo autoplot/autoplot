@@ -1918,14 +1918,27 @@ public class GuiSupport {
             });
 
             Plot p= state.getPlots(0);
-            if ( newP.getXaxis().isAutoRange() ) {
-                newP.getXaxis().syncTo( p.getXaxis(), Collections.singletonList(Axis.PROP_DRAWTICKLABELS ) );
-            }
             List<String> exclude= Arrays.asList(Plot.PROP_ID,
+                    Axis.PROP_DRAWTICKLABELS, Axis.PROP_VISIBLE, Axis.PROP_OPPOSITE );
+            if ( newP.getXaxis().getRange().getUnits().isConvertibleTo( p.getXaxis().getRange().getUnits() ) ) {
+                p.getXaxis().setRange(newP.getXaxis().getRange());
+                p.getXaxis().setLog(newP.getXaxis().isLog());
+            }
+            newP.getXaxis().syncTo( p.getXaxis(), exclude );
+            
+            if ( newP.getYaxis().getRange().getUnits().isConvertibleTo( p.getYaxis().getRange().getUnits() ) ) {
+                if ( !newP.getYaxis().isAutoRange() ) {
+                    p.getYaxis().setRange(newP.getYaxis().getRange());
+                    p.getYaxis().setLog(newP.getYaxis().isLog());
+                }
+            }
+            newP.getYaxis().syncTo( p.getYaxis(), exclude );
+            
+            exclude= Arrays.asList(Plot.PROP_ID,
                     Plot.PROP_ROWID,Plot.PROP_COLUMNID,
                     Plot.PROP_TICKS_URI,
                     Plot.PROP_EPHEMERIS_LABELS,Plot.PROP_EPHEMERISLINECOUNT,
-                    Plot.PROP_XAXIS);
+                    Plot.PROP_XAXIS, Plot.PROP_YAXIS );
             newP.syncTo( p,exclude );
             newP.setTicksURI("");
             newP.setEphemerisLabels("");
@@ -1935,10 +1948,18 @@ public class GuiSupport {
             Application dom= controller.getApplication();
             boolean doBindX= dom.getController().findBindings( dom, Application.PROP_TIMERANGE ).size()>0 &&
                     dom.getController().findBindings( newP, Plot.PROP_CONTEXT ).isEmpty() &&
-                    UnitsUtil.isTimeLocation( newP.getXaxis().getRange().getUnits() );
+                    UnitsUtil.isTimeLocation( newP.getXaxis().getRange().getUnits() ) &&
+                    UnitsUtil.isTimeLocation( dom.getTimeRange().getUnits() );
             if ( doBindX ) {
                 newP.getXaxis().setRange( dom.getTimeRange() );
                 controller.getApplication().getController().bind( dom, Application.PROP_TIMERANGE, newP.getXaxis(), Axis.PROP_RANGE );
+            } else {
+                if ( dom.getController().findBindings( dom, Application.PROP_TIMERANGE, newP, Plot.PROP_CONTEXT ).size()==1 &&
+                    UnitsUtil.isTimeLocation( newP.getXaxis().getRange().getUnits() ) ) {
+                    dom.setTimeRange( newP.getXaxis().getRange() );
+                    controller.getApplication().getController().unbind( dom, Application.PROP_TIMERANGE, newP, Plot.PROP_CONTEXT );
+                    controller.getApplication().getController().bind( dom, Application.PROP_TIMERANGE, newP.getXaxis(), Axis.PROP_RANGE );
+                }
             }
             
             Map<String,String> nameMap= new HashMap<>();
