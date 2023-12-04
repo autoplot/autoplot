@@ -1138,12 +1138,12 @@ public class ApplicationController extends DomNodeController implements RunLater
                 org.das2.util.LoggerManager.logGuiEvent(e);                
                 if ( ((JCheckBoxMenuItem)e.getSource()).isSelected() ) {
                     Rectangle r= impl.getActiveRegion().getBounds();
-                    Datum x= plot.getController().getDasPlot().getXAxis().invTransform(r.x);
-                    Datum y= plot.getController().getDasPlot().getYAxis().invTransform(r.y);
+                    Datum x1= plot.getController().getDasPlot().getXAxis().invTransform(r.x);
+                    Datum y1= plot.getController().getDasPlot().getYAxis().invTransform(r.y);
                     Datum x2= plot.getController().getDasPlot().getXAxis().invTransform(r.x+r.width);
                     Datum y2= plot.getController().getDasPlot().getYAxis().invTransform(r.y+r.height);                   
-                    annotation.setXrange( DatumRangeUtil.union(x,x2) );
-                    annotation.setYrange( DatumRangeUtil.union(y,y2) );
+                    annotation.setXrange( DatumRangeUtil.union(x1,x2) );
+                    annotation.setYrange( DatumRangeUtil.union(y1,y2) );
                     //annotation.setAnchorPosition(AnchorPosition.W);
                     annotation.setAnchorOffset("");
                     annotation.setAnchorType(AnchorType.DATA);
