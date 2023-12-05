@@ -20,6 +20,7 @@
  */
 package ZoeloeSoft.projects.JFontChooser;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,6 +39,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.Timer;
+import org.das2.util.Entities;
 
 public class JFontChooser extends JDialog {
 
@@ -136,6 +138,11 @@ public class JFontChooser extends JDialog {
                 if (fontCheck != null) {
                     updateFontCheck(getCurrentFont());
                 }
+//                if ( Entities.fontSupports(getCurrentFont(), txtSample.getText() ) ) {
+//                    cbBold.setForeground(Color.green);
+//                } else {
+//                    cbBold.setForeground(Color.red);
+//                }                
             }
         };
 
@@ -237,6 +244,12 @@ public class JFontChooser extends JDialog {
         }
         cbBold.setSelected(font.isBold());
         cbItalic.setSelected(font.isItalic());
+        
+//        if ( Entities.fontSupports(font, txtSample.getText() ) ) {
+//            cbBold.setForeground(Color.green);
+//        } else {
+//            cbBold.setForeground(Color.red);
+//        }
     }
 
     public Font getFont() {
@@ -269,7 +282,7 @@ public class JFontChooser extends JDialog {
     private FontCheck fontCheck = null;
 
     private void updateFontCheck( final Font font) {
-        String s= fontCheck.checkFont(font);
+        String s= fontCheck==null ? null : fontCheck.checkFont(font);
         if ( s==null ) {
             Timer t= new Timer(500,new ActionListener(){
                 @Override
