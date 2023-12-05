@@ -15,8 +15,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1459,6 +1461,23 @@ public class PlotElementController extends DomNodeController {
         }
     }
 
+    /**
+     * return true for a set of labels which seem to be describing different
+     * things.
+     * @param chs the array of labels.
+     * @return true if they appear to be differing.
+     */
+    private boolean dissimilarChannels( String[] chs ) {
+        int totalLen=0;
+        Set<Character> characters= new HashSet<>();
+        for ( String ch: chs ) {
+            for ( Character c: ch.toCharArray() ) {
+                characters.add(c);
+            }
+            totalLen+= ch.length();
+        }
+        return characters.size()>(totalLen/chs.length)*2;
+    }
 
     /**
      * This is the heart of the PlotElementController, and to some degree Autoplot.  In this routine, we are given
@@ -1607,6 +1626,12 @@ public class PlotElementController extends DomNodeController {
                     List<PlotElement> cp = new ArrayList<>(count);
                     int nsubsample= 1 + ( count-1 ) / 12; // 1-12 no subsample, 13-24 1 subsample, 25-36 2 subsample, etc.
 
+                    // check for inconsistencies in names, which might indictate that these are not similar channels
+                    boolean dissimilarChannels= dissimilarChannels(lnames);
+                    if ( dissimilarChannels ) {
+                        nsubsample= 1 + ( count-1 ) / 64; // 1-64 no subsample, 65...
+                    }
+                    
                     //check for non-unique labels, or labels that are simply numbers.
                     boolean uniqLabels= true;
                     assert lnames!=null;
