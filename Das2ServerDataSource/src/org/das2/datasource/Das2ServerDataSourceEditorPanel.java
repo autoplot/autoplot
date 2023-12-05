@@ -13,6 +13,7 @@ package org.das2.datasource;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
@@ -1096,8 +1097,11 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         Das2ServerGUI x = new Das2ServerGUI();
         x.setSpecification( dsdfContent );
         x.setParameters( readerParamsTextArea.getText() );
-        
-        int response= JOptionPane.showConfirmDialog( this, x.getPanel(), "Edit reader params", JOptionPane.OK_CANCEL_OPTION );
+        JScrollPane sp= new JScrollPane(x.getPanel());
+        sp.setMaximumSize( new Dimension(500,800) );
+        sp.setPreferredSize( new Dimension(300,500) );
+        sp.getVerticalScrollBar().setUnitIncrement(sp.getFont().getSize());
+        int response= JOptionPane.showConfirmDialog( this, sp, "Edit reader params", JOptionPane.OK_CANCEL_OPTION );
         if ( response==JOptionPane.OK_OPTION ) {
             readerParamsTextArea.setText( x.getParameters() );
         }
