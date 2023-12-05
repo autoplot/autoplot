@@ -961,8 +961,9 @@ public class RunBatchTool extends javax.swing.JPanel {
 
     private void exportResultsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportResultsMenuItemActionPerformed
         JFileChooser chooser= new JFileChooser();
-        chooser.setFileFilter( new FileNameExtensionFilter( "CSV Files", "csv") );
-        chooser.setDialogType( JFileChooser.OPEN_DIALOG );
+        chooser.addChoosableFileFilter( new FileNameExtensionFilter( "CSV Files", "csv") );
+        chooser.addChoosableFileFilter( new FileNameExtensionFilter( "JSON Files", "json") );
+        chooser.setDialogType( JFileChooser.SAVE_DIALOG );
         Preferences prefs= Preferences.userNodeForPackage(RunBatchTool.class );
         String s= prefs.get("export",null);
         if ( s!=null ) {
@@ -2703,7 +2704,11 @@ public class RunBatchTool extends javax.swing.JPanel {
                 if ( hasOutputFile ) {
                     record.append(",").append(jo.get("writeFile"));
                 }
-                record.append(",").append(jo.get("result"));
+                String resultString= jo.optString("result","");
+                int inl= resultString.indexOf("\n");
+                if ( inl>=0 ) inl= resultString.indexOf("\n",inl+1);
+                if ( inl>=0 ) resultString= resultString.substring(0,inl).replaceAll("\n"," ").replaceAll(",","");
+                record.append(",").append(resultString);
                 out.println( record.toString() );
             }
         } catch (JSONException ex) {
