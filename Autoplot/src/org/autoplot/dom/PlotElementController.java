@@ -1466,6 +1466,7 @@ public class PlotElementController extends DomNodeController {
      * things.
      * @param chs the array of labels.
      * @return true if they appear to be differing.
+     * @see https://sourceforge.net/p/autoplot/bugs/2571/
      */
     private boolean dissimilarChannels( String[] chs ) {
         int totalLen=0;
