@@ -2653,10 +2653,6 @@ public class RunBatchTool extends javax.swing.JPanel {
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
-    private static void exportResultsPendingJSON( File pendingFile, JSONObject results, JSONArray resultsArray, int recordsWrittenAlready ) throws FileNotFoundException, IOException, JSONException {        
-    
-    }
-    
     private static void exportResultsPendingCSV( File pendingFile, JSONObject results, JSONArray resultsArray, int recordsWrittenAlready ) throws FileNotFoundException, IOException {
         
         boolean header= recordsWrittenAlready==0;
