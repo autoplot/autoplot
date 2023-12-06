@@ -20,6 +20,7 @@ import org.jdesktop.beansbinding.Converter;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
+import org.das2.qds.ops.Ops;
 
 /**
  * Class for containing the logic of how macros are implemented.
@@ -92,7 +93,7 @@ public class LabelConverter extends Converter {
             if ( title.contains("CONTEXT" ) ) {
                 if ( pe!=null ) {
                     int loopCount=0;
-                    if ( pe.getController().isPendingChanges() ) {
+                    if ( pe.getController().isPendingChanges() ) { //TODO: review
                         loopCount++;
                         if ( loopCount>1000 ) {
                             break;
@@ -115,9 +116,8 @@ public class LabelConverter extends Converter {
                                 dataSet= d;
                             }
                         }
-                        String contextStr= DataSetUtil.contextAsString(dataSet);
                         logger.log(Level.FINEST, "bug1814: context substitution success. {0}", Thread.currentThread().getName());
-                        title= insertString( title, "CONTEXT", contextStr );
+                        title= insertUnformattedData( title, "CONTEXT", dataSet );
                     } else {
                         logger.log(Level.FINEST, "bug1814: ds is null. {0}", Thread.currentThread().getName());
                         title= insertString( title, "CONTEXT", "" ); 
@@ -128,6 +128,7 @@ public class LabelConverter extends Converter {
                 }
             }
             if ( title.contains("PLOT_CONTEXT") ) {
+                // Das2 also has a CONTEXT property, which is represented by PLOT_CONTEXT in Autoplot.
                 title= insertString( title, "PLOT_CONTEXT", "%{CONTEXT}");
             }            
             if ( title.contains("USER_PROPERTIES" ) ) {
@@ -318,6 +319,57 @@ public class LabelConverter extends Converter {
         return title;
     }
 
+    /**
+     * replace %{LABEL} or $(LABEL) with value, possibly formatting it.
+     * @param title the string containing the macro.
+     * @param label the label to replace, such as METADATA.SPACECRAFT.
+     * @param dataset the value to insert
+     * @return the new string with the value inserted.
+     */
+    protected static String insertUnformattedData( String title, String label, QDataSet dataset ) {
+        String svalue= DataSetUtil.contextAsString(dataset);
+        Pattern p= Pattern.compile("(\\%\\{"+label+"(,(.*?))?\\})");
+        Matcher m= p.matcher(title);
+        boolean found= m.find();
+        if ( !found ) {
+            p= Pattern.compile("(\\$\\("+label+"(,(.*?))?\\))");
+            m= p.matcher(title);
+            found= m.find();
+        }
+        if ( found ) {
+            String args= m.group(3);
+            if ( args!=null ) {
+                QDataSet ds= DataSetUtil.getContext(dataset);
+                if ( ds.length()>1 ) {
+                    ds= ds.trim(0,1);
+                    logger.warning("only 1 context supported");
+                } else if ( ds.length()==1 ) {
+                    ds= ds.slice(0);
+                } 
+                if ( ds.length()>0 ) {
+                    if ( args.startsWith("format=") && args.length()>8 ) {
+                        if ( args.charAt(7)=='$' ) {
+                            TimeParser tp= TimeParser.create(args.substring(7));
+                            if ( ds.length()==1 ) {
+                                svalue= tp.format( Ops.datum(ds.slice(0)) );
+                            } else if (ds.length()==2 ) {
+                                svalue= tp.format( Ops.datumRange(ds.slice(0)) );
+                            }
+                        } else {
+                            if ( args.endsWith("d") || args.endsWith("x") ) { // x is hexidecimal
+                                svalue= String.format( args.substring(7), (int)ds.slice(0).value() );
+                            } else {
+                                svalue= String.format( args.substring(7), ds.slice(0).value() );
+                            }
+                        }
+                    }
+                }
+            }
+            return title.substring(0,m.start()) + svalue + title.substring(m.end());
+        }
+        return title;
+    }
+    
     /**
      * replace %{LABEL} or $(LABEL) with value.
      * @param title the string containing the macro.
