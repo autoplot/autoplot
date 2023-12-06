@@ -1463,21 +1463,33 @@ public class PlotElementController extends DomNodeController {
 
     /**
      * return true for a set of labels which seem to be describing different
-     * things.
+     * things.  This is just simply checking to see:<ul>
+     * <li> if all the first characters are number, then it is similar
+     * <li> if all the first characters are the same letter, then it is similar
+     * <li> otherwise it is dissimilar.
      * @param chs the array of labels.
      * @return true if they appear to be differing.
      * @see https://sourceforge.net/p/autoplot/bugs/2571/
      */
     private boolean dissimilarChannels( String[] chs ) {
-        int totalLen=0;
-        Set<Character> characters= new HashSet<>();
+        if ( chs[0].length()==0 ) return true; // unnamed channels probably shouldn't happen
+        char c= chs[0].charAt(0);
+        char allStartWith= c;
+        boolean allNumbers= Character.isDigit(c) || c=='.' ;
         for ( String ch: chs ) {
-            for ( Character c: ch.toCharArray() ) {
-                characters.add(c);
+            if ( ch.length()==0 ) return true;
+            c= ch.charAt(0);
+            if ( allNumbers ) {
+                if ( !Character.isDigit(c) && c!='.' ) {
+                    return true;
+                }
+            } else {
+                if ( c!=allStartWith ) {
+                    return true;
+                }
             }
-            totalLen+= ch.length();
         }
-        return characters.size()>(totalLen/chs.length)*2;
+        return false;
     }
 
     /**
