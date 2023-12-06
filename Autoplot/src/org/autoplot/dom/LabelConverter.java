@@ -320,6 +320,25 @@ public class LabelConverter extends Converter {
     }
 
     /**
+     * find the dataset with the given name
+     * @param context
+     * @return 
+     */
+    private static QDataSet findByName( String name, QDataSet context ) {
+        for ( int i=0; i<context.length(); i++ ) {
+            QDataSet d= context.slice(i);
+            String n= Ops.guessName(d);
+            if ( n==null && d.rank()>0 ) {
+                n= Ops.guessName(d.slice(0));
+            }
+            if ( n!=null && n.equals(name) ) {
+                return d;
+            }
+        }
+        return null;
+    }
+    
+    /**
      * replace %{LABEL} or $(LABEL) with value, possibly formatting it.
      * @param title the string containing the macro.
      * @param label the label to replace, such as METADATA.SPACECRAFT.
@@ -340,26 +359,41 @@ public class LabelConverter extends Converter {
             String args= m.group(3);
             if ( args!=null ) {
                 QDataSet ds= DataSetUtil.getContext(dataset);
-                if ( ds.length()>1 ) {
-                    ds= ds.trim(0,1);
-                    logger.warning("only 1 context supported");
-                } else if ( ds.length()==1 ) {
-                    ds= ds.slice(0);
-                } 
-                if ( ds.length()>0 ) {
-                    if ( args.startsWith("format=") && args.length()>8 ) {
-                        if ( args.charAt(7)=='$' ) {
-                            TimeParser tp= TimeParser.create(args.substring(7));
-                            if ( ds.length()==1 ) {
-                                svalue= tp.format( Ops.datum(ds.slice(0)) );
-                            } else if (ds.length()==2 ) {
-                                svalue= tp.format( Ops.datumRange(ds.slice(0)) );
-                            }
+                String[] aa= args.split(",",-2);
+                for ( String a: aa ) {
+                    if ( a.startsWith("name=") ) {
+                        QDataSet ds1= findByName( a.substring(5), ds );
+                        if ( ds1==null ) {
+                            svalue="(notfound)";
                         } else {
-                            if ( args.endsWith("d") || args.endsWith("x") ) { // x is hexidecimal
-                                svalue= String.format( args.substring(7), (int)ds.slice(0).value() );
+                            ds= ds1;
+                        }
+                    }
+                }
+                if ( ds.rank()>1 ) {
+                    if ( ds.length()>1 ) {
+                        ds= ds.slice(0);
+                        logger.warning("only 1 context supported");
+                    } else if ( ds.length()==1 ) {
+                        ds= ds.slice(0);
+                    } 
+                }
+                for ( String a: aa ) {
+                    if ( ds.length()>0 ) {
+                        if ( a.startsWith("format=") && args.length()>8 ) {
+                            if ( a.charAt(7)=='$' ) {
+                                TimeParser tp= TimeParser.create(a.substring(7));
+                                if ( ds.length()==1 ) {
+                                    svalue= tp.format( Ops.datum(ds.slice(0)) );
+                                } else if (ds.length()==2 ) {
+                                    svalue= tp.format( Ops.datumRange(ds.slice(0)) );
+                                }
                             } else {
-                                svalue= String.format( args.substring(7), ds.slice(0).value() );
+                                if ( a.endsWith("d") || a.endsWith("x") ) { // x is hexidecimal
+                                    svalue= String.format( a.substring(7), (int)ds.slice(0).value() );
+                                } else {
+                                    svalue= String.format( a.substring(7), ds.slice(0).value() );
+                                }
                             }
                         }
                     }
