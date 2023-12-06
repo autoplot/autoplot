@@ -117,7 +117,7 @@ public class LabelConverter extends Converter {
                             }
                         }
                         logger.log(Level.FINEST, "bug1814: context substitution success. {0}", Thread.currentThread().getName());
-                        title= insertUnformattedData( title, "CONTEXT", dataSet );
+                        title= insertUnformattedData( title, "CONTEXT", dataSet ); 
                     } else {
                         logger.log(Level.FINEST, "bug1814: ds is null. {0}", Thread.currentThread().getName());
                         title= insertString( title, "CONTEXT", "" ); 
