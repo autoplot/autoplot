@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small><a href="https://geo.ndc.nasa.gov/ESB/outgoing/jbr/eastafr_das/CCSM4.BCSD.201902.nc?tas">Data</a> from TEMPO mission is displayed after slicing in time.</small></p>
+        <p><small>Experiments with adding "format" control to %{CONTEXT} macro look promising.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -32,7 +32,7 @@
                 
         <p>Bugfixes (2023-12-06 r27360):</p>
         <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2571/">2571</a>: detect when channel names are inconsistent, naming the channels of bundled housekeeping data.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2571/">2571</a>: detect when channel names are inconsistent where subsampling channels is not desirable.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2570/">2570</a>: fix annotation when pointAt is used
             <li><a href="https://sourceforge.net/p/autoplot/bugs/1507/">1507</a>: copy and paste plots via clipboard gets the x-axis wrong.
             <li>PngWalkTool address bar records .pngwalk files in its history.
