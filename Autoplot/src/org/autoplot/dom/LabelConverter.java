@@ -381,19 +381,24 @@ public class LabelConverter extends Converter {
                 for ( String a: aa ) {
                     if ( ds.length()>0 ) {
                         if ( !svalue.equals("(notfound)") && a.startsWith("format=") && args.length()>8 ) {
-                            if ( a.charAt(7)=='$' ) {
-                                TimeParser tp= TimeParser.create(a.substring(7));
-                                if ( ds.length()==1 ) {
-                                    svalue= tp.format( Ops.datum(ds.slice(0)) );
-                                } else if (ds.length()==2 ) {
-                                    svalue= tp.format( Ops.datumRange(ds.slice(0)) );
-                                }
-                            } else {
-                                if ( a.endsWith("d") || a.endsWith("x") ) { // x is hexidecimal
-                                    svalue= String.format( a.substring(7), (int)ds.slice(0).value() );
+                            try {
+                                if ( a.charAt(7)=='$' ) {
+                                    TimeParser tp= TimeParser.create(a.substring(7));
+                                    if ( ds.length()==1 ) {
+                                        svalue= tp.format( Ops.datum(ds.slice(0)) );
+                                    } else if (ds.length()==2 ) {
+                                        svalue= tp.format( Ops.datumRange(ds.slice(0)) );
+                                    }
                                 } else {
-                                    svalue= String.format( a.substring(7), ds.slice(0).value() );
+                                    if ( a.endsWith("d") || a.endsWith("x") ) { // x is hexidecimal
+                                        svalue= String.format( a.substring(7), (int)ds.slice(0).value() );
+                                    } else {
+                                        svalue= String.format( a.substring(7), ds.slice(0).value() );
+                                    }
                                 }
+                            } catch ( Exception ex ) {
+                                ex.printStackTrace();
+                                svalue="(exception)";
                             }
                         }
                     }
