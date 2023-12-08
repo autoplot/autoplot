@@ -380,7 +380,7 @@ public class LabelConverter extends Converter {
                 }
                 for ( String a: aa ) {
                     if ( ds.length()>0 ) {
-                        if ( a.startsWith("format=") && args.length()>8 ) {
+                        if ( !svalue.equals("(notfound)") && a.startsWith("format=") && args.length()>8 ) {
                             if ( a.charAt(7)=='$' ) {
                                 TimeParser tp= TimeParser.create(a.substring(7));
                                 if ( ds.length()==1 ) {
