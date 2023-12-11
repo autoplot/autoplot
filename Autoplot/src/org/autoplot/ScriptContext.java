@@ -109,7 +109,7 @@ public class ScriptContext extends PyJavaInstance {
 
     private static ScriptContext instance;
     
-    public static ScriptContext getInstance() {
+    public static synchronized ScriptContext getInstance() {
         if ( instance==null ) {
             instance= new ScriptContext();
         }
@@ -117,7 +117,7 @@ public class ScriptContext extends PyJavaInstance {
     }
     
     private ScriptContext() {
-        
+        logger.fine("new ScriptContext");
     }
     
     /**
