@@ -130,7 +130,7 @@ public class RunBatchTool extends javax.swing.JPanel {
             
     private ProgressMonitor monitor=null; // non-null when process is going.
     
-    private ScriptContext scriptContext;
+    private ScriptContext2023 scriptContext;
         
     /**
      * Creates new form BatchMaster
@@ -138,7 +138,7 @@ public class RunBatchTool extends javax.swing.JPanel {
      */
     public RunBatchTool( final Application dom ) {
         initComponents();
-        scriptContext= ScriptContext.getInstance();
+        scriptContext= ScriptContext2023.getInstance();
         
         Preferences prefs= Preferences.userNodeForPackage(RunBatchTool.class );
         String s= prefs.get( "lastTemplate", null );
@@ -1223,7 +1223,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                         String id= m.group(1);
                         template= "orbit:"+id+":"+template;
                     }
-                    ss= ScriptContext.generateTimeRanges(template, timeRangeComboBox.getSelectedItem().toString() );
+                    ss= ScriptContext2023.generateTimeRanges(template, timeRangeComboBox.getSelectedItem().toString() );
                 }
             } catch (ParseException ex) {
                 Logger.getLogger(RunBatchTool.class.getName()).log(Level.SEVERE, null, ex);

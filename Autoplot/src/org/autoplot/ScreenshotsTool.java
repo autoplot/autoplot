@@ -705,7 +705,7 @@ public class ScreenshotsTool extends EventQueue {
      * @return
      */
     public static BufferedImage getScreenShot() {
-        Window w= ScriptContext.getInstance().getViewWindow();
+        Window w= ScriptContext2023.getInstance().getViewWindow();
         int active= getActiveDisplay(w);
         return getScreenShot(active,0,true);
     }
@@ -715,7 +715,7 @@ public class ScreenshotsTool extends EventQueue {
      * @return
      */
     public static BufferedImage getScreenShotNoPointer(  ) {
-        Window w= ScriptContext.getInstance().getViewWindow();
+        Window w= ScriptContext2023.getInstance().getViewWindow();
         int active= getActiveDisplay(w);
         return getScreenShot(active,0,false);        
     }

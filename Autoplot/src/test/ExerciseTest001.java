@@ -7,7 +7,7 @@ package test;
 
 import java.io.File;
 import java.io.IOException;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetURI;
@@ -18,7 +18,7 @@ import org.das2.qds.ops.Ops;
  * @author jbf
  */
 public class ExerciseTest001 {
-    private static ScriptContext scriptContext;
+    private static ScriptContext2023 scriptContext;
 
     static void test001() throws Exception {
             scriptContext.getDocumentModel().getOptions().setAutolayout(false);

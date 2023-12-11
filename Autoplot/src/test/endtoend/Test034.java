@@ -3,12 +3,12 @@ package test.endtoend;
 
 import java.io.File;
 import java.util.logging.Level;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.DatumRange;
 import org.autoplot.dom.Application;
 
-import static org.autoplot.ScriptContext.*;
+import static org.autoplot.ScriptContext2023.*;
 import org.autoplot.datasource.AutoplotSettings;
 
 /**
@@ -18,7 +18,7 @@ import org.autoplot.datasource.AutoplotSettings;
  * @author jbf
  */
 public class Test034 {
-    private static ScriptContext scriptContext= ScriptContext.getInstance();
+    private static ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
     
     private final static String tsbURI= "http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109";
     private final static String noTsbURI= "http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/2000/po_h0_hyd_20000109_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX";

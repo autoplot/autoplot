@@ -99,7 +99,7 @@ import org.das2.util.filesystem.FileSystem;
  * 
  * @author jbf
  */
-public class ScriptContext extends PyJavaInstance {
+public class ScriptContext2023 extends PyJavaInstance {
 
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.script");
     private static final Logger resizeLogger= Logger.getLogger("autoplot.dom.canvas.resize");
@@ -107,19 +107,19 @@ public class ScriptContext extends PyJavaInstance {
     private ApplicationModel model = null;
     private Application dom= null;
 
-    private static ScriptContext instance;
+    private static ScriptContext2023 instance;
     
-    public static synchronized ScriptContext getInstance() {
+    public static synchronized ScriptContext2023 getInstance() {
         if ( instance==null ) {
-            instance= new ScriptContext();
+            instance= new ScriptContext2023();
         }
         return instance;
     }
     
-    private ScriptContext() {
+    private ScriptContext2023() {
         logger.fine("new ScriptContext");
     }
-    
+
     /**
      * set up the uncaught exception handler for headless applications, like CreatePngWalk.
      */
@@ -478,7 +478,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param out
      */
     public void _setOutputStream(OutputStream out) {
-        ScriptContext.out = out;
+        ScriptContext2023.out = out;
     }
     
     /**
@@ -503,7 +503,7 @@ public class ScriptContext extends PyJavaInstance {
             try {
                 SwingUtilities.invokeAndWait(run);
             } catch (InterruptedException | InvocationTargetException ex) {
-                Logger.getLogger(ScriptContext.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(ScriptContext2023.class.getName()).log(Level.SEVERE, null, ex);
             }
         }                
     }
@@ -2018,7 +2018,7 @@ addBottomDecoration( dom.canvases[0], paint )
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(ScriptContext.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(ScriptContext2023.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }

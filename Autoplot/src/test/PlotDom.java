@@ -6,7 +6,7 @@
 package test;
 
 import java.io.IOException;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.das2.qds.DDataSet;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
@@ -17,7 +17,7 @@ import org.das2.qds.ops.Ops;
  * @author jeremyfaden
  */
 public class PlotDom {
-    private static ScriptContext scriptContext;
+    private static ScriptContext2023 scriptContext;
     
     public static void main( String[] args ) throws IOException, InterruptedException {
 long t0= System.currentTimeMillis();

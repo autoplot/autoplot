@@ -29,7 +29,7 @@ import org.das2.graph.DasDevicePosition;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 
 /**
  * tests of das2 internals.  These are tests of non-graphic parts (see test009 for this), and does not include
@@ -334,7 +334,7 @@ public class Test019 {
             Logger.getLogger("test019").warning("disabling certificates");
             AutoplotUtil.disableCertificates();
             
-            ScriptContext.generateTimeRanges( "$(o,id=rbspa-pp)", "orbit:rbspa-pp:70-99" );
+            ScriptContext2023.generateTimeRanges( "$(o,id=rbspa-pp)", "orbit:rbspa-pp:70-99" );
             
             System.err.println( "=testParseDatumRange=" );
             testParseDatumRange();

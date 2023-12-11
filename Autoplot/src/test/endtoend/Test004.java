@@ -2,7 +2,7 @@
 package test.endtoend;
 
 import java.io.IOException;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 
 /**
  * Test Jan's products
@@ -11,7 +11,7 @@ import org.autoplot.ScriptContext;
 public class Test004 {
     public static void main(String[] args) {
         try {
-            ScriptContext sc= ScriptContext.getInstance();
+            ScriptContext2023 sc= ScriptContext2023.getInstance();
             sc.getDocumentModel().getOptions().setAutolayout(false);
             sc.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 

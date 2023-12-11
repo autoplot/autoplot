@@ -6,19 +6,19 @@ package test.endtoend;
 
 import java.io.PrintWriter;
 import java.util.logging.Level;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
 import org.autoplot.jythonsupport.Util;
-import static org.autoplot.ScriptContext.*;
+import static org.autoplot.ScriptContext2023.*;
 
 /**
  * Tests of inline data source.
  * @author jbf
  */
 public class Test028 {
-    private static ScriptContext scriptContext= ScriptContext.getInstance();
+    private static ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
     
     private static final String test="test028";
 

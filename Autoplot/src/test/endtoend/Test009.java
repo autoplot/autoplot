@@ -11,7 +11,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
 import org.das2.graph.DefaultPlotSymbol;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.autoplot.dom.Application;
 import org.das2.qds.DataSetOps;
 import org.das2.qds.DataSetUtil;
@@ -30,7 +30,7 @@ public class Test009 {
     static long t0= System.currentTimeMillis();
 
     public static void writePng( String name ) throws InterruptedException, IOException {
-        ScriptContext scriptContext= ScriptContext.getInstance();
+        ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
         scriptContext.writeToPng( name );
         System.out.println("wrote "+name+"  timer: "+(System.currentTimeMillis()-t0));
         resetTimer();
@@ -46,7 +46,7 @@ public class Test009 {
      */
     private static void extremes() throws InterruptedException, IOException {
 
-        ScriptContext scriptContext= ScriptContext.getInstance();
+        ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
         
         Application dom= scriptContext.getDocumentModel();
 
@@ -86,7 +86,7 @@ public class Test009 {
 
     private static void test1() throws IOException, InterruptedException {
         
-        ScriptContext scriptContext= ScriptContext.getInstance();
+        ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
         
         Application dom = scriptContext.getDocumentModel();
         scriptContext.setCanvasSize(800, 600);

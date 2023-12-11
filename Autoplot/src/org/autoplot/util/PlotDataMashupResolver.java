@@ -9,7 +9,7 @@ import javax.swing.SwingUtilities;
 import org.autoplot.ApplicationModel;
 import org.autoplot.AutoplotUI;
 import org.autoplot.AutoplotUtil;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.jythonsupport.ui.DataMashUp;
 import org.das2.qds.QDataSet;

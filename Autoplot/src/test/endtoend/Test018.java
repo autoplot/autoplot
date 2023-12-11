@@ -6,7 +6,7 @@ package test.endtoend;
 
 import java.io.IOException;
 import java.util.List;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -15,7 +15,7 @@ import org.das2.system.DasLogger;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.PlotElement;
 import org.autoplot.dom.Plot;
-import static org.autoplot.ScriptContext.*;
+import static org.autoplot.ScriptContext2023.*;
 import org.autoplot.dom.ApplicationController;
 import org.autoplot.dom.Axis;
 import org.autoplot.dom.BindingModel;
@@ -29,7 +29,7 @@ import org.das2.qds.SemanticOps;
  * @author jbf
  */
 public class Test018 {
-    private static ScriptContext scriptContext= ScriptContext.getInstance();
+    private static ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
     static long t0 = System.currentTimeMillis();
 
     public static void xxx(String id) {

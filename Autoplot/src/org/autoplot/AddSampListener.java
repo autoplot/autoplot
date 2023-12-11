@@ -139,7 +139,7 @@ public class AddSampListener {
             JComponent cc= hubConnector.createMonitorPanel();
             //cc.setMinimumSize( new Dimension(400,400));
             //cc.setPreferredSize( new Dimension(400,400));
-            ScriptContext.getInstance().addTab( "samp", cc );
+            ScriptContext2023.getInstance().addTab( "samp", cc );
         }
         
         Metadata meta = new Metadata();

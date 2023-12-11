@@ -30,10 +30,10 @@ public class AppManager {
     
     private static AppManager instance;
 
-    private ScriptContext scriptContext;
+    private ScriptContext2023 scriptContext;
     
     private AppManager() {
-        scriptContext= ScriptContext.getInstance();
+        scriptContext= ScriptContext2023.getInstance();
     }
     
     

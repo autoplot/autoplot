@@ -263,7 +263,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
     transient LayoutListener autoLayout;
     private boolean dsSelectTimerangeBound= false; // true if there is a binding between the app timerange and the dataSetSelector.
     
-    private ScriptContext scriptContext= ScriptContext.getInstance();
+    private ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
     
     // true means don't bring up an initial security dialog asking
     private boolean noAskParams;
@@ -6024,7 +6024,7 @@ APSplash.checkTime("init 240");
      * add the component (typically a JPanel) to the left
      * side of the application.
      * @param c null or the component to add
-     * @see ScriptContext#addTab(java.lang.String, javax.swing.JComponent) 
+     * @see ScriptContext2023#addTab(java.lang.String, javax.swing.JComponent) 
      * @see #clearLeftPanel() 
      * @see #setRightPanel(javax.swing.JComponent) 
      * @see #setBottomPanel(javax.swing.JComponent) 
@@ -6633,7 +6633,7 @@ APSplash.checkTime("init 240");
      * return the script context for this window.
      * @return 
      */
-    public ScriptContext getScriptContext() {
+    public ScriptContext2023 getScriptContext() {
         return scriptContext;
     }
     

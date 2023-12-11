@@ -5,7 +5,7 @@
 
 package test.endtoend;
 
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSourceRegistry;
 import org.autoplot.jythonsupport.Util;
@@ -15,7 +15,7 @@ import org.autoplot.jythonsupport.Util;
  * @author jbf
  */
 public class Test032 {
-    private static ScriptContext scriptContext= ScriptContext.getInstance();
+    private static ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
     
     private static void test1_dump( QDataSet ds ) {
         if ( ds.rank()==4 ) {

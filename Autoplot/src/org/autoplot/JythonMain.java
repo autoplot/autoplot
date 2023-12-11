@@ -47,7 +47,7 @@ public class JythonMain {
             argv[i-1]= args[i];
         }
 
-        ApplicationModel model= ScriptContext.getInstance().getApplicationModel();
+        ApplicationModel model= ScriptContext2023.getInstance().getApplicationModel();
 
         InputStream in;
         String name= null;

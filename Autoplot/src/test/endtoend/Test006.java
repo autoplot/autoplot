@@ -6,7 +6,7 @@ package test.endtoend;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import static org.autoplot.ScriptContext.*;
+import static org.autoplot.ScriptContext2023.*;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;

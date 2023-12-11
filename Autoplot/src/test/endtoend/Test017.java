@@ -15,8 +15,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.autoplot.ScriptContext;
-import static org.autoplot.ScriptContext.*;
+import org.autoplot.ScriptContext2023;
+import static org.autoplot.ScriptContext2023.*;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
@@ -28,7 +28,7 @@ import org.autoplot.jythonsupport.Util;
  * @author jbf
  */
 public class Test017 {
-    private static ScriptContext scriptContext= ScriptContext.getInstance();
+    private static ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
     static long t0 = System.currentTimeMillis();
 
     public static void xxx(String id) {

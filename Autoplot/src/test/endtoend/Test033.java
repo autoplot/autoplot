@@ -6,7 +6,7 @@
 package test.endtoend;
 
 import org.autoplot.pngwalk.CreatePngWalk;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.autoplot.dom.Application;
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +20,7 @@ import org.das2.datum.DatumRangeUtil;
  */
 public class Test033 {
 
-    private static ScriptContext scriptContext= ScriptContext.getInstance();
+    private static ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
     
     private static void makePngWalk1() throws Exception {
         Application dom= scriptContext.getDocumentModel();

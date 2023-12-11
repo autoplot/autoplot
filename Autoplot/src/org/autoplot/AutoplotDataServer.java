@@ -26,7 +26,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
-import static org.autoplot.ScriptContext.*;
+import static org.autoplot.ScriptContext2023.*;
 
 import org.das2.util.ArgumentList;
 import org.das2.util.LoggerManager;
@@ -441,7 +441,7 @@ public class AutoplotDataServer {
         }
         //initialize the application.  We don't use the object, but this
         //will allow us to reset the cache position.
-        ScriptContext.getInstance().getDocumentModel();
+        ScriptContext2023.getInstance().getDocumentModel();
 
         // set up the cache.
         String cache = alm.getValue("cache");

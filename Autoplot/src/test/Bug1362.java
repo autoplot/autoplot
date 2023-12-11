@@ -14,7 +14,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.das2.qds.QDataSet;
 import org.das2.qds.examples.Schemes;
 import org.das2.qds.ops.Ops;
@@ -25,7 +25,7 @@ import org.das2.qds.ops.Ops;
  */
 public class Bug1362 {
 
-    private static ScriptContext scriptContext;
+    private static ScriptContext2023 scriptContext;
     
     private static ProgressMonitor getMonitor(String label) {
         //DasProgressPanel p = DasProgressPanel.createFramed(label);
@@ -58,7 +58,7 @@ public class Bug1362 {
                     speedArrayMulti[i] = speed;
                     System.err.println("Multi threads: " + i + " " + speed );
                     QDataSet timesMulti = Ops.dataset(speedArrayMulti);
-                    ScriptContext.formatDataSet( timesMulti, "/tmp/multi.txt" );
+                    ScriptContext2023.formatDataSet( timesMulti, "/tmp/multi.txt" );
                 }
                 
             } else if (args[0].equals("two")) {
@@ -67,7 +67,7 @@ public class Bug1362 {
                     doTwoThreads();
                     speedArray2[i] = speed;
                     QDataSet timesTwo = Ops.dataset(speedArray2);
-                    ScriptContext.formatDataSet( timesTwo, "/tmp/twoThreads.txt" );
+                    ScriptContext2023.formatDataSet( timesTwo, "/tmp/twoThreads.txt" );
                 }
               
             } else if (args[0].equals("four")) {
@@ -76,7 +76,7 @@ public class Bug1362 {
                     doFourThreads();
                     speedArray4[i] = speed;
                     QDataSet timesFour = Ops.dataset(speedArray4);
-                    ScriptContext.formatDataSet( timesFour, "/tmp/fourThreads.txt" );
+                    ScriptContext2023.formatDataSet( timesFour, "/tmp/fourThreads.txt" );
                 }
                  
             } else if (args[0].equals("eight")) {
@@ -85,7 +85,7 @@ public class Bug1362 {
                     doEightThreads();
                     speedArray8[i] = speed;
                     QDataSet timesEight = Ops.dataset(speedArray8);
-                    ScriptContext.formatDataSet( timesEight, "/tmp/eightThreads.txt" );
+                    ScriptContext2023.formatDataSet( timesEight, "/tmp/eightThreads.txt" );
                 }
             } else {
                 System.err.println("args[0] should be four,eight or, multi");

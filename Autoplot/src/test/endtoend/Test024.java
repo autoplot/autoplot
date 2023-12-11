@@ -12,7 +12,7 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ConsoleTextProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.das2.qds.DataSetUtil;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceUtil;
@@ -24,7 +24,7 @@ import org.das2.qds.ops.Ops;
  * @author jbf
  */
 public class Test024 {
-    private static ScriptContext scriptContext= ScriptContext.getInstance();
+    private static ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
     public static void example1() throws Exception {
         System.err.println( "\n= example1 =\n");
         org.autoplot.idlsupport.APDataSet apds  = new org.autoplot.idlsupport.APDataSet();

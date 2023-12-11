@@ -53,7 +53,7 @@ import org.autoplot.AppManager;
 import org.autoplot.ApplicationModel;
 import org.autoplot.AutoplotUI;
 import org.autoplot.JythonUtil;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.autoplot.dom.ApplicationController;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSetURI;
@@ -554,8 +554,8 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             }
         }
         System.err.println("== Executing Script ==");
-        ScriptContext.getInstance().setApplication( app );
-        ScriptContext.getInstance().setWindow(model);
+        ScriptContext2023.getInstance().setApplication( app );
+        ScriptContext2023.getInstance().setWindow(model);
         if ( support.file!=null ) this.setRunningScript(support.file);
         support.executeScript( evt.getModifiers() );
     }//GEN-LAST:event_executeButtonActionPerformed

@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 import javax.swing.JDialog;
 import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.autoplot.dom.Application;
 import org.python.util.PythonInterpreter;
 import org.autoplot.jythonsupport.JythonUtil;
@@ -39,7 +39,7 @@ import org.python.core.PyException;
  * @author jbf
  */
 public class Test038 {
-    private static ScriptContext scriptContext= ScriptContext.getInstance();
+    private static ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
         
     static final Logger logger= Logger.getLogger("autoplot");
     
@@ -177,10 +177,10 @@ public class Test038 {
             QDataSet column= Ops.slice1(rr,1);
             QDataSet count= Ops.slice1(rr,2);
             QDataSet positionsds= Ops.dataset(positions).trim(0,count.length());
-            ScriptContext.formatDataSet( line, "test038."+f.getName()+".cdf?linenum" );
-            ScriptContext.formatDataSet( column, "test038."+f.getName()+".cdf?column&append=T" );
-            ScriptContext.formatDataSet( count, "test038."+f.getName()+".cdf?count&append=T" );
-            ScriptContext.formatDataSet( positionsds, "test038."+f.getName()+".cdf?position&append=T" );
+            ScriptContext2023.formatDataSet( line, "test038."+f.getName()+".cdf?linenum" );
+            ScriptContext2023.formatDataSet( column, "test038."+f.getName()+".cdf?column&append=T" );
+            ScriptContext2023.formatDataSet( count, "test038."+f.getName()+".cdf?count&append=T" );
+            ScriptContext2023.formatDataSet( positionsds, "test038."+f.getName()+".cdf?position&append=T" );
             
             scriptContext.plot(Ops.slice1(rr,0), Ops.slice1(rr,1), Ops.lesserOf(Ops.slice1(rr,2), MAX_COMPLETION_COUNT) );
             QDataSet r= Ops.where( Ops.eq( count, -99 ) );

@@ -6,7 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.das2.graph.DasAxis;
@@ -14,7 +14,7 @@ import org.das2.graph.DasCanvas;
 import org.das2.graph.Painter;
 import org.das2.qds.DataSetOps;
 import org.das2.qds.DataSetUtil;
-import static org.autoplot.ScriptContext.*;
+import static org.autoplot.ScriptContext2023.*;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
@@ -32,7 +32,7 @@ public class Test014 {
 
     private static final Set<Integer> usedIds= new HashSet<Integer>();
 
-    private static ScriptContext scriptContext= ScriptContext.getInstance();
+    private static ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
     
     public static void doTest( int id, String uri, QDataSet ds ) throws Exception {
 

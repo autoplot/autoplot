@@ -17,7 +17,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.das2.qds.QDataSet;
 import org.das2.qds.examples.Schemes;
 import org.das2.qds.ops.Ops;
@@ -27,7 +27,7 @@ import org.das2.qds.ops.Ops;
  * @author mmclouth
  */
 public class FFTMultiThreadExperiment {
-    private static ScriptContext scriptContext;
+    private static ScriptContext2023 scriptContext;
 
     private static ProgressMonitor getMonitor(String label) {
         //DasProgressPanel p = DasProgressPanel.createFramed(label);
@@ -108,7 +108,7 @@ public class FFTMultiThreadExperiment {
                     double speed = doTwoThreads(); 
                     //speedArray2[i] = speed;
                     QDataSet timesTwo = Ops.dataset(speed);
-                    ScriptContext.formatDataSet( timesTwo, "/tmp/twoThreads.txt" );
+                    ScriptContext2023.formatDataSet( timesTwo, "/tmp/twoThreads.txt" );
                 }
               
             } else if (args[0].equals("four")) {
@@ -116,7 +116,7 @@ public class FFTMultiThreadExperiment {
                 for( int i = 0; i< size ; i = i + 1) {
                     double speed = doFourThreads();
                     QDataSet timesFour = Ops.dataset(speed);
-                    ScriptContext.formatDataSet( timesFour, "/tmp/fourThreads.txt" );
+                    ScriptContext2023.formatDataSet( timesFour, "/tmp/fourThreads.txt" );
                 }
                  
             } else if (args[0].equals("eight")) {
@@ -125,7 +125,7 @@ public class FFTMultiThreadExperiment {
                     double speed = doEightThreads();
                     //speedArray8[i] = speed;
                     QDataSet timesEight = Ops.dataset(speed);
-                    ScriptContext.formatDataSet( timesEight, "/tmp/eightThreads.txt" );
+                    ScriptContext2023.formatDataSet( timesEight, "/tmp/eightThreads.txt" );
                 }
             } else {
                 System.err.println("args[0] should be four,eight or, multi");

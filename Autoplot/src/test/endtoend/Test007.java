@@ -6,7 +6,7 @@ package test.endtoend;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
@@ -18,7 +18,7 @@ import org.autoplot.jythonsupport.Util;
  */
 public class Test007 {
 
-    private static ScriptContext scriptContext= ScriptContext.getInstance();
+    private static ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
 
     public static void doTest( int id, String uri ) throws Exception {
         QDataSet ds;

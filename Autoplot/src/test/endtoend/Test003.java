@@ -14,7 +14,7 @@ import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.KeyChain;
 import org.das2.util.filesystem.WebFileSystem;
 import org.das2.util.monitor.CancelledOperationException;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.autoplot.datasource.DataSetURI;
 
 /**
@@ -25,7 +25,7 @@ public class Test003 {
 
     public static void doit(int id, String uri) {
         try {
-            ScriptContext sc= ScriptContext.getInstance();
+            ScriptContext2023 sc= ScriptContext2023.getInstance();
             System.err.println( String.format( "== %03d == ", id ) );
             long t0= System.currentTimeMillis();
             System.err.println("uri: "+uri);
@@ -38,7 +38,7 @@ public class Test003 {
     }
 
     public static void main(String[] args) {
-        ScriptContext sc= ScriptContext.getInstance();
+        ScriptContext2023 sc= ScriptContext2023.getInstance();
         boolean headless = true;
         
         boolean loginBeforeTest= false;

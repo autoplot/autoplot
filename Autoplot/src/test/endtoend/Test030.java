@@ -4,11 +4,11 @@
  */
 package test.endtoend;
 
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.das2.qds.DataSetOps;
 import org.das2.qds.QDataSet;
 import org.autoplot.jythonsupport.Util;
-import static org.autoplot.ScriptContext.*;
+import static org.autoplot.ScriptContext2023.*;
 
 /**
  * tests of metadata representation in the ascii file parser, that provides a means
@@ -20,7 +20,7 @@ import static org.autoplot.ScriptContext.*;
  * @author jbf
  */
 public class Test030 {
-    private static ScriptContext scriptContext= ScriptContext.getInstance();
+    private static ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
     
     /**
      * this reads the ascii file into a bundle and tries to plot the last one.

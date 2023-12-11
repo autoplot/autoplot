@@ -24,7 +24,7 @@ import org.python.core.PyInteger;
 import org.python.core.PyObject;
 import org.python.core.PyString;
 import org.autoplot.RenderType;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.CanvasUtil;
@@ -64,7 +64,7 @@ public class PlotCommand extends PyObject {
 
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
     
-    private ScriptContext scriptContext= ScriptContext.getInstance();
+    private ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
     
     public static final PyString __doc__ =
         new PyString("<html><H2>plot([index],x,y,z,[named parameters])</H2>"
@@ -221,7 +221,7 @@ public class PlotCommand extends PyObject {
         Column column=null;
         Plot plot=null; // use this plot
         
-        Application dom= ScriptContext.getInstance().getDocumentModel();
+        Application dom= ScriptContext2023.getInstance().getDocumentModel();
         String renderType=null;
         for ( int i=0; i<keywords.length; i++  ) {
             if ( keywords[i].equals("renderType" ) ) {

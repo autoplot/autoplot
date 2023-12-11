@@ -744,7 +744,7 @@ public class GuiSupport {
                 
                 if ( AutoplotUtil.showConfirmDialog( parent, edw, "Export All", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
                     try {
-                        ScriptContext.formatDataSet( edw.getDataSet(), edw.getUri() );
+                        ScriptContext2023.formatDataSet( edw.getDataSet(), edw.getUri() );
                         parent.setStatus("Wrote " + org.autoplot.datasource.DataSourceUtil.unescape(edw.getUri()) );
                     } catch (Exception ex) {
                         logger.log(Level.SEVERE, null, ex);

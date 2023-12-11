@@ -4,11 +4,11 @@
  */
 package test.endtoend;
 
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.autoplot.dom.Application;
 import org.das2.qds.QDataSet;
 import org.autoplot.jythonsupport.Util;
-import static org.autoplot.ScriptContext.*;
+import static org.autoplot.ScriptContext2023.*;
 
 /**
  * tests of tick labels, using the new DomainDivider.  This was a system written
@@ -18,7 +18,7 @@ import static org.autoplot.ScriptContext.*;
  * @author jbf
  */
 public class Test031 {
-    private static ScriptContext scriptContext= ScriptContext.getInstance();
+    private static ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
     
     public static void doTest( int id, String uri ) {
 

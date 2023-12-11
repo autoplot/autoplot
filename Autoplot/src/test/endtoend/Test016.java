@@ -9,9 +9,9 @@ import java.util.Map;
 import org.das2.graph.DasAxis;
 import org.autoplot.AutoplotUtil;
 import org.autoplot.AutoRangeUtil.AutoRangeDescriptor;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.das2.qds.DataSetUtil;
-import static org.autoplot.ScriptContext.*;
+import static org.autoplot.ScriptContext2023.*;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.MetadataModel;
@@ -27,7 +27,7 @@ import org.autoplot.metatree.MetadataUtil;
  */
 public class Test016 {
 
-    private static ScriptContext scriptContext= ScriptContext.getInstance();
+    private static ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
     
     public static void doTest( int id, String uri, QDataSet ds, Map<String,Object> meta, String dim ) throws Exception {
      

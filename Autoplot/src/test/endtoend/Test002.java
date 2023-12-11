@@ -4,7 +4,7 @@ package test.endtoend;
 import java.io.IOException;
 import java.io.PrintWriter;
 import org.autoplot.RenderType;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.autoplot.dom.Application;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
@@ -21,7 +21,7 @@ public class Test002 {
 
     public static void main(String[] args) {
         try {
-            ScriptContext sc= ScriptContext.getInstance();
+            ScriptContext2023 sc= ScriptContext2023.getInstance();
             sc.getDocumentModel().getOptions().setAutolayout(false);
             sc.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
             oldTests();
@@ -41,7 +41,7 @@ public class Test002 {
     }
 
     private static void doTest(final String s, final String label) throws IOException, InterruptedException, Exception {
-        ScriptContext sc= ScriptContext.getInstance();
+        ScriptContext2023 sc= ScriptContext2023.getInstance();
         sc.load(s);
         int width = sc.getDocumentModel().getCanvases(0).getWidth();
         int height = sc.getDocumentModel().getCanvases(0).getHeight();
@@ -115,7 +115,7 @@ public class Test002 {
     }
 
     private static void oldTests() throws Exception, IOException, InterruptedException {
-        ScriptContext sc= ScriptContext.getInstance();
+        ScriptContext2023 sc= ScriptContext2023.getInstance();
         QDataSet ds = Util.getDataSet("file:///home/jbf/ct/hudson/data.backup/wav/fireworks.wav");
         final Application dom = sc.getDocumentModel();
         dom.getCanvases(0).setFitted(false);

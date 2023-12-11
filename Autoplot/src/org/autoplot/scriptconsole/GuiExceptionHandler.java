@@ -92,7 +92,7 @@ import org.autoplot.AppManager;
 import org.autoplot.ApplicationModel;
 import org.autoplot.AutoplotUI;
 import org.autoplot.AutoplotUtil;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.DomNode;
 import org.autoplot.state.SerializeUtil;
@@ -908,7 +908,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         String eventId= sdf.format( now );
 
         String pendingFocus="N/A"; // many RTEs come from the selector where the string is not processed.
-        Window w= ScriptContext.getInstance().getViewWindow();
+        Window w= ScriptContext2023.getInstance().getViewWindow();
         if ( w instanceof AutoplotUI ) {
             AutoplotUI app= ((AutoplotUI)w);
             pendingFocus= app.getDataSetSelector().getValue();

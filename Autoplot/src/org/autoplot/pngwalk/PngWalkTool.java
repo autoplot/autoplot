@@ -128,7 +128,7 @@ import org.autoplot.AutoplotUI;
 import org.autoplot.AutoplotUtil;
 import org.autoplot.GuiSupport;
 import org.autoplot.JythonUtil;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.autoplot.bookmarks.Bookmark;
 import org.autoplot.bookmarks.BookmarksException;
 import org.autoplot.bookmarks.BookmarksManager;
@@ -217,7 +217,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
     private String pwd=null; // the location of the .pngwalk file, if used, or null.
     private String vapfile=null;
     
-    private ScriptContext scriptContext= ScriptContext.getInstance();
+    private ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
     
     public static void main(String[] args) {
 
@@ -573,7 +573,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
         final String lap= "View in Autoplot";
 
-        final ScriptContext scriptContext= tool.scriptContext;
+        final ScriptContext2023 scriptContext= tool.scriptContext;
 
         tool.addFileAction( enabler, new AbstractAction(lap) {
             @Override
@@ -984,7 +984,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
         } );
 
-        fileMenu.add( new AbstractAction( "Show Autoplot" ) {
+        fileMenu.add(new AbstractAction( "Show Autoplot" ) {
             @Override
             public void actionPerformed(ActionEvent ae) {
                LoggerManager.logGuiEvent(ae);        
@@ -996,7 +996,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                    }
                }
                if ( AppManager.getInstance().getApplicationCount()==1 ) {
-                   ScriptContext scriptContext= ScriptContext.getInstance();
+                   ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
                    scriptContext.createGui();
                    Window apWindow= scriptContext.getViewWindow();
                    raiseApWindowSoon(apWindow);

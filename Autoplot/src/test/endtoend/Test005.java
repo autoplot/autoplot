@@ -4,7 +4,7 @@ package test.endtoend;
 import java.io.PrintWriter;
 import org.autoplot.AutoplotUI;
 import org.autoplot.AutoplotUtil;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.autoplot.dom.Application;
 import org.das2.datum.DatumRangeUtil;
 import org.autoplot.dom.Axis;
@@ -30,7 +30,7 @@ public class Test005 {
 
             LoggerManager.readConfiguration("/home/jbf/autoplot_data/config/logging.properties");
             
-            ScriptContext scriptContext= ScriptContext.getInstance();
+            ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
             Application dom= scriptContext.getDocumentModel();
             
             Column mc= dom.getCanvases(0).getMarginColumn();

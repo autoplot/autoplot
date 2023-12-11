@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.Units;
 import org.das2.graph.DasCanvas;
-import static org.autoplot.ScriptContext.*;
+import static org.autoplot.ScriptContext2023.*;
 import org.autoplot.datasource.DataSetURI;
 
 import org.das2.util.ArgumentList;
@@ -103,7 +103,7 @@ public class AutoplotServer {
         
         logger.log(Level.FINE, "getDocumentModel");
         
-        ScriptContext scriptContext= ScriptContext.getInstance();
+        ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
         Application dom= scriptContext.getDocumentModel();
         
         // do dimensions

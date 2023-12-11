@@ -33,7 +33,7 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.ApplicationModel;
 import org.autoplot.AutoplotUtil;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.Plot;
 import org.autoplot.state.StatePersistence;
@@ -149,7 +149,7 @@ public class CreatePngWalk {
                 }
             }
         } else {
-            times = ScriptContext.generateTimeRanges(params.timeFormat, params.timeRangeStr);
+            times = ScriptContext2023.generateTimeRanges(params.timeFormat, params.timeRangeStr);
         }
         return times;
     }
@@ -885,7 +885,7 @@ public class CreatePngWalk {
     public static int doIt(Application dom, Params params) throws ParseException, IOException, InterruptedException {
         int status = 0;
 
-        Window viewWindow= ScriptContext.getInstance().getViewWindow();
+        Window viewWindow= ScriptContext2023.getInstance().getViewWindow();
 
         if (params == null) {
 
@@ -1171,7 +1171,7 @@ public class CreatePngWalk {
             dom = (Application) StatePersistence.restoreState(new File(vap));
         } else {
             String uri = alm.getValue("uri");
-            ScriptContext scriptContext= ScriptContext.getInstance();
+            ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
             scriptContext.setCanvasSize(800, 600);
             scriptContext.plot(uri);
             dom = scriptContext.getDocumentModel();

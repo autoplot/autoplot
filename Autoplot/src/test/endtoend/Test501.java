@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeModel;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.das2.client.DasServer;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -25,14 +25,14 @@ import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
 
-import static org.autoplot.ScriptContext.*;
+import static org.autoplot.ScriptContext2023.*;
 
 /**
  * Plasma Wave Group at Iowa, test Das2Server entries with "exampleRange".
  * @author jbf
  */
 public class Test501 {
-    private static ScriptContext scriptContext= ScriptContext.getInstance();
+    private static ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
         
     private static final int READ_SIZE_LIMIT_DAYS = 400; // chris has /voyager2/pws/SpecAnalyzer-Distogram.dsdf which is about a year, intentionally.
 
