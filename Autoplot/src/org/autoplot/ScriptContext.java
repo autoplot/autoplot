@@ -39,6 +39,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import jdk.internal.platform.SystemMetrics;
 import org.das2.DasApplication;
 import org.das2.util.awt.PdfGraphicsOutput;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -107,13 +108,26 @@ public class ScriptContext extends PyJavaInstance {
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.script");
     private static final Logger resizeLogger= Logger.getLogger("autoplot.dom.canvas.resize");
     
-    private static ApplicationModel model = null;
-    private static Application dom= null;
+    private ApplicationModel model = null;
+    private Application dom= null;
 
+    private static ScriptContext instance;
+    
+    public static ScriptContext getInstance() {
+        if ( instance==null ) {
+            instance= new ScriptContext();
+        }
+        return instance;
+    }
+    
+    private ScriptContext() {
+        
+    }
+    
     /**
      * set up the uncaught exception handler for headless applications, like CreatePngWalk.
      */
-    private static void setUpHeadlessExceptionHandler() {
+    private void setUpHeadlessExceptionHandler() {
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
@@ -130,7 +144,7 @@ public class ScriptContext extends PyJavaInstance {
     /**
      * initialize the model and view.
      */
-    private static synchronized void maybeInitModel() {
+    private synchronized void maybeInitModel() {
         if (model == null) {
             model = new ApplicationModel();
             model.setExceptionHandler( new ExitExceptionHandler() );
@@ -165,7 +179,7 @@ public class ScriptContext extends PyJavaInstance {
      * @see #setWindow(org.autoplot.ApplicationModel) 
      * @see #newApplication(java.lang.String) 
      */
-    public static synchronized void setApplication( AutoplotUI app ) {
+    public synchronized void setApplication( AutoplotUI app ) {
         setApplicationModel(app.applicationModel);
         setView(app);        
         appLookup.put( app.applicationModel, app );
@@ -174,7 +188,7 @@ public class ScriptContext extends PyJavaInstance {
     /**
      * reset the script focus to the default application.
      */
-    public static synchronized void setDefaultApplication() {
+    public synchronized void setDefaultApplication() {
         setApplication(defaultApp);
     }
     
@@ -186,7 +200,7 @@ public class ScriptContext extends PyJavaInstance {
      * @see #getWindow() which returns the current window.
      * @see #setApplication(org.autoplot.AutoplotUI) which creates another application.
      */
-    public static synchronized void setWindow( ApplicationModel appm ) {
+    public synchronized void setWindow( ApplicationModel appm ) {
         AutoplotUI app= appLookup.get(appm);
         if (app==null ) {
             view= null;
@@ -200,7 +214,7 @@ public class ScriptContext extends PyJavaInstance {
      * return the focus application.
      * @return the focus application.
      */
-    public static synchronized AutoplotUI getApplication() {
+    public synchronized AutoplotUI getApplication() {
         return view;
     }
     
@@ -208,7 +222,7 @@ public class ScriptContext extends PyJavaInstance {
      * return the internal handle for the window and dom within.
      * @return the internal handle for the application.
      */
-    public static synchronized ApplicationModel getWindow() {
+    public synchronized ApplicationModel getWindow() {
         return model;
     }
     
@@ -229,7 +243,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param id an identifier
      * @return the AutoplotUI.
      */
-    public static synchronized AutoplotUI newApplication( String id ) {
+    public synchronized AutoplotUI newApplication( String id ) {
         AutoplotUI result= apps.get(id);
         if ( result!=null ) {
             if ( !AppManager.getInstance().isRunningApplication(result) ) {
@@ -257,7 +271,7 @@ public class ScriptContext extends PyJavaInstance {
      * @return a handle (do not use this object, code will break) for the window.
      * @see #setWindow(org.autoplot.ApplicationModel) 
      */
-    public static synchronized ApplicationModel newWindow( final String id, int width, int height, int x, int y ) {
+    public synchronized ApplicationModel newWindow( final String id, int width, int height, int x, int y ) {
         ApplicationModel result= newWindow(id);
         Window window= SwingUtilities.getWindowAncestor(result.canvas);
         if ( window!=null ) {
@@ -282,7 +296,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param x the window upper-left location, if possible
      * @param y the window upper-left location, if possible
      */
-    public static synchronized void setWindowLocation( int x, int y ) {
+    public synchronized void setWindowLocation( int x, int y ) {
         Window window= SwingUtilities.getWindowAncestor( getWindow().getCanvas() );
         if ( window!=null ) {
         // assume it is fitted for now.  This is a gross over simplification, not considering scroll panes, etc.
@@ -297,7 +311,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param title
      * @return 
      */
-    public static synchronized ApplicationModel newDialogWindow( Window parent, final String title ) {
+    public synchronized ApplicationModel newDialogWindow( Window parent, final String title ) {
         final JDialog p= new JDialog(parent,title);
         ApplicationModel result= new ApplicationModel();
         result.addDasPeersToApp();
@@ -328,7 +342,7 @@ public class ScriptContext extends PyJavaInstance {
      * @return a handle (do not use this object, code will break) for the window.
      * @see #setWindow(org.autoplot.ApplicationModel) 
      */
-    public static synchronized ApplicationModel newWindow( final String id ) {
+    public synchronized ApplicationModel newWindow( final String id ) {
         ApplicationModel result= applets.get(id);
         if ( result==null ) {
             result= new ApplicationModel();
@@ -398,28 +412,28 @@ public class ScriptContext extends PyJavaInstance {
      * @param m the application model.
      * @see setWindow, which should be used instead.
      */
-    public static void setApplicationModel(ApplicationModel m) {
+    public void setApplicationModel(ApplicationModel m) {
         model = m;
         dom= m.getDocumentModel();
     }
     
-    private static AutoplotUI view = null;
+    private AutoplotUI view = null;
     
     /**
      * keep track of the default application.
      */
-    private static AutoplotUI defaultApp= null; // kludge to get the first.
+    private AutoplotUI defaultApp= null; // kludge to get the first.
 
     /**
      * set the default application.  Jython codes should not call this.
      * @param app
      */
-    protected static void _setDefaultApp( AutoplotUI app ) {
+    protected void _setDefaultApp( AutoplotUI app ) {
         defaultApp= app;
         appLookup.put( app.applicationModel, app);
     }
     
-    private static synchronized void maybeInitView() {
+    private synchronized void maybeInitView() {
         maybeInitModel();
         if (view == null) {
             Runnable run= new Runnable() {
@@ -447,7 +461,7 @@ public class ScriptContext extends PyJavaInstance {
      * Used by AutoplotUI to set the view.
      * @param v the new view.
      */
-    protected static void setView(AutoplotUI v) {
+    protected void setView(AutoplotUI v) {
         view = v;
     }
 
@@ -456,7 +470,7 @@ public class ScriptContext extends PyJavaInstance {
      * See createGui(), which creates the view.
      * @return
      */
-    public static Window getViewWindow() {
+    public Window getViewWindow() {
         return view;
     }
 
@@ -467,7 +481,7 @@ public class ScriptContext extends PyJavaInstance {
      * this routine.
      * @param out
      */
-    public static void _setOutputStream(OutputStream out) {
+    public void _setOutputStream(OutputStream out) {
         ScriptContext.out = out;
     }
     
@@ -478,7 +492,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param width the width of the canvas
      * @param height the height of the canvas
      */
-    public static void setCanvasSize( final int width, final int height) {
+    public void setCanvasSize( final int width, final int height) {
         maybeInitModel();
         Runnable run= new Runnable() {
             @Override
@@ -504,7 +518,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param surl
      * @Deprecated use plot instead;
      */
-    public static void setDataSourceURL(String surl) {
+    public void setDataSourceURL(String surl) {
         model.setDataSourceURL(surl);
         if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
     }
@@ -515,7 +529,7 @@ public class ScriptContext extends PyJavaInstance {
      * See getDataSet to load data synchronously.
      * @param suri a URI or vap file
      */
-    public static void plot(String suri) {
+    public void plot(String suri) {
         maybeInitModel();
         if ( view!=null && view.isExpertMode() ) {
             view.dataSetSelector.setValue(suri);
@@ -530,7 +544,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param surl1 the independent variable dataset (generally used for X)
      * @param surl2 the dependent variable dataset (generally used for Y, but can be rank 2).
      */
-    public static void plot(String surl1, String surl2) {
+    public void plot(String surl1, String surl2) {
         maybeInitModel();
         if ( surl1.endsWith(".vap") || surl1.contains(".vap?")  ) {
             throw new IllegalArgumentException("cannot load vap here in two-argument plot");
@@ -550,7 +564,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param chNum the data source number to reset the URI.
      * @param surl a URI to use
      */
-    public static void plot(int chNum, String surl) {
+    public void plot(int chNum, String surl) {
         maybeInitModel();
         model.setDataSet( chNum, null, surl );
         if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
@@ -562,7 +576,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param label for the plot.
      * @param surl a URI to use
      */
-    public static void plot(int chNum, String label, String surl) {
+    public void plot(int chNum, String label, String surl) {
         maybeInitModel();
         model.setDataSet( chNum, label, surl );
         if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
@@ -572,7 +586,7 @@ public class ScriptContext extends PyJavaInstance {
      * plot the dataset in the first dataSource node.
      * @param ds QDataSet to plot
      */
-    public static void plot(QDataSet ds) {
+    public void plot(QDataSet ds) {
         plot( 0, (String)null, ds );
     }
 
@@ -581,7 +595,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param x QDataSet for the independent parameter
      * @param y QDataSet for the dependent parameter
      */
-    public static void plot( QDataSet x, QDataSet y )  {
+    public void plot( QDataSet x, QDataSet y )  {
         plot( 0, (String)null, x, y );
     }
     
@@ -591,7 +605,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param y QDataSet for the independent parameter for the Y values
      * @param z Rank 1 or Rank 2 QDataSet for the dependent parameter
      */
-    public static void plot( QDataSet x, QDataSet y, QDataSet z ) {
+    public void plot( QDataSet x, QDataSet y, QDataSet z ) {
         plot( 0, (String)null, x, y, z );
     }
 
@@ -600,7 +614,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
      * @param ds dataset to plot.
      */
-    public static void plot( int chNum, QDataSet ds)  {
+    public void plot( int chNum, QDataSet ds)  {
         plot( chNum, (String)null, ds );
     }
 
@@ -610,7 +624,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param x QDataSet for the independent parameter for the X values
      * @param y QDataSet for the independent parameter for the Y values
      */
-    public static void plot( int chNum, QDataSet x, QDataSet y )  {
+    public void plot( int chNum, QDataSet x, QDataSet y )  {
         plot( chNum, (String)null, x, y );
     }
 
@@ -621,7 +635,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param y QDataSet for the independent parameter for the Y values
      * @param z Rank 1 or Rank 2 QDataSet for the dependent parameter
      */
-    public static void plot( int chNum, QDataSet x, QDataSet y, QDataSet z ) {
+    public void plot( int chNum, QDataSet x, QDataSet y, QDataSet z ) {
         plot( chNum, (String)null, x, y, z );
     }
 
@@ -712,7 +726,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param label the label for the plot dependent parameter
      * @param ds the dataset to use.
      */
-    public static void plot( int chNum, String label, QDataSet ds) {
+    public void plot( int chNum, String label, QDataSet ds) {
         maybeInitModel();
         MutablePropertyDataSet yds= ensureMutable(ds);
         model.setDataSet( chNum, label, yds );
@@ -727,7 +741,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param x QDataSet for the independent parameter for the X values
      * @param y QDataSet for the independent parameter for the Y values
      */
-    public static void plot( int chNum, String label, QDataSet x, QDataSet y ) {
+    public void plot( int chNum, String label, QDataSet x, QDataSet y ) {
         plot( chNum, label, x, y, (String)null );
     }
 
@@ -740,7 +754,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param y QDataSet for the independent parameter for the Y values, or null.
      * @param renderType string explicitly controlling the renderType and hints.
      */    
-    public static void plot( int chNum, String label, QDataSet x, QDataSet y, String renderType ) {
+    public void plot( int chNum, String label, QDataSet x, QDataSet y, String renderType ) {
         plot( chNum, label, x, y, renderType, true );
     }
 
@@ -754,7 +768,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param renderType string explicitly controlling the renderType and hints.
      * @param reset reset by autoranging, autolabelling, etc.
      */    
-    public static void plot( int chNum, String label, QDataSet x, QDataSet y, String renderType, boolean reset ) {        
+    public void plot( int chNum, String label, QDataSet x, QDataSet y, String renderType, boolean reset ) {        
         maybeInitModel();
         if ( x==null && renderType==null ) {
             model.setDataSet( chNum, label, y, reset );
@@ -783,7 +797,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param y QDataSet for the independent parameter for the Y values
      * @param z Rank 1 or Rank 2 QDataSet for the dependent parameter
      */
-    public static void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z ) {
+    public void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z ) {
         maybeInitModel();
         QDataSet xds= x;
         
@@ -824,7 +838,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param z Rank 1 or Rank 2 QDataSet for the dependent parameter, or null.
      * @param renderType hint at the render type to use, such as "nnSpectrogram" or "digital", 
      */
-    public static void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z, String renderType ) {
+    public void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z, String renderType ) {
         maybeInitModel();
         QDataSet xds= x;
         MutablePropertyDataSet zds= ensureMutable(z);
@@ -871,7 +885,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param renderType hint at the render type to use, such as "nnSpectrogram" or "digital", 
      * @param reset reset by autoranging, autolabelling, etc.
      */
-    public static void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z, String renderType, boolean reset ) {
+    public void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z, String renderType, boolean reset ) {
         maybeInitModel();
         QDataSet xds= x;
         MutablePropertyDataSet zds= ensureMutable(z);
@@ -905,7 +919,7 @@ public class ScriptContext extends PyJavaInstance {
      * @return the channel number for the new plot element.
      * @see #setLayout(int, int) 
      */
-    public static int addPlotElement( int chNum ) {
+    public int addPlotElement( int chNum ) {
         maybeInitModel();
         
         DataSourceFilter dsf= dom.getDataSourceFilters(chNum);
@@ -1104,7 +1118,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param message
      * @see #showMessageDialog(java.lang.String) 
      */
-    public static void setStatus( String message ) {
+    public void setStatus( String message ) {
         dom.getController().setStatus(message);
     }
     
@@ -1112,7 +1126,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * show a popup that you know the user will see.  Note HTML code will work.
      * @param message 
      */
-    public static void alert( String message ) {
+    public void alert( String message ) {
         String m= message;
         int messageType= JOptionPane.INFORMATION_MESSAGE;
         if ( m.startsWith("warning:") ){
@@ -1130,7 +1144,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param message, possibly containing HTML.
      * @see #setStatus(java.lang.String) 
      */
-    public static void showMessageDialog( String message ) {
+    public void showMessageDialog( String message ) {
         if ( message.split("\n").length>15 ) {
             JScrollPane pane= new JScrollPane( new JTextArea(message) );
             pane.setPreferredSize( new Dimension(800,600) );
@@ -1149,7 +1163,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param c the component to add.
      * @see AutoplotUI#setLeftPanel(javax.swing.JComponent) setLeftPanel which adds to the GUI
      */
-    public static void addTab( final String label, final JComponent c  ) {
+    public void addTab( final String label, final JComponent c  ) {
         Runnable run= new Runnable() {
             @Override
             public void run() {
@@ -1184,7 +1198,7 @@ addBottomDecoration( dom.canvases[0], paint )
      *   spectrogram, series, scatter, histogram, fill_to_zero, digital
      * @param name string name of the plot style.
      */
-    public static void setRenderStyle( String name ) {
+    public void setRenderStyle( String name ) {
         dom.getController().getPlotElement().setRenderType( RenderType.valueOf(name) );
     }
 
@@ -1196,7 +1210,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param o any object we want to look at.
      * @throws java.io.IOException
      */
-    public static void peekAt(Object o) throws IOException {
+    public void peekAt(Object o) throws IOException {
         out.write(o.toString().getBytes());
     }
 
@@ -1271,7 +1285,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param filename The name of a local file
      * @throws java.io.IOException
      */
-    public static void writeToPng(String filename) throws IOException {
+    public void writeToPng(String filename) throws IOException {
         setStatus("writing to "+filename);
         if ( !( filename.endsWith(".png") || filename.endsWith(".PNG") ) ) {
             filename= filename + ".png";
@@ -1287,7 +1301,7 @@ addBottomDecoration( dom.canvases[0], paint )
         setStatus("wrote to "+f.getAbsolutePath());
     }
 
-    private static void maybeMakeParent( String filename ) throws IOException {
+    private void maybeMakeParent( String filename ) throws IOException {
         filename= getLocalFilename(filename);
         File file= new File(filename);
         File parentFile= file.getParentFile();
@@ -1332,7 +1346,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param height the height in pixels of the png
      * @throws java.io.IOException
      */
-    public static void writeToPng( String filename, int width, int height ) throws IOException {
+    public void writeToPng( String filename, int width, int height ) throws IOException {
         filename= getLocalFilename(filename);
         
         BufferedImage image = model.canvas.getImage( width, height );
@@ -1357,7 +1371,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @see 
      * @throws java.io.IOException
      */
-    public static void writeToPng( String filename, int width, int height, Map<String,String> metadata ) throws IOException {
+    public void writeToPng( String filename, int width, int height, Map<String,String> metadata ) throws IOException {
         filename= getLocalFilename(filename);
         
         BufferedImage image = model.canvas.getImage( width, height );
@@ -1378,7 +1392,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param metadata if non-null, then write name/values pairs into the PNG Metadata. "Creation Time" is always added.  http://englishjavadrinker.blogspot.com/2010/09/png-keywords_12.html
      * @throws IOException
      */
-    public static void writeToPng( BufferedImage image, String filename, Map<String,String> metadata ) throws IOException {
+    public void writeToPng( BufferedImage image, String filename, Map<String,String> metadata ) throws IOException {
         
         logger.log(Level.CONFIG, "writeToPng(image,{0},metadata)", new Object[]{filename});
         if ( !( filename.endsWith(".png") || filename.endsWith(".PNG") ) ) {
@@ -1418,7 +1432,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param out the OutputStream accepting the data, which is not closed.
      * @throws java.io.IOException
      */
-    public static void writeToPng(OutputStream out) throws IOException {
+    public void writeToPng(OutputStream out) throws IOException {
         waitUntilIdle();
 
         DasCanvas c = model.getCanvas();
@@ -1443,7 +1457,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param filename the local file to write the file.
      * @throws java.io.IOException
      */    
-    public static void writeToSvg( String filename ) throws IOException {
+    public void writeToSvg( String filename ) throws IOException {
         setStatus("writing to "+filename);
         if ( !( filename.endsWith(".svg") || filename.endsWith(".SVG") ) ) {
             filename= filename + ".svg";
@@ -1468,7 +1482,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param out the OutputStream accepting the data, which is not closed.
      * @throws java.io.IOException
      */
-    public static void writeToSvg(OutputStream out) throws IOException {
+    public void writeToSvg(OutputStream out) throws IOException {
         waitUntilIdle();
 
         int width= model.getDocumentModel().getCanvases(0).getWidth();
@@ -1489,7 +1503,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param filename the local file to write the file.
      * @throws java.io.IOException
      */
-    public static void writeToPdf(String filename) throws IOException {
+    public void writeToPdf(String filename) throws IOException {
         setStatus("writing to "+filename);
         if ( !( filename.endsWith(".pdf") || filename.endsWith(".PDF") ) ) {
             filename= filename + ".pdf";
@@ -1517,7 +1531,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param out the OutputStream
      * @throws java.io.IOException
      */
-    public static void writeToPdf( OutputStream out ) throws IOException {
+    public void writeToPdf( OutputStream out ) throws IOException {
         waitUntilIdle();
         int width= model.getDocumentModel().getCanvases(0).getWidth();
         int height= model.getDocumentModel().getCanvases(0).getHeight();
@@ -1557,7 +1571,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * convenient method for getting an image from the current canvas.
      * @return
      */
-    public static BufferedImage writeToBufferedImage( ) {
+    public BufferedImage writeToBufferedImage( ) {
         waitUntilIdle();
         
         int height= model.getDocumentModel().getCanvases(0).getHeight();
@@ -1690,7 +1704,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * set the title of the plot.
      * @param title
      */
-    public static void setTitle(String title) {
+    public void setTitle(String title) {
         model.getDocumentModel().getController().getPlot().setTitle(title);
     }
     
@@ -1698,7 +1712,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * create a model with a GUI presentation layer.  If the GUI is already 
      * created, then this does nothing.
      */
-    public static void createGui() {
+    public void createGui() {
         maybeInitView();
     }
 
@@ -1709,7 +1723,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * provides full access to the application.
      * @return ApplicationModel object
      */
-    public static ApplicationModel getApplicationModel() {
+    public ApplicationModel getApplicationModel() {
         maybeInitModel();
         return model;
     }
@@ -1718,7 +1732,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * provide way to see if the model is already initialized (e.g. for clone application)
      * @return true is the model is already initialized.
      */
-    public static boolean isModelInitialized() {
+    public boolean isModelInitialized() {
         return model!=null;
     }
 
@@ -1743,7 +1757,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param dst java bean such as model.getPlotDefaults().getXAxis()
      * @param dstProp a property name such as "label"
      */
-    public static void bind( Object src, String srcProp, Object dst, String dstProp ) {
+    public void bind( Object src, String srcProp, Object dst, String dstProp ) {
         bind( src, srcProp, dst, dstProp, null );
     }
     
@@ -1769,7 +1783,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param dstProp a property name such as "label"
      * @param c converter for the binding, or null.
      */    
-    public static void bind( Object src, String srcProp, Object dst, String dstProp, Converter c ) {
+    public void bind( Object src, String srcProp, Object dst, String dstProp, Converter c ) {
         if ( DasApplication.hasAllPermission() ) {
             if ( src instanceof DomNode && dom.getController().getElementById(((DomNode)src).getId())==src ) {
                 DomNode srcNode= (DomNode)src;
@@ -1796,7 +1810,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * unbind the property
      * @param src 
      */
-    public static void unbind( DomNode src ) {
+    public void unbind( DomNode src ) {
         dom.getController().unbind(src);
     }
 
@@ -1807,7 +1821,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param dst 
      * @param dstProp 
      */
-    public static void unbind( DomNode src, String srcProp, DomNode dst, String dstProp ) {
+    public void unbind( DomNode src, String srcProp, DomNode dst, String dstProp ) {
         dom.getController().unbind(src,srcProp,dst,dstProp);
     }
     
@@ -1834,7 +1848,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param dstProp a property name such as "label"
      * @param c converter for the binding, or null.
      */    
-    public static void bindGuiSafe( final Object src, final String srcProp, 
+    public void bindGuiSafe( final Object src, final String srcProp, 
         final Object dst, final String dstProp, final Converter c ) {
         Runnable run= new Runnable() {
             @Override
@@ -1972,7 +1986,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * case defaults like the cache directory are set.
      * @return
      */
-    public static Application getDocumentModel() {
+    public Application getDocumentModel() {
         maybeInitModel();
         return dom;
     }
@@ -1982,7 +1996,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * wait until the application is idle.  This does a model.waitUntilIdle,
      * but also checks for the DataSetSelector for pending operations.
      */
-    public static void waitUntilIdle() {
+    public void waitUntilIdle() {
         if ( view!=null ) {
             while ( view.getDataSetSelector().isPendingChanges() ) {
                 try {
@@ -2001,7 +2015,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param id string for debugging.
      *@see http://autoplot.org/data/tools/reloadAll.jy
      */
-    public static void waitUntilIdle( String id ) {
+    public void waitUntilIdle( String id ) {
         logger.log(Level.INFO, "waitUntilIdle({0})", id);
         if ( view!=null ) {
             while ( view.getDataSetSelector().isPendingChanges() ) {
@@ -2020,7 +2034,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param filename
      * @throws java.io.IOException
      */
-    public static void save( String filename ) throws IOException {
+    public void save( String filename ) throws IOException {
         maybeInitModel();
         
         filename= getLocalFilename(filename);
@@ -2036,7 +2050,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param filename local or remote filename like http://autoplot.org/data/autoplot.vap
      * @throws java.io.IOException
      */
-    public static void load( String filename ) throws IOException {
+    public void load( String filename ) throws IOException {
         plot(filename);
     }
     
@@ -2073,7 +2087,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * make the layout more efficient by removing empty spaces and overlapping 
      * plots.
      */
-    public static void fixLayout() {
+    public void fixLayout() {
         org.autoplot.dom.DomOps.newCanvasLayout(dom);
     }
     
@@ -2081,7 +2095,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * make a stack plot.
      * @param nrows number of rows (plots)
      */
-    public static void setLayout( int nrows ) {
+    public void setLayout( int nrows ) {
         if ( nrows<1 ) throw new IllegalArgumentException("must be one or more rows");
         setLayout( nrows, 1 );
     }
@@ -2094,7 +2108,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param nrows number of rows
      * @param ncolumns number of columns
      */
-    public static void setLayout( int nrows, int ncolumns ) {
+    public void setLayout( int nrows, int ncolumns ) {
         if ( nrows<1 ) throw new IllegalArgumentException("must be one or more rows");
         if ( ncolumns<1 ) throw new IllegalArgumentException("must be one or more columns");        
         reset();
@@ -2122,7 +2136,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param dir below, above, right, or left, or null (None in Jython) to replace the current plot.
      * @return the new plots.
      */
-    public static List<Plot> addPlots( int nrows, int ncolumns, String dir ) {
+    public List<Plot> addPlots( int nrows, int ncolumns, String dir ) {
         if ( nrows<1 ) throw new IllegalArgumentException("must be one or more rows");
         if ( ncolumns<1 ) throw new IllegalArgumentException("must be one or more columns");
         Plot d= null;
@@ -2143,7 +2157,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @see #setLayout(int, int) setLayout(int, int) which will create a grid of plots.
      * @see #addPlotElement(int) addPlotElement(int) which will an another plotElement (an overplot) to the ith position.
      */
-    public static void setLayoutOverplot( int nplotElement ) {
+    public void setLayoutOverplot( int nplotElement ) {
         if ( nplotElement<1 ) throw new IllegalArgumentException("must be one or more plots");
         reset();
         DasCanvas c= dom.getCanvases(0).getController().getDasCanvas();
@@ -2165,7 +2179,7 @@ addBottomDecoration( dom.canvases[0], paint )
     /**
      * reset the application to its initial state.
      */
-    public static void reset() {
+    public void reset() {
         maybeInitModel();
         dom.getController().reset();
         AutoplotUI ui= getApplication();
@@ -2179,7 +2193,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * called when the application closes so if we reopen it will be in a
      * good state.
      */
-    protected static void close() {
+    protected void close() {
         model= null;
         view= null;
         out= null;
