@@ -37,7 +37,7 @@ public class Test_100_Demo1423 {
         
         JFrameOperator mainFrame = new JFrameOperator(app);
 
-        new JLabelOperator(mainFrame, AutoplotUI.READY_MESSAGE );
+        //new JLabelOperator(mainFrame, AutoplotUI.READY_MESSAGE );
 
         new JTextFieldOperator( app.getDataSetSelector().getEditor() ).setText("/home/jbf/ct/hudson/script/test037/demo1423.jy");
         new JButtonOperator( app.getDataSetSelector().getGoButton() ).clickMouse();
