@@ -17,9 +17,9 @@ import org.das2.datum.LoggerManager;
 import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.operators.JFrameOperator;
 import org.autoplot.AutoplotUI;
+import org.autoplot.ScriptContext;
 import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.TestOut;
-import static org.autoplot.ScriptContext.*;
 
 /**
  *
@@ -28,23 +28,24 @@ import static org.autoplot.ScriptContext.*;
 public class Test_038_CopyPlotElementsDown implements Scenario  {
 
     private static final Logger logger= LoggerManager.getLogger("vatesting");
-    
+    private static final ScriptContext scriptContext= ScriptContext.getInstance();
+
     public int runIt(Object param) {
 
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
         
         try {
-            createGui();
-            AutoplotUI app = (AutoplotUI) getViewWindow();
+            scriptContext.createGui();
+            AutoplotUI app = (AutoplotUI) scriptContext.getViewWindow();
             
-            Application dom = getDocumentModel();
+            Application dom = scriptContext.getDocumentModel();
             dom.getOptions().setAutolayout(false);
             
             JFrameOperator mainFrame = new JFrameOperator(app);
-            waitUntilIdle();
+            scriptContext.waitUntilIdle();
 
-            plot( "vap+inline:ripplesVectorTimeSeries(200)&RENDER_TYPE=hugeScatter" );
-            waitUntilIdle();
+            scriptContext.plot( "vap+inline:ripplesVectorTimeSeries(200)&RENDER_TYPE=hugeScatter" );
+            scriptContext.waitUntilIdle();
 
             org.das2.graph.DasPlot c= dom.getPlots(0).getController().getDasPlot();
             javax.swing.JPopupMenu menu= c.getDasMouseInputAdapter().getPrimaryPopupMenu();
@@ -55,8 +56,8 @@ public class Test_038_CopyPlotElementsDown implements Scenario  {
 
             Thread.sleep(1000);
 
-            writeToPng("Test_038_CopyPlotElementsDown.png");
-            save("Test_038_CopyPlotElementsDown.vap");
+            scriptContext.writeToPng("Test_038_CopyPlotElementsDown.png");
+            scriptContext.save("Test_038_CopyPlotElementsDown.vap");
 
             return 0;
         } catch (IOException ex) {

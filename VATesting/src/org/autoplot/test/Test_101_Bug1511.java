@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.test;
 
 
@@ -39,6 +35,9 @@ import org.netbeans.jemmy.operators.JTreeOperator;
  * @author mmclouth
  */
 public class Test_101_Bug1511 implements Scenario {
+
+    private static final ScriptContext scriptContext= ScriptContext.getInstance();
+
      @Override
     public int runIt(Object o) {
     
@@ -46,9 +45,9 @@ public class Test_101_Bug1511 implements Scenario {
 
         try {
             
-            ScriptContext.createGui();
+            scriptContext.createGui();
             
-            AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
+            AutoplotUI app= (AutoplotUI) scriptContext.getViewWindow();
             
             JFrameOperator mainFrame = new JFrameOperator(app);
             
@@ -63,7 +62,7 @@ public class Test_101_Bug1511 implements Scenario {
            
             
             Thread.sleep(5000);
-            ScriptContext.waitUntilIdle();
+            scriptContext.waitUntilIdle();
             
             JMenuBarOperator menuBar = new JMenuBarOperator( mainFrame );
 

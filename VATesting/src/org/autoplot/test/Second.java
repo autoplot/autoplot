@@ -18,10 +18,13 @@ import org.autoplot.ScriptContext;
  * @author jbf
  */
 public class Second implements Scenario {
+        
+    private static final ScriptContext scriptContext= ScriptContext.getInstance();
+    
     public int runIt(Object param) {
-        ScriptContext.createGui();
+        scriptContext.createGui();
 
-        AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
+        AutoplotUI app= (AutoplotUI) scriptContext.getViewWindow();
 
         JFrameOperator mainFrame = new JFrameOperator(app);
 

@@ -21,8 +21,6 @@ import org.netbeans.jemmy.operators.JTextComponentOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.autoplot.AutoplotUI;
 import org.autoplot.ScriptContext;
-import static org.autoplot.ScriptContext.save;
-import static org.autoplot.ScriptContext.writeToPng;
 import util.FiltersTreePicker;
 import util.RegexComponentChooser;
 
@@ -31,7 +29,8 @@ import util.RegexComponentChooser;
  * @author kenziemclouth
  */
 public class Test_051_HanningFilter implements Scenario {
-    
+    private static final ScriptContext scriptContext= ScriptContext.getInstance();
+
     @Override
     public int runIt(Object o) {
 
@@ -39,9 +38,9 @@ public class Test_051_HanningFilter implements Scenario {
 
         System.err.println("$Date$");
         try {
-            ScriptContext.createGui();
+            scriptContext.createGui();
 
-            AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
+            AutoplotUI app= (AutoplotUI) scriptContext.getViewWindow();
 
             JFrameOperator mainFrame = new JFrameOperator(app);
             // wait for the application to be in the "ready" state.
@@ -61,7 +60,7 @@ public class Test_051_HanningFilter implements Scenario {
             
             Thread.sleep(3000);
             
-            ScriptContext.waitUntilIdle();
+            scriptContext.waitUntilIdle();
             
             FiltersTreePicker.pickFilter( mainFrame, "Filters|Fourier Filtering|Hanning".split("\\|") );
         
@@ -76,8 +75,8 @@ public class Test_051_HanningFilter implements Scenario {
             tabs.selectPage("data");
             System.err.println("Done!");
 
-            writeToPng("Test_051_HanningFilter.png"); // Leave artifacts for testing.
-            save("Test_051_HanningFilter.vap");
+            scriptContext.writeToPng("Test_051_HanningFilter.png"); // Leave artifacts for testing.
+            scriptContext.save("Test_051_HanningFilter.vap");
             
             return(0);
         } catch (InterruptedException ex) {

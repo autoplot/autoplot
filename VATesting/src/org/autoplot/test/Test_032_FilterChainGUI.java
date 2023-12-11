@@ -24,8 +24,6 @@ import org.netbeans.jemmy.operators.JListOperator;
 import org.netbeans.jemmy.operators.JScrollPaneOperator;
 import org.autoplot.AutoplotUI;
 import org.autoplot.ScriptContext;
-import static org.autoplot.ScriptContext.save;
-import static org.autoplot.ScriptContext.writeToPng;
 import util.RegexComponentChooser;
 
 /** 
@@ -39,16 +37,17 @@ import util.RegexComponentChooser;
  * @author kenziemclouth
  */
 public class Test_032_FilterChainGUI implements Scenario {
-    
+    private static final ScriptContext scriptContext= ScriptContext.getInstance();
+        
     @Override
     public int runIt(Object o) {
 
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
 
         try {
-            ScriptContext.createGui();
+            scriptContext.createGui();
             
-            AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
+            AutoplotUI app= (AutoplotUI) scriptContext.getViewWindow();
             
             JFrameOperator mainFrame = new JFrameOperator(app);
         
@@ -121,8 +120,8 @@ public class Test_032_FilterChainGUI implements Scenario {
             
             System.err.println("Done!");
             
-            writeToPng("Test_032_FilterChainGUI.png"); // Leave artifacts for testing.
-            save("Test_032_FilterChainGUI.vap");
+            scriptContext.writeToPng("Test_032_FilterChainGUI.png"); // Leave artifacts for testing.
+            scriptContext.save("Test_032_FilterChainGUI.vap");
             
             
             return(0);

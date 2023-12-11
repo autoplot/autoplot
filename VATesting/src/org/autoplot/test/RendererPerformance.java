@@ -27,6 +27,9 @@ import org.das2.util.LoggerManager;
 public class RendererPerformance {
     
     private static final Logger logger= LoggerManager.getLogger("RendererPerformance");
+    
+    private static final ScriptContext scriptContext= ScriptContext.getInstance();
+    
     private static void waitForPaint( final DasCanvas c ) throws InterruptedException, InvocationTargetException {
         SwingUtilities.invokeAndWait( new Runnable() {
             @Override
@@ -38,18 +41,18 @@ public class RendererPerformance {
             
     private static void setUp( String uri ) {
         System.err.println("uri: "+uri);
-        ScriptContext.plot( uri );
+        scriptContext.plot( uri );
     }
     
     private static void stressIt( ) {
         
-        Application dom= ScriptContext.getDocumentModel();
+        Application dom= scriptContext.getDocumentModel();
         DasCanvas c= dom.getController().getCanvas().getController().getDasCanvas();
         
         PlotElementController pec= dom.getPlotElements(0).getController();
         
         try {
-            ScriptContext.waitUntilIdle();
+            scriptContext.waitUntilIdle();
             
             DatumRange r1= dom.getController().getPlot().getXaxis().getRange();
             DatumRange r2= DatumRangeUtil.rescale(r1,"1%,101%");
@@ -83,8 +86,8 @@ public class RendererPerformance {
         int nn;
         long t0;
 
-        Application dom= ScriptContext.getDocumentModel();
-        ScriptContext.createGui();
+        Application dom= scriptContext.getDocumentModel();
+        scriptContext.createGui();
 
         System.err.println("---------------------");
         nn= 400;    

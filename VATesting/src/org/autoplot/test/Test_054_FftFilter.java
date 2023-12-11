@@ -26,15 +26,16 @@ import util.RegexComponentChooser;
  * @author kenziemclouth
  */
 public class Test_054_FftFilter implements Scenario {
-    
+    private static final ScriptContext scriptContext= ScriptContext.getInstance();
+
     @Override
     public int runIt(Object o) {
 
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
   
-        ScriptContext.createGui();
+        scriptContext.createGui();
 
-        AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
+        AutoplotUI app= (AutoplotUI) scriptContext.getViewWindow();
 
         JFrameOperator mainFrame = new JFrameOperator(app);
         

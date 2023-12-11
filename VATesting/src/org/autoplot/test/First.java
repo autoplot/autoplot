@@ -25,9 +25,11 @@ public class First {
         Logger.getLogger("vatesting").info("info");
         Logger.getLogger("vatesting").fine("fine");
         
-        ScriptContext.createGui();
+        ScriptContext scriptContext= ScriptContext.getInstance();
         
-        AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
+        scriptContext.createGui();
+        
+        AutoplotUI app= (AutoplotUI) scriptContext.getViewWindow();
         
         JFrameOperator mainFrame = new JFrameOperator(app);
 

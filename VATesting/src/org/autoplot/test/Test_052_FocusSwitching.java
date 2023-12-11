@@ -25,9 +25,6 @@ import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.autoplot.AutoplotUI;
 import org.autoplot.ScreenshotsTool;
 import org.autoplot.ScriptContext;
-import static org.autoplot.ScriptContext.getDocumentModel;
-import static org.autoplot.ScriptContext.save;
-import static org.autoplot.ScriptContext.writeToPng;
 import org.autoplot.dom.Application;
 import org.autoplot.scriptconsole.DumpRteExceptionHandler;
 import util.NameComponentChooser;
@@ -39,7 +36,8 @@ import util.RegexComponentChooser;
  * @author Jeremy Faden
  */
 public class Test_052_FocusSwitching implements Scenario {
-    
+    private static final ScriptContext scriptContext= ScriptContext.getInstance();
+
     @Override
     public int runIt(Object o) {
 
@@ -47,18 +45,18 @@ public class Test_052_FocusSwitching implements Scenario {
 
         try {
             
-            ScriptContext.getApplicationModel().setExceptionHandler( new DumpRteExceptionHandler() );
+            scriptContext.getApplicationModel().setExceptionHandler( new DumpRteExceptionHandler() );
             org.das2.DasApplication.getDefaultApplication().setExceptionHandler( new DumpRteExceptionHandler() );
 
-            ScriptContext.createGui();
+            scriptContext.createGui();
             
-            ScriptContext.waitUntilIdle();
+            scriptContext.waitUntilIdle();
             
-            AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
+            AutoplotUI app= (AutoplotUI) scriptContext.getViewWindow();
             
             JFrameOperator mainFrame = new JFrameOperator(app);
 
-            Application dom = getDocumentModel();
+            Application dom = scriptContext.getDocumentModel();
             
             while ( dom.getOptions().isDataVisible()==false ) {
                 System.err.println("making it visible");
@@ -67,14 +65,14 @@ public class Test_052_FocusSwitching implements Scenario {
                 Thread.sleep(1000);
             }
             
-            ScriptContext.waitUntilIdle();            
+            scriptContext.waitUntilIdle();            
             
             
             new JTextFieldOperator( app.getDataSetSelector().getEditor() ).setText("vap+cdf:https://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=2000-01-09");
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
             
             Thread.sleep(1000);
-            ScriptContext.waitUntilIdle(); // clickMouse doesn't block, never has...
+            scriptContext.waitUntilIdle(); // clickMouse doesn't block, never has...
             
             dom.getOptions().setDataVisible(true);
             
@@ -89,7 +87,7 @@ public class Test_052_FocusSwitching implements Scenario {
             dom.getPlotElements(0).setComponent("|slice1(10)");
             Thread.sleep(1000);
             
-            ScriptContext.waitUntilIdle(); 
+            scriptContext.waitUntilIdle(); 
             
             new JButtonOperator( mainFrame, new NameComponentChooser("inspect") ).clickMouse();
 
@@ -98,16 +96,16 @@ public class Test_052_FocusSwitching implements Scenario {
             new JButtonOperator( diaFrame, "Plot Below" ).clickMouse();
             
             Thread.sleep(1000);
-            ScriptContext.waitUntilIdle(); // clickMouse doesn't block, never has...
+            scriptContext.waitUntilIdle(); // clickMouse doesn't block, never has...
             
             dom.getPlotElements(1).setComponent("|slice0(8)");
             Thread.sleep(1000);
             
-            ScriptContext.waitUntilIdle();
+            scriptContext.waitUntilIdle();
             
             dom.getController().setPlotElement( dom.getPlotElements(0) );
             
-            ScriptContext.waitUntilIdle();
+            scriptContext.waitUntilIdle();
             Thread.sleep(1000); // so that the data screen settles on one state before the screenshot, I hope.
             
             BufferedImage image= ScreenshotsTool.getScreenShotNoPointer();
@@ -120,8 +118,8 @@ public class Test_052_FocusSwitching implements Scenario {
             //System.err.println( "filter: " + app.getDataPanel().getFiltersChainPanel().getFilter() );
             System.err.println("Done!");
             
-            writeToPng("Test_052_FocusSwitching.png"); // Leave artifacts for testing.
-            save("Test_052_FocusSwitching.vap");
+            scriptContext.writeToPng("Test_052_FocusSwitching.png"); // Leave artifacts for testing.
+            scriptContext.save("Test_052_FocusSwitching.vap");
             
             return(0);
             

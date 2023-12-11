@@ -13,9 +13,8 @@ import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.TestOut;
 import org.autoplot.AutoplotUI;
-import static org.autoplot.ScriptContext.createGui;
-import static org.autoplot.ScriptContext.getApplicationModel;
-import static org.autoplot.ScriptContext.getViewWindow;
+import org.autoplot.ScriptContext;
+
 import org.autoplot.scriptconsole.DumpRteExceptionHandler;
 
 /**
@@ -23,17 +22,18 @@ import org.autoplot.scriptconsole.DumpRteExceptionHandler;
  * @author jbf
  */
 public class Test_000_Init implements Scenario {
-
+    
+    private static final ScriptContext scriptContext= ScriptContext.getInstance();
     @Override
     public int runIt(Object param) {
         
         // hide Jemmy output
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
             
-        getApplicationModel().setExceptionHandler( new DumpRteExceptionHandler() );
+        scriptContext.getApplicationModel().setExceptionHandler( new DumpRteExceptionHandler() );
             
-        createGui();
-        AutoplotUI app = (AutoplotUI) getViewWindow();
+        scriptContext.createGui();
+        AutoplotUI app = (AutoplotUI) scriptContext.getViewWindow();
         
         try {
             new Robot().mouseMove(app.getX() + 100, app.getY() + 100);

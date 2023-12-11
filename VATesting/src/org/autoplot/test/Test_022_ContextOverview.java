@@ -19,6 +19,7 @@ import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.*;
 import org.autoplot.AutoplotUI;
+import org.autoplot.ScriptContext;
 import static org.autoplot.ScriptContext.*;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.BindingModel;
@@ -31,6 +32,7 @@ import util.RegexComponentChooser;
 public class Test_022_ContextOverview implements Scenario {
 
     private static final Logger logger= LoggerManager.getLogger("vatesting");
+    private static final ScriptContext scriptContext= ScriptContext.getInstance();
     
     @Override
     public int runIt(Object o) {
@@ -38,18 +40,18 @@ public class Test_022_ContextOverview implements Scenario {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
 
         try {
-            createGui();
+            scriptContext.createGui();
             
-            Application dom= getDocumentModel();
+            Application dom= scriptContext.getDocumentModel();
             
             dom.getOptions().setAutolayout(false);
-            waitUntilIdle();
+            scriptContext.waitUntilIdle();
             sleep(1000);
             
-            AutoplotUI app = (AutoplotUI) getViewWindow();
+            AutoplotUI app = (AutoplotUI) scriptContext.getViewWindow();
             JFrameOperator mainFrame = new JFrameOperator(app);
             sleep(3000); // remote bookmarks can take a little while to load
-            waitUntilIdle();
+            scriptContext.waitUntilIdle();
             System.err.println("here line 52");
             JMenuBarOperator menuop= new JMenuBarOperator(mainFrame);
             System.err.println("here line 54");
@@ -60,13 +62,13 @@ public class Test_022_ContextOverview implements Scenario {
             System.err.println("here line 59");
             Util.waitUntilBusy(2000,app.getDom());
             System.err.println("here line 61");
-            waitUntilIdle();
+            scriptContext.waitUntilIdle();
 
             DatumRange range0= dom.getPlots(0).getXaxis().getRange();
             
             if ( range0.getUnits().isConvertibleTo(Units.dimensionless) ) {
-                waitUntilIdle();  // why???
-                ((AutoplotUI)getViewWindow()).getDataSetSelector().isPendingChanges();
+                scriptContext.waitUntilIdle();  // why???
+                ((AutoplotUI)scriptContext.getViewWindow()).getDataSetSelector().isPendingChanges();
                 range0= dom.getPlots(0).getXaxis().getRange();
             }
             
@@ -77,9 +79,9 @@ public class Test_022_ContextOverview implements Scenario {
                 System.err.println("after wait, data loaded. "+range0);
             }
 
-            save( "Test_022_ContextOverview.000.vap" );
+            scriptContext.save( "Test_022_ContextOverview.000.vap" );
 
-            waitUntilIdle();
+            scriptContext.waitUntilIdle();
              
             DatumRange dr;
             dr= DatumRangeUtil.rescale(dom.getPlots(0).getXaxis().getRange(), 0.2, 0.8 );
@@ -94,7 +96,7 @@ public class Test_022_ContextOverview implements Scenario {
 
             Thread.sleep(1000); // get to work on hudson--not sure why
 
-            writeToPng( "Test_022_ContextOverview.001.png");
+            scriptContext.writeToPng( "Test_022_ContextOverview.001.png");
 
 
             // small cheat, because we don't make the menu popup.
@@ -107,7 +109,7 @@ public class Test_022_ContextOverview implements Scenario {
 
             Thread.sleep(5000); // get to work on hudson--not sure why 
 
-            writeToPng( "Test_022_ContextOverview.002.png");
+            scriptContext.writeToPng( "Test_022_ContextOverview.002.png");
 
             boolean tbindings= dom.getBindings().length==13; // colorbar //TODO: WHY????
             boolean trange= range0.equals( dom.getPlots(1).getXaxis().getRange() );

@@ -15,7 +15,6 @@ import org.netbeans.jemmy.operators.JLabelOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.autoplot.AutoplotUI;
 import org.autoplot.ScriptContext;
-import static org.autoplot.ScriptContext.writeToPng;
 import util.RegexComponentChooser;
 
 /**
@@ -23,15 +22,18 @@ import util.RegexComponentChooser;
  * @author jbf
  */
 public class Test_100_Demo1423 {
+    
+    private static final ScriptContext scriptContext= ScriptContext.getInstance();
+    
     public static void main( String[] args ) throws Exception {
 
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
         
-        ScriptContext.createGui();
+        scriptContext.createGui();
         
-        AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
+        AutoplotUI app= (AutoplotUI) scriptContext.getViewWindow();
         
-        ScriptContext.waitUntilIdle();
+        scriptContext.waitUntilIdle();
         
         JFrameOperator mainFrame = new JFrameOperator(app);
 
@@ -45,23 +47,23 @@ public class Test_100_Demo1423 {
         DialogOperator popup = new DialogOperator( new RegexComponentChooser( "Run Script demo1423.jy") );           
         new JButtonOperator(popup,"OK").clickMouse();      
         
-        ScriptContext.setStatus("waiting 4 more seconds.");
-        ScriptContext.sleep(4000);
-        ScriptContext.setStatus("done waiting 4 seconds.");
+        scriptContext.setStatus("waiting 4 more seconds.");
+        scriptContext.sleep(4000);
+        scriptContext.setStatus("done waiting 4 seconds.");
         
-        ScriptContext.waitUntilIdle();
+        scriptContext.waitUntilIdle();
         
-        ScriptContext.setStatus("waiting 12 more seconds.");
-        ScriptContext.sleep(12000);
-        ScriptContext.setStatus("done waiting 12 seconds.");
+        scriptContext.setStatus("waiting 12 more seconds.");
+        scriptContext.sleep(12000);
+        scriptContext.setStatus("done waiting 12 seconds.");
         
-        ScriptContext.setStatus("waiting another 5 seconds.");
-        ScriptContext.sleep(5000);
-        ScriptContext.setStatus("done waiting 5 seconds.");
+        scriptContext.setStatus("waiting another 5 seconds.");
+        scriptContext.sleep(5000);
+        scriptContext.setStatus("done waiting 5 seconds.");
         
-        ScriptContext.waitUntilIdle();
+        scriptContext.waitUntilIdle();
         
-        writeToPng("Test_100_Demo1423.png"); // Leave artifacts for testing.
+        scriptContext.writeToPng("Test_100_Demo1423.png"); // Leave artifacts for testing.
 
         // The script writes this file, so delete it.  It's redundant.
         new File( "test037_demo1423.png" ).delete();

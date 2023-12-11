@@ -12,7 +12,6 @@ import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.DialogOperator;
-import org.netbeans.jemmy.operators.JMenuBarOperator;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JComboBoxOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
@@ -21,8 +20,6 @@ import org.netbeans.jemmy.operators.JTextComponentOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.autoplot.AutoplotUI;
 import org.autoplot.ScriptContext;
-import static org.autoplot.ScriptContext.save;
-import static org.autoplot.ScriptContext.writeToPng;
 import util.FiltersTreePicker;
 import util.RegexComponentChooser;
 
@@ -31,6 +28,7 @@ import util.RegexComponentChooser;
  * @author kenziemclouth
  */
 public class Test_050_FftFilter implements Scenario {
+    private static final ScriptContext scriptContext= ScriptContext.getInstance();
 
     @Override
     public int runIt(Object o) {
@@ -38,9 +36,9 @@ public class Test_050_FftFilter implements Scenario {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
   
         try {
-            ScriptContext.createGui();
+            scriptContext.createGui();
             
-            AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
+            AutoplotUI app= (AutoplotUI) scriptContext.getViewWindow();
             
             JFrameOperator mainFrame = new JFrameOperator(app);
 
@@ -48,7 +46,7 @@ public class Test_050_FftFilter implements Scenario {
             new JTextFieldOperator( app.getDataSetSelector().getEditor() ).setText("https://emfisis.physics.uiowa.edu/Flight/RBSP-A/L3/2012/12/01/rbsp-a_magnetometer_1sec-gei_emfisis-L3_20121201_v1.3.4.cdf?Magnitude");
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
             
-            ScriptContext.waitUntilIdle();
+            scriptContext.waitUntilIdle();
             
             FiltersTreePicker.pickFilter( mainFrame, "Filters|Fourier Filtering|FFT Power Spectrum with sliding window".split("\\|") );
             
@@ -73,8 +71,8 @@ public class Test_050_FftFilter implements Scenario {
             new JTabbedPaneOperator( app.getTabs() ).selectPage("data");
             System.err.println("Done!");
             
-            writeToPng("Test_050_FftFilter.png"); // Leave artifacts for testing.
-            save("Test_050_FftFilter.vap");
+            scriptContext.writeToPng("Test_050_FftFilter.png"); // Leave artifacts for testing.
+            scriptContext.save("Test_050_FftFilter.vap");
             
             return(0);
         } catch (InterruptedException ex) {

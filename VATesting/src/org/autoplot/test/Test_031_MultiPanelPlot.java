@@ -7,7 +7,6 @@ package org.autoplot.test;
 
 
 import java.awt.Point;
-import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,7 +17,6 @@ import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.DialogOperator;
 import org.netbeans.jemmy.operators.JMenuBarOperator;
 import org.netbeans.jemmy.operators.JButtonOperator;
-import org.netbeans.jemmy.operators.JCheckBoxOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
 import org.netbeans.jemmy.operators.JLabelOperator;
 import org.netbeans.jemmy.operators.JPopupMenuOperator;
@@ -28,8 +26,6 @@ import org.netbeans.jemmy.operators.JTextComponentOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.autoplot.AutoplotUI;
 import org.autoplot.ScriptContext;
-import static org.autoplot.ScriptContext.save;
-import static org.autoplot.ScriptContext.writeToPng;
 import org.autoplot.dom.Application;
 import util.RegexComponentChooser;
 
@@ -45,15 +41,17 @@ import util.RegexComponentChooser;
  * @author kenziemclouth
  */
 public class Test_031_MultiPanelPlot implements Scenario {
-    
+      
+    private static final ScriptContext scriptContext= ScriptContext.getInstance();
+        
         @Override
     public int runIt(Object o) {
 
         try {
-            ScriptContext.createGui();
+            scriptContext.createGui();
             
             System.err.println("here line 55");
-            AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
+            AutoplotUI app= (AutoplotUI) scriptContext.getViewWindow();
             
             JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
             System.err.println("here line 59");
@@ -70,12 +68,12 @@ public class Test_031_MultiPanelPlot implements Scenario {
                 System.err.println("here line 67, about to add the layout panel");
                 menuBar.pushMenu("Options|Enable Feature|Layout Panel", "|");
                 System.err.println("here line 70");
-                ScriptContext.waitUntilIdle();
+                scriptContext.waitUntilIdle();
                 System.err.println("here line 72");
             }
             new JTabbedPaneOperator( app.getTabs() ).selectPage("layout");
             
-            ScriptContext.waitUntilIdle();
+            scriptContext.waitUntilIdle();
             System.err.println("here line 76");
             JButtonOperator tallerB = new JButtonOperator( mainFrame, "Taller" );
             tallerB.clickMouse(4); // This is the number of clicks, for example 2 is double-click.
@@ -99,7 +97,7 @@ public class Test_031_MultiPanelPlot implements Scenario {
             size1.enterText("3");
             new JButtonOperator(frame,"OK").clickMouse();
             
-            ScriptContext.waitUntilIdle();
+            scriptContext.waitUntilIdle();
 
             while ( frame.isVisible() ) {
                 Thread.sleep(100);  // Why does the press take so long???
@@ -107,9 +105,9 @@ public class Test_031_MultiPanelPlot implements Scenario {
             
             Thread.sleep(1000);
             
-            ScriptContext.plot(1,"vap+fits:http://autoplot.org/data/hsi_qlimg_5050601_001.fits"); // small cheat
+            scriptContext.plot(1,"vap+fits:http://autoplot.org/data/hsi_qlimg_5050601_001.fits"); // small cheat
             Thread.sleep(1000);
-            ScriptContext.waitUntilIdle();
+            scriptContext.waitUntilIdle();
             
             //for mac 
             //mainFrame.clickMouse(clickPoint.x+50, clickPoint.y-130); 
@@ -130,7 +128,7 @@ public class Test_031_MultiPanelPlot implements Scenario {
             
             Thread.sleep(1000);
             // wait for the application to be in the "ready" state
-            ScriptContext.waitUntilIdle();
+            scriptContext.waitUntilIdle();
             
             //Open DOM Properties
             menuBar.pushMenu("Edit|Edit DOM", "|");
@@ -174,10 +172,10 @@ public class Test_031_MultiPanelPlot implements Scenario {
             new JButtonOperator(domProps, "Apply").clickMouse();
             new JButtonOperator(domProps, "OK").clickMouse();
             
-            ScriptContext.waitUntilIdle();
+            scriptContext.waitUntilIdle();
             
-            ScriptContext.fixLayout();
-            ScriptContext.waitUntilIdle();
+            scriptContext.fixLayout();
+            scriptContext.waitUntilIdle();
             
             while ( domProps.isVisible() ) {
                 Thread.sleep(100);  // Why does the press take so long???
@@ -212,8 +210,8 @@ public class Test_031_MultiPanelPlot implements Scenario {
 //            
 //            System.err.println("Done!");
 //            
-            writeToPng("Test_031_MultiPanelPlot.png"); // Leave artifacts for testing.
-            save("Test_031_MultiPanelPlot.vap");
+            scriptContext.writeToPng("Test_031_MultiPanelPlot.png"); // Leave artifacts for testing.
+            scriptContext.save("Test_031_MultiPanelPlot.vap");
             
             return(0);
         } catch (InterruptedException ex) {
