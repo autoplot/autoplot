@@ -18,7 +18,7 @@ import org.netbeans.jemmy.TestOut;
 import org.autoplot.dom.Application;
 import org.netbeans.jemmy.operators.JFrameOperator;
 import org.autoplot.AutoplotUI;
-import org.autoplot.ScriptContext2023;
+import static org.autoplot.ScriptContext.*;
 import org.autoplot.scriptconsole.DumpRteExceptionHandler;
 
 /**
@@ -28,8 +28,7 @@ import org.autoplot.scriptconsole.DumpRteExceptionHandler;
 public class Test_037_ZoomPan implements Scenario {
 
     private static final Logger logger= LoggerManager.getLogger("vatesting");
-    private static final ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
-
+    
     private static boolean close( double t, double d ) {
         return Math.abs( (t-d)/t ) < 0.10;
     }
@@ -44,32 +43,32 @@ public class Test_037_ZoomPan implements Scenario {
 
         try {
             
-            scriptContext.getApplicationModel().setExceptionHandler( new DumpRteExceptionHandler() );
+            getApplicationModel().setExceptionHandler( new DumpRteExceptionHandler() );
             
-            scriptContext.createGui();
-            AutoplotUI app = (AutoplotUI) scriptContext.getViewWindow();
-            Application dom = scriptContext.getDocumentModel();
+            createGui();
+            AutoplotUI app = (AutoplotUI) getViewWindow();
+            Application dom = getDocumentModel();
             dom.getOptions().setAutolayout(false);
             
             JFrameOperator mainFrame = new JFrameOperator(app);
-            scriptContext.waitUntilIdle();
+            waitUntilIdle();
             
             DasPlot p = dom.getController().getPlot().getController().getDasPlot();
             MouseWheelEvent e;
             e = new MouseWheelEvent(p, 0, System.currentTimeMillis(), 0, 300, 300, 0, false, MouseWheelEvent.WHEEL_UNIT_SCROLL, 1, 1);
             p.getDasMouseInputAdapter().getSecondaryModule().mouseWheelMoved(e);
-            scriptContext.writeToPng("Test_037_ZoomPan.001.png");
+            writeToPng("Test_037_ZoomPan.001.png");
             dr0= p.getXAxis().getDatumRange();
 
             e = new MouseWheelEvent(p, 0, System.currentTimeMillis(), 0, 300, 300, 0, false, MouseWheelEvent.WHEEL_UNIT_SCROLL, 1, -1);
             p.getDasMouseInputAdapter().getSecondaryModule().mouseWheelMoved(e);
-            scriptContext.writeToPng("Test_037_ZoomPan.002.png");
+            writeToPng("Test_037_ZoomPan.002.png");
             dr1= p.getXAxis().getDatumRange();
 
             dom.getController().getPlot().setIsotropic(true);
             e = new MouseWheelEvent(p, 0, System.currentTimeMillis(), 0, 300, 300, 0, false, MouseWheelEvent.WHEEL_UNIT_SCROLL, 1, 1);
             p.getXAxis().getDasMouseInputAdapter().getSecondaryModule().mouseWheelMoved(e);
-            scriptContext.writeToPng("Test_037_ZoomPan.003.png");
+            writeToPng("Test_037_ZoomPan.003.png");
             dr2= p.getXAxis().getDatumRange();
 
             if ( dr0.width().value()==125.0

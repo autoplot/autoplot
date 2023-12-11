@@ -30,10 +30,8 @@ public class AppManager {
     
     private static AppManager instance;
 
-    private ScriptContext2023 scriptContext;
-    
     private AppManager() {
-        scriptContext= ScriptContext2023.getInstance();
+        
     }
     
     
@@ -74,7 +72,7 @@ public class AppManager {
         logger.log(Level.FINE, "closeApplication({0})", app);
         if ( app instanceof AutoplotUI ) { // there's a bug here--we need to associate just with autoplot app.
             boolean resetMain= false;
-            if ( scriptContext.getViewWindow()==null ) {
+            if ( ScriptContext.getViewWindow()==null ) {
                 resetMain= true;
             }
             if ( requestClose(app) ) {
@@ -87,8 +85,8 @@ public class AppManager {
             if ( resetMain ) {
                 for ( Object o: this.apps ) {
                     if ( o instanceof AutoplotUI ) {
-                        scriptContext.setView((AutoplotUI)o); //TODO: if there are running apps, this will cause problems...
-                        scriptContext.setApplicationModel(((AutoplotUI)o).applicationModel);
+                        ScriptContext.setView((AutoplotUI)o); //TODO: if there are running apps, this will cause problems...
+                        ScriptContext.setApplicationModel(((AutoplotUI)o).applicationModel);
                     }
                 }
             }

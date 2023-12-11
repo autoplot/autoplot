@@ -6,7 +6,7 @@
 package test;
 
 import java.io.IOException;
-import org.autoplot.ScriptContext2023;
+import org.autoplot.ScriptContext;
 import org.das2.qds.DDataSet;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
@@ -17,11 +17,9 @@ import org.das2.qds.ops.Ops;
  * @author jeremyfaden
  */
 public class PlotDom {
-    private static ScriptContext2023 scriptContext;
-    
     public static void main( String[] args ) throws IOException, InterruptedException {
 long t0= System.currentTimeMillis();
-        scriptContext.createGui();
+        ScriptContext.createGui();
 System.err.println( System.currentTimeMillis()-t0 );
         double[] x = new double[400];
         double[][] y= new double[3][400];
@@ -43,10 +41,10 @@ System.err.println( System.currentTimeMillis()-t0 );
 
         ds.putProperty( QDataSet.RENDER_TYPE, "series" );
 System.err.println( System.currentTimeMillis()-t0 );
-        scriptContext.load("/tmp/foo.vap");
-        scriptContext.plot( 0, ds );
+        ScriptContext.load("/tmp/foo.vap");
+        ScriptContext.plot( 0, ds );
 System.err.println( System.currentTimeMillis()-t0 );
-        scriptContext.plot( 1, DDataSet.wrap(x), Ops.ripples(400) );
+        ScriptContext.plot( 1, DDataSet.wrap(x), Ops.ripples(400) );
 System.err.println( System.currentTimeMillis()-t0 );
     }
 }

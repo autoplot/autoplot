@@ -1,4 +1,8 @@
-
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package org.autoplot.test;
 
 
@@ -15,7 +19,7 @@ import org.netbeans.jemmy.operators.JPopupMenuOperator;
 import org.netbeans.jemmy.operators.JTabbedPaneOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.autoplot.AutoplotUI;
-import org.autoplot.ScriptContext2023;
+import org.autoplot.ScriptContext;
 import util.RegexComponentChooser;
 import java.awt.Robot;
 import org.netbeans.jemmy.JemmyProperties;
@@ -35,9 +39,6 @@ import org.netbeans.jemmy.operators.JTreeOperator;
  * @author mmclouth
  */
 public class Test_101_Bug1511 implements Scenario {
-
-    private static final ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
-
      @Override
     public int runIt(Object o) {
     
@@ -45,9 +46,9 @@ public class Test_101_Bug1511 implements Scenario {
 
         try {
             
-            scriptContext.createGui();
+            ScriptContext.createGui();
             
-            AutoplotUI app= (AutoplotUI) scriptContext.getViewWindow();
+            AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
             
             JFrameOperator mainFrame = new JFrameOperator(app);
             
@@ -62,7 +63,7 @@ public class Test_101_Bug1511 implements Scenario {
            
             
             Thread.sleep(5000);
-            scriptContext.waitUntilIdle();
+            ScriptContext.waitUntilIdle();
             
             JMenuBarOperator menuBar = new JMenuBarOperator( mainFrame );
 

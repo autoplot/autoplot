@@ -27,10 +27,10 @@ import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.autoplot.ScriptContext2023;
+import org.autoplot.ScriptContext;
 import org.das2.qds.DDataSet;
 import org.das2.qds.FDataSet;
-import static org.autoplot.ScriptContext2023.*;
+import static org.autoplot.ScriptContext.*;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.das2.qds.QubeDataSetIterator;
@@ -50,8 +50,6 @@ import test.BundleBinsDemo;
  */
 public class Test013 {
 
-    private static ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
-    
     static long t0= System.currentTimeMillis();
 
     public static void xxx(String id) {
@@ -86,8 +84,8 @@ public class Test013 {
             QDataSet qds = handler.getDataSet();
             //System.err.println( "" + qds + " "+ ( Ops.equivalent( ds, qds)  ) );
             System.err.println( "" + qds );
-            scriptContext.plot(qds);
-            scriptContext.writeToPng( file+".png" );
+            ScriptContext.plot(qds);
+            ScriptContext.writeToPng( file+".png" );
         } finally {
             if ( in!=null ) in.close();
         }

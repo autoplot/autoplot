@@ -53,20 +53,20 @@ public class AddSampListener {
     private static synchronized void maybePlot( DataSetSelector sel, String uri ) {
         
         if ( false ) {
-//            JPanel parent= new JPanel();
-//            parent.setLayout( new BorderLayout() );
-//            DataSourceEditorPanel p= DataSourceEditorPanelUtil.getDataSourceEditorPanel(parent,uri);
-//
-//            AutoplotUI dialogParent= ScriptContext.getApplication();
-//
-//            DataSourceEditorDialog dialog = new DataSourceEditorDialog( dialogParent, p.getPanel(), true);
-//            dialog.revalidate();
-//
-//            Icon icon= new javax.swing.ImageIcon(AddSampListener.class.getResource("/org/autoplot/datasource/fileMag.png") );
-//            if ( JOptionPane.OK_OPTION==WindowManager.showConfirmDialog( dialogParent, parent, "Editing URI", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon ) ) {
-//                String newUri= p.getURI();
-//                ScriptContext.plot(newUri);        
-//            }       
+            JPanel parent= new JPanel();
+            parent.setLayout( new BorderLayout() );
+            DataSourceEditorPanel p= DataSourceEditorPanelUtil.getDataSourceEditorPanel(parent,uri);
+
+            AutoplotUI dialogParent= ScriptContext.getApplication();
+
+            DataSourceEditorDialog dialog = new DataSourceEditorDialog( dialogParent, p.getPanel(), true);
+            dialog.revalidate();
+
+            Icon icon= new javax.swing.ImageIcon(AddSampListener.class.getResource("/org/autoplot/datasource/fileMag.png") );
+            if ( JOptionPane.OK_OPTION==WindowManager.showConfirmDialog( dialogParent, parent, "Editing URI", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon ) ) {
+                String newUri= p.getURI();
+                ScriptContext.plot(newUri);        
+            }       
         } else {
             sel.setValue(uri);
             final DataSetSelector fsel= sel;
@@ -139,7 +139,7 @@ public class AddSampListener {
             JComponent cc= hubConnector.createMonitorPanel();
             //cc.setMinimumSize( new Dimension(400,400));
             //cc.setPreferredSize( new Dimension(400,400));
-            ScriptContext2023.getInstance().addTab( "samp", cc );
+            ScriptContext.addTab( "samp", cc );
         }
         
         Metadata meta = new Metadata();

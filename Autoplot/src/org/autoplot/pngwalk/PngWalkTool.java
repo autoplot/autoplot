@@ -128,7 +128,7 @@ import org.autoplot.AutoplotUI;
 import org.autoplot.AutoplotUtil;
 import org.autoplot.GuiSupport;
 import org.autoplot.JythonUtil;
-import org.autoplot.ScriptContext2023;
+import org.autoplot.ScriptContext;
 import org.autoplot.bookmarks.Bookmark;
 import org.autoplot.bookmarks.BookmarksException;
 import org.autoplot.bookmarks.BookmarksManager;
@@ -216,8 +216,6 @@ public final class PngWalkTool extends javax.swing.JPanel {
     private String qcturl;  // the url for quality control data.
     private String pwd=null; // the location of the .pngwalk file, if used, or null.
     private String vapfile=null;
-    
-    private ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
     
     public static void main(String[] args) {
 
@@ -573,8 +571,6 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
         final String lap= "View in Autoplot";
 
-        final ScriptContext2023 scriptContext= tool.scriptContext;
-
         tool.addFileAction( enabler, new AbstractAction(lap) {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -700,7 +696,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                         if ( timeRange!=null ) {
                             suri = productFile + "?timeRange=" + timeRange;
                         } else {
-                            JOptionPane.showMessageDialog(scriptContext.getViewWindow(), "unable to resolve time range from image metadata or filename.");
+                            JOptionPane.showMessageDialog(ScriptContext.getViewWindow(), "unable to resolve time range from image metadata or filename.");
                             return;
                         }
                     }
@@ -709,19 +705,19 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 final String fsuri= suri;
                 
                 Runnable run = () -> {
-                    scriptContext.createGui();
-                    Window apWindow= scriptContext.getViewWindow();
+                    ScriptContext.createGui();
+                    Window apWindow= ScriptContext.getViewWindow();
                     if ( fsuri!=null ) {
                         raiseApWindowSoon(apWindow);
                         if ( fsuri.startsWith("script:") ) {
-                            scriptContext.getApplication().runScriptTools(fsuri);
+                            ScriptContext.getApplication().runScriptTools(fsuri);
                             return;
                         } else {
-                            scriptContext.plot(fsuri);
+                            ScriptContext.plot(fsuri);
                         }
                     }
                     // go through and check for the axis autorange flag, and autorange if necessary.
-                    Application dom= scriptContext.getDocumentModel();
+                    Application dom= ScriptContext.getDocumentModel();
                     for ( int i=0; i<dom.getPlots().length; i++ ) {
                         Plot p= dom.getPlots(i);
                         if ( p.getYaxis().isAutoRange() ) {
@@ -984,7 +980,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
         } );
 
-        fileMenu.add(new AbstractAction( "Show Autoplot" ) {
+        fileMenu.add( new AbstractAction( "Show Autoplot" ) {
             @Override
             public void actionPerformed(ActionEvent ae) {
                LoggerManager.logGuiEvent(ae);        
@@ -996,9 +992,8 @@ public final class PngWalkTool extends javax.swing.JPanel {
                    }
                }
                if ( AppManager.getInstance().getApplicationCount()==1 ) {
-                   ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
-                   scriptContext.createGui();
-                   Window apWindow= scriptContext.getViewWindow();
+                   ScriptContext.createGui();
+                   Window apWindow= ScriptContext.getViewWindow();
                    raiseApWindowSoon(apWindow);
                }
             }

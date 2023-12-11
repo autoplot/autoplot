@@ -5,6 +5,7 @@
  */
 package org.autoplot.test;
 
+import java.awt.Container;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -14,16 +15,22 @@ import org.netbeans.jemmy.ComponentChooser;
 import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.TestOut;
+import org.netbeans.jemmy.operators.CheckboxOperator;
 import org.netbeans.jemmy.operators.ComponentOperator;
 import org.netbeans.jemmy.operators.DialogOperator;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
+import org.netbeans.jemmy.operators.JLabelOperator;
 import org.netbeans.jemmy.operators.JMenuBarOperator;
+import org.netbeans.jemmy.operators.JTextComponentOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.autoplot.AddPlotElementDialog;
 import org.autoplot.AutoplotUI;
 import org.autoplot.ScreenshotsTool;
-import org.autoplot.ScriptContext2023;
+import org.autoplot.ScriptContext;
+import static org.autoplot.ScriptContext.save;
+import static org.autoplot.ScriptContext.writeToPng;
+import org.autoplot.datasource.DataSetSelector;
 import util.RegexComponentChooser;
 
 /**
@@ -32,8 +39,7 @@ import util.RegexComponentChooser;
  * @author Jeremy Faden
  */
 public class Test_043_DsfFilter implements Scenario {
-    private static final ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
-
+    
     public static int getComponentIndex( ComponentOperator child ) {
         JComponent container= (JComponent)child.getParent();
         for ( int i=0; i<container.getComponentCount(); i++ ) {
@@ -48,13 +54,13 @@ public class Test_043_DsfFilter implements Scenario {
     public int runIt(Object o) {
 
         try {
-            scriptContext.createGui();
+            ScriptContext.createGui();
             
-            scriptContext.waitUntilIdle();
+            ScriptContext.waitUntilIdle();
             
-            ScreenshotsTool st= new ScreenshotsTool( scriptContext.getApplication(), "Test_043_DsfFilter/", true );
+            ScreenshotsTool st= new ScreenshotsTool( ScriptContext.getApplication(), "Test_043_DsfFilter/", true );
                     
-            AutoplotUI app= (AutoplotUI) scriptContext.getViewWindow();
+            AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
             
             JFrameOperator mainFrame = new JFrameOperator(app);
 
@@ -62,7 +68,7 @@ public class Test_043_DsfFilter implements Scenario {
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
 
             Thread.sleep(1000);
-            scriptContext.waitUntilIdle();
+            ScriptContext.waitUntilIdle();
             
             st.takePicture( 52, "Here we've plotted a dataset with TSB, or the Time Series Browse capability.  Changing the time will load more data." );
             
@@ -95,8 +101,8 @@ public class Test_043_DsfFilter implements Scenario {
             
             st.takePicture( 99, "Copy plots down will copy the plot, and correctly connect the TSB capabilty of the lower plot as well." );
             
-            scriptContext.writeToPng("Test_043_DsfFiler.png"); // Leave artifacts for testing.
-            scriptContext.save("Test_043_DsfFiler.png");
+            writeToPng("Test_043_DsfFiler.png"); // Leave artifacts for testing.
+            save("Test_043_DsfFiler.png");
             
             Thread.sleep(1000);
             st.requestFinish(true);

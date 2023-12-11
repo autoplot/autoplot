@@ -7,9 +7,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.autoplot.ApplicationModel;
-import org.autoplot.AutoplotUI;
 import org.autoplot.AutoplotUtil;
-import org.autoplot.ScriptContext2023;
+import org.autoplot.ScriptContext;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.jythonsupport.ui.DataMashUp;
 import org.das2.qds.QDataSet;
@@ -23,11 +22,9 @@ public class PlotDataMashupResolver implements DataMashUp.Resolver {
     private static Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.gui");
     
     final DataMashUp dm;
-    final AutoplotUI app;
     
-    public PlotDataMashupResolver( DataMashUp dm, AutoplotUI app ) {
+    public PlotDataMashupResolver( DataMashUp dm ) {
         this.dm= dm;
-        this.app= app;
     }
     
     @Override
@@ -48,7 +45,7 @@ public class PlotDataMashupResolver implements DataMashUp.Resolver {
         @Override
         public void interactivePlot( QDataSet qds ) {
             Window w= SwingUtilities.getWindowAncestor(dm);
-            ApplicationModel model= app.getScriptContext().newDialogWindow( w, qds.toString() );
+            ApplicationModel model= ScriptContext.newDialogWindow( w, qds.toString() );
             model.setDataSet( qds );
         }
 }

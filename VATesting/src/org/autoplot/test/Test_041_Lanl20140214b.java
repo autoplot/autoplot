@@ -16,7 +16,7 @@ import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.autoplot.AutoplotUI;
-import org.autoplot.ScriptContext2023;
+import static org.autoplot.ScriptContext.*;
 import org.autoplot.dom.Application;
 
 /**
@@ -26,8 +26,7 @@ import org.autoplot.dom.Application;
 public class Test_041_Lanl20140214b implements Scenario {
     
     private static final Logger logger= LoggerManager.getLogger("vatesting");
-    private static final ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
-
+    
     public int runIt(Object param) {
 
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
@@ -35,20 +34,20 @@ public class Test_041_Lanl20140214b implements Scenario {
         try {
             System.err.println( "## v20141212" );
             
-            scriptContext.createGui();
-            Application dom= scriptContext.getDocumentModel();
+            createGui();
+            Application dom= getDocumentModel();
             
-            AutoplotUI app= (AutoplotUI) scriptContext.getViewWindow();
+            AutoplotUI app= (AutoplotUI) getViewWindow();
 
             //wait "Reloaded" footer
             
-            scriptContext.waitUntilIdle();
+            waitUntilIdle();
 
             new JTextFieldOperator( app.getDataSetSelector().getEditor() ).setText("http://www.rbsp-ect.lanl.gov/data_pub/rbspa/rept/level3/rbspa_$x_ect-rept-sci-L3_$Y$m$d_v$(v,sep).cdf?FEDU&timerange=20130915");
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
             
             Thread.sleep(6000); // TODO: have a look at the waitUntilIdle and convince self that it shouldn't be considered when blocking.
-            scriptContext.waitUntilIdle();
+            waitUntilIdle();
 
             // TODO: There's a strange bug where waitUntilIdle doesn't wait.  I can demo that the TSB code blocks properly, but this should be investigated more.
             int i=200;
@@ -57,10 +56,10 @@ public class Test_041_Lanl20140214b implements Scenario {
                 System.err.println("sleeping while file is downloading, because waitUntilIdle function failed. "+i);
                 Thread.sleep(1000);
                 i=i-1;
-                scriptContext.waitUntilIdle();
+                waitUntilIdle();
             }
             
-            scriptContext.writeToPng( "Test_041_Lanl20140214b.001.png");
+            writeToPng( "Test_041_Lanl20140214b.001.png");
 
             Util.switchToTab(app,"style");
             // how to push droplist?
@@ -68,21 +67,21 @@ public class Test_041_Lanl20140214b implements Scenario {
             
             dom.getPlotElements(0).getStyle().setRebinMethod( SpectrogramRenderer.RebinnerEnum.lanlNearestNeighbor );
             
-            scriptContext.writeToPng( "Test_041_Lanl20140214b.001a.png");
+            writeToPng( "Test_041_Lanl20140214b.001a.png");
             
-            scriptContext.waitUntilIdle();
+            waitUntilIdle();
 
             Util.pushContextMenu( dom.getPlots(0).getController().getDasPlot(),
                     new String[] { "Plot Element Type", "Series" } );
             
-            scriptContext.waitUntilIdle();
+            waitUntilIdle();
             
-            scriptContext.writeToPng( "Test_041_Lanl20140214b.002.png");
+            writeToPng( "Test_041_Lanl20140214b.002.png");
             
             Util.pushContextMenu( dom.getPlots(0).getController().getDasPlot(),
                     new String[] { "Plot Element Type", "Series" } );
             
-            scriptContext.waitUntilIdle();
+            waitUntilIdle();
             
             Thread.sleep(1000);
              

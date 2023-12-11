@@ -13,20 +13,19 @@ import org.netbeans.jemmy.operators.JTabbedPaneOperator;
 import org.netbeans.jemmy.operators.JTextAreaOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.autoplot.AutoplotUI;
-import org.autoplot.ScriptContext2023;
+import org.autoplot.ScriptContext;
 
 /**
  *
  * @author jbf
  */
 public class Third implements Scenario  {
-    private static final ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
 
     public int runIt(Object o) {
 
-        scriptContext.createGui();
+        ScriptContext.createGui();
 
-        AutoplotUI app= (AutoplotUI) scriptContext.getViewWindow();
+        AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
 
         JFrameOperator mainFrame = new JFrameOperator(app);
 

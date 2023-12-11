@@ -12,48 +12,48 @@ import java.util.logging.Logger;
 import org.das2.datum.LoggerManager;
 import org.netbeans.jemmy.JemmyProperties;
 import org.autoplot.AutoplotUI;
-import org.autoplot.ScriptContext2023;
 import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
+import static org.autoplot.ScriptContext.*;
 
 /**
  * Test_033
  * @author jbf
  */
 public class Test_033_OperationsCacheDoesNotProperlyUpdate implements Scenario  {
-    private static final Logger logger= LoggerManager.getLogger("vatesting");
-    private static final ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
 
+    private static final Logger logger= LoggerManager.getLogger("vatesting");
+    
     public int runIt(Object param) {
 
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
         
         try {
-            scriptContext.createGui();
-            AutoplotUI app = (AutoplotUI) scriptContext.getViewWindow();
+            createGui();
+            AutoplotUI app = (AutoplotUI) getViewWindow();
 
-            Application dom = scriptContext.getDocumentModel();
+            Application dom = getDocumentModel();
             dom.getOptions().setAutolayout(false);
             
-            scriptContext.waitUntilIdle();
+            waitUntilIdle();
 
             
             // plot test dataset
             new JTextFieldOperator(app.getDataSetSelector().getEditor()).setText("vap+inline:ripples(100,110)+randn(100)/50+outerProduct(ones(100),randn(110)/50)");
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
 
-            scriptContext.waitUntilIdle();
+            waitUntilIdle();
 
             dom.getPlotElements(0).setComponent("|dbAboveBackgroundDim1(10)");
-            scriptContext.waitUntilIdle();
+            waitUntilIdle();
 
             dom.getPlots(0).getXaxis().getController().getDasAxis().scanPrevious();
-            scriptContext.waitUntilIdle();
+            waitUntilIdle();
 
-            scriptContext.writeToPng("Test_033_OperationsCacheDoesNotProperlyUpdate.png");
-            scriptContext.save("Test_033_OperationsCacheDoesNotProperlyUpdate.vap");
+            writeToPng("Test_033_OperationsCacheDoesNotProperlyUpdate.png");
+            save("Test_033_OperationsCacheDoesNotProperlyUpdate.vap");
 
             return 0;
         } catch (IOException ex) {

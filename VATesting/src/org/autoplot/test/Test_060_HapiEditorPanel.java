@@ -17,7 +17,8 @@ import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.autoplot.AutoplotUI;
 import org.autoplot.ScreenshotsTool;
-import org.autoplot.ScriptContext2023;
+import org.autoplot.ScriptContext;
+import static org.autoplot.ScriptContext.createGui;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.util.jemmy.NameComponentChooser;
 import org.netbeans.jemmy.operators.DialogOperator;
@@ -30,7 +31,6 @@ import util.RegexComponentChooser;
  * @author jbf
  */
 public class Test_060_HapiEditorPanel implements Scenario {
-    private static final ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
 
     private static final Logger logger= LoggerManager.getLogger("vatesting");
     
@@ -48,7 +48,7 @@ public class Test_060_HapiEditorPanel implements Scenario {
         } catch ( InterruptedException ex ) {
             throw new RuntimeException(ex);
         }
-        scriptContext.waitUntilIdle();
+        ScriptContext.waitUntilIdle();
     }
     
     @Override
@@ -61,10 +61,10 @@ public class Test_060_HapiEditorPanel implements Scenario {
 
             Util.reportLogger(logger);
             
-            scriptContext.createGui();
+            createGui();
             
-            AutoplotUI app= (AutoplotUI) scriptContext.getViewWindow();
-            //ScreenshotsTool st= new ScreenshotsTool( scriptContext.getApplication(), "Test_060_HapiEditorPanel/", true );
+            AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
+            //ScreenshotsTool st= new ScreenshotsTool( ScriptContext.getApplication(), "Test_060_HapiEditorPanel/", true );
               
             JFrameOperator mainFrame= new JFrameOperator(app);
             
@@ -77,7 +77,7 @@ public class Test_060_HapiEditorPanel implements Scenario {
             wait(3000);
             new JButtonOperator( diaFrame, "Plot" ).clickMouse();
             waitUntilIdle(1000);
-            scriptContext.writeToPng("Test_060_HapiEditorPanel_1.png");
+            ScriptContext.writeToPng("Test_060_HapiEditorPanel_1.png");
             new JButtonOperator( mainFrame, new NameComponentChooser("inspect") ).clickMouse();
             wait(1000);
             diaFrame = new DialogOperator( new RegexComponentChooser( "Editing .*") );
@@ -88,7 +88,7 @@ public class Test_060_HapiEditorPanel implements Scenario {
             new JButtonOperator( diaFrame, "Plot Below" ).clickMouse();
             waitUntilIdle(1000);
             //st.takePicture(90,"Two plots.");
-            scriptContext.writeToPng("Test_060_HapiEditorPanel_2.png");
+            ScriptContext.writeToPng("Test_060_HapiEditorPanel_2.png");
             //st.requestFinish(true);
             
         } catch (IOException ex) {

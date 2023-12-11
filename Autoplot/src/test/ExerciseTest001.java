@@ -7,31 +7,31 @@ package test;
 
 import java.io.File;
 import java.io.IOException;
-import org.autoplot.ScriptContext2023;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetURI;
 import org.das2.qds.ops.Ops;
+
+import static org.autoplot.ScriptContext.*;
 
 /**
  * code to work out <a href='https://sourceforge.net/p/autoplot/bugs/360/'>sourceforge ticket</a>
  * @author jbf
  */
 public class ExerciseTest001 {
-    private static ScriptContext2023 scriptContext;
 
     static void test001() throws Exception {
-            scriptContext.getDocumentModel().getOptions().setAutolayout(false);
-            scriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+            getDocumentModel().getOptions().setAutolayout(false);
+            getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
             //QDataSet ds= Util.getDataSet( "http://www.autoplot.org/data/fireworks.wav" );
 
-            scriptContext.setCanvasSize( 800, 600 );
+            setCanvasSize( 800, 600 );
 
-            scriptContext.reset();
-            scriptContext.plot( "file:/home/jbf/ct/hudson/data.backup/xls/2008-lion and tiger summary.xls?sheet=Samantha+tiger+lp+lofreq&firstRow=53&column=Complex_Modulus&depend0=Frequency" );
+            reset();
+            plot( "file:/home/jbf/ct/hudson/data.backup/xls/2008-lion and tiger summary.xls?sheet=Samantha+tiger+lp+lofreq&firstRow=53&column=Complex_Modulus&depend0=Frequency" );
             // this causes bad things as of 2009-08-12.
-            scriptContext.plot( "file:/home/jbf/ct/hudson/data.backup/qds/hist.qds" );
-            scriptContext.writeToPng( "test001_003.png" );
+            plot( "file:/home/jbf/ct/hudson/data.backup/qds/hist.qds" );
+            writeToPng( "test001_003.png" );
 
     }
     public static void main(String[] args) throws InterruptedException, IOException, Exception {
@@ -42,7 +42,7 @@ public class ExerciseTest001 {
             test001();
             QDataSet ds= DataSetURI.getDataSource( pwd + "/test001_003.png" ).getDataSet(new NullProgressMonitor());
             double d= Ops.total(ds);
-            QDataSet ds2= scriptContext.getDocumentModel().getDataSourceFilters(0).getController().getFillDataSet();
+            QDataSet ds2= getDocumentModel().getDataSourceFilters(0).getController().getFillDataSet();
             String s= String.valueOf(ds2);
             if ( d!=3.58733967E8 ) {
                 System.err.println("here!!");
@@ -53,7 +53,7 @@ public class ExerciseTest001 {
                     System.err.println("rename failed: "+f + " to " + sfn );
                 }
                 Thread.sleep(1000);
-                scriptContext.writeToPng( "test001_003."+i+"test.png" );
+                writeToPng( "test001_003."+i+"test.png" );
             } else {
                 ok++;
             }

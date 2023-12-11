@@ -4,7 +4,7 @@ package test.endtoend;
 import java.io.IOException;
 import java.io.PrintWriter;
 import org.autoplot.RenderType;
-import org.autoplot.ScriptContext2023;
+import org.autoplot.ScriptContext;
 import org.autoplot.dom.Application;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
@@ -21,9 +21,8 @@ public class Test002 {
 
     public static void main(String[] args) {
         try {
-            ScriptContext2023 sc= ScriptContext2023.getInstance();
-            sc.getDocumentModel().getOptions().setAutolayout(false);
-            sc.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+            ScriptContext.getDocumentModel().getOptions().setAutolayout(false);
+            ScriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
             oldTests();
             testVaps();
             System.exit(0);  // TODO: something is firing up the event thread
@@ -41,12 +40,12 @@ public class Test002 {
     }
 
     private static void doTest(final String s, final String label) throws IOException, InterruptedException, Exception {
-        ScriptContext2023 sc= ScriptContext2023.getInstance();
-        sc.load(s);
-        int width = sc.getDocumentModel().getCanvases(0).getWidth();
-        int height = sc.getDocumentModel().getCanvases(0).getHeight();
-        sc.setCanvasSize(width, height); // TODO: why?  I shouldn't have to set this...
-        sc.writeToPng(label + ".png");
+
+        ScriptContext.load(s);
+        int width = ScriptContext.getDocumentModel().getCanvases(0).getWidth();
+        int height = ScriptContext.getDocumentModel().getCanvases(0).getHeight();
+        ScriptContext.setCanvasSize(width, height); // TODO: why?  I shouldn't have to set this...
+        ScriptContext.writeToPng(label + ".png");
 
         System.err.printf("wrote to %s.png %dx%d\n", label, width, height);
 
@@ -115,22 +114,22 @@ public class Test002 {
     }
 
     private static void oldTests() throws Exception, IOException, InterruptedException {
-        ScriptContext2023 sc= ScriptContext2023.getInstance();
+
         QDataSet ds = Util.getDataSet("file:///home/jbf/ct/hudson/data.backup/wav/fireworks.wav");
-        final Application dom = sc.getDocumentModel();
+        final Application dom = ScriptContext.getDocumentModel();
         dom.getCanvases(0).setFitted(false);
-        sc.setCanvasSize(400, 800);
-        sc.plot(0, Ops.autoHistogram(ds));
+        ScriptContext.setCanvasSize(400, 800);
+        ScriptContext.plot(0, Ops.autoHistogram(ds));
         dom.getPlots(0).getXaxis().getController().getDasAxis().setUseDomainDivider(true);
         dom.getPlotElements(0).setRenderType(RenderType.fillToZero);
         dom.getPlots(0).getYaxis().setLabel("auto histogram of!chttp://www.autoplot.org/data/fireworks.wav");
         QDataSet ds2 = Ops.autoHistogram(Ops.log10(Ops.fftWindow(ds, 512)));
-        sc.plot(1, ds2);
+        ScriptContext.plot(1, ds2);
         dom.getPlots(1).getXaxis().getController().getDasAxis().setUseDomainDivider(true);
         dom.getPlotElements(1).setRenderType(RenderType.fillToZero);
         dom.getPlots(1).getYaxis().setLabel("auto histogram of!cpower spectrum");
         dom.getPlots(1).getXaxis().setLabel("log(Ops.fftWindow(512)");
-        sc.writeToPng("test002.png");
+        ScriptContext.writeToPng("test002.png");
 
     }
 }

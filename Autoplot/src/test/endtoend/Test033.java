@@ -6,7 +6,7 @@
 package test.endtoend;
 
 import org.autoplot.pngwalk.CreatePngWalk;
-import org.autoplot.ScriptContext2023;
+import org.autoplot.ScriptContext;
 import org.autoplot.dom.Application;
 import java.io.File;
 import java.io.IOException;
@@ -20,10 +20,9 @@ import org.das2.datum.DatumRangeUtil;
  */
 public class Test033 {
 
-    private static ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
-    
+
     private static void makePngWalk1() throws Exception {
-        Application dom= scriptContext.getDocumentModel();
+        Application dom= ScriptContext.getDocumentModel();
 
         String pwd= new File("pngwalk").getAbsoluteFile().toString();
 
@@ -33,7 +32,7 @@ public class Test033 {
         pp.timeFormat= "$Y$m$d";
         pp.timeRangeStr= "2006-dec-2 to 2006-dec-22";
 
-        scriptContext.load( "file:/home/jbf/ct/hudson/vap/cassini_kp.vap" );
+        ScriptContext.load( "file:/home/jbf/ct/hudson/vap/cassini_kp.vap" );
 
         System.err.println("writing pngwalk at "+pwd );
         CreatePngWalk.doIt( dom, pp );
@@ -45,7 +44,7 @@ public class Test033 {
      * @throws Exception
      */
     private static void makePngWalk2() throws Exception {
-        Application dom= scriptContext.getDocumentModel();
+        Application dom= ScriptContext.getDocumentModel();
 
         String pwd= new File("pngwalk").getAbsoluteFile().toString();
 
@@ -55,7 +54,7 @@ public class Test033 {
         pp.timeFormat= "$Y$m$d-$(H,span=2)";
         pp.timeRangeStr= "2006-dec-2 to 2006-dec-5";
 
-        scriptContext.load( "file:/home/jbf/ct/hudson/vap/cassini_kp.vap" );
+        ScriptContext.load( "file:/home/jbf/ct/hudson/vap/cassini_kp.vap" );
 
         System.err.println("writing pngwalk at "+pwd );
         CreatePngWalk.doIt( dom, pp );
@@ -67,7 +66,7 @@ public class Test033 {
      * @throws Exception
      */
     private static void makePngWalk3() throws Exception {
-        Application dom= scriptContext.getDocumentModel();
+        Application dom= ScriptContext.getDocumentModel();
 
         String pwd= new File("pngwalk3").getAbsoluteFile().toString();
 
@@ -77,7 +76,7 @@ public class Test033 {
         pp.timeFormat= "$Y$m";
         pp.timeRangeStr= "2005 through 2007";
 
-        scriptContext.load( "file:///home/jbf/ct/hudson/vap/kp_dst.vap" );
+        ScriptContext.load( "file:///home/jbf/ct/hudson/vap/kp_dst.vap" );
 
         System.err.println("writing pngwalk at "+pwd );
         CreatePngWalk.doIt( dom, pp );
@@ -89,7 +88,7 @@ public class Test033 {
      * @throws Exception 
      */
     private static void makePngWalk5() throws Exception {
-        Application dom= scriptContext.getDocumentModel();
+        Application dom= ScriptContext.getDocumentModel();
 
         String pwd= new File("pngwalk5").getAbsoluteFile().toString();
 
@@ -99,7 +98,7 @@ public class Test033 {
         pp.timeFormat= "$Y$m$d-$(H,span=6)";
         pp.timeRangeStr= "1984-01-14 through 1984-01-23";
 
-        scriptContext.load( "file:/home/jbf/ct/hudson/vap/lanl/lanlGeoEpDemo4.vap" );
+        ScriptContext.load( "file:/home/jbf/ct/hudson/vap/lanl/lanlGeoEpDemo4.vap" );
 
         dom.getPlots(1).getXaxis().setRange( DatumRangeUtil.parseTimeRange("1984-01-14 through 1984-01-23") );
         System.err.println("writing pngwalk at "+pwd );
@@ -113,7 +112,7 @@ public class Test033 {
      * @throws Exception
      */
     private static void makePngWalk4() throws Exception {
-        Application dom= scriptContext.getDocumentModel();
+        Application dom= ScriptContext.getDocumentModel();
 
         String pwd= new File("pngwalk4").getAbsoluteFile().toString();
 
@@ -126,7 +125,7 @@ public class Test033 {
         pp.autorange= true;
         pp.version= "v1.2";
 
-        scriptContext.load( "file:///home/jbf/ct/hudson/vap/kp_dst.vap" );
+        ScriptContext.load( "file:///home/jbf/ct/hudson/vap/kp_dst.vap" );
 
         System.err.println("writing pngwalk at "+pwd );
         CreatePngWalk.doIt( dom, pp );
@@ -134,7 +133,7 @@ public class Test033 {
     }
 
     private static void makePngWalk6() throws IOException, ParseException, InterruptedException {
-        Application dom= scriptContext.getDocumentModel();
+        Application dom= ScriptContext.getDocumentModel();
 
         String pwd= new File("pngwalk6").getAbsoluteFile().toString();
 
@@ -147,7 +146,7 @@ public class Test033 {
         pp.autorange= true;
         pp.version= "v1.3";
 
-        scriptContext.load( "/home/jbf/ct/hudson/vap/multiScaleBVoyager.vap" );
+        ScriptContext.load( "/home/jbf/ct/hudson/vap/multiScaleBVoyager.vap" );
 
         System.err.println("writing pngwalk at "+pwd );
         CreatePngWalk.doIt( dom, pp );
@@ -158,7 +157,7 @@ public class Test033 {
 
         long t0;
 
-        scriptContext.getDocumentModel().getOptions().setAutolayout(false);
+        ScriptContext.getDocumentModel().getOptions().setAutolayout(false);
 
         //t0= System.currentTimeMillis();
         //makePngWalk1();

@@ -14,7 +14,7 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.SpectrogramRenderer;
 import org.autoplot.RenderType;
-import org.autoplot.ScriptContext2023;
+import org.autoplot.ScriptContext;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.PlotElementController;
 import org.das2.util.LoggerManager;
@@ -27,9 +27,6 @@ import org.das2.util.LoggerManager;
 public class RendererPerformance {
     
     private static final Logger logger= LoggerManager.getLogger("RendererPerformance");
-    
-    private static final ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
-    
     private static void waitForPaint( final DasCanvas c ) throws InterruptedException, InvocationTargetException {
         SwingUtilities.invokeAndWait( new Runnable() {
             @Override
@@ -41,18 +38,18 @@ public class RendererPerformance {
             
     private static void setUp( String uri ) {
         System.err.println("uri: "+uri);
-        scriptContext.plot( uri );
+        ScriptContext.plot( uri );
     }
     
     private static void stressIt( ) {
         
-        Application dom= scriptContext.getDocumentModel();
+        Application dom= ScriptContext.getDocumentModel();
         DasCanvas c= dom.getController().getCanvas().getController().getDasCanvas();
         
         PlotElementController pec= dom.getPlotElements(0).getController();
         
         try {
-            scriptContext.waitUntilIdle();
+            ScriptContext.waitUntilIdle();
             
             DatumRange r1= dom.getController().getPlot().getXaxis().getRange();
             DatumRange r2= DatumRangeUtil.rescale(r1,"1%,101%");
@@ -86,8 +83,8 @@ public class RendererPerformance {
         int nn;
         long t0;
 
-        Application dom= scriptContext.getDocumentModel();
-        scriptContext.createGui();
+        Application dom= ScriptContext.getDocumentModel();
+        ScriptContext.createGui();
 
         System.err.println("---------------------");
         nn= 400;    

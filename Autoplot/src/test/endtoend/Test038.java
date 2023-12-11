@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 import javax.swing.JDialog;
 import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
-import org.autoplot.ScriptContext2023;
+import org.autoplot.ScriptContext;
 import org.autoplot.dom.Application;
 import org.python.util.PythonInterpreter;
 import org.autoplot.jythonsupport.JythonUtil;
@@ -39,8 +39,7 @@ import org.python.core.PyException;
  * @author jbf
  */
 public class Test038 {
-    private static ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
-        
+    
     static final Logger logger= Logger.getLogger("autoplot");
     
     public static final int COMPLETION_ERROR = -99;
@@ -177,33 +176,33 @@ public class Test038 {
             QDataSet column= Ops.slice1(rr,1);
             QDataSet count= Ops.slice1(rr,2);
             QDataSet positionsds= Ops.dataset(positions).trim(0,count.length());
-            ScriptContext2023.formatDataSet( line, "test038."+f.getName()+".cdf?linenum" );
-            ScriptContext2023.formatDataSet( column, "test038."+f.getName()+".cdf?column&append=T" );
-            ScriptContext2023.formatDataSet( count, "test038."+f.getName()+".cdf?count&append=T" );
-            ScriptContext2023.formatDataSet( positionsds, "test038."+f.getName()+".cdf?position&append=T" );
+            ScriptContext.formatDataSet( line, "test038."+f.getName()+".cdf?linenum" );
+            ScriptContext.formatDataSet( column, "test038."+f.getName()+".cdf?column&append=T" );
+            ScriptContext.formatDataSet( count, "test038."+f.getName()+".cdf?count&append=T" );
+            ScriptContext.formatDataSet( positionsds, "test038."+f.getName()+".cdf?position&append=T" );
             
-            scriptContext.plot(Ops.slice1(rr,0), Ops.slice1(rr,1), Ops.lesserOf(Ops.slice1(rr,2), MAX_COMPLETION_COUNT) );
+            ScriptContext.plot(Ops.slice1(rr,0), Ops.slice1(rr,1), Ops.lesserOf(Ops.slice1(rr,2), MAX_COMPLETION_COUNT) );
             QDataSet r= Ops.where( Ops.eq( count, -99 ) );
             
             if ( r.length()>0 ) {
-                Application dom= scriptContext.getDocumentModel();
+                Application dom= ScriptContext.getDocumentModel();
                 int i= (int)r.value(0);
                 String s= String.format("Fail @ %d<br>line=%d col=%d", positions[i], (int)line.value(i), (int)column.value(i) );
                 dom.getController().addAnnotation( dom.getPlots(0), s );
             }
             
-            scriptContext.waitUntilIdle();
-            scriptContext.setRenderStyle("digital");
-            scriptContext.getDocumentModel().getPlotElements(0).setRenderControl("format=%d&fontSize=0.6em");
+            ScriptContext.waitUntilIdle();
+            ScriptContext.setRenderStyle("digital");
+            ScriptContext.getDocumentModel().getPlotElements(0).setRenderControl("format=%d&fontSize=0.6em");
             
-            scriptContext.getDocumentModel().getPlots(0).getYaxis().setRange( 
+            ScriptContext.getDocumentModel().getPlots(0).getYaxis().setRange( 
                     DatumRange.newDatumRange( -1, 120, Units.dimensionless ) );
-            scriptContext.getDocumentModel().getPlots(0).getXaxis().setLog(false);
+            ScriptContext.getDocumentModel().getPlots(0).getXaxis().setLog(false);
             
-            scriptContext.setTitle( "completions count for "+f.getName() );
+            ScriptContext.setTitle( "completions count for "+f.getName() );
             
             String fout= "test038_completions_"+f.getName()+".png";
-            scriptContext.writeToPng( fout );
+            ScriptContext.writeToPng( fout );
             return r.length();
             
         } catch ( Exception ex ) {

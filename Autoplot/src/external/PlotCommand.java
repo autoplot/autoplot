@@ -24,7 +24,7 @@ import org.python.core.PyInteger;
 import org.python.core.PyObject;
 import org.python.core.PyString;
 import org.autoplot.RenderType;
-import org.autoplot.ScriptContext2023;
+import org.autoplot.ScriptContext;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.CanvasUtil;
@@ -63,8 +63,6 @@ import org.python.core.PyMethod;
 public class PlotCommand extends PyObject {
 
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
-    
-    private ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
     
     public static final PyString __doc__ =
         new PyString("<html><H2>plot([index],x,y,z,[named parameters])</H2>"
@@ -221,7 +219,7 @@ public class PlotCommand extends PyObject {
         Column column=null;
         Plot plot=null; // use this plot
         
-        Application dom= ScriptContext2023.getInstance().getDocumentModel();
+        Application dom= ScriptContext.getDocumentModel();
         String renderType=null;
         for ( int i=0; i<keywords.length; i++  ) {
             if ( keywords[i].equals("renderType" ) ) {
@@ -360,12 +358,12 @@ public class PlotCommand extends PyObject {
         QDataSet[] qargs= new QDataSet[nargs];
 
         if ( nargs==1 && po0 instanceof PyString ) {
-            scriptContext.plot( iplot, ((PyString) po0).toString());
+            ScriptContext.plot( iplot, ((PyString) po0).toString());
         } else if ( nargs==2 && po0 instanceof PyString && args[1] instanceof PyString ) {
             DatumRange drtr= DatumRangeUtil.parseTimeRangeValid(((PyString)args[1]).toString() );
             try{
                 String uri= DataSourceUtil.setTimeRange( ((PyString) po0).toString(), drtr, new NullProgressMonitor() );
-                scriptContext.plot( iplot, uri );          
+                ScriptContext.plot( iplot, uri );          
             } catch ( IOException | URISyntaxException | ParseException ex ) {
                 throw new RuntimeException(ex);
             }
@@ -377,11 +375,11 @@ public class PlotCommand extends PyObject {
             }
 
             if ( nargs==1 ) {  // x
-                scriptContext.plot( iplot, null, null, qargs[0], renderType, reset );
+                ScriptContext.plot( iplot, null, null, qargs[0], renderType, reset );
             } else if ( nargs==2 ) {  // x, y
-                scriptContext.plot( iplot, null, qargs[0], qargs[1], renderType, reset );
+                ScriptContext.plot( iplot, null, qargs[0], qargs[1], renderType, reset );
             } else if ( nargs==3 ) {  // x, y, z
-                scriptContext.plot( iplot, null, qargs[0], qargs[1], qargs[2], renderType, reset );
+                ScriptContext.plot( iplot, null, qargs[0], qargs[1], qargs[2], renderType, reset );
             }
 
         }

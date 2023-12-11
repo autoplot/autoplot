@@ -8,7 +8,7 @@ import org.python.core.Py;
 import org.python.core.PyInteger;
 import org.python.core.PyObject;
 import org.python.core.PyString;
-import org.autoplot.ScriptContext2023;
+import org.autoplot.ScriptContext;
 import org.autoplot.dom.Annotation;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.DomNode;
@@ -178,7 +178,7 @@ public class AnnotationCommand extends PyObject {
             index= 0;
         }
         
-        Application dom= ScriptContext2023.getInstance().getDocumentModel();
+        Application dom= ScriptContext.getDocumentModel();
         
         dom.getController().registerPendingChange( this, this );  
         dom.getController().performingChange(this,this);

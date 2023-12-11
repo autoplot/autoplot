@@ -12,7 +12,7 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ConsoleTextProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.autoplot.ScriptContext2023;
+import org.autoplot.ScriptContext;
 import org.das2.qds.DataSetUtil;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceUtil;
@@ -24,7 +24,7 @@ import org.das2.qds.ops.Ops;
  * @author jbf
  */
 public class Test024 {
-    private static ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
+
     public static void example1() throws Exception {
         System.err.println( "\n= example1 =\n");
         org.autoplot.idlsupport.APDataSet apds  = new org.autoplot.idlsupport.APDataSet();
@@ -33,9 +33,9 @@ public class Test024 {
         System.err.println( apds.toString() );
 
         apds.setPreferredUnits( "hours since 2007-01-17T00:00" );
-        scriptContext.plot( DataSetUtil.asDataSet( apds.values( apds.depend(0) )), DataSetUtil.asDataSet(apds.values()) );
+        ScriptContext.plot( DataSetUtil.asDataSet( apds.values( apds.depend(0) )), DataSetUtil.asDataSet(apds.values()) );
 
-        scriptContext.writeToPng("test024_001");
+        ScriptContext.writeToPng("test024_001");
 
     }
 
@@ -47,7 +47,7 @@ public class Test024 {
         System.err.println( apds.toString() );
 
         apds.setFillValue( -999 );
-        scriptContext.plot( DataSetUtil.asDataSet(apds.values()) );
+        ScriptContext.plot( DataSetUtil.asDataSet(apds.values()) );
 
         double[] vv= (double[]) apds.values();
         for ( int i=0; i<vv.length; i++ ) {
@@ -55,7 +55,7 @@ public class Test024 {
         }
         System.err.println();
 
-        scriptContext.writeToPng("test024_002");
+        ScriptContext.writeToPng("test024_002");
 
     }
 
@@ -81,7 +81,7 @@ public class Test024 {
         System.err.println( apds.toString() );
 
         apds.setFillValue( -999 );
-        scriptContext.plot( DataSetUtil.asDataSet(apds.values()) );
+        ScriptContext.plot( DataSetUtil.asDataSet(apds.values()) );
 
         double[] vv= (double[]) apds.values();
         for ( int i=0; i<vv.length; i++ ) {
@@ -89,7 +89,7 @@ public class Test024 {
         }
         System.err.println();
 
-        scriptContext.writeToPng("test024_004");
+        ScriptContext.writeToPng("test024_004");
 
     }
 
@@ -109,7 +109,7 @@ public class Test024 {
         System.err.println( apds.toString() );
 
         apds.setFillValue( -999 );
-        scriptContext.plot( DataSetUtil.asDataSet(apds.values()) );
+        ScriptContext.plot( DataSetUtil.asDataSet(apds.values()) );
 
         double[] vv= (double[]) apds.values();
         for ( int i=0; i<vv.length; i++ ) {
@@ -117,7 +117,7 @@ public class Test024 {
         }
         System.err.println();
 
-        scriptContext.writeToPng("test024_005");
+        ScriptContext.writeToPng("test024_005");
 
     }
 

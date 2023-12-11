@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeModel;
-import org.autoplot.ScriptContext2023;
 import org.das2.client.DasServer;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -25,15 +24,13 @@ import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
 
-import static org.autoplot.ScriptContext2023.*;
+import static org.autoplot.ScriptContext.*;
 
 /**
  * Plasma Wave Group at Iowa, test Das2Server entries with "exampleRange".
  * @author jbf
  */
 public class Test501 {
-    private static ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
-        
     private static final int READ_SIZE_LIMIT_DAYS = 400; // chris has /voyager2/pws/SpecAnalyzer-Distogram.dsdf which is about a year, intentionally.
 
     private static final int testid=501;
@@ -84,22 +81,22 @@ public class Test501 {
             pw.close();
         }
 
-        scriptContext.plot( ds );
-        scriptContext.setCanvasSize( 750, 300 );
+        plot( ds );
+        setCanvasSize( 750, 300 );
         int i= uri.lastIndexOf("/");
 
-        scriptContext.getApplicationModel().waitUntilIdle();
+        getApplicationModel().waitUntilIdle();
 
         String fileUri= uri.substring(i+1);
 
-        if ( !scriptContext.getDocumentModel().getPlotElements(0).getComponent().equals("") ) {
-            String dsstr= String.valueOf( scriptContext.getDocumentModel().getDataSourceFilters(0).getController().getDataSet() );
-            fileUri= fileUri + " " + dsstr +" " + scriptContext.getDocumentModel().getPlotElements(0).getComponent();
+        if ( !getDocumentModel().getPlotElements(0).getComponent().equals("") ) {
+            String dsstr= String.valueOf( getDocumentModel().getDataSourceFilters(0).getController().getDataSet() );
+            fileUri= fileUri + " " + dsstr +" " + getDocumentModel().getPlotElements(0).getComponent();
         }
 
         String result= null;
 
-        scriptContext.setTitle(fileUri);
+        setTitle(fileUri);
         String name;
         if ( doTest ) {
             int h = uri.hashCode();
@@ -112,7 +109,7 @@ public class Test501 {
             name= String.format( "ex_test%03d_%03d.png", testid, iid );
             result= null;
         }
-        scriptContext.writeToPng( name );
+        writeToPng( name );
         System.err.printf( "wrote to file: %s\n", name );
 
         System.err.printf( "Read in %9.3f seconds (%s): %s\n", t, label, uri );
@@ -126,8 +123,8 @@ public class Test501 {
         //String s= "/voyager1/pws/SpecAnalyzer-4s-Efield.dsdf";
         //ids.add(0,s);
 
-        scriptContext.getDocumentModel().getOptions().setAutolayout(false);
-        scriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+        getDocumentModel().getOptions().setAutolayout(false);
+        getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
         int iid= 0;
 

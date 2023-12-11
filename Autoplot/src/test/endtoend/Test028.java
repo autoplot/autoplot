@@ -6,20 +6,19 @@ package test.endtoend;
 
 import java.io.PrintWriter;
 import java.util.logging.Level;
-import org.autoplot.ScriptContext2023;
+import org.autoplot.ScriptContext;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
 import org.autoplot.jythonsupport.Util;
-import static org.autoplot.ScriptContext2023.*;
+import static org.autoplot.ScriptContext.*;
 
 /**
  * Tests of inline data source.
  * @author jbf
  */
 public class Test028 {
-    private static ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
-    
+
     private static final String test="test028";
 
     public static void doTest( int id, String uri ) throws Exception {
@@ -44,11 +43,11 @@ public class Test028 {
             pw.close();
         }
 
-        scriptContext.plot( ds );
+        plot( ds );
 
         int i= uri.lastIndexOf("/");
-        scriptContext.setTitle(uri.substring(i+1));
-        scriptContext.writeToPng( String.format( test + "_%03d.png", id ) );
+        setTitle(uri.substring(i+1));
+        writeToPng( String.format( test + "_%03d.png", id ) );
 
         System.err.printf( "Read in %9.3f seconds (%s): %s\n", t, label, uri );
     }
@@ -59,12 +58,12 @@ public class Test028 {
             
            // ScriptContext.createGui();
 
-            scriptContext.setCanvasSize(640,480);
-            scriptContext.getDocumentModel().getOptions().setAutolayout(false);
-            scriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-7em");
-            scriptContext.setCanvasSize(640,480);
-            scriptContext.getDocumentModel().getOptions().setAutolayout(false);
-            scriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-7em");
+            setCanvasSize(640,480);
+            getDocumentModel().getOptions().setAutolayout(false);
+            getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-7em");
+            setCanvasSize(640,480);
+            getDocumentModel().getOptions().setAutolayout(false);
+            getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-7em");
 
             doTest( 0, "vap+inline:1,2;3,4;5,6;7,2;9,0" );
             doTest( 2, "vap+inline:1,3;2,4" );

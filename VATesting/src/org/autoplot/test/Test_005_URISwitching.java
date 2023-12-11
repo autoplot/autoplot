@@ -16,7 +16,9 @@ import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.autoplot.AutoplotUI;
-import org.autoplot.ScriptContext2023;
+import org.autoplot.ScriptContext;
+import static org.autoplot.ScriptContext.createGui;
+import static org.autoplot.ScriptContext.writeToPng;
 import org.autoplot.datasource.DataSetSelector;
 
 /**
@@ -29,8 +31,7 @@ import org.autoplot.datasource.DataSetSelector;
 public class Test_005_URISwitching implements Scenario {
 
     private static final Logger logger= LoggerManager.getLogger("vatesting");
-    private static final ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
-        
+    
     @Override
     public int runIt(Object o) {
 
@@ -44,23 +45,23 @@ public class Test_005_URISwitching implements Scenario {
                 System.err.println( "handlers: " + h.getClass().toString() + " " + h.getLevel() + " " + h.getFormatter().getClass().toString() );
             }
             
-            scriptContext.createGui();
+            createGui();
             
-            AutoplotUI app= (AutoplotUI) scriptContext.getViewWindow();
+            AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
             
             DataSetSelector dss= app.getDataSetSelector();
             new JTextFieldOperator( dss.getEditor() ).setText("http://autoplot.org/data/hsi_qlimg_5050601_001.fits");
             new JButtonOperator( dss.getGoButton() ).clickMouse();
             Util.waitUntilBusy(500,app.getDom());
             
-            scriptContext.writeToPng( "Test_005_URISwitching.demo012.png" );
+            writeToPng( "Test_005_URISwitching.demo012.png" );
             
             new JTextFieldOperator( dss.getEditor() ).setText("https://cdaweb.gsfc.nasa.gov/pub/data/omni/low_res_omni/omni2_1963.dat?column=field17");
             new JButtonOperator( dss.getGoButton() ).clickMouse();
             Util.waitUntilBusy(500,app.getDom());
-            scriptContext.waitUntilIdle();
+            ScriptContext.waitUntilIdle();
             
-            scriptContext.writeToPng( "Test_005_URISwitching.demo007.png" );
+            writeToPng( "Test_005_URISwitching.demo007.png" );
             
         } catch (IOException ex) {
             Logger.getLogger(Test_005_URISwitching.class.getName()).log(Level.SEVERE, null, ex);

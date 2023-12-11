@@ -6,7 +6,7 @@ package test.endtoend;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import org.autoplot.ScriptContext2023;
+import static org.autoplot.ScriptContext.*;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
@@ -18,7 +18,6 @@ import org.autoplot.jythonsupport.Util;
  */
 public class Test007 {
 
-    private static ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
 
     public static void doTest( int id, String uri ) throws Exception {
         QDataSet ds;
@@ -29,23 +28,23 @@ public class Test007 {
         hist.putProperty( QDataSet.TITLE, uri );
         String label= String.format( "test007_%03d", id );
         hist.putProperty( QDataSet.LABEL, label );
-        scriptContext.formatDataSet( hist, label+".qds");
+        formatDataSet( hist, label+".qds");
 
         QDataSet dep0= (QDataSet) ds.property( QDataSet.DEPEND_0 );
         if ( dep0!=null ) {
             MutablePropertyDataSet hist2= (MutablePropertyDataSet) Ops.autoHistogram(dep0);
-            scriptContext.formatDataSet( hist2, label+".dep0.qds");
+            formatDataSet( hist2, label+".dep0.qds");
         } else {
             PrintWriter pw= new PrintWriter( label+".dep0.qds" );
             pw.println("no dep0");
             pw.close();
         }
 
-        scriptContext.plot( ds );
+        plot( ds );
         
         int i= uri.lastIndexOf("/");
-        scriptContext.setTitle(uri.substring(i+1));
-        scriptContext.writeToPng( String.format( "test007_%03d.png", id ) );
+        setTitle(uri.substring(i+1));
+        writeToPng( String.format( "test007_%03d.png", id ) );
 
         System.err.printf( "Read in %9.3f seconds (%s): %s\n", t, label, uri );
     }
@@ -53,11 +52,11 @@ public class Test007 {
     public static void main(String[] args) {
         try {
 
-            scriptContext.setCanvasSize(750, 300);
-            scriptContext.getDocumentModel().getOptions().setAutolayout(false);
-            scriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
-            scriptContext.getDocumentModel().getCanvases(0).getMarginRow().setTop("2em");
-            scriptContext.getDocumentModel().getCanvases(0).getMarginRow().setBottom("100%-2em");
+            setCanvasSize(750, 300);
+            getDocumentModel().getOptions().setAutolayout(false);
+            getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+            getDocumentModel().getCanvases(0).getMarginRow().setTop("2em");
+            getDocumentModel().getCanvases(0).getMarginRow().setBottom("100%-2em");
 
             doTest( 0, "vap+tsds:http://timeseries.org/get.cgi?StartDate=19980101&EndDate=20090101&ppd=1&ext=bin&out=tsml&param1=NGDC_NOAA15_SEM2-33-v0" );
             doTest( 1, "vap+tsds:http://tsds.net/cgi-bin/get.cgi?StartDate=20000101&EndDate=20010101&ext=bin&out=tsml&ppd=24&filter=mean&param1=OMNI_OMNI2-41-v1");

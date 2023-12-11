@@ -11,20 +11,17 @@ import org.netbeans.jemmy.operators.JFrameOperator;
 import org.netbeans.jemmy.operators.JLabelOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.autoplot.AutoplotUI;
-import org.autoplot.ScriptContext2023;
+import org.autoplot.ScriptContext;
 
 /**
  *
  * @author jbf
  */
 public class Second implements Scenario {
-        
-    private static final ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
-    
     public int runIt(Object param) {
-        scriptContext.createGui();
+        ScriptContext.createGui();
 
-        AutoplotUI app= (AutoplotUI) scriptContext.getViewWindow();
+        AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
 
         JFrameOperator mainFrame = new JFrameOperator(app);
 

@@ -129,8 +129,6 @@ public class RunBatchTool extends javax.swing.JPanel {
     public static final int HTML_LINE_LIMIT = 50;
             
     private ProgressMonitor monitor=null; // non-null when process is going.
-    
-    private ScriptContext2023 scriptContext;
         
     /**
      * Creates new form BatchMaster
@@ -138,8 +136,7 @@ public class RunBatchTool extends javax.swing.JPanel {
      */
     public RunBatchTool( final Application dom ) {
         initComponents();
-        scriptContext= ScriptContext2023.getInstance();
-        
+
         Preferences prefs= Preferences.userNodeForPackage(RunBatchTool.class );
         String s= prefs.get( "lastTemplate", null );
         if ( s!=null ) {
@@ -1223,7 +1220,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                         String id= m.group(1);
                         template= "orbit:"+id+":"+template;
                     }
-                    ss= ScriptContext2023.generateTimeRanges(template, timeRangeComboBox.getSelectedItem().toString() );
+                    ss= ScriptContext.generateTimeRanges(template, timeRangeComboBox.getSelectedItem().toString() );
                 }
             } catch (ParseException ex) {
                 Logger.getLogger(RunBatchTool.class.getName()).log(Level.SEVERE, null, ex);
@@ -1684,16 +1681,16 @@ public class RunBatchTool extends javax.swing.JPanel {
         s= s.replaceAll(" ","_"); 
 
         if ( s.endsWith(".png") ) {
-            BufferedImage bufferedImage = scriptContext.writeToBufferedImage(); 
+            BufferedImage bufferedImage = ScriptContext.writeToBufferedImage(); 
             Map<String,String> metadata= new LinkedHashMap<>();
             metadata.put( "ScriptURI",uri );
             if ( dom!=null ) {
                 metadata.put( DasPNGConstants.KEYWORD_PLOT_INFO, 
                     dom.getController().getApplicationModel().canvas.getImageMetadata() );
             }
-            scriptContext.writeToPng(bufferedImage,s,metadata);
+            ScriptContext.writeToPng(bufferedImage,s,metadata);
         } else if ( s.endsWith(".pdf") ) {
-            scriptContext.writeToPdf(s);
+            ScriptContext.writeToPdf(s);
         } 
         return s;
 
@@ -2354,7 +2351,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                             interp.setOut(outbaos);
                             uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
                             interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile),scriptFile.getName()), scriptFile.getName() );
-                            Application myDom= scriptContext.getDocumentModel();
+                            Application myDom= ScriptContext.getDocumentModel();
                             if ( writeCheckBox.isSelected() ) {
                                 runResults.put("writeFile", doWrite(f1.trim(), "", uri, myDom ) );
                             }
@@ -2411,7 +2408,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                                 uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
                                 interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile), scriptFile.getName()), scriptFile.getName() );
                                 if ( writeCheckBox.isSelected() ) {
-                                    Application myDom= scriptContext.getDocumentModel();
+                                    Application myDom= ScriptContext.getDocumentModel();
                                     runResults.put("writeFile", doWrite(f1.trim(),f2.trim(), uri, myDom ) );
                                 }
                                 jobs2.get(i2).setIcon(ICON_OKAY);

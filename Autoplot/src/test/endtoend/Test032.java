@@ -5,9 +5,9 @@
 
 package test.endtoend;
 
-import org.autoplot.ScriptContext2023;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSourceRegistry;
+import static org.autoplot.ScriptContext.*;
 import org.autoplot.jythonsupport.Util;
 
 /**
@@ -15,8 +15,7 @@ import org.autoplot.jythonsupport.Util;
  * @author jbf
  */
 public class Test032 {
-    private static ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
-    
+
     private static void test1_dump( QDataSet ds ) {
         if ( ds.rank()==4 ) {
             for ( int i0=0; i0<3; i0++ ) {
@@ -215,8 +214,8 @@ public class Test032 {
         test3();
 
         if ( true ) {
-            scriptContext.getDocumentModel().getOptions().setAutolayout(false);
-            scriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+            getDocumentModel().getOptions().setAutolayout(false);
+            getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
             DataSourceRegistry.getInstance().registerExtension( "org.autoplot.cdf.CdfJavaDataSourceFactory", "cdf", "CDF files using java based reader" );
 

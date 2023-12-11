@@ -22,7 +22,7 @@ import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.autoplot.AutoplotUI;
-import org.autoplot.ScriptContext2023;
+import org.autoplot.ScriptContext;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.BindingModel;
 import util.NameComponentChooser;
@@ -35,25 +35,24 @@ import util.RegexComponentChooser;
 public class Test_034_TimeSeriesBrowse implements Scenario {
 
     private static final Logger logger= LoggerManager.getLogger("vatesting");
-    private static final ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
-
+    
     public int runIt(Object o) {
 
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
 
         try {
-            scriptContext.createGui();
-            AutoplotUI app = (AutoplotUI) scriptContext.getViewWindow();
-            Application dom = scriptContext.getDocumentModel();
+            ScriptContext.createGui();
+            AutoplotUI app = (AutoplotUI) ScriptContext.getViewWindow();
+            Application dom = ScriptContext.getDocumentModel();
             dom.getOptions().setAutolayout(false);
             
             JFrameOperator mainFrame = new JFrameOperator(app);
-            scriptContext.waitUntilIdle();
+            ScriptContext.waitUntilIdle();
 
             new JTextFieldOperator(app.getDataSetSelector().getEditor()).setText("https://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109"); 
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
             
-            final DasAxis xaxis = scriptContext.getDocumentModel().getPlots(0).getXaxis().getController().getDasAxis();
+            final DasAxis xaxis = ScriptContext.getDocumentModel().getPlots(0).getXaxis().getController().getDasAxis();
 
             // The following is interesting code that needs to be studied more.  I think what's happened
             // is I moved the DataSetSelector event firing back on to the event thread, and 
@@ -68,7 +67,7 @@ public class Test_034_TimeSeriesBrowse implements Scenario {
             System.err.println("TODO: There should be a way to make sure the app has received the update.");
             Thread.sleep(1500);
             
-            scriptContext.waitUntilIdle();
+            ScriptContext.waitUntilIdle();
 
             SwingUtilities.invokeAndWait( new Runnable() {
                 public void run() {
@@ -89,7 +88,7 @@ public class Test_034_TimeSeriesBrowse implements Scenario {
 
             System.err.println("Boo, sleep because testing server isn't stopping properly."); //TODO: fix this!
             Thread.sleep(1000);
-            scriptContext.waitUntilIdle();
+            ScriptContext.waitUntilIdle();
             
             int tries=0;
             while ( tries<10 && dom.getPlotElements(1).getController().getDataSet()==null ) {
@@ -101,10 +100,10 @@ public class Test_034_TimeSeriesBrowse implements Scenario {
             System.err.println( "5: "+xaxis.getDatumRange() );
             System.err.println("current directory: "+new File(".").getAbsoluteFile().toString());
             
-            scriptContext.writeToPng( "Test_034_TimeSeriesBrowse.001.png");
+            ScriptContext.writeToPng( "Test_034_TimeSeriesBrowse.001.png");
         
             System.err.println("--- bindings ---");
-            BindingModel[] bms= scriptContext.getDocumentModel().getBindings();
+            BindingModel[] bms= ScriptContext.getDocumentModel().getBindings();
             for ( BindingModel bm: bms ) {
                 System.err.println(bm);
             }

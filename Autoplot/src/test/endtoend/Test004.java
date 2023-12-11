@@ -1,8 +1,12 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
 
 package test.endtoend;
 
 import java.io.IOException;
-import org.autoplot.ScriptContext2023;
+import org.autoplot.ScriptContext;
 
 /**
  * Test Jan's products
@@ -11,14 +15,13 @@ import org.autoplot.ScriptContext2023;
 public class Test004 {
     public static void main(String[] args) {
         try {
-            ScriptContext2023 sc= ScriptContext2023.getInstance();
-            sc.getDocumentModel().getOptions().setAutolayout(false);
-            sc.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+            ScriptContext.getDocumentModel().getOptions().setAutolayout(false);
+            ScriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
-            sc.load( "/home/jbf/ct/hudson/vap/merka_celias_test004_v1.04.vap" );
-            System.err.println( "#### model pending changes: " + sc.getDocumentModel().getController().isPendingChanges() );
-            sc.setCanvasSize( 992, 711 );
-            sc.writeToPng( "test004.png" );
+            ScriptContext.load( "/home/jbf/ct/hudson/vap/merka_celias_test004_v1.04.vap" );
+            System.err.println( "#### model pending changes: " + ScriptContext.getDocumentModel().getController().isPendingChanges() );
+            ScriptContext.setCanvasSize( 992, 711 );
+            ScriptContext.writeToPng( "test004.png" );
             System.exit(0);  // TODO: something is firing up the event thread
         } catch ( Exception ex ) {
             ex.printStackTrace();

@@ -1,38 +1,157 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot;
 
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.das2.dataset.DataSet;
+import org.das2.dataset.TableDataSet;
+import org.das2.dataset.VectorDataSet;
+import org.das2.graph.DasCanvas;
+import org.das2.util.DasPNGConstants;
+import org.das2.util.DasPNGEncoder;
 import java.awt.Window;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.ParseException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.locks.Lock;
+import javax.swing.JButton;
 import javax.swing.JComponent;
-import org.autoplot.dom.Application;
-import org.autoplot.dom.DomNode;
-import org.autoplot.dom.Plot;
-import org.das2.components.DataPointRecorder;
-import org.das2.event.MouseModule;
-import org.das2.graph.DasColorBar;
-import org.das2.qds.QDataSet;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+import org.das2.DasApplication;
+import org.das2.util.awt.PdfGraphicsOutput;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
+import org.jdesktop.beansbinding.BeanProperty;
+import org.jdesktop.beansbinding.Binding;
+import org.jdesktop.beansbinding.Bindings;
+import org.python.core.PyJavaInstance;
+import org.autoplot.dom.Application;
+import org.autoplot.dom.DataSourceFilter;
+import org.autoplot.scriptconsole.ExitExceptionHandler;
+import org.das2.dataset.DataSetAdapter;
+import org.das2.datum.InconvertibleUnitsException;
+import org.das2.event.BoxRenderer;
+import org.das2.event.BoxSelectionEvent;
+import org.das2.event.BoxSelectionListener;
+import org.das2.event.BoxSelectorMouseModule;
+import org.das2.event.MouseModule;
+import org.das2.graph.DasPlot;
+import org.das2.util.awt.SvgGraphicsOutput;
 import org.das2.util.monitor.ProgressMonitor;
 import org.jdesktop.beansbinding.Converter;
+import org.python.core.Py;
 import org.python.core.PyFunction;
+import org.autoplot.ApplicationModel.ResizeRequestListener;
+import org.autoplot.datasource.AnonymousDataSource;
+import org.autoplot.dom.DomNode;
+import org.autoplot.dom.DomUtil;
+import org.autoplot.dom.Plot;
+import org.autoplot.dom.PlotElement;
+import org.autoplot.state.StatePersistence;
+import org.das2.qds.QDataSet;
+import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSource;
+import org.autoplot.datasource.DataSourceFormat;
+import org.autoplot.datasource.FileSystemUtil;
+import org.autoplot.datasource.GuiUtil;
+import org.autoplot.datasource.URISplit;
+import org.das2.components.DataPointRecorder;
+import org.das2.datum.Units;
+import org.das2.graph.DasColorBar;
+import org.das2.graph.Painter;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.DataSetWrapper;
+import org.das2.qds.MutablePropertyDataSet;
+import org.das2.qds.SemanticOps;
+import org.das2.qds.ops.Ops;
+import org.das2.qstream.SimpleStreamFormatter;
+import org.das2.qstream.StreamException;
+import org.das2.util.filesystem.FileSystem;
 
 /**
- *
+ * ScriptContext provides the API to perform abstract functions with 
+ * the application.  For example, 
+ * 
+ *<blockquote><pre><small>{@code
+ ScriptContext.load('http://autoplot.org/data/somedata.dat')
+ ScriptContext.writeToPdf('/tmp/foo.pdf')
+ *}</small></pre></blockquote>
+ * 
  * @author jbf
  */
-public class ScriptContext {
+public class ScriptContext extends PyJavaInstance {
 
-    private static ScriptContext2023 sc= ScriptContext2023.getInstance();
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.script");
+    private static final Logger resizeLogger= Logger.getLogger("autoplot.dom.canvas.resize");
     
+    private static ApplicationModel model = null;
+    private static Application dom= null;
+
+    /**
+     * set up the uncaught exception handler for headless applications, like CreatePngWalk.
+     */
+    private static void setUpHeadlessExceptionHandler() {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                logger.log(Level.SEVERE, "runtime exception: " + e, e);
+                if (e instanceof InconvertibleUnitsException) {
+                    // do nothing!!!  this is associated with the state change.  TODO: this should probably not be here, and it should be caught elsewhere.
+                    return;
+                }
+                model.getExceptionHandler().handleUncaught(e);
+            }
+        });
+    }
+    
+    /**
+     * initialize the model and view.
+     */
+    private static synchronized void maybeInitModel() {
+        if (model == null) {
+            model = new ApplicationModel();
+            model.setExceptionHandler( new ExitExceptionHandler() );
+            setUpHeadlessExceptionHandler();
+            model.addDasPeersToAppAndWait();
+            dom= model.getDocumentModel();
+        }
+        if ( view!=null ) {
+            if ( SwingUtilities.isEventDispatchThread() ) {
+                if ( !view.isVisible() ) view.setVisible(true);
+            } else {
+                SwingUtilities.invokeLater( new Runnable() {
+                    @Override
+                    public void run() {
+                        if ( !view.isVisible() ) view.setVisible(true);
+                    }
+                } );
+            }
+        }
+    }
+
     /**
      * set the current application for commands.  For example, to
      * have two windows plotting data, you would:
@@ -47,14 +166,16 @@ public class ScriptContext {
      * @see #newApplication(java.lang.String) 
      */
     public static synchronized void setApplication( AutoplotUI app ) {
-        sc.setApplication(app);
+        setApplicationModel(app.applicationModel);
+        setView(app);        
+        appLookup.put( app.applicationModel, app );
     }
     
     /**
      * reset the script focus to the default application.
      */
-    public  static synchronized void setDefaultApplication() {
-        sc.setDefaultApplication();
+    public static synchronized void setDefaultApplication() {
+        setApplication(defaultApp);
     }
     
     /**
@@ -65,8 +186,14 @@ public class ScriptContext {
      * @see #getWindow() which returns the current window.
      * @see #setApplication(org.autoplot.AutoplotUI) which creates another application.
      */
-    public  static synchronized void setWindow( ApplicationModel appm ) {
-        sc.setWindow(appm);
+    public static synchronized void setWindow( ApplicationModel appm ) {
+        AutoplotUI app= appLookup.get(appm);
+        if (app==null ) {
+            view= null;
+        } else {
+            view= app;
+        }
+        setApplicationModel(appm);              
     }
     
     /**
@@ -74,7 +201,7 @@ public class ScriptContext {
      * @return the focus application.
      */
     public static synchronized AutoplotUI getApplication() {
-        return sc.getApplication();
+        return view;
     }
     
     /**
@@ -82,9 +209,13 @@ public class ScriptContext {
      * @return the internal handle for the application.
      */
     public static synchronized ApplicationModel getWindow() {
-        return sc.getWindow();
+        return model;
     }
-        
+    
+    private static final Map<String,AutoplotUI> apps= new HashMap();
+    private static final Map<String,ApplicationModel> applets= new HashMap();
+    private static final Map<ApplicationModel,AutoplotUI> appLookup= new HashMap();
+    
     /**
      * get or create the application identified by the name.  For example:
      *<blockquote><pre>
@@ -99,7 +230,21 @@ public class ScriptContext {
      * @return the AutoplotUI.
      */
     public static synchronized AutoplotUI newApplication( String id ) {
-        return sc.newApplication(id);
+        AutoplotUI result= apps.get(id);
+        if ( result!=null ) {
+            if ( !AppManager.getInstance().isRunningApplication(result) ) {
+                AutoplotUI app= apps.remove(id); //TODO: just listen for window events!
+                appLookup.remove(app.applicationModel);
+                result= null;
+            }
+        }
+        if ( result==null ) {
+            result= view.newApplication();
+            result.setApplicationName(id);
+            apps.put(id,result);
+            appLookup.put(result.applicationModel,result);
+        }
+        return result;
     }
     
     /**
@@ -113,7 +258,23 @@ public class ScriptContext {
      * @see #setWindow(org.autoplot.ApplicationModel) 
      */
     public static synchronized ApplicationModel newWindow( final String id, int width, int height, int x, int y ) {
-        return sc.newWindow(id, width, height, x, y);
+        ApplicationModel result= newWindow(id);
+        Window window= SwingUtilities.getWindowAncestor(result.canvas);
+        if ( window!=null ) {
+        // assume it is fitted for now.  This is a gross over simplification, not considering scroll panes, etc.
+            Dimension windowDimension= window.getSize();
+            Dimension canvasDimension= model.canvas.getSize();
+            if ( Math.abs( windowDimension.width - canvasDimension.width )>100 
+                    || Math.abs( windowDimension.height - canvasDimension.height )>100 ) { 
+                window.setSize( width + 2, height + 29 ); // safety.  Based on arbitrary window system (Gnome).
+            } else {
+                window.setSize( width + ( windowDimension.width - canvasDimension.width ), height +  ( windowDimension.height - canvasDimension.height ) ); 
+            }
+            window.setLocation( x, y );
+        } else {
+            model.canvas.setSize(width,height);
+        }
+        return result;
     }
     
     /**
@@ -122,7 +283,12 @@ public class ScriptContext {
      * @param y the window upper-left location, if possible
      */
     public static synchronized void setWindowLocation( int x, int y ) {
-        sc.setWindowLocation(x, y);
+        Window window= SwingUtilities.getWindowAncestor( getWindow().getCanvas() );
+        if ( window!=null ) {
+        // assume it is fitted for now.  This is a gross over simplification, not considering scroll panes, etc.
+            window.setLocation( x, y );
+        } else {
+        }
     }
     
     /**
@@ -132,7 +298,28 @@ public class ScriptContext {
      * @return 
      */
     public static synchronized ApplicationModel newDialogWindow( Window parent, final String title ) {
-        return sc.newDialogWindow(parent, title);
+        final JDialog p= new JDialog(parent,title);
+        ApplicationModel result= new ApplicationModel();
+        result.addDasPeersToApp();
+        if ( !DasApplication.getDefaultApplication().isHeadless() ) {
+            p.getContentPane().add(result.canvas);
+            p.pack();
+            p.setVisible(true);
+        }
+        result.setResizeRequestListener( new ResizeRequestListener() {
+            @Override
+            public double resize(int width, int height) {
+                resizeLogger.log(Level.FINE, "resize1 ({0},{1})", new Object[]{width,height});
+                if ( p!=null ) {
+                    Dimension windowDimension= p.getSize();
+                    Dimension canvasDimension= model.canvas.getSize();        
+                    p.setSize( width + ( windowDimension.width - canvasDimension.width ), height +  ( windowDimension.height - canvasDimension.height ) ); 
+                }
+                model.canvas.setSize(width,height);
+                return 1.;
+            }                
+        } );
+        return result;
     }
 
     /**
@@ -142,7 +329,68 @@ public class ScriptContext {
      * @see #setWindow(org.autoplot.ApplicationModel) 
      */
     public static synchronized ApplicationModel newWindow( final String id ) {
-        return sc.newWindow( id );
+        ApplicationModel result= applets.get(id);
+        if ( result==null ) {
+            result= new ApplicationModel();
+            result.addDasPeersToApp();
+            result.setName(id);
+            applets.put(id,result);
+            final JFrame j;
+            if ( !DasApplication.getDefaultApplication().isHeadless() ) {
+                j= new JFrame(id);
+                j.setIconImage( AutoplotUtil.getAutoplotIcon() );
+                j.getContentPane().add(result.canvas);
+                j.pack();
+                j.setVisible(true);
+                j.addWindowListener(new WindowListener() {
+                    @Override
+                    public void windowOpened(WindowEvent e) {
+                    }
+
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        applets.remove(id);
+                    }
+
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                        applets.remove(id);
+                    }
+
+                    @Override
+                    public void windowIconified(WindowEvent e) {
+                    }
+
+                    @Override
+                    public void windowDeiconified(WindowEvent e) {
+                    }
+
+                    @Override
+                    public void windowActivated(WindowEvent e) {
+                    }
+
+                    @Override
+                    public void windowDeactivated(WindowEvent e) {
+                    }
+                });
+            } else {
+                j= null;
+            }
+            result.setResizeRequestListener( new ResizeRequestListener() {
+                @Override
+                public double resize(int width, int height) {
+                    resizeLogger.log(Level.FINE, "resize2 ({0},{1})", new Object[]{width,height});
+                    if ( j!=null ) {
+                        Dimension windowDimension= j.getSize();
+                        Dimension canvasDimension= model.canvas.getSize();        
+                        j.setSize( width + ( windowDimension.width - canvasDimension.width ), height +  ( windowDimension.height - canvasDimension.height ) ); 
+                    }
+                    model.canvas.setSize(width,height);
+                    return 1.;
+                }                
+            } );
+        }
+        return result;
     }
             
     /**
@@ -150,26 +398,77 @@ public class ScriptContext {
      * @param m the application model.
      * @see setWindow, which should be used instead.
      */
-    public synchronized static void setApplicationModel(ApplicationModel m) {
-        sc.setApplicationModel(m);
+    public static void setApplicationModel(ApplicationModel m) {
+        model = m;
+        dom= m.getDocumentModel();
     }
     
+    private static AutoplotUI view = null;
+    
+    /**
+     * keep track of the default application.
+     */
+    private static AutoplotUI defaultApp= null; // kludge to get the first.
+
+    /**
+     * set the default application.  Jython codes should not call this.
+     * @param app
+     */
+    protected static void _setDefaultApp( AutoplotUI app ) {
+        defaultApp= app;
+        appLookup.put( app.applicationModel, app);
+    }
+    
+    private static synchronized void maybeInitView() {
+        maybeInitModel();
+        if (view == null) {
+            Runnable run= new Runnable() {
+                @Override
+                public void run() {
+                    view = new AutoplotUI(model);
+                    view.setVisible(true);
+                    defaultApp= view;
+                }
+            };
+            if ( SwingUtilities.isEventDispatchThread() ) {
+                run.run();
+            } else {
+                try {
+                    SwingUtilities.invokeAndWait(run);
+                } catch (InterruptedException | InvocationTargetException ex) {
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
+                }
+            }
+        }
+        view.setMessage( AutoplotUI.READY_MESSAGE );
+    }
+
+    /**
+     * Used by AutoplotUI to set the view.
+     * @param v the new view.
+     */
+    protected static void setView(AutoplotUI v) {
+        view = v;
+    }
+
     /**
      * return the Window for the application, to be used for dialogs.
      * See createGui(), which creates the view.
      * @return
      */
-    public synchronized static Window getViewWindow() {
-        return sc.getViewWindow();
+    public static Window getViewWindow() {
+        return view;
     }
+
+    private static OutputStream out = System.out;
 
     /**
      * resets the output stream.  This method is used internally, do not use
      * this routine.
      * @param out
      */
-    public static synchronized void _setOutputStream(OutputStream out) {
-        sc._setOutputStream(out);
+    public static void _setOutputStream(OutputStream out) {
+        ScriptContext.out = out;
     }
     
     /**
@@ -179,8 +478,24 @@ public class ScriptContext {
      * @param width the width of the canvas
      * @param height the height of the canvas
      */
-    public static synchronized  void setCanvasSize( final int width, final int height) {
-        sc.setCanvasSize(width, height);
+    public static void setCanvasSize( final int width, final int height) {
+        maybeInitModel();
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                model.setCanvasSize(width, height);                
+                model.getDocumentModel().getCanvases(0).setSize(width,height);
+            }
+        };
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            run.run();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(run);
+            } catch (InterruptedException | InvocationTargetException ex) {
+                Logger.getLogger(ScriptContext.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }                
     }
 
     /**
@@ -189,8 +504,9 @@ public class ScriptContext {
      * @param surl
      * @Deprecated use plot instead;
      */
-    public static synchronized void setDataSourceURL(String surl) {
-        sc.setDataSourceURL(surl);
+    public static void setDataSourceURL(String surl) {
+        model.setDataSourceURL(surl);
+        if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
     }
 
     /**
@@ -199,8 +515,13 @@ public class ScriptContext {
      * See getDataSet to load data synchronously.
      * @param suri a URI or vap file
      */
-    public static synchronized void plot(String suri) {
-        sc.plot(suri);
+    public static void plot(String suri) {
+        maybeInitModel();
+        if ( view!=null && view.isExpertMode() ) {
+            view.dataSetSelector.setValue(suri);
+        }
+        model.resetDataSetSourceURL(suri, new NullProgressMonitor());
+        if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
     }
 
     /**
@@ -209,8 +530,19 @@ public class ScriptContext {
      * @param surl1 the independent variable dataset (generally used for X)
      * @param surl2 the dependent variable dataset (generally used for Y, but can be rank 2).
      */
-    public  static synchronized void plot(String surl1, String surl2) {
-        sc.plot(surl1,surl2);
+    public static void plot(String surl1, String surl2) {
+        maybeInitModel();
+        if ( surl1.endsWith(".vap") || surl1.contains(".vap?")  ) {
+            throw new IllegalArgumentException("cannot load vap here in two-argument plot");
+        } else {
+            DataSourceFilter dsf= model.getDocumentModel().getDataSourceFilters(0);
+            List<PlotElement> pes= dom.getController().getPlotElementsFor(dsf);
+            PlotElement pe;
+            if ( pes.size()>0 ) pe= pes.get(0); else pe=null;
+            Plot p= pe==null ? dom.getPlots(0) : dom.getController().getPlotFor(pe);
+            dom.getController().doplot( p, pe, surl1, surl2 );
+        }
+        if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
     }
 
     /**
@@ -218,8 +550,10 @@ public class ScriptContext {
      * @param chNum the data source number to reset the URI.
      * @param surl a URI to use
      */
-    public  static synchronized void plot(int chNum, String surl) {
-        sc.plot(chNum,surl);
+    public static void plot(int chNum, String surl) {
+        maybeInitModel();
+        model.setDataSet( chNum, null, surl );
+        if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
     }
 
     /**
@@ -228,16 +562,18 @@ public class ScriptContext {
      * @param label for the plot.
      * @param surl a URI to use
      */
-    public  static synchronized void plot(int chNum, String label, String surl) {
-        sc.plot(chNum,label,surl);
+    public static void plot(int chNum, String label, String surl) {
+        maybeInitModel();
+        model.setDataSet( chNum, label, surl );
+        if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
     }
 
     /**
      * plot the dataset in the first dataSource node.
      * @param ds QDataSet to plot
      */
-    public  static synchronized void plot(QDataSet ds) {
-        sc.plot(ds);
+    public static void plot(QDataSet ds) {
+        plot( 0, (String)null, ds );
     }
 
     /**
@@ -245,8 +581,8 @@ public class ScriptContext {
      * @param x QDataSet for the independent parameter
      * @param y QDataSet for the dependent parameter
      */
-    public  static synchronized void plot( QDataSet x, QDataSet y )  {
-        sc.plot( x, y );
+    public static void plot( QDataSet x, QDataSet y )  {
+        plot( 0, (String)null, x, y );
     }
     
     /**
@@ -255,8 +591,8 @@ public class ScriptContext {
      * @param y QDataSet for the independent parameter for the Y values
      * @param z Rank 1 or Rank 2 QDataSet for the dependent parameter
      */
-    public  static synchronized void plot( QDataSet x, QDataSet y, QDataSet z ) {
-        sc.plot( 0, (String)null, x, y, z );
+    public static void plot( QDataSet x, QDataSet y, QDataSet z ) {
+        plot( 0, (String)null, x, y, z );
     }
 
     /**
@@ -264,8 +600,8 @@ public class ScriptContext {
      * @param chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
      * @param ds dataset to plot.
      */
-    public  static synchronized void plot( int chNum, QDataSet ds)  {
-        sc.plot( chNum, ds );
+    public static void plot( int chNum, QDataSet ds)  {
+        plot( chNum, (String)null, ds );
     }
 
     /**
@@ -274,8 +610,8 @@ public class ScriptContext {
      * @param x QDataSet for the independent parameter for the X values
      * @param y QDataSet for the independent parameter for the Y values
      */
-    public static  synchronized void plot( int chNum, QDataSet x, QDataSet y )  {
-        sc.plot( chNum, x, y );
+    public static void plot( int chNum, QDataSet x, QDataSet y )  {
+        plot( chNum, (String)null, x, y );
     }
 
     /**
@@ -285,8 +621,8 @@ public class ScriptContext {
      * @param y QDataSet for the independent parameter for the Y values
      * @param z Rank 1 or Rank 2 QDataSet for the dependent parameter
      */
-    public  static synchronized void plot( int chNum, QDataSet x, QDataSet y, QDataSet z ) {
-        sc.plot( chNum, x, y, z );
+    public static void plot( int chNum, QDataSet x, QDataSet y, QDataSet z ) {
+        plot( chNum, (String)null, x, y, z );
     }
 
     /**
@@ -300,19 +636,88 @@ public class ScriptContext {
      * @return object representing the color table.
      * @see rgbColorDataset
      */
-    public synchronized static DasColorBar.Type makeColorTable( String name, QDataSet index, QDataSet rgb ) {
-        return ScriptContext2023.makeColorTable(name, index, rgb);
+    public static DasColorBar.Type makeColorTable( String name, QDataSet index, QDataSet rgb ) {
+        boolean implicitWarn= false;
+        if ( index==null ) {
+            index= Ops.indgen(rgb.length());
+            implicitWarn= true;
+        }
+        int[] iindex= new int[index.length()];
+        int[] red= new int[rgb.length()];
+        int[] green= new int[rgb.length()];
+        int[] blue= new int[rgb.length()];
+
+        int bottom= 0;
+        int top= 0;
+        if ( rgb.rank()==1 ) {
+            if ( SemanticOps.getUnits(rgb)==Units.rgbColor ) {
+                for ( int i=0; i<iindex.length; i++ ) {
+                    iindex[i]= (int)Math.round(index.value(i));
+                    red[i]= ( (int)rgb.value(i) & 0xFF0000 ) >> 16;
+                    green[i]= ( (int)rgb.value(i) & 0x00FF00 ) >> 8;
+                    blue[i]= ( (int)rgb.value(i) & 0x0000FF );
+                    top= Math.max( top, iindex[i] );
+                }
+            } else {
+                throw new IllegalArgumentException("only rank 2 bundle of R,G,B or rank 1 data with Units.rgbColor.");
+            }
+        } else {
+            for ( int i=0; i<iindex.length; i++ ) {
+                iindex[i]= (int)Math.round(index.value(i));
+                red[i]= (int)Math.round(rgb.value(i,0));
+                green[i]= (int)Math.round(rgb.value(i,1));
+                blue[i]= (int)Math.round(rgb.value(i,2));
+                top= Math.max( top, iindex[i] );
+            }
+        }
+        if ( top>254 ) {
+            if ( implicitWarn ) {
+                throw new IllegalArgumentException("no more than 254 colors.");
+            } else {
+                throw new IllegalArgumentException("the top index must be less than 254.");
+            }
+        } 
+        try {
+            DasColorBar.Type t= DasColorBar.Type.parse( name );
+            return t;
+            
+        } catch ( IllegalArgumentException e ) {
+            logger.log(Level.FINE, "creating type \"{0}\"", name);
+            int[] tt= DasColorBar.Type.makeColorTable( iindex, red, green, blue, top, bottom, top );
+            return new DasColorBar.Type( name, tt );
+        }
+        
     }    
     
-
+    private static MutablePropertyDataSet ensureMutable( QDataSet ds ) {
+        if ( ds==null ) return null;
+        return Ops.copy(ds);
+    }
+    
+    private static void ensureImmutable( QDataSet ... dss ) {
+        for ( QDataSet ds: dss ) {
+            if ( ds==null ) continue;
+            if ( ds instanceof MutablePropertyDataSet ) {
+                MutablePropertyDataSet mpds= (MutablePropertyDataSet)ds;
+                if ( !mpds.isImmutable() ) {
+                    mpds.makeImmutable();
+                }
+            }
+        }
+    }
+    
     /**
      * bring up the autoplot with the dataset
      * @param chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
      * @param label the label for the plot dependent parameter
      * @param ds the dataset to use.
      */
-    public static synchronized void plot( int chNum, String label, QDataSet ds) {
-        sc.plot( chNum, label, ds );
+    public static void plot( int chNum, String label, QDataSet ds) {
+        maybeInitModel();
+        MutablePropertyDataSet yds= ensureMutable(ds);
+        model.setDataSet( chNum, label, yds );
+        ensureImmutable(ds);
+        if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
     }
 
     /**
@@ -322,8 +727,8 @@ public class ScriptContext {
      * @param x QDataSet for the independent parameter for the X values
      * @param y QDataSet for the independent parameter for the Y values
      */
-    public static synchronized void plot( int chNum, String label, QDataSet x, QDataSet y ) {
-        sc.plot( chNum, label, x, y );
+    public static void plot( int chNum, String label, QDataSet x, QDataSet y ) {
+        plot( chNum, label, x, y, (String)null );
     }
 
     /**
@@ -335,8 +740,8 @@ public class ScriptContext {
      * @param y QDataSet for the independent parameter for the Y values, or null.
      * @param renderType string explicitly controlling the renderType and hints.
      */    
-    public static synchronized void plot( int chNum, String label, QDataSet x, QDataSet y, String renderType ) {
-        sc.plot( chNum, label, x, y, renderType );
+    public static void plot( int chNum, String label, QDataSet x, QDataSet y, String renderType ) {
+        plot( chNum, label, x, y, renderType, true );
     }
 
     /**
@@ -349,8 +754,25 @@ public class ScriptContext {
      * @param renderType string explicitly controlling the renderType and hints.
      * @param reset reset by autoranging, autolabelling, etc.
      */    
-    public static synchronized void plot( int chNum, String label, QDataSet x, QDataSet y, String renderType, boolean reset ) {        
-        sc.plot(chNum, label, x, y, renderType, reset);
+    public static void plot( int chNum, String label, QDataSet x, QDataSet y, String renderType, boolean reset ) {        
+        maybeInitModel();
+        if ( x==null && renderType==null ) {
+            model.setDataSet( chNum, label, y, reset );
+        } else {
+            QDataSet xds= x;
+            MutablePropertyDataSet yds= ensureMutable(y);
+            if ( xds!=null && yds!=null ) {
+                if ( yds.rank()==0 ) {
+                    yds.putProperty( QDataSet.CONTEXT_0,xds );
+                } else {
+                    yds.putProperty( QDataSet.DEPEND_0,xds );
+                }
+            }
+            if ( ( yds!=null ) && ( xds!=null || renderType!=null ) ) yds.putProperty( QDataSet.RENDER_TYPE, renderType ); // plot command calls this with all-null arguments, and we don't when RENDER_TYPE setting to be nulled.
+            model.setDataSet( chNum, label, yds);
+        }
+        ensureImmutable(x,y);
+        if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
     }
     
     /**
@@ -361,8 +783,27 @@ public class ScriptContext {
      * @param y QDataSet for the independent parameter for the Y values
      * @param z Rank 1 or Rank 2 QDataSet for the dependent parameter
      */
-    public static synchronized void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z ) {
-        sc.plot( chNum, label, x, y, z ) ;
+    public static void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z ) {
+        maybeInitModel();
+        QDataSet xds= x;
+        
+        if ( z==null ) throw new IllegalArgumentException("z is null");
+        if ( z.rank()==1 ) {
+            QDataSet zds= z;
+            MutablePropertyDataSet yds= ensureMutable(y);
+            if ( yds==null ) throw new IllegalArgumentException("y is null");
+            yds.putProperty( QDataSet.DEPEND_0, xds );
+            yds.putProperty( QDataSet.PLANE_0, zds );
+            model.setDataSet(chNum, label, yds);
+        } else {
+            QDataSet yds= y;
+            MutablePropertyDataSet zds= ensureMutable(z);
+            if ( xds!=null ) zds.putProperty( QDataSet.DEPEND_0, xds );
+            if ( yds!=null ) zds.putProperty( QDataSet.DEPEND_1, yds );
+            model.setDataSet(chNum, label, zds);
+        }
+        ensureImmutable(x,y,z);
+        if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
     }
 
     /**
@@ -383,8 +824,32 @@ public class ScriptContext {
      * @param z Rank 1 or Rank 2 QDataSet for the dependent parameter, or null.
      * @param renderType hint at the render type to use, such as "nnSpectrogram" or "digital", 
      */
-    public synchronized  void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z, String renderType ) {
-        sc.plot(chNum, label, x, y, z, renderType );
+    public static void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z, String renderType ) {
+        maybeInitModel();
+        QDataSet xds= x;
+        MutablePropertyDataSet zds= ensureMutable(z);
+        if ( zds==null ) {
+            MutablePropertyDataSet yds= ensureMutable(y);
+            if ( yds==null ) throw new IllegalArgumentException("y cannot be null if z is null");
+            yds.putProperty( QDataSet.RENDER_TYPE, renderType );
+            yds.putProperty( QDataSet.DEPEND_0, xds );
+            model.setDataSet(chNum, label, yds);
+        } else if ( zds.rank()==1 ) {           
+            MutablePropertyDataSet yds= ensureMutable(y);
+            if ( yds==null ) throw new IllegalArgumentException("y cannot be null if z is null");
+            yds.putProperty( QDataSet.RENDER_TYPE, renderType );
+            yds.putProperty( QDataSet.DEPEND_0, xds );
+            yds.putProperty( QDataSet.PLANE_0, zds );
+            model.setDataSet(chNum, label, yds);
+        } else {
+            QDataSet yds= y;
+            zds.putProperty( QDataSet.RENDER_TYPE, renderType );
+            if ( x!=null ) zds.putProperty( QDataSet.DEPEND_0, xds );
+            if ( y!=null ) zds.putProperty( QDataSet.DEPEND_1, yds );
+            model.setDataSet(chNum, label, zds);
+        }
+        ensureImmutable(x,y,z);
+        if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
     }
 
     /**
@@ -406,8 +871,32 @@ public class ScriptContext {
      * @param renderType hint at the render type to use, such as "nnSpectrogram" or "digital", 
      * @param reset reset by autoranging, autolabelling, etc.
      */
-    public static synchronized void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z, String renderType, boolean reset ) {
-        sc.plot(chNum, label, x, y, z, renderType, reset);
+    public static void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z, String renderType, boolean reset ) {
+        maybeInitModel();
+        QDataSet xds= x;
+        MutablePropertyDataSet zds= ensureMutable(z);
+        if ( zds==null ) {
+            MutablePropertyDataSet yds= ensureMutable(y);
+            if ( yds==null ) throw new IllegalArgumentException("y cannot be null if z is null");
+            yds.putProperty( QDataSet.RENDER_TYPE, renderType );
+            yds.putProperty( QDataSet.DEPEND_0, xds );
+            model.setDataSet(chNum, label, yds, reset);
+        } else if ( zds.rank()==1 ) {           
+            MutablePropertyDataSet yds= ensureMutable(y);
+            if ( yds==null ) throw new IllegalArgumentException("y cannot be null if z is null");
+            yds.putProperty( QDataSet.RENDER_TYPE, renderType );
+            yds.putProperty( QDataSet.DEPEND_0, xds );
+            yds.putProperty( QDataSet.PLANE_0, zds );
+            model.setDataSet(chNum, label, yds, reset);
+        } else {
+            QDataSet yds= y;
+            zds.putProperty( QDataSet.RENDER_TYPE, renderType );
+            if ( x!=null ) zds.putProperty( QDataSet.DEPEND_0, xds );
+            if ( y!=null ) zds.putProperty( QDataSet.DEPEND_1, yds );
+            model.setDataSet(chNum, label, zds, reset);
+        }
+        ensureImmutable(x,y,z);
+        if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
     }
     
     /**
@@ -416,8 +905,29 @@ public class ScriptContext {
      * @return the channel number for the new plot element.
      * @see #setLayout(int, int) 
      */
-    public static synchronized int addPlotElement( int chNum ) {
-        return sc.addPlotElement(chNum);
+    public static int addPlotElement( int chNum ) {
+        maybeInitModel();
+        
+        DataSourceFilter dsf= dom.getDataSourceFilters(chNum);
+        List<PlotElement> pes= dom.getController().getPlotElementsFor(dsf);
+        if ( pes.isEmpty() ) throw new IllegalArgumentException("nothing plotted that is listening to this channel number.");
+        String plotId= pes.get(0).getPlotId();
+        Plot plot= (Plot)DomUtil.getElementById( dom, plotId );
+                
+        PlotElement pe= dom.getController().addPlotElement( plot, null, null );
+
+        // we've added a new DataSourceFilter (and channel number), so identify this.
+        dsf= dom.getController().getDataSourceFilterFor(pe);
+        // figure out the channel number.
+        int newChNum=-1;
+        DataSourceFilter[] dsfs= dom.getDataSourceFilters();
+        for ( int i=0; i<dsfs.length; i++ ) {
+            if ( dsfs[i]==dsf ) {
+                newChNum= i;
+                break;
+            }
+        }
+        return newChNum;
     }
     
     /**
@@ -439,8 +949,15 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
      * @see org.das2.event.BoxSelectionEvent BoxSelectionEvent for the methods of the event.
      * 
      */
-    public synchronized static MouseModule addMouseModule( Plot plot, String label, final PyFunction listener ) {
-        return ScriptContext2023.addMouseModule( plot, label, listener);
+    public static MouseModule addMouseModule( Plot plot, String label, final PyFunction listener ) {
+        DasPlot p= plot.getController().getDasPlot();
+        BoxSelectorMouseModule mm= new BoxSelectorMouseModule( p, p.getXAxis(), p.getYAxis(), null, new BoxRenderer(p), label );
+        BoxSelectionListener bsl= (BoxSelectionEvent e) -> {
+            listener.__call__(Py.java2py(e));
+        };
+        mm.addBoxSelectionListener(bsl);
+        p.getDasMouseInputAdapter().setPrimaryModule(mm);
+        return mm;
     }
     
     /**
@@ -462,7 +979,28 @@ addTopDecoration( dom.canvases[0], paint )
      * 
      */
     public static void addTopDecoration( DomNode node, final PyFunction painter ) {
-        ScriptContext2023.addTopDecoration(node, painter);
+        if ( !( node instanceof Plot ) && ! ( node instanceof org.autoplot.dom.Canvas ) ) {
+            throw new IllegalArgumentException("first argument must be plot or canvas");
+        }
+        if ( node instanceof Plot ) {
+            final Plot p= (Plot)node;
+            Painter thep= new Painter() {
+                @Override
+                public void paint(Graphics2D g) {
+                    painter.__call__(Py.java2py(g));
+                }   
+            };
+            p.getController().getDasPlot().setTopDecorator(thep);
+        } else if ( node instanceof org.autoplot.dom.Canvas ) {
+            final org.autoplot.dom.Canvas c= (org.autoplot.dom.Canvas)node;
+            Painter thep= new Painter() {
+                @Override
+                public void paint(Graphics2D g) {
+                    painter.__call__(Py.java2py(g));
+                }   
+            };
+            c.getController().getDasCanvas().addTopDecorator(thep);
+        }
     }
     
     /**
@@ -485,7 +1023,28 @@ addBottomDecoration( dom.canvases[0], paint )
      * 
      */
     public static void addBottomDecoration( DomNode node, final PyFunction painter ) {
-        ScriptContext2023.addBottomDecoration(node, painter);
+        if ( !( node instanceof Plot ) && ! ( node instanceof org.autoplot.dom.Canvas ) ) {
+            throw new IllegalArgumentException("first argument must be plot or canvas");
+        }
+        if ( node instanceof Plot ) {
+            final Plot p= (Plot)node;
+            Painter thep= new Painter() {
+                @Override
+                public void paint(Graphics2D g) {
+                    painter.__call__(Py.java2py(g));
+                }   
+            };
+            p.getController().getDasPlot().setBottomDecorator(thep);
+        } else if ( node instanceof org.autoplot.dom.Canvas ) {
+            final org.autoplot.dom.Canvas c= (org.autoplot.dom.Canvas)node;
+            Painter thep= new Painter() {
+                @Override
+                public void paint(Graphics2D g) {
+                    painter.__call__(Py.java2py(g));
+                }   
+            };
+            c.getController().getDasCanvas().addBottomDecorator(thep);
+        }
     }
     
     /**
@@ -503,7 +1062,17 @@ addBottomDecoration( dom.canvases[0], paint )
      * 
      */
     public static DataPointRecorder createDataPointRecorder(  ) {
-        return ScriptContext2023.createDataPointRecorder();
+        DataPointRecorder result= new DataPointRecorder(true);
+        JButton button= new JButton( "Export Data...");
+        DataSource dss= new AnonymousDataSource() {
+            @Override
+            public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
+                return result.getDataPoints();
+            }
+        };
+        button.setAction( ExportDataPanel.createExportDataAction( result, dss ) );
+        result.addAccessory( button );
+        return result;
     }
     
     /**
@@ -518,7 +1087,15 @@ addBottomDecoration( dom.canvases[0], paint )
      * @return 
      */
     public static ApplicationModel createApplicationModel( final String id ) {
-        return ScriptContext2023.createApplicationModel(id);
+        ApplicationModel result= applets.get(id);
+        if ( result==null ) {
+            result= new ApplicationModel();
+            result.addDasPeersToApp();
+            result.setName(id);
+            applets.put(id,result);
+        }
+        
+        return result;
     }
         
     /**
@@ -528,7 +1105,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @see #showMessageDialog(java.lang.String) 
      */
     public static void setStatus( String message ) {
-        sc.setStatus(message);
+        dom.getController().setStatus(message);
     }
     
     /**
@@ -536,7 +1113,15 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param message 
      */
     public static void alert( String message ) {
-        sc.alert(message);
+        String m= message;
+        int messageType= JOptionPane.INFORMATION_MESSAGE;
+        if ( m.startsWith("warning:") ){
+            m= m.substring(8).trim();
+            messageType= JOptionPane.WARNING_MESSAGE;
+        }
+        
+        JOptionPane.showMessageDialog( view, m, "Message", messageType );
+        dom.getController().setStatus("warning: "+m);
     }
     
     /**
@@ -546,7 +1131,14 @@ addBottomDecoration( dom.canvases[0], paint )
      * @see #setStatus(java.lang.String) 
      */
     public static void showMessageDialog( String message ) {
-        sc.showMessageDialog(message);
+        if ( message.split("\n").length>15 ) {
+            JScrollPane pane= new JScrollPane( new JTextArea(message) );
+            pane.setPreferredSize( new Dimension(800,600) );
+            pane.setMaximumSize( new Dimension(800,600) );
+            JOptionPane.showMessageDialog( view, pane );
+        } else {
+            JOptionPane.showMessageDialog( view, message );
+        }
     }
 
     
@@ -558,7 +1150,33 @@ addBottomDecoration( dom.canvases[0], paint )
      * @see AutoplotUI#setLeftPanel(javax.swing.JComponent) setLeftPanel which adds to the GUI
      */
     public static void addTab( final String label, final JComponent c  ) {
-        sc.addTab(label, c);
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                maybeInitView();
+                int n= view.getTabs().getComponentCount();
+                for ( int i=0; i<n; i++ ) {
+                    final String titleAt = view.getTabs().getTitleAt(i);
+                    if ( titleAt.equals(label) || titleAt.equals("("+label+")") ) { //DANGER view is model
+                        view.getTabs().remove( i );
+                        break;
+                    }
+                }
+                if ( GuiUtil.hasScrollPane(c) ) {
+                    view.getTabs().add(label,c);
+                } else {
+                    JScrollPane jsp= new JScrollPane();
+                    jsp.getViewport().add(c);
+                    view.getTabs().add(label,jsp);        
+                }
+            }
+        };
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            run.run();
+        } else {
+            SwingUtilities.invokeLater(run);
+        }
+
     }
     
     /**
@@ -567,7 +1185,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param name string name of the plot style.
      */
     public static void setRenderStyle( String name ) {
-        sc.setRenderStyle(name);
+        dom.getController().getPlotElement().setRenderType( RenderType.valueOf(name) );
     }
 
     /**
@@ -579,7 +1197,66 @@ addBottomDecoration( dom.canvases[0], paint )
      * @throws java.io.IOException
      */
     public static void peekAt(Object o) throws IOException {
-        sc.peekAt(o);
+        out.write(o.toString().getBytes());
+    }
+
+    /**
+     * return the local filename from the string which can start with file://.
+     **<blockquote><pre><small>{@code
+     *    in: file://tmp/data/autoplot.png
+     *   out: /tmp/data/autoplot.png
+     *    in: test016_006.png
+     *   out: test016_006.png
+     *    in: http://autoplot.org/data/
+     *    throws IllegalArgumentException
+     *    in: file://tmp/data/autoplot.xls?sheet=sheet1
+     *   out: /tmp/data/autoplot.xls?sheet=sheet1
+     *    in: /tmp/has spaces.png
+     *   out: /tmp/has spaces.png
+     *    in: C:\Users\Documents and Settings\
+     *   out: C:\Users\Documents and Settings\
+     *}</small></pre></blockquote>
+     * @param filename like "file:/tmp/data/autoplot.png"
+     * @return  "/tmp/data/autoplot.png"
+     * @throws IllegalArgumentException if the filename reference is not a local reference.
+     */
+    private static String getLocalFilename( String filename ) {
+        String fp;
+        String qp=null; // query part
+        int iq= filename.indexOf('?');
+        if ( iq>-1 ) {
+            fp = filename.substring(0,iq);
+            qp= filename.substring(iq);
+        } else {
+            fp= filename;
+        }
+
+        if ( filename.contains("/") || filename.contains("\\") ) {
+            URISplit split= URISplit.parse(filename);
+            if ( split.path==null ) {
+                throw new IllegalArgumentException("something is wrong with the specified filename: "+filename);
+            }
+            if ( !"file".equals(split.scheme) ) {
+                throw new IllegalArgumentException("cannot write to "+filename+ " because it must be local file");
+            }
+            if ( fp.startsWith("file:") ) {
+                filename= split.file.substring(split.scheme.length()+1); //TODO: this is sloppy.
+                if ( split.params!=null ) {
+                    filename= filename + "?"+ split.params;
+                }
+                if ( filename.startsWith("///" ) ) filename= filename.substring(2);
+                return filename;
+            } else {
+                if ( qp!=null ) {
+                    return fp + qp;
+                } else {
+                    return fp;
+                }
+            }
+        } else {
+            String pwd= new File("").getAbsolutePath();
+            return pwd + File.separator + filename;
+        }
     }
     
     /**
@@ -595,7 +1272,32 @@ addBottomDecoration( dom.canvases[0], paint )
      * @throws java.io.IOException
      */
     public static void writeToPng(String filename) throws IOException {
-        sc.writeToPng(filename);
+        setStatus("writing to "+filename);
+        if ( !( filename.endsWith(".png") || filename.endsWith(".PNG") ) ) {
+            filename= filename + ".png";
+        }
+        filename= getLocalFilename(filename);
+        waitUntilIdle();
+
+        int width= model.getDocumentModel().getCanvases(0).getWidth();
+        int height= model.getDocumentModel().getCanvases(0).getHeight();
+        logger.log(Level.FINER, "writeToPng {0} by {1} {2}", new Object[]{width, height, filename});
+        writeToPng( filename, width, height );
+        File f= new File(filename);
+        setStatus("wrote to "+f.getAbsolutePath());
+    }
+
+    private static void maybeMakeParent( String filename ) throws IOException {
+        filename= getLocalFilename(filename);
+        File file= new File(filename);
+        File parentFile= file.getParentFile();
+        if ( parentFile!=null ) { // relative filenames are okay.
+            if ( !parentFile.exists() ) {
+                if ( !parentFile.mkdirs() ) {
+                    throw new IOException( "unable to mkdir: "+file.getParentFile() );
+                }
+            }
+        }
     }
     
     /**
@@ -631,7 +1333,16 @@ addBottomDecoration( dom.canvases[0], paint )
      * @throws java.io.IOException
      */
     public static void writeToPng( String filename, int width, int height ) throws IOException {
-        sc.writeToPng( filename, width, height );
+        filename= getLocalFilename(filename);
+        
+        BufferedImage image = model.canvas.getImage( width, height );
+        
+        Logger llogger= Logger.getLogger("autoplot.scriptcontext.writeToPng");
+        llogger.log(Level.FINE, "writeToPng({0},{1},{2})->{3},{4} image.", new Object[]{filename, width, height, image.getWidth(), image.getHeight()});
+        Map<String,String> meta= new LinkedHashMap<>();
+        meta.put( DasPNGConstants.KEYWORD_SOFTWARE, "Autoplot" );
+        meta.put( DasPNGConstants.KEYWORD_PLOT_INFO, model.canvas.getImageMetadata() );
+        writeToPng( image, filename, meta );
     }
 
     /**
@@ -647,7 +1358,17 @@ addBottomDecoration( dom.canvases[0], paint )
      * @throws java.io.IOException
      */
     public static void writeToPng( String filename, int width, int height, Map<String,String> metadata ) throws IOException {
-        sc.writeToPng( filename, width, height, metadata );
+        filename= getLocalFilename(filename);
+        
+        BufferedImage image = model.canvas.getImage( width, height );
+        
+        Logger llogger= Logger.getLogger("autoplot.scriptcontext.writeToPng");
+        llogger.log(Level.FINE, "writeToPng({0},{1},{2})->{3},{4} image.", new Object[]{filename, width, height, image.getWidth(), image.getHeight()});
+        Map<String,String> meta= new LinkedHashMap<>();
+        meta.putAll(metadata);
+        meta.put( DasPNGConstants.KEYWORD_SOFTWARE, "Autoplot" );
+        meta.put( DasPNGConstants.KEYWORD_PLOT_INFO, model.canvas.getImageMetadata() );
+        writeToPng( image, filename, meta );
     }
     
     /**
@@ -658,7 +1379,37 @@ addBottomDecoration( dom.canvases[0], paint )
      * @throws IOException
      */
     public static void writeToPng( BufferedImage image, String filename, Map<String,String> metadata ) throws IOException {
-        sc.writeToPng( image, filename, metadata );
+        
+        logger.log(Level.CONFIG, "writeToPng(image,{0},metadata)", new Object[]{filename});
+        if ( !( filename.endsWith(".png") || filename.endsWith(".PNG") ) ) {
+            filename= filename + ".png";
+        }
+
+        filename= getLocalFilename(filename);
+
+        waitUntilIdle();
+        
+        maybeMakeParent(filename);
+        
+        final FileOutputStream out1 = new FileOutputStream(filename);
+
+        DasPNGEncoder encoder = new DasPNGEncoder();
+        encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, new Date().toString());
+        if ( metadata!=null ) {
+            for ( Entry<String,String> m: metadata.entrySet() ) {
+                encoder.addText( m.getKey(), m.getValue() );
+            }
+        }
+        try {
+            encoder.write( image, out1);
+        } catch (IOException ioe) {
+        } finally {
+            try {
+                out1.close();
+            } catch (IOException ioe) {
+                throw new RuntimeException(ioe);
+            }
+        }
     }
 
     /**
@@ -668,7 +1419,21 @@ addBottomDecoration( dom.canvases[0], paint )
      * @throws java.io.IOException
      */
     public static void writeToPng(OutputStream out) throws IOException {
-        sc.writeToPng( out );
+        waitUntilIdle();
+
+        DasCanvas c = model.getCanvas();
+        int width= model.getDocumentModel().getCanvases(0).getWidth();
+        int height= model.getDocumentModel().getCanvases(0).getHeight();
+
+        BufferedImage image = c.getImage(width,height);
+
+        DasPNGEncoder encoder = new DasPNGEncoder();
+        encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, new Date().toString());
+        encoder.addText(DasPNGConstants.KEYWORD_SOFTWARE, "Autoplot" );
+        encoder.addText(DasPNGConstants.KEYWORD_PLOT_INFO, c.getImageMetadata() );        
+
+        encoder.write( image, out);
+
     }
     
     /**
@@ -679,7 +1444,23 @@ addBottomDecoration( dom.canvases[0], paint )
      * @throws java.io.IOException
      */    
     public static void writeToSvg( String filename ) throws IOException {
-        sc.writeToSvg(filename);
+        setStatus("writing to "+filename);
+        if ( !( filename.endsWith(".svg") || filename.endsWith(".SVG") ) ) {
+            filename= filename + ".svg";
+        }
+        filename= getLocalFilename(filename);
+        
+        waitUntilIdle();
+        int width= model.getDocumentModel().getCanvases(0).getWidth();
+        int height= model.getDocumentModel().getCanvases(0).getHeight();
+        model.getCanvas().setSize( width, height );
+        model.getCanvas().validate();
+        waitUntilIdle();
+
+        maybeMakeParent(filename);
+
+        model.getCanvas().writeToSVG(filename);
+        setStatus("wrote to "+filename);        
     }
 
     /**
@@ -688,7 +1469,15 @@ addBottomDecoration( dom.canvases[0], paint )
      * @throws java.io.IOException
      */
     public static void writeToSvg(OutputStream out) throws IOException {
-        sc.writeToSvg(out);
+        waitUntilIdle();
+
+        int width= model.getDocumentModel().getCanvases(0).getWidth();
+        int height= model.getDocumentModel().getCanvases(0).getHeight();
+        model.getCanvas().setSize( width, height );
+        model.getCanvas().validate();
+        waitUntilIdle();
+        model.getCanvas().writeToGraphicsOutput( out, new SvgGraphicsOutput() );
+
     }
     
     /**
@@ -701,7 +1490,23 @@ addBottomDecoration( dom.canvases[0], paint )
      * @throws java.io.IOException
      */
     public static void writeToPdf(String filename) throws IOException {
-        sc.writeToPdf(filename);
+        setStatus("writing to "+filename);
+        if ( !( filename.endsWith(".pdf") || filename.endsWith(".PDF") ) ) {
+            filename= filename + ".pdf";
+        }
+        filename= getLocalFilename(filename);
+        
+        waitUntilIdle();
+        int width= model.getDocumentModel().getCanvases(0).getWidth();
+        int height= model.getDocumentModel().getCanvases(0).getHeight();
+        model.getCanvas().setSize( width, height );
+        model.getCanvas().validate();
+        waitUntilIdle();
+
+        maybeMakeParent(filename);
+
+        model.getCanvas().writeToPDF(filename);
+        setStatus("wrote to "+filename);
     }
 
     /**
@@ -713,7 +1518,13 @@ addBottomDecoration( dom.canvases[0], paint )
      * @throws java.io.IOException
      */
     public static void writeToPdf( OutputStream out ) throws IOException {
-        sc.writeToPdf(out);
+        waitUntilIdle();
+        int width= model.getDocumentModel().getCanvases(0).getWidth();
+        int height= model.getDocumentModel().getCanvases(0).getHeight();
+        model.getCanvas().setSize( width, height );
+        model.getCanvas().validate();
+        waitUntilIdle();
+        model.getCanvas().writeToGraphicsOutput( out, new PdfGraphicsOutput() );
     }
 
     /**
@@ -723,17 +1534,38 @@ addBottomDecoration( dom.canvases[0], paint )
      * @return the image
      */
     public static BufferedImage writeToBufferedImage( Application applicationIn ) {
-        return ScriptContext2023.writeToBufferedImage( applicationIn );
+        for ( DataSourceFilter dsf : applicationIn.getDataSourceFilters() ) {
+            if ( dsf.getUri().equals("vap+internal:") ) {
+                logger.fine("copy over vap+internal datasets.");
+            }
+        }
+        ApplicationModel appmodel= new ApplicationModel();
+        appmodel.addDasPeersToAppAndWait();
+        appmodel.getDocumentModel().syncTo(applicationIn);
+
+        DomUtil.copyOverInternalData( applicationIn, appmodel.getDocumentModel() );
+
+        int height= applicationIn.getCanvases(0).getHeight();
+        int width= applicationIn.getCanvases(0).getWidth();
+        
+        BufferedImage image= appmodel.getCanvas().getImage(width, height);
+        
+        return image;
     }
 
     /**
      * convenient method for getting an image from the current canvas.
      * @return
      */
-    public BufferedImage writeToBufferedImage( ) {
-        return sc.writeToBufferedImage();
+    public static BufferedImage writeToBufferedImage( ) {
+        waitUntilIdle();
+        
+        int height= model.getDocumentModel().getCanvases(0).getHeight();
+        int width= model.getDocumentModel().getCanvases(0).getWidth();
+
+        BufferedImage image= model.getDocumentModel().getCanvases(0).getController().getDasCanvas().getImage(width, height);
+        return image;
     }
-    
     /**
      * return an array of URLs that match the spec for the time range provided.
      * For example,
@@ -830,7 +1662,27 @@ addBottomDecoration( dom.canvases[0], paint )
      * @throws java.lang.Exception
      */
     public static void formatDataSet(QDataSet ds, String file, ProgressMonitor monitor ) throws Exception {
-        sc.formatDataSet( ds, file, monitor );
+
+        if ( !file.startsWith("/") && !file.startsWith("vap+") ) {
+            String s= getLocalFilename(file);
+            file= s;
+        }
+
+        DataSourceFormat format;
+        try {
+            format = DataSetURI.getDataSourceFormat( DataSetURI.getURI(file) );
+        } catch ( URISyntaxException ex ) {
+            URISplit split= URISplit.parse(file); // fall back to the old logic
+            URI uri = split.resourceUri; 
+            format = DataSetURI.getDataSourceFormat( uri );
+        }
+        
+        if (format == null) {
+            throw new IllegalArgumentException("no format for extension: " + file);
+        }
+
+        format.formatData( file, ds, monitor );
+
     }
     
     
@@ -839,7 +1691,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param title
      */
     public static void setTitle(String title) {
-        sc.setTitle(title);
+        model.getDocumentModel().getController().getPlot().setTitle(title);
     }
     
     /**
@@ -847,7 +1699,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * created, then this does nothing.
      */
     public static void createGui() {
-        sc.createGui();
+        maybeInitView();
     }
 
     /**
@@ -857,16 +1709,17 @@ addBottomDecoration( dom.canvases[0], paint )
      * provides full access to the application.
      * @return ApplicationModel object
      */
-    public ApplicationModel getApplicationModel() {
-        return sc.getApplicationModel();
+    public static ApplicationModel getApplicationModel() {
+        maybeInitModel();
+        return model;
     }
 
     /**
      * provide way to see if the model is already initialized (e.g. for clone application)
      * @return true is the model is already initialized.
      */
-    public boolean isModelInitialized() {
-        return sc.isModelInitialized();
+    public static boolean isModelInitialized() {
+        return model!=null;
     }
 
     /**
@@ -917,7 +1770,26 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param c converter for the binding, or null.
      */    
     public static void bind( Object src, String srcProp, Object dst, String dstProp, Converter c ) {
-        sc.bind(src, srcProp, dst, dstProp, c);
+        if ( DasApplication.hasAllPermission() ) {
+            if ( src instanceof DomNode && dom.getController().getElementById(((DomNode)src).getId())==src ) {
+                DomNode srcNode= (DomNode)src;
+                dom.getController().bind( srcNode, srcProp, dst, dstProp, c );
+            } else {
+                BeanProperty srcbp= BeanProperty.create(srcProp);
+                Object value= srcbp.getValue(src);
+                if ( value==null ) {
+                    System.err.println("warning: src property "+srcProp+ " of "+src+" is null");
+                }
+                BeanProperty dstbp= BeanProperty.create(dstProp);
+                dstbp.setValue(dst, value );
+                dstbp.getValue(dst);
+                Binding b= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, src, srcbp, dst, dstbp );
+                if ( c!=null ) b.setConverter(c);
+                b.bind();
+            }
+        } else {
+            System.err.println("bindings disabled in applet environment");
+        }
     }
     
     /**
@@ -925,7 +1797,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param src 
      */
     public static void unbind( DomNode src ) {
-        sc.unbind(src);
+        dom.getController().unbind(src);
     }
 
     /**
@@ -936,7 +1808,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param dstProp 
      */
     public static void unbind( DomNode src, String srcProp, DomNode dst, String dstProp ) {
-        sc.unbind(src, srcProp, dst, dstProp);
+        dom.getController().unbind(src,srcProp,dst,dstProp);
     }
     
 
@@ -964,7 +1836,21 @@ addBottomDecoration( dom.canvases[0], paint )
      */    
     public static void bindGuiSafe( final Object src, final String srcProp, 
         final Object dst, final String dstProp, final Converter c ) {
-        sc.bindGuiSafe(src, srcProp, dst, dstProp, c);
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                bind( src, srcProp, dst, dstProp, c );
+            }
+        };
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            run.run();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(run);
+            } catch ( InterruptedException|InvocationTargetException ex ) {
+                logger.log( Level.WARNING, ex.getMessage(), ex );
+            }
+        }
     }
 
     
@@ -985,7 +1871,12 @@ addBottomDecoration( dom.canvases[0], paint )
      * @throws java.io.IOException 
      */
     public static void dumpToQStream( QDataSet ds, OutputStream out, boolean ascii ) throws IOException {
-        ScriptContext2023.dumpToQStream(ds, out, ascii);
+        try {
+            SimpleStreamFormatter f= new SimpleStreamFormatter();
+            f.format( ds, out, ascii );
+        } catch (StreamException ex) {
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
+        }
     }
 
 
@@ -1002,7 +1893,26 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param ascii use ascii transfer types, otherwise binary are used.
      */
     public static void dumpToDas2Stream(QDataSet ds, boolean ascii) {
-        ScriptContext2023.dumpToDas2Stream(ds, ascii);
+        try {
+            ByteArrayOutputStream bufout = new ByteArrayOutputStream(10000);
+            DataSet lds = DataSetAdapter.createLegacyDataSet(ds);
+            if (ascii) {
+                if (lds instanceof TableDataSet) {
+                    org.das2.dataset.TableUtil.dumpToAsciiStream((TableDataSet) lds, bufout);
+                } else {
+                    org.das2.dataset.VectorUtil.dumpToAsciiStream((VectorDataSet) lds, bufout);
+                }
+            } else {
+                if (lds instanceof TableDataSet) {
+                    org.das2.dataset.TableUtil.dumpToBinaryStream((TableDataSet) lds, bufout);
+                } else {
+                    org.das2.dataset.VectorUtil.dumpToBinaryStream((VectorDataSet) lds, bufout);
+                }
+
+            }
+            out.write(bufout.toByteArray());
+        } catch (IOException ex) {
+        }
     }
 
     /**
@@ -1017,7 +1927,24 @@ addBottomDecoration( dom.canvases[0], paint )
      * @throws java.io.IOException
      */
     public static void dumpToDas2Stream(QDataSet ds, String file, boolean ascii) throws IOException {
-        ScriptContext2023.dumpToDas2Stream(ds, file, ascii);
+
+        file= getLocalFilename(file);
+
+        OutputStream bufout = new FileOutputStream(file);
+        DataSet lds = DataSetAdapter.createLegacyDataSet(ds);
+        if (ascii) {
+            if (lds instanceof TableDataSet) {
+                org.das2.dataset.TableUtil.dumpToAsciiStream((TableDataSet) lds, bufout);
+            } else {
+                org.das2.dataset.VectorUtil.dumpToAsciiStream((VectorDataSet) lds, bufout);
+            }
+        } else {
+            if (lds instanceof TableDataSet) {
+                org.das2.dataset.TableUtil.dumpToBinaryStream((TableDataSet) lds, bufout);
+            } else {
+                org.das2.dataset.VectorUtil.dumpToBinaryStream((VectorDataSet) lds, bufout);
+            }
+        }
     }
 
     /**
@@ -1025,7 +1952,19 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param dir the directory
      */
     public static void mkdir( String dir ) {
-        ScriptContext2023.mkdir(dir);
+        
+        dir= getLocalFilename(dir);
+
+        if ( !dir.endsWith("/") ) {
+            throw new IllegalArgumentException("folder name must end in /");
+        }
+
+        File f= new File(dir);
+        if ( !f.exists() ) {
+            if ( !f.mkdirs() ) {
+                throw new IllegalArgumentException("unable to make directory: "+f );
+            }
+        }
     }
 
     /**
@@ -1033,8 +1972,9 @@ addBottomDecoration( dom.canvases[0], paint )
      * case defaults like the cache directory are set.
      * @return
      */
-    public Application getDocumentModel() {
-        return sc.getDocumentModel();
+    public static Application getDocumentModel() {
+        maybeInitModel();
+        return dom;
     }
 
 
@@ -1043,7 +1983,16 @@ addBottomDecoration( dom.canvases[0], paint )
      * but also checks for the DataSetSelector for pending operations.
      */
     public static void waitUntilIdle() {
-        sc.waitUntilIdle();
+        if ( view!=null ) {
+            while ( view.getDataSetSelector().isPendingChanges() ) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        model.waitUntilIdle();
     }
 
     /**
@@ -1053,7 +2002,17 @@ addBottomDecoration( dom.canvases[0], paint )
      *@see http://autoplot.org/data/tools/reloadAll.jy
      */
     public static void waitUntilIdle( String id ) {
-        sc.waitUntilIdle(id);
+        logger.log(Level.INFO, "waitUntilIdle({0})", id);
+        if ( view!=null ) {
+            while ( view.getDataSetSelector().isPendingChanges() ) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(ScriptContext.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        model.waitUntilIdle();
     }    
 
     /**
@@ -1062,7 +2021,14 @@ addBottomDecoration( dom.canvases[0], paint )
      * @throws java.io.IOException
      */
     public static void save( String filename ) throws IOException {
-        sc.save(filename);
+        maybeInitModel();
+        
+        filename= getLocalFilename(filename);
+        
+        if ( ! filename.endsWith(".vap") )
+            throw new IllegalArgumentException("filename must end in vap");
+
+        model.doSave( new File( filename ) );
     }
 
     /**
@@ -1071,7 +2037,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @throws java.io.IOException
      */
     public static void load( String filename ) throws IOException {
-        sc.load(filename);
+        plot(filename);
     }
     
     /**
@@ -1082,7 +2048,14 @@ addBottomDecoration( dom.canvases[0], paint )
      * @see #saveVap(org.autoplot.dom.Application, java.lang.String) 
      */
     public static Application loadVap( String filename ) throws IOException {
-        return ScriptContext2023.loadVap(filename);
+        try {
+            File f= FileSystemUtil.doDownload( filename, new NullProgressMonitor() );
+            return (Application) StatePersistence.restoreState( f );
+        } catch (FileSystem.FileSystemOfflineException ex) {
+            throw new IOException(ex);
+        } catch (URISyntaxException ex) {
+            throw new IllegalArgumentException(ex);
+        }
     }
     
     /**
@@ -1093,7 +2066,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @see #loadVap(java.lang.String) 
      */
     public static void saveVap( Application dom, String filename ) throws IOException {
-        ScriptContext2023.saveVap(dom, filename);
+        StatePersistence.saveState( new File(filename), dom );
     }
     
     /**
@@ -1101,7 +2074,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * plots.
      */
     public static void fixLayout() {
-        sc.fixLayout();
+        org.autoplot.dom.DomOps.newCanvasLayout(dom);
     }
     
     /**
@@ -1109,7 +2082,8 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param nrows number of rows (plots)
      */
     public static void setLayout( int nrows ) {
-        sc.setLayout(nrows);
+        if ( nrows<1 ) throw new IllegalArgumentException("must be one or more rows");
+        setLayout( nrows, 1 );
     }
     
     /**
@@ -1121,7 +2095,23 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param ncolumns number of columns
      */
     public static void setLayout( int nrows, int ncolumns ) {
-        sc.setLayout(nrows, ncolumns);
+        if ( nrows<1 ) throw new IllegalArgumentException("must be one or more rows");
+        if ( ncolumns<1 ) throw new IllegalArgumentException("must be one or more columns");        
+        reset();
+        DasCanvas c= dom.getCanvases(0).getController().getDasCanvas();
+        Lock canvasLock= c.mutatorLock();
+        Lock lock= dom.getController().mutatorLock();
+        try {
+            canvasLock.lock();
+            lock.lock();
+            Plot p= dom.getController().getPlot();
+            dom.getController().addPlots( nrows, ncolumns, null );
+            dom.getController().deletePlot(p);
+        } finally {
+            lock.unlock();
+            canvasLock.unlock();
+        }
+        waitUntilIdle();
     }
     
     /**
@@ -1132,8 +2122,19 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param dir below, above, right, or left, or null (None in Jython) to replace the current plot.
      * @return the new plots.
      */
-    public List<Plot> addPlots( int nrows, int ncolumns, String dir ) {
-        return sc.addPlots(nrows, ncolumns, dir);
+    public static List<Plot> addPlots( int nrows, int ncolumns, String dir ) {
+        if ( nrows<1 ) throw new IllegalArgumentException("must be one or more rows");
+        if ( ncolumns<1 ) throw new IllegalArgumentException("must be one or more columns");
+        Plot d= null;
+        if ( dir==null ) {
+            d= dom.getController().getPlot();
+        }
+        List<Plot> result= dom.getController().addPlots( nrows, ncolumns, dir );
+        if ( dir==null ) {
+            dom.getController().deletePlot(d);
+        }
+        if ( result.size()>0 ) dom.getController().setPlot(result.get(0));
+        return result;
     }
     
     /**
@@ -1143,15 +2144,44 @@ addBottomDecoration( dom.canvases[0], paint )
      * @see #addPlotElement(int) addPlotElement(int) which will an another plotElement (an overplot) to the ith position.
      */
     public static void setLayoutOverplot( int nplotElement ) {
-        sc.setLayoutOverplot(nplotElement);
+        if ( nplotElement<1 ) throw new IllegalArgumentException("must be one or more plots");
+        reset();
+        DasCanvas c= dom.getCanvases(0).getController().getDasCanvas();
+        Lock canvasLock= c.mutatorLock();
+        Lock lock= dom.getController().mutatorLock();
+        try {
+            canvasLock.lock();
+            lock.lock();
+            Plot p= dom.getController().getPlot();
+            for ( int i=1; i<nplotElement; i++ ) {
+                dom.getController().addPlotElement( p, null );
+            }
+        } finally {
+            lock.unlock();
+            canvasLock.unlock();
+        }
     }
             
     /**
      * reset the application to its initial state.
      */
     public static void reset() {
-        sc.reset();
+        maybeInitModel();
+        dom.getController().reset();
+        AutoplotUI ui= getApplication();
+        if ( ui!=null ) {
+            ui.getUndoRedoSupport().resetHistory();
+        }
+        
     }
 
-    
+    /**
+     * called when the application closes so if we reopen it will be in a
+     * good state.
+     */
+    protected static void close() {
+        model= null;
+        view= null;
+        out= null;
+    }
 }

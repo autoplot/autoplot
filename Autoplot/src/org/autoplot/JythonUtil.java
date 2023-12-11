@@ -442,7 +442,7 @@ public class JythonUtil {
             if ( makeTool ) {
                 assert makeToolPanel!=null;
                 if ( makeToolPanel.isInstall() ) { // the scientist has requested that the script be installed.
-                    Window w= ScriptContext2023.getInstance().getViewWindow();
+                    Window w= ScriptContext.getViewWindow();
                     if ( w instanceof AutoplotUI ) {
                         ((AutoplotUI)w).installTool( file, resourceUri );
                         ((AutoplotUI)w).reloadTools();

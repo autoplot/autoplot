@@ -16,7 +16,9 @@ import org.netbeans.jemmy.operators.JLabelOperator;
 import org.netbeans.jemmy.operators.JTabbedPaneOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.autoplot.AutoplotUI;
-import org.autoplot.ScriptContext2023;
+import org.autoplot.ScriptContext;
+import static org.autoplot.ScriptContext.save;
+import static org.autoplot.ScriptContext.writeToPng;
 import util.FiltersTreePicker;
 import util.RegexComponentChooser;
 
@@ -25,9 +27,7 @@ import util.RegexComponentChooser;
  * @author mmclouth
  */
 public class Test_039_OperationsCacheReset implements Scenario {
-
-    private static final ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
-
+    
      @Override
     public int runIt(Object o) {
 
@@ -35,9 +35,9 @@ public class Test_039_OperationsCacheReset implements Scenario {
         
         try {
             
-            scriptContext.createGui();
+            ScriptContext.createGui();
             
-            AutoplotUI app= (AutoplotUI) scriptContext.getViewWindow();
+            AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
             
             JFrameOperator mainFrame = new JFrameOperator(app);
         
@@ -89,7 +89,7 @@ public class Test_039_OperationsCacheReset implements Scenario {
             new JTextFieldOperator(app.getDataSetSelector().getEditor()).setText("vap+inline:ripplesSpectrogramTimeSeries(2000)");
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
             
-            scriptContext.waitUntilIdle();
+            ScriptContext.waitUntilIdle();
              
             {
                 FiltersTreePicker.pickFilter( mainFrame, new String[] { "Filters", "Data Set Operations", "Reduce in Zeroth Dimension" } );
@@ -113,8 +113,8 @@ public class Test_039_OperationsCacheReset implements Scenario {
 
             System.err.println("Done!");
             
-            scriptContext.writeToPng("Test_039_OperationsCacheReset.png"); // Leave artifacts for testing.
-            scriptContext.save("Test_039_OperationsCacheReset.vap");
+            writeToPng("Test_039_OperationsCacheReset.png"); // Leave artifacts for testing.
+            save("Test_039_OperationsCacheReset.vap");
             
             
         return(0);

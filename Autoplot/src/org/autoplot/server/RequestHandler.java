@@ -15,7 +15,7 @@ import org.python.core.PyDictionary;
 import org.python.util.PythonInterpreter;
 import org.autoplot.ApplicationModel;
 import org.autoplot.JythonUtil;
-import org.autoplot.ScriptContext2023;
+import org.autoplot.ScriptContext;
 import org.autoplot.scriptconsole.LogConsole;
 
 /**
@@ -64,7 +64,7 @@ public class RequestHandler {
             
             model.setPrompt("autoplot> "); // always reset the prompt.
             
-            ScriptContext2023.getInstance()._setOutputStream(out); // TODO: this is very kludgy and will surely cause problems
+            ScriptContext._setOutputStream(out); // TODO: this is very kludgy and will surely cause problems
             
             BufferedReader reader= new BufferedReader( new InputStreamReader(in) );
             

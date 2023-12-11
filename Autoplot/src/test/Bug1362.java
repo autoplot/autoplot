@@ -14,7 +14,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.autoplot.ScriptContext2023;
+import org.autoplot.ScriptContext;
 import org.das2.qds.QDataSet;
 import org.das2.qds.examples.Schemes;
 import org.das2.qds.ops.Ops;
@@ -25,8 +25,6 @@ import org.das2.qds.ops.Ops;
  */
 public class Bug1362 {
 
-    private static ScriptContext2023 scriptContext;
-    
     private static ProgressMonitor getMonitor(String label) {
         //DasProgressPanel p = DasProgressPanel.createFramed(label);
         //p.setVisible(true);
@@ -58,7 +56,7 @@ public class Bug1362 {
                     speedArrayMulti[i] = speed;
                     System.err.println("Multi threads: " + i + " " + speed );
                     QDataSet timesMulti = Ops.dataset(speedArrayMulti);
-                    ScriptContext2023.formatDataSet( timesMulti, "/tmp/multi.txt" );
+                    ScriptContext.formatDataSet( timesMulti, "/tmp/multi.txt" );
                 }
                 
             } else if (args[0].equals("two")) {
@@ -67,7 +65,7 @@ public class Bug1362 {
                     doTwoThreads();
                     speedArray2[i] = speed;
                     QDataSet timesTwo = Ops.dataset(speedArray2);
-                    ScriptContext2023.formatDataSet( timesTwo, "/tmp/twoThreads.txt" );
+                    ScriptContext.formatDataSet( timesTwo, "/tmp/twoThreads.txt" );
                 }
               
             } else if (args[0].equals("four")) {
@@ -76,7 +74,7 @@ public class Bug1362 {
                     doFourThreads();
                     speedArray4[i] = speed;
                     QDataSet timesFour = Ops.dataset(speedArray4);
-                    ScriptContext2023.formatDataSet( timesFour, "/tmp/fourThreads.txt" );
+                    ScriptContext.formatDataSet( timesFour, "/tmp/fourThreads.txt" );
                 }
                  
             } else if (args[0].equals("eight")) {
@@ -85,24 +83,24 @@ public class Bug1362 {
                     doEightThreads();
                     speedArray8[i] = speed;
                     QDataSet timesEight = Ops.dataset(speedArray8);
-                    ScriptContext2023.formatDataSet( timesEight, "/tmp/eightThreads.txt" );
+                    ScriptContext.formatDataSet( timesEight, "/tmp/eightThreads.txt" );
                 }
             } else {
                 System.err.println("args[0] should be four,eight or, multi");
             }
 
             
-            scriptContext.setLayout(4, 1);
+            ScriptContext.setLayout(4, 1);
 
             
-            scriptContext.getDocumentModel().getPlots(2).getYaxis().setRange( DatumRange.newDatumRange(0,10,Units.dimensionless) );
+            ScriptContext.getDocumentModel().getPlots(2).getYaxis().setRange( DatumRange.newDatumRange(0,10,Units.dimensionless) );
                     
             //ScriptContext.plot(1, "Times 2", timesTwo);
             //ScriptContext.plot(0, "Times 4", timesFour);
             //ScriptContext.plot(1, "Times 8", timesEight);
             
             try {
-                scriptContext.writeToPng("/tmp/Experiment1.png");
+                ScriptContext.writeToPng("/tmp/Experiment1.png");
             } catch (IOException ex) {
                 Logger.getLogger(Bug1362.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -127,9 +125,9 @@ public class Bug1362 {
         long time = System.currentTimeMillis() - t0;
         //System.err.println("Time for original task: " + time);
 
-        scriptContext.setLayout(3, 1);
+        ScriptContext.setLayout(3, 1);
 
-        scriptContext.plot(0, out);
+        ScriptContext.plot(0, out);
 
         final ProgressMonitor mon1 = getMonitor("task 1");
         final ProgressMonitor mon2 = getMonitor("task 2");
@@ -191,8 +189,8 @@ public class Bug1362 {
         }
         long time = System.currentTimeMillis() - t0;
 
-        scriptContext.setLayout(threads + 1, 1);
-        scriptContext.plot(0, out[0]);
+        ScriptContext.setLayout(threads + 1, 1);
+        ScriptContext.plot(0, out[0]);
 
         long time0= System.currentTimeMillis();
         for (int i = 0; i < threads; i = i + 1) {
@@ -205,7 +203,7 @@ public class Bug1362 {
                 public void run() {
                     try {
                         out[j] = Ops.copy(Ops.fftPower(ds.trim(((j - 1) * DATASET_SIZE) / thr, (j * DATASET_SIZE) / thr), 512, mon.get(j) ) );
-                        scriptContext.plot(j, out[j]);
+                        ScriptContext.plot(j, out[j]);
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -228,7 +226,7 @@ public class Bug1362 {
         speed = ((double) time) / time1;
 
         try {
-            scriptContext.writeToPng("/tmp/Experiment1_graphs.png");
+            ScriptContext.writeToPng("/tmp/Experiment1_graphs.png");
         } catch (IOException ex) {
             Logger.getLogger(Bug1362.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -248,7 +246,7 @@ public class Bug1362 {
         long time = System.currentTimeMillis() - t0;
         //System.err.println("Time for original task: " + time);
 
-        scriptContext.setLayout(5, 1);
+        ScriptContext.setLayout(5, 1);
 
         //ScriptContext.plot( 0, out );
         final ProgressMonitor mon1 = getMonitor("task 1");
@@ -331,7 +329,7 @@ public class Bug1362 {
         long time = System.currentTimeMillis() - t0;
         //System.err.println("Time for original task: " + time);
 
-        scriptContext.setLayout(5, 1);
+        ScriptContext.setLayout(5, 1);
 
         //ScriptContext.plot( 0, out );
         final ProgressMonitor mon1 = getMonitor("task 1");

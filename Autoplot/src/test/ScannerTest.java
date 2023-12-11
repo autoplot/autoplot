@@ -10,7 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.LineNumberInputStream;
 import java.util.Scanner;
 import java.util.regex.Pattern;
-import org.autoplot.ScriptContext2023;
+import org.autoplot.ScriptContext;
 import org.das2.qds.DDataSet;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
@@ -99,6 +99,6 @@ public class ScannerTest {
 
         QDataSet datads= data.getDataSet();
 
-        ScriptContext2023.formatDataSet(datads,"file:///home/jbf/tmp/foo.qds?type=binary");
+        ScriptContext.formatDataSet(datads,"file:///home/jbf/tmp/foo.qds?type=binary");
     }
 }

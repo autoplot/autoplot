@@ -75,12 +75,10 @@ import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.autoplot.GuiSupport;
 import org.autoplot.JythonUtil;
-import org.autoplot.ScriptContext2023;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.help.Util;
 import org.autoplot.jythonsupport.ui.EditorTextPane;
 import org.autoplot.util.TickleTimer;
-import org.python.core.Py;
 import org.xml.sax.SAXException;
 
 /**
@@ -265,8 +263,6 @@ public class LogConsole extends javax.swing.JPanel {
                     interp.set( e.getKey(), e.getValue() );
                 }
             }
-            //org.autoplot.ScriptContext sc= ScriptContext.getInstance();
-            //interp.set( "reset", Py.newJavaFunc( sc.getClass(), "reset" ) );
             commandLineTextPane1.setText(s);
             commandLineTextPane1.setCaretPosition(ipos);
         }

@@ -20,7 +20,9 @@ import org.netbeans.jemmy.operators.JPopupMenuOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.autoplot.AutoplotUI;
 import org.autoplot.ScreenshotsTool;
-import org.autoplot.ScriptContext2023;
+import org.autoplot.ScriptContext;
+import static org.autoplot.ScriptContext.save;
+import static org.autoplot.ScriptContext.writeToPng;
 import org.autoplot.dom.Application;
 import util.RegexComponentChooser;
 
@@ -30,8 +32,7 @@ import util.RegexComponentChooser;
  * @author Jeremy Faden
  */
 public class Test_042_TwoTsb implements Scenario {
-    private static final ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
-
+    
     @Override
     public int runIt(Object o) {
 
@@ -49,13 +50,13 @@ public class Test_042_TwoTsb implements Scenario {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
 
         try {
-            scriptContext.createGui();
+            ScriptContext.createGui();
             
-            scriptContext.waitUntilIdle();
+            ScriptContext.waitUntilIdle();
             
-            ScreenshotsTool st= new ScreenshotsTool( scriptContext.getApplication(), "Test_042_TwoTsb/", true );
+            ScreenshotsTool st= new ScreenshotsTool( ScriptContext.getApplication(), "Test_042_TwoTsb/", true );
                     
-            AutoplotUI app= (AutoplotUI) scriptContext.getViewWindow();
+            AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
             
             JFrameOperator mainFrame = new JFrameOperator(app);
 
@@ -63,16 +64,16 @@ public class Test_042_TwoTsb implements Scenario {
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
 
             Thread.sleep(1000);
-            scriptContext.waitUntilIdle();
+            ScriptContext.waitUntilIdle();
             
             st.takePicture( 52, "Here we've plotted a dataset with TSB, or the Time Series Browse capability.  Changing the time will load more data." );
             
-            Application dom= scriptContext.getDocumentModel();
+            Application dom= ScriptContext.getDocumentModel();
             
             dom.getPlotElements(0).setDisplayLegend(true);
             dom.getPlotElements(0).setLegendLabel("%{PLOT_CONTEXT}");
             
-            scriptContext.waitUntilIdle();
+            ScriptContext.waitUntilIdle();
             
             st.takePicture( 60, "The hidden time range control is in the 'context' property of the plot.  The macro %{PLOT_CONTEXT} is used to show it." );
             
@@ -85,28 +86,28 @@ public class Test_042_TwoTsb implements Scenario {
                 new RegexComponentChooser("Copy Plot Elements Down") } );
             
             Thread.sleep(1000);
-            scriptContext.waitUntilIdle();
+            ScriptContext.waitUntilIdle();
 
             st.takePicture( 73, "Copy plots down will copy the plot, and correctly connect the TSB capabilty of the lower plot as well." );
             
-            scriptContext.writeToPng("Test_042_TwoTsb.png"); // Leave artifacts for testing.
-            scriptContext.save("Test_042_TwoTsb.vap");
+            writeToPng("Test_042_TwoTsb.png"); // Leave artifacts for testing.
+            save("Test_042_TwoTsb.vap");
             
             Thread.sleep(1000);
             
             dom.setTimeRange( dom.getTimeRange().next() );
-            scriptContext.writeToPng("Test_042_TwoTsb_2.png"); // Leave artifacts for testing.
-            scriptContext.save("Test_042_TwoTsb_2.vap");
+            writeToPng("Test_042_TwoTsb_2.png"); // Leave artifacts for testing.
+            save("Test_042_TwoTsb_2.vap");
             st.takePicture( 84, "Advancing dom.timeRange loads data for the next day." );
             
             dom.setTimeRange( dom.getTimeRange().rescale(0,0.5) );
-            scriptContext.writeToPng("Test_042_TwoTsb_3.png"); // Leave artifacts for testing.
-            scriptContext.save("Test_042_TwoTsb_3.vap");
+            writeToPng("Test_042_TwoTsb_3.png"); // Leave artifacts for testing.
+            save("Test_042_TwoTsb_3.vap");
             st.takePicture( 88, "Setting dom.timeRange to a partial day loads just the data within the interval." );
             
             dom.setTimeRange( dom.getTimeRange().rescale(-0.5,0.5) );
-            scriptContext.writeToPng("Test_042_TwoTsb_4.png"); // Leave artifacts for testing.
-            scriptContext.save("Test_042_TwoTsb_4.vap");
+            writeToPng("Test_042_TwoTsb_4.png"); // Leave artifacts for testing.
+            save("Test_042_TwoTsb_4.vap");
             st.takePicture( 93, "Setting dom.timeRange to cross a day boundary loads two partial days." );
             
             System.err.println("Sleep 2 seconds to see if that fixes last image");

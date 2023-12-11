@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.Units;
 import org.das2.graph.DasCanvas;
-import static org.autoplot.ScriptContext2023.*;
+import static org.autoplot.ScriptContext.*;
 import org.autoplot.datasource.DataSetURI;
 
 import org.das2.util.ArgumentList;
@@ -102,9 +102,7 @@ public class AutoplotServer {
         }
         
         logger.log(Level.FINE, "getDocumentModel");
-        
-        ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
-        Application dom= scriptContext.getDocumentModel();
+        Application dom= getDocumentModel();
         
         // do dimensions
         if ("".equals(scanvasAspect)) {
@@ -136,7 +134,7 @@ public class AutoplotServer {
             }
 
             Application readOnlyDom= loadVap(vap); // read again to get options.
-            scriptContext.load(vap);
+            load(vap);
             
             if ( vap.startsWith("http") ) {
                 meta.put( PNG_KEY_VAP, vap );
@@ -159,7 +157,7 @@ public class AutoplotServer {
             }
             DasCanvas c = dom.getController().getCanvas().getController().getDasCanvas();
             
-            Application dom2= scriptContext.getDocumentModel();
+            Application dom2= getDocumentModel();
             
             boolean isAutoranged= false;
             if ( autorange ) {
@@ -208,7 +206,7 @@ public class AutoplotServer {
             
             logger.log(Level.FINE, "plot uri {0}", suri);
             
-            scriptContext.plot(suri);
+            plot(suri);
             
             logger.log(Level.FINE, "done plot {0}", suri); 
             
@@ -216,7 +214,7 @@ public class AutoplotServer {
         }
         
         if ( rescaleFonts ) {
-            Application state= scriptContext.getDocumentModel();
+            Application state= getDocumentModel();
             Font f= Font.decode( state.getCanvases(0).getFont() );
             Font newFont= f.deriveFont( f.getSize2D() * (float)scale );
             state.getCanvases(0).getController().getDasCanvas().setBaseFont(newFont);
@@ -226,7 +224,7 @@ public class AutoplotServer {
 
         logger.fine("get the model which provides the canvas");
         
-        Application model= scriptContext.getDocumentModel();
+        Application model= getDocumentModel();
         if ( alm.getBooleanValue("nomessages" ) ) {
             model.getOptions().setPrintingLogLevel(Level.OFF);
         }
@@ -236,10 +234,10 @@ public class AutoplotServer {
                 if ( outfile.equals("-") ) {
                     model.getCanvases(0).setWidth(width);
                     model.getCanvases(0).setHeight(height);
-                    scriptContext.writeToPng( System.out );
+                    writeToPng( System.out );
                 } else {
                     logger.log(Level.INFO, "write to {0}", outfile);
-                    scriptContext.writeToPng( outfile, width, height, meta );
+                    writeToPng( outfile, width, height, meta );
                     System.err.println("write to "+ outfile);
                 }
                 break;
@@ -247,13 +245,13 @@ public class AutoplotServer {
                 if ( outfile.equals("-") ) {
                     model.getCanvases(0).setWidth(width);
                     model.getCanvases(0).setHeight(height);
-                    scriptContext.writeToPdf( System.out );
+                    writeToPdf( System.out );
                 } else {
                     model.getCanvases(0).setWidth(width);
                     model.getCanvases(0).setHeight(height);
                     logger.log(Level.INFO, "write to {0}", outfile);
                     System.err.println("write to "+ outfile);
-                    scriptContext.writeToPdf( outfile );
+                    writeToPdf( outfile );
                 }   
                 break;
             default:
