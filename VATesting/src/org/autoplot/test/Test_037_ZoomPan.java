@@ -18,7 +18,7 @@ import org.netbeans.jemmy.TestOut;
 import org.autoplot.dom.Application;
 import org.netbeans.jemmy.operators.JFrameOperator;
 import org.autoplot.AutoplotUI;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.autoplot.scriptconsole.DumpRteExceptionHandler;
 
 /**
@@ -28,7 +28,7 @@ import org.autoplot.scriptconsole.DumpRteExceptionHandler;
 public class Test_037_ZoomPan implements Scenario {
 
     private static final Logger logger= LoggerManager.getLogger("vatesting");
-    private static final ScriptContext scriptContext= ScriptContext.getInstance();
+    private static final ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
 
     private static boolean close( double t, double d ) {
         return Math.abs( (t-d)/t ) < 0.10;

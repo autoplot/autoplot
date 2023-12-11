@@ -11,7 +11,7 @@ import org.netbeans.jemmy.operators.JFrameOperator;
 import org.netbeans.jemmy.operators.JLabelOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.autoplot.AutoplotUI;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 
 /**
  * first testing of Jemmy API.
@@ -25,7 +25,7 @@ public class First {
         Logger.getLogger("vatesting").info("info");
         Logger.getLogger("vatesting").fine("fine");
         
-        ScriptContext scriptContext= ScriptContext.getInstance();
+        ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
         
         scriptContext.createGui();
         

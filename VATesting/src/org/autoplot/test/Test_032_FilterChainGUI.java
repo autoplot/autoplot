@@ -23,7 +23,7 @@ import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.netbeans.jemmy.operators.JListOperator;
 import org.netbeans.jemmy.operators.JScrollPaneOperator;
 import org.autoplot.AutoplotUI;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import util.RegexComponentChooser;
 
 /** 
@@ -37,7 +37,7 @@ import util.RegexComponentChooser;
  * @author kenziemclouth
  */
 public class Test_032_FilterChainGUI implements Scenario {
-    private static final ScriptContext scriptContext= ScriptContext.getInstance();
+    private static final ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
         
     @Override
     public int runIt(Object o) {

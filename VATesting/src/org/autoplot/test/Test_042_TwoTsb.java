@@ -20,7 +20,7 @@ import org.netbeans.jemmy.operators.JPopupMenuOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.autoplot.AutoplotUI;
 import org.autoplot.ScreenshotsTool;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.autoplot.dom.Application;
 import util.RegexComponentChooser;
 
@@ -30,7 +30,7 @@ import util.RegexComponentChooser;
  * @author Jeremy Faden
  */
 public class Test_042_TwoTsb implements Scenario {
-    private static final ScriptContext scriptContext= ScriptContext.getInstance();
+    private static final ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
 
     @Override
     public int runIt(Object o) {

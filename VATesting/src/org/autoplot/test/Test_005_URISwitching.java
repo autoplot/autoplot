@@ -16,7 +16,7 @@ import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.autoplot.AutoplotUI;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.autoplot.datasource.DataSetSelector;
 
 /**
@@ -29,7 +29,7 @@ import org.autoplot.datasource.DataSetSelector;
 public class Test_005_URISwitching implements Scenario {
 
     private static final Logger logger= LoggerManager.getLogger("vatesting");
-    private static final ScriptContext scriptContext= ScriptContext.getInstance();
+    private static final ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
         
     @Override
     public int runIt(Object o) {

@@ -19,8 +19,8 @@ import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.*;
 import org.autoplot.AutoplotUI;
-import org.autoplot.ScriptContext;
-import static org.autoplot.ScriptContext.*;
+import org.autoplot.ScriptContext2023;
+import static org.autoplot.ScriptContext2023.*;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.BindingModel;
 import util.RegexComponentChooser;
@@ -32,7 +32,7 @@ import util.RegexComponentChooser;
 public class Test_022_ContextOverview implements Scenario {
 
     private static final Logger logger= LoggerManager.getLogger("vatesting");
-    private static final ScriptContext scriptContext= ScriptContext.getInstance();
+    private static final ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
     
     @Override
     public int runIt(Object o) {

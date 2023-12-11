@@ -17,7 +17,7 @@ import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.autoplot.AutoplotUI;
 import org.autoplot.ScreenshotsTool;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.util.jemmy.NameComponentChooser;
 import org.netbeans.jemmy.operators.DialogOperator;
@@ -30,7 +30,7 @@ import util.RegexComponentChooser;
  * @author jbf
  */
 public class Test_060_HapiEditorPanel implements Scenario {
-    private static final ScriptContext scriptContext= ScriptContext.getInstance();
+    private static final ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
 
     private static final Logger logger= LoggerManager.getLogger("vatesting");
     

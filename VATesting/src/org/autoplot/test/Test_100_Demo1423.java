@@ -14,7 +14,7 @@ import org.netbeans.jemmy.operators.JFrameOperator;
 import org.netbeans.jemmy.operators.JLabelOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.autoplot.AutoplotUI;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import util.RegexComponentChooser;
 
 /**
@@ -23,7 +23,7 @@ import util.RegexComponentChooser;
  */
 public class Test_100_Demo1423 {
     
-    private static final ScriptContext scriptContext= ScriptContext.getInstance();
+    private static final ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
     
     public static void main( String[] args ) throws Exception {
 

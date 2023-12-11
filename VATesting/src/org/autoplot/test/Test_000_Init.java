@@ -13,7 +13,7 @@ import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.TestOut;
 import org.autoplot.AutoplotUI;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 
 import org.autoplot.scriptconsole.DumpRteExceptionHandler;
 
@@ -23,7 +23,7 @@ import org.autoplot.scriptconsole.DumpRteExceptionHandler;
  */
 public class Test_000_Init implements Scenario {
     
-    private static final ScriptContext scriptContext= ScriptContext.getInstance();
+    private static final ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
     @Override
     public int runIt(Object param) {
         

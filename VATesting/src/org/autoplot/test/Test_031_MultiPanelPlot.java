@@ -25,7 +25,7 @@ import org.netbeans.jemmy.operators.JTableOperator;
 import org.netbeans.jemmy.operators.JTextComponentOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.autoplot.AutoplotUI;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.autoplot.dom.Application;
 import util.RegexComponentChooser;
 
@@ -42,7 +42,7 @@ import util.RegexComponentChooser;
  */
 public class Test_031_MultiPanelPlot implements Scenario {
       
-    private static final ScriptContext scriptContext= ScriptContext.getInstance();
+    private static final ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
         
         @Override
     public int runIt(Object o) {

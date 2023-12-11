@@ -21,7 +21,7 @@ import org.netbeans.jemmy.operators.JFrameOperator;
 import org.netbeans.jemmy.operators.JListOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.autoplot.AutoplotUI;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import util.NameComponentChooser;
 import util.RegexComponentChooser;
 /**
@@ -31,7 +31,7 @@ import util.RegexComponentChooser;
 public class Test_035_3533882_timerange_reset implements Scenario {
 
     private static final Logger logger= LoggerManager.getLogger("vatesting");
-    private static final ScriptContext scriptContext= ScriptContext.getInstance();
+    private static final ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
 
     public int runIt(Object o) {
 

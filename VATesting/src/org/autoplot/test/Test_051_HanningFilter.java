@@ -20,7 +20,7 @@ import org.netbeans.jemmy.operators.JTabbedPaneOperator;
 import org.netbeans.jemmy.operators.JTextComponentOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.autoplot.AutoplotUI;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import util.FiltersTreePicker;
 import util.RegexComponentChooser;
 
@@ -29,7 +29,7 @@ import util.RegexComponentChooser;
  * @author kenziemclouth
  */
 public class Test_051_HanningFilter implements Scenario {
-    private static final ScriptContext scriptContext= ScriptContext.getInstance();
+    private static final ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
 
     @Override
     public int runIt(Object o) {

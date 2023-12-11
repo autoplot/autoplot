@@ -24,7 +24,7 @@ import org.netbeans.jemmy.operators.JTabbedPaneOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.autoplot.AutoplotUI;
 import org.autoplot.ScreenshotsTool;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.autoplot.dom.Application;
 import org.autoplot.scriptconsole.DumpRteExceptionHandler;
 import util.NameComponentChooser;
@@ -36,7 +36,7 @@ import util.RegexComponentChooser;
  * @author Jeremy Faden
  */
 public class Test_052_FocusSwitching implements Scenario {
-    private static final ScriptContext scriptContext= ScriptContext.getInstance();
+    private static final ScriptContext2023 scriptContext= ScriptContext2023.getInstance();
 
     @Override
     public int runIt(Object o) {
