@@ -27,7 +27,8 @@ import org.autoplot.metatree.MetadataUtil;
  */
 public class Test016 {
 
-
+    private static ScriptContext scriptContext= ScriptContext.getInstance();
+    
     public static void doTest( int id, String uri, QDataSet ds, Map<String,Object> meta, String dim ) throws Exception {
      
         long t0= System.currentTimeMillis();
@@ -66,17 +67,17 @@ public class Test016 {
             dep0.putProperty(QDataSet.UNITS, autoRange.property(QDataSet.UNITS) );
         }
 
-        plot( hist );
-        setCanvasSize( 600, 600 );
+        scriptContext.plot( hist );
+        scriptContext.setCanvasSize( 600, 600 );
 
         //final DasCanvas cc= getDocumentModel().getCanvases(0).getController().getDasCanvas();
-        DasAxis xAxis= getDocumentModel().getPlots(0).getXaxis().getController().getDasAxis();
+        DasAxis xAxis= scriptContext.getDocumentModel().getPlots(0).getXaxis().getController().getDasAxis();
 
         xAxis.setLabel(DataSetUtil.format(autoRange));
 
         //int i= uri.lastIndexOf("/");
 
-        writeToPng( String.format( "test016_%03d.png", id ) );
+        scriptContext.writeToPng( String.format( "test016_%03d.png", id ) );
         
         formatDataSet( autoRange, label+".qds");
 
@@ -90,13 +91,13 @@ public class Test016 {
      * @throws IOException 
      */
     public static void doTestQube( int id, String uri ) throws IOException {
-        ScriptContext.plot(uri);
-        ScriptContext.waitUntilIdle();
-        Application dom= ScriptContext.getDocumentModel();
+        scriptContext.plot(uri);
+        scriptContext.waitUntilIdle();
+        Application dom= scriptContext.getDocumentModel();
         QDataSet result= Ops.bundle( DataSetUtil.asDataSet(dom.getPlots(0).getXaxis().getRange()),
                 DataSetUtil.asDataSet(dom.getPlots(0).getYaxis().getRange()),
                 DataSetUtil.asDataSet(dom.getPlots(0).getZaxis().getRange()) );
-        writeToPng( String.format( "test016_%03d.png", id ) );
+        scriptContext.writeToPng( String.format( "test016_%03d.png", id ) );
         System.out.println( String.format( "--- %03d ---", id ) );
         System.out.println( "xrange: "+dom.getPlots(0).getXaxis().getRange() );
         System.out.println( "yrange: "+dom.getPlots(0).getYaxis().getRange() );
@@ -106,8 +107,8 @@ public class Test016 {
     public static void main(String[] args)  {
         try {
 
-            getDocumentModel().getOptions().setAutolayout(false);
-            getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+            scriptContext.getDocumentModel().getOptions().setAutolayout(false);
+            scriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
             QDataSet ds;
             Map<String,Object> meta;

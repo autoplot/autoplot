@@ -17,9 +17,11 @@ import org.das2.qds.ops.Ops;
  * @author jeremyfaden
  */
 public class PlotDom {
+    private static ScriptContext scriptContext;
+    
     public static void main( String[] args ) throws IOException, InterruptedException {
 long t0= System.currentTimeMillis();
-        ScriptContext.createGui();
+        scriptContext.createGui();
 System.err.println( System.currentTimeMillis()-t0 );
         double[] x = new double[400];
         double[][] y= new double[3][400];
@@ -41,10 +43,10 @@ System.err.println( System.currentTimeMillis()-t0 );
 
         ds.putProperty( QDataSet.RENDER_TYPE, "series" );
 System.err.println( System.currentTimeMillis()-t0 );
-        ScriptContext.load("/tmp/foo.vap");
-        ScriptContext.plot( 0, ds );
+        scriptContext.load("/tmp/foo.vap");
+        scriptContext.plot( 0, ds );
 System.err.println( System.currentTimeMillis()-t0 );
-        ScriptContext.plot( 1, DDataSet.wrap(x), Ops.ripples(400) );
+        scriptContext.plot( 1, DDataSet.wrap(x), Ops.ripples(400) );
 System.err.println( System.currentTimeMillis()-t0 );
     }
 }

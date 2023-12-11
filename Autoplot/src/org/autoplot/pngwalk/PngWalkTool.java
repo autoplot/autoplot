@@ -217,6 +217,8 @@ public final class PngWalkTool extends javax.swing.JPanel {
     private String pwd=null; // the location of the .pngwalk file, if used, or null.
     private String vapfile=null;
     
+    private ScriptContext scriptContext= ScriptContext.getInstance();
+    
     public static void main(String[] args) {
 
         DataSetURI.init();  // for FtpFileSystem implementation
@@ -571,6 +573,8 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
         final String lap= "View in Autoplot";
 
+        final ScriptContext scriptContext= tool.scriptContext;
+
         tool.addFileAction( enabler, new AbstractAction(lap) {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -696,7 +700,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                         if ( timeRange!=null ) {
                             suri = productFile + "?timeRange=" + timeRange;
                         } else {
-                            JOptionPane.showMessageDialog(ScriptContext.getViewWindow(), "unable to resolve time range from image metadata or filename.");
+                            JOptionPane.showMessageDialog(scriptContext.getViewWindow(), "unable to resolve time range from image metadata or filename.");
                             return;
                         }
                     }
@@ -705,19 +709,19 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 final String fsuri= suri;
                 
                 Runnable run = () -> {
-                    ScriptContext.createGui();
-                    Window apWindow= ScriptContext.getViewWindow();
+                    scriptContext.createGui();
+                    Window apWindow= scriptContext.getViewWindow();
                     if ( fsuri!=null ) {
                         raiseApWindowSoon(apWindow);
                         if ( fsuri.startsWith("script:") ) {
-                            ScriptContext.getApplication().runScriptTools(fsuri);
+                            scriptContext.getApplication().runScriptTools(fsuri);
                             return;
                         } else {
-                            ScriptContext.plot(fsuri);
+                            scriptContext.plot(fsuri);
                         }
                     }
                     // go through and check for the axis autorange flag, and autorange if necessary.
-                    Application dom= ScriptContext.getDocumentModel();
+                    Application dom= scriptContext.getDocumentModel();
                     for ( int i=0; i<dom.getPlots().length; i++ ) {
                         Plot p= dom.getPlots(i);
                         if ( p.getYaxis().isAutoRange() ) {
@@ -992,8 +996,9 @@ public final class PngWalkTool extends javax.swing.JPanel {
                    }
                }
                if ( AppManager.getInstance().getApplicationCount()==1 ) {
-                   ScriptContext.createGui();
-                   Window apWindow= ScriptContext.getViewWindow();
+                   ScriptContext scriptContext= ScriptContext.getInstance();
+                   scriptContext.createGui();
+                   Window apWindow= scriptContext.getViewWindow();
                    raiseApWindowSoon(apWindow);
                }
             }

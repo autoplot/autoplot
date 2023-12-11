@@ -5,6 +5,7 @@
 package test.endtoend;
 
 import java.io.PrintWriter;
+import org.autoplot.ScriptContext;
 import static org.autoplot.ScriptContext.*;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
@@ -18,6 +19,7 @@ import org.autoplot.jythonsupport.Util;
 public class Test008 {
 
     public static final boolean debug= false;
+    private static ScriptContext scriptContext= ScriptContext.getInstance();
 
     public static void doTest( int id, String uri ) throws Exception {
         QDataSet ds;
@@ -40,11 +42,11 @@ public class Test008 {
             pw.close();
         }
 
-        plot( ds );
-        setCanvasSize( 750, 300 );
+        scriptContext.plot( ds );
+        scriptContext.setCanvasSize( 750, 300 );
         int i= uri.lastIndexOf("/");
-        setTitle(uri.substring(i+1));
-        writeToPng( String.format( "test008_%03d.png", id ) );
+        scriptContext.setTitle(uri.substring(i+1));
+        scriptContext.writeToPng( String.format( "test008_%03d.png", id ) );
 
         System.err.printf( "Read in %9.3f seconds (%s): %s\n", t, label, uri );
     }
@@ -52,14 +54,14 @@ public class Test008 {
     public static void main(String[] args) {
         try {
 
-            getDocumentModel().getOptions().setAutolayout(false);
-            getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+            scriptContext.getDocumentModel().getOptions().setAutolayout(false);
+            scriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
             doTest( 0, "file:///home/jbf/ct/hudson/data.backup/dat/ACE_sis_level2_data_1hr_1283.txt?time=year&timeFormat=%Y+%j+%H+%M+%S&depend1Labels=5:13&rank2=5:13&skip=2&validMin=2e-09" );
             
-            load( "/home/jbf/ct/hudson/vap/ace_sis_level2_data_server_v1.03.vap" );
-            setCanvasSize( 750, 300 );
-            writeToPng( "test008_001.png" );
+            scriptContext.load( "/home/jbf/ct/hudson/vap/ace_sis_level2_data_server_v1.03.vap" );
+            scriptContext.setCanvasSize( 750, 300 );
+            scriptContext.writeToPng( "test008_001.png" );
 
             doTest( 2, "file:///home/jbf/ct/hudson/data.backup/dat/ACE_sis_level2_data_1hr_1283.txt?time=year&timeFormat=%Y+%j+%H+%M+%S&intervalTag=start&depend1Labels=5:13&rank2=5:13&skip=2&validMin=2e-09" );
 

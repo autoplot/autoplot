@@ -50,6 +50,8 @@ import test.BundleBinsDemo;
  */
 public class Test013 {
 
+    private static ScriptContext scriptContext= ScriptContext.getInstance();
+    
     static long t0= System.currentTimeMillis();
 
     public static void xxx(String id) {
@@ -84,8 +86,8 @@ public class Test013 {
             QDataSet qds = handler.getDataSet();
             //System.err.println( "" + qds + " "+ ( Ops.equivalent( ds, qds)  ) );
             System.err.println( "" + qds );
-            ScriptContext.plot(qds);
-            ScriptContext.writeToPng( file+".png" );
+            scriptContext.plot(qds);
+            scriptContext.writeToPng( file+".png" );
         } finally {
             if ( in!=null ) in.close();
         }

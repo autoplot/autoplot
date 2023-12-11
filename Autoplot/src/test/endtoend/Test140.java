@@ -32,7 +32,6 @@ import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
 
-import static org.autoplot.ScriptContext.*;
 import org.autoplot.bookmarks.Bookmark;
 import org.autoplot.bookmarks.BookmarksException;
 import org.autoplot.datasource.AutoplotSettings;
@@ -60,6 +59,8 @@ import org.xml.sax.SAXException;
  */
 public class Test140 {
     
+    private static ScriptContext scriptContext= ScriptContext.getInstance();
+    
     private static int testid;
     
     /**
@@ -84,7 +85,7 @@ public class Test140 {
     }
     
     private static void listAllPendingTasks() {
-        MonitorFactory mf= getDocumentModel().getController().getMonitorFactory();
+        MonitorFactory mf= scriptContext.getDocumentModel().getController().getMonitorFactory();
         if ( mf instanceof DefaultMonitorFactory ) {
             DefaultMonitorFactory dmf= (DefaultMonitorFactory)mf;
             DefaultMonitorFactory.MonitorEntry[] mes= dmf.getMonitors();
@@ -155,13 +156,13 @@ public class Test140 {
             }
                     
             // for vap files, load the vap and grab the first dataset.
-            ScriptContext.load(uri);
-            ds= getDocumentModel().getDataSourceFilters(0).getController().getDataSet();
+            scriptContext.load(uri);
+            ds= scriptContext.getDocumentModel().getDataSourceFilters(0).getController().getDataSet();
             tsec= (System.currentTimeMillis()-t0)/1000.;
             if ( ds!=null ) {
                 MutablePropertyDataSet hist= (MutablePropertyDataSet) Ops.autoHistogram(ds);
                 hist.putProperty( QDataSet.LABEL, label );
-                formatDataSet( hist, getUniqueFilename(label,".qds",true) );
+                scriptContext.formatDataSet( hist, getUniqueFilename(label,".qds",true) );
             } else {
                 throw new IllegalArgumentException("a dataset from the vap was null: "+uri );
             }
@@ -185,13 +186,13 @@ public class Test140 {
                         hist.putProperty( QDataSet.TITLE, uri );
 
                         hist.putProperty( QDataSet.LABEL, label );
-                        formatDataSet( hist, label+".qds");        
+                        scriptContext.formatDataSet( hist, label+".qds");        
                     }
 
                     QDataSet dep0= (QDataSet) ds.property( QDataSet.DEPEND_0 );
                     if ( dep0!=null ) {
                         MutablePropertyDataSet hist2= (MutablePropertyDataSet) Ops.autoHistogram(dep0);
-                        formatDataSet( hist2, label+".dep0.qds");
+                        scriptContext.formatDataSet( hist2, label+".dep0.qds");
                     } else {
                         try (PrintWriter pw = new PrintWriter( label+".dep0.qds" )) {
                             pw.println("no dep0");
@@ -203,25 +204,25 @@ public class Test140 {
 
                 listAllPendingTasks();
                 
-                reset();
-                plot( ds );
-                setCanvasSize( 450, 300 );
-                getDocumentModel().getOptions().setCanvasFont("sans-10");
-                getDocumentModel().getCanvases(0).getMarginColumn().setLeft("5.0em");
-                getDocumentModel().getCanvases(0).getMarginColumn().setRight("100.00%-10.0em");
+                scriptContext.reset();
+                scriptContext.plot( ds );
+                scriptContext.setCanvasSize( 450, 300 );
+                scriptContext.getDocumentModel().getOptions().setCanvasFont("sans-10");
+                scriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setLeft("5.0em");
+                scriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100.00%-10.0em");
                 
                 int i= uri.lastIndexOf("/");
 
-                getApplicationModel().waitUntilIdle();
+                scriptContext.getApplicationModel().waitUntilIdle();
 
                 String fileUri= uri.substring(i+1);
 
-                if ( !getDocumentModel().getPlotElements(0).getComponent().equals("") ) {
-                    String dsstr= String.valueOf( getDocumentModel().getDataSourceFilters(0).getController().getDataSet() );
-                    fileUri= fileUri + " " + dsstr +" " + getDocumentModel().getPlotElements(0).getComponent();
+                if ( !scriptContext.getDocumentModel().getPlotElements(0).getComponent().equals("") ) {
+                    String dsstr= String.valueOf( scriptContext.getDocumentModel().getDataSourceFilters(0).getController().getDataSet() );
+                    fileUri= fileUri + " " + dsstr +" " + scriptContext.getDocumentModel().getPlotElements(0).getComponent();
                 }
 
-                setTitle(fileUri);
+                scriptContext.setTitle(fileUri);
                 
             } else {
                 throw new IllegalArgumentException("uri results in null dataset: "+uri );
@@ -271,12 +272,12 @@ public class Test140 {
         String name1= getUniqueFilename( name, ".png", true );
         
         if ( isPublic ) {
-            writeToPng( name1 );
+            scriptContext.writeToPng( name1 );
         } else {
-            writeToPng( "/home/jbf/ct/hudson/private/test/"+name1 );
-            int width= getApplicationModel().getDom().getController().getCanvas().getWidth();
-            int height= getApplicationModel().getDom().getController().getCanvas().getHeight();
-            BufferedImage image = getApplicationModel().getDom().getController().getCanvas().getController().getDasCanvas().getImage( width, height );
+            scriptContext.writeToPng( "/home/jbf/ct/hudson/private/test/"+name1 );
+            int width= scriptContext.getApplicationModel().getDom().getController().getCanvas().getWidth();
+            int height= scriptContext.getApplicationModel().getDom().getController().getCanvas().getHeight();
+            BufferedImage image = scriptContext.getApplicationModel().getDom().getController().getCanvas().getController().getDasCanvas().getImage( width, height );
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             ImageIO.write(image, "png", outputStream);
             byte[] data = outputStream.toByteArray();
@@ -301,9 +302,9 @@ public class Test140 {
         }
 
         if ( uri.endsWith(".vap") || uri.contains(".vap?timerange=") ) {
-            reset();
-            ScriptContext.getDocumentModel().getOptions().setColor( Color.BLACK );
-            ScriptContext.getDocumentModel().getOptions().setBackground( Color.WHITE );
+            scriptContext.reset();
+            scriptContext.getDocumentModel().getOptions().setColor( Color.BLACK );
+            scriptContext.getDocumentModel().getOptions().setBackground( Color.WHITE );
         }
         
         return result;
@@ -514,7 +515,7 @@ public class Test140 {
         Map<String,Exception> exceptions= new LinkedHashMap();
         Map<String,Integer> exceptionNumbers= new LinkedHashMap();
         
-        ScriptContext.getDocumentModel().getOptions().setAutolayout(false);
+        scriptContext.getDocumentModel().getOptions().setAutolayout(false);
 
         for ( int i=1; i<args.length; i++ ) {
             String uri= args[i];

@@ -908,7 +908,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         String eventId= sdf.format( now );
 
         String pendingFocus="N/A"; // many RTEs come from the selector where the string is not processed.
-        Window w= ScriptContext.getViewWindow();
+        Window w= ScriptContext.getInstance().getViewWindow();
         if ( w instanceof AutoplotUI ) {
             AutoplotUI app= ((AutoplotUI)w);
             pendingFocus= app.getDataSetSelector().getValue();

@@ -4381,7 +4381,7 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
             dataSetSelector.maybePlot( KeyEvent.ALT_MASK );
         } else {
             final DataMashUp dm= new DataMashUp();
-            dm.setResolver( new PlotDataMashupResolver(dm) );
+            dm.setResolver( new PlotDataMashupResolver(dm,this) );
 
             if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, dm, "Data Mash Up", JOptionPane.OK_CANCEL_OPTION ) ) {
                 dataSetSelector.setValue(dm.getAsJythonInline());
@@ -6627,6 +6627,14 @@ APSplash.checkTime("init 240");
             
         };
         return runListener;
+    }
+    
+    /**
+     * return the script context for this window.
+     * @return 
+     */
+    public ScriptContext getScriptContext() {
+        return scriptContext;
     }
     
 //    /**

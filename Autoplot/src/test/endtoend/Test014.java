@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import org.autoplot.ScriptContext;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.das2.graph.DasAxis;
@@ -31,6 +32,8 @@ public class Test014 {
 
     private static final Set<Integer> usedIds= new HashSet<Integer>();
 
+    private static ScriptContext scriptContext= ScriptContext.getInstance();
+    
     public static void doTest( int id, String uri, QDataSet ds ) throws Exception {
 
         System.err.println( String.format("== doTest(%d,%s) ==",id,uri ) );
@@ -81,23 +84,23 @@ public class Test014 {
         
         // kludge: since in das2 Units.dimensionless is convertable to logERatio, force the units change to something not dimensionless.
         if ( "log".equals(type) ) {
-            getDocumentModel().getPlots(0).getXaxis().setRange( DatumRange.newDatumRange( 0, 10, Units.seconds ) );
+            scriptContext.getDocumentModel().getPlots(0).getXaxis().setRange( DatumRange.newDatumRange( 0, 10, Units.seconds ) );
         }
 
-        plot( hist );
+        scriptContext.plot( hist );
         hist=Ops.copy(hist);
                 
-        setCanvasSize( 600, 600 );
+        scriptContext.setCanvasSize( 600, 600 );
 
-        final DasCanvas cc= getDocumentModel().getCanvases(0).getController().getDasCanvas();
-        DasAxis xAxis= getDocumentModel().getPlots(0).getXaxis().getController().getDasAxis();
+        final DasCanvas cc= scriptContext.getDocumentModel().getCanvases(0).getController().getDasCanvas();
+        DasAxis xAxis= scriptContext.getDocumentModel().getPlots(0).getXaxis().getController().getDasAxis();
 
         xAxis.setLabel("UNITS=%{UNITS}");
 
         Painter p = new Painter() {
             @Override
             public void paint(Graphics2D g) {
-                DasAxis xAxis= getDocumentModel().getPlots(0).getXaxis().getController().getDasAxis();
+                DasAxis xAxis= scriptContext.getDocumentModel().getPlots(0).getXaxis().getController().getDasAxis();
                 if ( cadence==null ) {
                  
                 } else {
@@ -110,9 +113,9 @@ public class Test014 {
 
         int i= uri.lastIndexOf("/");
 
-        setTitle(uri.substring(i+1)+"!c cadence="+cadence );
+        scriptContext.setTitle(uri.substring(i+1)+"!c cadence="+cadence );
 
-        writeToPng( String.format( "test014_%03d.png", id ) );
+        scriptContext.writeToPng( String.format( "test014_%03d.png", id ) );
 
         cc.removeTopDecorator(p);
         
@@ -138,8 +141,8 @@ public class Test014 {
             System.err.println("== done, datum formatting experiments, thanks ==");
             
             
-            getDocumentModel().getOptions().setAutolayout(false);
-            getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+            scriptContext.getDocumentModel().getOptions().setAutolayout(false);
+            scriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
             QDataSet ds;
 

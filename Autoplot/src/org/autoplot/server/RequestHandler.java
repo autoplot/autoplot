@@ -64,7 +64,7 @@ public class RequestHandler {
             
             model.setPrompt("autoplot> "); // always reset the prompt.
             
-            ScriptContext._setOutputStream(out); // TODO: this is very kludgy and will surely cause problems
+            ScriptContext.getInstance()._setOutputStream(out); // TODO: this is very kludgy and will surely cause problems
             
             BufferedReader reader= new BufferedReader( new InputStreamReader(in) );
             

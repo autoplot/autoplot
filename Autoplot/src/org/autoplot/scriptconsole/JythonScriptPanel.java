@@ -554,8 +554,8 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             }
         }
         System.err.println("== Executing Script ==");
-        ScriptContext.setApplication( app );
-        ScriptContext.setWindow(model);
+        ScriptContext.getInstance().setApplication( app );
+        ScriptContext.getInstance().setWindow(model);
         if ( support.file!=null ) this.setRunningScript(support.file);
         support.executeScript( evt.getModifiers() );
     }//GEN-LAST:event_executeButtonActionPerformed

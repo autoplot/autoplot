@@ -178,7 +178,7 @@ public class AnnotationCommand extends PyObject {
             index= 0;
         }
         
-        Application dom= ScriptContext.getDocumentModel();
+        Application dom= ScriptContext.getInstance().getDocumentModel();
         
         dom.getController().registerPendingChange( this, this );  
         dom.getController().performingChange(this,this);

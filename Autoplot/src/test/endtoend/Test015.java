@@ -6,6 +6,7 @@ package test.endtoend;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import org.autoplot.ScriptContext;
 import static org.autoplot.ScriptContext.*;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
@@ -17,7 +18,8 @@ import org.autoplot.jythonsupport.Util;
  * @author jbf
  */
 public class Test015 {
-
+    private static ScriptContext scriptContext= ScriptContext.getInstance();
+    
 
     public static void doTest( int id, String uri ) throws Exception {
         QDataSet ds;
@@ -40,19 +42,19 @@ public class Test015 {
             pw.close();
         }
 
-        plot( ds );
-        setCanvasSize( 750, 300 );
+        scriptContext.plot( ds );
+        scriptContext.setCanvasSize( 750, 300 );
         int i= uri.lastIndexOf("/");
-        setTitle(uri.substring(i+1));
-        writeToPng( String.format( "test015_%03d.png", id ) );
+        scriptContext.setTitle(uri.substring(i+1));
+        scriptContext.writeToPng( String.format( "test015_%03d.png", id ) );
 
         System.err.printf( "Read in %9.3f seconds (%s): %s\n", t, label, uri );
     }
     
     public static void main(String[] args) {
         try {
-            getDocumentModel().getOptions().setAutolayout(false);
-            getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+            scriptContext.getDocumentModel().getOptions().setAutolayout(false);
+            scriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
             
             doTest( 0, "vap+cef:file:///home/jbf/ct/hudson/data.backup/cef/C1_CP_PEA_CP3DXPH_DNFlux__20020811_140000_20020811_150000_V061018.cef?Data__C1_CP_PEA_CP3DXPH_DNFlux" );
             doTest( 1, "vap+cef:file:///home/jbf/ct/hudson/data.backup/cef/C1_CP_CIS-CODIF_HS_H1_PSD__20020117_000000_20020117_240000_V070824.cef?3d_ions__C1_CP_CIS-CODIF_HS_H1_PSD");

@@ -6,6 +6,7 @@ package test.endtoend;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import org.autoplot.ScriptContext;
 import static org.autoplot.ScriptContext.*;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
@@ -17,7 +18,7 @@ import org.autoplot.jythonsupport.Util;
  * @author jbf
  */
 public class Test023 {
-
+    private static ScriptContext scriptContext= ScriptContext.getInstance();
 
     public static void doTest( int id, String uri ) throws Exception {
         QDataSet ds;
@@ -40,11 +41,11 @@ public class Test023 {
             pw.close();
         }
 
-        plot( ds );
+        scriptContext.plot( ds );
         
         int i= uri.lastIndexOf("/");
-        setTitle(uri.substring(i+1));
-        writeToPng( String.format( "test023_%03d.png", id ) );
+        scriptContext.setTitle(uri.substring(i+1));
+        scriptContext.writeToPng( String.format( "test023_%03d.png", id ) );
 
         System.err.printf( "Read in %9.3f seconds (%s): %s\n", t, label, uri );
     }
@@ -52,9 +53,9 @@ public class Test023 {
     public static void main(String[] args)  {
         try {
 
-            setCanvasSize(750, 300);
-            getDocumentModel().getOptions().setAutolayout(false);
-            getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+            scriptContext.setCanvasSize(750, 300);
+            scriptContext.getDocumentModel().getOptions().setAutolayout(false);
+            scriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
             doTest( 0, "file:///home/jbf/ct/hudson/data.backup/h5/SourceAcronym_Subset1-1-v0.h5?ExtendibleArray" );
             //doTest( 1, "file:///home/jbf/ct/hudson/data/ncml/ap_service_provider_agg.ncml?Elastischer_Modul" ); // drop support for ncml

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeModel;
+import org.autoplot.ScriptContext;
 import org.das2.client.DasServer;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -31,6 +32,8 @@ import static org.autoplot.ScriptContext.*;
  * @author jbf
  */
 public class Test501 {
+    private static ScriptContext scriptContext= ScriptContext.getInstance();
+        
     private static final int READ_SIZE_LIMIT_DAYS = 400; // chris has /voyager2/pws/SpecAnalyzer-Distogram.dsdf which is about a year, intentionally.
 
     private static final int testid=501;
@@ -81,22 +84,22 @@ public class Test501 {
             pw.close();
         }
 
-        plot( ds );
-        setCanvasSize( 750, 300 );
+        scriptContext.plot( ds );
+        scriptContext.setCanvasSize( 750, 300 );
         int i= uri.lastIndexOf("/");
 
-        getApplicationModel().waitUntilIdle();
+        scriptContext.getApplicationModel().waitUntilIdle();
 
         String fileUri= uri.substring(i+1);
 
-        if ( !getDocumentModel().getPlotElements(0).getComponent().equals("") ) {
-            String dsstr= String.valueOf( getDocumentModel().getDataSourceFilters(0).getController().getDataSet() );
-            fileUri= fileUri + " " + dsstr +" " + getDocumentModel().getPlotElements(0).getComponent();
+        if ( !scriptContext.getDocumentModel().getPlotElements(0).getComponent().equals("") ) {
+            String dsstr= String.valueOf( scriptContext.getDocumentModel().getDataSourceFilters(0).getController().getDataSet() );
+            fileUri= fileUri + " " + dsstr +" " + scriptContext.getDocumentModel().getPlotElements(0).getComponent();
         }
 
         String result= null;
 
-        setTitle(fileUri);
+        scriptContext.setTitle(fileUri);
         String name;
         if ( doTest ) {
             int h = uri.hashCode();
@@ -109,7 +112,7 @@ public class Test501 {
             name= String.format( "ex_test%03d_%03d.png", testid, iid );
             result= null;
         }
-        writeToPng( name );
+        scriptContext.writeToPng( name );
         System.err.printf( "wrote to file: %s\n", name );
 
         System.err.printf( "Read in %9.3f seconds (%s): %s\n", t, label, uri );
@@ -123,8 +126,8 @@ public class Test501 {
         //String s= "/voyager1/pws/SpecAnalyzer-4s-Efield.dsdf";
         //ids.add(0,s);
 
-        getDocumentModel().getOptions().setAutolayout(false);
-        getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+        scriptContext.getDocumentModel().getOptions().setAutolayout(false);
+        scriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
         int iid= 0;
 

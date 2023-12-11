@@ -11,6 +11,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.autoplot.ScriptContext;
 import static org.autoplot.ScriptContext.*;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
@@ -22,7 +23,7 @@ import org.autoplot.jythonsupport.Util;
  * @author jbf
  */
 public class Test021 {
-
+    private static ScriptContext scriptContext= ScriptContext.getInstance();
     static long t0 = System.currentTimeMillis();
 
     static String[] uris = new String[]{
@@ -100,9 +101,9 @@ public class Test021 {
         int count;
 
         try {
-        setCanvasSize(750, 300);
-        getDocumentModel().getOptions().setAutolayout(false);
-        getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+        scriptContext.setCanvasSize(750, 300);
+        scriptContext.getDocumentModel().getOptions().setAutolayout(false);
+        scriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
         xxx("start");
 
@@ -175,11 +176,11 @@ public class Test021 {
                         pw.println("no dep0");
                         pw.close();
                     }
-                    plot(ds);
-                    setCanvasSize(750, 300);
+                    scriptContext.plot(ds);
+                    scriptContext.setCanvasSize(750, 300);
                     int i = s.lastIndexOf("/");
-                    setTitle(s.substring(i + 1));
-                    writeToPng(label + ".png");
+                    scriptContext.setTitle(s.substring(i + 1));
+                    scriptContext.writeToPng(label + ".png");
                     
                 } catch (Exception ex) {
                     TestSupport.logger.log(Level.SEVERE, ex.toString(), ex);

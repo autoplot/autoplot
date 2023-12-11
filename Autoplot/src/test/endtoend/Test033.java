@@ -20,9 +20,10 @@ import org.das2.datum.DatumRangeUtil;
  */
 public class Test033 {
 
-
+    private static ScriptContext scriptContext= ScriptContext.getInstance();
+    
     private static void makePngWalk1() throws Exception {
-        Application dom= ScriptContext.getDocumentModel();
+        Application dom= scriptContext.getDocumentModel();
 
         String pwd= new File("pngwalk").getAbsoluteFile().toString();
 
@@ -32,7 +33,7 @@ public class Test033 {
         pp.timeFormat= "$Y$m$d";
         pp.timeRangeStr= "2006-dec-2 to 2006-dec-22";
 
-        ScriptContext.load( "file:/home/jbf/ct/hudson/vap/cassini_kp.vap" );
+        scriptContext.load( "file:/home/jbf/ct/hudson/vap/cassini_kp.vap" );
 
         System.err.println("writing pngwalk at "+pwd );
         CreatePngWalk.doIt( dom, pp );
@@ -44,7 +45,7 @@ public class Test033 {
      * @throws Exception
      */
     private static void makePngWalk2() throws Exception {
-        Application dom= ScriptContext.getDocumentModel();
+        Application dom= scriptContext.getDocumentModel();
 
         String pwd= new File("pngwalk").getAbsoluteFile().toString();
 
@@ -54,7 +55,7 @@ public class Test033 {
         pp.timeFormat= "$Y$m$d-$(H,span=2)";
         pp.timeRangeStr= "2006-dec-2 to 2006-dec-5";
 
-        ScriptContext.load( "file:/home/jbf/ct/hudson/vap/cassini_kp.vap" );
+        scriptContext.load( "file:/home/jbf/ct/hudson/vap/cassini_kp.vap" );
 
         System.err.println("writing pngwalk at "+pwd );
         CreatePngWalk.doIt( dom, pp );
@@ -66,7 +67,7 @@ public class Test033 {
      * @throws Exception
      */
     private static void makePngWalk3() throws Exception {
-        Application dom= ScriptContext.getDocumentModel();
+        Application dom= scriptContext.getDocumentModel();
 
         String pwd= new File("pngwalk3").getAbsoluteFile().toString();
 
@@ -76,7 +77,7 @@ public class Test033 {
         pp.timeFormat= "$Y$m";
         pp.timeRangeStr= "2005 through 2007";
 
-        ScriptContext.load( "file:///home/jbf/ct/hudson/vap/kp_dst.vap" );
+        scriptContext.load( "file:///home/jbf/ct/hudson/vap/kp_dst.vap" );
 
         System.err.println("writing pngwalk at "+pwd );
         CreatePngWalk.doIt( dom, pp );
@@ -88,7 +89,7 @@ public class Test033 {
      * @throws Exception 
      */
     private static void makePngWalk5() throws Exception {
-        Application dom= ScriptContext.getDocumentModel();
+        Application dom= scriptContext.getDocumentModel();
 
         String pwd= new File("pngwalk5").getAbsoluteFile().toString();
 
@@ -98,7 +99,7 @@ public class Test033 {
         pp.timeFormat= "$Y$m$d-$(H,span=6)";
         pp.timeRangeStr= "1984-01-14 through 1984-01-23";
 
-        ScriptContext.load( "file:/home/jbf/ct/hudson/vap/lanl/lanlGeoEpDemo4.vap" );
+        scriptContext.load( "file:/home/jbf/ct/hudson/vap/lanl/lanlGeoEpDemo4.vap" );
 
         dom.getPlots(1).getXaxis().setRange( DatumRangeUtil.parseTimeRange("1984-01-14 through 1984-01-23") );
         System.err.println("writing pngwalk at "+pwd );
@@ -112,7 +113,7 @@ public class Test033 {
      * @throws Exception
      */
     private static void makePngWalk4() throws Exception {
-        Application dom= ScriptContext.getDocumentModel();
+        Application dom= scriptContext.getDocumentModel();
 
         String pwd= new File("pngwalk4").getAbsoluteFile().toString();
 
@@ -125,7 +126,7 @@ public class Test033 {
         pp.autorange= true;
         pp.version= "v1.2";
 
-        ScriptContext.load( "file:///home/jbf/ct/hudson/vap/kp_dst.vap" );
+        scriptContext.load( "file:///home/jbf/ct/hudson/vap/kp_dst.vap" );
 
         System.err.println("writing pngwalk at "+pwd );
         CreatePngWalk.doIt( dom, pp );
@@ -133,7 +134,7 @@ public class Test033 {
     }
 
     private static void makePngWalk6() throws IOException, ParseException, InterruptedException {
-        Application dom= ScriptContext.getDocumentModel();
+        Application dom= scriptContext.getDocumentModel();
 
         String pwd= new File("pngwalk6").getAbsoluteFile().toString();
 
@@ -146,7 +147,7 @@ public class Test033 {
         pp.autorange= true;
         pp.version= "v1.3";
 
-        ScriptContext.load( "/home/jbf/ct/hudson/vap/multiScaleBVoyager.vap" );
+        scriptContext.load( "/home/jbf/ct/hudson/vap/multiScaleBVoyager.vap" );
 
         System.err.println("writing pngwalk at "+pwd );
         CreatePngWalk.doIt( dom, pp );
@@ -157,7 +158,7 @@ public class Test033 {
 
         long t0;
 
-        ScriptContext.getDocumentModel().getOptions().setAutolayout(false);
+        scriptContext.getDocumentModel().getOptions().setAutolayout(false);
 
         //t0= System.currentTimeMillis();
         //makePngWalk1();

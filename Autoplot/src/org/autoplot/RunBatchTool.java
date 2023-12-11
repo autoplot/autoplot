@@ -129,6 +129,8 @@ public class RunBatchTool extends javax.swing.JPanel {
     public static final int HTML_LINE_LIMIT = 50;
             
     private ProgressMonitor monitor=null; // non-null when process is going.
+    
+    private ScriptContext scriptContext;
         
     /**
      * Creates new form BatchMaster
@@ -136,7 +138,8 @@ public class RunBatchTool extends javax.swing.JPanel {
      */
     public RunBatchTool( final Application dom ) {
         initComponents();
-
+        scriptContext= ScriptContext.getInstance();
+        
         Preferences prefs= Preferences.userNodeForPackage(RunBatchTool.class );
         String s= prefs.get( "lastTemplate", null );
         if ( s!=null ) {
@@ -1681,16 +1684,16 @@ public class RunBatchTool extends javax.swing.JPanel {
         s= s.replaceAll(" ","_"); 
 
         if ( s.endsWith(".png") ) {
-            BufferedImage bufferedImage = ScriptContext.writeToBufferedImage(); 
+            BufferedImage bufferedImage = scriptContext.writeToBufferedImage(); 
             Map<String,String> metadata= new LinkedHashMap<>();
             metadata.put( "ScriptURI",uri );
             if ( dom!=null ) {
                 metadata.put( DasPNGConstants.KEYWORD_PLOT_INFO, 
                     dom.getController().getApplicationModel().canvas.getImageMetadata() );
             }
-            ScriptContext.writeToPng(bufferedImage,s,metadata);
+            scriptContext.writeToPng(bufferedImage,s,metadata);
         } else if ( s.endsWith(".pdf") ) {
-            ScriptContext.writeToPdf(s);
+            scriptContext.writeToPdf(s);
         } 
         return s;
 
@@ -2351,7 +2354,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                             interp.setOut(outbaos);
                             uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
                             interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile),scriptFile.getName()), scriptFile.getName() );
-                            Application myDom= ScriptContext.getDocumentModel();
+                            Application myDom= scriptContext.getDocumentModel();
                             if ( writeCheckBox.isSelected() ) {
                                 runResults.put("writeFile", doWrite(f1.trim(), "", uri, myDom ) );
                             }
@@ -2408,7 +2411,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                                 uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
                                 interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile), scriptFile.getName()), scriptFile.getName() );
                                 if ( writeCheckBox.isSelected() ) {
-                                    Application myDom= ScriptContext.getDocumentModel();
+                                    Application myDom= scriptContext.getDocumentModel();
                                     runResults.put("writeFile", doWrite(f1.trim(),f2.trim(), uri, myDom ) );
                                 }
                                 jobs2.get(i2).setIcon(ICON_OKAY);

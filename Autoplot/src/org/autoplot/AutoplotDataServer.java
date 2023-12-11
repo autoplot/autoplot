@@ -441,7 +441,7 @@ public class AutoplotDataServer {
         }
         //initialize the application.  We don't use the object, but this
         //will allow us to reset the cache position.
-        getDocumentModel();
+        ScriptContext.getInstance().getDocumentModel();
 
         // set up the cache.
         String cache = alm.getValue("cache");

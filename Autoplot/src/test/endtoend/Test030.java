@@ -4,6 +4,7 @@
  */
 package test.endtoend;
 
+import org.autoplot.ScriptContext;
 import org.das2.qds.DataSetOps;
 import org.das2.qds.QDataSet;
 import org.autoplot.jythonsupport.Util;
@@ -19,7 +20,8 @@ import static org.autoplot.ScriptContext.*;
  * @author jbf
  */
 public class Test030 {
-
+    private static ScriptContext scriptContext= ScriptContext.getInstance();
+    
     /**
      * this reads the ascii file into a bundle and tries to plot the last one.
      * This removes most of the dependence on the AsciiDataSource.
@@ -37,8 +39,8 @@ public class Test030 {
 
         QDataSet x= DataSetOps.unbundle(ds,0);
         QDataSet y= DataSetOps.unbundle(ds,bds.length()-1,true);
-        plot( x, y );
-        setTitle( uri );
+        scriptContext.plot( x, y );
+        scriptContext.setTitle( uri );
 
         String label= String.format( "test030_%03d", id );
 
@@ -49,7 +51,7 @@ public class Test030 {
 //            System.err.println(lshell.property(QDataSet.DEPEND_1));
 //        }
 
-        writeToPng( label+".png" );
+        scriptContext.writeToPng( label+".png" );
         //((MutablePropertyDataSet)bundle1).putProperty( QDataSet.LABEL, uri );
         formatDataSet( ds, label+".qds");
         formatDataSet( ds, label+".txt");
@@ -63,12 +65,12 @@ public class Test030 {
         QDataSet ds= Util.getDataSet( uri );
         System.err.printf( "   read %s.\n", String.valueOf(ds) );
 
-        plot( ds );
-        setTitle( uri );
+        scriptContext.plot( ds );
+        scriptContext.setTitle( uri );
 
         String label= String.format( "test030_%03d", id );
 
-        writeToPng( label+".png" );
+        scriptContext.writeToPng( label+".png" );
         //((MutablePropertyDataSet)bundle1).putProperty( QDataSet.LABEL, uri );
         formatDataSet( ds, label+".qds");
         formatDataSet( ds, label+".txt");

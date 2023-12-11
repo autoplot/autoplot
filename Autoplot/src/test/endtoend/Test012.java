@@ -6,6 +6,7 @@ package test.endtoend;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import org.autoplot.ScriptContext;
 import static org.autoplot.ScriptContext.*;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
@@ -19,7 +20,8 @@ import org.autoplot.jythonsupport.Util;
 public class Test012 {
     private static int testid;
 
-
+    private static ScriptContext scriptContext= ScriptContext.getInstance();
+    
     public static void doTest( int testid, int id, String uri ) throws Exception {
         QDataSet ds;
         long t0= System.currentTimeMillis();
@@ -49,21 +51,21 @@ public class Test012 {
             pw.close();
         }
 
-        plot( ds );
-        setCanvasSize( 750, 300 );
+        scriptContext.plot( ds );
+        scriptContext.setCanvasSize( 750, 300 );
         int i= uri.lastIndexOf("/");
 
-        getApplicationModel().waitUntilIdle();
+        scriptContext.getApplicationModel().waitUntilIdle();
 
         String fileUri= uri.substring(i+1);
 
-        if ( !getDocumentModel().getPlotElements(0).getComponent().equals("") ) {
-            String dsstr= String.valueOf( getDocumentModel().getDataSourceFilters(0).getController().getDataSet() );
-            fileUri= fileUri + " " + dsstr +" " + getDocumentModel().getPlotElements(0).getComponent();
+        if ( !scriptContext.getDocumentModel().getPlotElements(0).getComponent().equals("") ) {
+            String dsstr= String.valueOf( scriptContext.getDocumentModel().getDataSourceFilters(0).getController().getDataSet() );
+            fileUri= fileUri + " " + dsstr +" " + scriptContext.getDocumentModel().getPlotElements(0).getComponent();
         }
 
-        setTitle(fileUri);
-        writeToPng( String.format( "test%03d_%03d.png", testid, id ) );
+        scriptContext.setTitle(fileUri);
+        scriptContext.writeToPng( String.format( "test%03d_%03d.png", testid, id ) );
 
         System.err.printf( "Read in %9.3f seconds (%s): %s\n", t, label, uri );
     }
@@ -71,8 +73,8 @@ public class Test012 {
     public static void main(String[] args) {
         try {
 
-            getDocumentModel().getOptions().setAutolayout(false);
-            getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+            scriptContext.getDocumentModel().getOptions().setAutolayout(false);
+            scriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
             testid = args.length==1 ? Integer.parseInt(args[0]) : 12; // support running test with java reader test032
 

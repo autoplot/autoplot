@@ -4,6 +4,7 @@
  */
 package test.endtoend;
 
+import org.autoplot.ScriptContext;
 import org.autoplot.dom.Application;
 import org.das2.qds.QDataSet;
 import org.autoplot.jythonsupport.Util;
@@ -17,7 +18,8 @@ import static org.autoplot.ScriptContext.*;
  * @author jbf
  */
 public class Test031 {
-
+    private static ScriptContext scriptContext= ScriptContext.getInstance();
+    
     public static void doTest( int id, String uri ) {
 
         try {
@@ -25,12 +27,12 @@ public class Test031 {
 
             QDataSet bds= (QDataSet) ds.property(QDataSet.BUNDLE_1);
             
-            plot( ds );
-            setTitle( uri );
+            scriptContext.plot( ds );
+            scriptContext.setTitle( uri );
 
             String label= String.format( "test031_%03d", id );
 
-            writeToPng( label+".png" );
+            scriptContext.writeToPng( label+".png" );
             //((MutablePropertyDataSet)bundle1).putProperty( QDataSet.LABEL, uri );
             formatDataSet( ds, label+".qds");
 
@@ -43,7 +45,7 @@ public class Test031 {
 
     public static void main(String[] args) throws Exception  {
         try {
-            Application dom= getDocumentModel();
+            Application dom= scriptContext.getDocumentModel();
             dom.getPlots(0).getXaxis().getController().getDasAxis().setUseDomainDivider(true);
             dom.getPlots(0).getYaxis().getController().getDasAxis().setUseDomainDivider(true);
             dom.getPlots(0).getZaxis().getController().getDasAxis().setUseDomainDivider(true);

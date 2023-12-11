@@ -64,6 +64,8 @@ public class PlotCommand extends PyObject {
 
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
     
+    private ScriptContext scriptContext= ScriptContext.getInstance();
+    
     public static final PyString __doc__ =
         new PyString("<html><H2>plot([index],x,y,z,[named parameters])</H2>"
             + "plot (or plotx) plots the data or URI for data on the canvas.\n"
@@ -219,7 +221,7 @@ public class PlotCommand extends PyObject {
         Column column=null;
         Plot plot=null; // use this plot
         
-        Application dom= ScriptContext.getDocumentModel();
+        Application dom= ScriptContext.getInstance().getDocumentModel();
         String renderType=null;
         for ( int i=0; i<keywords.length; i++  ) {
             if ( keywords[i].equals("renderType" ) ) {
@@ -358,12 +360,12 @@ public class PlotCommand extends PyObject {
         QDataSet[] qargs= new QDataSet[nargs];
 
         if ( nargs==1 && po0 instanceof PyString ) {
-            ScriptContext.plot( iplot, ((PyString) po0).toString());
+            scriptContext.plot( iplot, ((PyString) po0).toString());
         } else if ( nargs==2 && po0 instanceof PyString && args[1] instanceof PyString ) {
             DatumRange drtr= DatumRangeUtil.parseTimeRangeValid(((PyString)args[1]).toString() );
             try{
                 String uri= DataSourceUtil.setTimeRange( ((PyString) po0).toString(), drtr, new NullProgressMonitor() );
-                ScriptContext.plot( iplot, uri );          
+                scriptContext.plot( iplot, uri );          
             } catch ( IOException | URISyntaxException | ParseException ex ) {
                 throw new RuntimeException(ex);
             }
@@ -375,11 +377,11 @@ public class PlotCommand extends PyObject {
             }
 
             if ( nargs==1 ) {  // x
-                ScriptContext.plot( iplot, null, null, qargs[0], renderType, reset );
+                scriptContext.plot( iplot, null, null, qargs[0], renderType, reset );
             } else if ( nargs==2 ) {  // x, y
-                ScriptContext.plot( iplot, null, qargs[0], qargs[1], renderType, reset );
+                scriptContext.plot( iplot, null, qargs[0], qargs[1], renderType, reset );
             } else if ( nargs==3 ) {  // x, y, z
-                ScriptContext.plot( iplot, null, qargs[0], qargs[1], qargs[2], renderType, reset );
+                scriptContext.plot( iplot, null, qargs[0], qargs[1], qargs[2], renderType, reset );
             }
 
         }

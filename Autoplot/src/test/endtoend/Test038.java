@@ -39,7 +39,8 @@ import org.python.core.PyException;
  * @author jbf
  */
 public class Test038 {
-    
+    private static ScriptContext scriptContext= ScriptContext.getInstance();
+        
     static final Logger logger= Logger.getLogger("autoplot");
     
     public static final int COMPLETION_ERROR = -99;
@@ -181,28 +182,28 @@ public class Test038 {
             ScriptContext.formatDataSet( count, "test038."+f.getName()+".cdf?count&append=T" );
             ScriptContext.formatDataSet( positionsds, "test038."+f.getName()+".cdf?position&append=T" );
             
-            ScriptContext.plot(Ops.slice1(rr,0), Ops.slice1(rr,1), Ops.lesserOf(Ops.slice1(rr,2), MAX_COMPLETION_COUNT) );
+            scriptContext.plot(Ops.slice1(rr,0), Ops.slice1(rr,1), Ops.lesserOf(Ops.slice1(rr,2), MAX_COMPLETION_COUNT) );
             QDataSet r= Ops.where( Ops.eq( count, -99 ) );
             
             if ( r.length()>0 ) {
-                Application dom= ScriptContext.getDocumentModel();
+                Application dom= scriptContext.getDocumentModel();
                 int i= (int)r.value(0);
                 String s= String.format("Fail @ %d<br>line=%d col=%d", positions[i], (int)line.value(i), (int)column.value(i) );
                 dom.getController().addAnnotation( dom.getPlots(0), s );
             }
             
-            ScriptContext.waitUntilIdle();
-            ScriptContext.setRenderStyle("digital");
-            ScriptContext.getDocumentModel().getPlotElements(0).setRenderControl("format=%d&fontSize=0.6em");
+            scriptContext.waitUntilIdle();
+            scriptContext.setRenderStyle("digital");
+            scriptContext.getDocumentModel().getPlotElements(0).setRenderControl("format=%d&fontSize=0.6em");
             
-            ScriptContext.getDocumentModel().getPlots(0).getYaxis().setRange( 
+            scriptContext.getDocumentModel().getPlots(0).getYaxis().setRange( 
                     DatumRange.newDatumRange( -1, 120, Units.dimensionless ) );
-            ScriptContext.getDocumentModel().getPlots(0).getXaxis().setLog(false);
+            scriptContext.getDocumentModel().getPlots(0).getXaxis().setLog(false);
             
-            ScriptContext.setTitle( "completions count for "+f.getName() );
+            scriptContext.setTitle( "completions count for "+f.getName() );
             
             String fout= "test038_completions_"+f.getName()+".png";
-            ScriptContext.writeToPng( fout );
+            scriptContext.writeToPng( fout );
             return r.length();
             
         } catch ( Exception ex ) {

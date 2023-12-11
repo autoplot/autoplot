@@ -27,6 +27,7 @@ import org.das2.qds.ops.Ops;
  * @author mmclouth
  */
 public class FFTMultiThreadExperiment {
+    private static ScriptContext scriptContext;
 
     private static ProgressMonitor getMonitor(String label) {
         //DasProgressPanel p = DasProgressPanel.createFramed(label);
@@ -131,17 +132,17 @@ public class FFTMultiThreadExperiment {
             }
 
             
-            ScriptContext.setLayout(4, 1);
+            scriptContext.setLayout(4, 1);
 
             
-            ScriptContext.getDocumentModel().getPlots(2).getYaxis().setRange( DatumRange.newDatumRange(0,10,Units.dimensionless) );
+            scriptContext.getDocumentModel().getPlots(2).getYaxis().setRange( DatumRange.newDatumRange(0,10,Units.dimensionless) );
                     
             //ScriptContext.plot(1, "Times 2", timesTwo);
             //ScriptContext.plot(0, "Times 4", timesFour);
             //ScriptContext.plot(1, "Times 8", timesEight);
             
             try {
-                ScriptContext.writeToPng("/tmp/Experiment1.png");
+                scriptContext.writeToPng("/tmp/Experiment1.png");
             } catch (IOException ex) {
                 Logger.getLogger(FFTMultiThreadExperiment.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -166,9 +167,9 @@ public class FFTMultiThreadExperiment {
         long time = System.currentTimeMillis() - t0;
         //System.err.println("Time for original task: " + time);
 
-        ScriptContext.setLayout(3, 1);
+        scriptContext.setLayout(3, 1);
 
-        ScriptContext.plot(0, out);
+        scriptContext.plot(0, out);
 
         final ProgressMonitor mon1 = getMonitor("task 1");
         final ProgressMonitor mon2 = getMonitor("task 2");
@@ -300,7 +301,7 @@ public class FFTMultiThreadExperiment {
         long time = System.currentTimeMillis() - t0;
         //System.err.println("Time for original task: " + time);
 
-        ScriptContext.setLayout(5, 1);
+        scriptContext.setLayout(5, 1);
 
         //ScriptContext.plot( 0, out );
         final ProgressMonitor mon1 = getMonitor("task 1");
@@ -385,7 +386,7 @@ public class FFTMultiThreadExperiment {
         long time = System.currentTimeMillis() - t0;
         //System.err.println("Time for original task: " + time);
 
-        ScriptContext.setLayout(5, 1);
+        scriptContext.setLayout(5, 1);
 
         //ScriptContext.plot( 0, out );
         final ProgressMonitor mon1 = getMonitor("task 1");

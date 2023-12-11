@@ -15,6 +15,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.autoplot.ScriptContext;
 import static org.autoplot.ScriptContext.*;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
@@ -27,7 +28,7 @@ import org.autoplot.jythonsupport.Util;
  * @author jbf
  */
 public class Test017 {
-
+    private static ScriptContext scriptContext= ScriptContext.getInstance();
     static long t0 = System.currentTimeMillis();
 
     public static void xxx(String id) {
@@ -41,12 +42,12 @@ public class Test017 {
 
         int count;
 
-        setCanvasSize(750, 300);
-        getDocumentModel().getOptions().setAutolayout(false);
-        getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
-        getDocumentModel().getCanvases(0).getMarginColumn().setLeft("5em");
-        getDocumentModel().getCanvases(0).getMarginRow().setTop("2em");
-        getDocumentModel().getCanvases(0).getMarginRow().setBottom("100%-2em");
+        scriptContext.setCanvasSize(750, 300);
+        scriptContext.getDocumentModel().getOptions().setAutolayout(false);
+        scriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+        scriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setLeft("5em");
+        scriptContext.getDocumentModel().getCanvases(0).getMarginRow().setTop("2em");
+        scriptContext.getDocumentModel().getCanvases(0).getMarginRow().setBottom("100%-2em");
 
         xxx("start");
 
@@ -298,11 +299,11 @@ public class Test017 {
                     pw.println("no dep0");
                     pw.close();
                 }
-                plot(ds);
-                setCanvasSize(750, 300);
+                scriptContext.plot(ds);
+                scriptContext.setCanvasSize(750, 300);
                 int i = uri.lastIndexOf("/");
-                setTitle(uri.substring(i + 1));
-                writeToPng(id + ".png");
+                scriptContext.setTitle(uri.substring(i + 1));
+                scriptContext.writeToPng(id + ".png");
                 resultMessage= "okay!";
 
             } catch (Exception ex) {
