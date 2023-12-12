@@ -165,11 +165,11 @@ public class AnnotationController extends DomNodeController {
                 if ( ((String)evt.getNewValue()).length()==0 ) {
                     dasAnnotation.setPlot(null);
                 } else {
-                    Plot oldPlot= (Plot) DomUtil.getElementById( dom, (String)evt.getOldValue() ); 
+                    Plot oldPlot= (Plot) DomUtil.getElementById( dom, (String)evt.getOldValue(), true ); 
                     if ( oldPlot!=null && contextPropertyChangeListener!=null ) {
                         oldPlot.removePropertyChangeListener( PlotController.PROP_ACTIVEDATASET, contextPropertyChangeListener );
                     }
-                    Plot plot= (Plot) DomUtil.getElementById( dom, (String)evt.getNewValue() );                
+                    Plot plot= (Plot) DomUtil.getElementById( dom, (String)evt.getNewValue(), true );                
                     if ( plot!=null && plot.getId().length()>0 ) {
                         LabelConverter lc= new LabelConverter( dom, plot, null, null, annotation );
                         contextPropertyChangeListener = (PropertyChangeEvent evt1) -> {
@@ -189,6 +189,10 @@ public class AnnotationController extends DomNodeController {
                 }
             }
         });
+        
+        String p= annotation.getPlotId();
+        annotation.setPlotId("");
+        annotation.setPlotId(p); // trigger an update
         
         dom.getCanvases(0).addPropertyChangeListener( Canvas.PROP_FONT, new PropertyChangeListener() {
             @Override

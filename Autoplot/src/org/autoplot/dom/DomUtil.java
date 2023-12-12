@@ -437,6 +437,21 @@ public class DomUtil {
         String result = edit.getAsText();
         return result;
     }
+    
+    /**
+     * like getElementById, but return null if the id is an empty string.
+     * @param root
+     * @param id
+     * @param allowEmpty
+     * @return 
+     */
+    public static DomNode getElementById(DomNode root, String id, boolean allowEmpty ) {
+        if ( id.equals("") && allowEmpty ) {
+            return null;
+        } else {
+            return getElementById( root, id );
+        }
+    }
 
     /**
      * return the node with this id, or null if the id is not found.
