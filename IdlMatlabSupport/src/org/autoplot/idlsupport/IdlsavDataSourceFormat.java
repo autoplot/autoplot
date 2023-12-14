@@ -154,10 +154,11 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
             if ( f.length()>Integer.MAX_VALUE ) {
                 throw new IllegalArgumentException("Unable to read large IDLSav files");
             }
-            FileChannel fc= new RandomAccessFile( f, "r" ).getChannel();
-            ByteBuffer byteBuffer = ByteBuffer.allocate((int) f.length());
-            fc.read(byteBuffer);
-            fc.close();
+            ByteBuffer byteBuffer;
+            try (FileChannel fc = new RandomAccessFile( f, "r" ).getChannel()) {
+                byteBuffer = ByteBuffer.allocate((int) f.length());
+                fc.read(byteBuffer);
+            }
             String[] names= reader.readVarNames( byteBuffer );
             for ( String n: names ) {
                 QDataSet v= IdlsavDataSource.getArray( reader, byteBuffer, n );
