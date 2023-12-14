@@ -148,7 +148,7 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
         String append = getParam( "append", "F" );
         WriteIDLSav write= new WriteIDLSav();
 
-        if ( append.equals("T") ) {
+        if ( append.equals("T") ) { 
             ReadIDLSav reader= new ReadIDLSav();
             File f= new File( getResourceURI().getPath() );
             if ( f.length()>Integer.MAX_VALUE ) {
