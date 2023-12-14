@@ -6,6 +6,9 @@ import java.io.FileOutputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsConverter;
 import org.das2.datum.UnitsUtil;
@@ -22,6 +25,12 @@ import org.das2.qds.ops.Ops;
  */
 public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
 
+    /**
+     * Add the data to the container which will be written to an IDLSave file.
+     * @param write the container
+     * @param data the data
+     * @param guessName the name to use, if name is not found within the data.
+     */
     private void doOne( WriteIDLSav write, QDataSet data, String guessName ) {
 
         String su= getParam( "tunits", "t1970" );
@@ -118,6 +127,18 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
         
     }
     
+    private String incrementName( String n ) {
+        if ( Character.isDigit( n.charAt(n.length()-1) ) ) {
+            Pattern p= Pattern.compile("([a-zA-Z_])(d+)");
+            Matcher m= p.matcher(n);
+            if ( m.matches() ) {
+                int d= Integer.parseInt( m.group(2) );
+                return m.group(1)+String.valueOf(d);
+            }
+        }
+        return n+"1";
+    }
+    
     @Override
     public void formatData( String uri, QDataSet data, ProgressMonitor mon ) throws Exception {
 
@@ -127,6 +148,8 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
         String append = getParam( "append", "F" );
         WriteIDLSav write= new WriteIDLSav();
 
+        String guessName= "data";
+        
         if ( append.equals("T") ) { 
             ReadIDLSav reader= new ReadIDLSav();
             File f= new File( getResourceURI().getPath() );
@@ -139,6 +162,9 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
                 fc.read(byteBuffer);
             }
             String[] names= reader.readVarNames( byteBuffer );
+            while ( Arrays.asList(names).contains(guessName.toUpperCase()) ) {
+                guessName= incrementName(guessName);
+            }
             for ( String n: names ) {
                 QDataSet v= IdlsavDataSource.getArray( reader, byteBuffer, n );
                 doOne( write, v, n );
@@ -159,7 +185,7 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
                 doOne( write,dep0,"dep0" );
             }
 
-            doOne( write,data,"data" );
+            doOne( write,data,guessName );
 
             QDataSet dep1= (QDataSet) data.property(QDataSet.DEPEND_1);
             if ( dep1!=null ) {
