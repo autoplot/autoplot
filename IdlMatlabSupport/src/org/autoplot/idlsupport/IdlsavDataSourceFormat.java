@@ -167,9 +167,7 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
         }
                 
         if ( data.rank()!=1 && data.rank()!=2 && data.rank()!=3 ) {
-            if ( append.equals("T") ) {
-                throw new IllegalArgumentException("append does not work with bundle");
-            }
+            //TODO: I don't think this code is ever used.
             if ( SemanticOps.isBundle(data) ) {        
                 formatRank2Bundle( uri, data, write, mon );
                 File f= new File( getResourceURI().toURL().getFile() );
