@@ -43,7 +43,7 @@ public class IdlsavDataSource extends AbstractDataSource {
         super(uri);
     }
 
-    public Object getFromStructure( Map v, String t ) {
+    public static Object getFromStructure( Map v, String t ) {
         int i= t.indexOf('.');
         if ( i==-1 ) {
             return ((Map)v).get(t);
@@ -53,14 +53,14 @@ public class IdlsavDataSource extends AbstractDataSource {
         }
     }
     
-    private Map<String,Object> getUserProperties( ReadIDLSav.ArrayData arr ) {
+    private static Map<String,Object> getUserProperties( ReadIDLSav.ArrayData arr ) {
         Map up= new LinkedHashMap();
         up.put( "fileOffset", arr._fileOffset );
         up.put( "lengthBytes", arr._lengthBytes );
         return up;
     }
     
-    private QDataSet getArray( ReadIDLSav reader, ByteBuffer buffer, String arg ) throws IOException {
+    public static QDataSet getArray( ReadIDLSav reader, ByteBuffer buffer, String arg ) throws IOException {
         Object v;
         
         int i= arg.indexOf('.');
