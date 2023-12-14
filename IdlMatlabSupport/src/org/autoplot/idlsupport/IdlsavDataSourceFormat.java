@@ -7,6 +7,9 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.das2.datum.Units;
@@ -107,12 +110,13 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
             }
         }
         
-        write.addVariable( Ops.guessName(data,guessName), odd );
+        String name = Ops.guessName(data,guessName);
+        write.addVariable( name, odd );
          
     }
     
     
-    private void formatRank2Bundle( String uri, QDataSet data, WriteIDLSav write, ProgressMonitor mon ) throws Exception {
+    private void formatRank2Bundle( String uri, QDataSet data, WriteIDLSav write, String[] names, ProgressMonitor mon ) throws Exception {
         setUri(uri);
 
         QDataSet dep0= (QDataSet) data.property(QDataSet.DEPEND_0);
@@ -122,21 +126,38 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
         
         for ( int i=0; i<data.length(0); i++ ) {
             QDataSet ds1= Ops.unbundle( data, i );
-            doOne( write,ds1,"data"+i );
+            String guessName= maybeIncrementName("data"+i,names);
+            doOne( write,ds1,guessName );
         }  
         
     }
     
-    private String incrementName( String n ) {
-        if ( Character.isDigit( n.charAt(n.length()-1) ) ) {
-            Pattern p= Pattern.compile("([a-zA-Z_])(d+)");
-            Matcher m= p.matcher(n);
-            if ( m.matches() ) {
-                int d= Integer.parseInt( m.group(2) );
-                return m.group(1)+String.valueOf(d);
-            }
+    /**
+     * return a name which is unique from names.
+     * @param n
+     * @param names
+     * @return 
+     */
+    private String maybeIncrementName( String n, String[] names ) {
+        Set<String> nnames;
+        if ( names==null ) {
+            nnames= Collections.emptySet();
+        } else {
+            nnames= new HashSet<>(Arrays.asList(names));
         }
-        return n+"1";
+        if ( nnames.contains(n) ) {
+            if ( Character.isDigit( n.charAt(n.length()-1) ) ) {
+                Pattern p= Pattern.compile("([a-zA-Z_])(d+)");
+                Matcher m= p.matcher(n);
+                if ( m.matches() ) {
+                    int d= Integer.parseInt( m.group(2) );
+                    return m.group(1)+String.valueOf(d);
+                }
+            }
+            return n+"1";
+        } else {
+            return n;
+        }
     }
     
     @Override
@@ -149,6 +170,7 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
         WriteIDLSav write= new WriteIDLSav();
 
         String guessName= "data";
+        String[] names= new String[0];
         
         if ( append.equals("T") ) { 
             ReadIDLSav reader= new ReadIDLSav();
@@ -161,23 +183,17 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
                 byteBuffer = ByteBuffer.allocate((int) f.length());
                 fc.read(byteBuffer);
             }
-            String[] names= reader.readVarNames( byteBuffer );
-            while ( Arrays.asList(names).contains(guessName.toUpperCase()) ) {
-                guessName= incrementName(guessName);
-            }
+            names= reader.readVarNames( byteBuffer );
+            guessName= maybeIncrementName(guessName,names);
             for ( String n: names ) {
                 QDataSet v= IdlsavDataSource.getArray( reader, byteBuffer, n );
                 doOne( write, v, n );
             }
         }
                 
-        if ( data.rank()!=1 && data.rank()!=2 && data.rank()!=3 ) {
-            //TODO: I don't think this code is ever used.
-            if ( SemanticOps.isBundle(data) ) {        
-                formatRank2Bundle( uri, data, write, mon );
-            } else {
-                throw new IllegalArgumentException("not supported, rank "+data.rank() );
-            }
+        if ( data.rank()==2 &&  SemanticOps.isBundle(data) ) {
+            formatRank2Bundle( uri, data, write, names, mon );
+
         } else {
 
             QDataSet dep0= (QDataSet) data.property(QDataSet.DEPEND_0);
