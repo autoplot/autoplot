@@ -202,7 +202,7 @@ public class AddAnnotationDialog extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        GrannyTextEditor edit= GraphUtil.newGrannyTextEditor();
+        GrannyTextEditor edit= AutoplotUI.newGrannyTextEditorWithMacros();
         edit.setValue( jTextField1.getText() );
         if ( JOptionPane.OK_OPTION==
                 JOptionPane.showConfirmDialog( this, edit, GrannyTextEditor.EDITOR_TITLE, JOptionPane.OK_CANCEL_OPTION ) ) {

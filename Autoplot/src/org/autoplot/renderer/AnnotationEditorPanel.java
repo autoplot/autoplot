@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
+import org.autoplot.AutoplotUI;
 import org.autoplot.AutoplotUtil;
 import org.autoplot.dom.Annotation;
 import org.autoplot.dom.Canvas;
@@ -733,7 +734,7 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_useUrlActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        GrannyTextEditor textedit= GraphUtil.newGrannyTextEditor();
+        GrannyTextEditor textedit= AutoplotUI.newGrannyTextEditorWithMacros();
         textedit.setValue( this.textField.getText() );
         if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( this, textedit, "Edit Text", JOptionPane.OK_CANCEL_OPTION ) ) {
             this.textField.setText( textedit.getValue() );

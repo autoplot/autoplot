@@ -180,6 +180,7 @@ import org.autoplot.util.DataSetSelectorStringSchemeEditor;
 import org.autoplot.util.FontStringSchemeEditor;
 import org.autoplot.util.LayoutStringSchemeEditor;
 import org.autoplot.util.PlotDataMashupResolver;
+import org.das2.components.GrannyTextEditor;
 import org.das2.components.propertyeditor.TickValuesStringSchemeEditor;
 import org.das2.graph.GraphUtil;
 import org.das2.components.propertyeditor.SpecialColorsStringSchemeEditor;
@@ -238,6 +239,19 @@ public final class AutoplotUI extends javax.swing.JFrame {
             }
         };
         new Thread(run).start();
+    }
+    
+    /**
+     * Autoplot adds additional macros to granny text strings for annotations and titles.
+     * @return editor with extra tab.
+     */
+    public static GrannyTextEditor newGrannyTextEditorWithMacros() {
+        GrannyTextEditor edit= GraphUtil.newGrannyTextEditor();
+        edit.addButton( "macros", "%{CONTEXT} with format", "%{CONTEXT,format=%d}" );
+        edit.addButton( "macros", "%{CONTEXT} with time", "%{CONTEXT,format=$H:$M}" );
+        edit.addButton( "macros", "%{CONTEXT} with name", "%{CONTEXT,name=pitch}" );
+        edit.addButton( "macros", "%{TIMERANGE}", "%{TIMERANGE}" );
+        return edit;
     }
 
     final String TAB_TOOLTIP_CANVAS = "<html>Canvas tab contains the plot and plot elements.<br>Click on plot elements to select.<br>%s</html>";
@@ -1219,9 +1233,9 @@ public final class AutoplotUI extends javax.swing.JFrame {
             PropertyEditor.addStringEditor("tickValues", new TickValuesStringSchemeEditor() );
             PropertyEditor.addStringEditor("specialColors", new SpecialColorsStringSchemeEditor() );
             PropertyEditor.addStringEditor("autoRangeHints", new AutoRangeHintsStringSchemeEditor() );
-            PropertyEditor.addStringEditor("label", GraphUtil.newGrannyTextEditor() );
-            PropertyEditor.addStringEditor("title", GraphUtil.newGrannyTextEditor() );
-            PropertyEditor.addStringEditor("org.autoplot.dom.Annotation","text", GraphUtil.newGrannyTextEditor() ); //TODO: this will surely cause problems...
+            PropertyEditor.addStringEditor("label", newGrannyTextEditorWithMacros() );
+            PropertyEditor.addStringEditor("title", newGrannyTextEditorWithMacros() );
+            PropertyEditor.addStringEditor("org.autoplot.dom.Annotation","text", newGrannyTextEditorWithMacros() ); 
             PropertyEditor.addStringEditor("legendLabel", GraphUtil.newGrannyTextEditor() ); 
             PropertyEditor.addStringEditor("colorbarColumnPosition", new LayoutStringSchemeEditor(true, "H") );
             PropertyEditor.addStringEditor("top", new LayoutStringSchemeEditor(false, "T") );

@@ -908,7 +908,7 @@ public class AxisPanel extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
     private void addEditGrannyText( JTextField textField ) {        
-        GrannyTextEditor gte= GraphUtil.newGrannyTextEditor();
+        GrannyTextEditor gte= AutoplotUI.newGrannyTextEditorWithMacros();
         gte.setValue( textField.getText() );
         if ( JOptionPane.OK_OPTION==
                 JOptionPane.showConfirmDialog( this, gte, "Granny Text Editor", JOptionPane.OK_CANCEL_OPTION ) ) {
