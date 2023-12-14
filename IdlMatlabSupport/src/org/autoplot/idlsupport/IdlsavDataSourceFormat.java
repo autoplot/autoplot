@@ -176,7 +176,6 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
                 try (FileOutputStream fos = new FileOutputStream(f)) {
                     write.write( fos );
                 }
-                return;
             } else {
                 throw new IllegalArgumentException("not supported, rank "+data.rank() );
             }
