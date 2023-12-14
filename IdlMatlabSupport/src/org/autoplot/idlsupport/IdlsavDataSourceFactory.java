@@ -206,8 +206,9 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
     @Override
     public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
         
-        if ( file==null ) {
-            file= DataSetURI.getFile( cc.resourceURI, mon );
+        File thefile= DataSetURI.getFile( cc.resourceURI, mon );
+        if ( file==null || !thefile.equals(file) ) {
+            file= thefile;
             buf= ReadIDLSav.readFileIntoByteBuffer(file);
             reader= new ReadIDLSav();
             names= reader.readVarNames(buf);
