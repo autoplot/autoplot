@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Experiments with adding <a href="https://sourceforge.net/p/autoplot/feature-requests/417/">"format" control</a> to %{CONTEXT} macro look promising.</small></p>
+        <p><small>Interesting screen encountered while parsing PDS3 binary files from Juno/JADE from PDS-PPI.  Wouldn't it be nice to have a PDS3 parser?  <a href="https://groups.google.com/g/autoplot">Let me know</a> if you agree!</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -32,6 +32,8 @@
                 
         <p>Bugfixes (2023-12-13 r27414):</p>
         <ul>
+            <li><a href="https://github.com/das-developers/das2java/issues/47">47</a>: annotation properly clips when splitAnchorType is used.
+            <li>Bugfix for completions when reading an IDLSav file, internal cache didn't reset.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2573/">2573</a>: annotation didn't properly listen to the ACTIVEDATASET property and would fail to update %{CONTEXT}.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2571/">2571</a>: detect when channel names are inconsistent where subsampling channels is not desirable.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2570/">2570</a>: fix annotation when pointAt is used
@@ -72,7 +74,7 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>Export to IDLSav now has append=T control.
+            <li>Export to IDLSav now has append=T control; supports all rank data; and supports rank 2 bundle.
             <li><a href='https://sourceforge.net/p/autoplot/feature-requests/417/'>417</a>: more control over %{CONTEXT}.
             <li><a href='https://github.com/das-developers/das2java/issues/89'>89</a>: add &amp;parallel; and &amp;npar; to Entities.java.
             <li>various improvements to Jython to Java converter.
