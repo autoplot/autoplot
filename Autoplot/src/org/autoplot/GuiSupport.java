@@ -146,7 +146,9 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.xml.sax.SAXException;
 import ZoeloeSoft.projects.JFontChooser.JFontChooser;
+import org.autoplot.renderer.AnnotationEditorPanel;
 import org.das2.components.propertyeditor.EnumerationEditor;
+import org.das2.datum.Datum;
 import org.das2.graph.DasColorBar;
 
 /**
@@ -2497,14 +2499,18 @@ public class GuiSupport {
             @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);
-                AddAnnotationDialog dia= new AddAnnotationDialog();
-                dia.setPointAtX( plot.getXAxis().invTransform( plot.getDasMouseInputAdapter().getMousePressPositionOnCanvas().x ) );
-                dia.setPointAtY( plot.getYAxis().invTransform( plot.getDasMouseInputAdapter().getMousePressPositionOnCanvas().y ) );
-                if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( app, dia, "Add Annotation", JOptionPane.OK_CANCEL_OPTION ) ) {
-                    Annotation ann= controller.addAnnotation( domPlot, dia.getText() );
-                    dia.configure(ann);
-                    ann.setAnchorOffset("1em,1em");
-                    ann.setFontSize("1.4em");
+                AnnotationEditorPanel p= new AnnotationEditorPanel();
+                Annotation ann= new Annotation();
+                ann.setPlotId( domPlot.getId() );
+                Datum datax= plot.getXAxis().invTransform( plot.getDasMouseInputAdapter().getMousePressPositionOnCanvas().x );
+                Datum datay= plot.getYAxis().invTransform( plot.getDasMouseInputAdapter().getMousePressPositionOnCanvas().y );
+                ann.setPointAtX( datax );
+                ann.setPointAtY( datay );
+                ann.setXrange( DatumRange.newRange( datax, datax ) );
+                ann.setYrange( DatumRange.newRange( datay, datay ) );
+                p.doBindings(ann);
+                if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( app, p, "Add Annotation", JOptionPane.OK_CANCEL_OPTION ) ) {
+                    controller.addAnnotation( ann );
                 }
             }
         }));
