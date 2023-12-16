@@ -109,6 +109,9 @@
               </StringArray>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="plotIdComboBoxActionPerformed"/>
+          </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
           </AuxValues>
@@ -289,6 +292,8 @@
         </Component>
       </SubComponents>
     </Container>
+    <Component class="javax.swing.ButtonGroup" name="verticalButtonGroup">
+    </Component>
   </NonVisualComponents>
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
@@ -313,27 +318,32 @@
                       <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="dataAnchorTypeButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="plotAnchorTypeButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jPanel1" max="32767" attributes="0"/>
                   </Group>
                   <Component id="textUrlPanel" alignment="1" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
-                      <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                          <Group type="102" attributes="0">
-                              <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="anchorPositionPanel" max="32767" attributes="0"/>
-                          </Group>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="103" alignment="0" groupAlignment="1" attributes="0">
-                                  <Component id="customColorsPanel" alignment="1" min="-2" max="-2" attributes="0"/>
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Component id="jLabel13" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="anchorOffsetTF" min="-2" pref="203" max="-2" attributes="0"/>
-                                  </Group>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                              <Group type="102" attributes="0">
+                                  <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="anchorPositionPanel" max="32767" attributes="0"/>
                               </Group>
-                              <Component id="customColorsCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
+                                      <Component id="customColorsPanel" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Component id="customColorsCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="jLabel13" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="anchorOffsetTF" min="-2" pref="203" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
@@ -342,7 +352,7 @@
                               <Component id="pointAtCheckBox" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
-                          <Group type="102" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
                               <EmptySpace min="22" pref="22" max="-2" attributes="0"/>
                               <Component id="pointAtPanel" max="32767" attributes="0"/>
                           </Group>
@@ -383,11 +393,12 @@
                   <Group type="103" alignment="0" groupAlignment="3" attributes="0">
                       <Component id="jLabel3" alignment="3" max="32767" attributes="0"/>
                       <Component id="dataAnchorTypeButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="plotAnchorTypeButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="anchorToPanel" min="-2" pref="43" max="-2" attributes="0"/>
+              <Component id="anchorToPanel" min="-2" pref="52" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                   <Component id="jLabel2" pref="21" max="32767" attributes="0"/>
@@ -413,7 +424,7 @@
                   </Group>
                   <Component id="pointAtPanel" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="58" max="32767" attributes="0"/>
+              <EmptySpace pref="49" max="32767" attributes="0"/>
               <Component id="linkyLabelPanel" min="-2" pref="20" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -441,9 +452,16 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
                   <Component id="canvasAnchorTypeButton" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                  <Component id="jCheckBox1" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="ydataAnchor" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="yplotAnchor" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="ycanvasAnchor" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -451,7 +469,13 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
                   <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                  <Component id="canvasAnchorTypeButton" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="canvasAnchorTypeButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jCheckBox1" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="ydataAnchor" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="yplotAnchor" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="ycanvasAnchor" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
               </Group>
           </Group>
         </DimensionLayout>
@@ -464,10 +488,42 @@
             </Property>
             <Property name="selected" type="boolean" value="true"/>
             <Property name="text" type="java.lang.String" value="Canvas"/>
+            <Property name="toolTipText" type="java.lang.String" value="Annotation is anchored to a row and column on the canvas, or to the canvas itsself."/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="canvasAnchorTypeButtonActionPerformed"/>
           </Events>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="jCheckBox1">
+          <Properties>
+            <Property name="selected" type="boolean" value="false"/>
+            <Property name="text" type="java.lang.String" value="vertical anchor:"/>
+            <Property name="toolTipText" type="java.lang.String" value="Anchor vertical to this instead"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="ydataAnchor">
+          <Properties>
+            <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+              <ComponentRef name="verticalButtonGroup"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Data"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="yplotAnchor">
+          <Properties>
+            <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+              <ComponentRef name="verticalButtonGroup"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Plot"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="ycanvasAnchor">
+          <Properties>
+            <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+              <ComponentRef name="verticalButtonGroup"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Canvas"/>
+          </Properties>
         </Component>
       </SubComponents>
     </Container>
@@ -477,6 +533,7 @@
           <ComponentRef name="buttonGroup1"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Data"/>
+        <Property name="toolTipText" type="java.lang.String" value="Annotation is anchored to the data itself, using xrange and yrange properties"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dataAnchorTypeButtonActionPerformed"/>
@@ -620,6 +677,8 @@
           <ComponentRef name="typeButtonGroup"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Image URL:"/>
+        <Property name="toolTipText" type="java.lang.String" value="This is no longer supported, see image in granny strings"/>
+        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="useUrlActionPerformed"/>
@@ -634,25 +693,42 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
-                  <Component id="jLabel14" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="pointAtXTF" min="-2" pref="133" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jLabel15" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="pointAtYTF" min="-2" pref="123" max="-2" attributes="0"/>
+              <Group type="102" attributes="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" attributes="0">
+                          <Component id="jLabel14" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="pointAtXTF" min="-2" pref="133" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="jLabel15" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="pointAtYTF" min="-2" pref="123" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" attributes="0">
+                          <Component id="jLabel17" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="pointAtOffsetCB" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jLabel14" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="pointAtXTF" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLabel15" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="pointAtYTF" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Group type="102" attributes="0">
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jLabel14" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="pointAtXTF" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jLabel15" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="pointAtYTF" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jLabel17" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="pointAtOffsetCB" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -678,6 +754,28 @@
             <Property name="text" type="java.lang.String" value="0.0"/>
           </Properties>
         </Component>
+        <Component class="javax.swing.JLabel" name="jLabel17">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="point at offset:"/>
+            <Property name="toolTipText" type="java.lang.String" value="Amount to back off from the target"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JComboBox" name="pointAtOffsetCB">
+          <Properties>
+            <Property name="editable" type="boolean" value="true"/>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+              <StringArray count="4">
+                <StringItem index="0" value="0em"/>
+                <StringItem index="1" value="0.5em"/>
+                <StringItem index="2" value="1em"/>
+                <StringItem index="3" value=""/>
+              </StringArray>
+            </Property>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+          </AuxValues>
+        </Component>
       </SubComponents>
     </Container>
     <Component class="javax.swing.JLabel" name="jLabel16">
@@ -693,5 +791,17 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
     </Container>
+    <Component class="javax.swing.JRadioButton" name="plotAnchorTypeButton">
+      <Properties>
+        <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+          <ComponentRef name="buttonGroup1"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="Plot"/>
+        <Property name="toolTipText" type="java.lang.String" value="Annotation is anchored to the plot, can can refer to context and the data.  "/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="plotAnchorTypeButtonActionPerformed"/>
+      </Events>
+    </Component>
   </SubComponents>
 </Form>

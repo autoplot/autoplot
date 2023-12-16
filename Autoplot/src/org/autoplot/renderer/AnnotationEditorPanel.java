@@ -202,6 +202,7 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         addBinding( bc, ann, Annotation.PROP_SHOWARROW, pointAtCheckBox, "selected" );
         addBinding( bc, ann, Annotation.PROP_POINTATX, pointAtXTF, "text_ON_ACTION_OR_FOCUS_LOST", getDatumToStringConverter() );
         addBinding( bc, ann, Annotation.PROP_POINTATY, pointAtYTF, "text_ON_ACTION_OR_FOCUS_LOST", getDatumToStringConverter() );
+        addBinding( bc, ann, Annotation.PROP_POINTATOFFSET, pointAtOffsetCB, "selectedItem" );
         addBinding( bc, ann, Annotation.PROP_BORDERTYPE, borderTypeEnumerationEditor, "value" );
         bc.bind();
         
@@ -275,11 +276,16 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         textFieldPanel = new javax.swing.JPanel();
         textField = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
+        verticalButtonGroup = new javax.swing.ButtonGroup();
         jLabel2 = new javax.swing.JLabel();
         anchorPositionPanel = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         canvasAnchorTypeButton = new javax.swing.JRadioButton();
+        jCheckBox1 = new javax.swing.JCheckBox();
+        ydataAnchor = new javax.swing.JRadioButton();
+        yplotAnchor = new javax.swing.JRadioButton();
+        ycanvasAnchor = new javax.swing.JRadioButton();
         dataAnchorTypeButton = new javax.swing.JRadioButton();
         customColorsCheckBox = new javax.swing.JCheckBox();
         anchorToPanel = new javax.swing.JPanel();
@@ -301,9 +307,12 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         jLabel15 = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
         pointAtYTF = new javax.swing.JTextField();
+        jLabel17 = new javax.swing.JLabel();
+        pointAtOffsetCB = new javax.swing.JComboBox<>();
         jLabel16 = new javax.swing.JLabel();
         borderTypePanel = new javax.swing.JPanel();
         linkyLabelPanel = new javax.swing.JPanel();
+        plotAnchorTypeButton = new javax.swing.JRadioButton();
 
         dataControlPanel.setAlignmentX(0.0F);
         dataControlPanel.setAlignmentY(0.0F);
@@ -353,6 +362,11 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         jLabel9.setText("Plot containing annotation:");
 
         plotIdComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        plotIdComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                plotIdComboBoxActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout plotControlPanelLayout = new javax.swing.GroupLayout(plotControlPanel);
         plotControlPanel.setLayout(plotControlPanelLayout);
@@ -465,30 +479,57 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         buttonGroup1.add(canvasAnchorTypeButton);
         canvasAnchorTypeButton.setSelected(true);
         canvasAnchorTypeButton.setText("Canvas");
+        canvasAnchorTypeButton.setToolTipText("Annotation is anchored to a row and column on the canvas, or to the canvas itsself.");
         canvasAnchorTypeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 canvasAnchorTypeButtonActionPerformed(evt);
             }
         });
 
+        jCheckBox1.setSelected(false);
+        jCheckBox1.setText("vertical anchor:");
+        jCheckBox1.setToolTipText("Anchor vertical to this instead");
+
+        verticalButtonGroup.add(ydataAnchor);
+        ydataAnchor.setText("Data");
+
+        verticalButtonGroup.add(yplotAnchor);
+        yplotAnchor.setText("Plot");
+
+        verticalButtonGroup.add(ycanvasAnchor);
+        ycanvasAnchor.setText("Canvas");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
                 .addComponent(canvasAnchorTypeButton)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(jCheckBox1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(ydataAnchor)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(yplotAnchor)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(ycanvasAnchor)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(canvasAnchorTypeButton))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(canvasAnchorTypeButton)
+                    .addComponent(jCheckBox1)
+                    .addComponent(ydataAnchor)
+                    .addComponent(yplotAnchor)
+                    .addComponent(ycanvasAnchor)))
         );
 
         buttonGroup1.add(dataAnchorTypeButton);
         dataAnchorTypeButton.setText("Data");
+        dataAnchorTypeButton.setToolTipText("Annotation is anchored to the data itself, using xrange and yrange properties");
         dataAnchorTypeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 dataAnchorTypeButtonActionPerformed(evt);
@@ -573,6 +614,8 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
 
         typeButtonGroup.add(useUrl);
         useUrl.setText("Image URL:");
+        useUrl.setToolTipText("This is no longer supported, see image in granny strings");
+        useUrl.setEnabled(false);
         useUrl.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 useUrlActionPerformed(evt);
@@ -589,27 +632,45 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
 
         pointAtYTF.setText("0.0");
 
+        jLabel17.setText("point at offset:");
+        jLabel17.setToolTipText("Amount to back off from the target");
+
+        pointAtOffsetCB.setEditable(true);
+        pointAtOffsetCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0em", "0.5em", "1em", "" }));
+
         javax.swing.GroupLayout pointAtPanelLayout = new javax.swing.GroupLayout(pointAtPanel);
         pointAtPanel.setLayout(pointAtPanelLayout);
         pointAtPanelLayout.setHorizontalGroup(
             pointAtPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pointAtPanelLayout.createSequentialGroup()
-                .addComponent(jLabel14)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pointAtXTF, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel15)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pointAtYTF, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(pointAtPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pointAtPanelLayout.createSequentialGroup()
+                        .addComponent(jLabel14)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pointAtXTF, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel15)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pointAtYTF, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(pointAtPanelLayout.createSequentialGroup()
+                        .addComponent(jLabel17)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pointAtOffsetCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pointAtPanelLayout.setVerticalGroup(
             pointAtPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pointAtPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(jLabel14)
-                .addComponent(pointAtXTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(jLabel15)
-                .addComponent(pointAtYTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(pointAtPanelLayout.createSequentialGroup()
+                .addGroup(pointAtPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel14)
+                    .addComponent(pointAtXTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel15)
+                    .addComponent(pointAtYTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pointAtPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel17)
+                    .addComponent(pointAtOffsetCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jLabel16.setText("Border Type:");
@@ -617,6 +678,15 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         borderTypePanel.setLayout(new java.awt.BorderLayout());
 
         linkyLabelPanel.setLayout(new java.awt.BorderLayout());
+
+        buttonGroup1.add(plotAnchorTypeButton);
+        plotAnchorTypeButton.setText("Plot");
+        plotAnchorTypeButton.setToolTipText("Annotation is anchored to the plot, can can refer to context and the data.  ");
+        plotAnchorTypeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                plotAnchorTypeButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -630,23 +700,27 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(dataAnchorTypeButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(plotAnchorTypeButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(textUrlPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(jLabel2)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(anchorPositionPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(25, 25, 25)
+                                        .addComponent(customColorsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(customColorsCheckBox)))
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2)
+                                .addComponent(jLabel13)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(anchorPositionPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(customColorsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                        .addComponent(jLabel13)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(anchorOffsetTF, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addComponent(customColorsCheckBox)))
+                                .addComponent(anchorOffsetTF, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -681,10 +755,11 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(dataAnchorTypeButton))
+                        .addComponent(dataAnchorTypeButton)
+                        .addComponent(plotAnchorTypeButton))
                     .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(anchorToPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(anchorToPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 21, Short.MAX_VALUE)
@@ -705,7 +780,7 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(customColorsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(pointAtPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 58, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
                 .addComponent(linkyLabelPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -742,6 +817,16 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void plotAnchorTypeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotAnchorTypeButtonActionPerformed
+        if ( plotAnchorTypeButton.isSelected() ) {
+            setAnchorType(AnchorType.PLOT);
+        }
+    }//GEN-LAST:event_plotAnchorTypeButtonActionPerformed
+
+    private void plotIdComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotIdComboBoxActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_plotIdComboBoxActionPerformed
+
     public static void main( String[] args ) {
         AnnotationEditorPanel p= new AnnotationEditorPanel();
         Annotation a= new Annotation();
@@ -767,6 +852,7 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
     private javax.swing.JPanel dataControlPanel;
     private javax.swing.JPanel foregroundColorPanel;
     private javax.swing.JButton jButton1;
+    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -775,6 +861,7 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -785,9 +872,11 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel linkyLabelPanel;
+    private javax.swing.JRadioButton plotAnchorTypeButton;
     private javax.swing.JPanel plotControlPanel;
     private javax.swing.JComboBox<String> plotIdComboBox;
     private javax.swing.JCheckBox pointAtCheckBox;
+    private javax.swing.JComboBox<String> pointAtOffsetCB;
     private javax.swing.JPanel pointAtPanel;
     private javax.swing.JTextField pointAtXTF;
     private javax.swing.JTextField pointAtYTF;
@@ -801,7 +890,11 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
     private javax.swing.JPanel urlPanel;
     private javax.swing.JTextField urlTextField;
     private javax.swing.JRadioButton useUrl;
+    private javax.swing.ButtonGroup verticalButtonGroup;
     private javax.swing.JPanel xrangePanel;
+    private javax.swing.JRadioButton ycanvasAnchor;
+    private javax.swing.JRadioButton ydataAnchor;
+    private javax.swing.JRadioButton yplotAnchor;
     private javax.swing.JPanel yrangePanel;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
