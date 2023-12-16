@@ -552,6 +552,8 @@ public class DomOps {
         } finally {
             dom.options.setAutolayout(autoLayout);
         }
+        
+        dom.getController().waitUntilIdle();
     }
 
     /**
