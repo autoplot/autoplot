@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Interesting screen encountered while parsing PDS3 binary files from Juno/JADE from PDS-PPI.  Wouldn't it be nice to have a PDS3 parser?  <a href="https://groups.google.com/g/autoplot">Let me know</a> if you agree!</small></p>
+        <p><small>More wintery view of the bytes of PDS3 JADE files.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,13 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2023-12-15 r27428):</p>
+        <p>Bugfixes (2023-12-16 r27432):</p>
         <ul>
+            <li>Always use edit annotation, even for new annotations.
+            <li>Updates to the edit annotation dialog, including anchorType="plot".
+        </ul>
+        <p>Older Bugfixes (2023-12-15 r27428):</p>
+        <ul> 
             <li><a href="https://github.com/das-developers/das2java/issues/47">47</a>: annotation properly clips when splitAnchorType is used.
             <li>Bugfix for completions when reading an IDLSav file, internal cache didn't reset.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2573/">2573</a>: annotation didn't properly listen to the ACTIVEDATASET property and would fail to update %{CONTEXT}.
@@ -51,48 +56,16 @@
             <li>Don't treat %Y the same as $Y.  Reserve percents for Python string formatting.
             <li>Improvements and bugfixes with Jython to Java converter.
         </ul>
-        <p>Older Bugfixes (2023-11-17 r27321):</p>
-        <ul> 
-            <li><a href="https://github.com/das-developers/das2java/issues/84">84</a>: Correct "java.lang.IllegalStateException: Already connected" when getting a second file listing of restricted web site.  Thanks, Bill!
-            <li>bugfix in Das2Server where very large DSDF could cause runtime error.  Thanks, Chris!
-            <li>bugfix when string parameter is "https://....", where it mistook the parameter in logic to handle "opt1: opt1 explanation". 
-            <li><a href="https://github.com/das-developers/das2java/issues/83">83</a>: LogLin tick positions mode for log axes had a bug.  Thanks, James!
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/811/">811</a>: copy of rows and marginRow needed to do this correctly.
-            <li><a href="https://github.com/das-developers/das2java/issues/66">66</a>: OutsideSE Legend with multiple lines fixed.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2563/">2563</a>: resize plot when binding scales resets range instead of scales.
-            <li>toTimeDataSet(1999,12,31,0,0,0,0) (all rank 0 scalars) works now.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2564/">2564</a>: HAPI CSV redirect was failing.
-            <li>Valid ISO8601 range 20000101T1300Z/1400Z now parses.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2562/">2562</a>: HAPI server events list doesn't include nominal units with Events List Tool
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2560/">2560</a>: appliedFilters=' ' resulted in extra line (!c) being added to title.  Thanks, Ivar!
-            <li>don't make the last highlited log message stack trace be the console tooltip, since this makes the GUI hard to use.  The "AP>" prompt still has the text.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2558/">2558</a>: improve support for long-array-backed CDF_TT2000 timetags, properly handling times to nanosecond resolution.  Thanks, Connor!
-            <li>make sure all time generators in Run Batch generate times which Run Batch can use. Thanks, Sadie!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2556/">2556</a>: support rank 2 waveform with units of seconds in metadata tab.  Thanks, Sadie!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2556/">2556</a>: correction to Jython editor error highliting, where extra line was drawn.  Thanks, Sadie!
-            <li>remove old test which unnecessarily abandoned the tick bounds calculation when more lines were requested for ticks than needed.
-        </ul>
         <p>Features:</p>
         <ul>
+        </ul>
+        <p>Less recent features:</p>
+        <ul> 
             <li>Export to IDLSav now has append=T control; supports all rank data; and supports rank 2 bundle.
             <li><a href='https://sourceforge.net/p/autoplot/feature-requests/417/'>417</a>: more control over %{CONTEXT}.
             <li><a href='https://github.com/das-developers/das2java/issues/89'>89</a>: add &amp;parallel; and &amp;npar; to Entities.java.
             <li>various improvements to Jython to Java converter.
             <li><a href="https://github.com/das-developers/das2docs/issues/3">3</a>: Initial support for Das2Server parameters GUI.
-        </ul>
-        <p>Less recent features:</p>
-        <ul> 
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/816/">rfe816</a>: add save-to-pngwalk action.
-            <li>simple editor colors GUI also loads and saves configurations.
-            <li>Jython fileExists function supports remote filesystems.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2564/">2563</a>: Colorbar has context menu item to switch to different colorbar.
-            <li>DasAxis format supports %04X for hexidecimal ticks.
-            <li><a href="https://github.com/das-developers/das2java/issues/82">82</a>: DasRow and DasColumn now have top/bottom right/left control string property, minLayout/,maxLayout, simplifying Autoplot and contains complexity within one Das2 class.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/814/">rfe814</a>: support run batch output file with file_%04d.png for template, allowing more control over formatting.  Thanks, Sadie!
-            <li>Support Jython completions based on "a,b=1,2" tuple assignment and matching.  Thanks, Connor!
-            <li>"file:" locations for scripting documentation now works.  Thanks, Kristoff!
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/811/">rfe811</a>: new dialog for fix layout includes options to move legends and remove gaps, show preview.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/811/">rfe811</a>: plot.ephemerisLineCount property added, so that the layout can be done before ephemeris is loaded.
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
