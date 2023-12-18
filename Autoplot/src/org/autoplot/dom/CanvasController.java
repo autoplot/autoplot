@@ -14,6 +14,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.geom.GeneralPath;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -141,7 +144,14 @@ public class CanvasController extends DomNodeController {
         this.dasCanvas = canvas;
 
         ApplicationController ac = dom.controller;
-
+        dasCanvas.addMouseListener( new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                dom.getController().setPlotElement(null);
+                dom.getController().setStatus("ready");
+            }
+            
+        });
         dasCanvas.addComponentListener(new ComponentListener() {
             @Override
             public void componentResized(ComponentEvent e) {
