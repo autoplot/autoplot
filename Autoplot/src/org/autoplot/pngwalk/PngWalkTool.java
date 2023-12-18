@@ -64,6 +64,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
@@ -784,7 +785,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
             if ( !f.getName().endsWith(".pngwalk") ) {
                 f= new File( f.getAbsolutePath() + ".pngwalk" );
             }
-            prefs.put( PngWalkTool.PREF_RECENT, f.getName() );
+            prefs.put( PngWalkTool.PREF_RECENT, f.getAbsolutePath() );
             try ( PrintWriter w= new PrintWriter(f) ) {
                 if ( parent.baseurl.length()==0 ) {
                     String t= parent.getTemplate();
@@ -803,11 +804,17 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     }
                     w.println( "timeFormat="+s );
                 }
-                if ( parent.getQCTUrl()!=null && parent.getQCTUrl().length()>0 ) {
-                    w.println( "qcturl="+parent.getQCTUrl() );
+                String pwd= chooser.getSelectedFile().getParent();
+                w.println( "pwd="+ pwd );
+                if ( isQualityControlEnabled() ) {
+                    if ( parent.getQCTUrl()!=null ) {
+                        w.println( "qcturl="+parent.getQCTUrl() );
+                    } else {
+                        w.println( "qcturl="+"file://"+pwd );
+                    }
                 }
-                w.println( "pwd="+ chooser.getSelectedFile().getParent() );
             }
+            parent.setStatus(".pngwalk file saved: "+f);
         }
     }
     
