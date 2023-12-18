@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>More wintery view of the bytes of PDS3 JADE files.</small></p>
+        <p><small>Huge scatter color selection.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -32,6 +32,7 @@
                 
         <p>Bugfixes (2023-12-16 r27432):</p>
         <ul>
+            <li>suppress useless "not supported: block" message on stderr.
             <li>Always use edit annotation, even for new annotations.
             <li>Updates to the edit annotation dialog, including anchorType="plot".
         </ul>
@@ -58,6 +59,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Write to pngwalk file will add quality to the save directory, if it is enabled.
         </ul>
         <p>Less recent features:</p>
         <ul> 
