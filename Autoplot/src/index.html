@@ -32,6 +32,8 @@
                 
         <p>Bugfixes (2023-12-16 r27432):</p>
         <ul>
+            <li>RunBatch had code which assumed min and max values were both the same type (not 0,4.5).
+            <li>fftPower had branch which assumed xtags had units.
             <li>suppress useless "not supported: block" message on stderr.
             <li>Always use edit annotation, even for new annotations.
             <li>Updates to the edit annotation dialog, including anchorType="plot".
