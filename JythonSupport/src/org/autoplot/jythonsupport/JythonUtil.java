@@ -2065,8 +2065,8 @@ public class JythonUtil {
                 }
                 PyObject pymax= pyDict.get( new PyString("max"), null );
                 if ( pymax!=null ) {
-                    if ( pymin instanceof PyInteger ) {
-                        constraints.put( "max", ((PyInteger)pymax).__tojava__(Integer.class) );
+                    if ( pymax instanceof PyInteger ) {
+                        constraints.put( "max", (pymax).__tojava__(Integer.class) );
                     } else {
                         constraints.put( "max", Double.parseDouble( pymax.__str__().toString() ) );
                     }
