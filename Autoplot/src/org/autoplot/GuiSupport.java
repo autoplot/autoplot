@@ -146,6 +146,8 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.xml.sax.SAXException;
 import ZoeloeSoft.projects.JFontChooser.JFontChooser;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import org.autoplot.renderer.AnnotationEditorPanel;
 import org.das2.components.propertyeditor.EnumerationEditor;
 import org.das2.datum.Datum;
@@ -1541,10 +1543,18 @@ public class GuiSupport {
                 public void actionPerformed(ActionEvent e) {
                     org.das2.util.LoggerManager.logGuiEvent(e);
                     EnumerationEditor edit = new EnumerationEditor();
+                    DasColorBar.Type type0= ((DasColorBar)dasAxis).getType();
+                    edit.setValue( type0 );
+                    edit.addPropertyChangeListener( new PropertyChangeListener() {
+                        @Override
+                        public void propertyChange(PropertyChangeEvent evt) {
+                            ((DasColorBar)dasAxis).setType((DasColorBar.Type) edit.getValue());
+                        }
+                    });
                     edit.setValue( ((DasColorBar)dasAxis).getType() );
                     if ( JOptionPane.OK_OPTION
-                            ==JOptionPane.showConfirmDialog( dasAxis.getCanvas(), edit.getCustomEditor(), "Set Colortable", JOptionPane.OK_CANCEL_OPTION ) ) {
-                        ((DasColorBar)dasAxis).setType((DasColorBar.Type) edit.getValue());
+                            !=JOptionPane.showConfirmDialog( dasAxis.getCanvas(), edit.getCustomEditor(), "Set Colortable", JOptionPane.OK_CANCEL_OPTION ) ) {
+                        ((DasColorBar)dasAxis).setType(type0);
                     }
                 }
             });
