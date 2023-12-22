@@ -7,6 +7,8 @@ import gov.nasa.pds.label.object.DataObject;
 import gov.nasa.pds.label.object.FieldDescription;
 import gov.nasa.pds.label.object.TableObject;
 import gov.nasa.pds.objectAccess.ParseException;
+import gov.nasa.pds.ppi.label.PDSException;
+import gov.nasa.pds.ppi.label.PDSLabel;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -23,6 +25,7 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
@@ -37,6 +40,8 @@ import org.das2.datum.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -100,14 +105,19 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
                 return true;
             } else {
                 try {
-                    getDataObject( xmlfile.toURI().toURL(), id );
-                    return false;
+                    if (xmlfile.getName().endsWith("LBL") ) {
+                        return true;
+                        // PDS 3 not supported yet
+                    } else { 
+                        getDataObject( xmlfile.toURI().toURL(), id );
+                        return false;
+                    }
                 } catch ( Exception ex ) {
                     problems.add(ex.getMessage());
                     return true;
                 }
             }
-        } catch ( IOException ex ) {
+        } catch ( IOException | IllegalArgumentException | PDSException ex ) {
             logger.log(Level.SEVERE, null, ex);
             problems.add(ex.getMessage());
             return false;
@@ -127,59 +137,97 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
             
         Map<String,String> result= new LinkedHashMap<>();
         
-        Label label = Label.open( xmlfile.toURI().toURL() ); // this works
-        
-        for ( TableObject t : label.getObjects( TableObject.class) ) {
-            //TODO: can there be more than one table?
-            for ( FieldDescription fd: t.getFields() ) {
-                result.put( fd.getName(), fd.getName() + " of a table" );
+        if ( xmlfile.getName().endsWith(".LBL") ) { // New handling for PDS3
+            File labelfile= xmlfile;
+            PDSLabel label = new PDSLabel();
+            Document doc;
+            if ( !label.parse( labelfile.toString() ) ) {
+                throw new IllegalArgumentException("unable to use file "+labelfile);
             }
-        }
-        
-        DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
-        domFactory.setNamespaceAware(false);
-        DocumentBuilder builder = domFactory.newDocumentBuilder();
-        Document doc = builder.parse(xmlfile);
-        
-        for ( ArrayObject a: label.getObjects(ArrayObject.class) ) {
-            //result.put( a.getName(), a.getDescription() ); //TODO: update PDS4 library
-            String n= a.getName();
-            XPathExpression xp= XPathFactory.newInstance().newXPath().compile(
-                "//Product_Observational/File_Area_Observational/Array[name='"+n+"']");
-            org.w3c.dom.Node n1= (org.w3c.dom.Node)xp.evaluate(doc,XPathConstants.NODE);
-            XPathExpression xp2= XPathFactory.newInstance().newXPath().compile(
-                "Axis_Array/axis_name/text()");
-                
-            org.w3c.dom.NodeList nn= (org.w3c.dom.NodeList)xp2.evaluate(n1,XPathConstants.NODESET);
-            String[] ss= new String[nn.getLength()];
-            for ( int i=0; i<ss.length; i++ ) {
-                ss[i]= nn.item(i).getTextContent();
+            doc= label.getDocument();
+            XPathFactory factory = XPathFactory.newInstance();
+            XPath xpath = factory.newXPath();
+            NodeList dat= (NodeList) xpath.evaluate("/LABEL/TABLE/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
+            
+            for ( int i=0; i<dat.getLength(); i++ ) {
+                Node n= dat.item(i);
+                String name= n.getTextContent();
+                result.put( name, name );
             }
-            result.put( a.getName(), a.getName() + " ("+ String.join(",", ss)+")");
+            return result;
+            
+        } else {
+            Label label = Label.open( xmlfile.toURI().toURL() ); // this works
+
+            for ( TableObject t : label.getObjects( TableObject.class) ) {
+                //TODO: can there be more than one table?
+                for ( FieldDescription fd: t.getFields() ) {
+                    result.put( fd.getName(), fd.getName() + " of a table" );
+                }
+            }
+
+            DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
+            domFactory.setNamespaceAware(false);
+            DocumentBuilder builder = domFactory.newDocumentBuilder();
+            Document doc = builder.parse(xmlfile);
+
+            for ( ArrayObject a: label.getObjects(ArrayObject.class) ) {
+                //result.put( a.getName(), a.getDescription() ); //TODO: update PDS4 library
+                String n= a.getName();
+                XPathExpression xp= XPathFactory.newInstance().newXPath().compile(
+                    "//Product_Observational/File_Area_Observational/Array[name='"+n+"']");
+                org.w3c.dom.Node n1= (org.w3c.dom.Node)xp.evaluate(doc,XPathConstants.NODE);
+                XPathExpression xp2= XPathFactory.newInstance().newXPath().compile(
+                    "Axis_Array/axis_name/text()");
+
+                org.w3c.dom.NodeList nn= (org.w3c.dom.NodeList)xp2.evaluate(n1,XPathConstants.NODESET);
+                String[] ss= new String[nn.getLength()];
+                for ( int i=0; i<ss.length; i++ ) {
+                    ss[i]= nn.item(i).getTextContent();
+                }
+                result.put( a.getName(), a.getName() + " ("+ String.join(",", ss)+")");
+            }
+
+            return result;
         }
-        
-        return result;
     }
     
     protected static URL getFileResource( URL labelFile, ProgressMonitor mon ) 
-            throws IOException, URISyntaxException, ParserConfigurationException, SAXException, XPathExpressionException {
+            throws IOException, URISyntaxException, ParserConfigurationException, SAXException, XPathExpressionException, PDSException {
         String suri= fromUri( labelFile.toURI() );
-        File xmlfile = DataSetURI.getFile(suri,mon);
-        DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
-        domFactory.setNamespaceAware(false);
-        DocumentBuilder builder = domFactory.newDocumentBuilder();
-        Document doc = builder.parse(xmlfile);
-        
-        XPathExpression xp= XPathFactory.newInstance().newXPath().compile(
-                "//Product_Observational/File_Area_Observational/File/file_name/text()");
-        String fname= (String)xp.evaluate( doc, XPathConstants.STRING );
-        
-        if ( fname.length()==0 ) {
-            throw new IllegalArgumentException("file name is empty or not found at "+
+        File file = DataSetURI.getFile(suri,mon);
+        if ( file.getName().endsWith("LBL") ) {
+            File labelfile= file;
+            PDSLabel label = new PDSLabel();
+            Document doc;
+            if ( !label.parse( labelfile.toString() ) ) {
+                throw new IllegalArgumentException("unable to use file "+labelFile);
+            }
+            doc= label.getDocument();
+            XPathFactory factory = XPathFactory.newInstance();
+            XPath xpath = factory.newXPath();
+            NodeList dat= (NodeList) xpath.evaluate("/LABEL/POINTER/text()",doc,XPathConstants.NODESET);
+            return new URL( labelFile, dat.item(0).getNodeValue() );
+            //<POINTER object="TABLE">JAD_L50_LRS_ELC_ANY_DEF_2016240_V01.DAT</POINTER>
+            
+        } else {
+            File xmlfile= file;
+            DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
+            domFactory.setNamespaceAware(false);
+            DocumentBuilder builder = domFactory.newDocumentBuilder();
+            Document doc = builder.parse(xmlfile);
+
+            XPathExpression xp= XPathFactory.newInstance().newXPath().compile(
                     "//Product_Observational/File_Area_Observational/File/file_name/text()");
+            String fname= (String)xp.evaluate( doc, XPathConstants.STRING );
+
+            if ( fname.length()==0 ) {
+                throw new IllegalArgumentException("file name is empty or not found at "+
+                        "//Product_Observational/File_Area_Observational/File/file_name/text()");
+            }
+            URL fnameUrl= new URL( labelFile, fname );
+            return fnameUrl;
         }
-        URL fnameUrl= new URL( labelFile, fname );
-        return fnameUrl;
     }
     
     @Override
