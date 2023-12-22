@@ -54,7 +54,12 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
     
     @Override
     public DataSource getDataSource(URI uri) throws Exception {
-        return new PdsDataSource( uri );
+        URISplit split= URISplit.parse(uri);
+        if ( split.file.toLowerCase().endsWith(".lbl") ) {
+            return new Pds3DataSource( uri );
+        } else {
+            return new PdsDataSource( uri );
+        }
     }
 
     private DataObject getDataObject( URL url, String name ) throws MalformedURLException, ParseException, Exception {
@@ -79,6 +84,31 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
         return null;
     }
             
+    protected static PDS3DataObject getDataObjectPds3( URL url, String name ) throws IOException, PDSException, XPathExpressionException {
+
+        File f= DataSetURI.getFile( url, new NullProgressMonitor() );
+        URL fileUrl;
+            
+        PDSLabel label = new PDSLabel();
+        Document doc;
+        if ( !label.parse( f.toPath() ) ) {
+            throw new IllegalArgumentException("unable to use file "+url);
+        }
+        doc= label.getDocument();
+        XPathFactory factory = XPathFactory.newInstance();
+            
+        XPath xpath = factory.newXPath();
+        Node dat= (Node) xpath.evaluate(String.format("/LABEL/TABLE/COLUMN[NAME='%s']",name),doc,XPathConstants.NODE);
+        
+        PDS3DataObject obj= new PDS3DataObject();
+        obj.name= name;
+        //obj.description=  (String)xpath.evaluate("/DESCRIPTION/text()",dat,XPathConstants.STRING);
+        System.err.println("dat="+dat);
+        
+        return obj;
+        
+    }
+
     @Override
     public boolean reject(String suri, List<String> problems, ProgressMonitor mon) {
         try {
@@ -106,8 +136,8 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
             } else {
                 try {
                     if (xmlfile.getName().endsWith("LBL") ) {
-                        return true;
-                        // PDS 3 not supported yet
+                        getDataObjectPds3( xmlfile.toURI().toURL(), id );
+                        return false;
                     } else { 
                         getDataObject( xmlfile.toURI().toURL(), id );
                         return false;
