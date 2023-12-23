@@ -242,7 +242,17 @@ public class Pds3DataSource extends AbstractDataSource {
         
         return Ops.dataset(csvfile,Units.nominal());
     }
-    
+
+    @Override
+    public Map<String, Object> getMetadata(ProgressMonitor mon) throws Exception {
+        URISplit split= URISplit.parse( getURI() );
+        File lblfile = DataSetURI.getFile( split.resourceUri.toURL() ,new NullProgressMonitor());
+        
+        String name= getParam("arg_0","");
+        
+        return PdsDataSourceFactory.getDataObjectPds3( lblfile.toURL(), name ).getMetadata();
+                           
+    }
     
     @Override
     public org.das2.qds.QDataSet getDataSet(ProgressMonitor mon) throws Exception {

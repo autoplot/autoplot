@@ -102,7 +102,7 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
         Node table= (Node) xpath.evaluate(String.format("/LABEL/TABLE[1]",name),doc,XPathConstants.NODE);
         Node column= (Node) xpath.evaluate(String.format("/LABEL/TABLE/COLUMN[NAME='%s']",name),doc,XPathConstants.NODE);
         
-        PDS3DataObject obj= new PDS3DataObject(table,column);
+        PDS3DataObject obj= new PDS3DataObject( doc.getDocumentElement(), table,column);
         
         //obj.description=  (String)xpath.evaluate("/DESCRIPTION/text()",dat,XPathConstants.STRING);
         System.err.println("dat="+column);

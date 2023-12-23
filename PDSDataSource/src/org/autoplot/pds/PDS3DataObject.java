@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -44,7 +45,11 @@ public class PDS3DataObject {
     private double missingConstant;
     private String unit;
     private String description;
-
+    
+    JSONObject labelJSONObject;
+    JSONObject columnJSONObject;
+    JSONObject tableJSONObject;
+    
     /*      
             <START_BYTE>86365</START_BYTE>
             <ITEMS>3</ITEMS>
@@ -56,13 +61,16 @@ public class PDS3DataObject {
             <UNIT>nT</UNIT>
             <DESCRIPTION>MAG vector in J
      */
-    public PDS3DataObject(Node table, Node column) {
+    public PDS3DataObject( Node label, Node table, Node column) {
         try {
+            labelJSONObject= toJSONObject( label );
             JSONObject jtable= toJSONObject(table);
+            tableJSONObject= jtable;
             interchangeFormat= jtable.optString("INTERCHANGE_FORMAT", "BINARY");
             rowBytes= jtable.getInt("ROW_BYTES");
             rows= jtable.optInt("ROWS",-1);
             JSONObject j= toJSONObject(column);
+            columnJSONObject= j;
             if ( j.has("ITEMS") ) {
                 items= j.getInt("ITEMS");
             } else {
@@ -192,5 +200,31 @@ public class PDS3DataObject {
      */
     public String getDescription() {
         return this.description;
+    }
+
+    
+    private Map<String, Object> getMetadata( JSONObject jo ) {
+        Map<String,Object> result= new LinkedHashMap<>();
+        Iterator it= jo.keys();
+        while( it.hasNext() ) {
+            String k= (String)it.next();
+            try {
+                Object v= jo.get(k);
+                if ( v instanceof JSONObject ) {
+                    result.put( k, getMetadata((JSONObject)v) );
+                } else {
+                    result.put( k, v );
+                }
+            } catch (JSONException ex) {
+            }
+        }
+        return result;
+    }
+    
+    public Map<String, Object> getMetadata() {
+        Map<String,Object> result= getMetadata(columnJSONObject);
+        result.put("_table", getMetadata(tableJSONObject));
+        result.put("_label", getMetadata(labelJSONObject));
+        return result;
     }
 }
