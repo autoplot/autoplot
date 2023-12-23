@@ -75,6 +75,7 @@ public class PDS3DataObject {
             validMaximum= j.optDouble("VALID_MAXIMUM",Double.POSITIVE_INFINITY);
             validMinimum= j.optDouble("VALID_MINIMUM",Double.NEGATIVE_INFINITY);
             missingConstant= j.optDouble("MISSING_CONSTANT",Double.NaN);
+            description= j.optString("DESCRIPTION", "");
         } catch (TransformerException | JSONException ex) {
             throw new IllegalArgumentException("unable to run");
         }
@@ -103,11 +104,18 @@ public class PDS3DataObject {
         
     }
 
+    /**
+     * return the Autoplot URI to load the data.
+     * @param resource the granule (binary or ASCII) file to load.
+     * @return the URI.
+     */
     public String resolveUri(URL resource) {
         Map<String,String> args= new LinkedHashMap<>();
         args.put( "recLength", String.valueOf(rowBytes) );
-        if ( dataType.equals("DATE") ) {
+        if ( dataType.equals("DATE") || dataType.equals("TIME") ) {
             args.put("type", "time"+bytes);
+        } else if ( dataType.equals("ASCII_REAL") ) {
+            args.put("type", "ascii"+bytes);
         } else if ( dataType.equals("PC_REAL") ) {
             args.put("type", "float");
             args.put("byteOrder", "little");
@@ -173,8 +181,16 @@ public class PDS3DataObject {
         if ( missingConstant!=Double.NaN ) args.put( "fillValue", String.valueOf(missingConstant));
         if ( validMaximum!=Double.POSITIVE_INFINITY ) args.put( "validMax", String.valueOf(validMaximum) );
         if ( validMinimum!=Double.NEGATIVE_INFINITY ) args.put( "validMin", String.valueOf(validMinimum) );
-        if ( unit.trim().length()!=0 ) args.put( "units", unit );
+        if ( unit.trim().length()!=0 && !args.get("type").startsWith("time") ) args.put( "units", unit );
         if ( items>-1 ) args.put( "dims", "["+items+"]");
         return "vap+bin:" + resource.toString() + "?" + URISplit.formatParams(args) ;
+    }
+    
+    /**
+     * return a several line description of the data.
+     * @return a several line description of the data.
+     */
+    public String getDescription() {
+        return this.description;
     }
 }

@@ -305,6 +305,7 @@ public class Pds3DataSource extends AbstractDataSource {
             QDataSet ds= delegate.getDataSet( mon.getSubtaskMonitor( "dataset "+ i ) );
             ds= Ops.putProperty( ds, QDataSet.NAME, name );
             ds= Ops.putProperty( ds, QDataSet.LABEL, name );
+            ds= Ops.putProperty( ds, QDataSet.DESCRIPTION, obj.getDescription() );
             results[i]= ds;
             
         }
