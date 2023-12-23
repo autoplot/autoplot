@@ -63,106 +63,6 @@ public class Pds3DataSource extends AbstractDataSource {
     }
 
     /**
-     * bootstrap routine for getting data from fields of a TableObject.  TODO: rewrite so that
-     * multiple fields are read at once.
-     * @param t
-     * @param columnName
-     * @return
-     * @throws IOException 
-     */
-    private QDataSet getFromTable( TableObject t, String[] columnNames ) throws IOException {
-        
-        int ncols= columnNames.length;
-        int[] icols= new int[ncols];
-        
-        DataSetBuilder dsb= new DataSetBuilder(2,100,ncols);
-        
-        for ( int i=0; i<ncols; i++ ) {
-            int icol= -1;
-            FieldDescription[] fields= t.getFields();
-            for ( int j=0; j<fields.length; j++ ) {
-                if ( fields[j].getName().equals(columnNames[i]) ) {
-                    icol= j;
-                    break;
-                }
-            }
-            //TODO: what is returned when column isn't found?
-            icols[i]= icol;
-            FieldDescription fieldDescription= t.getFields()[icol];
-            dsb.setName( i, fieldDescription.getName() );
-            dsb.setLabel( i, fieldDescription.getName() );
-            //TODO: Larry has nice descriptions.  How to get at those? https://space.physics.uiowa.edu/pds/cassini-rpws-electron_density/data/2006/rpws_fpe_2006-141_v1.xml
-            //TODO: also https://pds-ppi.igpp.ucla.edu/data/cassini-caps-fitted-parameters/Data/CAS_CAPS_FITTED_PARAMETERS_WILSON_V01.xml?Sc_lat&X=Utc
-            switch (fieldDescription.getType()) {
-                case ASCII_DATE:
-                case ASCII_DATE_DOY:
-                case ASCII_DATE_TIME_DOY_UTC:
-                case ASCII_DATE_TIME_UTC:
-                case ASCII_DATE_TIME_DOY:
-                case ASCII_DATE_TIME_YMD:
-                case ASCII_DATE_TIME_YMD_UTC:
-                    dsb.setUnits(i, Units.us2000);
-                    break;
-                    //TODO: create timeparser 
-                case ASCII_STRING:
-                    dsb.setUnits(i, Units.nominal(fieldDescription.getName()) );
-                default:
-                    dsb.setUnits(i, Units.dimensionless ); // TODO: how to get "unit" from label
-            }
-        }
-        
-        boolean doTimeCheck= true; // allow ASCII_STRING to contain times, flipping from nominal units to time location units.
-        
-        TableRecord r;
-        while ( ( r= t.readNext())!=null ) {
-            for ( int i=0; i<ncols; i++ ) {
-                try {
-                    if ( doTimeCheck ) {
-                        String s= r.getString(icols[i]+1);
-                        if ( DatumRangeUtil.parseISO8601(s)!=null && !( dsb.getUnits(i) instanceof NumberUnits ) ) {
-                            dsb.setUnits( i, Units.us2000 );
-                        }
-                    }
-                    dsb.putValue( -1, i, r.getString(icols[i]+1) );
-                } catch (ParseException ex) {
-                    dsb.putValue( -1, i, dsb.getUnits(i).getFillDatum() );
-                }
-            }
-            doTimeCheck= false;
-            dsb.nextRecord();
-        }
-        
-        return dsb.getDataSet();
-    }
-    
-    private double[] flatten( double[][] dd ) {
-        double[] rank1= new double[dd.length*dd[0].length];
-        int nj= dd[0].length;
-        int kk= 0;
-        for ( int i=0; i<dd.length; i++ ) {
-            double[] d= dd[i];
-            for ( int j=0; j<nj; j++ ) {
-                rank1[kk++]= d[j];
-            }
-        }
-        return rank1;
-    }
-    
-    private double[] flatten3d( double[][][] dd ) {
-        double[] rank1= new double[dd.length*dd[0].length*dd[0][0].length];
-        int kk= 0;
-        int[] qube= new int[] { dd.length, dd[0].length, dd[0][0].length };
-        for ( int i0=0; i0<qube[0]; i0++ ) {
-            for ( int i1=0; i1<qube[1]; i1++ ) {
-                double[] d1= dd[i0][i1];
-                for ( int i2=0; i2<qube[2]; i2++ ) {
-                    rank1[kk++]= d1[i2];
-                }
-            }
-        }
-        return rank1;
-    }
-    /**
      * Read the XML file into a document.
      * @param f the file
      * @return the document object
@@ -350,10 +250,10 @@ public class Pds3DataSource extends AbstractDataSource {
         
         URISplit split= URISplit.parse( getURI() );
             
-        File xmlfile = DataSetURI.getFile( split.resourceUri.toURL() ,new NullProgressMonitor());
+        File lblfile = DataSetURI.getFile( split.resourceUri.toURL() ,new NullProgressMonitor());
         
         PDSLabel label= new PDSLabel();
-        if ( !label.parse(xmlfile.toPath()) ) {
+        if ( !label.parse(lblfile.toPath()) ) {
             throw new IllegalArgumentException("Unable to parse label: "+getURI() );
         }
         
@@ -387,10 +287,25 @@ public class Pds3DataSource extends AbstractDataSource {
             if ( results[i]!=null ) continue;
             name= names.get(i);            
             
-            PDS3DataObject obj= PdsDataSourceFactory.getDataObjectPds3( xmlfile.toURL(), name );
+            PDS3DataObject obj= PdsDataSourceFactory.getDataObjectPds3( lblfile.toURL(), name );
+            
+            String datafile;
+            URL fileUrl;
+            
+            if ( label.filePointers().size()==1 ) {
+                datafile= (String)label.filePointers().get(0);
+                fileUrl= new URL( split.resourceUri.toURL(), datafile );
+            } else {
+                throw new IllegalArgumentException("multiple file pointers not accepted");
+            }
+            
+            String uri= obj.resolveUri( fileUrl );
             
             DataSource delegate= DataSetURI.getDataSource(uri);
-            results[i]= delegate.getDataSet( mon.getSubtaskMonitor( "dataset "+ i ) );
+            QDataSet ds= delegate.getDataSet( mon.getSubtaskMonitor( "dataset "+ i ) );
+            ds= Ops.putProperty( ds, QDataSet.NAME, name );
+            ds= Ops.putProperty( ds, QDataSet.LABEL, name );
+            results[i]= ds;
             
         }
         
