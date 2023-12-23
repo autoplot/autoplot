@@ -79,12 +79,15 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
         XPath xpath = factory.newXPath();
         
         Node table= (Node) xpath.evaluate(String.format("/LABEL/TABLE[1]",name),doc,XPathConstants.NODE);
-        Node column= (Node) xpath.evaluate(String.format("/LABEL/TABLE/COLUMN[NAME='%s']",name),doc,XPathConstants.NODE);
-        if ( table==null ) {
+        Node column= (Node) xpath.evaluate(String.format("/LABEL/TABLE[1]/COLUMN[NAME='%s']",name),doc,XPathConstants.NODE);
+        if ( table==null || column==null) {
             table= (Node) xpath.evaluate(String.format("/LABEL/BINARY_TABLE[1]",name),doc,XPathConstants.NODE);
-            column= (Node) xpath.evaluate(String.format("/LABEL/BINARY_TABLE/COLUMN[NAME='%s']",name),doc,XPathConstants.NODE);
+            column= (Node) xpath.evaluate(String.format("/LABEL/BINARY_TABLE[1]/COLUMN[NAME='%s']",name),doc,XPathConstants.NODE);
         }
-        
+        if ( table==null || column==null ) {
+            table= (Node) xpath.evaluate(String.format("/LABEL/TIME_SERIES[1]",name),doc,XPathConstants.NODE);
+            column= (Node) xpath.evaluate(String.format("/LABEL/TIME_SERIES[1]/COLUMN[NAME='%s']",name),doc,XPathConstants.NODE);
+        }
         PDS3DataObject obj= new PDS3DataObject( doc.getDocumentElement(), table,column);
         
         //obj.description=  (String)xpath.evaluate("/DESCRIPTION/text()",dat,XPathConstants.STRING);
@@ -130,7 +133,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
         } catch ( IOException | IllegalArgumentException | PDSException ex ) {
             logger.log(Level.SEVERE, null, ex);
             problems.add(ex.getMessage());
-            return false;
+            return true;
         }
     }
 
@@ -163,6 +166,9 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
         if ( dat.getLength()==0 ) {
             dat= (NodeList) xpath.evaluate("/LABEL/BINARY_TABLE/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
         }
+        if ( dat.getLength()==0 ) {
+            dat= (NodeList) xpath.evaluate("/LABEL/TIME_SERIES/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
+        }
         for ( int i=0; i<dat.getLength(); i++ ) {
             Node n= dat.item(i);
             String name= n.getTextContent();
@@ -186,7 +192,11 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
         XPathFactory factory = XPathFactory.newInstance();
         XPath xpath = factory.newXPath();
         NodeList dat= (NodeList) xpath.evaluate("/LABEL/POINTER/text()",doc,XPathConstants.NODESET);
-        return new URL( labelFile, dat.item(0).getNodeValue() );
+        String f= dat.item(0).getNodeValue();
+        if ( f.contains(", ") ) { // https://pds-ppi.igpp.ucla.edu/data/GO-J-PWS-2-EDR-WAVEFORM-80KHZ-V1.0/DATA/C032095/80KHZ_0320950402.LBL
+            f= f.substring(0,f.indexOf(", "));
+        }
+        return new URL( labelFile, f );
         //<POINTER object="TABLE">JAD_L50_LRS_ELC_ANY_DEF_2016240_V01.DAT</POINTER>
 
     }
