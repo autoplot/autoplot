@@ -11,6 +11,7 @@ import gov.nasa.pds.ppi.label.PDSException;
 import gov.nasa.pds.ppi.label.PDSLabel;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -79,6 +80,10 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
         
         Node table= (Node) xpath.evaluate(String.format("/LABEL/TABLE[1]",name),doc,XPathConstants.NODE);
         Node column= (Node) xpath.evaluate(String.format("/LABEL/TABLE/COLUMN[NAME='%s']",name),doc,XPathConstants.NODE);
+        if ( table==null ) {
+            table= (Node) xpath.evaluate(String.format("/LABEL/BINARY_TABLE[1]",name),doc,XPathConstants.NODE);
+            column= (Node) xpath.evaluate(String.format("/LABEL/BINARY_TABLE/COLUMN[NAME='%s']",name),doc,XPathConstants.NODE);
+        }
         
         PDS3DataObject obj= new PDS3DataObject( doc.getDocumentElement(), table,column);
         
@@ -149,10 +154,15 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
             throw new IllegalArgumentException("unable to use file "+labelfile);
         }
         doc= label.getDocument();
+        label.printXML( new PrintStream("/tmp/ap/DS1-C-PEPE-2-EDR-BORRELLY-V1.0.xml") );
+        
         XPathFactory factory = XPathFactory.newInstance();
         XPath xpath = factory.newXPath();
         NodeList dat= (NodeList) xpath.evaluate("/LABEL/TABLE/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
 
+        if ( dat.getLength()==0 ) {
+            dat= (NodeList) xpath.evaluate("/LABEL/BINARY_TABLE/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
+        }
         for ( int i=0; i<dat.getLength(); i++ ) {
             Node n= dat.item(i);
             String name= n.getTextContent();
