@@ -1,1 +1,2 @@
 org.autoplot.pds.PdsDataSourceFactory pds pds4 lblx lbl
+org.autoplot.pds.Pds3DataSourceFactory lbl
