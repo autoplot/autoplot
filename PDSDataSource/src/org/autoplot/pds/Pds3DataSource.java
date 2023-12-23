@@ -250,7 +250,7 @@ public class Pds3DataSource extends AbstractDataSource {
         
         String name= getParam("arg_0","");
         
-        return PdsDataSourceFactory.getDataObjectPds3( lblfile.toURL(), name ).getMetadata();
+        return Pds3DataSourceFactory.getDataObjectPds3( lblfile.toURL(), name ).getMetadata();
                            
     }
     
@@ -297,7 +297,7 @@ public class Pds3DataSource extends AbstractDataSource {
             if ( results[i]!=null ) continue;
             name= names.get(i);            
             
-            PDS3DataObject obj= PdsDataSourceFactory.getDataObjectPds3( lblfile.toURL(), name );
+            PDS3DataObject obj= Pds3DataSourceFactory.getDataObjectPds3( lblfile.toURL(), name );
             
             String datafile;
             URL fileUrl;
