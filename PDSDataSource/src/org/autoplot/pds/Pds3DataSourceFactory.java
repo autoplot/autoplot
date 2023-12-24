@@ -64,7 +64,16 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
         }
     }
 
-            
+
+    /**
+     * return information about how this data is stored in PDS3DataObject.
+     * @param url
+     * @param name
+     * @return
+     * @throws IOException
+     * @throws PDSException
+     * @throws XPathExpressionException 
+     */
     protected static PDS3DataObject getDataObjectPds3( URL url, String name ) throws IOException, PDSException, XPathExpressionException {
 
         File f= DataSetURI.getFile( url, new NullProgressMonitor() );
@@ -138,37 +147,32 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
         }
     }
 
-    /**
-     * return a list of parameters.
-     * @param f
-     * @return 
-     */
-    private Map<String,String> getDataObjectNames( URL url, ProgressMonitor mon) throws Exception {
+    private static Document getDocumentWithImports( URL labelUrl ) throws IOException, PDSException {
+        File xmlfile = DataSetURI.getFile( labelUrl,new NullProgressMonitor());
+
+        PDSLabel label = new PDSLabel(); 
         
-        URL fileUrl= getFileResource( url, mon );
-        File xmlfile = DataSetURI.getFile( url,new NullProgressMonitor());
-        DataSetURI.getFile( fileUrl,mon );
-            
-        Map<String,String> result= new LinkedHashMap<>();
-        
-        File labelfile= xmlfile;
-        PDSLabel label = new PDSLabel();
-        Document doc;
-        if ( !label.parse( labelfile.toString() ) ) {
-            throw new IllegalArgumentException("unable to use file "+labelfile);
+        if ( !label.parse( xmlfile.getPath() ) ) {
+            throw new IllegalArgumentException("unable to use file "+labelUrl);
         }
+        Document doc;
         doc= label.getDocument();
          
         XPathFactory factory = XPathFactory.newInstance();
         XPath xpath = factory.newXPath();
         
         // check for pointers to STRUCTURE, where we will import the content of the file.
-        NodeList structures= (NodeList) xpath.evaluate("/LABEL/*/POINTER[@object=\"STRUCTURE\"]",doc,XPathConstants.NODESET);
+        NodeList structures;
+        try {
+            structures = (NodeList) xpath.evaluate("/LABEL/*/POINTER[@object=\"STRUCTURE\"]",doc,XPathConstants.NODESET);
+        } catch (XPathExpressionException ex) {
+            throw new RuntimeException(ex);
+        }
         for ( int i=0; i<structures.getLength(); i++ ) {
             Node child= structures.item(i);
             Node parent= child.getParentNode();
             
-            URL childUrl= new URL( url, child.getTextContent() );
+            URL childUrl= new URL( labelUrl, child.getTextContent() );
             File childfile = DataSetURI.getFile( childUrl,new NullProgressMonitor());
             
             PDSLabel label2 = new PDSLabel();
@@ -182,9 +186,24 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
                 parent.insertBefore(kid, child);
             }
         }
-        
         //DocumentUtil.dumpToXML( doc, new File("/tmp/ap/label-with-imports.xml") );
-
+        return doc;
+    }
+    
+    /**
+     * return a list of parameters.
+     * @param f
+     * @return 
+     */
+    private Map<String,String> getDataObjectNames( URL url, ProgressMonitor mon) throws Exception {
+        
+        Map<String,String> result= new LinkedHashMap<>();
+        
+        Document doc= getDocumentWithImports(url);
+        
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath xpath = factory.newXPath();
+        
         NodeList dat= (NodeList) xpath.evaluate("/LABEL/TABLE/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
         if ( dat.getLength()==0 ) {
             dat= (NodeList) xpath.evaluate("/LABEL/BINARY_TABLE/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
