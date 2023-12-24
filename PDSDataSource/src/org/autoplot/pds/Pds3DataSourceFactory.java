@@ -76,16 +76,10 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
      */
     protected static PDS3DataObject getDataObjectPds3( URL url, String name ) throws IOException, PDSException, XPathExpressionException {
 
-        File f= DataSetURI.getFile( url, new NullProgressMonitor() );
-            
-        PDSLabel label = new PDSLabel();
         Document doc;
-        if ( !label.parse( f.toPath() ) ) {
-            throw new IllegalArgumentException("unable to use file "+url);
-        }
-        doc= label.getDocument();
-        XPathFactory factory = XPathFactory.newInstance();
-            
+        doc= getDocumentWithImports(url);
+
+        XPathFactory factory = XPathFactory.newInstance();    
         XPath xpath = factory.newXPath();
         
         Node table= (Node) xpath.evaluate(String.format("/LABEL/TABLE[1]",name),doc,XPathConstants.NODE);
@@ -94,9 +88,19 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
             table= (Node) xpath.evaluate(String.format("/LABEL/BINARY_TABLE[1]",name),doc,XPathConstants.NODE);
             column= (Node) xpath.evaluate(String.format("/LABEL/BINARY_TABLE[1]/COLUMN[NAME='%s']",name),doc,XPathConstants.NODE);
         }
+        if ( table==null || column==null) {
+            table= (Node) xpath.evaluate(String.format("/LABEL/ASCII_TABLE[1]",name),doc,XPathConstants.NODE);
+            column= (Node) xpath.evaluate(String.format("/LABEL/ASCII_TABLE[1]/COLUMN[NAME='%s']",name),doc,XPathConstants.NODE);
+        }
         if ( table==null || column==null ) {
             table= (Node) xpath.evaluate(String.format("/LABEL/TIME_SERIES[1]",name),doc,XPathConstants.NODE);
             column= (Node) xpath.evaluate(String.format("/LABEL/TIME_SERIES[1]/COLUMN[NAME='%s']",name),doc,XPathConstants.NODE);
+        }
+        if ( table==null ) {
+            throw new IllegalArgumentException("Unable to find table" );
+        }
+        if ( column==null ) {
+            throw new IllegalArgumentException("Unable to find column: "+name );
         }
         PDS3DataObject obj= new PDS3DataObject( doc.getDocumentElement(), table,column);
         
@@ -147,7 +151,14 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
         }
     }
 
-    private static Document getDocumentWithImports( URL labelUrl ) throws IOException, PDSException {
+    /**
+     * read in the PDS label, resolving STRUCTURES which are loaded with a pointer.
+     * @param labelUrl
+     * @return
+     * @throws IOException
+     * @throws PDSException 
+     */
+    protected static Document getDocumentWithImports( URL labelUrl ) throws IOException, PDSException {
         File xmlfile = DataSetURI.getFile( labelUrl,new NullProgressMonitor());
 
         PDSLabel label = new PDSLabel(); 
@@ -186,7 +197,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
                 parent.insertBefore(kid, child);
             }
         }
-        //DocumentUtil.dumpToXML( doc, new File("/tmp/ap/label-with-imports.xml") );
+        DocumentUtil.dumpToXML( doc, new File("/tmp/ap/label-with-imports.xml") );
         return doc;
     }
     
