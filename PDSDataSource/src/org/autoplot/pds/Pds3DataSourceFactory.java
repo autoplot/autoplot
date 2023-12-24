@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -157,18 +158,44 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
             throw new IllegalArgumentException("unable to use file "+labelfile);
         }
         doc= label.getDocument();
-        label.printXML( new PrintStream("/tmp/ap/DS1-C-PEPE-2-EDR-BORRELLY-V1.0.xml") );
-        
+         
         XPathFactory factory = XPathFactory.newInstance();
         XPath xpath = factory.newXPath();
-        NodeList dat= (NodeList) xpath.evaluate("/LABEL/TABLE/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
+        
+        // check for pointers to STRUCTURE, where we will import the content of the file.
+        NodeList structures= (NodeList) xpath.evaluate("/LABEL/*/POINTER[@object=\"STRUCTURE\"]",doc,XPathConstants.NODESET);
+        for ( int i=0; i<structures.getLength(); i++ ) {
+            Node child= structures.item(i);
+            Node parent= child.getParentNode();
+            
+            URL childUrl= new URL( url, child.getTextContent() );
+            File childfile = DataSetURI.getFile( childUrl,new NullProgressMonitor());
+            
+            PDSLabel label2 = new PDSLabel();
+            label2.parse(childfile.toPath());
+            Document doc2= label2.getDocument();
+            Node newChild= doc2.getDocumentElement();
+            NodeList importKids= newChild.getChildNodes();
+            for ( int j=0; j<importKids.getLength(); j++ ) {
+                Node kid= importKids.item(j);
+                doc.adoptNode(kid);
+                parent.insertBefore(kid, child);
+            }
+        }
+        
+        //DocumentUtil.dumpToXML( doc, new File("/tmp/ap/label-with-imports.xml") );
 
+        NodeList dat= (NodeList) xpath.evaluate("/LABEL/TABLE/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
         if ( dat.getLength()==0 ) {
             dat= (NodeList) xpath.evaluate("/LABEL/BINARY_TABLE/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
         }
         if ( dat.getLength()==0 ) {
+            dat= (NodeList) xpath.evaluate("/LABEL/ASCII_TABLE/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
+        }
+        if ( dat.getLength()==0 ) {
             dat= (NodeList) xpath.evaluate("/LABEL/TIME_SERIES/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
         }
+        
         for ( int i=0; i<dat.getLength(); i++ ) {
             Node n= dat.item(i);
             String name= n.getTextContent();
@@ -208,16 +235,6 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
             logger.log(Level.FINE, "getCompletions {0}", cc.resourceURI);
             
             File xmlfile = DataSetURI.getFile(cc.resourceURI.toURL(),new NullProgressMonitor());
-            
-            URL fileUrl;
-            try {
-                fileUrl = getFileResource( cc.resourceURI.toURL(), mon );
-            } catch ( IOException | URISyntaxException | ParserConfigurationException | XPathExpressionException | SAXException ex ) {
-                List<CompletionContext> ccresult= new ArrayList<>();
-                ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "point to the xml or lblx file" ) );
-                return ccresult;
-            }
-            DataSetURI.getFile(fileUrl,mon );
              
             Map<String,String> result;
             result = getDataObjectNames(xmlfile.toURI().toURL(), mon);
