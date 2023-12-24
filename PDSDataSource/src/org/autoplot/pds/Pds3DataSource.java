@@ -245,16 +245,18 @@ public class Pds3DataSource extends AbstractDataSource {
         String name= getParam("arg_0","");
         
         URISplit split= URISplit.parse( getURI() );
-            
-        File lblfile = DataSetURI.getFile( split.resourceUri.toURL() ,new NullProgressMonitor());
         
+        URL labelUrl= split.resourceUri.toURL();
+        File xmlfile = DataSetURI.getFile( labelUrl,new NullProgressMonitor());
+        
+        Document doc= Pds3DataSourceFactory.getDocumentWithImports( xmlfile.toURI().toURL() );
+            
         PDSLabel label= new PDSLabel();
-        if ( !label.parse(lblfile.toPath()) ) {
-            throw new IllegalArgumentException("Unable to parse label: "+getURI() );
+        // we need to parse this twice because it contains the name of the data file as well.
+        if ( !label.parse( xmlfile.getPath() ) ) {
+            throw new IllegalArgumentException("unable to use file "+labelUrl);
         }
         
-        Document doc= label.getDocument();
-                           
         List<String> names= new ArrayList<>();
         String X= getParam("X","");
         if ( !X.equals("") ) {
@@ -283,7 +285,7 @@ public class Pds3DataSource extends AbstractDataSource {
             if ( results[i]!=null ) continue;
             name= names.get(i);            
             
-            PDS3DataObject obj= Pds3DataSourceFactory.getDataObjectPds3( lblfile.toURL(), name );
+            PDS3DataObject obj= Pds3DataSourceFactory.getDataObjectPds3( labelUrl, name );
             
             String datafile;
             URL fileUrl;
@@ -292,7 +294,10 @@ public class Pds3DataSource extends AbstractDataSource {
                 datafile= (String)label.filePointers().get(0);
                 fileUrl= new URL( split.resourceUri.toURL(), datafile );
             } else {
-                throw new IllegalArgumentException("multiple file pointers not accepted");
+                System.err.println("Kludge to see how close the code is");
+                datafile= (String)label.filePointers().get(0);
+                fileUrl= new URL( split.resourceUri.toURL(), datafile );
+                //throw new IllegalArgumentException("multiple file pointers not accepted");
             }
             
             String uri= obj.resolveUri( fileUrl );
