@@ -1,14 +1,10 @@
 package org.autoplot.pds;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -17,12 +13,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.autoplot.datasource.URISplit;
-import org.das2.util.FileUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *
@@ -32,6 +26,10 @@ public class PDS3DataObject {
 
     private String name;
     private String uri;
+    /**
+     * number of records into the file, 1 is the first offset into the file.
+     */
+    private int fileOffset;
     private int rowBytes;
     private int rows;
     private String interchangeFormat;
@@ -124,6 +122,8 @@ public class PDS3DataObject {
             args.put("type", "time"+bytes);
         } else if ( dataType.equals("ASCII_REAL") ) {
             args.put("type", "ascii"+bytes);
+        } else if ( dataType.equals("ASCII_INTEGER") ) {
+            args.put("type", "ascii"+bytes);
         } else if ( dataType.equals("PC_REAL") ) {
             args.put("type", "float");
             args.put("byteOrder", "little");
@@ -185,6 +185,9 @@ public class PDS3DataObject {
         } else {
             throw new IllegalArgumentException("unsupported type:" +dataType);
         }
+        if ( this.fileOffset>1 ) {
+            args.put("byteOffset", String.valueOf(this.fileOffset*this.rowBytes) );
+        }
         args.put( "recOffset", String.valueOf(startByte-1));
         if ( missingConstant!=Double.NaN ) args.put( "fillValue", String.valueOf(missingConstant));
         if ( validMaximum!=Double.POSITIVE_INFINITY ) args.put( "validMax", String.valueOf(validMaximum) );
@@ -227,4 +230,18 @@ public class PDS3DataObject {
         result.put("_label", getMetadata(labelJSONObject));
         return result;
     }
+
+    public int getFileOffset() {
+        return fileOffset;
+    }
+
+    /**
+     * the offset into the file, where 1 is the beginning.
+     * @param fileOffset 
+     */
+    public void setFileOffset(int fileOffset) {
+        this.fileOffset = fileOffset;
+    }
+    
+    
 }

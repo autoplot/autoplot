@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -67,8 +69,8 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
 
     /**
      * return information about how this data is stored in PDS3DataObject.
-     * @param url
-     * @param name
+     * @param url URL of label
+     * @param name the object name
      * @return
      * @throws IOException
      * @throws PDSException
@@ -81,21 +83,48 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
 
         XPathFactory factory = XPathFactory.newInstance();    
         XPath xpath = factory.newXPath();
+
+        int lineOffset=1;
         
         Node table= (Node) xpath.evaluate(String.format("/LABEL/TABLE[1]",name),doc,XPathConstants.NODE);
         Node column= (Node) xpath.evaluate(String.format("/LABEL/TABLE[1]/COLUMN[NAME='%s']",name),doc,XPathConstants.NODE);
+
         if ( table==null || column==null) {
             table= (Node) xpath.evaluate(String.format("/LABEL/BINARY_TABLE[1]",name),doc,XPathConstants.NODE);
             column= (Node) xpath.evaluate(String.format("/LABEL/BINARY_TABLE[1]/COLUMN[NAME='%s']",name),doc,XPathConstants.NODE);
+            if ( table!=null ) {
+                String pointer= (String)xpath.evaluate("/LABEL/POINTER[@object='BINARY_TABLE']/text()",doc,XPathConstants.STRING);
+                if ( pointer!=null && pointer.length()>0 ) {
+                    FilePointer p= new FilePointer(url,pointer);
+                    lineOffset= p.getOffset();
+                }
+            }
         }
+
         if ( table==null || column==null) {
             table= (Node) xpath.evaluate(String.format("/LABEL/ASCII_TABLE[1]",name),doc,XPathConstants.NODE);
             column= (Node) xpath.evaluate(String.format("/LABEL/ASCII_TABLE[1]/COLUMN[NAME='%s']",name),doc,XPathConstants.NODE);
+            if ( table!=null ) {
+                String pointer= (String)xpath.evaluate("/LABEL/POINTER[@object='ASCII_TABLE']/text()",doc,XPathConstants.STRING);
+                if ( pointer!=null && pointer.length()>0 ) {
+                    FilePointer p= new FilePointer(url,pointer);
+                    lineOffset= p.getOffset();
+                }
+            }
         }
+
         if ( table==null || column==null ) {
             table= (Node) xpath.evaluate(String.format("/LABEL/TIME_SERIES[1]",name),doc,XPathConstants.NODE);
-            column= (Node) xpath.evaluate(String.format("/LABEL/TIME_SERIES[1]/COLUMN[NAME='%s']",name),doc,XPathConstants.NODE);
+            column= (Node) xpath.evaluate(String.format("/LABEL/TIME_SERIES[1]/COLUMN[NAME='%s']",name),doc,XPathConstants.NODE); 
+            if ( table!=null ) {
+                String pointer= (String)xpath.evaluate("/LABEL/POINTER[@object='TIME_SERIES']/text()",doc,XPathConstants.STRING);
+                if ( pointer!=null && pointer.length()>0 ) {
+                    FilePointer p= new FilePointer(url,pointer);
+                    lineOffset= p.getOffset();
+                }
+            }
         }
+        
         if ( table==null ) {
             throw new IllegalArgumentException("Unable to find table" );
         }
@@ -103,9 +132,8 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
             throw new IllegalArgumentException("Unable to find column: "+name );
         }
         PDS3DataObject obj= new PDS3DataObject( doc.getDocumentElement(), table,column);
-        
+        obj.setFileOffset( lineOffset );
         //obj.description=  (String)xpath.evaluate("/DESCRIPTION/text()",dat,XPathConstants.STRING);
-        System.err.println("dat="+column);
         
         return obj;
         
@@ -123,21 +151,21 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
             if ( id==null ) id= params.get("Y");
             if ( id==null ) id= params.get("Z");
 
+            FilePointer filePointer;
             File xmlfile = DataSetURI.getFile( split.resourceUri.toURL() ,new NullProgressMonitor());
-            URL fileUrl;
             try {
-                fileUrl = getFileResource( split.resourceUri.toURL(), mon );
+                filePointer= getFileResource(xmlfile.toURI().toURL(), mon);
             } catch ( IOException | URISyntaxException | ParserConfigurationException | XPathExpressionException | SAXException ex ) {
                 problems.add("uri should point to xml or lblx file");
                 return true;
             }
-            DataSetURI.getFile(fileUrl,mon );
+            DataSetURI.getFile(filePointer.getUrl(),mon );
 
             if ( id==null ) {
                 return true;
             } else {
                 try {
-                    getDataObjectPds3( xmlfile.toURI().toURL(), id );
+                    getDataObjectPds3( xmlfile.toURI().toURL(), id ); // note local copy
                     return false;
                 } catch ( Exception ex ) {
                     problems.add(ex.getMessage());
@@ -197,7 +225,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
                 parent.insertBefore(kid, child);
             }
         }
-        //DocumentUtil.dumpToXML( doc, new File("/tmp/ap/label-with-imports.xml") );
+        DocumentUtil.dumpToXML( doc, new File("/tmp/ap/label-with-imports.xml") );
         return doc;
     }
     
@@ -235,7 +263,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
 
     }
     
-    protected static URL getFileResource( URL labelFile, ProgressMonitor mon ) 
+    protected static FilePointer getFileResource( URL labelFile, ProgressMonitor mon ) 
             throws IOException, URISyntaxException, ParserConfigurationException, SAXException, XPathExpressionException, PDSException {
         String suri= fromUri( labelFile.toURI() );
         File file = DataSetURI.getFile(suri,mon);
@@ -250,10 +278,8 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
         XPath xpath = factory.newXPath();
         NodeList dat= (NodeList) xpath.evaluate("/LABEL/POINTER/text()",doc,XPathConstants.NODESET);
         String f= dat.item(0).getNodeValue();
-        if ( f.contains(", ") ) { // https://pds-ppi.igpp.ucla.edu/data/GO-J-PWS-2-EDR-WAVEFORM-80KHZ-V1.0/DATA/C032095/80KHZ_0320950402.LBL
-            f= f.substring(0,f.indexOf(", "));
-        }
-        return new URL( labelFile, f );
+        FilePointer result= new FilePointer(labelFile,f);
+        return result;
         //<POINTER object="TABLE">JAD_L50_LRS_ELC_ANY_DEF_2016240_V01.DAT</POINTER>
 
     }
