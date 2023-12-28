@@ -280,27 +280,26 @@ public class Pds3DataSource extends AbstractDataSource {
             
         QDataSet result=null;
         QDataSet[] results= new QDataSet[names.size()];
+         
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath xpath = factory.newXPath();
+        
+        String datafile = (String) xpath.evaluate("/LABEL/POINTER[@object=\"ASCII_TABLE\"]",doc,XPathConstants.STRING);
+        if ( datafile.length()==0 ) {
+            datafile = (String) xpath.evaluate("/LABEL/POINTER[@object=\"BINARY_TABLE\"]",doc,XPathConstants.STRING);
+        }
+        if ( datafile.length()==0 ) {
+            datafile = (String) xpath.evaluate("/LABEL/POINTER[@object=\"TABLE\"]",doc,XPathConstants.STRING);
+        }
+        FilePointer fp= new FilePointer(labelUrl, datafile );
         
         for ( int i=0; i<names.size(); i++ ) {
             if ( results[i]!=null ) continue;
             name= names.get(i);            
             
             PDS3DataObject obj= Pds3DataSourceFactory.getDataObjectPds3( labelUrl, name );
-            
-            String datafile;
-            URL fileUrl;
-            
-            if ( label.filePointers().size()==1 ) {
-                datafile= (String)label.filePointers().get(0);
-                fileUrl= new URL( split.resourceUri.toURL(), datafile );
-            } else {
-                System.err.println("Kludge to see how close the code is");
-                datafile= (String)label.filePointers().get(0);
-                fileUrl= new URL( split.resourceUri.toURL(), datafile );
-                //throw new IllegalArgumentException("multiple file pointers not accepted");
-            }
-            
-            String uri= obj.resolveUri( fileUrl );
+                        
+            String uri= obj.resolveUri( fp.getUrl() );
             
             DataSource delegate= DataSetURI.getDataSource(uri);
             QDataSet ds= delegate.getDataSet( mon.getSubtaskMonitor( "dataset "+ i ) );
