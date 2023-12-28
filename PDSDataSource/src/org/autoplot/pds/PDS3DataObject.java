@@ -181,7 +181,10 @@ public class PDS3DataObject {
                     args.put("type", "long");
                     break;
             }
-            args.put("byteOrder", "big");
+            args.put("byteOrder", "big");        
+        } else if ( dataType.equals("LSB_BIT_STRING" ) ) {
+            args.put("type","ubyte");
+            args.put("dims","["+bytes+"]");
         } else {
             throw new IllegalArgumentException("unsupported type:" +dataType);
         }
@@ -234,7 +237,7 @@ public class PDS3DataObject {
     public int getFileOffset() {
         return fileOffset;
     }
-
+    
     /**
      * the offset into the file, where 1 is the beginning.
      * @param fileOffset 
