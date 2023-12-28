@@ -1,18 +1,10 @@
 
 package org.autoplot.pds;
 
-import gov.nasa.pds.label.Label;
-import gov.nasa.pds.label.object.ArrayObject;
-import gov.nasa.pds.label.object.DataObject;
-import gov.nasa.pds.label.object.FieldDescription;
-import gov.nasa.pds.label.object.TableObject;
-import gov.nasa.pds.objectAccess.ParseException;
 import gov.nasa.pds.ppi.label.PDSException;
 import gov.nasa.pds.ppi.label.PDSLabel;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -23,15 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.autoplot.datasource.AbstractDataSourceFactory;
@@ -49,7 +35,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
- *
+ * Factory for resolving PDS3 URIs.
  * @author jbf
  */
 public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
@@ -154,7 +140,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
             FilePointer filePointer;
             File xmlfile = DataSetURI.getFile( split.resourceUri.toURL() ,new NullProgressMonitor());
             try {
-                filePointer= getFileResource(xmlfile.toURI().toURL(), mon);
+                filePointer= getFileResource( split.resourceUri.toURL(), mon);
             } catch ( IOException | URISyntaxException | ParserConfigurationException | XPathExpressionException | SAXException ex ) {
                 problems.add("uri should point to xml or lblx file");
                 return true;
@@ -165,7 +151,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
                 return true;
             } else {
                 try {
-                    getDataObjectPds3( xmlfile.toURI().toURL(), id ); // note local copy
+                    getDataObjectPds3( split.resourceUri.toURL(), id ); // note local copy
                     return false;
                 } catch ( Exception ex ) {
                     problems.add(ex.getMessage());
