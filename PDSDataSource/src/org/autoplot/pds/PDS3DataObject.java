@@ -118,7 +118,7 @@ public class PDS3DataObject {
     public String resolveUri(URL resource) {
         Map<String,String> args= new LinkedHashMap<>();
         args.put( "recLength", String.valueOf(rowBytes) );
-        if ( dataType.equals("DATE") || dataType.equals("TIME") ) {
+        if ( dataType.equals("DATE") || dataType.equals("TIME") || ( dataType.equals("CHARACTER") && unit.equals("UTC") ) ) {
             args.put("type", "time"+bytes);
         } else if ( dataType.equals("ASCII_REAL") ) {
             args.put("type", "ascii"+bytes);
