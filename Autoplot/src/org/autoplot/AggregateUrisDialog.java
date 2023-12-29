@@ -340,8 +340,11 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
                         dom.getController().getApplicationModel().addRecent( dsf.getUri() );
                     }
                 }
-                String newUri= dom.getController().getDataSourceFilter().getUri();
-                dataSetSelector.setValue(newUri);
+                DataSourceFilter dsf= dom.getController().getDataSourceFilter();
+                if ( dsf!=null ) {
+                    String newUri= dsf.getUri();
+                    dataSetSelector.setValue(newUri);
+                }
                 
             }
         };

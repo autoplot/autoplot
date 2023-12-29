@@ -321,11 +321,16 @@ public final class ApplicationModel {
      */
     public void setDataSet(QDataSet ds) {
         dom.getController().getPlotElement().getController().setResetRanges(true);
-        dom.getController().getDataSourceFilter().getController().setDataSource(null);
-        dom.getController().getDataSourceFilter().setUri("vap+internal:");
-        dom.getController().getDataSourceFilter().setFilters("");
-        dom.getController().getDataSourceFilter().getController().setDataSetInternal(null); // clear out properties and metadata
-        dom.getController().getDataSourceFilter().getController().setDataSetInternal(ds);
+        DataSourceFilter dsf= dom.getController().getDataSourceFilter();
+        if ( dsf!=null ) {
+            dsf.getController().setDataSource(null);
+            dsf.setUri("vap+internal:");
+            dsf.setFilters("");
+            dsf.getController().setDataSetInternal(null); // clear out properties and metadata
+            dsf.getController().setDataSetInternal(ds);
+        } else {
+            logger.warning("expected dsf to be non-null.");
+        }
     }
 
     /**
@@ -431,7 +436,11 @@ public final class ApplicationModel {
     }
 
     public DataSource dataSource() {
-        return dom.getController().getDataSourceFilter().getController().getDataSource();
+        DataSourceFilter dsf= dom.getController().getDataSourceFilter();
+        if ( dsf==null ) {
+            throw new NullPointerException("Expected dsf to be non-null");
+        }
+        return dsf.getController().getDataSource();
     }
 
     public synchronized void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
@@ -534,7 +543,9 @@ public final class ApplicationModel {
      * @throws RuntimeException when resetDataSetSourceURL throws Exception
      */
     public void setDataSourceURL(String suri) {
-        String oldVal = dom.getController().getDataSourceFilter().getUri();
+        DataSourceFilter dsf= dom.getController().getDataSourceFilter();
+        if ( dsf==null ) return;
+        String oldVal = dsf.getUri();
         if (suri == null && oldVal == null) {
             return;
         }
@@ -547,7 +558,9 @@ public final class ApplicationModel {
     }
 
     public String getDataSourceURL() {
-        return dom.getController().getDataSourceFilter().getUri();
+        DataSourceFilter dsf= dom.getController().getDataSourceFilter();
+        if ( dsf==null ) throw new NullPointerException("expected DSF to be non-null");
+        return dsf.getUri();
     }
     protected List<Bookmark> recent = null;
     protected List<Bookmark> bookmarks = null;
@@ -1465,7 +1478,11 @@ public final class ApplicationModel {
      * @return
      */
     public DataSourceController getDataSourceFilterController() {
-        return dom.getController().getDataSourceFilter().getController();
+        DataSourceFilter dsf= dom.getController().getDataSourceFilter();
+        if ( dsf==null ) {
+            throw new NullPointerException("Expected DSF to be non-null");
+        }
+        return dsf.getController();
     }
     
     private final Map<RenderType,PlotStylePanel.StylePanel> panelCache= new HashMap<>();

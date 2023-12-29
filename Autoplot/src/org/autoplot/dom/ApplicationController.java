@@ -699,10 +699,14 @@ public class ApplicationController extends DomNodeController implements RunLater
         //registerPendingChange( this, PENDING_CHANGE_REPLOTURI );
         //performingChange( this, PENDING_CHANGE_REPLOTURI );
         DataSourceFilter dsf= getDataSourceFilter();
-        dsf.getController().setSuri(suri, new NullProgressMonitor() );
-        //dsf.getController().resolveDataSource( false, new NullProgressMonitor() );
-        dsf.getController().update(true);
-        //changePerformed( this, PENDING_CHANGE_REPLOTURI );
+        if ( dsf==null ) {
+            logger.warning("dsf is null, doing nothing");
+        } else {
+            dsf.getController().setSuri(suri, new NullProgressMonitor() );
+            //dsf.getController().resolveDataSource( false, new NullProgressMonitor() );
+            dsf.getController().update(true);
+            //changePerformed( this, PENDING_CHANGE_REPLOTURI );
+        }
         if ( !resetPlot ) {
             assert lock!=null;
             lock.unlock();
@@ -2157,7 +2161,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         if (!dsfs.contains(getDataSourceFilter())) {
             if (dsfs.isEmpty()) {
-                setDataSourceFilter(null);
+                setDataSourceFilter(null); //TODO: review this.  It might be better to never allow no DSFs.
             } else {
                 setDataSourceFilter(dsfs.get(0));
             }
@@ -3223,7 +3227,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     public static final String PROP_PLOT_ELEMENT = "plotElement";
 
     /**
-     * return the focus plot element
+     * return the focus plot element or null
      * @return the focus plot element
      */
     public PlotElement getPlotElement() {
@@ -3375,7 +3379,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     public static final String PROP_DATASOURCEFILTER = "dataSourceFilter";
 
     /**
-     * return focus dataSourceFilter.
+     * return focus dataSourceFilter, or null.
      * @return the focus dataSourceFilter.
      */
     public DataSourceFilter getDataSourceFilter() {
@@ -3384,9 +3388,12 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     /**
      * set the focus dataSourceFilter.
-     * @param dataSourceFilter the focus dataSourceFilter.
+     * @param dataSourceFilter the focus dataSourceFilter, or null.
      */
     public void setDataSourceFilter(DataSourceFilter dataSourceFilter) {
+        if ( dataSourceFilter==null ) {
+            logger.info("set dataSourceFilter to null");
+        }
         DataSourceFilter oldDataSourceFilter = this.dataSourceFilter;
         this.dataSourceFilter = dataSourceFilter;
         propertyChangeSupport.firePropertyChange(PROP_DATASOURCEFILTER, oldDataSourceFilter, dataSourceFilter);
