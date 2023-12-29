@@ -211,7 +211,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
                 parent.insertBefore(kid, child);
             }
         }
-        DocumentUtil.dumpToXML( doc, new File("/tmp/ap/label-with-imports.xml") );
+        //DocumentUtil.dumpToXML( doc, new File("/tmp/ap/label-with-imports.xml") );
         return doc;
     }
     
