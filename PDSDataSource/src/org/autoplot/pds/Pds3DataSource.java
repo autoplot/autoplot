@@ -232,11 +232,10 @@ public class Pds3DataSource extends AbstractDataSource {
     @Override
     public Map<String, Object> getMetadata(ProgressMonitor mon) throws Exception {
         URISplit split= URISplit.parse( getURI() );
-        File lblfile = DataSetURI.getFile( split.resourceUri.toURL() ,new NullProgressMonitor());
         
         String name= getParam("arg_0","");
         
-        return Pds3DataSourceFactory.getDataObjectPds3( lblfile.toURL(), name ).getMetadata();
+        return Pds3DataSourceFactory.getDataObjectPds3(  split.resourceUri.toURL(), name ).getMetadata();
                            
     }
     
