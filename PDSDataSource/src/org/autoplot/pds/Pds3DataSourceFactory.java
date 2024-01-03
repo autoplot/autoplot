@@ -173,6 +173,9 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
      * @throws PDSException 
      */
     protected static Document getDocumentWithImports( URL labelUrl ) throws IOException, PDSException {
+        
+        System.err.println("labelUrl: "+ labelUrl);
+        
         File xmlfile = DataSetURI.getFile( labelUrl,new NullProgressMonitor());
 
         PDSLabel label = new PDSLabel(); 
