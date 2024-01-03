@@ -87,6 +87,7 @@ import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.RecentComboBox;
 import org.autoplot.datasource.TimeRangeTool;
 import org.autoplot.datasource.URISplit;
+import org.autoplot.datasource.WindowManager;
 import org.das2.client.Das2ServerGUI;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -1101,7 +1102,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         sp.setMaximumSize( new Dimension(500,800) );
         sp.setPreferredSize( new Dimension(300,500) );
         sp.getVerticalScrollBar().setUnitIncrement(sp.getFont().getSize());
-        int response= JOptionPane.showConfirmDialog( this, sp, "Edit reader params", JOptionPane.OK_CANCEL_OPTION );
+        int response= WindowManager.showConfirmDialog( this, sp, "Edit reader params", JOptionPane.OK_CANCEL_OPTION );
         if ( response==JOptionPane.OK_OPTION ) {
             readerParamsTextArea.setText( x.getParameters() );
         }
