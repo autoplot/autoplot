@@ -153,7 +153,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         intrinsicCb = new javax.swing.JCheckBox();
         recentComboBox1 = new org.autoplot.datasource.RecentComboBox();
         itemsComboBox = new javax.swing.JComboBox<>();
-        jButton1 = new javax.swing.JButton();
+        editParamsButton = new javax.swing.JButton();
 
         setName("das2serverDataSourceEditorPanel"); // NOI18N
 
@@ -252,11 +252,11 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         itemsComboBox.setEditable(true);
         itemsComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " ", " " }));
 
-        jButton1.setText("Edit Params");
-        jButton1.setToolTipText("The DSDF can be used to describe the parameters, and this experimental GUI will be generated.");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        editParamsButton.setText("Edit Params");
+        editParamsButton.setToolTipText("The DSDF can be used to describe the parameters, and this experimental GUI will be generated.");
+        editParamsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                editParamsButtonActionPerformed(evt);
             }
         });
 
@@ -294,7 +294,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(viewDsdfButton)
-                            .add(jButton1)))
+                            .add(editParamsButton)))
                     .add(layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(jLabel1)
@@ -353,7 +353,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                             .add(jLabel6)
                             .add(intrinsicCb)
                             .add(itemsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                    .add(jButton1))
+                    .add(editParamsButton))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -1047,7 +1047,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         logger.log(Level.FINEST, "changed {0}", evt.getItem());
     }//GEN-LAST:event_recentComboBox1ItemStateChanged
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void editParamsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editParamsButtonActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
         TreePath p= jTree1.getSelectionPath();
         TreeModel m= jTree1.getModel();
@@ -1091,7 +1091,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         }
         
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_editParamsButtonActionPerformed
 
     public void editDsdfContent() {
         Das2ServerGUI x = new Das2ServerGUI();
@@ -1111,10 +1111,10 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     public javax.swing.JComboBox das2ServerComboBox;
     public javax.swing.JLabel descriptionLabel;
     public javax.swing.JCheckBox discoveryCb;
+    public javax.swing.JButton editParamsButton;
     public javax.swing.JComboBox examplesComboBox;
     public javax.swing.JCheckBox intrinsicCb;
     public javax.swing.JComboBox<String> itemsComboBox;
-    public javax.swing.JButton jButton1;
     public javax.swing.JLabel jLabel1;
     public javax.swing.JLabel jLabel2;
     public javax.swing.JLabel jLabel3;
