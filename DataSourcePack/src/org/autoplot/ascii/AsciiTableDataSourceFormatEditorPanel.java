@@ -54,7 +54,9 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
         timeUnitsDropList = new javax.swing.JComboBox();
         timeUnitsCB = new javax.swing.JCheckBox();
         delimiterCheckBox = new javax.swing.JCheckBox();
-        jTextField1 = new javax.swing.JTextField();
+        delimiterTextField = new javax.swing.JTextField();
+        commentCheckBox = new javax.swing.JCheckBox();
+        commentTextField = new javax.swing.JTextField();
 
         useFormatSpecCB.setText("Explicit Format Specifiers");
         useFormatSpecCB.setToolTipText("Specify the format to for numbers and times.");
@@ -141,12 +143,15 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
         timeUnitsCB.setText("Time Units:");
 
         delimiterCheckBox.setText("Delimiter:");
-        delimiterCheckBox.setToolTipText("The delimiter, or SPACE, NONE, COMMA");
+        delimiterCheckBox.setToolTipText("The delimiter, or SPACE, NONE, COMMA, SEMICOLON, COLON, TAB");
 
-        jTextField1.setText(" ");
+        delimiterTextField.setText(" ");
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, delimiterCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), jTextField1, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, delimiterCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), delimiterTextField, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
+
+        commentCheckBox.setText("Comment:");
+        commentCheckBox.setToolTipText("Comment to insert at top.  If empty, then no line is added");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -156,27 +161,31 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(useFormatSpecCB)
-                            .add(layout.createSequentialGroup()
-                                .add(richHeadersCB)
-                                .add(18, 18, 18)
-                                .add(noHeadersCB))
-                            .add(justDataCB)
-                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                                .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                                    .add(timeUnitsCB)
-                                    .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                    .add(timeUnitsDropList, 0, 353, Short.MAX_VALUE))
-                                .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                                    .add(12, 12, 12)
-                                    .add(explicitFormatSpecPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
-                        .add(18, 18, 18))
+                        .add(timeUnitsCB)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(timeUnitsDropList, 0, 371, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
                         .add(delimiterCheckBox)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jTextField1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 26, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .add(delimiterTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 26, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(useFormatSpecCB)
+                            .add(justDataCB)
+                            .add(layout.createSequentialGroup()
+                                .add(12, 12, 12)
+                                .add(explicitFormatSpecPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(layout.createSequentialGroup()
+                                .add(richHeadersCB)
+                                .add(18, 18, 18)
+                                .add(noHeadersCB)))
+                        .add(0, 0, Short.MAX_VALUE))
+                    .add(layout.createSequentialGroup()
+                        .add(commentCheckBox)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(commentTextField)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -186,6 +195,10 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
                     .add(richHeadersCB)
                     .add(noHeadersCB))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(commentCheckBox)
+                    .add(commentTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(4, 4, 4)
                 .add(justDataCB)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(useFormatSpecCB)
@@ -198,8 +211,8 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(delimiterCheckBox)
-                    .add(jTextField1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(15, Short.MAX_VALUE))
+                    .add(delimiterTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(59, Short.MAX_VALUE))
         );
 
         bindingGroup.bind();
@@ -223,11 +236,13 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox commentCheckBox;
+    private javax.swing.JTextField commentTextField;
     private javax.swing.JCheckBox delimiterCheckBox;
+    private javax.swing.JTextField delimiterTextField;
     private javax.swing.JPanel explicitFormatSpecPanel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JCheckBox justDataCB;
     private javax.swing.JCheckBox noHeadersCB;
     private javax.swing.JTextField numberFormatSpecifierTF;
@@ -274,6 +289,16 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
         if ( s!=null && s.length()>0 && 'F'==s.substring(0,1).toUpperCase().charAt(0) ) {
             justDataCB.setSelected(true);
         }
+        s= args.getOrDefault("delim",",");
+        delimiterCheckBox.setSelected(!s.equals(","));
+        if ( delimiterCheckBox.isSelected() ) {
+            delimiterTextField.setText(s);
+        } 
+        s= args.get("comment");
+        commentCheckBox.setSelected(s!=null);
+        if ( commentCheckBox.isSelected() ) {
+            commentTextField.setText(s.replaceAll("\\+"," "));
+        }
     }
 
     @Override
@@ -308,6 +333,15 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
             args.put( "doDep", "F" );
         }
         
+        if ( commentCheckBox.isSelected() ) {
+            args.put( "comment", commentTextField.getText().replaceAll("\\s", "+"));
+        }
+        
+        if ( delimiterCheckBox.isSelected() ) {
+            String s= delimiterTextField.getText();
+            if ( s.equals(" ") ) s= "SPACE";
+            args.put("delim", s );
+        }
         String params= URISplit.formatParams(args);
         if ( result==null ) result= "file:///";
         URISplit ss= URISplit.parse(result);
