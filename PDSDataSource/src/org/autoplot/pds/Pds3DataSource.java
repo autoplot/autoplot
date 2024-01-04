@@ -248,7 +248,7 @@ public class Pds3DataSource extends AbstractDataSource {
         URL labelUrl= split.resourceUri.toURL();
         File xmlfile = DataSetURI.getFile( labelUrl,new NullProgressMonitor());
         
-        Document doc= Pds3DataSourceFactory.getDocumentWithImports( xmlfile.toURI().toURL() );
+        Document doc= Pds3DataSourceFactory.getDocumentWithImports( labelUrl );
             
         PDSLabel label= new PDSLabel();
         // we need to parse this twice because it contains the name of the data file as well.

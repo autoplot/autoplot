@@ -151,7 +151,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
                 return true;
             } else {
                 try {
-                    getDataObjectPds3( split.resourceUri.toURL(), id ); // note local copy
+                    getDataObjectPds3( split.resourceUri.toURL(), id ); 
                     return false;
                 } catch ( Exception ex ) {
                     problems.add(ex.getMessage());
@@ -174,7 +174,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
      */
     protected static Document getDocumentWithImports( URL labelUrl ) throws IOException, PDSException {
         
-        System.err.println(">>>  labelUrl: "+ labelUrl);
+        logger.entering( "Pds3DataSourceFactory", "getDocumentWithImports", labelUrl );
         
         File xmlfile = DataSetURI.getFile( labelUrl,new NullProgressMonitor());
 
@@ -215,6 +215,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
             }
         }
         //DocumentUtil.dumpToXML( doc, new File("/tmp/ap/label-with-imports.xml") );
+        logger.exiting( "Pds3DataSourceFactory", "getDocumentWithImports" );
         return doc;
     }
     
