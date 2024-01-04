@@ -53,6 +53,8 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
         justDataCB = new javax.swing.JCheckBox();
         timeUnitsDropList = new javax.swing.JComboBox();
         timeUnitsCB = new javax.swing.JCheckBox();
+        delimiterCheckBox = new javax.swing.JCheckBox();
+        jTextField1 = new javax.swing.JTextField();
 
         useFormatSpecCB.setText("Explicit Format Specifiers");
         useFormatSpecCB.setToolTipText("Specify the format to for numbers and times.");
@@ -138,6 +140,14 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
 
         timeUnitsCB.setText("Time Units:");
 
+        delimiterCheckBox.setText("Delimiter:");
+        delimiterCheckBox.setToolTipText("The delimiter, or SPACE, NONE, COMMA");
+
+        jTextField1.setText(" ");
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, delimiterCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), jTextField1, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -145,21 +155,28 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(useFormatSpecCB)
                     .add(layout.createSequentialGroup()
-                        .add(richHeadersCB)
-                        .add(18, 18, 18)
-                        .add(noHeadersCB))
-                    .add(justDataCB)
-                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                            .add(timeUnitsCB)
-                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                            .add(timeUnitsDropList, 0, 353, Short.MAX_VALUE))
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                            .add(12, 12, 12)
-                            .add(explicitFormatSpecPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
-                .add(18, 18, 18))
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(useFormatSpecCB)
+                            .add(layout.createSequentialGroup()
+                                .add(richHeadersCB)
+                                .add(18, 18, 18)
+                                .add(noHeadersCB))
+                            .add(justDataCB)
+                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                                .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                                    .add(timeUnitsCB)
+                                    .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                    .add(timeUnitsDropList, 0, 353, Short.MAX_VALUE))
+                                .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                                    .add(12, 12, 12)
+                                    .add(explicitFormatSpecPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
+                        .add(18, 18, 18))
+                    .add(layout.createSequentialGroup()
+                        .add(delimiterCheckBox)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jTextField1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 26, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -178,7 +195,11 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(timeUnitsDropList, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(timeUnitsCB))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(delimiterCheckBox)
+                    .add(jTextField1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         bindingGroup.bind();
@@ -202,9 +223,11 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox delimiterCheckBox;
     private javax.swing.JPanel explicitFormatSpecPanel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JTextField jTextField1;
     private javax.swing.JCheckBox justDataCB;
     private javax.swing.JCheckBox noHeadersCB;
     private javax.swing.JTextField numberFormatSpecifierTF;

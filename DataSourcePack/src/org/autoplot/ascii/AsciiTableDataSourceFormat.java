@@ -45,7 +45,8 @@ import org.das2.qds.ops.Ops;
  * <li>tformat=hours+since+2015-01-01T00:00 use offsets. (timeformat and tformat are aliases)
  * <li>tformat=$Y+$J+$H+$M+$S. (separate into columns for each component)
  * <li>tformat=day
- * <li>format=%5.2f use this formatter for data.
+ * <li>format=%5.2f use this formatter for data, otherwise default formatting is used.  (See QDataSet.FORMAT)
+ * <li>delim=none don't use a delimeter
  * </ul>
  * @author jbf
  */
@@ -438,12 +439,30 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
     }
     
     /**
-     * return " " or ", "
+     * return " " or ", ", or whatever is specified by the "delim" control.
      * @return the delimiter.
      */
     private String getDelim( ) {
         String head= getParam( "header", "" ); // could be "rich"
         String delim = "rich".equals(head) ? " " : ", ";
+        String x= getParam("delim",",").toUpperCase();
+        if ( !x.equals(",") ) {
+            if ( x.equals("NONE") ) {
+                delim="";
+            } else if ( x.equals("WHITESPACE") || x.equals("SPACE") ) {
+                delim= " ";
+            } else if ( x.equals("COMMA") ) {
+                delim= ",";
+            } else if ( x.equals("SEMICOLON") ) {
+                delim= ";";
+            } else if ( x.equals("COLON") ) {
+                delim= ":";
+            } else if ( x.equals("TAB") ) {
+                delim= "\t";
+            } else {
+                delim= x;
+            }
+        }
         return delim;
     }
     
