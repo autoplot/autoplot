@@ -35,6 +35,7 @@ import org.das2.qds.DataSetUtil;
 import org.das2.qds.LongReadAccess;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.ops.Ops;
+import org.das2.qds.util.AsciiParser;
 
 /**
  * Format the QDataSet into Ascii tables.  
@@ -618,11 +619,34 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                     out.print( "# " );
                 }
                 for ( int k=0; k<nelements; k++ ) {
-                    out.print( l1  );
-                    if ( i==bundleDesc.length()-1 && k==nelements-1 ) {
-                        out.print( "\n" );
+                    if ( delim.length()>0 ) {
+                        out.print( l1  );
+                        if ( i==bundleDesc.length()-1 && k==nelements-1 ) {
+                            out.print( "\n" );
+                        } else {
+                            out.print( delim );
+                        }
                     } else {
-                        out.print( delim );
+                        String f= (String)bundleDesc.property(QDataSet.FORMAT,i);
+                        if ( f==null ) {
+                            out.print( l1 ); 
+                        } else {
+                            int len= AsciiParser.guessLengthForFormat(f);
+                            if ( len==-1 ) {
+                                out.print( l1 );
+                            } else {
+                                StringBuilder b= new StringBuilder();
+                                int extra= len - l1.length();
+                                for ( int ii=0; ii<extra; ii++ ) {
+                                    b.append( " " );
+                                }
+                                b.append( l1 );
+                                out.print(b.toString());
+                            }                        
+                            if ( i==bundleDesc.length()-1 && k==nelements-1 ) {
+                                out.print( "\n" );
+                            }
+                        }
                     }
                 }
             }
@@ -827,6 +851,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
      */
     private String dataSetLabel( QDataSet ds, String deft ) {
         String head= getParam( "header", "" ); // could be "rich"
+        String delim= getDelim();
         String name;
         if ( "rich".equals(head) ) {
             name = (String) ds.property(QDataSet.NAME);
@@ -848,6 +873,14 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 label= label + "("+getTimeUnitLabel()+")";
             } else {
                 label= label+"("+units+")";
+            }
+        }
+        if ( delim.length()==0 ) {
+            String f= (String)ds.property(QDataSet.FORMAT);
+            if ( f==null ) {
+                label= " " + label ;
+            } else {
+                label= " " + label ;
             }
         }
         return label;
