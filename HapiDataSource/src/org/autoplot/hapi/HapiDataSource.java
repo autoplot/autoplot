@@ -1013,6 +1013,9 @@ public final class HapiDataSource extends AbstractDataSource {
         if ( pp.length()>0 ) {
             String[] pps= pp.split(",");
             for ( int i=0; i<pps.length; i++ ) {
+                if ( i==0 && ( pps[i].equals("Time") || pps[i].equals("time") ) ) {
+                    pps[i] = parametersArray.getJSONObject(0).getString("name");
+                }
                 pps[i]= pps[i].replace("+"," ");
                 pps[i]= pps[i].replaceAll("\\%2B","+");
             }
@@ -1024,6 +1027,8 @@ public final class HapiDataSource extends AbstractDataSource {
                 pp= parametersArray.getJSONObject(0).getString("name") + ","+ pp;
                 pps= pp.split(",");
             }
+            
+            pp= String.join( ",", pps ); // because we might have changed "timestamp" to "Time"
             
             ArrayList namesNotFound= new ArrayList();
             ParamDescription[] subsetPds= new ParamDescription[pps.length];
