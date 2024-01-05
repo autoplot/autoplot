@@ -267,7 +267,7 @@ public class HapiServer {
      * @return the request, with the ID and parameters URL encoded.
      */
     public static URL getDataURL( URL server, String id, DatumRange tr, String parameters ) {
-        TimeParser tp= TimeParser.create("$Y-$m-$dT$H:$M:$SZ");
+        TimeParser tp= TimeParser.create("$Y-$m-$dT$H:$M:$S.$(subsec;places=3)Z");
         HashMap<String,String> map= new LinkedHashMap();
         map.put(HapiSpec.URL_PARAM_ID, id );
         String version;
