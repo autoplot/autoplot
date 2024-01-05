@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Initial support for PDS3 looks promising.</small></p>
+        <p><small><a href='https://github.com/autoplot/dev/blob/master/demos/2023/20231220/colors.jy'>Script</a> shows all the named web colors.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -32,6 +32,7 @@
                 
         <p>Bugfixes (2024-01-05 r27485):</p>
         <ul>
+            <li>HAPI time ranges requested with millisecond precision, after we noticed truncating milliseconds would cause requests from https://vires.services/hapi to fail because of startDate.
             <li>HAPI data requests with "Time" as the first parameter should always load the time, regardless of its name.
             <li>binAverageBundle checks for dimensionless and degrees, don't do sloppy logic which assumes degrees were intended, since radians are often represented as dimensionless.
             <li>binAverageBundle mishandled ylog bins, adding the linear half-bin not the log half-bin, causing out of bounds.
