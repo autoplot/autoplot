@@ -30,8 +30,11 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-01-03 r27474):</p>
+        <p>Bugfixes (2024-01-05 r27485):</p>
         <ul>
+            <li>HAPI data requests with "Time" as the first parameter should always load the time, regardless of its name.
+            <li>binAverageBundle checks for dimensionless and degrees, don't do sloppy logic which assumes degrees were intended, since radians are often represented as dimensionless.
+            <li>binAverageBundle mishandled ylog bins, adding the linear half-bin not the log half-bin, causing out of bounds.
             <li>Corrections to Das2Server parameters GUI, thanks Chris!
             <li>RunBatch had code which assumed min and max values were both the same type (not 0,4.5).
             <li>fftPower had branch which assumed xtags had units.
