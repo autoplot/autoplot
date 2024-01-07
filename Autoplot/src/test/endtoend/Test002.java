@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import org.autoplot.RenderType;
 import org.autoplot.ScriptContext;
 import org.autoplot.dom.Application;
+import org.autoplot.dom.Row;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
 import org.autoplot.jythonsupport.Util;
@@ -46,7 +47,14 @@ public class Test002 {
         int height = ScriptContext.getDocumentModel().getCanvases(0).getHeight();
         ScriptContext.setCanvasSize(width, height); // TODO: why?  I shouldn't have to set this...
         ScriptContext.writeToPng(label + ".png");
-
+        
+        if ( label.equals("test002_009" ) ) {
+            System.err.println("Rows:");
+            for ( Row r: ScriptContext.getDocumentModel().getCanvases(0).getRows() ) {
+                System.err.println( r );
+            }
+        }
+        
         System.err.printf("wrote to %s.png %dx%d\n", label, width, height);
 
 
