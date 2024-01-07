@@ -8,7 +8,7 @@ import org.das2.util.filesystem.FileSystemFactory;
 
 /**
  * creates a ZipFileSystem
- * @author ed
+ * @author Ed Jackson
  */
 public class ZipFileSystemFactory implements FileSystemFactory {
 
