@@ -32,6 +32,7 @@
                 
         <p>Bugfixes (2024-01-05 r27485):</p>
         <ul>
+            <li>Exceptions occurring during Mashup tool loading variables now correctly throw Java exception (FileNotFound), not PyException.
             <li>HAPI time ranges requested with millisecond precision, after we noticed truncating milliseconds would cause requests from https://vires.services/hapi to fail because of startDate.
             <li>HAPI data requests with "Time" as the first parameter should always load the time, regardless of its name.
             <li>binAverageBundle checks for dimensionless and degrees, don't do sloppy logic which assumes degrees were intended, since radians are often represented as dimensionless.
