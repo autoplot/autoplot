@@ -283,7 +283,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
             File xmlfile = DataSetURI.getFile(cc.resourceURI.toURL(),new NullProgressMonitor());
              
             Map<String,String> result;
-            result = getDataObjectNames(xmlfile.toURI().toURL(), mon);
+            result = getDataObjectNames(cc.resourceURI.toURL(), mon);
             
             List<CompletionContext> ccresult= new ArrayList<>();
             ccresult.add( new CompletionContext( 
