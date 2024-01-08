@@ -1,6 +1,8 @@
 
 package org.autoplot.inline;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.text.ParseException;
@@ -40,6 +42,8 @@ import org.das2.datum.Datum;
 import org.das2.datum.DatumUtil;
 import org.das2.datum.InconvertibleUnitsException;
 import org.das2.qds.examples.Schemes;
+import org.python.core.Py;
+import org.python.core.PyException;
 
 /**
  * Data source used mostly for demonstrations and quick modifications
@@ -377,7 +381,21 @@ public class InlineDataSource extends AbstractDataSource {
                     interp.set( "monitor", mon.getSubtaskMonitor(arg));
                     arg= URISplit.uriDecode(arg);
                     if ( arg.startsWith("timerange=") ) continue;
-                    execCommand( interp, arg );
+                    try {
+                        execCommand( interp, arg );
+                    } catch ( Exception ex ) {
+                        if ( ex instanceof PyException ) {
+                            Object o= ((PyException)ex).value.__tojava__(Exception.class);
+                            if ( o==Py.NoConversion ) {
+                                throw ex;
+                            } else {
+                                Exception ex2= (Exception)o;
+                                throw ex2;
+                            }
+                        } else {
+                            throw ex;
+                        }
+                    }
 
                 } else { 
                     ds= parseInlineDs(arg);
