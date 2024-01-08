@@ -317,8 +317,9 @@ public class RunBatchTool extends javax.swing.JPanel {
         showHelpMenuItem = new javax.swing.JMenuItem();
         jPanel1 = new javax.swing.JPanel();
         postRunPopupMenu = new javax.swing.JPopupMenu();
-        copyUri = new javax.swing.JMenuItem();
+        copyScriptUri = new javax.swing.JMenuItem();
         rerunScriptMenuItem = new javax.swing.JMenuItem();
+        copyUriMenuItem = new javax.swing.JMenuItem();
         goButton = new javax.swing.JButton();
         param1ScrollPane = new javax.swing.JScrollPane();
         param1Values = new javax.swing.JTextArea();
@@ -501,13 +502,13 @@ public class RunBatchTool extends javax.swing.JPanel {
             .addGap(0, 100, Short.MAX_VALUE)
         );
 
-        copyUri.setText("Copy Script URI");
-        copyUri.addActionListener(new java.awt.event.ActionListener() {
+        copyScriptUri.setText("Copy Script URI");
+        copyScriptUri.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                copyUriActionPerformed(evt);
+                copyScriptUriActionPerformed(evt);
             }
         });
-        postRunPopupMenu.add(copyUri);
+        postRunPopupMenu.add(copyScriptUri);
 
         rerunScriptMenuItem.setText("Re-Run Script");
         rerunScriptMenuItem.setToolTipText("Re run the script with these arguments");
@@ -517,6 +518,14 @@ public class RunBatchTool extends javax.swing.JPanel {
             }
         });
         postRunPopupMenu.add(rerunScriptMenuItem);
+
+        copyUriMenuItem.setText("jMenuItem1");
+        copyUriMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                copyUriMenuItemActionPerformed(evt);
+            }
+        });
+        postRunPopupMenu.add(copyUriMenuItem);
 
         goButton.setText("Go!");
         goButton.setToolTipText("Run the batch processes, holding shift to run independent processes in parallel.");
@@ -983,6 +992,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                 return;
             }
             prefs.put("export", f.toString() );
+            String message0= messageLabel.getText();
             Runnable run= () -> {
                 try {
                     exportResults( f );
@@ -992,7 +1002,9 @@ public class RunBatchTool extends javax.swing.JPanel {
                 } catch (JSONException ex) {
                     JOptionPane.showMessageDialog(RunBatchTool.this, "Unable to save file because of JSON exception "+ex.getMessage() );
                 }
+                messageLabel.setText(message0);
             };
+            messageLabel.setText("writing to "+ff + "...");
             new Thread(run).start();
         }
     }//GEN-LAST:event_exportResultsMenuItemActionPerformed
@@ -1047,7 +1059,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_writeFilenameCBActionPerformed
 
-    private void copyUriActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyUriActionPerformed
+    private void copyScriptUriActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyScriptUriActionPerformed
         JLabel p= getSelectedLabel();
         String uri= jobs.get(p);
         if ( uri!=null ) {
@@ -1060,7 +1072,7 @@ public class RunBatchTool extends javax.swing.JPanel {
             System.err.println("internal error...");
         }
         
-    }//GEN-LAST:event_copyUriActionPerformed
+    }//GEN-LAST:event_copyScriptUriActionPerformed
 
     private void rerunScriptMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rerunScriptMenuItemActionPerformed
         JLabel jLabel1= getSelectedLabel();
@@ -1105,6 +1117,15 @@ public class RunBatchTool extends javax.swing.JPanel {
             mon.cancel();
         }
     }//GEN-LAST:event_cancelButtonActionPerformed
+
+    private void copyUriMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyUriMenuItemActionPerformed
+        JLabel p= getSelectedLabel();
+        String argValue= p.getText();
+        System.err.println(argValue);
+        StringSelection stringSelection= new StringSelection( argValue );
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents( stringSelection, null );
+        messageLabel.setText("Copied to system clipboard: "+argValue );
+    }//GEN-LAST:event_copyUriMenuItemActionPerformed
 
     private void doLoadFromFile( JTextArea paramValues ) {
         JFileChooser chooser= new JFileChooser();
@@ -2608,7 +2629,8 @@ public class RunBatchTool extends javax.swing.JPanel {
     private javax.swing.JMenuItem SaveAsMenuItem;
     private javax.swing.JButton cancelButton;
     private javax.swing.JButton closeButton;
-    private javax.swing.JMenuItem copyUri;
+    private javax.swing.JMenuItem copyScriptUri;
+    private javax.swing.JMenuItem copyUriMenuItem;
     private org.autoplot.datasource.DataSetSelector dataSetSelector1;
     private javax.swing.JButton editParamsButton;
     private javax.swing.JMenuItem exportResultsMenuItem;
@@ -2653,7 +2675,8 @@ public class RunBatchTool extends javax.swing.JPanel {
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
-    private static void exportResultsPendingCSV( File pendingFile, JSONObject results, JSONArray resultsArray, int recordsWrittenAlready ) throws FileNotFoundException, IOException {
+    private static void exportResultsPendingCSV( File pendingFile, JSONObject results, JSONArray resultsArray, 
+            int recordsWrittenAlready ) throws FileNotFoundException, IOException {
         
         boolean header= recordsWrittenAlready==0;
         
@@ -2702,6 +2725,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                 }
                 String resultString= jo.optString("result","");
                 int inl= resultString.indexOf("\n");
+                if ( inl>=0 ) inl= resultString.indexOf("\n",inl+1);
                 if ( inl>=0 ) inl= resultString.indexOf("\n",inl+1);
                 if ( inl>=0 ) resultString= resultString.substring(0,inl).replaceAll("\n"," ").replaceAll(",","");
                 record.append(",").append(resultString);
