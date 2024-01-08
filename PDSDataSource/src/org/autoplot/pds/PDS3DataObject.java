@@ -81,6 +81,9 @@ public class PDS3DataObject {
             validMaximum= j.optDouble("VALID_MAXIMUM",Double.POSITIVE_INFINITY);
             validMinimum= j.optDouble("VALID_MINIMUM",Double.NEGATIVE_INFINITY);
             missingConstant= j.optDouble("MISSING_CONSTANT",Double.NaN);
+            if ( Double.isNaN(missingConstant) ) {
+                missingConstant= j.optDouble("INVALID_CONSTANT",Double.NaN);
+            }
             description= j.optString("DESCRIPTION", "");
         } catch (TransformerException | JSONException ex) {
             throw new IllegalArgumentException("unable to run");
