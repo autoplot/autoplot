@@ -390,7 +390,7 @@ public class InlineDataSource extends AbstractDataSource {
                                 throw ex;
                             } else {
                                 Exception ex2= (Exception)o;
-                                throw ex2;
+                                throw ex2; 
                             }
                         } else {
                             throw ex;
