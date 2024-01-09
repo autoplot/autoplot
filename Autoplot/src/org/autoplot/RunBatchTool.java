@@ -995,8 +995,13 @@ public class RunBatchTool extends javax.swing.JPanel {
             String message0= messageLabel.getText();
             Runnable run= () -> {
                 try {
-                    exportResults( f );
-                    JOptionPane.showMessageDialog(RunBatchTool.this, "data saved to "+f );
+                    if ( results==null ) {
+                        exportResults(f,resultsPending);
+                        JOptionPane.showMessageDialog(RunBatchTool.this, "pending results saved to "+f );
+                    } else {
+                        exportResults( f,results );
+                        JOptionPane.showMessageDialog(RunBatchTool.this, "data saved to "+f );
+                    }
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(RunBatchTool.this, "Unable to save file. "+ex.getMessage() );
                 } catch (JSONException ex) {
@@ -1164,7 +1169,7 @@ public class RunBatchTool extends javax.swing.JPanel {
             
     }
 
-    private void exportResults( File f ) throws IOException, JSONException {
+    private void exportResults( File f, JSONObject results ) throws IOException, JSONException {
         if ( results==null ) {
             return;
         }
@@ -2162,24 +2167,28 @@ public class RunBatchTool extends javax.swing.JPanel {
                 executor.execute(runOne);
                 i1=i1+1;
                 
-                if ( resultsFile!=null ) {
-                    if ( resultsFile.getName().endsWith(".json") ) {
-                        
-                    } else {
-                        File pendingResultsFile= new File( resultsFile.getAbsolutePath()+".pending" );
-                        exportResultsPendingCSV( pendingResultsFile, jo, ja, exportResultsWritten );
-                    }
-                    exportResultsWritten= icount;
-                }
-                
-                JSONObject pendingResults= new JSONObject( jo.toString() );
-                pendingResults.put( "results", new JSONArray( ja.toString() ) );
             }
+            
+            long lastWrite= System.currentTimeMillis();
             
             while ( true ) {
                 if ( executor.getActiveCount()==0 && I1.intValue()==ff1.length ) {
                     break;
                 }
+                if ( resultsFile!=null && ( ( System.currentTimeMillis()-lastWrite )>30000 ) ) { // write to pending file every thirty seconds.
+                    if ( resultsFile.getName().endsWith(".json") ) {
+                        
+                    } else {
+                        File pendingResultsFile= new File( resultsFile.getAbsolutePath()+".pending" );
+                        exportResultsPendingCSV( pendingResultsFile, jo, ja, exportResultsWritten );
+                        messageLabel.setText( "wrote ("+icount+") to " + resultsFile.getAbsolutePath()+".pending");
+                    }
+                    exportResultsWritten= icount;
+                    lastWrite= System.currentTimeMillis();
+                }
+                
+                JSONObject pendingResults= new JSONObject( jo.toString() );
+                pendingResults.put( "results", new JSONArray( ja.toString() ) );
             }
                 
             jo.put( "results", ja );
@@ -2338,6 +2347,8 @@ public class RunBatchTool extends javax.swing.JPanel {
             int i1=0;
             int exportResultsWritten=0;
             
+            long lastWrite= System.currentTimeMillis();
+            
             for ( String f1 : ff1 ) {
                 JSONObject runResults= new JSONObject();
                 Map<String,Object> scriptParams= new LinkedHashMap<>();
@@ -2472,18 +2483,20 @@ public class RunBatchTool extends javax.swing.JPanel {
                 }
                 i1=i1+1;
                 
-                if ( resultsFile!=null ) {
+                if ( resultsFile!=null && ( ( System.currentTimeMillis()-lastWrite )>30000 ) ) {
                     if ( resultsFile.getName().endsWith(".json") ) {
                         
                     } else {
                         File pendingResultsFile= new File( resultsFile.getAbsolutePath()+".pending" );
                         exportResultsPendingCSV( pendingResultsFile, jo, ja, exportResultsWritten );
+                        messageLabel.setText( "wrote ("+icount+") to " + resultsFile.getAbsolutePath()+".pending");
                     }
                     exportResultsWritten= icount;
+                    lastWrite= System.currentTimeMillis();
                 }
                 
-                JSONObject pendingResults= new JSONObject( jo.toString() );
-                pendingResults.put( "results", new JSONArray( ja.toString() ) );
+                resultsPending= new JSONObject( jo.toString() );
+                resultsPending.put( "results", new JSONArray( ja.toString() ) );
             }
             
             jo.put( "results", ja );
