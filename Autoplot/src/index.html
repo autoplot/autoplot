@@ -32,6 +32,7 @@
                 
         <p>Bugfixes (2024-01-05 r27485):</p>
         <ul>
+            <li>corrections to pending results file in Run Batch Tool.
             <li>Exceptions occurring during Mashup tool loading variables now correctly throw Java exception (FileNotFound), not PyException.
             <li>HAPI time ranges requested with millisecond precision, after we noticed truncating milliseconds would cause requests from https://vires.services/hapi to fail because of startDate.
             <li>HAPI data requests with "Time" as the first parameter should always load the time, regardless of its name.
@@ -46,6 +47,7 @@
         </ul>
         <p>Older Bugfixes (2023-12-15 r27428):</p>
         <ul> 
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2554/">2554</a>: echo the number of records written to the pending results file.
             <li><a href="https://github.com/das-developers/das2java/issues/47">47</a>: annotation properly clips when splitAnchorType is used.
             <li>Bugfix for completions when reading an IDLSav file, internal cache didn't reset.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2573/">2573</a>: annotation didn't properly listen to the ACTIVEDATASET property and would fail to update %{CONTEXT}.
