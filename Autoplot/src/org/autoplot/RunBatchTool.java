@@ -32,6 +32,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -1177,7 +1178,7 @@ public class RunBatchTool extends javax.swing.JPanel {
             String sresults= results.toString(3);
             FileUtil.writeStringToFile( f, sresults );
         } else {
-            exportResultsPendingCSV( f, results, results.getJSONArray("results"), 0 );
+            appendResultsPendingCSV( f, results, results.getJSONArray("results"), 0 );
         }
     }
     
@@ -2157,12 +2158,25 @@ public class RunBatchTool extends javax.swing.JPanel {
                 final String final_param1= param1;
                 final Map<String,String> final_params= params;
                 final JLabel jobLabel= jobs1.get(i1);
+                final JSONObject frunResults= new JSONObject();
+                ja.put(i1,frunResults);  // note runResults must be mutable
+                                
                 Runnable runOne= () -> {
-                    doOneJob( jobLabel, scriptFile, parms, final_params, final_param1, final_f1, monitor.getSubtaskMonitor(final_f1) );
-                    if ( monitor.isFinished() ) {
-                        System.err.println("huh?");
+                    JSONObject runResults= doOneJob( jobLabel, scriptFile, parms, final_params, final_param1, final_f1, monitor.getSubtaskMonitor(final_f1) );
+                    Iterator i= runResults.keys();
+                    while ( i.hasNext() ) {
+                        String k= (String) i.next();
+                        try {
+                            frunResults.put( k, runResults.get(k) );
+                        } catch (JSONException ex) {
+                            logger.log(Level.SEVERE, null, ex);
+                        }
                     }
-                    monitor.setTaskProgress(I1.incrementAndGet());
+                    if ( monitor.isFinished() ) {
+                        logger.fine("monitor reports being finished though it shouldn't have been.");
+                    } else {
+                        monitor.setTaskProgress(I1.incrementAndGet());
+                    }
                 };
                 executor.execute(runOne);
                 i1=i1+1;
@@ -2180,10 +2194,12 @@ public class RunBatchTool extends javax.swing.JPanel {
                         
                     } else {
                         File pendingResultsFile= new File( resultsFile.getAbsolutePath()+".pending" );
-                        exportResultsPendingCSV( pendingResultsFile, jo, ja, exportResultsWritten );
-                        messageLabel.setText( "wrote ("+monitor.getTaskProgress()+") to " + resultsFile.getAbsolutePath()+".pending");
+                        appendResultsPendingCSV( pendingResultsFile, jo, ja, exportResultsWritten );
+                        int nrec= ja.length() - exportResultsWritten;
+                        messageLabel.setText( "wrote ("+nrec+" more) to " + resultsFile.getAbsolutePath()+".pending");
+                        messageLabel.setToolTipText( "nrec="+ nrec+", ja.length="+ja.length() + ", exportResultsWritten="+exportResultsWritten );
+                        exportResultsWritten= ja.length();
                     }
-                    exportResultsWritten= icount;
                     lastWrite= System.currentTimeMillis();
                 }
                 
@@ -2194,12 +2210,19 @@ public class RunBatchTool extends javax.swing.JPanel {
             jo.put( "results", ja );
             results= jo;
             
+            if ( resultsFile!=null ) {
+                appendResultsPendingCSV( resultsFile, jo, ja, 0 );
+                messageLabel.setText( "completed, wrote ("+ja.length()+") to " + resultsFile.getAbsolutePath());
+                
+            }
         } catch (JSONException ex) {
             logger.log(Level.SEVERE, null, ex);
             
         } finally {
-            
-            messageLabel.setText("Jobs are complete, click above to edit.");
+            if ( !messageLabel.getText().startsWith("completed, wrote") ) {
+                messageLabel.setText("Jobs are complete, click above to edit.");
+            }
+            messageLabel.setToolTipText("");
             if ( !monitor.isFinished() ) monitor.finished();
             this.monitor=null;
             
@@ -2488,8 +2511,9 @@ public class RunBatchTool extends javax.swing.JPanel {
                         
                     } else {
                         File pendingResultsFile= new File( resultsFile.getAbsolutePath()+".pending" );
-                        exportResultsPendingCSV( pendingResultsFile, jo, ja, exportResultsWritten );
-                        messageLabel.setText( "wrote ("+icount+") to " + resultsFile.getAbsolutePath()+".pending");
+                        int nrec= ja.length() - exportResultsWritten;
+                        appendResultsPendingCSV( pendingResultsFile, jo, ja, exportResultsWritten );
+                        messageLabel.setText( "wrote ("+nrec+" more) to " + resultsFile.getAbsolutePath()+".pending");
                     }
                     exportResultsWritten= icount;
                     lastWrite= System.currentTimeMillis();
@@ -2502,12 +2526,18 @@ public class RunBatchTool extends javax.swing.JPanel {
             jo.put( "results", ja );
             results= jo;
             
+            if ( resultsFile!=null ) {
+                appendResultsPendingCSV( resultsFile, jo, ja, 0 );
+                messageLabel.setText( "completed, wrote ("+ja.length()+") to " + resultsFile.getAbsolutePath());
+            }
+            
         } catch (JSONException ex) {
             logger.log(Level.SEVERE, null, ex);
             
         } finally {
-            
-            messageLabel.setText("Jobs are complete, click \"Edit Parameter Values\" to edit.");
+            if ( !messageLabel.getText().startsWith("completed, wrote (") ) {
+                messageLabel.setText("Jobs are complete, click \"Edit Parameter Values\" to edit.");
+            }
             if ( !monitor.isFinished() ) monitor.finished();
             this.monitor=null;
             
@@ -2688,7 +2718,10 @@ public class RunBatchTool extends javax.swing.JPanel {
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
-    private static void exportResultsPendingCSV( File pendingFile, JSONObject results, JSONArray resultsArray, 
+    private static void appendResultsPendingCSV( 
+            File pendingFile, 
+            JSONObject results, 
+            JSONArray resultsArray, 
             int recordsWrittenAlready ) throws FileNotFoundException, IOException {
         
         boolean header= recordsWrittenAlready==0;
@@ -2744,6 +2777,8 @@ public class RunBatchTool extends javax.swing.JPanel {
                 record.append(",").append(resultString);
                 out.println( record.toString() );
             }
+            out.flush();
+            
         } catch (JSONException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
