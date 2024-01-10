@@ -2181,7 +2181,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                     } else {
                         File pendingResultsFile= new File( resultsFile.getAbsolutePath()+".pending" );
                         exportResultsPendingCSV( pendingResultsFile, jo, ja, exportResultsWritten );
-                        messageLabel.setText( "wrote ("+icount+") to " + resultsFile.getAbsolutePath()+".pending");
+                        messageLabel.setText( "wrote ("+monitor.getTaskProgress()+") to " + resultsFile.getAbsolutePath()+".pending");
                     }
                     exportResultsWritten= icount;
                     lastWrite= System.currentTimeMillis();
