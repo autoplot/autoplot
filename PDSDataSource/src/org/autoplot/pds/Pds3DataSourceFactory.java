@@ -233,6 +233,8 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
         XPathFactory factory = XPathFactory.newInstance();
         XPath xpath = factory.newXPath();
         
+        // page 4-1 (p53) of https://pds.nasa.gov/datastandards/pds3/standards/sr/StdRef_20090227_v3.8.pdf
+        // https://pds.nasa.gov/datastandards/pds3/standards/sr/AppendixA.pdf
         NodeList dat= (NodeList) xpath.evaluate("/LABEL/TABLE/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
         if ( dat.getLength()==0 ) {
             dat= (NodeList) xpath.evaluate("/LABEL/BINARY_TABLE/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
