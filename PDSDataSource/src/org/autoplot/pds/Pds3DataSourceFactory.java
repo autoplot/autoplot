@@ -243,6 +243,9 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
         if ( dat.getLength()==0 ) {
             dat= (NodeList) xpath.evaluate("/LABEL/TIME_SERIES/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
         }
+        if ( dat.getLength()==0 ) {
+            dat= (NodeList) xpath.evaluate("/LABEL/FILE/SPREADSHEET/FIELD/NAME/text()",doc,XPathConstants.NODESET);
+        }
         
         for ( int i=0; i<dat.getLength(); i++ ) {
             Node n= dat.item(i);
@@ -267,6 +270,11 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
         XPathFactory factory = XPathFactory.newInstance();
         XPath xpath = factory.newXPath();
         NodeList dat= (NodeList) xpath.evaluate("/LABEL/POINTER/text()",doc,XPathConstants.NODESET);
+        if ( dat==null || dat.getLength()==0 ) {
+            // https://pds-ppi.igpp.ucla.edu/data/GO-J-PWS-5-DDR-PLASMA-DENSITY-FULL-V1.0/DATA/00_JUPITER/FPE_1996_05_25_V01.LBL
+            dat= (NodeList) xpath.evaluate("/LABEL/FILE/POINTER/text()",doc,XPathConstants.NODESET);
+        }
+        
         String f= dat.item(0).getNodeValue();
         FilePointer result= new FilePointer(labelFile,f);
         return result;
