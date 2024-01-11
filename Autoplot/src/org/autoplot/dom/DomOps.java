@@ -442,7 +442,9 @@ public class DomOps {
         Logger logger= LoggerManager.getLogger("autoplot.dom.layout.fixlayout");
         logger.fine( "enter fixLayout" );
         
-        dom.getController().waitUntilIdle();
+        if ( !dom.controller.changesSupport.mutatorLock().isLocked() ) {
+            dom.getController().waitUntilIdle();
+        }
         
         boolean autoLayout= dom.options.isAutolayout();
         dom.options.setAutolayout(false);
@@ -553,7 +555,9 @@ public class DomOps {
             dom.options.setAutolayout(autoLayout);
         }
         
-        dom.getController().waitUntilIdle();
+        if ( !dom.controller.changesSupport.mutatorLock().isLocked() ) {
+            dom.getController().waitUntilIdle();
+        }
     }
 
     /**
