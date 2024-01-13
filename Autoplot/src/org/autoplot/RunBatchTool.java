@@ -1178,7 +1178,7 @@ public class RunBatchTool extends javax.swing.JPanel {
             String sresults= results.toString(3);
             FileUtil.writeStringToFile( f, sresults );
         } else {
-            appendResultsPendingCSV( f, results, results.getJSONArray("results"), 0 );
+            appendResultsPendingCSV( f, results, results.getJSONArray("results"), 0, results.getJSONArray("results").length() );
         }
     }
     
@@ -2189,16 +2189,17 @@ public class RunBatchTool extends javax.swing.JPanel {
                 if ( executor.getActiveCount()==0 && I1.intValue()==ff1.length ) {
                     break;
                 }
-                if ( resultsFile!=null && ( ( System.currentTimeMillis()-lastWrite )>30000 ) ) { // write to pending file every thirty seconds.
+                if ( resultsFile!=null && ( ( System.currentTimeMillis()-lastWrite )>10000 ) ) { // write to pending file every ten seconds.
                     if ( resultsFile.getName().endsWith(".json") ) {
                         
                     } else {
                         File pendingResultsFile= new File( resultsFile.getAbsolutePath()+".pending" );
-                        appendResultsPendingCSV( pendingResultsFile, jo, ja, exportResultsWritten );
-                        int nrec= ja.length() - exportResultsWritten;
-                        messageLabel.setText( "wrote ("+nrec+" more) to " + resultsFile.getAbsolutePath()+".pending");
-                        messageLabel.setToolTipText( "nrec="+ nrec+", ja.length="+ja.length() + ", exportResultsWritten="+exportResultsWritten );
-                        exportResultsWritten= ja.length();
+                        int completed= I1.intValue();
+                        int count= completed - exportResultsWritten;
+                        
+                        appendResultsPendingCSV( pendingResultsFile, jo, ja, exportResultsWritten, count);
+                        messageLabel.setText( "wrote records "+exportResultsWritten+"-"+completed + " to " + resultsFile.getAbsolutePath()+".pending");
+                        exportResultsWritten= completed;
                     }
                     lastWrite= System.currentTimeMillis();
                 }
@@ -2211,7 +2212,7 @@ public class RunBatchTool extends javax.swing.JPanel {
             results= jo;
             
             if ( resultsFile!=null ) {
-                appendResultsPendingCSV( resultsFile, jo, ja, 0 );
+                appendResultsPendingCSV( resultsFile, jo, ja, 0, ja.length() );
                 messageLabel.setText( "completed, wrote ("+ja.length()+") to " + resultsFile.getAbsolutePath());
                 
             }
@@ -2512,7 +2513,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                     } else {
                         File pendingResultsFile= new File( resultsFile.getAbsolutePath()+".pending" );
                         int nrec= ja.length() - exportResultsWritten;
-                        appendResultsPendingCSV( pendingResultsFile, jo, ja, exportResultsWritten );
+                        appendResultsPendingCSV( pendingResultsFile, jo, ja, exportResultsWritten, ja.length()-exportResultsWritten );
                         messageLabel.setText( "wrote ("+nrec+" more) to " + resultsFile.getAbsolutePath()+".pending");
                     }
                     exportResultsWritten= icount;
@@ -2527,7 +2528,7 @@ public class RunBatchTool extends javax.swing.JPanel {
             results= jo;
             
             if ( resultsFile!=null ) {
-                appendResultsPendingCSV( resultsFile, jo, ja, 0 );
+                appendResultsPendingCSV( resultsFile, jo, ja, 0, ja.length() );
                 messageLabel.setText( "completed, wrote ("+ja.length()+") to " + resultsFile.getAbsolutePath());
             }
             
@@ -2722,7 +2723,7 @@ public class RunBatchTool extends javax.swing.JPanel {
             File pendingFile, 
             JSONObject results, 
             JSONArray resultsArray, 
-            int recordsWrittenAlready ) throws FileNotFoundException, IOException {
+            int recordsWrittenAlready, int count ) throws FileNotFoundException, IOException {
         
         boolean header= recordsWrittenAlready==0;
         
@@ -2757,7 +2758,8 @@ public class RunBatchTool extends javax.swing.JPanel {
 
             }
             
-            for ( int i=recordsWrittenAlready; i<resultsArray.length(); i++ ) {
+            int stop= recordsWrittenAlready + count;
+            for ( int i=recordsWrittenAlready; i<stop; i++ ) {
                 jo= resultsArray.getJSONObject(i);
                 record= new StringBuilder();
                 record.append(i);
