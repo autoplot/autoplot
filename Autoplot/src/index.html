@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small><a href='https://github.com/autoplot/dev/blob/master/demos/2023/20231220/colors.jy'>Script</a> shows all the named web colors.</small></p>
+        <p><small>Frigid temperatures after a record week of snow in Iowa City.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,9 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-01-11 r27504):</p>
+        <p>Bugfixes (2024-01-14 r27504):</p>
         <ul>
+            <li><a href="https://github.com/das-developers/das2java/issues/94">94</a>: Support offline mode with GitHubFileSystem
             <li>rfe811: "Break into stack of plots" action would hang because of mishandling of locks.  Thanks, Darrelle!
             <li>PDS3 looks for both INVALID_CONSTANT and MISSING CONSTANT.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2554/">2554</a>: tweaks to the Run Batch GUI, and improvements to feedback, results file for multi-thread runs.
