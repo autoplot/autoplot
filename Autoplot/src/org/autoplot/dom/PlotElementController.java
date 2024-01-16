@@ -1330,7 +1330,13 @@ public class PlotElementController extends DomNodeController {
         int lat = -1, lon = -1;
         
         int rank= fillDs.rank();
-        
+
+        if ( rank==3 ) {
+            if ( Schemes.isTriangleMesh(fillDs) ) {
+                return "";
+            }
+        }
+                        
         List<Integer> slicePref = new ArrayList( rank );
         for ( int i=0; i<fillDs.rank(); i++ ) slicePref.add(2);
                 
@@ -1416,6 +1422,8 @@ public class PlotElementController extends DomNodeController {
             if ( Schemes.isArrayOfBoundingBox(fillDs) ) {
                 return "";
             }
+            
+            // see line above about triangleMesh
 
             // pick a slice index near the middle, which is less likely to be all fill.
             int n= Math.max( 0, qube.get(sliceIndex)/2-1 );
@@ -2795,6 +2803,9 @@ public class PlotElementController extends DomNodeController {
             return true;
 
         } else if ( spec==RenderType.digital ) {
+            return true;
+
+        } else if ( spec==RenderType.internal ) { // we don't know what this is
             return true;
 
         } else {
