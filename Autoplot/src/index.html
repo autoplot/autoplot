@@ -30,8 +30,9 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-01-14 r27504):</p>
+        <p>Bugfixes (2024-01-17 r27509):</p>
         <ul>
+            <li>WritableJoinDataSet copy failed when child was also JoinDataSet.
             <li><a href="https://github.com/das-developers/das2java/issues/94">94</a>: Support offline mode with GitHubFileSystem
             <li>rfe811: "Break into stack of plots" action would hang because of mishandling of locks.  Thanks, Darrelle!
             <li>PDS3 looks for both INVALID_CONSTANT and MISSING CONSTANT.
@@ -73,6 +74,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>metadata tab shows data with Units.rgbValue as named color if possible.
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/819/">819</a>: add polyMesh QDataSet schema, to finish off the things QDataSet was intended to model.
             <li>support for fixed-length fields in ASCII format, including delim=NONE.  Allow comment to be specified.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/818/">818</a>: Initial support for PDS3 labels.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/817/">817</a>: Power Spectral Density and other functions.
