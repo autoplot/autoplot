@@ -1332,7 +1332,7 @@ public class PlotElementController extends DomNodeController {
         int rank= fillDs.rank();
 
         if ( rank==3 ) {
-            if ( Schemes.isTriangleMesh(fillDs) ) {
+            if ( Schemes.isPolyMesh(fillDs) ) {
                 return "";
             }
         }
