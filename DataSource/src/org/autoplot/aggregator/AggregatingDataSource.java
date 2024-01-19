@@ -404,6 +404,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
             boolean avail= getParam( "avail", "F" ).equals("T");
             boolean reduce= getParam( "reduce", "F" ).equals("T");
             boolean filenameProvidesContext= getParam( "filenameProvidesContext", "F" ).equals("T");
+            boolean addDimension= getParam( "addDim","F" ).equals("T");
 
             if ( avail ) {
                 logger.log(Level.FINE, "availablility {0} ", new Object[]{ lviewRange});
@@ -646,7 +647,11 @@ public final class AggregatingDataSource extends AbstractDataSource {
                     }
 
                     if (result == null && altResult==null ) {
-                        if ( ds1 instanceof JoinDataSet ) {
+                        if ( addDimension ) {
+                            altResult= new JoinDataSet(ds1);
+                            dep0Builder= new DataSetBuilder(1,ss.length);
+                            dep0Builder.nextRecord(dr1.middle());
+                        } else if ( ds1 instanceof JoinDataSet ) {
                             altResult= JoinDataSet.copy( (JoinDataSet)ds1 );
                             DDataSet mpds= DDataSet.create(new int[0]);
                             altResult.putProperty(QDataSet.JOIN_0,mpds );
@@ -695,7 +700,12 @@ public final class AggregatingDataSource extends AbstractDataSource {
                         cacheRange1 = dr1;
 
                     } else {
-                        if ( ds1 instanceof JoinDataSet ) {
+                        if ( addDimension ) {
+                            altResult.join(ds1);
+                            assert result instanceof JoinDataSet;
+                            assert dep0Builder!=null;
+                            dep0Builder.nextRecord(dr1.middle());
+                        } else if ( ds1 instanceof JoinDataSet ) {
                             assert altResult!=null;
                             altResult.joinAll( (JoinDataSet)ds1 );
                         } else if ( result instanceof BufferDataSet ) {
@@ -823,6 +833,12 @@ public final class AggregatingDataSource extends AbstractDataSource {
             }
             
             if ( altResult!=null ) {
+                
+                if ( addDimension ) {
+                    altResult.putProperty( QDataSet.JOIN_0, null );
+                    altResult.putProperty( QDataSet.DEPEND_0, dep0Builder.getDataSet() );
+                }
+                
                 DataSetUtil.validate( altResult, new ArrayList<String>() );
             
                 ArrayDataSet dep0 = (ArrayDataSet) altResult.property(DDataSet.DEPEND_0);
