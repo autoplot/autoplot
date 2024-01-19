@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Frigid temperatures after a record week of snow in Iowa City.</small></p>
+        <p><small>A quick glance with Autoplot shows geothermal is keeping up with the cold.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -74,6 +74,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>rfe521: introduce aggregation control addDim=T which will force it to aggregation to a dimension, so rank 1 can be added for each day and viewed as spectrogram.  Thanks, Jean-Marc!
             <li>metadata tab shows data with Units.rgbValue as named color if possible.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/819/">819</a>: add polyMesh QDataSet schema, to finish off the things QDataSet was intended to model.
             <li>support for fixed-length fields in ASCII format, including delim=NONE.  Allow comment to be specified.
