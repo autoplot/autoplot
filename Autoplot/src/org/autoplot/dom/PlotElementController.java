@@ -2354,8 +2354,6 @@ public class PlotElementController extends DomNodeController {
      *
      * This also sets the style node of the plotElement copy, so its values should be sync'ed as well.
      * 
-     * This routine can be found by searching for "liver," since it is not the heart but pretty close to it.
-     * 
      * @param peleCopy the plot element.
      * @param props metadata provided by the data source, converted to uniform QDataSet scheme (e.g. get(DEPEND_0).get(TYPICAL_MIN) )
      * @param fillDs the dataset
@@ -2382,17 +2380,21 @@ public class PlotElementController extends DomNodeController {
      * This is the old updateFillSeries and updateFillSpectrogram code.  
      * 
      * 
-     * This calculates
-     * ranges and preferred symbol settings, and puts the values in peleCopy.plotDefaults.
-     * The dom Plot containing this plotElement should be listening for changes in plotElement.plotDefaults,
+     * This calculates ranges and preferred symbol settings, and puts the values
+     * in peleCopy.plotDefaults.  The dom Plot containing this plotElement 
+     * should be listening for changes in plotElement.plotDefaults,
      * and can then decide if it wants to use the autorange settings.
      *
-     * This also sets the style node of the plotElement copy, so its values should be sync'ed as well.
+     * This also sets the style node of the plotElement copy, so its values 
+     * should be sync'ed as well.
      * 
-     * This routine can be found by searching for "liver," since it is not the heart but pretty close to it.
+     * This routine can be found by searching for "liver," since it is not the 
+     * heart but pretty close to it.  (2024-01-19: I forgot about liver, was 
+     * thinking autorange9)
      * 
      * @param peleCopy the plot element.
-     * @param props metadata provided by the data source, converted to uniform QDataSet scheme (e.g. get(DEPEND_0).get(TYPICAL_MIN) )
+     * @param props metadata provided by the data source, converted to uniform 
+     * QDataSet scheme (e.g. get(DEPEND_0).get(TYPICAL_MIN) )
      * @param fillDs the dataset
      * @param ignoreDsProps 
      */
@@ -2437,6 +2439,12 @@ public class PlotElementController extends DomNodeController {
             }
 
             QDataSet yds = (QDataSet) SemanticOps.ytagsDataSet(fillDs);
+            
+            // spectrogram mode with join dataset -> so use implicit findgen dataset for Y.
+            if ( fillDs.rank()==2 && SemanticOps.isJoin(fillDs) ) {
+                yds= null; // code below calculates this.
+            }
+            
             Map<String,Object> yprops= (Map) props.get(QDataSet.DEPEND_1);
             if (yds == null) {
                 if ( fillDs.property(QDataSet.JOIN_0)!=null ) {
@@ -2444,7 +2452,8 @@ public class PlotElementController extends DomNodeController {
                     for ( int i=0; i<fillDs.length(); i++ ) {
                         QDataSet yds1= (QDataSet)fillDs.property(QDataSet.DEPEND_1,i);
                         if ( yds1==null ) {
-                            yds1= Ops.linspace( 0, fillDs.length(i,0)-1, fillDs.length(i,0) );
+                            int n= fillDs.slice(i).length();
+                            yds1= Ops.linspace( 0, n-1, n );
                         }
                         ds.join(yds1);
                     }
