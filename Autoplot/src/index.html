@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>A quick glance with Autoplot shows geothermal heat is keeping up with the cold.</small></p>
+        <p><small>Autoplot used to study GitHub image.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -32,6 +32,10 @@
                 
         <p>Bugfixes (2024-01-17 r27509):</p>
         <ul>
+            <li>slices on single-screen machines always jumped to 0,0.
+        </ul>
+        <p>Older Bugfixes (2024-01-20 r27509):</p>
+        <ul> 
             <li>WritableJoinDataSet copy failed when child was also JoinDataSet.
             <li><a href="https://github.com/das-developers/das2java/issues/94">94</a>: Support offline mode with GitHubFileSystem
             <li>rfe811: "Break into stack of plots" action would hang because of mishandling of locks.  Thanks, Darrelle!
@@ -50,30 +54,11 @@
             <li>Always use edit annotation, even for new annotations.
             <li>Updates to the edit annotation dialog, including anchorType="plot".
         </ul>
-        <p>Older Bugfixes (2023-12-15 r27428):</p>
-        <ul> 
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2554/">2554</a>: echo the number of records written to the pending results file.
-            <li><a href="https://github.com/das-developers/das2java/issues/47">47</a>: annotation properly clips when splitAnchorType is used.
-            <li>Bugfix for completions when reading an IDLSav file, internal cache didn't reset.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2573/">2573</a>: annotation didn't properly listen to the ACTIVEDATASET property and would fail to update %{CONTEXT}.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2571/">2571</a>: detect when channel names are inconsistent where subsampling channels is not desirable.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2570/">2570</a>: fix annotation when pointAt is used
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/1507/">1507</a>: copy and paste plots via clipboard gets the x-axis wrong.
-            <li>PngWalkTool address bar records .pngwalk files in its history.
-            <li>NetCDF data editor panel didn't update description as X and Y parameters were selected.  
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2567/">2567</a>: correct loaded vaps where column has marginRow as parent, which happened for years but wasn't noticed.  Thanks, Connor!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2567/">2567</a>: where text property wasn't re-bound after the plotId changed.  Thanks, Connor!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2567/">2567</a>: clipping of the ephemeris labels.  Thanks, Connor!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2556/">2556</a>: march through the stack trace looking for lines to annotate.  Introduce new purple error squiggle to indicate some uncertainty in the location.
-            <li>rte_0611117604: sloppy code with X and Y in editor.  Thanks, Connor!
-            <li>Correct where Ops.java had references to JSON but shouldn't have.  This is handled in the calling code now, where Jython dictionaries are converted to maps for QDataSet.  
-            <li>expandToFillGaps doesn't assume that timetags are monotonic now, when finding shortest interval.  Thanks, George!
-            <li><a href="https://github.com/das-developers/das2java/issues/86">86</a>: longTitles property would miscalculate width when yaxis was on right.  Thanks, James!
-            <li>Don't treat %Y the same as $Y.  Reserve percents for Python string formatting.
-            <li>Improvements and bugfixes with Jython to Java converter.
-        </ul>
         <p>Features:</p>
         <ul>
+        </ul>
+        <p>Less recent features:</p>
+        <ul> 
             <li>rfe521: introduce aggregation control addDim=T which will force it to aggregation to a dimension, so rank 1 can be added for each day and viewed as spectrogram.  Thanks, Jean-Marc!
             <li>metadata tab shows data with Units.rgbValue as named color if possible.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/819/">819</a>: add polyMesh QDataSet schema, to finish off the things QDataSet was intended to model.
@@ -82,14 +67,6 @@
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/817/">817</a>: Power Spectral Density and other functions.
             <li>Click on canvas corner to blur focus.
             <li>Write to pngwalk file will add quality control to the save directory, if it is enabled.
-        </ul>
-        <p>Less recent features:</p>
-        <ul> 
-            <li>Export to IDLSav now has append=T control; supports all rank data; and supports rank 2 bundle.
-            <li><a href='https://sourceforge.net/p/autoplot/feature-requests/417/'>417</a>: more control over %{CONTEXT}.
-            <li><a href='https://github.com/das-developers/das2java/issues/89'>89</a>: add &amp;parallel; and &amp;npar; to Entities.java.
-            <li>various improvements to Jython to Java converter.
-            <li><a href="https://github.com/das-developers/das2docs/issues/3">3</a>: Initial support for Das2Server parameters GUI.
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
