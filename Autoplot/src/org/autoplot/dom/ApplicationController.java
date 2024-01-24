@@ -2666,7 +2666,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             BindingModel bm= findBinding( src, srcProp, ((DomNode)dst), dstProp );
             Binding binding= this.bindingImpls.get(bm);
             if ( binding!=null ) { 
-                deleteBinding(bm);
+                removeBinding(bm);
             } else {
                 logger.log(Level.FINE, "expected to find binding for {0}.{1} to {2}.{3}", new Object[]{src.getId(), srcProp, ((DomNode)dst).getId(), dstProp});
             }
