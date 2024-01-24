@@ -80,13 +80,12 @@ public class PDS3DataObject {
             } else {
                 items= -1;
             }
-            if ( !interchangeFormat.equals("ASCII") ) {
-                startByte= j.optInt("START_BYTE",0);
-                bytes= j.getInt("BYTES");
-                dataType= j.getString("DATA_TYPE");
-            } else {
-                fieldNumber= j.getInt("FIELD_NUMBER");
-            }
+
+            startByte= j.optInt("START_BYTE",0);
+            bytes= j.optInt("BYTES",-1);
+            dataType= j.optString("DATA_TYPE","");
+            fieldNumber= j.optInt("FIELD_NUMBER",-1);
+
             unit= j.optString("UNIT","");
             validMaximum= j.optDouble("VALID_MAXIMUM",Double.POSITIVE_INFINITY);
             validMinimum= j.optDouble("VALID_MINIMUM",Double.NEGATIVE_INFINITY);
@@ -129,7 +128,7 @@ public class PDS3DataObject {
      * @return the URI.
      */
     public String resolveUri(URL resource) {
-        if ( interchangeFormat.equals("ASCII") ) {
+        if ( interchangeFormat.equals("ASCII") && fieldNumber>-1 ) {
             return getAsciiUri(resource);
         } else {
             return getBinaryUri(resource) ;

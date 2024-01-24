@@ -252,9 +252,11 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
     }
     
     /**
-     * return a list of parameters.
-     * @param f
-     * @return 
+     * return a list of parameters and their summarized descriptions.  The
+     * summaries are the first sentence of the description.
+     * @param url the LBL file location.
+     * @param mon a monitor.
+     * @return a map from id to description of the id.
      */
     private Map<String,String> getDataObjectNames( URL url, ProgressMonitor mon) throws Exception {
         
