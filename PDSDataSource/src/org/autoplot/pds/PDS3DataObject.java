@@ -26,10 +26,11 @@ public class PDS3DataObject {
 
     private String name;
     private String uri;
+    
     /**
-     * number of records into the file, 1 is the first offset into the file.
+     * number of records or bytes into the file, 1 is the first offset into the file.
      */
-    private int fileOffset;
+    private FilePointer filePointer;
     private int rowBytes;
     private int rows;
     private String interchangeFormat;
@@ -43,6 +44,11 @@ public class PDS3DataObject {
     private double missingConstant;
     private String unit;
     private String description;
+    
+    /**
+     * spreadsheet field number, 1 is the first column.
+     */
+    private int fieldNumber;
     
     JSONObject labelJSONObject;
     JSONObject columnJSONObject;
@@ -64,7 +70,7 @@ public class PDS3DataObject {
             labelJSONObject= toJSONObject( label );
             JSONObject jtable= toJSONObject(table);
             tableJSONObject= jtable;
-            interchangeFormat= jtable.optString("INTERCHANGE_FORMAT", "BINARY");
+            interchangeFormat= jtable.optString("INTERCHANGE_FORMAT", "ASCII");
             rowBytes= jtable.getInt("ROW_BYTES");
             rows= jtable.optInt("ROWS",-1);
             JSONObject j= toJSONObject(column);
@@ -74,9 +80,13 @@ public class PDS3DataObject {
             } else {
                 items= -1;
             }
-            startByte= j.getInt("START_BYTE");
-            bytes= j.getInt("BYTES");
-            dataType= j.getString("DATA_TYPE");
+            if ( !interchangeFormat.equals("ASCII") ) {
+                startByte= j.optInt("START_BYTE",0);
+                bytes= j.getInt("BYTES");
+                dataType= j.getString("DATA_TYPE");
+            } else {
+                fieldNumber= j.getInt("FIELD_NUMBER");
+            }
             unit= j.optString("UNIT","");
             validMaximum= j.optDouble("VALID_MAXIMUM",Double.POSITIVE_INFINITY);
             validMinimum= j.optDouble("VALID_MINIMUM",Double.NEGATIVE_INFINITY);
@@ -119,6 +129,38 @@ public class PDS3DataObject {
      * @return the URI.
      */
     public String resolveUri(URL resource) {
+        if ( interchangeFormat.equals("ASCII") ) {
+            return getAsciiUri(resource);
+        } else {
+            return getBinaryUri(resource) ;
+        }
+    }
+        
+    private String getAsciiUri(URL resource) {
+        Map<String,String> args= new LinkedHashMap<>();
+        if ( filePointer!=null ) {
+            switch (filePointer.getOffsetUnits()) {
+                case LINES:
+                    args.put("skipLines",String.valueOf(filePointer.getOffset()));
+                    break;
+                case BYTES:
+                    int offsetBytes=filePointer.getOffset();
+                    offsetBytes= (int)(offsetBytes * 0.98); // fudge factor, because of newlines?
+                    args.put("skipBytes",String.valueOf(offsetBytes));
+                    break;
+                default:
+                    throw new IllegalArgumentException("unsupported file pointer");
+            }
+        }
+        args.put("column",String.valueOf(fieldNumber-1));
+        return "vap+txt:" + resource.toString() + "?" + URISplit.formatParams(args) ;
+    }
+    /**
+     * return a several line description of the data.
+     * @return a several line description of the data.
+     */
+
+    private String getBinaryUri(URL resource) throws IllegalArgumentException {
         Map<String,String> args= new LinkedHashMap<>();
         args.put( "recLength", String.valueOf(rowBytes) );
         if ( dataType.equals("DATE") || dataType.equals("TIME") || ( dataType.equals("CHARACTER") && unit.equals("UTC") ) ) {
@@ -191,8 +233,17 @@ public class PDS3DataObject {
         } else {
             throw new IllegalArgumentException("unsupported type:" +dataType);
         }
-        if ( this.fileOffset>1 ) {
-            args.put("byteOffset", String.valueOf(this.fileOffset*this.rowBytes) );
+        if ( this.filePointer!=null ) {
+            switch (this.filePointer.getOffsetUnits()) {
+                case LINES:
+                    args.put("byteOffset", String.valueOf(this.filePointer.getOffset()*this.rowBytes) );
+                    break;
+                case BYTES:
+                    args.put("byteOffset", String.valueOf(this.filePointer.getOffset()) );
+                    break;
+                default:
+                    throw new IllegalArgumentException("Hmmm, uncoded case.  Contact Jeremy Faden.");
+            }
         }
         args.put( "recOffset", String.valueOf(startByte-1));
         if ( missingConstant!=Double.NaN ) args.put( "fillValue", String.valueOf(missingConstant));
@@ -237,16 +288,16 @@ public class PDS3DataObject {
         return result;
     }
 
-    public int getFileOffset() {
-        return fileOffset;
+    public FilePointer getFilePointer() {
+        return filePointer;
     }
     
     /**
      * the offset into the file, where 1 is the beginning.
      * @param fileOffset 
      */
-    public void setFileOffset(int fileOffset) {
-        this.fileOffset = fileOffset;
+    public void setFilePointer( FilePointer p ) {
+        this.filePointer = p;
     }
     
     

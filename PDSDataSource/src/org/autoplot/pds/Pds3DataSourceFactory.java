@@ -69,20 +69,18 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
 
         XPathFactory factory = XPathFactory.newInstance();    
         XPath xpath = factory.newXPath();
-
-        int lineOffset=1;
         
         Node table= (Node) xpath.evaluate(String.format("/LABEL/TABLE[1]",name),doc,XPathConstants.NODE);
         Node column= (Node) xpath.evaluate(String.format("/LABEL/TABLE[1]/COLUMN[NAME='%s']",name),doc,XPathConstants.NODE);
 
+        FilePointer p= null;
         if ( table==null || column==null) {
             table= (Node) xpath.evaluate(String.format("/LABEL/BINARY_TABLE[1]",name),doc,XPathConstants.NODE);
             column= (Node) xpath.evaluate(String.format("/LABEL/BINARY_TABLE[1]/COLUMN[NAME='%s']",name),doc,XPathConstants.NODE);
             if ( table!=null ) {
                 String pointer= (String)xpath.evaluate("/LABEL/POINTER[@object='BINARY_TABLE']/text()",doc,XPathConstants.STRING);
                 if ( pointer!=null && pointer.length()>0 ) {
-                    FilePointer p= new FilePointer(url,pointer);
-                    lineOffset= p.getOffset();
+                    p= new FilePointer(url,pointer);
                 }
             }
         }
@@ -93,8 +91,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
             if ( table!=null ) {
                 String pointer= (String)xpath.evaluate("/LABEL/POINTER[@object='ASCII_TABLE']/text()",doc,XPathConstants.STRING);
                 if ( pointer!=null && pointer.length()>0 ) {
-                    FilePointer p= new FilePointer(url,pointer);
-                    lineOffset= p.getOffset();
+                    p= new FilePointer(url,pointer);
                 }
             }
         }
@@ -105,8 +102,18 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
             if ( table!=null ) {
                 String pointer= (String)xpath.evaluate("/LABEL/POINTER[@object='TIME_SERIES']/text()",doc,XPathConstants.STRING);
                 if ( pointer!=null && pointer.length()>0 ) {
-                    FilePointer p= new FilePointer(url,pointer);
-                    lineOffset= p.getOffset();
+                    p= new FilePointer(url,pointer);
+                }
+            }
+        }
+        
+        if ( table==null || column==null ) { ///LABEL/FILE/SPREADSHEET/FIELD/NAME/text()
+            table= (Node) xpath.evaluate(String.format("/LABEL/FILE/SPREADSHEET"),doc,XPathConstants.NODE);
+            column= (Node) xpath.evaluate(String.format("/LABEL/FILE/SPREADSHEET/FIELD[NAME='%s']",name),doc,XPathConstants.NODE); 
+            if ( table!=null ) {
+                String pointer= (String)xpath.evaluate("/LABEL/FILE/POINTER[@object='SPREADSHEET']/text()",doc,XPathConstants.STRING);
+                if ( pointer!=null && pointer.length()>0 ) {
+                    p= new FilePointer(url,pointer);
                 }
             }
         }
@@ -118,7 +125,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
             throw new IllegalArgumentException("Unable to find column: "+name );
         }
         PDS3DataObject obj= new PDS3DataObject( doc.getDocumentElement(), table,column);
-        obj.setFileOffset( lineOffset );
+        obj.setFilePointer( p );
         //obj.description=  (String)xpath.evaluate("/DESCRIPTION/text()",dat,XPathConstants.STRING);
         
         return obj;
@@ -220,6 +227,31 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
     }
     
     /**
+     * shorten the description to about a sentence by removing the first 
+     * sentence (presumed to be a summary) or the first 80 characters.
+     * @param desc
+     * @return 
+     */
+    private String summarizeDescription( String desc ) {
+        int i= desc.indexOf(".");
+        int l= desc.length();
+        int limit=80;
+        if ( i==-1 ) {
+            if ( l>limit ) {
+                desc= desc.substring(0,limit)+"...";
+            } 
+        } else {
+            if ( i>limit ) {
+                desc= desc.substring(0,limit)+"...";
+            } else {
+                desc= desc.substring(0,i+1);
+            }
+        }
+        desc= String.join(" ",desc.split("[\\s|\\&\\#13\\;]+"));
+        return desc;
+    }
+    
+    /**
      * return a list of parameters.
      * @param f
      * @return 
@@ -252,7 +284,8 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
         for ( int i=0; i<dat.getLength(); i++ ) {
             Node n= dat.item(i);
             String name= n.getTextContent();
-            result.put( name, name );
+            PDS3DataObject dd= getDataObjectPds3( url, name );
+            result.put( name, summarizeDescription(dd.getDescription()) );
         }
         return result;
 

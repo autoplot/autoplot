@@ -290,6 +290,9 @@ public class Pds3DataSource extends AbstractDataSource {
         if ( datafile.length()==0 ) {
             datafile = (String) xpath.evaluate("/LABEL/POINTER[@object=\"TABLE\"]",doc,XPathConstants.STRING);
         }
+        if ( datafile.length()==0 ) {
+            datafile= (String)xpath.evaluate("/LABEL/FILE/POINTER[@object='SPREADSHEET']/text()",doc,XPathConstants.STRING);
+        }
         FilePointer fp= new FilePointer(labelUrl, datafile );
         
         for ( int i=0; i<names.size(); i++ ) {
