@@ -691,7 +691,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
         if (o != null) {
             parser.setSkipLines(Integer.parseInt(o));
         }
-
+        
         o = params.get("recCount");
         if (o != null) {
             parser.setRecordCountLimit(Integer.parseInt(o));
@@ -1231,8 +1231,22 @@ public class AsciiTableDataSource extends AbstractDataSource {
             mon.setProgressMessage("reading "+file);
             ds1 = (DDataSet) parser.readStream( new InputStreamReader(in), mon.getSubtaskMonitor("read file")); //DANGER
         } else {
+            int skipBytes= Integer.parseInt(getParam("skipBytes","0"));
+            int fileLength= (int)file.length();
             mon.setProgressMessage("reading "+file);
-            ds1 = (DDataSet) parser.readFile(file.toString(), mon.getSubtaskMonitor("read file")); //DANGER
+            mon.setTaskSize(fileLength-skipBytes);
+            InputStream ins= new FileInputStream(file);
+            
+            if ( skipBytes>0 ) {
+                byte[] bb= new byte[skipBytes];
+                int bytesRead=0;
+                while ( bytesRead<skipBytes ) {
+                    int n= ins.read(bb);
+                    if ( n==-1 ) throw new IllegalArgumentException("unable to read skipBytes from file");
+                    bytesRead+= n;
+                }
+            }
+            ds1 = (DDataSet) parser.readStream( new InputStreamReader(ins), mon ); //DANGER
             
         }
         

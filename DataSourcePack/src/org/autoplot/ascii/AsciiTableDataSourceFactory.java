@@ -52,6 +52,7 @@ public class AsciiTableDataSourceFactory extends AbstractDataSourceFactory imple
         if (cc.context == CompletionContext.CONTEXT_PARAMETER_NAME) {
             List<CompletionContext> result = new ArrayList<>();
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "skipLines=", "the number of lines to skip before attempting to parse"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "skipBytes=", "the number of bytes to skip before attempting to parse"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "recCount=", "the number of records to read in"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "recStart=", "skip this number of records"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "column=", "the column to read in"));
