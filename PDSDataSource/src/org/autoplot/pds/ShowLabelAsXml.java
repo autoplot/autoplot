@@ -29,7 +29,8 @@ import org.w3c.dom.Document;
  */
 public class ShowLabelAsXml {
     public static void main( String[] args ) throws MalformedURLException, IOException, PDSException, TransformerException {
-        String lbl="https://pds-ppi.igpp.ucla.edu/data/JNO-J_SW-JAD-5-CALIBRATED-V1.0/DATA/2016/2016240/ELECTRONS/JAD_L50_LRS_ELC_ANY_DEF_2016240_V01.LBL";
+        //String lbl="https://pds-ppi.igpp.ucla.edu/data/JNO-J_SW-JAD-5-CALIBRATED-V1.0/DATA/2016/2016240/ELECTRONS/JAD_L50_LRS_ELC_ANY_DEF_2016240_V01.LBL";
+        String lbl="https://pds-ppi.igpp.ucla.edu/data/GO-J-PWS-5-DDR-PLASMA-DENSITY-FULL-V1.0/DATA/00_JUPITER/FPE_1996_05_25_V01.LBL";
         File f= DataSetURI.getFile( new URL(lbl), new NullProgressMonitor() );
         URL fileUrl;
             
@@ -48,7 +49,7 @@ public class ShowLabelAsXml {
         String output = writer.getBuffer().toString().replaceAll("\n|\r", "");
 
         System.err.println( "output to " + new File(".").getAbsolutePath() );
-        try ( FileWriter fw= new FileWriter("JAD_L50_LRS_ELC_ANY_DEF_2016240_V01.LBL.xml") ) {
+        try ( FileWriter fw= new FileWriter( f.getName() + ".xml") ) {
             fw.append(output);
         }
         
