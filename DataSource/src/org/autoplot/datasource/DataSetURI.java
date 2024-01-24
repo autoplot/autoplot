@@ -1,11 +1,4 @@
-/*
- * DataSetURI.java
- *
- * Created on March 31, 2007, 7:54 AM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
+
 package org.autoplot.datasource;
 
 import java.util.logging.Level;
@@ -99,7 +92,8 @@ public class DataSetURI {
         FileSystem.registerFileSystemFactory("zip", new zipfs.ZipFileSystemFactory());
         FileSystem.registerFileSystemFactory("tar", new org.das2.util.filesystem.VFSFileSystemFactory());
         FileSystem.registerFileSystemFactory("ftp", new FTPBeanFileSystemFactory());
-        if ( System.getProperty("AP_CURL")!=null || System.getProperty("AP_WGET")!=null ) { // TODO: this only handles HTTP and HTTPS. FTP should probably be handled as well, but check curl.
+        if ( System.getProperty("AP_CURL")!=null || System.getProperty("AP_WGET")!=null ) {
+            // TODO: this only handles HTTP and HTTPS. FTP should probably be handled as well, but check curl.
             FileSystem.registerFileSystemFactory("http", new WGetFileSystemFactory() );
             FileSystem.registerFileSystemFactory("https", new WGetFileSystemFactory() );
             FileSystem.registerFileSystemFactory("ftp", new WGetFileSystemFactory() );
@@ -281,7 +275,8 @@ public class DataSetURI {
      * @throws org.das2.util.filesystem.FileSystem.FileSystemOfflineException 
      * @throws java.net.UnknownHostException 
      */
-    public static String[] unaggregate( String resourceURI, DatumRange timerange ) throws FileSystem.FileSystemOfflineException, UnknownHostException, IOException {
+    public static String[] unaggregate( String resourceURI, DatumRange timerange ) 
+        throws FileSystem.FileSystemOfflineException, UnknownHostException, IOException {
         
         int i= AggregatingDataSourceFactory.splitIndex( resourceURI );
 
@@ -514,7 +509,8 @@ public class DataSetURI {
             if (eext != null) {
                 DataSourceFactory delegateFactory;
                 if ( eext.equals(RECOGNIZE_FILE_EXTENSION_XML) || eext.equals(RECOGNIZE_FILE_EXTENSION_JSON) ) {
-                    String ff= AggregatingDataSourceFactory.getRepresentativeFile( uri, mon.getSubtaskMonitor("find representative file") );
+                    String ff= AggregatingDataSourceFactory.getRepresentativeFile( 
+                        uri, mon.getSubtaskMonitor("find representative file") );
                     if ( ff==null ) {
                         mon.finished();
                         throw new IllegalArgumentException("Unable to find file from aggregation: "+uri);
@@ -525,7 +521,7 @@ public class DataSetURI {
                     if ( extr!=null && extr.startsWith("vap+") ) {
                         delegateFactory=  DataSourceRegistry.getInstance().getSource(extr);
                     } else {
-                        delegateFactory = DataSourceRegistry.getInstance().getSource(eext); // just do what we would have done before.
+                        delegateFactory = DataSourceRegistry.getInstance().getSource(eext); // do what we would have done before.
                     }
                 } else {
                     delegateFactory = DataSourceRegistry.getInstance().getSource(eext);
@@ -570,7 +566,9 @@ public class DataSetURI {
         factory = DataSourceRegistry.getInstance().getSource(ext);
 
         // rte_1512402504_20121004_002144.xml: actually I think it was the parens on the next expression.
-        if (factory == null && ( resourceUri.getScheme()!=null && ( resourceUri.getScheme().equals("http") || resourceUri.getScheme().equals("https") ) ) ) { // get the mime type
+        if (factory == null && 
+            ( resourceUri.getScheme()!=null 
+                && ( resourceUri.getScheme().equals("http") || resourceUri.getScheme().equals("https") ) ) ) { // get the mime type
             URL url = resourceUri.toURL();
             mon.setTaskSize(-1);
             mon.started();
@@ -647,7 +645,8 @@ public class DataSetURI {
             FileSystem fs = FileSystem.create(spath);
             FileObject fo = fs.getFileObject(split.file.substring(split.path.length()));
             if (!fo.isLocal()) {
-                logger.log(Level.FINE, "getInputStream(URL): downloading file {0} from {1}", new Object[] { fo.getNameExt(), url.toString() } );
+                logger.log(Level.FINE, "getInputStream(URL): downloading file {0} from {1}", 
+                    new Object[] { fo.getNameExt(), url.toString() } );
             }
             return fo.getInputStream(mon);
 
@@ -675,7 +674,8 @@ public class DataSetURI {
             filename = DataSourceUtil.unescape(filename);
         FileObject fo = fs.getFileObject(filename);
         if (!fo.isLocal()) {
-            logger.log(Level.FINE, "getInputStream(URI): downloading file {0} from {1}{2}", new Object[] { fo.getNameExt(), fs.getRootURI(), filename } );
+            logger.log(Level.FINE, "getInputStream(URI): downloading file {0} from {1}{2}", 
+                new Object[] { fo.getNameExt(), fs.getRootURI(), filename } );
         }
         InputStream result= fo.getInputStream(mon);
         logger.exiting("DataSetURI", "getInputStream" );
@@ -832,10 +832,10 @@ public class DataSetURI {
      * This will use a temporary local file in some cases, such as when the URL
      * has parameters, which prevent use with the FileSystem model.
      *
-     * TODO: why is there both getFile(url,mon) and getFile( suri, allowHtml, mon )???
+     * TODO: why are there both getFile(url,mon) and getFile( suri, allowHtml, mon )???
      * 
      * @param url the URL of the file.
-     * @param mon progress monitor or null.  If null then AlertProgressMonitor is used to show when the download time is not trivial.
+     * @param mon progress monitor or null. If null then AlertProgressMonitor is used to show when the download time is not trivial.
      * @return the File
      * @throws java.io.IOException
      * @see #getFile(java.lang.String, boolean, org.das2.util.monitor.ProgressMonitor) 
@@ -862,7 +862,9 @@ public class DataSetURI {
             }
             File tfile;
             if ( fo.exists() ) {
-                tfile = fo.getFile(mon); //TODO: there's a bug here: where we rename the file after unzipping it, but we don't check to see if the .gz is newer.
+                //TODO: there's a bug here: where we rename the file after unzipping it, 
+                // but we don't check to see if the .gz is newer.
+                tfile = fo.getFile(mon); 
                 checkNonHtml( tfile, url );
             } else {
                 FileObject foz= fs.getFileObject(filename+".gz"); // repeat the .gz logic that FileStorageModel.java has.
@@ -918,7 +920,10 @@ public class DataSetURI {
     public static File getCacheFilename( URI suri ) {
         URISplit split = URISplit.parse( suri );
 
-        if ( split.scheme.equals("http") || split.scheme.equals("https") || split.scheme.equals("ftp") || split.scheme.equals("sftp") ) {
+        if ( split.scheme.equals("http") 
+            || split.scheme.equals("https") 
+            || split.scheme.equals("ftp") 
+            || split.scheme.equals("sftp") ) {
             try {
                 URI root= new URI( split.file ); // from WebFileSystem.
                 File local = FileSystem.settings().getLocalCacheDir();
@@ -971,12 +976,15 @@ public class DataSetURI {
         URL url= isUrl( split.resourceUri ) ? split.resourceUri.toURL() : null;
 
         try {
-            FileSystem fs = FileSystem.create(toUri(split.path),mon.getSubtaskMonitor("create filesystem")); // mon because of ZipFileSystem
+            FileSystem fs = FileSystem.create(toUri(split.path),mon.getSubtaskMonitor("create filesystem")); 
+            // (monitor created because it might be ZipFileSystem)
             String filename = split.file.substring(split.path.length());
             FileObject fo = fs.getFileObject(filename);
             File tfile;
             if ( fo.exists() ) {
-                tfile = fo.getFile(mon); //TODO: there's a bug here: where we rename the file after unzipping it, but we don't check to see if the .gz is newer.
+                tfile = fo.getFile(mon); 
+                //TODO: there's a bug here: where we rename the file after unzipping it, 
+                //  but we don't check to see if the .gz is newer.
                 if ( !allowHtml && tfile.exists() && url!=null ) checkNonHtml( tfile, url );
             } else {
                 synchronized ( DataSetURI.class ) { // all this needs review, because often Apache servers will also unpack files.
@@ -1008,7 +1016,8 @@ public class DataSetURI {
                            return downloadResourceAsTempFile(  url, mon);
                         }
                         if ( fs instanceof WebFileSystem && ((WebFileSystem)fs).isOffline() ) {
-                            throw new FileNotFoundException( "File not found in cache of offline filesystem: "+ split.resourceUri +"\n(Offline because of \""+ ((WebFileSystem)fs).getOfflineMessage() + "\")" );
+                            throw new FileNotFoundException( "File not found in cache of offline filesystem: " 
+                                + split.resourceUri +"\n(Offline because of \""+ ((WebFileSystem)fs).getOfflineMessage() + "\")" );
                         } else {
                             if ( fo.exists() ) {
                                 throw new IOException( "Unknown I/O Exception occurred" );
@@ -1089,7 +1098,8 @@ public class DataSetURI {
      * yourself, it should be deleted when the process exits.
      * 
      * @param url the address to download.
-     * @param timeoutSeconds if positive, the number of seconds to allow use of a downloaded resource.  If -1, then the default ten seconds is used.  12 hours is the longest allowed interval.
+     * @param timeoutSeconds if positive, the number of seconds to allow use of a downloaded resource.  
+     *     If -1, then the default ten seconds is used.  12 hours is the longest allowed interval.
      * @param mon a progress monitor, or null.
      * @return a File in the FileSystemCache.  The file will have question marks and ampersands removed.
      * @throws IOException
@@ -1145,7 +1155,8 @@ public class DataSetURI {
         } else {
             is= split.scheme.length()+3;
         }
-        String id= split.scheme + "/" + split.path.substring(is); // fs.getLocalRoot().toString().substring(FileSystem.settings().getLocalCacheDir().toString().length());
+        // fs.getLocalRoot().toString().substring(FileSystem.settings().getLocalCacheDir().toString().length());
+        String id= split.scheme + "/" + split.path.substring(is); 
 
         final long tnow= System.currentTimeMillis();
 
@@ -1256,7 +1267,8 @@ public class DataSetURI {
                 logger.log(Level.FINE, "this thread will downloading temp resource {0}", tempfile);
                 action= ACTION_DOWNLOAD;
                 try (OutputStream out = new FileOutputStream(result) ) { // touch the file
-                    out.write( "DataSetURI.downloadResourceAsTempFile: This placeholding temporary file should not be used.\n".getBytes() ); // I bet we see this message again!
+                    out.write( ("DataSetURI.downloadResourceAsTempFile: This placeholding "
+                        + "temporary file should not be used.\n").getBytes() ); // I bet we see this message again!
                 } // I bet we see this message again!
                 OutputStream outf= new FileOutputStream(tempfile);
                 outf.close();
@@ -1286,8 +1298,10 @@ public class DataSetURI {
                             tlength= System.currentTimeMillis();
                         } else {
                             if ( System.currentTimeMillis()-tlength >  3 * FileSystem.settings().getConnectTimeoutMs() ) { 
-                                logger.log(Level.WARNING, "timeout waiting for lengthening of file {0} which another thread is loading", tempfile);
-                                throw new IOException("timeout waiting for lengthening of file "+tempfile+" which another thread is loading");
+                                logger.log(Level.WARNING, "timeout waiting for lengthening of file "
+                                    + "{0} which another thread is loading", tempfile);
+                                throw new IOException("timeout waiting for lengthening of file "
+                                    +tempfile+" which another thread is loading");
                             }
                         }
                         if ( mon.isCancelled() ) {
@@ -1598,7 +1612,8 @@ public class DataSetURI {
      * @return
      * @throws Exception
      */
-    public static List<CompletionResult> getCompletions(final String surl, final int carotpos, ProgressMonitor mon) throws Exception {
+    public static List<CompletionResult> getCompletions(
+        final String surl, final int carotpos, ProgressMonitor mon) throws Exception {
         if ( carotpos==0 || (
                 !surl.substring(0,carotpos).contains(":")
                 && ( carotpos<4 && surl.substring(0, carotpos).equals( "vap".substring(0,carotpos ) )
@@ -1608,7 +1623,9 @@ public class DataSetURI {
 
 
         URISplit split = URISplit.parse(surl, carotpos, true);
-        if ( ( split.vapScheme!=null && split.file == null ) || ( split.file!=null && split.resourceUriCarotPos > split.file.length()) && DataSourceRegistry.getInstance().hasSourceByExt(DataSetURI.getExt(surl))) {
+        if ( ( split.vapScheme!=null && split.file == null )
+            || ( split.file!=null && split.resourceUriCarotPos > split.file.length()) 
+            && DataSourceRegistry.getInstance().hasSourceByExt(DataSetURI.getExt(surl)) ) {
             return getFactoryCompletions(URISplit.format(split), split.formatCarotPos, mon);
         } else {
             if ( split.vapScheme==null && split.scheme==null ) {
@@ -1640,7 +1657,9 @@ public class DataSetURI {
      * @return possibly immutable list.
      * @throws IOException 
      */
-    public static List<CompletionResult> getHostCompletions(final String surl, final int carotpos, ProgressMonitor mon) throws IOException {
+    public static List<CompletionResult> getHostCompletions(
+        final String surl, final int carotpos, ProgressMonitor mon) throws IOException {
+        
         URISplit split = URISplit.parse(surl.substring(0, carotpos));
 
         String prefix;
@@ -1776,7 +1795,10 @@ public class DataSetURI {
      * @throws IOException
      * @throws URISyntaxException
      */
-    public static List<CompletionResult> getFileSystemCompletions(final String surl, final int carotpos, boolean inclAgg, boolean inclFiles, String acceptPattern, ProgressMonitor mon) throws IOException, URISyntaxException {
+    public static List<CompletionResult> getFileSystemCompletions(
+        final String surl, final int carotpos, boolean inclAgg, boolean inclFiles, String acceptPattern, ProgressMonitor mon) 
+        throws IOException, URISyntaxException {
+        
         return getFileSystemCompletions( surl, carotpos, inclAgg, inclFiles ? null : new ArrayList(), acceptPattern, mon );
     }
 
@@ -1794,7 +1816,10 @@ public class DataSetURI {
      * @throws IOException
      * @throws URISyntaxException
      */
-    public static List<CompletionResult> getFileSystemCacheCompletions(final String surl, final int carotpos, boolean inclAgg, boolean inclFiles, String acceptPattern, ProgressMonitor mon) throws IOException, URISyntaxException {
+    public static List<CompletionResult> getFileSystemCacheCompletions(
+        final String surl, final int carotpos, boolean inclAgg, boolean inclFiles, String acceptPattern, ProgressMonitor mon) 
+        throws IOException, URISyntaxException {
+        
         URISplit split = URISplit.parse(surl.substring(0, carotpos));
 
         String prefix;
@@ -1815,7 +1840,8 @@ public class DataSetURI {
             throw new IllegalArgumentException("need scheme and hostname");
         }
             
-        File cacheF = new File(FileSystem.settings().getLocalCacheDir(), split.scheme + '/' + split.path.substring(split.scheme.length()+3) );
+        File cacheF = new File(FileSystem.settings().getLocalCacheDir(), split.scheme + '/' + 
+                               split.path.substring(split.scheme.length()+3) );
 
         if (!cacheF.exists()) return Collections.emptyList();
         s = cacheF.list();
@@ -1850,7 +1876,8 @@ public class DataSetURI {
                         s2= new String[0];
                     }
                 }
-                completions.add(new DataSetURI.CompletionResult(surlDir + result1.toString(), result1.toString(), null, surl.substring(0, carotpos), true));
+                completions.add(new DataSetURI.CompletionResult(
+                    surlDir + result1.toString(), result1.toString(), null, surl.substring(0, carotpos), true));
             }
         }
 
@@ -1877,7 +1904,10 @@ public class DataSetURI {
      * @throws IOException
      * @throws URISyntaxException
      */
-    public static List<CompletionResult> getFileSystemCompletions(final String surl, final int carotpos, boolean inclAgg, List<String> inclFiles, String acceptPattern, ProgressMonitor mon) throws IOException, URISyntaxException {
+    public static List<CompletionResult> getFileSystemCompletions(
+        final String surl, final int carotpos, boolean inclAgg, List<String> inclFiles, String acceptPattern, ProgressMonitor mon) 
+        throws IOException, URISyntaxException {
+        
         URISplit split = URISplit.parse(surl.substring(0, carotpos),carotpos,false);
         if ( split.file==null ) {
             logger.info("url passed to getFileSystemCompletions does not appear to be a filesystem.");
@@ -2098,15 +2128,27 @@ public class DataSetURI {
                         offlineMsg= offlineMsg.substring(0,17)+"...";
                     }
                     if ( offlineCode==0 ) {
-                        completions.add( new DataSetURI.CompletionResult( fs.getRootURI().toString(), "(FileSystem is offline: "+offlineMsg+")", 
-                                "<html>The filesystem is offline because of<br>"+wfs.getOfflineMessage()+"<br>Use Tools->Cache->Reset Memory Caches to reset", fs.getRootURI().toString(), false ) );                        
+                        completions.add( new DataSetURI.CompletionResult( 
+                            fs.getRootURI().toString(), "(FileSystem is offline: "+offlineMsg+")", 
+                            "<html>The filesystem is offline because of<br>"+wfs.getOfflineMessage()
+                                +"<br>Use Tools->Cache->Reset Memory Caches to reset", 
+                            fs.getRootURI().toString(), 
+                            false ) );                        
                     } else {
-                        completions.add( new DataSetURI.CompletionResult( fs.getRootURI().toString(), "(FileSystem is offline: "+offlineMsg+")", 
-                                "<html>The filesystem is offline because of<br>"+offlineCode + ": "+wfs.getOfflineMessage()+"<br>Use Tools->Cache->Reset Memory Caches to reset", fs.getRootURI().toString(), false ) );
+                        completions.add( new DataSetURI.CompletionResult( 
+                            fs.getRootURI().toString(), "(FileSystem is offline: "+offlineMsg+")", 
+                            "<html>The filesystem is offline because of<br>"+offlineCode + ": "+wfs.getOfflineMessage()
+                                +"<br>Use Tools->Cache->Reset Memory Caches to reset", 
+                            fs.getRootURI().toString(), 
+                            false ) );
                     }
                     
                 } else {
-                    completions.add( new DataSetURI.CompletionResult( fs.getRootURI().toString(), "(FileSystem is offline)", "The filesystem is offline.  Use Tools->Cache->Reset Memory Caches to reset", fs.getRootURI().toString(), false ) );
+                    completions.add( new DataSetURI.CompletionResult( 
+                        fs.getRootURI().toString(), "(FileSystem is offline)", 
+                        "The filesystem is offline.  Use Tools->Cache->Reset Memory Caches to reset", 
+                        fs.getRootURI().toString(), 
+                        false ) );
                 }
             }
         }
@@ -2133,7 +2175,8 @@ public class DataSetURI {
         for ( String ext: dexts ) {
             String vapext= "vap+"+ext.substring(1);
             if ( vapext.startsWith(prefix) ) {
-                completions.add( new CompletionResult( vapext + ":", DataSourceRegistry.getDescriptionFor( vapext ), prefix, true ) );
+                completions.add( 
+                    new CompletionResult( vapext + ":", DataSourceRegistry.getDescriptionFor( vapext ), prefix, true ) );
             }
         }
 
@@ -2183,7 +2226,8 @@ public class DataSetURI {
     public static List<String> getSortedDiscoverableExtentions() {
         final List<String> exts= DataSetURI.getDiscoverableExtensions();
         exts.add("file:"); // special marker for local files.
-        File f= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ) + "/bookmarks/discovery.txt" );
+        File f= new File( 
+            AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ) + "/bookmarks/discovery.txt" );
         if ( f.exists()&& f.canRead()) {
             BufferedReader reader=null;
             try {
@@ -2442,13 +2486,16 @@ public class DataSetURI {
                 for (String item : s) {
                     if (item.startsWith(prefix)) {
                         CompletionContext cc1 = new CompletionContext(CompletionContext.CONTEXT_FILE, surlDir + item);
-                        result.add(new CompletionResult(CompletionContext.insert(cc, cc1), cc1.label, cc1.doc, surl1.substring(0, carotPos), true));
+                        result.add(new CompletionResult(
+                            CompletionContext.insert(cc, cc1), cc1.label, cc1.doc, surl1.substring(0, carotPos), true));
                     }
                 }
             } catch (MalformedURLException ex) {
-                result = Collections.singletonList(new CompletionResult("Malformed URI", "Something in the URL prevents processing "+ surl1.substring(0, carotPos), "", false));
+                result = Collections.singletonList(new CompletionResult(
+                    "Malformed URI", "Something in the URL prevents processing "+ surl1.substring(0, carotPos), "", false));
             } catch (FileSystem.FileSystemOfflineException ex) {
-                result = Collections.singletonList(new CompletionResult("FileSystem offline", "FileSystem is offline." + surl1.substring(0, carotPos), "", false));
+                result = Collections.singletonList(new CompletionResult(
+                    "FileSystem offline", "FileSystem is offline." + surl1.substring(0, carotPos), "", false));
             } finally {
                 mon.finished();
             }
