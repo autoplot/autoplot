@@ -1297,6 +1297,7 @@ public final class PlotController extends DomNodeController {
             }
             
             if ( pele.isAutoRenderType() && pp.isEmpty() ) {
+                // https://sourceforge.net/p/autoplot/bugs/2575/
                 PlotController.this.setAutoBinding(true);
             }
             doPlotElementDefaultsChange(pele);
@@ -1780,7 +1781,10 @@ public final class PlotController extends DomNodeController {
      */
     private void doPlotElementDefaultsChange( PlotElement pele ) {
 
-        if ( pele!=null && isAutoBinding() ) doCheckBindings( plot, pele.getPlotDefaults() );
+        if ( pele!=null && isAutoBinding() ) {
+            // bug https://sourceforge.net/p/autoplot/bugs/2575/: who resets autoBinding? 
+            doCheckBindings( plot, pele.getPlotDefaults() );
+        }
 
         List<BindingModel> bms= dom.getController().findBindings( dom, Application.PROP_TIMERANGE, null, Axis.PROP_RANGE );
         BindingModel existingBinding= dom.getController().findBinding( dom, Application.PROP_TIMERANGE, plot.xaxis, Axis.PROP_RANGE );
