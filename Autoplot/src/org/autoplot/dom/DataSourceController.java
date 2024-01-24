@@ -499,7 +499,7 @@ public class DataSourceController extends DomNodeController {
                                 BindingModel bm = dom.controller.findBinding(dom, Application.PROP_TIMERANGE, p.getXaxis(), Axis.PROP_RANGE);
                                 //TODO: verify this! https://sourceforge.net/tracker/index.php?func=detail&aid=3516161&group_id=199733&atid=970682
                                 if (bm != null) {
-                                    dom.controller.deleteBinding(bm);
+                                    dom.controller.removeBinding(bm);
                                 }
                             }
                         }
