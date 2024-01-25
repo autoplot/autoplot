@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package org.autoplot.pds;
 
 import gov.nasa.pds.ppi.label.PDSException;
@@ -23,6 +20,8 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.w3c.dom.Document;
 
 /**
+ * This useful class loads the LBL using PDSLabel to provide it as a Document, and then this
+ * is exported to XML for use in Netbeans.
  * 
  * XPATH: /LABEL/TABLE/COLUMN/NAME/text()
  * @author jbf
@@ -30,7 +29,8 @@ import org.w3c.dom.Document;
 public class ShowLabelAsXml {
     public static void main( String[] args ) throws MalformedURLException, IOException, PDSException, TransformerException {
         //String lbl="https://pds-ppi.igpp.ucla.edu/data/JNO-J_SW-JAD-5-CALIBRATED-V1.0/DATA/2016/2016240/ELECTRONS/JAD_L50_LRS_ELC_ANY_DEF_2016240_V01.LBL";
-        String lbl="https://pds-ppi.igpp.ucla.edu/data/GO-J-PWS-5-DDR-PLASMA-DENSITY-FULL-V1.0/DATA/00_JUPITER/FPE_1996_05_25_V01.LBL";
+        //String lbl="https://pds-ppi.igpp.ucla.edu/data/GO-J-PWS-5-DDR-PLASMA-DENSITY-FULL-V1.0/DATA/00_JUPITER/FPE_1996_05_25_V01.LBL";
+        String lbl="https://pds-ppi.igpp.ucla.edu/data/JNO-J_SW-JAD-3-CALIBRATED-V1.0/DATA/2023/2023004/ELECTRONS/JAD_L30_LRS_ELC_ANY_CNT_2023004_V04.LBL";
         File f= DataSetURI.getFile( new URL(lbl), new NullProgressMonitor() );
         URL fileUrl;
             
