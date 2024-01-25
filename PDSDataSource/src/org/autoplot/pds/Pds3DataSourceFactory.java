@@ -62,7 +62,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
      * @throws PDSException
      * @throws XPathExpressionException 
      */
-    protected static PDS3DataObject getDataObjectPds3( URL url, String name ) throws IOException, PDSException, XPathExpressionException {
+    public static PDS3DataObject getDataObjectPds3( URL url, String name ) throws IOException, PDSException, XPathExpressionException {
 
         Document doc;
         doc= getDocumentWithImports(url);
