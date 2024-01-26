@@ -5,6 +5,8 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -12,6 +14,10 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import org.autoplot.datasource.URISplit;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,6 +45,7 @@ public class PDS3DataObject {
     private int items;
     private int itemBytes;
     private int bytes;
+    private String dims; // dimensions for rank 2 or higher data, like "[64,48]" or "[3]"
     private double validMinimum;
     private double validMaximum;
     private double missingConstant;
@@ -75,6 +82,7 @@ public class PDS3DataObject {
             rows= jtable.optInt("ROWS",-1);
             JSONObject j= toJSONObject(column);
             columnJSONObject= j;
+            j.toString(4);
             if ( j.has("ITEMS") ) {
                 items= j.getInt("ITEMS");
             } else {
@@ -83,6 +91,23 @@ public class PDS3DataObject {
 
             startByte= j.optInt("START_BYTE",0);
             bytes= j.optInt("BYTES",-1);
+            
+            if ( column.getNodeName().equals("CONTAINER") ) {
+                // all other properties come from the innermost node.
+                XPathFactory factory = XPathFactory.newInstance();    
+                XPath xpath = factory.newXPath();
+                Node column1= (Node) xpath.evaluate("COLUMN",column,XPathConstants.NODE);
+                if ( column1==null ) {
+                    column1= (Node) xpath.evaluate("CONTAINER/COLUMN",column,XPathConstants.NODE);
+                    String dim0=(String)xpath.evaluate("REPETITIONS/text()",column,XPathConstants.STRING);
+                    String dim1=(String)xpath.evaluate("CONTAINER/REPETITIONS/text()",column,XPathConstants.STRING);
+                    dims= "["+dim0+","+dim1+"]";
+                } else {
+                    dims= "["+(String)xpath.evaluate("REPETITIONS/text()",column,XPathConstants.STRING)+"]";
+                }
+                j= toJSONObject(column1);
+            }
+                
             dataType= j.optString("DATA_TYPE","");
             fieldNumber= j.optInt("FIELD_NUMBER",-1);
 
@@ -96,10 +121,20 @@ public class PDS3DataObject {
             description= j.optString("DESCRIPTION", "");
         } catch (TransformerException | JSONException ex) {
             throw new IllegalArgumentException("unable to run");
+        } catch (XPathExpressionException ex) {
+            Logger.getLogger(PDS3DataObject.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    private JSONObject toJSONObject(Node n) throws TransformerConfigurationException, TransformerException, JSONException {
+    /**
+     * convert the Document into a JSON object which is easier to work with.
+     * @param n
+     * @return
+     * @throws TransformerConfigurationException
+     * @throws TransformerException
+     * @throws JSONException 
+     */
+    protected static JSONObject toJSONObject(Node n) throws TransformerConfigurationException, TransformerException, JSONException {
         TransformerFactory transfac = TransformerFactory.newInstance();
         transfac.setAttribute("indent-number", 4);
         Transformer trans = transfac.newTransformer();
@@ -249,7 +284,11 @@ public class PDS3DataObject {
         if ( validMaximum!=Double.POSITIVE_INFINITY ) args.put( "validMax", String.valueOf(validMaximum) );
         if ( validMinimum!=Double.NEGATIVE_INFINITY ) args.put( "validMin", String.valueOf(validMinimum) );
         if ( unit.trim().length()!=0 && !args.get("type").startsWith("time") ) args.put( "units", unit );
-        if ( items>-1 ) args.put( "dims", "["+items+"]");
+        if ( items>-1 ) {
+            args.put( "dims", "["+items+"]");
+        } else if ( dims!=null ) {
+            args.put( "dims", dims);
+        }
         return "vap+bin:" + resource.toString() + "?" + URISplit.formatParams(args) ;
     }
     

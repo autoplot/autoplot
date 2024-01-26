@@ -57,7 +57,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
      * return information about how this data is stored in PDS3DataObject.
      * @param url URL of label
      * @param name the object name
-     * @return
+     * @return PDS3DataObject
      * @throws IOException
      * @throws PDSException
      * @throws XPathExpressionException 
@@ -119,8 +119,23 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
         }
         
         if ( table==null ) {
-            throw new IllegalArgumentException("Unable to find table" );
+            // maybe they are high-rank
+            table= (Node) xpath.evaluate(String.format("/LABEL/TABLE[1]",name),doc,XPathConstants.NODE);
+            if ( table==null ) {            
+                throw new IllegalArgumentException("Unable to find table" );
+            } else {
+                column= (Node) xpath.evaluate(String.format("/LABEL/TABLE[1]/CONTAINER/COLUMN[NAME='%s']",name),doc,XPathConstants.NODE);
+                if ( column==null ) {
+                    column= (Node) xpath.evaluate(String.format("/LABEL/TABLE[1]/CONTAINER/CONTAINER/COLUMN[NAME='%s']",name),doc,XPathConstants.NODE);
+                    if ( column!=null ) {   
+                        column= column.getParentNode().getParentNode();
+                    }
+                } else {
+                    column= column.getParentNode();
+                }
+            }
         }
+        
         if ( column==null ) {
             throw new IllegalArgumentException("Unable to find column: "+name );
         }
@@ -289,6 +304,37 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
             PDS3DataObject dd= getDataObjectPds3( url, name );
             result.put( name, summarizeDescription(dd.getDescription()) );
         }
+        
+        // check for high-rank containers
+        Node table=null;
+        if ( table==null ) {
+            // maybe they are high-rank
+            
+            Node n= doc.getDocumentElement();
+            
+            table= (Node) xpath.evaluate(String.format("/LABEL/TABLE[1]"),n,XPathConstants.NODE);
+            if ( table==null ) {            
+                
+            } else {
+                NodeList columns= (NodeList) xpath.evaluate("CONTAINER/COLUMN",table,XPathConstants.NODESET);
+                for ( int i=0; i<columns.getLength(); i++ ) {
+                    Node column= columns.item(i);
+                    String name= (String)xpath.evaluate("NAME/text()",column,XPathConstants.STRING);
+                    PDS3DataObject dd= getDataObjectPds3( url, name );
+                    result.put( name, summarizeDescription(dd.getDescription()) );                      
+                }
+                columns= (NodeList) xpath.evaluate("CONTAINER/CONTAINER/COLUMN",table,XPathConstants.NODESET);
+                for ( int i=0; i<columns.getLength(); i++ ) {
+                    Node column= columns.item(i);
+                    if ( column!=null ) {   
+                        String name= (String)xpath.evaluate("NAME/text()",column,XPathConstants.STRING);
+                        PDS3DataObject dd= getDataObjectPds3( url, name );
+                        result.put( name, summarizeDescription(dd.getDescription()) );  
+                    }
+                }
+            }
+        }
+        
         return result;
 
     }
