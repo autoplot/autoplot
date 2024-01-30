@@ -1961,8 +1961,12 @@ addBottomDecoration( dom.canvases[0], paint )
 
         File f= new File(dir);
         if ( !f.exists() ) {
-            if ( !f.mkdirs() ) {
-                throw new IllegalArgumentException("unable to make directory: "+f );
+            synchronized ( ScriptContext.class ) { // only one thread gets to make the directory, double-check.
+                if ( !f.exists() ) {
+                    if ( !f.mkdirs() ) {
+                        throw new IllegalArgumentException("unable to make directory: "+f );
+                    }
+                }
             }
         }
     }
