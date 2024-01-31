@@ -1480,7 +1480,9 @@ public final class ApplicationModel {
     public DataSourceController getDataSourceFilterController() {
         DataSourceFilter dsf= dom.getController().getDataSourceFilter();
         if ( dsf==null ) {
-            throw new NullPointerException("Expected DSF to be non-null");
+            dom.getController().getDataSourceFilter();
+            dsf= dom.getDataSourceFilters(0);
+            
         }
         return dsf.getController();
     }
