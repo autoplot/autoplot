@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Autoplot used to study GitHub image.</small></p>
+        <p><small>Run batch tool used to generate new icons for the spectrogram renderer.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,9 +30,12 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-01-24 r27509):</p>
+        <p>Bugfixes (2024-01-31 r27533):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2576">2576</a>: hopefully fix "Expected DSF to be non-null" message when focus is blurred.
+            <li>remove kernalCode spectrogram rebin mode, which shouldn't have been exposed.
             <li>slices on single-screen machines always jumped to pixel coordinates 0,0.
+            <li>mkdir function is in a synchronized block, so that multi-thread batch processing don't step on each other's toes.
         </ul>
         <p>Older Bugfixes (2024-01-20 r27509):</p>
         <ul> 
@@ -56,6 +59,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>update das2 spectrogram icons.
+            <li>invalid(ds) function added equivalent to valid(ds).eq(0).
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/818/">818</a>: Support for high-rank (multi-index) data PDS3 tables with CONTAINERS.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/818/">818</a>: Support for PDS3 spreadsheets.
         </ul>
