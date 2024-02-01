@@ -320,7 +320,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         postRunPopupMenu = new javax.swing.JPopupMenu();
         copyScriptUri = new javax.swing.JMenuItem();
         rerunScriptMenuItem = new javax.swing.JMenuItem();
-        copyUriMenuItem = new javax.swing.JMenuItem();
+        copyValueMenuItem = new javax.swing.JMenuItem();
         goButton = new javax.swing.JButton();
         param1ScrollPane = new javax.swing.JScrollPane();
         param1Values = new javax.swing.JTextArea();
@@ -520,13 +520,14 @@ public class RunBatchTool extends javax.swing.JPanel {
         });
         postRunPopupMenu.add(rerunScriptMenuItem);
 
-        copyUriMenuItem.setText("jMenuItem1");
-        copyUriMenuItem.addActionListener(new java.awt.event.ActionListener() {
+        copyValueMenuItem.setText("Copy Value to Clipboard");
+        copyValueMenuItem.setToolTipText("");
+        copyValueMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                copyUriMenuItemActionPerformed(evt);
+                copyValueMenuItemActionPerformed(evt);
             }
         });
-        postRunPopupMenu.add(copyUriMenuItem);
+        postRunPopupMenu.add(copyValueMenuItem);
 
         goButton.setText("Go!");
         goButton.setToolTipText("Run the batch processes, holding shift to run independent processes in parallel.");
@@ -1124,14 +1125,14 @@ public class RunBatchTool extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_cancelButtonActionPerformed
 
-    private void copyUriMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyUriMenuItemActionPerformed
+    private void copyValueMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyValueMenuItemActionPerformed
         JLabel p= getSelectedLabel();
         String argValue= p.getText();
         System.err.println(argValue);
         StringSelection stringSelection= new StringSelection( argValue );
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents( stringSelection, null );
         messageLabel.setText("Copied to system clipboard: "+argValue );
-    }//GEN-LAST:event_copyUriMenuItemActionPerformed
+    }//GEN-LAST:event_copyValueMenuItemActionPerformed
 
     private void doLoadFromFile( JTextArea paramValues ) {
         JFileChooser chooser= new JFileChooser();
@@ -2674,7 +2675,7 @@ public class RunBatchTool extends javax.swing.JPanel {
     private javax.swing.JButton cancelButton;
     private javax.swing.JButton closeButton;
     private javax.swing.JMenuItem copyScriptUri;
-    private javax.swing.JMenuItem copyUriMenuItem;
+    private javax.swing.JMenuItem copyValueMenuItem;
     private org.autoplot.datasource.DataSetSelector dataSetSelector1;
     private javax.swing.JButton editParamsButton;
     private javax.swing.JMenuItem exportResultsMenuItem;
