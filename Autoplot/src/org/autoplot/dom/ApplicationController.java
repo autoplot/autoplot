@@ -3379,11 +3379,16 @@ public class ApplicationController extends DomNodeController implements RunLater
     public static final String PROP_DATASOURCEFILTER = "dataSourceFilter";
 
     /**
-     * return focus dataSourceFilter, or null.
+     * return focus dataSourceFilter, or null.  This will return
+     * the first dataSourceFilter when nothing is in focus.
      * @return the focus dataSourceFilter.
      */
     public DataSourceFilter getDataSourceFilter() {
-        return dataSourceFilter;
+        if ( this.dataSourceFilter==null && this.application.dataSourceFilters.size()>0 ) {
+            return this.application.dataSourceFilters.get(0);
+        } else {
+            return dataSourceFilter;
+        }
     }
 
     /**
