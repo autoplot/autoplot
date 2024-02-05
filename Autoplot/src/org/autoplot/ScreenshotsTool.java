@@ -560,6 +560,8 @@ public class ScreenshotsTool extends EventQueue {
         }
 
         g.fill(s);
+        g.setColor(Color.GRAY);
+        g.draw(s);
         
         logger.log(Level.FINE, "filterBackground in {0}ms", (System.currentTimeMillis()-t0));
         return containsPointer;
