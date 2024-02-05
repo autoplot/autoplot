@@ -632,7 +632,6 @@ public class LayoutPanel extends javax.swing.JPanel {
             dom.getController().setSelectedPlots("");
         }
 
-        updateDataSourceList();
         canvasLayoutPanel1.setSelectedComponents( selected );
         canvasLayoutPanel1.setComponent(dasPlot);
         
