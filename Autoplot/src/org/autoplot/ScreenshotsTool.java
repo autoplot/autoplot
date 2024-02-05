@@ -537,6 +537,7 @@ public class ScreenshotsTool extends EventQueue {
             if ( frame.isVisible() ) {
                 if( frame.getExtendedState() != Frame.ICONIFIED ) {
                     Rectangle rect= frame.getBounds();
+                    //rect= new Rectangle( rect.x-1, rect.y-1, rect.width+2, rect.height+2 ); // My Linux doesn't put nice borders around GUIs.
                     logger.log(Level.FINER, "showing {0} {1}", new Object[]{rect, frame.getTitle()});
                     if ( rect.contains(p) ) containsPointer=true;
                     rect.translate( -b.x, -b.y );
@@ -562,6 +563,8 @@ public class ScreenshotsTool extends EventQueue {
         g.fill(s);
         g.setColor(Color.GRAY);
         g.draw(s);
+        g.setColor(Color.WHITE);
+        g.draw(r);
         
         logger.log(Level.FINE, "filterBackground in {0}ms", (System.currentTimeMillis()-t0));
         return containsPointer;
