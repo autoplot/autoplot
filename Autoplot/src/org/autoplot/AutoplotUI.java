@@ -11,6 +11,7 @@ import javax.swing.Icon;
 import org.autoplot.bookmarks.Bookmark;
 import org.autoplot.bookmarks.BookmarksManager;
 import com.cottagesystems.jdiskhog.JDiskHogPanel;
+import com.formdev.flatlaf.FlatLightLaf;
 import java.awt.AWTEvent;
 import org.das2.components.DasProgressPanel;
 import org.das2.components.TearoffTabbedPane;
@@ -107,6 +108,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -4914,6 +4916,7 @@ private void updateFrameTitle() {
         alm.addBooleanSwitchArgument("scriptPanel", null, "scriptPanel", "enable script panel");
         alm.addBooleanSwitchArgument("logConsole", "l", "logConsole", "enable log console");
         alm.addOptionalSwitchArgument("nativeLAF", "n", "nativeLAF", ArgumentList.TRUE, "use the system look and feel (T or F)");
+        alm.addOptionalSwitchArgument("flatLAF", null, "flatLAF", ArgumentList.FALSE, "use the OS-independent Flat look and feel (T or F)");
         alm.addOptionalSwitchArgument("macUseScreenMenuBar",null,"macUseScreenMenuBar",ArgumentList.FALSE, "use Mac menu bar (T or F)");
         alm.addOptionalSwitchArgument("open", "o", "open", null, "open this URI (to support javaws)");
         alm.addOptionalSwitchArgument("print", null, "print", "", "print this URI (to support javaws)");
@@ -5095,19 +5098,17 @@ private void updateFrameTitle() {
             setupMacMenuBarSoon();
         }
         
-        if ( !headless && nativeLAF ) {
-            logger.fine("nativeLAF");
+        if ( !headless ) {
             try {
-                String s= javax.swing.UIManager.getSystemLookAndFeelClassName();
-//                if ( System.getProperty("swing.defaultlaf").equals("com.sun.java.swing.plaf.gtk.GTKLookAndFeel") ) {
-//                    if ( s.endsWith("MetalLookAndFeel") && System.getProperty("os.name").equals("Linux") ) { // Linux Mint, for one...
-//                        Toolkit toolkit = Toolkit.getDefaultToolkit();
-//                        if (((SunToolkit) toolkit).isNativeGTKAvailable()) {
-//                            s= "com.sun.java.swing.plaf.gtk.GTKLookAndFeel";
-//                        }
-//                    }
-//                }
-                javax.swing.UIManager.setLookAndFeel(s);
+                if ( alm.getBooleanValue("flatLAF")==true ) {
+                    UIManager.setLookAndFeel( new FlatLightLaf() );
+                    UIManager.put( "TabbedPane.selectedBackground", Color.white );
+                    UIManager.put( "ScrollBar.showButtons", true );
+                } else if ( nativeLAF ) {
+                    logger.fine("nativeLAF");
+                    String s= javax.swing.UIManager.getSystemLookAndFeelClassName();
+                    javax.swing.UIManager.setLookAndFeel(s);
+                }
             } catch ( ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e ) {
                 logger.log( Level.SEVERE, e.getMessage(), e );
             }
