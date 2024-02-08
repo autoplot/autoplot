@@ -66,7 +66,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         if ( name!=null ) {
             return name;
         } else {
-            logger.log(Level.WARNING, "new variable: {0}", dep0);
+            logger.log(Level.FINE, "new variable: {0}", dep0);
         }
         
         name = (String) dep0.property(QDataSet.NAME);
@@ -308,7 +308,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             if ( bds!=null && dep1==null && "T".equals(params.get("bundle")) ) {
                 for ( int i=0; i<bds.length(); i++ ) {
                     QDataSet data1= Ops.unbundle( data, i ) ;
-                    addVariableRankN( cdf, data1, nameFor(data1), false, params, mon );
+                    addVariableRankN( cdf, data1, nameFor(data1), false, params, mon.getSubtaskMonitor("bundle") );
                     if ( dep0!=null ) cdf.addVariableAttributeEntry( nameFor(data1), "DEPEND_0", CDFDataType.CHAR, dep0name );
                 }
                 
@@ -316,12 +316,12 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 int n= data.length(0,0);
                 for ( int i=0; i<n; i++ ) {
                     QDataSet data1= Ops.slice2( data, i );
-                    addVariableRankN( cdf, data1, nameFor(data1), false, params, mon );
+                    addVariableRankN( cdf, data1, nameFor(data1), false, params, mon.getSubtaskMonitor("rank3") );
                     if ( dep0!=null ) cdf.addVariableAttributeEntry( nameFor(data1), "DEPEND_0", CDFDataType.CHAR, dep0name );
                 }
                 
             } else {
-                addVariableRankN( cdf, data, nameFor(data), false, params, mon );
+                addVariableRankN( cdf, data, nameFor(data), false, params, mon.getSubtaskMonitor("bundle1") );
 
                 try {
                     if ( dep0!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_0", CDFDataType.CHAR, dep0name );
@@ -722,7 +722,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 mon.started();
                 for ( int i=0; i<ds.length(); i++ ) {
                     mon.setTaskProgress(i);
-                    Array.set(oexport, i, CdfDataSourceFormat.datasetToArray( ds.slice(i), uc, type, mon ) );
+                    Array.set(oexport, i, CdfDataSourceFormat.datasetToArray( ds.slice(i), uc, type, null ) );
                 }
                 mon.finished();
                 return oexport;
@@ -742,9 +742,13 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 } else {
                     throw new IllegalArgumentException("type not supported"+type);
                 }
+                mon.setTaskSize(ds.length());
+                mon.started();
                 for ( int i=0; i<ds.length(); i++ ) {
-                    Array.set(oexport, i, CdfDataSourceFormat.datasetToArray( ds.slice(i), uc, type, mon ) );
+                    mon.setTaskProgress(i);
+                    Array.set(oexport, i, CdfDataSourceFormat.datasetToArray( ds.slice(i), uc, type, null ) );
                 }
+                mon.finished();
                 return oexport;
             case 4:
                 if ( type==CDFDataType.DOUBLE ) {
@@ -762,9 +766,13 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 } else {
                     throw new IllegalArgumentException("type not supported"+type);
                 }
+                mon.setTaskSize(ds.length());
+                mon.started();
                 for ( int i=0; i<ds.length(); i++ ) {
-                    Array.set(oexport, i, CdfDataSourceFormat.datasetToArray( ds.slice(i), uc, type, mon ) );
+                    mon.setTaskProgress(i);
+                    Array.set(oexport, i, CdfDataSourceFormat.datasetToArray( ds.slice(i), uc, type, null ) );
                 }
+                mon.finished();
                 return oexport;
             default:
                 throw new IllegalArgumentException("rank 0 not supported");
