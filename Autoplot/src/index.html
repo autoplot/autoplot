@@ -30,8 +30,11 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-02-03 r27537):</p>
+        <p>Bugfixes (2024-02-08 r27548):</p>
         <ul>
+            <li>clean up monitor usage in export to CDF file.  Thanks, Kristoff!
+            <li>clean up logging messages in fftpower.  Thanks, Kristoff!
+            <li>colorbar image includes alpha channel to support use over RDP.  Thanks, Kristoff!
             <li>rank 0 data sent into Slice Filter Editor Panel would cause runtime error.
             <li>correction to label in Run Batch post-run popup menu.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2576">2576</a>: hopefully fix "Expected DSF to be non-null" message when focus is blurred.
