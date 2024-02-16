@@ -1538,7 +1538,7 @@ public class GuiSupport {
         }
 
         if (axis == plot.getZaxis()) {
-            JMenuItem addPlotMenu = new JMenuItem( new AbstractAction("Set Colorbar...") {
+            JMenuItem addPlotMenu = new JMenuItem( new AbstractAction("Set Color Table...") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     org.das2.util.LoggerManager.logGuiEvent(e);
@@ -1553,7 +1553,7 @@ public class GuiSupport {
                     });
                     edit.setValue( ((DasColorBar)dasAxis).getType() );
                     if ( JOptionPane.OK_OPTION
-                            !=JOptionPane.showConfirmDialog( dasAxis.getCanvas(), edit.getCustomEditor(), "Set Colortable", JOptionPane.OK_CANCEL_OPTION ) ) {
+                            !=JOptionPane.showConfirmDialog( dasAxis.getCanvas(), edit.getCustomEditor(), "Set Color Table", JOptionPane.OK_CANCEL_OPTION ) ) {
                         ((DasColorBar)dasAxis).setType(type0);
                     }
                 }
