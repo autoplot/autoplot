@@ -757,6 +757,7 @@ public class RunBatchTool extends javax.swing.JPanel {
             return;
         }
         goButton.setEnabled(false);
+        messageLabel.setText("Setting up to run jobs...");
         Runnable run= () -> {
             try {
                 String scriptName= dataSetSelector1.getValue();
@@ -2001,6 +2002,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         final DasProgressPanel monitor= DasProgressPanel.createComponent( "" );
         progressPanel.add( monitor.getComponent() );
         this.monitor= monitor;
+        monitor.started();
 
         jobs.clear();
         final List<JLabel> jobs1= new ArrayList<>();
