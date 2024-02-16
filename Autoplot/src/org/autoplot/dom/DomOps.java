@@ -1,6 +1,7 @@
 
 package org.autoplot.dom;
 
+import java.awt.Event;
 import java.awt.Rectangle;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import javax.swing.SwingUtilities;
 import org.das2.graph.DasRow;
 import org.das2.util.LoggerManager;
 import org.autoplot.datasource.DataSourceUtil;
@@ -442,7 +444,8 @@ public class DomOps {
         Logger logger= LoggerManager.getLogger("autoplot.dom.layout.fixlayout");
         logger.fine( "enter fixLayout" );
         
-        if ( !dom.controller.changesSupport.mutatorLock().isLocked() ) {
+        if ( !dom.controller.changesSupport.mutatorLock().isLocked() 
+                && !SwingUtilities.isEventDispatchThread() ) {
             dom.getController().waitUntilIdle();
         }
         
@@ -555,7 +558,8 @@ public class DomOps {
             dom.options.setAutolayout(autoLayout);
         }
         
-        if ( !dom.controller.changesSupport.mutatorLock().isLocked() ) {
+        if ( !dom.controller.changesSupport.mutatorLock().isLocked()
+                && !SwingUtilities.isEventDispatchThread() ) {
             dom.getController().waitUntilIdle();
         }
     }
