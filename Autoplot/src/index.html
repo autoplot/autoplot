@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small><a href="https://github.com/autoplot/dev/blob/master/demos/2024/20240214/randomwalk.jy">Script</a> showing 32 random walks is run with 20 different seeds to find the most heart-shaped image using the Run Batch tool.  Happy Valentine's Day!</small></p>
+        <p><small>Right-click on the color bar to change which color table is used.</p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,9 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-02-13 r27548):</p>
+        <p>Bugfixes (2024-02-16 r27554):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2578/">2578</a>: Hang after new layout when "move legends" was checked.
             <li>clean up monitor usage in export to CDF file.  Thanks, Kristoff!
             <li>clean up logging messages in fftpower.  Thanks, Kristoff!
             <li>colorbar image includes alpha channel to support use over RDP.  Thanks, Kristoff!
