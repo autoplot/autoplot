@@ -2033,48 +2033,7 @@ public class RunBatchTool extends javax.swing.JPanel {
 
             for ( int i=0; i<jobs1.size(); i++ ) {
                 final int fi= i;
-                jobs1.get(i).addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        selectRecord(fi);
-                        String param1= (String)RunBatchTool.this.param1NameCB.getSelectedItem();
-                        if ( RunBatchTool.this.results!=null ) {
-                            String s= jobs1.get(fi).getText();
-                            List<JSONObject> thisRow= new ArrayList<>();
-                            try {
-                                JSONObject jo= RunBatchTool.this.results;
-                                JSONArray ja= jo.getJSONArray("results");
-                                for ( int j=0; j<ja.length(); j++ ) {
-                                    JSONObject jo1= ja.getJSONObject(j);
-                                    if ( jo1.getString(param1).equals(s) ) {
-                                        thisRow.add( jo1 );
-                                    }
-                                }
-                                if ( jobs2.size()==thisRow.size() ) {
-                                    for ( int i=0; i<thisRow.size(); i++ ) {
-                                        JSONObject runResults= thisRow.get(i);
-                                        String except= thisRow.get(i).getString("result");
-                                        if ( except.length()>0 ) {
-                                            jobs2.get(i).setIcon(ICON_PROB);
-                                        } else {
-                                            jobs2.get(i).setIcon(ICON_OKAY);
-                                        }
-                                        if ( jobs2.get(i).getIcon()==ICON_OKAY ) {
-                                            jobs2.get(i).setToolTipText( htmlize(runResults.getString("stdout")) );
-                                        } else {
-                                            jobs2.get(i).setToolTipText( htmlize(runResults.getString("stdout"),runResults.getString("result")));
-                                        }
-                                    }
-                                } else {
-                                    logger.fine("Nothing to do.");
-                                }
-                                
-                            } catch (JSONException ex) {
-                                Logger.getLogger(RunBatchTool.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                        }
-                    }
-                });
+                jobs1.get(i).addMouseListener(getJobsMouseListener( fi, jobs1, jobs2 ) );
             }
 
             param1JLabels= jobs1.toArray( new JLabel[jobs1.size()] );
