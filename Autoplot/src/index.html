@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Right-click on the color bar to change which color table is used.</p>
+        <p><small>ImageDataSource can grab images from PNGs produced by Das2 using "Rich PNG" metadata within the PNG file.  A bug with the clip=T control (above right) is now fixed, try https://github.com/autoplot/dev/bugs/2024/20240216/pngWithMeta.png?clip=T&plotInfo=0</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,13 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-02-16 r27554):</p>
+        <p>Bugfixes (2024-02-17 r27561):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2579/">2579</a>: ImageDataSource clip=T is fixed.
+            <li>Popup after multi-thread run in Run Batch Tool is restored.
+        </ul>
+        <p>Older Bugfixes (2024-02-16 r27554):</p>
+        <ul> 
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2578/">2578</a>: Hang after new layout when "move legends" was checked.
             <li>clean up monitor usage in export to CDF file.  Thanks, Kristoff!
             <li>clean up logging messages in fftpower.  Thanks, Kristoff!
@@ -43,28 +48,11 @@
             <li>slices on single-screen machines always jumped to pixel coordinates 0,0.
             <li>mkdir function is in a synchronized block, so that multi-thread batch processing don't step on each other's toes.
         </ul>
-        <p>Older Bugfixes (2024-01-20 r27509):</p>
-        <ul> 
-            <li>WritableJoinDataSet copy failed when child was also JoinDataSet.
-            <li><a href="https://github.com/das-developers/das2java/issues/94">94</a>: Support offline mode with GitHubFileSystem
-            <li>rfe811: "Break into stack of plots" action would hang because of mishandling of locks.  Thanks, Darrelle!
-            <li>PDS3 looks for both INVALID_CONSTANT and MISSING CONSTANT.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2554/">2554</a>: tweaks to the Run Batch GUI, and improvements to feedback, results file for multi-thread runs.
-            <li>corrections to pending results file in Run Batch Tool.
-            <li>Exceptions occurring during Mashup tool loading variables now correctly throw Java exception (FileNotFound), not PyException.
-            <li>HAPI time ranges requested with millisecond precision, after we noticed truncating milliseconds would cause requests from https://vires.services/hapi to fail because of startDate.
-            <li>HAPI data requests with "Time" as the first parameter should always load the time, regardless of its name.
-            <li>binAverageBundle checks for dimensionless and degrees, don't do sloppy logic which assumes degrees were intended, since radians are often represented as dimensionless.
-            <li>binAverageBundle mishandled ylog bins, adding the linear half-bin not the log half-bin, causing out of bounds.
-            <li>Corrections to Das2Server parameters GUI, thanks Chris!
-            <li>RunBatch had code which assumed min and max values were both the same type (not 0,4.5).
-            <li>fftPower had branch which assumed xtags had units.
-            <li>suppress useless "not supported: block" message on stderr.
-            <li>Always use edit annotation, even for new annotations.
-            <li>Updates to the edit annotation dialog, including anchorType="plot".
-        </ul>
         <p>Features:</p>
         <ul>
+        </ul>
+        <p>Less recent features:</p>
+        <ul> 
             <li>putProperty can insert into METADATA, supporting kludgy LIMIT_WARN_MIN and LIMIT_WARN_MAX.  
             <li>Include Flat Look and Feel so that all platforms are able use one, clean look, if desired.  (See --flatLAF)
             <li>screenshots tool puts gray border around things, since some Linux GUIs don't have crisp edges.
@@ -72,17 +60,6 @@
             <li>invalid(ds) function added equivalent to valid(ds).eq(0).
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/818/">818</a>: Support for high-rank (multi-index) data PDS3 tables with CONTAINERS.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/818/">818</a>: Support for PDS3 spreadsheets.
-        </ul>
-        <p>Less recent features:</p>
-        <ul> 
-            <li>rfe521: introduce aggregation control addDim=T which will force it to aggregation to a dimension, so rank 1 can be added for each day and viewed as spectrogram.  Thanks, Jean-Marc!
-            <li>metadata tab shows data with Units.rgbValue as named color if possible.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/819/">819</a>: add polyMesh QDataSet schema, to finish off the things QDataSet was intended to model.
-            <li>support for fixed-length fields in ASCII format, including delim=NONE.  Allow comment to be specified.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/818/">818</a>: Initial support for PDS3 labels.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/817/">817</a>: Power Spectral Density and other functions.
-            <li>Click on canvas corner to blur focus.
-            <li>Write to pngwalk file will add quality control to the save directory, if it is enabled.
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
