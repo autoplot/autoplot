@@ -439,7 +439,7 @@ public class ImageDataSource extends AbstractDataSource {
                 myy.putProperty( QDataSet.TYPICAL_MAX,yrange.value(1) );
                 myy.putProperty( QDataSet.UNITS,yunits );
                 myy.putProperty( QDataSet.SCALE_TYPE, ylog ? QDataSet.VALUE_SCALE_TYPE_LOG : QDataSet.VALUE_SCALE_TYPE_LINEAR );
-                myy.putProperty( QDataSet.LABEL, y.opt("label") );
+                myy.putProperty( QDataSet.LABEL, y.opt("label") ); 
                 
                 result.putProperty( QDataSet.DEPEND_1, yy );
                 yclip= new int[] { height-y.getInt("bottom"), height-y.getInt("top")-1 };
