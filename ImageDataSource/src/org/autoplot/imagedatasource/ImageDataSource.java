@@ -410,10 +410,12 @@ public class ImageDataSource extends AbstractDataSource {
                 xx= Ops.multiply( xx, ( dxmax-dxmin ) / ( x.getInt("right") -x.getInt("left") ) );
                 xx= Ops.add( xx, dxmin );
                 if ( xlog ) xx= Ops.exp10(xx);
-                ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MIN,xrange.value(0) );
-                ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MAX,xrange.value(1) );
-                ((MutablePropertyDataSet)xx).putProperty( QDataSet.UNITS,xunits );
-                ((MutablePropertyDataSet)xx).putProperty( QDataSet.SCALE_TYPE, xlog ? QDataSet.VALUE_SCALE_TYPE_LOG : QDataSet.VALUE_SCALE_TYPE_LINEAR );
+                MutablePropertyDataSet mxx= (MutablePropertyDataSet)xx;
+                mxx.putProperty( QDataSet.TYPICAL_MIN,xrange.value(0) );
+                mxx.putProperty( QDataSet.TYPICAL_MAX,xrange.value(1) );
+                mxx.putProperty( QDataSet.UNITS,xunits );
+                mxx.putProperty( QDataSet.SCALE_TYPE, xlog ? QDataSet.VALUE_SCALE_TYPE_LOG : QDataSet.VALUE_SCALE_TYPE_LINEAR );
+                mxx.putProperty( QDataSet.LABEL, x.opt("label") );
                 result.putProperty( QDataSet.DEPEND_0, xx );
                 xclip= new int[] { x.getInt("left")+1, x.getInt("right") };
 
@@ -432,12 +434,18 @@ public class ImageDataSource extends AbstractDataSource {
                 yy= Ops.multiply( yy, ( dymax-dymin ) / ( y.getInt("top") -y.getInt("bottom") ) );
                 yy= Ops.add( yy, dymin );
                 if ( ylog ) yy= Ops.exp10(yy);
-                ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MIN,yrange.value(0) );
-                ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MAX,yrange.value(1) );
-                ((MutablePropertyDataSet)yy).putProperty( QDataSet.UNITS,yunits );
-                ((MutablePropertyDataSet)yy).putProperty( QDataSet.SCALE_TYPE, ylog ? QDataSet.VALUE_SCALE_TYPE_LOG : QDataSet.VALUE_SCALE_TYPE_LINEAR );
+                MutablePropertyDataSet myy= (MutablePropertyDataSet)yy;
+                myy.putProperty( QDataSet.TYPICAL_MIN,yrange.value(0) );
+                myy.putProperty( QDataSet.TYPICAL_MAX,yrange.value(1) );
+                myy.putProperty( QDataSet.UNITS,yunits );
+                myy.putProperty( QDataSet.SCALE_TYPE, ylog ? QDataSet.VALUE_SCALE_TYPE_LOG : QDataSet.VALUE_SCALE_TYPE_LINEAR );
+                myy.putProperty( QDataSet.LABEL, y.opt("label") );
+                
                 result.putProperty( QDataSet.DEPEND_1, yy );
                 yclip= new int[] { height-y.getInt("bottom"), height-y.getInt("top")-1 };
+                
+                result.putProperty( QDataSet.TITLE, plot.opt("title") );
+                
                 
             } else {
                 throw new IllegalArgumentException("png contains no rich metadata.");
