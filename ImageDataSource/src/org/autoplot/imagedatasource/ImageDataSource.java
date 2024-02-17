@@ -413,6 +413,7 @@ public class ImageDataSource extends AbstractDataSource {
                 ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MIN,xrange.value(0) );
                 ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MAX,xrange.value(1) );
                 ((MutablePropertyDataSet)xx).putProperty( QDataSet.UNITS,xunits );
+                ((MutablePropertyDataSet)xx).putProperty( QDataSet.SCALE_TYPE, xlog ? QDataSet.VALUE_SCALE_TYPE_LOG : QDataSet.VALUE_SCALE_TYPE_LINEAR );
                 result.putProperty( QDataSet.DEPEND_0, xx );
                 xclip= new int[] { x.getInt("left"), x.getInt("right") };
 
@@ -434,6 +435,7 @@ public class ImageDataSource extends AbstractDataSource {
                 ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MIN,yrange.value(0) );
                 ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MAX,yrange.value(1) );
                 ((MutablePropertyDataSet)yy).putProperty( QDataSet.UNITS,yunits );
+                ((MutablePropertyDataSet)yy).putProperty( QDataSet.SCALE_TYPE, ylog ? QDataSet.VALUE_SCALE_TYPE_LOG : QDataSet.VALUE_SCALE_TYPE_LINEAR );
                 result.putProperty( QDataSet.DEPEND_1, yy );
                 yclip= new int[] { y.getInt("top"), y.getInt("bottom") };
                 
@@ -450,9 +452,6 @@ public class ImageDataSource extends AbstractDataSource {
             }
             if ( yclip!=null ) {
                 result= Ops.maybeCopy( Ops.trim1( result, yclip[0], yclip[1] ) );
-                
-                System.err.println( Ops.extent( (QDataSet)result.property(QDataSet.DEPEND_1) ) );
-                
             }
         } 
 
