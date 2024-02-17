@@ -415,7 +415,7 @@ public class ImageDataSource extends AbstractDataSource {
                 ((MutablePropertyDataSet)xx).putProperty( QDataSet.UNITS,xunits );
                 ((MutablePropertyDataSet)xx).putProperty( QDataSet.SCALE_TYPE, xlog ? QDataSet.VALUE_SCALE_TYPE_LOG : QDataSet.VALUE_SCALE_TYPE_LINEAR );
                 result.putProperty( QDataSet.DEPEND_0, xx );
-                xclip= new int[] { x.getInt("left"), x.getInt("right") };
+                xclip= new int[] { x.getInt("left")+1, x.getInt("right") };
 
                 JSONArray size= jo.getJSONArray("size");
                 int height= size.getInt(1);                
@@ -437,7 +437,7 @@ public class ImageDataSource extends AbstractDataSource {
                 ((MutablePropertyDataSet)yy).putProperty( QDataSet.UNITS,yunits );
                 ((MutablePropertyDataSet)yy).putProperty( QDataSet.SCALE_TYPE, ylog ? QDataSet.VALUE_SCALE_TYPE_LOG : QDataSet.VALUE_SCALE_TYPE_LINEAR );
                 result.putProperty( QDataSet.DEPEND_1, yy );
-                yclip= new int[] { y.getInt("top"), y.getInt("bottom") };
+                yclip= new int[] { height-y.getInt("bottom"), height-y.getInt("top")-1 };
                 
             } else {
                 throw new IllegalArgumentException("png contains no rich metadata.");
