@@ -2190,7 +2190,7 @@ public class PlotElementController extends DomNodeController {
                         peleCopy.getPlotDefaults().getYaxis().getRange().toString() ) );
             }
 
-            plotElement.setPlotDefaults( peleCopy.getPlotDefaults() );  // bug 2992903 runs through here
+            plotElement.setPlotDefaults( peleCopy.getPlotDefaults() );  // bug https://sourceforge.net/p/autoplot/bugs/283/ runs through here
             plotElement.style.syncTo( peleCopy.style );
             plotElement.renderType= peleCopy.renderType;  // don't fire an event
             // and hope that the plot is listening.
@@ -2231,6 +2231,12 @@ public class PlotElementController extends DomNodeController {
 
     }
 
+    /**
+     * pull out axis labels into plotDefaults.
+     * @param peleCopy
+     * @param properties
+     * @param spec 
+     */
     private static void doInterpretMetadata( PlotElement peleCopy, Map properties, RenderType spec) {
 
         Object v;
@@ -2279,6 +2285,25 @@ public class PlotElementController extends DomNodeController {
                     plotDefaults.setTitle((String) v);
                 }
             }
+        } else if ( spec == RenderType.image ) {
+            Map<String,Object> yprop, xprop=null, prop;
+            xprop= (Map<String, Object>) properties.get( QDataSet.DEPEND_0 );
+            yprop= (Map<String, Object>) properties.get( QDataSet.DEPEND_1 ); 
+            
+            if ( xprop!=null ) {
+                plotDefaults.xaxis.label= (String) xprop.get(QDataSet.LABEL);
+                if ( (v = xprop.get(QDataSet.SCALE_TYPE)) != null) {
+                    plotDefaults.getXaxis().setLog(v.equals("log"));
+                }
+            }
+
+            if ( yprop!=null ) {
+                plotDefaults.yaxis.label= (String) yprop.get(QDataSet.LABEL);
+                if ( (v = yprop.get(QDataSet.SCALE_TYPE)) != null) {
+                    plotDefaults.getYaxis().setLog(v.equals("log"));
+                }
+            }
+            
         } else { // hugeScatter okay
 
             Map<String,Object> yprop, xprop=null, prop;

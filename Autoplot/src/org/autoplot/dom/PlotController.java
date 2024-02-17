@@ -1777,6 +1777,7 @@ public final class PlotController extends DomNodeController {
 
     /**
      * check all the plotElements' plot defaults, so that properties marked as automatic can be reset.
+     * This is another important plot one searches for often, so not the liver or heart but the hand since it sets plot labels.
      * @param plotElement
      */
     private void doPlotElementDefaultsChange( PlotElement pele ) {
