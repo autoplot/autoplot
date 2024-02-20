@@ -839,7 +839,7 @@ public class SimplifyScriptSupport {
                         //TODO: can we identify type?  Insert <id>__CLASSTYPE=... for completions.
                         if ( a.value instanceof Call ) {
                             String type= maybeIdentifyReturnType( id, (Call)a.value, importedNames );
-                            logger.log(Level.INFO, "id type: {0}__CLASSTYPE= {1}", new Object[]{id, type});
+                            logger.log(Level.FINE, "id type: {0}__CLASSTYPE= {1}", new Object[]{id, type});
                         }
                     } else if (et instanceof Attribute) {
                         return false;
