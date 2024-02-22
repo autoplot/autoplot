@@ -521,7 +521,9 @@ public class ScriptContext extends PyJavaInstance {
             view.dataSetSelector.setValue(suri);
         }
         model.resetDataSetSourceURL(suri, new NullProgressMonitor());
-        if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
+        if ( !SwingUtilities.isEventDispatchThread() ) {
+            model.waitUntilIdle();
+        }
     }
 
     /**

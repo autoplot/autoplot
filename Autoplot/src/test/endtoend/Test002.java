@@ -53,6 +53,13 @@ public class Test002 {
             for ( Row r: ScriptContext.getDocumentModel().getCanvases(0).getRows() ) {
                 System.err.println( r );
             }
+            Thread.sleep(10000);
+            ScriptContext.load(s);
+            System.err.println("after reload, Rows:");
+            for ( Row r: ScriptContext.getDocumentModel().getCanvases(0).getRows() ) {
+                System.err.println( r );
+            }
+            ScriptContext.writeToPng(label + ".png");
         }
         
         System.err.printf("wrote to %s.png %dx%d\n", label, width, height);
