@@ -78,7 +78,7 @@ public class Test002 {
          //TODO: why does this rerange?   "014 file:///home/jbf/ct/hudsonvap/garageTemps_v1_07.vap",
             //mem "014 file:///home/jbf/ct/autoplot/demos/polarUvi.vap",
             "015 file:///home/jbf/ct/autoplot/demos/polar.vap",
-            "020 file:///home/jbf/ct/hudson/vap/auto3.vap",
+            //"020 file:///home/jbf/ct/hudson/vap/auto3.vap",
             "021 file:///home/jbf/ct/hudson/vap/auto4.v1_07.vap",
             "022 file:///home/jbf/ct/hudson/vap/tt2000.vap",
             "023 file:///home/jbf/ct/hudson/vap/seth/multiScheme.vap",
