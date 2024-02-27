@@ -305,7 +305,7 @@ public class EmbedDataExperiment {
             }
         }
         
-        FileOutputStream fout= new FileOutputStream(f);
+        FileOutputStream fout= new FileOutputStream(f+".tmp");
         ZipOutputStream out=null;
         try {
             out= new ZipOutputStream( fout );
@@ -382,6 +382,9 @@ public class EmbedDataExperiment {
                 }
             }
             fout.close();
+            if ( !new File(f+".tmp").renameTo(f) ) {
+                logger.log(Level.WARNING, "unable to rename file: {0}", new File(f+".tmp"));
+            }
         }
     }
 }
