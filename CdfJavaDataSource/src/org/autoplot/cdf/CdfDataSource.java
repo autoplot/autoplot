@@ -1462,7 +1462,7 @@ public class CdfDataSource extends AbstractDataSource {
                         if (DataSetUtil.isMonotonic(depDs)) {
                             depDs.putProperty(QDataSet.MONOTONIC, Boolean.TRUE);
                         } else {
-                            logger.log(Level.INFO, "data has dependency which is non-monotonic: {0}", depName);
+                            logger.log(Level.FINE, "data has dependency which is non-monotonic: {0}", depName);
                             depDs.putProperty(QDataSet.MONOTONIC, Boolean.FALSE);
 //                            if (sidep == 0) {
 //                                logger.info("sorting dep0 to make depend0 monotonic");
