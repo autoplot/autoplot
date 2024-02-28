@@ -3,6 +3,7 @@ package org.autoplot.servlet;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -28,6 +29,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -595,15 +597,15 @@ public class ScriptGUIServlet extends HttpServlet {
         
         dom.getOptions().setAutolayout(false);
         
-        PythonInterpreter interp = JythonUtil.createInterpreter( true, true );
-        interp.set("java",null);
-        interp.set("org",null);
-        interp.set("getFile",null);
-        interp.set("dom",dom);
-        interp.set("downloadResourceAsTempFile",null);
+        //PythonInterpreter interp = JythonUtil.createInterpreter( true, true );
+        //interp.set("java",null);
+        //interp.set("org",null);
+        //interp.set("getFile",null);
+        //interp.set("dom",dom);
+        //interp.set("downloadResourceAsTempFile",null);
         
-        LoggingOutputStream los1= new LoggingOutputStream( Logger.getLogger("autoplot.servlet.scriptservlet"), Level.INFO );
-        interp.setOut( los1 );
+        //LoggingOutputStream los1= new LoggingOutputStream( Logger.getLogger("autoplot.servlet.scriptservlet"), Level.INFO );
+        //interp.setOut( los1 );
                         
         script= JythonRefactory.fixImports(script);
         
@@ -625,6 +627,7 @@ public class ScriptGUIServlet extends HttpServlet {
         boolean success= false;
         
         try ( OutputStream baos= new FileOutputStream( consoleKeyFile, true ) ) {
+            baos.write( ("running script..."+name+"\n").getBytes() );
             runScript( dom,
                 new ByteArrayInputStream(script.getBytes("UTF-8")),
                 baos,
@@ -661,12 +664,18 @@ public class ScriptGUIServlet extends HttpServlet {
         } else {
             // clean up after ourselves...
             File imageKeyFile =  getKeyFile( key, ".png.t" );
+            BufferedImage im= new BufferedImage( 400, 400, BufferedImage.TYPE_INT_ARGB );
+            Graphics2D g= (Graphics2D) im.getGraphics();
+            g.setColor( Color.LIGHT_GRAY );
+            g.fillRoundRect( 50,50,300,300,16,16 );
+            g.dispose();
+            ImageIO.write( im, "png", getKeyFile( key, ".png" ) );
             boolean throwException=false;
             if ( ! imageKeyFile.delete() ) {
                 throwException= true;
             } 
-            if ( !consoleKeyFile.delete() ) {
-                throwException= true;
+            if ( !consoleKeyFile.renameTo( getKeyFile( key, ".txt" ) ) ) {
+                throw new IllegalArgumentException("unable to rename file (.txt)");
             }
             if ( throwException ) {
                 throw new IOException("unable to delete png or console output, someone will have to deal with this...");
