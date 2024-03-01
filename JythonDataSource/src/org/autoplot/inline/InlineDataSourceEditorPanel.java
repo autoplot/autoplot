@@ -92,6 +92,10 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         examplesButton = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         editorTextPane1 = new org.autoplot.jythonsupport.ui.EditorTextPane();
+        jPanel4 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        editorTextPane2 = new org.autoplot.jythonsupport.ui.EditorTextPane();
         jPanel3 = new javax.swing.JPanel();
         dataMashUp1 = new org.autoplot.jythonsupport.ui.DataMashUp();
 
@@ -225,10 +229,37 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                     .addComponent(examplesButton)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 255, Short.MAX_VALUE))
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("jython", jPanel2);
+
+        jLabel3.setText("<html>This shows the equivalent .jyds script.  A jyds script is a Jython script which loads and manipulates data.  Often a mash-up is converted to a .jyds script, and this unmodifiable editor shows an equivalent script.  This content can be copied into a .jyds file and then a URI pointing to the .jyds file can be executed to load data.");
+        jLabel3.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+
+        jScrollPane4.setViewportView(editorTextPane2);
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 604, Short.MAX_VALUE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(8, 8, 8)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("jyds", jPanel4);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -526,14 +557,18 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
     private javax.swing.JButton deleteSelectedButton;
     private javax.swing.JLabel directionsLabel;
     private org.autoplot.jythonsupport.ui.EditorTextPane editorTextPane1;
+    private org.autoplot.jythonsupport.ui.EditorTextPane editorTextPane2;
     private javax.swing.JButton examplesButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JComboBox schemeComboBox;
     private javax.swing.JTable table;
@@ -542,6 +577,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
     DefaultTableModel tm;
     
     String program;
+    String jyds;
     JTextField tf;
     String mashupUri= null;
     
@@ -718,6 +754,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 t.append(ss[i]);
             }
             program= t.toString(); // go ahead and set this as well.
+            jyds= equivalentScript(uri);
         } else {
             String[] ss= Util.guardedSplit( uri, '&', '\'', '\"' );
             //String[] ss= uri.split("&");
@@ -727,6 +764,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 t.append(ss[i]);
             }
             program= t.toString();
+            jyds= equivalentScript(uri);
             this.tm= null;
         }
     }
@@ -746,11 +784,16 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         if ( program!=null ) {
             editorTextPane1.setContentType("text/python");
             editorTextPane1.setText(program);
+        } 
+        if ( jyds!=null ) {
+            editorTextPane2.setContentType("text/python");
+            editorTextPane2.setText(jyds);
+            editorTextPane2.setEditable(false);
         }
         if ( ltm!=null ) {
             switch (tm.getColumnCount()) {
                 case 2:
-                    this.schemeComboBox.setSelectedIndex(2);
+                    this.schemeComboBox.setSelectedIndex(3);
                     break;
                 case 4:
                     this.schemeComboBox.setSelectedIndex(1);
@@ -780,7 +823,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             if ( needTimeRange ) {
                 dataMashUp1.enableTimeRange();
             }
-            this.jTabbedPane1.setSelectedIndex(2);
+            this.jTabbedPane1.setSelectedIndex(3);
             
         } else {
             this.schemeComboBox.setSelectedIndex(0);
@@ -855,6 +898,35 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         if ( JOptionPane.OK_OPTION== JOptionPane.showConfirmDialog( null, ds.getPanel(), "Test Inline Editor", JOptionPane.OK_CANCEL_OPTION ) ) {
             System.err.println(ds.getURI());
         }
+        
+    }
+
+    private String equivalentScript(String uri) {
+        String[] ss= Util.guardedSplit( uri, '&', '\'', '\"' );
+        Pattern trp= Pattern.compile("timerange=(.*)");
+        Matcher m = trp.matcher(ss[ss.length-1]);
+        if ( m.matches() ) {
+            String t= "timerange=\'"+m.group(1).replaceAll("\\+"," ")+"\'";
+            for ( int i=ss.length-1; i>0; i-- ) {
+                String tt1= ss[i-1];
+                if ( tt1.contains("getDataSet(\'") && tt1.endsWith("\')") ) {
+                    tt1= tt1.substring(0,tt1.length()-2)+"',timerange)";
+                }
+                ss[i]= tt1;
+            }
+            ss[0]= t;
+        }
+        int lastIndex= ss.length-1;
+        if ( !ss[lastIndex].contains("=") ) { 
+            //TODO: vap+inline:x=linspace(0,10,101)&y=sin(x)&x&y
+            ss[lastIndex]= "result="+ss[lastIndex];
+        }
+        StringBuilder t= new StringBuilder();
+        for ( int i=0; i<ss.length; i++ ) {
+            if ( i>0 ) t.append("\n");
+            t.append(ss[i]);
+        }
+        return t.toString();
         
     }
 }
