@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Data from FITS file loaded.</small></p>
+        <p><small>Jython <a href="https://github.com/autoplot/dev/blob/master/demos/2024/20240214/demoSubprocessMPEGConvert.jy">Script</a> used to wrap the unix "ffmpeg" command, demonstrating how run-batch tool can be used to monitor unix processes as well.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,11 +30,11 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-02-26 r27574):</p>
+        <p>Bugfixes (2024-03-02 r27578):</p>
         <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2581/">2581</a>: write the .vap.zip to a temporary file and move it once completed.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2581/">2581</a>: write the .vap.zip to a temporary file and move it once completed.  Thanks, Sadie!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2581/">2581</a>: quiet message about non-monotonic DEPEND_1.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2580/">2580</a>: ImageDataSource recovers labels from rich PNG metadata.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2580/">2580</a>: ImageDataSource recovers labels from rich PNG metadata.  Thanks, Bill!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2579/">2579</a>: ImageDataSource clip=T is fixed.
             <li>Popup after multi-thread run in Run Batch Tool is restored.
         </ul>
@@ -53,6 +53,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add fixLayout command to Jython, to support "fixLayout(verticalSpacing='1em',horizontalSpacing='1em')"  Thanks, Sadie!
+            <li>vap+inline: editor GUI, used for the mash-up tool, has a jyds tab which shows equivalent jyds script.  Thanks, Sadie!
+            <li>Autoplot ScriptGUIServlet puts empty gray rounded rectangle image to clarify failure behavior, so something is always displayed.
             <li>Very simple rebundle filter editor added.
         </ul>
         <p>Less recent features:</p>
