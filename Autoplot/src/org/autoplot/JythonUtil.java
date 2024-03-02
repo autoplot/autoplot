@@ -5,6 +5,7 @@ import com.github.difflib.DiffUtils;
 import com.github.difflib.patch.Patch;
 import external.AnnotationCommand;
 import external.PlotCommand;
+import external.FixLayoutCommand;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -97,6 +98,7 @@ public class JythonUtil {
         interp.set( "plot", new PlotCommand() );
         interp.set( "dataset", new DatasetCommand() );
         interp.set( "annotation", new AnnotationCommand() );
+        interp.set( "fixLayout", new FixLayoutCommand() );
         
         return interp;
     }
