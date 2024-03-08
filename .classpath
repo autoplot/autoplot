@@ -57,5 +57,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/das2java"/>
 	<classpathentry kind="lib" path="APLibs/lib/jsyntaxpane-1.2.0.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/netcdfAll-5.5.3.jar"/>
+	<classpathentry kind="lib" path="APLibs/lib/flatlaf-3.3.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
