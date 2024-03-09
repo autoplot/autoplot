@@ -53,6 +53,7 @@ import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.jythonsupport.DatasetCommand;
+import org.autoplot.jythonsupport.GetDataSetCommand;
 import org.autoplot.jythonsupport.ui.EditorTextPane;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
 import org.autoplot.jythonsupport.ui.ScriptPanelSupport;
@@ -97,6 +98,7 @@ public class JythonUtil {
         interp.set( "plotx", new PlotCommand() );
         interp.set( "plot", new PlotCommand() );
         interp.set( "dataset", new DatasetCommand() );
+        interp.set( "getDataSet2024", new GetDataSetCommand() );
         interp.set( "annotation", new AnnotationCommand() );
         interp.set( "fixLayout", new FixLayoutCommand() );
         
