@@ -156,6 +156,7 @@ public class JythonUtil {
         }
 
         interp.set("dataset", new DatasetCommand());
+        interp.set("getDataSet2024", new GetDataSetCommand() );
         interp.set("monitor", new NullProgressMonitor());
 
 //        try {
