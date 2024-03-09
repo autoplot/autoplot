@@ -29,7 +29,7 @@ import org.python.core.PyJavaInstance;
  */
 public class DatasetCommand extends PyObject {
 
-    private static final Logger logger= org.das2.util.LoggerManager.getLogger("jython.commands.datset");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("jython.commands.dataset");
     
     public static final PyString __doc__ =
         new PyString("<html><H2>dataset(ds,[named parameters])</H2>"
