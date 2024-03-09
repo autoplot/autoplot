@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.jythonsupport;
 
 import java.io.BufferedReader;
@@ -579,7 +576,7 @@ public class Util {
      * @return QDataSet the dataset or null.
      * @throws java.lang.Exception
      */
-    public static QDataSet getDataSet( String spec, InputStream in, ProgressMonitor mon ) throws Exception {
+    public static QDataSet getDataSetFromStream( String spec, InputStream in, ProgressMonitor mon ) throws Exception {
         logger.log( Level.FINE, "getDataSet(\"{0}\",InputStream)", new Object[]{spec} );
         String[] ss= spec.split(":",-2);
         String ext;
