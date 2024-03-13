@@ -3086,8 +3086,13 @@ public class PlotElementController extends DomNodeController {
 
         setupStyle( plotElement );
         
+        RenderType renderType = plotElement.getRenderType();
+        if ( getApplication().getOptions().nearestNeighbor && renderType==RenderType.spectrogram ) {
+            renderType= RenderType.nnSpectrogram;
+        }
+        
         final Renderer newRenderer =
-                AutoplotUtil.maybeCreateRenderer( plotElement.getRenderType(),
+                AutoplotUtil.maybeCreateRenderer( renderType,
                 oldRenderer, cb, false );
 
         if ( newRenderer!=oldRenderer && newRenderer instanceof SpectrogramRenderer ) {
@@ -3105,6 +3110,10 @@ public class PlotElementController extends DomNodeController {
 
         if (oldRenderer != newRenderer || getDasPlot()!=newRenderer.getParent() ) {
             if ( oldRenderer != newRenderer ) {
+                if ( newRenderer instanceof SpectrogramRenderer ) {
+                    plotElement.getStyle().setRebinMethod( ((SpectrogramRenderer) newRenderer).getRebinner() );
+                    ((SpectrogramRenderer)newRenderer).getRebinner();
+                }
                 setRenderer(newRenderer);
                 //logger.fine( "getRenderer= "+getRenderer() + "  plotElementController="+ this + " ("+this.hashCode()+")" );
                 if ( oldRenderer!=null ) {
