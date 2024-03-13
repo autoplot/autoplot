@@ -229,12 +229,12 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                     .addComponent(examplesButton)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE))
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("jython", jPanel2);
 
-        jLabel3.setText("<html>This shows the equivalent .jyds script.  A jyds script is a Jython script which loads and manipulates data.  Often a mash-up is converted to a .jyds script, and this unmodifiable editor shows an equivalent script.  This content can be copied into a .jyds file and then a URI pointing to the .jyds file can be executed to load data.");
+        jLabel3.setText("<html>This shows the equivalent .jy script.  A jy script is a Jython script which loads and manipulates data.  Often a mash-up is converted to a .jy script, and this unmodifiable editor shows an equivalent script.  This \ncan be saved to a .jyds file without the plot command to make a .jyds script.\n");
         jLabel3.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         jScrollPane4.setViewportView(editorTextPane2);
@@ -256,10 +256,10 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 .addContainerGap()
                 .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(8, 8, 8)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE))
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("jyds", jPanel4);
+        jTabbedPane1.addTab("jy", jPanel4);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -923,9 +923,10 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         }
         StringBuilder t= new StringBuilder();
         for ( int i=0; i<ss.length; i++ ) {
-            if ( i>0 ) t.append("\n");
             t.append(ss[i]);
+            t.append("\n");
         }
+        t.append("plot(result)\n");
         return t.toString();
         
     }
