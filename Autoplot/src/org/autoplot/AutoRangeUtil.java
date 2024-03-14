@@ -1,12 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot;
 
-import java.text.ParseException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,7 +10,6 @@ import static org.autoplot.AutoplotUtil.DS_LENGTH_LIMIT;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
-import org.das2.datum.DatumUtil;
 import org.das2.datum.DomainDivider;
 import org.das2.datum.DomainDividerUtil;
 import org.das2.datum.InconvertibleUnitsException;
@@ -135,7 +130,25 @@ public class AutoRangeUtil {
         return result;
     }
 
-        /**
+    /**
+     * for a group of autoranges, return a suitable range for all.  For example,
+     * if any are non-log, then the result is non-log.  The range will be the
+     * union of all ranges.
+     * @param adss list of autoranges
+     * @return common autorange.
+     */
+    public static AutoRangeDescriptor commonRange(List<AutoRangeDescriptor> adss) {
+        AutoRangeDescriptor common= new AutoRangeDescriptor();
+        common.range= null;
+        common.log= true;
+        for ( AutoRangeDescriptor ads : adss ) {
+            if ( common.range==null ) common.range= ads.range;
+            if ( ads.log==false ) common.log= false;
+        }
+        return common;
+    }
+
+    /**
      * legacy class for describing the results of the autorange routine.
      * Note that QDataSet bounding cubes provide the same functionality.
      */

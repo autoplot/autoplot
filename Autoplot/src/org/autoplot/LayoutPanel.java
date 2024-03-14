@@ -1345,25 +1345,20 @@ public class LayoutPanel extends javax.swing.JPanel {
 
                 Plot[] bottomTopPlots= DomOps.bottomAndTopMostPlot(dom, plots);
 
-                if ( dia.getCondenseColorBarsCB().isSelected() ) {
-                    p.getZaxis().setVisible(true);
-                    for ( Plot p1: plots ) {
-                        p1.getZaxis().setVisible(false);
-                    }
-                    p.getZaxis().setVisible(true);
-                } else {
-                    p.getZaxis().setVisible(false);
-                }
                 if ( dia.getxAxisCB().isSelected() ) { // bind the xaxes
-                    DatumRange range= getSelectedPlots().get(0).getXaxis().getRange();
-                    boolean log= getSelectedPlots().get(0).getXaxis().isLog();
+                    List<AutoRangeUtil.AutoRangeDescriptor> adss= new ArrayList<>();
                     for ( Plot p1: getSelectedPlots() ) {
-                        range= DatumRangeUtil.union( range, p1.getXaxis().getRange() );
-                        log= log && p1.getXaxis().isLog();
+                        if ( p1.getXaxis().isVisible() ) {
+                            AutoRangeUtil.AutoRangeDescriptor ads= new AutoRangeUtil.AutoRangeDescriptor();
+                            ads.range= p1.getXaxis().getRange();
+                            ads.log= p1.getXaxis().isLog();
+                            adss.add(ads);
+                        }
                     }
+                    AutoRangeUtil.AutoRangeDescriptor ads= AutoRangeUtil.commonRange(adss);
                     for ( Plot p1: getSelectedPlots() ) {
-                        p.getXaxis().setRange( range );
-                        if ( !log ) p1.getXaxis().setLog(log);
+                        p.getXaxis().setRange( ads.range );
+                        if ( !ads.log ) p1.getXaxis().setLog(ads.log);
                         BindingModel check= 
                             dom.getController().findBinding(dom, Application.PROP_TIMERANGE, p1.getXaxis(), Axis.PROP_RANGE );
                         if ( check!=null ) {
@@ -1371,37 +1366,51 @@ public class LayoutPanel extends javax.swing.JPanel {
                         } else {
                             dom.getController().bind( p.getXaxis(), "range", p1.getXaxis(), "range" );
                         }
-                        p.getXaxis().setLog( log );
+                        p.getXaxis().setLog( ads.log );
                         dom.getController().bind( p.getXaxis(), "log", p1.getXaxis(), "log" );
                     }
                 }
                 if ( dia.getyAxisCB().isSelected() ) { // bind the xaxes
-                    DatumRange range= getSelectedPlots().get(0).getYaxis().getRange();
-                    boolean log= getSelectedPlots().get(0).getYaxis().isLog();
+                    List<AutoRangeUtil.AutoRangeDescriptor> adss= new ArrayList<>();
                     for ( Plot p1: getSelectedPlots() ) {
-                        range= DatumRangeUtil.union( range, p1.getYaxis().getRange() );
-                        log= log && p1.getYaxis().isLog();
+                        if ( p1.getYaxis().isVisible() ) {
+                            AutoRangeUtil.AutoRangeDescriptor ads= new AutoRangeUtil.AutoRangeDescriptor();
+                            ads.range= p1.getYaxis().getRange();
+                            ads.log= p1.getYaxis().isLog();
+                            adss.add(ads);
+                        }
                     }
+                    AutoRangeUtil.AutoRangeDescriptor ads= AutoRangeUtil.commonRange(adss);
+                    p.getYaxis().setRange( ads.range );
+                    p.getYaxis().setLog( ads.log );
+                    p.getYaxis().setRange( ads.range );
                     for ( Plot p1: getSelectedPlots() ) {
-                        p.getYaxis().setRange( range );
-                        if ( !log ) p1.getYaxis().setLog(log);
+                        if ( ads.log ) p1.getYaxis().setRange( ads.range );
+                        p1.getYaxis().setLog( ads.log );
+                        p1.getYaxis().setRange( ads.range );
                         dom.getController().bind( p.getYaxis(), "range", p1.getYaxis(), "range" );
-                        p.getYaxis().setLog( log );
                         dom.getController().bind( p.getYaxis(), "log", p1.getYaxis(), "log" );
                     }
                 }
                 if ( dia.getzAxisCB().isSelected() ) { // bind the xaxes
-                    DatumRange range= getSelectedPlots().get(0).getZaxis().getRange();
-                    boolean log= getSelectedPlots().get(0).getZaxis().isLog();
+                    List<AutoRangeUtil.AutoRangeDescriptor> adss= new ArrayList<>();
                     for ( Plot p1: getSelectedPlots() ) {
-                        range= DatumRangeUtil.union( range, p1.getZaxis().getRange() );
-                        log= log && p1.getZaxis().isLog();
+                        if ( p1.getZaxis().isVisible() ) {
+                            AutoRangeUtil.AutoRangeDescriptor ads= new AutoRangeUtil.AutoRangeDescriptor();
+                            ads.range= p1.getZaxis().getRange();
+                            ads.log= p1.getZaxis().isLog();
+                            adss.add(ads);
+                        }
                     }
+                    AutoRangeUtil.AutoRangeDescriptor ads= AutoRangeUtil.commonRange(adss);
+                    p.getZaxis().setRange( ads.range );
+                    p.getZaxis().setLog( ads.log );
+                    p.getZaxis().setRange( ads.range );
                     for ( Plot p1: getSelectedPlots() ) {
-                        p.getZaxis().setRange( range );
-                        if ( !log ) p1.getZaxis().setLog(log);
+                        if ( ads.log ) p1.getZaxis().setRange( ads.range );
+                        p1.getZaxis().setLog( ads.log );
+                        p1.getZaxis().setRange( ads.range );
                         dom.getController().bind( p.getZaxis(), "range", p1.getZaxis(), "range" );
-                        p.getZaxis().setLog( log );
                         dom.getController().bind( p.getZaxis(), "log", p1.getZaxis(), "log" );
                     }
                 }
@@ -1411,7 +1420,17 @@ public class LayoutPanel extends javax.swing.JPanel {
                         dom.getController().bind( p, "colortable", p1, "colortable" );
                     }
                 }
-
+                
+                if ( dia.getCondenseColorBarsCB().isSelected() ) {
+                    p.getZaxis().setVisible(true);
+                    for ( Plot p1: plots ) {
+                        p1.getZaxis().setVisible(false);
+                    }
+                    p.getZaxis().setVisible(true);
+                } else {
+                    p.getZaxis().setVisible(false);
+                }
+                
                 if ( dia.getCondenseXAxisLabelsCB().isSelected() ) {
                     String t= plots.get(0).getTitle();
                     for ( Plot p1: getSelectedPlots() ) {
