@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Old screenshot with annotations looks nice and helps to think about spring!</p>
+        <p><small>Trim command now supports non-monotonic timetags.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,10 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-03-13 r27589):</p>
+        <p>Bugfixes (2024-03-18 r27589):</p>
         <ul>
+            <li>trim command handles unsorted data.
+            <li>"Add hidden plot" would bind all plots' colorbars, even if it was not visible.  Thanks, Connor!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2583/">2583</a>: default nearestNeighbor works again.  Thanks, Ivar!
             <li>rte_0437885777: index out of bounds when rank 1 dataset is tested for bounds scheme.  Thanks, Connor!
             <li><a href="https://github.com/das-developers/das2java/issues/98">98</a>: where implicit ytags for dataset([[0,0,0],[0,0,0],[0,0,0]]) where incorrect.  Thanks, David!

@@ -328,6 +328,11 @@ public class InlineDataSource extends AbstractDataSource {
 
         Map<String,String> p= new LinkedHashMap<>();
 
+        if ( ss.length==1 && ss[0].equals("None") ) {
+            logger.info("vap+inline:None is useful for testing");
+            return null;
+        }
+        
         mon.setTaskSize(ss.length);
         mon.started();
         
@@ -396,7 +401,6 @@ public class InlineDataSource extends AbstractDataSource {
                             throw ex;
                         }
                     }
-
                 } else { 
                     ds= parseInlineDs(arg);
 
