@@ -4,6 +4,7 @@ package org.autoplot.jythonsupport;
 
 import java.text.ParseException;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -14,6 +15,7 @@ import org.das2.qds.QDataSet;
 import org.das2.datum.Units;
 import org.das2.qds.ops.Ops;
 import org.das2.util.monitor.ProgressMonitor;
+import org.python.core.PyClass;
 import org.python.core.PyList;
 
 /**
@@ -96,7 +98,7 @@ public class GetDataSetsCommand extends PyObject {
                 if ( v!=Py.NoConversion ) {
                     monitor= (ProgressMonitor)v;
                 }
-            } else if ( kw.equals("timerange") ) {
+            } else if ( kw.equals("timerange") || kw.equals("trim") ) {
                 Object v= val.__tojava__(DatumRange.class);
                 if ( v!=Py.NoConversion ) {
                     trimRange= (DatumRange)v;
@@ -167,8 +169,9 @@ public class GetDataSetsCommand extends PyObject {
                 throw new IllegalArgumentException("dataset needs between one and two parameters.");
         }
         
+        // Here is the getDataSets Java command.
         try {
-            result= Util.getDataSets( uris, monitor );
+            result= Util.getDataSets( uris, trimRange, monitor );
         } catch ( Exception ex ) {
             throw Py.JavaError(ex);
         }
@@ -181,6 +184,17 @@ public class GetDataSetsCommand extends PyObject {
             String sval= (String) val.__str__().__tojava__(String.class);
             switch ( kw ) {
                 case "trim":
+                    if ( trimRange==null ) {
+                        if ( val.equals(Py.None) ) {
+                            continue;
+                        } else {
+                            try {
+                                trimRange= DatumRangeUtil.parseTimeRange(sval);
+                            } catch (ParseException ex) {
+                                Logger.getLogger(GetDataSetsCommand.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }
                     for ( int ids=0; ids<result.size(); ids++ ) {
                         result.set( ids, Ops.trim( result.get(ids), trimRange) );
                     }
@@ -212,7 +226,7 @@ public class GetDataSetsCommand extends PyObject {
         
         PyList result2= new PyList();
         for ( int ids= 0; ids<result.size(); ids ++ ) {
-            result2.__add__( new PyQDataSet(result.get(ids)) );
+            result2.append( new PyQDataSet(result.get(ids)) );
         }
         
         return result2;

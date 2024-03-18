@@ -97,7 +97,7 @@ public class GetDataSetCommand extends PyObject {
                 if ( v!=Py.NoConversion ) {
                     monitor= (ProgressMonitor)v;
                 }
-            } else if ( kw.equals("timerange") ) {
+            } else if ( kw.equals("timerange") || kw.equals("trim") ) {
                 Object v= val.__tojava__(DatumRange.class);
                 if ( v!=Py.NoConversion ) {
                     trimRange= (DatumRange)v;
@@ -184,6 +184,17 @@ public class GetDataSetCommand extends PyObject {
             String sval= (String) val.__str__().__tojava__(String.class);
             switch ( kw ) {
                 case "trim":
+                    if ( trimRange==null ) {
+                        if ( val.equals(Py.None) ) {
+                            continue;
+                        } else {
+                            try {
+                                trimRange= DatumRangeUtil.parseTimeRange(sval);
+                            } catch (ParseException ex) {
+                                Logger.getLogger(GetDataSetsCommand.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }
                     result= Ops.trim( result, trimRange );
                     break;
                 case "units":
