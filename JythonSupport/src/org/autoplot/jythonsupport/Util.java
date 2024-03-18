@@ -183,7 +183,7 @@ public class Util {
      * can be used from AutoplotServer.
      *
      * @param suri the URI of the dataset, such as "http://autoplot.org/data/2010_061_17_41_40.txt?column=field8"
-     * @param timeRange the timerange to load, if the data supports time series browsing.
+     * @param timeRange null or the timerange to load, if the data supports time series browsing.
      * @param monitor progress monitor object, or null (None in Jython).
      * @return null or the dataset for the URI.
      * @throws java.lang.Exception plug-in readers can throw exception.
@@ -203,7 +203,7 @@ public class Util {
             tsb= factory.getCapability( TimeSeriesBrowse.class );
         }
         
-        if ( tsb!=null ) {
+        if ( tsb!=null && timeRange!=null ) {
             tsb.setTimeRange( timeRange );
         } else {
             logger.fine("TimeSeriesBrowse capability not found, simply returning dataset.");
@@ -242,7 +242,7 @@ public class Util {
         if ( rds==null ) return null;
 
         if ( tsb!=null ) {
-            if ( !Schemes.isTimeSeries(rds) ) {
+            if ( !Schemes.isTimeSeries(rds) && timeRange!=null ) {
                 logger.fine("trim data to timerange");
                 rds= DataSourceUtil.trimScatterToTimeRange( rds, timeRange );
             }
@@ -315,7 +315,7 @@ public class Util {
     }
 
     /**
-     * experiment with multiple, simultaneous reads in Jython codes.  This will read all the data
+     * load multiple uris simultaneously.  This will read all the data
      * at once, returning all data or throwing one of the exceptions.
      *
      * @param uris a list of URI strings.
@@ -324,6 +324,20 @@ public class Util {
      * @throws Exception if any of the loads reports an exception
      */
     public static List<QDataSet> getDataSets( List<String> uris, ProgressMonitor mon ) throws Exception {
+        return getDataSets( uris, null, mon );
+    }
+    
+    /**
+     * load multiple uris simultaneously.  This will read all the data
+     * at once, returning all data or throwing one of the exceptions.
+     *
+     * @param uris a list of URI strings.
+     * @param timerange the timerange to load, and the reader may return data from a longer interval.
+     * @param mon monitor for the aggregate load.  TODO: Each uri should given equal shares of the task.
+     * @return list of loaded data
+     * @throws Exception if any of the loads reports an exception
+     */
+    public static List<QDataSet> getDataSets( List<String> uris, DatumRange timerange, ProgressMonitor mon ) throws Exception {
         if ( mon==null ) mon= new NullProgressMonitor();
         final ArrayList result= new ArrayList( uris.size() );
         final ProgressMonitor[] monitors= new ProgressMonitor[uris.size()];
@@ -340,7 +354,7 @@ public class Util {
                 public void run() {
                     QDataSet ds;
                     try {
-                        ds = getDataSet(uri,thisProgressMonitor);
+                        ds = getDataSet(uri,timerange,thisProgressMonitor);
                         if ( ds==null ) {
                             throw new NoDataInIntervalException("data returned was null");
                         } else {
