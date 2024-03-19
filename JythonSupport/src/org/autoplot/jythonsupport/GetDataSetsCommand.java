@@ -1,5 +1,4 @@
 
-
 package org.autoplot.jythonsupport;
 
 import java.text.ParseException;
@@ -15,14 +14,13 @@ import org.das2.qds.QDataSet;
 import org.das2.datum.Units;
 import org.das2.qds.ops.Ops;
 import org.das2.util.monitor.ProgressMonitor;
-import org.python.core.PyClass;
 import org.python.core.PyList;
 
 /**
  * new implementation of the dataset command allows for keywords in the
  * Jython environment.
  *<blockquote><pre><small>{@code
- * dataset( [1,2,3,4,3], title='My Data' )
+ * Tp,Np=getDataSets( ['vap+cdaweb:ds=STA_L2_MAGPLASMA_1M&id=Tp','vap+cdaweb:ds=STA_L2_MAGPLASMA_1M&id=Np'],'2022-12-24' )
  *}</small></pre></blockquote>
  * @see http://autoplot.org/help.datasetCommand
  * @author jbf

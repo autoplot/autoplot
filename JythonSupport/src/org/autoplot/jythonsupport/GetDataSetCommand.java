@@ -1,12 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot.jythonsupport;
 
 import java.text.ParseException;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
@@ -18,14 +13,12 @@ import org.das2.qds.QDataSet;
 import org.das2.datum.Units;
 import org.das2.qds.ops.Ops;
 import org.das2.util.monitor.ProgressMonitor;
-import org.python.core.PyDictionary;
-import org.python.core.PyJavaInstance;
 
 /**
  * new implementation of the dataset command allows for keywords in the
  * Jython environment.
  *<blockquote><pre><small>{@code
- * dataset( [1,2,3,4,3], title='My Data' )
+ * Tp=getDataSet( 'vap+cdaweb:ds=STA_L2_MAGPLASMA_1M&id=Tp',trim='2022-12-24' )
  *}</small></pre></blockquote>
  * @see http://autoplot.org/help.datasetCommand
  * @author jbf
