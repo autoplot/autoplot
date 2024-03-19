@@ -48,6 +48,7 @@ public class GetDataSetCommand extends PyObject {
             + "<table>\n"
             + "<tr><td>trim=True </td><td>trim the data to the requested time range.</td></tr>\n"
             + "<tr><td>units=None </td><td>convert the data to the given units, or remove the unit if empty string or None\n"
+            + "<tr><td>sortTime=True</td><td>sort the data by its timetags</td></tr>\n"
             + "</table></html>");
 
     /**
@@ -62,11 +63,13 @@ public class GetDataSetCommand extends PyObject {
         FunctionSupport fs= new FunctionSupport( "getDataSet", 
             new String[] { "uri", 
                 "timerange", "monitor",
-                "trim", "units"
+                "trim", "units",
+                "sortTime"
             },
             new PyObject[] { 
                 Py.None, Py.None,
-                Py.None, Py.None
+                Py.None, Py.None,
+                Py.None
             }
         );
         
@@ -210,8 +213,22 @@ public class GetDataSetCommand extends PyObject {
                 case "monitor":
                     // these were already handled
                     break;
+                case "sortTime":
+                    if ( val.__nonzero__() ) {
+                        long t0= System.currentTimeMillis();
+                        QDataSet tt= Ops.xtags( result );
+                        QDataSet s= Ops.sort(tt);
+                        if ( Boolean.TRUE.equals(s.property(QDataSet.MONOTONIC)) && s.length()==tt.length() ) {
+                            continue;
+                        }
+                        long t1=  System.currentTimeMillis();
+                        result= Ops.applyIndex( result, s);
+                        long t2=  System.currentTimeMillis();
+                        logger.log(Level.INFO, "sort in millis: {0}", t1-t0 );
+                        logger.log(Level.INFO, "applyIndex in millis: {0}", t2-t1 );
+                    }
                 default:
-                    throw new IllegalArgumentException("bad keyword");
+                    throw new IllegalArgumentException("bad keyword: "+kw);
             }
         }
             

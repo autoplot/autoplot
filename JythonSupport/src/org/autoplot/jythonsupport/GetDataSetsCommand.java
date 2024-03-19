@@ -45,6 +45,7 @@ public class GetDataSetsCommand extends PyObject {
             + "<table>\n"
             + "<tr><td>trim=True </td><td>trim the data to the requested time range.</td></tr>\n"
             + "<tr><td>units=None </td><td>convert the data to the given units, or remove the unit if empty string or None\n"
+            + "<tr><td>sortTime=True</td><td>sort the data by its timetags</td></tr>\n"                
             + "</table></html>");
 
     private List<String> toList( Object arg ) {
@@ -63,11 +64,13 @@ public class GetDataSetsCommand extends PyObject {
         FunctionSupport fs= new FunctionSupport( "getDataSets", 
             new String[] { "uri", 
                 "timerange", "monitor",
-                "trim", "units"
+                "trim", "units",
+                "sortTime"
             },
             new PyObject[] { 
                 Py.None, Py.None,
-                Py.None, Py.None
+                Py.None, Py.None,
+                Py.None
             }
         );
         
@@ -215,6 +218,22 @@ public class GetDataSetsCommand extends PyObject {
                         }
                     }
                     break;
+                case "sortTime":
+                    if ( val.__nonzero__() ) {
+                        long t0= System.currentTimeMillis();
+                        QDataSet tt= Ops.xtags( result.get(0) );
+                        QDataSet s= Ops.sort(tt);
+                        if ( Boolean.TRUE.equals(s.property(QDataSet.MONOTONIC)) && s.length()==tt.length() ) {
+                            continue;
+                        }
+                        long t1=  System.currentTimeMillis();
+                        for ( int ids=0; ids<result.size(); ids++ ) {
+                            result.set( ids, Ops.applyIndex( result.get(ids), s) );
+                        }
+                        long t2=  System.currentTimeMillis();
+                        logger.log(Level.INFO, "sort in millis: {0}", t1-t0 );
+                        logger.log(Level.INFO, "applyIndex in millis: {0}", t2-t1 );
+                    }
                 case "timerange":
                 case "monitor":
                     // these were already handled
