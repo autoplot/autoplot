@@ -30,10 +30,11 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-03-18 r27589):</p>
+        <p>Bugfixes (2024-03-21 r27589):</p>
         <ul>
+            <li>clarify das2server "force intrinsic resolution" button use when model (and ephemeris) data is read.
             <li>trim drops TYPICAL_MIN, TYPICAL_MAX metadata.
-            <li>trim command handles unsorted data.
+            <li>rte 2146560169: null pointer exception during state transition.  Thanks, Sadie!
             <li>"Add hidden plot" would bind all plots' colorbars, even if it was not visible.  Thanks, Connor!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2583/">2583</a>: default nearestNeighbor works again.  Thanks, Ivar!
             <li>rte_0437885777: index out of bounds when rank 1 dataset is tested for bounds scheme.  Thanks, Connor!
@@ -59,6 +60,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>trim(startTime,endTime) command now handles unsorted data, filtering with O(N) code instead of O(LogN) branch with monotonic data.
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/824/">rfe842</a>: getDataSets and getDataSet have sortTime control keyword.
             <li>add MigLayout, which should be nice layout manager for Jython.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/824/">rfe842</a>: getDataSets matches getDataSet to allow the time to be passed in separately, and also includes trim keyword.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/824/">rfe842</a>: getDataSet added to experiment with new version of getDataSet command which includes trim.
