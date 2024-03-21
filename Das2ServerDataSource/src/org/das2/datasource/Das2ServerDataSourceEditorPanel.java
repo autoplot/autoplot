@@ -187,7 +187,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         jScrollPane2.setViewportView(readerParamsTextArea);
 
         jLabel5.setText("Sampling Interval (sec):");
-        jLabel5.setToolTipText("<html> Interval (in seconds) to use for arbitrary resolution data.<br>Typically used for spacecraft positions, leave blank for most datasets.<br> </html> ");
+        jLabel5.setToolTipText("<html> Interval (in seconds) to use for arbitrary resolution data.<br>Typically used for spacecraft positions or models, leave blank for most datasets.<br> </html> ");
 
         tcaTextField.setText(" ");
         tcaTextField.setToolTipText("<html> Interval (in seconds) to use for TCA (ephemeris) data.<br> Leave blank for most datasets.<br> </html> ");
@@ -236,6 +236,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         });
 
         intrinsicCb.setText("Force Intrinsic Resolution");
+        intrinsicCb.setToolTipText("Force the load of data at its intrinsic resolution, or for modelled quantities, always load at the sampling interval.");
         intrinsicCb.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 intrinsicCbActionPerformed(evt);

@@ -208,7 +208,7 @@
     <Component class="javax.swing.JLabel" name="jLabel5">
       <Properties>
         <Property name="text" type="java.lang.String" value="Sampling Interval (sec):"/>
-        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt; Interval (in seconds) to use for arbitrary resolution data.&lt;br&gt;Typically used for spacecraft positions, leave blank for most datasets.&lt;br&gt; &lt;/html&gt; "/>
+        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt; Interval (in seconds) to use for arbitrary resolution data.&lt;br&gt;Typically used for spacecraft positions or models, leave blank for most datasets.&lt;br&gt; &lt;/html&gt; "/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="tcaTextField">
@@ -288,6 +288,7 @@
     <Component class="javax.swing.JCheckBox" name="intrinsicCb">
       <Properties>
         <Property name="text" type="java.lang.String" value="Force Intrinsic Resolution"/>
+        <Property name="toolTipText" type="java.lang.String" value="Force the load of data at its intrinsic resolution, or for modelled quantities, always load at the sampling interval."/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="intrinsicCbActionPerformed"/>
