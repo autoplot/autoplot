@@ -876,7 +876,7 @@ public class ScriptPanelSupport {
                     if ( fd.count>0 ) {
                         JScrollPane pane= new JScrollPane(p);
 
-                        if ( AutoplotUtil.showConfirmDialog2( panel, pane, "edit parameters", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+                        if ( AutoplotUtil.showConfirmDialog2( panel, pane, "edit script parameters", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
                             ParametersFormPanel.resetVariables( fd, vars );
                             String parseExcept= null;
                             for ( Entry<String,String> v: vars.entrySet() ) {
@@ -889,7 +889,14 @@ public class ScriptPanelSupport {
                             if ( parseExcept!=null ) {
                                 JOptionPane.showMessageDialog( panel, "ParseException in parameter "+parseExcept );
                             } else {
-                                interp.exec(JythonRefactory.fixImports(panel.getEditorPanel().getText()));
+                                String code= panel.getEditorPanel().getText();
+                                if ( file==null ) {
+                                    interp.exec(JythonRefactory.fixImports(panel.getEditorPanel().getText()));
+                                } else {
+                                    try (InputStream in = new ByteArrayInputStream( code.getBytes() )) {
+                                        interp.execfile(JythonRefactory.fixImports(in,file.getName()),file.getName());
+                                    }
+                                }
                             }
                         }
                     } else {
