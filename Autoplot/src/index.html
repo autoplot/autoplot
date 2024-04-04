@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Trim command now supports non-monotonic timetags.</small></p>
+        <p><small>Small Autoplot <a href="https://github.com/autoplot/dev/blob/master/demos/2024/20240214/demoSubprocessDVToMP4Convert.jy">script</a> wraps spawn of Linux ffmpeg command, allowing Autoplot to manage jobs with its Run Batch Tool.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,10 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-03-21 r27589):</p>
+        <p>Bugfixes (2024-04-04 r27603):</p>
         <ul>
+            <li>When script is shift-run from script panel so that parameters dialog is shown, crash/stop location was not indicated.  Thanks, Sadie!
+            <li>slice1 of qube ds size 0,n properly results in length 0 dataset.
             <li>clarify das2server "force intrinsic resolution" button use when model (and ephemeris) data is read.
             <li>trim drops TYPICAL_MIN, TYPICAL_MAX metadata.
             <li>rte 2146560169: null pointer exception during state transition.  Thanks, Sadie!
