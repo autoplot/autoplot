@@ -4406,7 +4406,7 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
 
     private void runBatchMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runBatchMenuItemActionPerformed
         RunBatchTool mmm= new RunBatchTool(dom);
-        final JDialog dia= new JDialog( this, "Run Batch" );
+        final JDialog dia= new JDialog( this, "Run Batch Tool" );
         dia.getRootPane().registerKeyboardAction((ActionEvent e) -> {
             org.das2.util.LoggerManager.logGuiEvent(e);
             dia.setVisible(false);
