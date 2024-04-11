@@ -407,6 +407,18 @@ public class DataMashUp extends javax.swing.JPanel {
         return b.toString();
     }
     
+    /**
+     * return the Jython for just the node.
+     * @param tn
+     * @return 
+     */
+    public String getAsJythonExpr( TreeNode tn ) {
+        
+        DefaultTreeModel m= (DefaultTreeModel) expressionTree.getModel();
+                
+        return getJython( m, tn );
+    }
+    
     private void fillTreeExprType( exprType et, MutableTreeNode parent, int i, List<String> datasets, List<String> usedDatasets) {
         if ( et instanceof Name ) {
             String name= ((Name)et).id;
@@ -1522,14 +1534,7 @@ public class DataMashUp extends javax.swing.JPanel {
         }
         expressionTree.setSelectionPath(tp);
         if ( !expressionTree.getModel().isLeaf(tp.getLastPathComponent()) ) {
-            String s= getAsJythonInline( (TreeNode)tp.getLastPathComponent() );
-            int i= s.lastIndexOf("&");
-            if ( i>-1 ) {
-                s= s.substring(i+1);
-            } else {
-                i= s.lastIndexOf(":");
-                s= s.substring(i+1);
-            }
+            String s= getAsJythonExpr( (TreeNode)tp.getLastPathComponent() );
             s= namedURIListTool1.selectDataId(s);
             if ( s!=null ) {
                 doDrop(s,tp,false);
