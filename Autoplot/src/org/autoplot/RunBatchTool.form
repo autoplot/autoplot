@@ -605,6 +605,7 @@
     <Component class="javax.swing.JButton" name="cancelButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Cancel"/>
+        <Property name="toolTipText" type="java.lang.String" value="cancel task.  Note tasks must be checking for cancel to terminate immediately."/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>

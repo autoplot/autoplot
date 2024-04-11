@@ -655,6 +655,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         });
 
         cancelButton.setText("Cancel");
+        cancelButton.setToolTipText("cancel task.  Note tasks must be checking for cancel to terminate immediately.");
         cancelButton.setEnabled(false);
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1124,6 +1125,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         if ( mon!=null ) {
             mon.cancel();
         }
+        cancelButton.setEnabled(false);
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void copyValueMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyValueMenuItemActionPerformed
