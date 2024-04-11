@@ -143,6 +143,9 @@ public class Axis extends DomNode {
      * @param label the label
      */
     public void setLabel(String label) {
+        if ( label==null ) {
+            throw new NullPointerException("label cannot be set to null");
+        }
         String oldLabel = this.label;
         this.label = label;
         propertyChangeSupport.firePropertyChange(PROP_LABEL, oldLabel, label);
