@@ -207,13 +207,15 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
     public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
         
         File thefile= DataSetURI.getFile( cc.resourceURI, mon );
-        if ( file==null || !thefile.equals(file) ) {
+        //if ( file==null || !thefile.equals(file) ) {
             file= thefile;
+            logger.info("reading variables from idlsav");
             buf= ReadIDLSav.readFileIntoByteBuffer(file);
+            logger.info("done reading variables from idlsav");
             reader= new ReadIDLSav();
             names= reader.readVarNames(buf);
             
-        }
+        //}
 
         if ( cc.context.equals(CompletionContext.CONTEXT_PARAMETER_NAME) ) {
             List<CompletionContext> ccresult= new ArrayList<>();
