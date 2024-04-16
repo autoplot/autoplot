@@ -2700,7 +2700,15 @@ public class PlotElementController extends DomNodeController {
                 }
             }
 
-            AutoRangeUtil.AutoRangeDescriptor xdesc = AutoRangeUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0), ignoreDsProps);
+            AutoRangeUtil.AutoRangeDescriptor xdesc;
+            
+            if ( fillDs.length()==1 && SemanticOps.isRank2Waveform(fillDs) ) {
+                QDataSet waveform= Ops.flattenWaveform(fillDs);
+                xds= SemanticOps.xtagsDataSet(waveform);
+                xdesc= AutoRangeUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0), ignoreDsProps);
+            } else {
+                xdesc= AutoRangeUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0), ignoreDsProps);
+            }
 
             peleCopy.getPlotDefaults().getXaxis().setLog(xdesc.log);
             if ( UnitsUtil.isOrdinalMeasurement( xdesc.range.getUnits() ) ) {
