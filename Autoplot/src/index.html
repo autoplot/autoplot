@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>2017 eclipse cloud cover from read from citizen science <a href="https://observer.globe.gov/get-data/eclipse-data/eclipse-2017-data">website</a></small></p>
+        <p><small>Solar radiation time series from Tempest weather station shows dip during partial eclipse in Iowa City, Iowa, USA.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,7 +30,11 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-04-11 r27603):</p>
+        <p>Bugfixes (2024-04-16 r27603):</p>
+        <ul>
+            <li>bug 2585: don't cache idlsav listing.  It doesn't seem to be necessary and is confusing
+        </ul>
+        <p>Older Bugfixes (2024-04-11 r27603):</p>
         <ul>
             <li>Minor GUI corrections to "Run Batch Tool", including consistent naming and disabling cancel to provide feedback.
             <li><a href="https://github.com/das-developers/das2java/issues/104">104</a>: str(DatumRange) increases resolution to show difference between extent.  Thanks, James!
@@ -49,20 +53,11 @@
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2579/">2579</a>: ImageDataSource clip=T is fixed.
             <li>Popup after multi-thread run in Run Batch Tool is restored.
         </ul>
-        <p>Older Bugfixes (2024-02-16 r27554):</p>
-        <ul> 
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2578/">2578</a>: Hang after new layout when "move legends" was checked.
-            <li>clean up monitor usage in export to CDF file.  Thanks, Kristoff!
-            <li>clean up logging messages in fftpower.  Thanks, Kristoff!
-            <li>colorbar image includes alpha channel to support use over RDP.  Thanks, Kristoff!
-            <li>rank 0 data sent into Slice Filter Editor Panel would cause runtime error.
-            <li>correction to label in Run Batch post-run popup menu.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2576">2576</a>: hopefully fix "Expected DSF to be non-null" message when focus is blurred.
-            <li>remove kernalCode spectrogram rebin mode, which shouldn't have been exposed.
-            <li>slices on single-screen machines always jumped to pixel coordinates 0,0.
-            <li>mkdir function is in a synchronized block, so that multi-thread batch processing don't step on each other's toes.
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li>resolution parameter for Das2Server limits the requested resolution for interactive plotting.
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>trim(startTime,endTime) command now handles unsorted data, filtering with O(N) code instead of O(LogN) branch with monotonic data.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/824/">rfe842</a>: getDataSets and getDataSet have sortTime control keyword.
@@ -74,16 +69,6 @@
             <li>vap+inline: editor GUI, used for the mash-up tool, has a jyds tab which shows equivalent jyds script.  Thanks, Sadie!
             <li>Autoplot ScriptGUIServlet puts empty gray rounded rectangle image to clarify failure behavior, so something is always displayed.
             <li>Very simple rebundle filter editor added.
-        </ul>
-        <p>Less recent features:</p>
-        <ul> 
-            <li>putProperty can insert into METADATA, supporting kludgy LIMIT_WARN_MIN and LIMIT_WARN_MAX.  
-            <li>Include Flat Look and Feel so that all platforms are able use one, clean look, if desired.  (See --flatLAF)
-            <li>screenshots tool puts gray border around things, since some Linux GUIs don't have crisp edges.
-            <li>update das2 spectrogram icons.
-            <li>invalid(ds) function added equivalent to valid(ds).eq(0).
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/818/">818</a>: Support for high-rank (multi-index) data PDS3 tables with CONTAINERS.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/818/">818</a>: Support for PDS3 spreadsheets.
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
