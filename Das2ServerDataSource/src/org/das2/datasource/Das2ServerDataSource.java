@@ -146,6 +146,7 @@ public final class Das2ServerDataSource extends AbstractDataSource {
         resolution = null;
         if (params2.get("resolution") != null) {
             resolution = Units.seconds.parse(params2.get("resolution"));
+            minResolution= resolution;
         }
 
     }
@@ -154,6 +155,7 @@ public final class Das2ServerDataSource extends AbstractDataSource {
 
     DatumRange timeRange;
     Datum resolution;
+    Datum minResolution;
     String interval;
     String dsParams;
     List<String> tcaDesc;
@@ -989,7 +991,9 @@ public final class Das2ServerDataSource extends AbstractDataSource {
             @Override
             public void setTimeResolution(Datum d) {
                 logger.log(Level.FINE, "setTimeResolution to {0}", d);
-                
+                if ( minResolution!=null && d.lt(minResolution) ) {
+                    d= minResolution;
+                }
                 resolution = d;
             }
 
