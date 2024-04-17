@@ -2291,17 +2291,17 @@ public class PlotElementController extends DomNodeController {
             yprop= (Map<String, Object>) properties.get( QDataSet.DEPEND_1 ); 
             
             if ( xprop!=null ) {
-                plotDefaults.xaxis.label= (String) xprop.get(QDataSet.LABEL);
-                if ( (v = xprop.get(QDataSet.SCALE_TYPE)) != null) {
-                    plotDefaults.getXaxis().setLog(v.equals("log"));
-                }
+                v = xprop.get(QDataSet.LABEL);
+                if ( v!=null ) plotDefaults.xaxis.setLabel( (String)v );
+                v = xprop.get(QDataSet.SCALE_TYPE);
+                if ( v!=null) plotDefaults.getXaxis().setLog(v.equals("log"));
             }
 
             if ( yprop!=null ) {
-                plotDefaults.yaxis.label= (String) yprop.get(QDataSet.LABEL);
-                if ( (v = yprop.get(QDataSet.SCALE_TYPE)) != null) {
-                    plotDefaults.getYaxis().setLog(v.equals("log"));
-                }
+                v= (String) yprop.get(QDataSet.LABEL);
+                if ( v!=null ) plotDefaults.yaxis.setLabel( (String)v );
+                v = yprop.get(QDataSet.SCALE_TYPE);
+                if ( v!=null) plotDefaults.getYaxis().setLog(v.equals("log"));
             }
             
         } else { // hugeScatter okay
@@ -2387,6 +2387,12 @@ public class PlotElementController extends DomNodeController {
         doAutoranging( peleCopy, props, fillDs, false );
     }
 
+    /**
+     * copy the settings in bounds to the plot.  For example, datumRange(bounds.slice(0)) will be the new x-axis
+     * setting.
+     * @param p the plot
+     * @param bounds the bounding box or cube.
+     */
     private static void copyAutorange( Plot p, QDataSet bounds ) {
         assert Schemes.isBoundingBox(bounds);
         p.xaxis.setRange( DataSetUtil.asDatumRange( bounds.slice(0),true ) );
