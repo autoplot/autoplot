@@ -193,6 +193,9 @@ public class Util {
         dslogger.log( Level.FINE, "getDataSet(\"{0}\",DatumRangeUtil.parseTimeRange({1}),monitor)", new Object[]{suri, timeRange} );
         URI uri = DataSetURI.getURI(suri);
         DataSourceFactory factory = DataSetURI.getDataSourceFactory(uri, new NullProgressMonitor());
+        if ( factory==null ) {
+            throw new IllegalArgumentException("Unable to identify data source to handle URI: "+suri );
+        }
         DataSource result = factory.getDataSource( uri );
         if (monitor == null) {
             monitor = new NullProgressMonitor();
