@@ -78,6 +78,8 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     private Datum myValidTime;
     
     private Component firstParameter=null;
+    
+    private boolean initialized= false;
 	
     /**
      * return the range of available data. For example, Polar/Hydra data is available
@@ -545,6 +547,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
 
     private void serversComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serversComboBoxActionPerformed
         try {
+            if ( !initialized ) return;
             final URL url= HapiServer.encodeURL( (String)serversComboBox.getSelectedItem() );
             if ( currentServer==null || !url.toExternalForm().equals(currentServer.toExternalForm()) ) {
                 DefaultListModel m= new DefaultListModel() ;
@@ -881,6 +884,10 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         
         disableCacheCheckBox.setSelected( "F".equals(params.get("cache")) );
         messagesLabel.setText("Select dataset above");
+        
+        initialized= true;
+        serversComboBox.setSelectedItem( split.file );
+            
     }
 
     @Override
