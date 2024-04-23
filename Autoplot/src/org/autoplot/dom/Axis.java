@@ -1,6 +1,7 @@
 
 package org.autoplot.dom;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -326,6 +327,26 @@ public class Axis extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_TICKVALUES, oldTicks, ticks);
     }
 
+    private Color foreground = Color.black;
+
+    public static final String PROP_FOREGROUND = "foreground";
+
+    public Color getForeground() {
+        return foreground;
+    }
+
+    /**
+     * override the foreground color of the axis, presumably to match the color of a
+     * trace on the plot.
+     * @param foreground 
+     */
+    public void setForeground(Color foreground) {
+        System.err.println(" " + getId() + ": "+foreground );
+        Color oldForeground = this.foreground;
+        this.foreground = foreground;
+        propertyChangeSupport.firePropertyChange(PROP_FOREGROUND, oldForeground, foreground);
+    }
+    
 
     AxisController controller;
 
@@ -366,6 +387,7 @@ public class Axis extends DomNode {
             if ( !exclude.contains( PROP_TICKVALUES ) ) this.setTickValues(that.getTickValues());
             if ( !exclude.contains( PROP_REFERENCE ) ) this.setReference(that.getReference());            
             if ( !exclude.contains( PROP_VISIBLE ) ) this.setVisible(that.isVisible());
+            if ( !exclude.contains( PROP_FOREGROUND ) ) this.setForeground(that.getForeground());
         }
     }
 
@@ -413,6 +435,8 @@ public class Axis extends DomNode {
         if ( !b ) result.add(new PropertyChangeDiff( PROP_REFERENCE, that.reference, this.reference ) );
         b=  that.visible==this.visible;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_VISIBLE, that.visible, this.visible ) );
+        b=  that.foreground.equals(this.foreground);
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_FOREGROUND, that.foreground, this.foreground ) );
 
         return result;
     }

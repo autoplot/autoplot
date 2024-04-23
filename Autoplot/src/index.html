@@ -30,8 +30,10 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-04-20 r27617):</p>
+        <p>Bugfixes (2024-04-23 r27620):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2004/">2004</a>: sometimes HAPI dialog would flip to other server during initialization.
+            <li>improve feedback when URI data source cannot be identified. (*.foo file)
             <li><a href="https://github.com/das-developers/das2java/issues/105">105</a>: color chooser droplist would ignore if black was selected in some cases.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2580/">2580</a>: recent change to grab labels from image rich png metadata contained runtime error in some cases.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2588/">2588</a>: single-record waveform dataset doesn't autorange in X properly
@@ -58,6 +60,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Add color property to axes, so that you can refer to a color.
             <li>resolution parameter for Das2Server limits the requested resolution for interactive plotting.
         </ul>
         <p>Less recent features:</p>

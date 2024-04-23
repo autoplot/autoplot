@@ -1,6 +1,7 @@
 
 package org.autoplot.dom;
 
+import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
@@ -288,6 +289,8 @@ public class AxisController extends DomNodeController {
         ac.bind(axis, Axis.PROP_OPPOSITE, dasAxis, "orientation", getOppositeConverter(axis,dasAxis) );
         ac.bind(axis, Axis.PROP_TICKVALUES, dasAxis, DasAxis.PROP_TICKVALUES );
         ac.bind(axis, Axis.PROP_REFERENCE, dasAxis, DasAxis.PROP_REFERENCE );
+        ac.bind(axis, Axis.PROP_FOREGROUND, dasAxis, "foreground" );
+        
         column= dasAxis.getColumn();
         row= dasAxis.getRow();
         if ( dasAxis.isHorizontal() ) {
@@ -398,6 +401,7 @@ public class AxisController extends DomNodeController {
         if ( !exclude.contains( Axis.PROP_TICKVALUES ) ) axis.setTickValues( that.getTickValues() );
         if ( !exclude.contains( Axis.PROP_REFERENCE ) ) axis.setReference( that.getReference() );
         if ( !exclude.contains( Axis.PROP_VISIBLE ) ) axis.setVisible( that.isVisible() );
+        if ( !exclude.contains( Axis.PROP_FOREGROUND ) ) axis.setForeground( that.getForeground() );
         if ( lock!=null ) lock.unlock();
     }
 }
