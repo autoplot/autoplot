@@ -2299,6 +2299,9 @@ public class ApplicationController extends DomNodeController implements RunLater
             p0.getXaxis().setForeground(application.options.foreground);
             p0.getYaxis().setForeground(application.options.foreground);
             p0.getZaxis().setForeground(application.options.foreground);
+            p0.getXaxis().setAxisOffset("");
+            p0.getYaxis().setAxisOffset("");
+            p0.getZaxis().setAxisOffset("");
             
             for ( int i=application.getPlotElements().length-1; i>0; i-- ) {
                 deletePlotElement( application.getPlotElements(i) ); //may delete dsf and plots as well.

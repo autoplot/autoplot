@@ -347,6 +347,24 @@ public class Axis extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_FOREGROUND, oldForeground, foreground);
     }
     
+    private String axisOffset = "";
+
+    public static final String PROP_AXISOFFSET = "axisOffset";
+
+    public String getAxisOffset() {
+        return axisOffset;
+    }
+
+    /**
+     * extra amount to scoot out the axis.
+     * @param axisOffset 
+     */
+    public void setAxisOffset(String axisOffset) {
+        String oldAxisOffset = this.axisOffset;
+        this.axisOffset = axisOffset;
+        propertyChangeSupport.firePropertyChange(PROP_AXISOFFSET, oldAxisOffset, axisOffset);
+    }
+
 
     AxisController controller;
 
@@ -388,6 +406,7 @@ public class Axis extends DomNode {
             if ( !exclude.contains( PROP_REFERENCE ) ) this.setReference(that.getReference());            
             if ( !exclude.contains( PROP_VISIBLE ) ) this.setVisible(that.isVisible());
             if ( !exclude.contains( PROP_FOREGROUND ) ) this.setForeground(that.getForeground());
+            if ( !exclude.contains( PROP_AXISOFFSET ) ) this.setAxisOffset(that.getAxisOffset());
         }
     }
 
@@ -437,6 +456,8 @@ public class Axis extends DomNode {
         if ( !b ) result.add(new PropertyChangeDiff( PROP_VISIBLE, that.visible, this.visible ) );
         b=  that.foreground.equals(this.foreground);
         if ( !b ) result.add(new PropertyChangeDiff( PROP_FOREGROUND, that.foreground, this.foreground ) );
+        b=  that.axisOffset.equals(this.axisOffset);
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_AXISOFFSET, that.axisOffset, this.axisOffset ) );
 
         return result;
     }
