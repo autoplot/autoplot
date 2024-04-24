@@ -1,6 +1,7 @@
 
 package org.autoplot.state;
 
+import java.awt.Color;
 import java.io.FileNotFoundException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -404,6 +405,19 @@ public class StatePersistence {
                 rows[i]= r;
             }
             c.setRows(rows);
+        }
+        
+        Color foreground= state.getOptions().getForeground();
+        for ( Plot p: state.getPlots() ) {
+            if (p.getXaxis().getForeground().equals(state.getOptions().getBackground())) {
+                p.getXaxis().setForeground(foreground);
+            }
+            if (p.getYaxis().getForeground().equals(state.getOptions().getBackground())) {
+                p.getYaxis().setForeground(foreground);
+            }
+            if (p.getZaxis().getForeground().equals(state.getOptions().getBackground())) {
+                p.getZaxis().setForeground(foreground);
+            }
         }
 
         for ( BindingModel m: state.getBindings() ) {

@@ -16,6 +16,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import org.das2.graph.GraphUtil;
 import org.autoplot.dom.DomUtil;
+import org.autoplot.dom.Plot;
 import org.autoplot.dom.PlotElement;
 
 /**
@@ -259,6 +260,17 @@ public final class FontAndColorsDialog extends javax.swing.JDialog {
             for ( PlotElement p: pe ) {
                 if (p.getStyle().getColor().equals(app.getCanvas().getForeground())) {
                     p.getStyle().setColor(fores[i]);
+                }
+            }
+            for ( Plot p: app.dom.getPlots() ) {
+                if (p.getXaxis().getForeground().equals(app.getCanvas().getForeground())) {
+                    p.getXaxis().setForeground(fores[i]);
+                }
+                if (p.getYaxis().getForeground().equals(app.getCanvas().getForeground())) {
+                    p.getYaxis().setForeground(fores[i]);
+                }
+                if (p.getZaxis().getForeground().equals(app.getCanvas().getForeground())) {
+                    p.getZaxis().setForeground(fores[i]);
                 }
             }
             app.getDom().getOptions().setForeground(fores[i]);
