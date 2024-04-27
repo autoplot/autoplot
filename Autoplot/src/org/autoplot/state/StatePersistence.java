@@ -408,17 +408,17 @@ public class StatePersistence {
         }
         
         Color foreground= state.getOptions().getForeground();
-        for ( Plot p: state.getPlots() ) {
-            if (p.getXaxis().getForeground().equals(state.getOptions().getBackground())) {
-                p.getXaxis().setForeground(foreground);
-            }
-            if (p.getYaxis().getForeground().equals(state.getOptions().getBackground())) {
-                p.getYaxis().setForeground(foreground);
-            }
-            if (p.getZaxis().getForeground().equals(state.getOptions().getBackground())) {
-                p.getZaxis().setForeground(foreground);
-            }
-        }
+//        for ( Plot p: state.getPlots() ) {
+//            if (p.getXaxis().getForeground().equals(state.getOptions().getBackground())) {
+//                p.getXaxis().setForeground(foreground);
+//            }
+//            if (p.getYaxis().getForeground().equals(state.getOptions().getBackground())) {
+//                p.getYaxis().setForeground(foreground);
+//            }
+//            if (p.getZaxis().getForeground().equals(state.getOptions().getBackground())) {
+//                p.getZaxis().setForeground(foreground);
+//            }
+//        }
 
         for ( BindingModel m: state.getBindings() ) {
             Object src= DomUtil.getElementById( state, m.getSrcId() );

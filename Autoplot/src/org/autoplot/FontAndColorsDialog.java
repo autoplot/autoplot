@@ -262,17 +262,17 @@ public final class FontAndColorsDialog extends javax.swing.JDialog {
                     p.getStyle().setColor(fores[i]);
                 }
             }
-            for ( Plot p: app.dom.getPlots() ) {
-                if (p.getXaxis().getForeground().equals(app.getCanvas().getForeground())) {
-                    p.getXaxis().setForeground(fores[i]);
-                }
-                if (p.getYaxis().getForeground().equals(app.getCanvas().getForeground())) {
-                    p.getYaxis().setForeground(fores[i]);
-                }
-                if (p.getZaxis().getForeground().equals(app.getCanvas().getForeground())) {
-                    p.getZaxis().setForeground(fores[i]);
-                }
-            }
+//            for ( Plot p: app.dom.getPlots() ) {
+//                if (p.getXaxis().getForeground().equals(app.getCanvas().getForeground())) {
+//                    p.getXaxis().setForeground(fores[i]);
+//                }
+//                if (p.getYaxis().getForeground().equals(app.getCanvas().getForeground())) {
+//                    p.getYaxis().setForeground(fores[i]);
+//                }
+//                if (p.getZaxis().getForeground().equals(app.getCanvas().getForeground())) {
+//                    p.getZaxis().setForeground(fores[i]);
+//                }
+//            }
             app.getDom().getOptions().setForeground(fores[i]);
             app.getDom().getOptions().setColor(fores[i]);
             app.getDom().getOptions().setBackground(backs[i]);
