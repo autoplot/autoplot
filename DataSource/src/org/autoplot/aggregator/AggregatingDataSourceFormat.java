@@ -34,7 +34,7 @@ public class AggregatingDataSourceFormat implements DataSourceFormat {
     
     @Override
     public void formatData(String uri, QDataSet data, ProgressMonitor mon) throws Exception {
-        String surl = DataSetURI.fromUri( new URI( uri ) );
+        String surl = DataSetURI.fromUri( DataSetURI.toUri( URISplit.makeCanonical(uri) ) );
         URISplit split= URISplit.parse(uri);
         Map<String,String> params= URISplit.parseParams(split.params);
         String str= params.remove(URISplit.PARAM_TIME_RANGE);
