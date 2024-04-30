@@ -1712,10 +1712,17 @@ public class PlotElementController extends DomNodeController {
                                             label1= context.toString(); // rank 0.
                                         }
                                     }
+                                    s= lnames[i];
                                 } else {
-                                    label1= llabels[i];
+                                    if ( uniqLabels ) {
+                                        label1= llabels[i];
+                                        s= lnames[i];
+                                    } else {
+                                        label1= "ch_"+i;
+                                        s= s+"|unbundle('ch_"+i+"')";
+                                    }
                                 }
-                                s= lnames[i];
+                                
                             } else {
                                 if ( uniqLabels ) {
                                     s= s+"|unbundle('"+lnames[i]+"')";
