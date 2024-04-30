@@ -41,6 +41,7 @@ public class DatasetCommand extends PyObject {
             + "<tr><td>label </td><td>label for the data, which could be used as an axis label.</td></tr>\n"
             + "<tr><td>name </td><td>name for the data, which should be a legal Jython variable name.</td></tr>\n"
             + "<tr><td>units </td><td>units for the data, which string representing the units of the data.</td></tr>\n"
+            + "<tr><td>resetUnits </td><td>assert units for the data, with no attempt to perform the units conversion.</td></tr>\n"
             + "<tr><td>validMin validMax</td><td>range of valid values for the data.</td></tr>\n"
             + "<tr><td>typicalMin typicalMax</td><td>typical range dataset, used for suggesting axis ranges.</td></tr>\n"
             + "<tr><td>scaleType</td><td>'log' or 'linear'</td></tr>\n"
@@ -97,7 +98,7 @@ public class DatasetCommand extends PyObject {
         FunctionSupport fs= new FunctionSupport( "dataset", 
             new String[] { "ds", "ds1", "ds2", "ds3", "ds4",
             "title", "label", "name",
-            "units", "format", "cadence", 
+            "units", "format", "cadence", "resetUnits",
             "fillValue", "validMin", "validMax", "typicalMin", "typicalMax",
             "scaleType", "averageType",
             "renderType", "bins1", "bins0", "cacheTag", "userProperties",
@@ -105,7 +106,7 @@ public class DatasetCommand extends PyObject {
         },
         new PyObject[] { Py.None, Py.None, Py.None, Py.None, Py.None,
             Py.None, Py.None, Py.None,
-            Py.None, Py.None, Py.None,
+            Py.None, Py.None, Py.None, Py.None,
             Py.None, Py.None, Py.None, Py.None, Py.None,
             Py.None, Py.None,
             Py.None, Py.None, Py.None, Py.None, Py.None,
@@ -119,13 +120,14 @@ public class DatasetCommand extends PyObject {
         QDataSet result;
         
         Units units=null;
+        boolean resetUnits=false;
         
         for ( int i=nparm; i<args.length; i++ ) { //HERE nargs
             String kw= keywords[i-nparm];
             PyObject val= args[i];
 
-            String sval= (String) val.__str__().__tojava__(String.class);
-            if ( kw.equals("units") ) {
+            if ( kw.equals("units") || kw.equals("resetUnits") ) {
+                if ( kw.equals("resetUnits") ) resetUnits=true;
                 if ( val.__tojava__(Units.class)!= Py.NoConversion ) {
                     units= (Units)val.__tojava__(Units.class);
                 } else {
@@ -140,7 +142,13 @@ public class DatasetCommand extends PyObject {
                 throw new IllegalArgumentException("dataset needs at least one argument");
             case 1:
                 if ( units!=null ) {
-                    result= JythonOps.dataset( args[0], units );
+                    if ( resetUnits && args[0] instanceof PyQDataSet ) {
+                        QDataSet ds= (QDataSet)args[0].__tojava__(QDataSet.class);
+                        ds= Ops.putProperty( ds, QDataSet.UNITS,null );
+                        result= Ops.dataset( ds, units );
+                    } else {
+                        result= JythonOps.dataset( args[0], units );
+                    }
                 } else {
                     result= JythonOps.dataset( args[0] );
                 }
@@ -202,6 +210,7 @@ public class DatasetCommand extends PyObject {
                     result= Ops.putProperty( result, kw.toUpperCase(), sval );
                     break;
                 case "units":
+                case "resetUnits":
                     if ( val.__tojava__(Units.class)!= Py.NoConversion ) {
                         result= Ops.putProperty( result, QDataSet.UNITS, val.__tojava__(Units.class)  );
                     } else {
