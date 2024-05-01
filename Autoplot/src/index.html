@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Old dog foot prints database found, and demonstrates that spaces within .zip files are handled properly.</small></p>
+        <p><small>Old dog foot prints database found, and demonstrates that spaces within .zip files are handled properly.  Happy May Day!</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,10 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-04-29 r27629):</p>
+        <p>Bugfixes (2024-05-01 r27629):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2589/">2589</a>: add resetUnits to dataset command, which ignores any units the dataset already has.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2593/">2593</a>: handle when unique names for each channel aren't found on this path.
             <li>export to aggregatingDataSource had code sloppiness which requires vap+txt prefix and didn't handles spaces properly.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/826/">826</a>: comment out new axis color feature for next production release, until issues are resolved.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2004/">2004</a>: sometimes HAPI dialog would flip to other server during initialization.
@@ -62,7 +64,9 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>Add matrixFormat so that matrices can be viewed conveniently.
+            <li>DataSetBuilder supports nominal units where the unit type changes (for different namespaces)
+            <li>AsciiParser supports dash and double parens in column names, supporting "visualFeature(visualFeature(ordinal))" and "co-rotational X component" 
+            <li>Add print(matrixFormat(m,'nl')) so that matrices can be viewed conveniently and unambiguously.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/826/">826</a>: Add axisOffset property, so that offset axes can be used in .vaps.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/826/">826</a>: Add color property to axes, so that you can refer to a color.
             <li>resolution parameter for Das2Server limits the requested resolution for interactive plotting.
