@@ -276,7 +276,7 @@ public class HapiServer {
         } catch (JSONException | IOException ex) {
             version= "2.0";
         }
-        if ( version.startsWith("2.") ) {
+        if ( version.startsWith("2.") || version.startsWith("1.")) {
             map.put(HapiSpec.URL_PARAM_TIMEMIN, tp.format(tr.min()) );
             map.put(HapiSpec.URL_PARAM_TIMEMAX, tp.format(tr.max()) );
         } else {
