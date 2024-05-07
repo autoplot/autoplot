@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Old dog foot prints database found, and demonstrates that spaces within .zip files are handled properly.  Happy May Day!</small></p>
+        <p><small><a href="https://github.com/autoplot/dev/blob/master/demos/2024/20240504/demoMultiCondition.jy">Script</a> shows example of how to select a subset of the data matching multiple conditions.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,7 +30,11 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-05-02 r27630):</p>
+        <p>Bugfixes (2024-05-07 r27630):</p>
+        <ul>
+            <li>cleanData filter ignored the number of stddevs argument.
+        </ul>
+        <p>Older Bugfixes (2024-05-02 r27630):</p>
         <ul>
             <li>HAPI 1.1 supported again.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2589/">2589</a>: add resetUnits to dataset command, which ignores any units the dataset already has.
@@ -44,26 +48,10 @@
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2588/">2588</a>: single-record waveform dataset doesn't autorange in X properly
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2585/">2585</a>: don't cache idlsav listing.  It doesn't seem to be necessary and is confusing
         </ul>
-        <p>Older Bugfixes (2024-04-11 r27603):</p>
-        <ul>
-            <li>Minor GUI corrections to "Run Batch Tool", including consistent naming and disabling cancel to provide feedback.
-            <li><a href="https://github.com/das-developers/das2java/issues/104">104</a>: str(DatumRange) increases resolution to show difference between extent.  Thanks, James!
-            <li>When script is shift-run from script panel so that parameters dialog is shown, crash/stop location was not indicated.  Thanks, Sadie!
-            <li>slice1 of qube ds size 0,n properly results in length 0 dataset.
-            <li>clarify das2server "force intrinsic resolution" button use when model (and ephemeris) data is read.
-            <li>trim drops TYPICAL_MIN, TYPICAL_MAX metadata.
-            <li>rte 2146560169: null pointer exception during state transition.  Thanks, Sadie!
-            <li>"Add hidden plot" would bind all plots' colorbars, even if it was not visible.  Thanks, Connor!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2583/">2583</a>: default nearestNeighbor works again.  Thanks, Ivar!
-            <li>rte_0437885777: index out of bounds when rank 1 dataset is tested for bounds scheme.  Thanks, Connor!
-            <li><a href="https://github.com/das-developers/das2java/issues/98">98</a>: where implicit ytags for dataset([[0,0,0],[0,0,0],[0,0,0]]) where incorrect.  Thanks, David!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2581/">2581</a>: write the .vap.zip to a temporary file and move it once completed.  Thanks, Sadie!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2581/">2581</a>: quiet message about non-monotonic DEPEND_1.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2580/">2580</a>: ImageDataSource recovers labels from rich PNG metadata.  Thanks, Bill!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2579/">2579</a>: ImageDataSource clip=T is fixed.
-            <li>Popup after multi-thread run in Run Batch Tool is restored.
-        </ul>
         <p>Features:</p>
+        <ul>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>DataSetBuilder supports nominal units where the unit type changes (for different namespaces)
             <li>AsciiParser supports dash and double parens in column names, supporting "visualFeature(visualFeature(ordinal))" and "co-rotational X component" 
@@ -71,19 +59,6 @@
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/826/">826</a>: Add axisOffset property, so that offset axes can be used in .vaps.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/826/">826</a>: Add color property to axes, so that you can refer to a color.
             <li>resolution parameter for Das2Server limits the requested resolution for interactive plotting.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>trim(startTime,endTime) command now handles unsorted data, filtering with O(N) code instead of O(LogN) branch with monotonic data.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/824/">rfe842</a>: getDataSets and getDataSet have sortTime control keyword.
-            <li>add MigLayout, which should be nice layout manager for Jython.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/824/">rfe842</a>: getDataSets matches getDataSet to allow the time to be passed in separately, and also includes trim keyword.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/824/">rfe842</a>: getDataSet added to experiment with new version of getDataSet command which includes trim.
-            <li>flatlaf added to Eclipse build info.  Thanks, James!
-            <li>add fixLayout command to Jython, to support "fixLayout(verticalSpacing='1em',horizontalSpacing='1em')"  Thanks, Sadie!
-            <li>vap+inline: editor GUI, used for the mash-up tool, has a jyds tab which shows equivalent jyds script.  Thanks, Sadie!
-            <li>Autoplot ScriptGUIServlet puts empty gray rounded rectangle image to clarify failure behavior, so something is always displayed.
-            <li>Very simple rebundle filter editor added.
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
