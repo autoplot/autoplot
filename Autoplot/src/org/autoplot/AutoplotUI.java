@@ -4923,7 +4923,7 @@ private void updateFrameTitle() {
         alm.addOptionalSwitchArgument("script", "s", "script", "", "run this script after starting.  " +
                 "Arguments following are " +
                 "passed into the script as sys.argv");
-        alm.addBooleanSwitchArgument( "scriptExit",null,"scriptExit","force exit after running the script");
+        alm.addBooleanSwitchArgument( "scriptExit",null,"scriptExit","force exit after running the script, setting exit status to non-zero for exception");
         alm.addOptionalSwitchArgument("testPngFilename", null, "testPngFilename", "", "write canvas to this png file after script is run" );
         alm.addOptionalSwitchArgument("autoLayout",null,"autoLayout",ArgumentList.TRUE,"turn on/off initial autolayout setting");
         alm.addOptionalSwitchArgument("mode","m","mode","expert","start in basic (browse,reduced) mode or expert mode" );
