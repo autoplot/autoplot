@@ -4812,7 +4812,9 @@ private void updateFrameTitle() {
             if ( quit ) {
                 logger.log( Level.WARNING, ex.getMessage(), ex ); 
                 System.err.println( ex.getMessage() );
+                System.err.println("isAllowExit: "+AppManager.getInstance().isAllowExit());
                 AppManager.getInstance().quit(100);
+                System.err.println("still here?");
             } else {
                 model.getExceptionHandler().handle(ex);
             }
