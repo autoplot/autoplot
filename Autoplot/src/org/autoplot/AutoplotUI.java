@@ -4808,7 +4808,15 @@ private void updateFrameTitle() {
             } else {
                 model.getExceptionHandler().handle(ex);
             }
-        }        
+        } catch ( RuntimeException ex ) {
+            if ( quit ) {
+                logger.log( Level.WARNING, ex.getMessage(), ex ); 
+                System.err.println( ex.getMessage() );
+                AppManager.getInstance().quit(100);
+            } else {
+                model.getExceptionHandler().handle(ex);
+            }
+        }       
     }
     
     /**
