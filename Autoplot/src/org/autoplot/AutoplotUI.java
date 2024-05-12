@@ -4810,7 +4810,6 @@ private void updateFrameTitle() {
             }
         } catch ( RuntimeException ex ) {
             if ( quit ) {
-                System.err.println("*** HERE ***");
                 logger.log( Level.WARNING, ex.getMessage(), ex ); 
                 System.err.println( ex.getMessage() );
                 AppManager.getInstance().quit(100);
