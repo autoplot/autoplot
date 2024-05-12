@@ -116,8 +116,9 @@ public class TestRunScripts {
         tsec= t0; // for non-vap non-uri
         psec= t0;
         
-        // java -cp autoplot.jar --script uri
-        String[] command= new String[] { "java", "-jar", autoplotJar, "--headless", "--scriptExit", "--script", uri };
+        // java -cp autoplot.jar --script=uri
+        // --scriptExit is maybe a bug because otherwise Autoplot doesn't exit after
+        String[] command= new String[] { "java", "-jar", autoplotJar, "--headless", "--scriptExit", "--script="+uri };
         
         System.err.println( String.join( " ", command ) );
         
