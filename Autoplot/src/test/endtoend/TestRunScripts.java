@@ -34,18 +34,26 @@ public class TestRunScripts {
     private static String autoplotJar;
     
     public static void main( String[] args ) throws IOException {
-        args= new String[] { 
-            "/home/jbf/local/autoplot/autoplot.jar",
-            "000",
-            "https://github.com/autoplot/dev/blob/master/demos/tools/systemmonitor/systemmonitor.md"
-        };
+        //args= new String[] { 
+        //    "/home/jbf/local/autoplot/autoplot.jar",
+        //    "000",
+        //    "https://github.com/autoplot/dev/blob/master/demos/tools/systemmonitor/systemmonitor.md"
+        //};
             
+        int exitCode=0;
+        
         autoplotJar= args[0];
         testid= Integer.parseInt( args[1] );
         args= Arrays.copyOfRange( args, 2, args.length );
         for ( String s: args ) {
-            runScriptsInFile(s);
+            try {
+                runScriptsInFile(s);
+            } catch ( Exception ex ) {
+                exitCode=1;
+            }
         }
+        
+        System.exit(exitCode);
     }
     
     public static void runScriptsInFile( String uri ) {
