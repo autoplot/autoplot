@@ -143,7 +143,7 @@ public class AppManager {
      */
     public void quit( int status ) {
         if ( this.allowExit ) {
-            System.err.println("about to exit");
+            System.err.println("about to exit with status "+status);
             System.exit(status); //TODO: findbugs DM_EXIT--and I wonder what happens when Autoplot is used on a Tomcat web server?  Otherwise this is appropriate for swing apps.
             System.err.println("should not get here");
         }
