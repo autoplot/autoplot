@@ -49,7 +49,7 @@ public class TestRunScripts {
             try {
                 runScriptsInFile(s);
             } catch ( Exception ex ) {
-                exitCode=1;
+                exitCode=-1;
             }
         }
         
@@ -137,6 +137,7 @@ public class TestRunScripts {
         p.waitFor();
         
         if ( p.exitValue()!=0 ) {
+            System.err.println("p.exitValue()=="+p.exitValue());
             throw new Exception("script got exception: "+uri);
         }
 
