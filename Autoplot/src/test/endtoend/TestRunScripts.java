@@ -70,6 +70,8 @@ public class TestRunScripts {
         Map<String,Exception> exceptions= new LinkedHashMap();
         Map<String,Integer> exceptionNumbers= new LinkedHashMap();
         
+        System.err.println("version TestRunScripts 2024-05-13 17:51");
+        
         try {
             System.err.println("\n=======================");
             System.err.println("== from "+uri);
