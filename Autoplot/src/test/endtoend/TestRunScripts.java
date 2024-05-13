@@ -32,6 +32,7 @@ public class TestRunScripts {
     
     private static int testid;
     private static String autoplotJar;
+    private static String jre= System.getenv("JAVA_HOME") +"/bin/java";
     
     public static void main( String[] args ) throws IOException {
         //args= new String[] { 
@@ -126,7 +127,7 @@ public class TestRunScripts {
         
         // java -cp autoplot.jar --script=uri
         // --scriptExit is maybe a bug because otherwise Autoplot doesn't exit after
-        String[] command= new String[] { "java", "-jar", autoplotJar, "--headless", "--scriptExit", "--script="+uri };
+        String[] command= new String[] { jre, "-jar", autoplotJar, "--headless", "--scriptExit", "--script="+uri };
         
         System.err.println( String.join( " ", command ) );
         
