@@ -14,6 +14,7 @@ import java.util.Map;
 import org.autoplot.bookmarks.Bookmark;
 import org.autoplot.bookmarks.BookmarksException;
 import org.autoplot.datasource.DataSetURI;
+import org.das2.util.FileUtil;
 import org.das2.util.filesystem.HtmlUtil;
 import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -36,11 +37,11 @@ public class TestRunScripts {
     private static String jre= System.getenv("JAVA_HOME") +"/bin/java";
     
     public static void main( String[] args ) throws IOException {
-        //args= new String[] { 
-        //    "/home/jbf/local/autoplot/autoplot.jar",
-        //    "000",
-        //    "https://github.com/autoplot/dev/blob/master/demos/tools/systemmonitor/systemmonitor.md"
-        //};
+        args= new String[] { 
+            "/home/jbf/local/autoplot/autoplot.jar",
+            "000",
+            "https://github.com/autoplot/dev/blob/master/demos/tools/systemmonitor/systemmonitor.md"
+        };
             
         int exitCode=0;
         
@@ -55,6 +56,12 @@ public class TestRunScripts {
             }
         }
         
+        //File f=  new File("errorcode.txt").getAbsoluteFile();
+        
+        //System.err.println("writing exit code to errorcode.txt because Java/Jenkins can't talk: "+f);
+        //FileUtil.writeStringToFile( f, String.valueOf(exitCode) );
+        
+        System.err.println("exiting with exitCode " + exitCode);
         System.exit(exitCode);
     }
     
@@ -81,6 +88,15 @@ public class TestRunScripts {
         
         }
         
+        if ( exceptions.size()>0 ) {
+            // throw one of the exceptions
+            String s=null;
+            for ( String k: exceptions.keySet() ) {
+                if (s==null) s= k;
+                System.err.println(""+k+"\t"+exceptions.get(k).toString());
+            }
+            throw new RuntimeException(exceptions.get(s));
+        }
         
     }
     
