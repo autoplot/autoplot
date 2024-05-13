@@ -14,7 +14,6 @@ import java.util.Map;
 import org.autoplot.bookmarks.Bookmark;
 import org.autoplot.bookmarks.BookmarksException;
 import org.autoplot.datasource.DataSetURI;
-import org.autoplot.datasource.DataSourceUtil;
 import org.das2.util.filesystem.HtmlUtil;
 import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -24,7 +23,9 @@ import org.xml.sax.SAXException;
  * Somehow there doesn't seem to be a test which runs a set of scripts in
  * a bookmarks file or website.  This takes the list in the first
  * argument, a bookmarks file, and runs through all the tests.  Each is
- * run with a fresh Autoplot session, possibly in parallel.
+ * run with a fresh Autoplot session, possibly in parallel.  This
+ * runs the scripts found in the file, exiting with 17 when some exception
+ * is thrown.
  * 
  * @author jbf
  */
@@ -50,7 +51,7 @@ public class TestRunScripts {
             try {
                 runScriptsInFile(s);
             } catch ( Exception ex ) {
-                exitCode=-1;
+                exitCode=17;
             }
         }
         
@@ -138,7 +139,6 @@ public class TestRunScripts {
         p.waitFor();
         
         if ( p.exitValue()!=0 ) {
-            System.err.println("p.exitValue()=="+p.exitValue());
             throw new Exception("script got exception: "+uri);
         }
 
