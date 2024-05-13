@@ -37,11 +37,11 @@ public class TestRunScripts {
     private static String jre= System.getenv("JAVA_HOME") +"/bin/java";
     
     public static void main( String[] args ) throws IOException {
-        args= new String[] { 
-            "/home/jbf/local/autoplot/autoplot.jar",
-            "000",
-            "https://github.com/autoplot/dev/blob/master/demos/tools/systemmonitor/systemmonitor.md"
-        };
+        //args= new String[] { 
+        //    "/home/jbf/local/autoplot/autoplot.jar",
+        //    "000",
+        //    "https://github.com/autoplot/dev/blob/master/demos/tools/systemmonitor/systemmonitor.md"
+        //};
             
         int exitCode=0;
         
