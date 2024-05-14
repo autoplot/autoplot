@@ -51,6 +51,7 @@ import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.jythonsupport.ClipboardEditorPanel;
 import org.autoplot.jythonsupport.JavaJythonConverter;
 import org.autoplot.jythonsupport.MathematicaJythonConverter;
+import org.autoplot.jythonsupport.ScriptDocumentationPanel;
 import static org.das2.jythoncompletion.JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER;
 import org.das2.jythoncompletion.JythonInterpreterProvider;
 
@@ -339,7 +340,23 @@ public final class EditorContextMenu {
             Action a;
             JMenuItem item;
             JMenu insertCodeMenu= new JMenu("Insert Code");
-
+            
+            a= new AbstractAction("Set Script Documentation") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);                
+                    ScriptDocumentationPanel p= new ScriptDocumentationPanel();
+                    p.initialize(editor.getText());
+                    if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( menu, p, "Set Script Description", JOptionPane.OK_CANCEL_OPTION ) ) {
+                        String src= p.implement( editor.getText() );
+                        editor.setText(src);
+                    }
+                }                
+            };
+            item= new JMenuItem( a );
+            item.setToolTipText("<html>Add title and description to the script</html>");
+            insertCodeMenu.add( item );
+            
             JMenu getParamMenu= new JMenu("Get Parameter");
             getParamMenu.setToolTipText("<html>Parameters provide a consistent and clean method for passing parameters into scripts.");
 
