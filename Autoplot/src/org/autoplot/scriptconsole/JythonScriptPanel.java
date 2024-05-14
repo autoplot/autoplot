@@ -437,7 +437,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
         executeButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/go.png"))); // NOI18N
         executeButton.setText("Run");
-        executeButton.setToolTipText("<html>Run the script.  <br>Alt enters editor GUI.  <br>Ctrl attempts to trace program location.  <br>Shift will being up parameters gui.");
+        executeButton.setToolTipText("<html>Run the script.  <br>Alt enters editor GUI.  <br>Ctrl attempts to trace program location.  <br>Shift enters editor GUI.");
         executeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 executeButtonActionPerformed(evt);

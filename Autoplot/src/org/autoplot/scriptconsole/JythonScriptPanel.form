@@ -66,7 +66,7 @@
           <Image iconType="3" name="/org/autoplot/go.png"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Run"/>
-        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Run the script.  &lt;br&gt;Alt enters editor GUI.  &lt;br&gt;Ctrl attempts to trace program location.  &lt;br&gt;Shift will being up parameters gui."/>
+        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Run the script.  &lt;br&gt;Alt enters editor GUI.  &lt;br&gt;Ctrl attempts to trace program location.  &lt;br&gt;Shift enters editor GUI."/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="executeButtonActionPerformed"/>

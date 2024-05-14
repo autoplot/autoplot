@@ -734,7 +734,7 @@ public class ScriptPanelSupport {
      * <li>0 normal
      * <li>1 parameters GUI (SHIFT is pressed)
      * <li>2 trace (CRTL is pressed)
-     * <li>8 enter editor (ALT is pressed)
+     * <li>8 parameters GUI (ALT is pressed)
      * </ul>
      * @param mode bit array controlling execution.
      * @throws RuntimeException
@@ -873,7 +873,7 @@ public class ScriptPanelSupport {
                     env.put("dom",interp.get("dom") );
                     env.put("PWD",interp.get("PWD") );
                     ParametersFormPanel.FormData fd=  pfp.doVariables( env, panel.getEditorPanel().getText(), vars, p );
-                    if ( fd.count>0 ) {
+                    if ( true ) {
                         JScrollPane pane= new JScrollPane(p);
 
                         if ( AutoplotUtil.showConfirmDialog2( panel, pane, "edit script parameters", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
@@ -988,10 +988,9 @@ public class ScriptPanelSupport {
      * <li>0 normal
      * <li>1 parameters GUI (SHIFT is pressed)
      * <li>2 trace (CRTL is pressed)
-     * <li>8 enter editor (ALT is pressed)
+     * <li>8 parameters GUI (ALT is pressed)
      * </ul>
-     * TODO: what's the difference between ALT and SHIFT?
-     * @param mode =0 normal.  =2=CTRL_MASK= trace.  ALT_MASK is enter editor.  SHIFT_MASK brings up parameters GUI.
+     * @param mode =0 normal.  =2=CTRL_MASK= trace.  ALT_MASK or SHIFT_MASK brings up parameters GUI.
      */
     protected void executeScript(final int mode) {
 
