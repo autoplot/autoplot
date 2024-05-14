@@ -24,6 +24,10 @@ public class PromptTextArea extends JTextArea {
     
     JLabel promptLabel= new JLabel("enter text here");
     
+    public PromptTextArea(  ) {
+        this("enter text here");
+    }
+    
     public PromptTextArea( String label ) {
         this.promptLabel.setText( label );
         this.promptLabel.setForeground( Color.GRAY );

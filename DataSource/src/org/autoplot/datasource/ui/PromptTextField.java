@@ -21,6 +21,10 @@ public class PromptTextField extends JTextField {
 
     JLabel promptLabel= new JLabel("enter text here");
 
+    public PromptTextField() {
+        this("enter text");
+    }
+    
     public PromptTextField( String label ) {
         super(40);
         this.promptLabel.setText( label );
