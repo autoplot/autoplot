@@ -150,6 +150,9 @@ public class ScriptDocumentationPanel extends javax.swing.JPanel {
                 } else if ( s.charAt(21)=='"' && s.charAt(22)=='"' ) {
                     ignoreUntilTriple="\"\"\"";
                 }
+                if ( s.indexOf(ignoreUntilTriple,24)>-1 ) {  // setScriptDescription('''my description''')
+                    ignoreUntilTriple=null; 
+                }
             } else {
                 b.append(s).append("\n");
             }
