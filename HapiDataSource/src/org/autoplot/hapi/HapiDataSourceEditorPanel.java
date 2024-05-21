@@ -22,6 +22,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -81,6 +82,8 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     
     private boolean initialized= false;
 	
+    private List<JCheckBox> parameterCheckboxes= new ArrayList<>();
+    
     /**
      * return the range of available data. For example, Polar/Hydra data is available
      * from 1996-03-20 to 2008-04-15.
@@ -133,6 +136,8 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     private DatumRange currentRange= null;
     private String currentId= null;
     private String currentExtra=null;
+    private JSONObject currentInfo=null;
+    
     private int lastParamIndex= -1; // the index of the last parameter selection.
 
     /**
@@ -156,12 +161,23 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             throw new RuntimeException(ex);
         }
         initComponents();
-        filtersComboBox.setPreferenceNode("hapi.filters");
+        
+        datasetFilterComboBox.setPreferenceNode("hapi.filters");
         PromptComboBoxEditor editor= new PromptComboBoxEditor("search regex");
-        filtersComboBox.setEditor( editor );
+        editor.setTooltipText( datasetFilterComboBox.getToolTipText() );
+        datasetFilterComboBox.setEditor( editor );
         ((JTextField)editor.getEditorComponent()).setColumns(10);
-        filtersComboBox.invalidate();
-        filtersComboBox.revalidate();
+        datasetFilterComboBox.invalidate();
+        datasetFilterComboBox.revalidate();
+        
+        parameterFilterComboBox.setPreferenceNode("hapi.filters");
+        editor= new PromptComboBoxEditor("search");
+        editor.setTooltipText( datasetFilterComboBox.getToolTipText() );
+        parameterFilterComboBox.setEditor( editor );
+        ((JTextField)editor.getEditorComponent()).setColumns(7);
+        parameterFilterComboBox.invalidate();
+        parameterFilterComboBox.revalidate();
+
         timeRangeComboBox.setPreferenceNode(RecentComboBox.PREF_NODE_TIMERANGE);
         parametersScrollPane.getVerticalScrollBar().setUnitIncrement( parametersPanel.getFont().getSize() );
 
@@ -207,13 +223,27 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 }
             }
         } );
-        filtersComboBox.getEditor().getEditorComponent().addKeyListener( new KeyAdapter() {
+        datasetFilterComboBox.getEditor().getEditorComponent().addKeyListener( new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
                 Runnable run= new Runnable() {
                     public void run() {
-                        final String search= (String)filtersComboBox.getEditor().getItem();
-                        resetServerCatalog( currentServer, search );                        
+                        resetServerCatalog( currentServer );                        
+                    }
+                };
+                SwingUtilities.invokeLater(run);
+            }
+        } );
+        parameterFilterComboBox.getEditor().getEditorComponent().addKeyListener( new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                Runnable run= new Runnable() {
+                    public void run() {
+                        try {
+                            resetIdImmediately( currentId, currentInfo );
+                        } catch ( JSONException ex ) {
+                            ex.printStackTrace();
+                        }
                     }
                 };
                 SwingUtilities.invokeLater(run);
@@ -310,11 +340,12 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         extraInfoButton = new javax.swing.JButton();
         titleLabel = new javax.swing.JLabel();
         cachedFileButton = new javax.swing.JButton();
+        parameterFilterComboBox = new org.autoplot.datasource.RecentComboBox();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         idsList2 = new javax.swing.JList<>();
         clearButton = new javax.swing.JButton();
-        filtersComboBox = new org.autoplot.datasource.RecentComboBox();
+        datasetFilterComboBox = new org.autoplot.datasource.RecentComboBox();
         messagesLabel = new javax.swing.JLabel();
         binaryCB = new javax.swing.JCheckBox();
         timeRangeComboBox = new org.autoplot.datasource.RecentComboBox();
@@ -388,11 +419,19 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         });
 
+        parameterFilterComboBox.setToolTipText("search bar, any parameter or parameter description containing regular expression (.* matches anything) is shown");
+        parameterFilterComboBox.setMaximumSize(new java.awt.Dimension(1028, 32767));
+        parameterFilterComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                parameterFilterComboBoxActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(parametersScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 486, Short.MAX_VALUE)
+            .addComponent(parametersScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addComponent(clearAllB)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -401,14 +440,20 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 .addComponent(cachedFileButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(extraInfoButton))
-            .addComponent(titleLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addComponent(titleLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(parameterFilterComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(4, 4, 4))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addComponent(titleLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(titleLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(parameterFilterComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(parametersScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
+                .addComponent(parametersScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(clearAllB)
@@ -433,11 +478,11 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         });
 
-        filtersComboBox.setToolTipText("search bar, any id or title containing regular expression (.* matches anything) is shown");
-        filtersComboBox.setMaximumSize(new java.awt.Dimension(1028, 32767));
-        filtersComboBox.addActionListener(new java.awt.event.ActionListener() {
+        datasetFilterComboBox.setToolTipText("search bar, any id or title containing regular expression (.* matches anything) is shown");
+        datasetFilterComboBox.setMaximumSize(new java.awt.Dimension(1028, 32767));
+        datasetFilterComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                filtersComboBoxActionPerformed(evt);
+                datasetFilterComboBoxActionPerformed(evt);
             }
         });
 
@@ -446,7 +491,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(filtersComboBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(datasetFilterComboBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(clearButton))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -457,7 +502,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(clearButton)
-                    .addComponent(filtersComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(datasetFilterComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 216, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
@@ -574,8 +619,8 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     }//GEN-LAST:event_serversComboBoxActionPerformed
 
     private void clearAllBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearAllBActionPerformed
-        boolean first= !currentServer.toString().contains("https://cdaweb.gsfc.nasa.gov/registry/hdp/hapi");
-        for ( Component c: parametersPanel.getComponents() ) {
+        boolean first= currentServer==null || !currentServer.toString().contains("https://cdaweb.gsfc.nasa.gov/registry/hdp/hapi");
+        for ( Component c: parameterCheckboxes ) {
             if ( c instanceof JCheckBox ) {
                 if ( first ) {
                     ((JCheckBox)c).setSelected(true);
@@ -588,7 +633,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     }//GEN-LAST:event_clearAllBActionPerformed
 
     private void setAllBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setAllBActionPerformed
-        for ( Component c: parametersPanel.getComponents() ) {
+        for ( Component c: parameterCheckboxes ) {
             if ( c instanceof JCheckBox ) {
                 ((JCheckBox)c).setSelected(true);
             }
@@ -628,19 +673,19 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     }//GEN-LAST:event_extraInfoButtonActionPerformed
 
     private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearButtonActionPerformed
-        filtersComboBox.setSelectedItem("");
+        datasetFilterComboBox.setSelectedItem("");
+        parameterFilterComboBox.setSelectedItem("");
     }//GEN-LAST:event_clearButtonActionPerformed
 
-    private void filtersComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filtersComboBoxActionPerformed
-        final String filter= filtersComboBox.getSelectedItem().toString();
+    private void datasetFilterComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_datasetFilterComboBoxActionPerformed
         Runnable run= new Runnable() {
             @Override
             public void run() {
-                resetServerCatalog( currentServer, filter );
+                resetServerCatalog( currentServer );
             }
         };
         new Thread( run, "resetServerCatalog2" ).start();
-    }//GEN-LAST:event_filtersComboBoxActionPerformed
+    }//GEN-LAST:event_datasetFilterComboBoxActionPerformed
 
     private void exampleTimeRangesCBItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_exampleTimeRangesCBItemStateChanged
         String s= (String)exampleTimeRangesCB.getSelectedItem();
@@ -697,16 +742,27 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         
     }//GEN-LAST:event_cachedFileButtonActionPerformed
 
+    private void parameterFilterComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_parameterFilterComboBoxActionPerformed
+
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                resetVariableTimer.tickle("resetFilter");
+            }
+        };
+        new Thread( run, "parameterFilter" ).start();
+    }//GEN-LAST:event_parameterFilterComboBoxActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox binaryCB;
     private javax.swing.JButton cachedFileButton;
     private javax.swing.JButton clearAllB;
     private javax.swing.JButton clearButton;
+    private org.autoplot.datasource.RecentComboBox datasetFilterComboBox;
     private javax.swing.JCheckBox disableCacheCheckBox;
     private javax.swing.JComboBox<String> exampleTimeRangesCB;
     private javax.swing.JButton extraInfoButton;
-    private org.autoplot.datasource.RecentComboBox filtersComboBox;
     private javax.swing.JList<String> idsList2;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
@@ -716,6 +772,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JLabel messagesLabel;
+    private org.autoplot.datasource.RecentComboBox parameterFilterComboBox;
     private javax.swing.JPanel parametersPanel;
     private javax.swing.JScrollPane parametersScrollPane;
     private javax.swing.JComboBox<String> serversComboBox;
@@ -755,7 +812,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
      * @param parameters comma-delineated list of currentParameters.
      */
     private void setParameters( String parameters ) {
-        for ( Component c: parametersPanel.getComponents() ) {
+        for ( Component c: parameterCheckboxes ) {
             if ( c instanceof JCheckBox ) {
                 ((JCheckBox)c).setSelected(false);
             }
@@ -763,7 +820,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         if ( parameters.length()>0 ) {
             String[] ss= parameters.split(",");
             int iparam=0;
-            for ( Component c: parametersPanel.getComponents() ) {
+            for ( Component c: parameterCheckboxes ) {
                 if ( c instanceof JCheckBox ) {
                     String name= ((JCheckBox)c).getName();
                     ((JCheckBox)c).setSelected(false);
@@ -779,7 +836,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 }
             }
         } else {
-            for ( Component c: parametersPanel.getComponents() ) {
+            for ( Component c: parameterCheckboxes ) {
                 if ( c instanceof JCheckBox ) {
                     ((JCheckBox)c).setSelected(true);
                 }
@@ -804,7 +861,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     private String getParameters(boolean enumerate) {
         StringBuilder b= new StringBuilder();
         boolean areAllTrue= true;
-        for ( Component c: parametersPanel.getComponents() ) {
+        for ( Component c: parameterCheckboxes ) {
             if ( c instanceof JCheckBox ) {
                 if ( ((JCheckBox)c).isSelected() ) {
                     b.append(",").append(c.getName());
@@ -969,8 +1026,9 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
      * @throws IOException
      * @throws JSONException 
      */    
-    private void resetServerCatalog( URL server, String filter ) {
+    private void resetServerCatalog( URL server ) {
         try {
+            final String filter= datasetFilterComboBox.getSelectedItem().toString();
             DefaultListModel model= new DefaultListModel();
             int maxCharacters=0;
             for ( JSONObject catalogEntry: new JSONArrayIterator(idsJSON) ) {
@@ -1028,7 +1086,8 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         loadServerCapabilities(server);
         Runnable run= new Runnable() {
             public void run() {
-                resetServerCatalog(server,"");
+                datasetFilterComboBox.setSelectedItem("");
+                resetServerCatalog(server);
             }
         };
         SwingUtilities.invokeLater(run);
@@ -1156,6 +1215,9 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         }
         JSONArray parameters= info.getJSONArray("parameters");
+        String parameterFilter= (String)parameterFilterComboBox.getSelectedItem();
+        if ( parameterFilter==null ) parameterFilter="";
+        Pattern p= parameterFilter.length()>0 ? Pattern.compile(parameterFilter,Pattern.CASE_INSENSITIVE) : null ;
 
         StringBuilder extra= new StringBuilder();
         extra.append("<html><table>");
@@ -1179,6 +1241,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         extra.append("</table></html>");
         currentExtra= extra.toString();
         parametersPanel.removeAll();
+        parameterCheckboxes.clear();
         String[] sparams= new String[parameters.length()];
         Boolean startRank2= null;
         for ( int i=0; i<parameters.length(); i++ ) {
@@ -1220,21 +1283,21 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                         if ( lastParamIndex>-1 ) {
                             if ( lastParamIndex<fi ) {
                                 for ( int i=lastParamIndex; i<=fi; i++ ) {
-                                    ( (JCheckBox)parametersPanel.getComponent(i) ).setSelected(true);
+                                    ( (JCheckBox)parameterCheckboxes.get(i) ).setSelected(true);
                                 } 
                             } else {
                                 for ( int i=fi; i<=lastParamIndex; i++ ) {
-                                    ( (JCheckBox)parametersPanel.getComponent(i) ).setSelected(true);
+                                    ( (JCheckBox)parameterCheckboxes.get(i) ).setSelected(true);
                                 } 
                             }
                         }
                     }
                     lastParamIndex= fi;
-                    String label= ((JCheckBox)parametersPanel.getComponent(fi)).getText();
+                    String label= ((JCheckBox) parameterCheckboxes.get(fi)).getText();
                     boolean rank2= label.contains("[");
-                    for ( int i=1; i<parametersPanel.getComponentCount(); i++ ) {
-                        Component c= parametersPanel.getComponent(i);
-                        if ( c instanceof JCheckBox && c!=((JCheckBox)parametersPanel.getComponent(fi)) ) {
+                    for ( int i=1; i<parameterCheckboxes.size(); i++ ) {
+                        Component c= parameterCheckboxes.get(i);
+                        if ( c instanceof JCheckBox && c!=((JCheckBox)parameterCheckboxes.get(fi)) ) {
                             boolean otherIsRank2= ((JCheckBox)c).getText().contains("[");
                             boolean isAlreadySelected= ((JCheckBox)c).isSelected();
                             ((JCheckBox)c).setSelected( otherIsRank2 ? false : ( isAlreadySelected && !rank2 ) );
@@ -1243,15 +1306,23 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 }
 
             });
+            String labelDesc;
             if ( parameter.has("description") ) {
                 String d= parameter.getString("description");
                 //parametersPanel.add( new javax.swing.JLabel( d ) );
                 cb.setToolTipText(d);
-                cb.setText( label+": "+d);
+                labelDesc= label+": "+d;
             } else {
-                cb.setText( label );
+                labelDesc= label;
             }
-            parametersPanel.add( cb );
+            cb.setText( labelDesc );
+            parameterCheckboxes.add( cb );
+            
+            if ( p==null || p.matcher(labelDesc).find() ) {
+                parametersPanel.add( cb );
+            } else {
+                cb.setSelected(false);
+            }
         }
         parametersPanel.setToolTipText("shift-click will select range of parameters");
         parametersPanel.revalidate();
@@ -1343,8 +1414,10 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         final JSONObject info;
         try {
             info = HapiServer.getInfo( server, id );
+            currentInfo= info;
         } catch (IOException | JSONException ex) {
             logger.log(Level.SEVERE, null, ex);
+            currentInfo= null;
             resetIdReportError(server, id, ex);
             return;
         }

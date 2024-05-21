@@ -132,7 +132,7 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="parametersScrollPane" pref="486" max="32767" attributes="0"/>
+                  <Component id="parametersScrollPane" pref="492" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="clearAllB" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -142,15 +142,23 @@
                       <EmptySpace max="32767" attributes="0"/>
                       <Component id="extraInfoButton" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="titleLabel" alignment="0" max="32767" attributes="0"/>
+                  <Group type="102" alignment="1" attributes="0">
+                      <Component id="titleLabel" max="32767" attributes="0"/>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <Component id="parameterFilterComboBox" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
+                  </Group>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="titleLabel" min="-2" pref="17" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="titleLabel" alignment="3" min="-2" pref="17" max="-2" attributes="0"/>
+                          <Component id="parameterFilterComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="parametersScrollPane" pref="188" max="32767" attributes="0"/>
+                      <Component id="parametersScrollPane" pref="186" max="32767" attributes="0"/>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="clearAllB" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -226,6 +234,17 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cachedFileButtonActionPerformed"/>
               </Events>
             </Component>
+            <Component class="org.autoplot.datasource.RecentComboBox" name="parameterFilterComboBox">
+              <Properties>
+                <Property name="toolTipText" type="java.lang.String" value="search bar, any parameter or parameter description containing regular expression (.* matches anything) is shown"/>
+                <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                  <Dimension value="[1028, 32767]"/>
+                </Property>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="parameterFilterComboBoxActionPerformed"/>
+              </Events>
+            </Component>
           </SubComponents>
         </Container>
         <Container class="javax.swing.JPanel" name="jPanel1">
@@ -239,7 +258,7 @@
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="filtersComboBox" max="32767" attributes="0"/>
+                      <Component id="datasetFilterComboBox" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="clearButton" min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -253,7 +272,7 @@
                   <Group type="102" alignment="0" attributes="0">
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="clearButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="filtersComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="datasetFilterComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="0" pref="216" max="32767" attributes="0"/>
                   </Group>
@@ -301,7 +320,7 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="clearButtonActionPerformed"/>
               </Events>
             </Component>
-            <Component class="org.autoplot.datasource.RecentComboBox" name="filtersComboBox">
+            <Component class="org.autoplot.datasource.RecentComboBox" name="datasetFilterComboBox">
               <Properties>
                 <Property name="toolTipText" type="java.lang.String" value="search bar, any id or title containing regular expression (.* matches anything) is shown"/>
                 <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -309,7 +328,7 @@
                 </Property>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filtersComboBoxActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="datasetFilterComboBoxActionPerformed"/>
               </Events>
             </Component>
           </SubComponents>
