@@ -18,4 +18,8 @@ public class PromptComboBoxEditor extends BasicComboBoxEditor {
         editor= new PromptTextField(prompt);
     }
     
+    public void setTooltipText( String text ) {
+        this.editor.setToolTipText(text);
+    }
+    
 }
