@@ -30,11 +30,11 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-05-18 r27661):</p>
+        <p>Bugfixes (2024-05-21 r27664):</p>
         <ul>
             <li>Script editor Shift+Run and Alt+Run are the same thing, and should always enter the parameters GUI, even when there are no parameters.
             <li>"autoplot --help" indicates that --scriptExit will set an exit code for exception.
-            <li>cleanData filter ignored the number of stddevs argument.
+            <li>cleanData filter ignored the number of stddevs argument.  Thanks, Sadie!
         </ul>
         <p>Older Bugfixes (2024-05-02 r27630):</p>
         <ul>
@@ -52,6 +52,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>HAPI dialog has filter for parameter names, to support SSCWeb and CDF files with many parameters.  Thanks, Sadie!
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/829/">829</a>: Script editor dialog for setScriptDescription
             <li>TestRunScripts.java introduced to run a series of scripts reporting any exceptions.
         </ul>
