@@ -1310,15 +1310,20 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             if ( parameter.has("description") ) {
                 String d= parameter.getString("description");
                 //parametersPanel.add( new javax.swing.JLabel( d ) );
-                cb.setToolTipText(d);
-                labelDesc= label+": "+d;
+                if ( d.length()>80 ) {
+                    cb.setToolTipText(d);
+                    labelDesc= label+": "+d.substring(0,80)+"...";
+                } else {
+                    cb.setToolTipText(d);
+                    labelDesc= label+": "+d;
+                }
             } else {
                 labelDesc= label;
             }
             cb.setText( labelDesc );
             parameterCheckboxes.add( cb );
             
-            if ( p==null || p.matcher(labelDesc).find() ) {
+            if ( p==null || ( p.matcher(labelDesc).find() ) ) {
                 parametersPanel.add( cb );
             } else {
                 cb.setSelected(false);
