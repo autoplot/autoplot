@@ -203,10 +203,21 @@ public class ParametersFormPanel {
                     if ( appearsToBeUrl(value) ) {
                         value= value.trim(); // Yeah kludge code, but for sure someone (me) is going to do this. --JF
                     } else {
-                        if ( fd.typesList.get(j).equals('T') || fd.typesList.get(j).equals('A') ) { //TODO: jupiter: 2029-02-02T00:00 to  2029-02-12T00:00  
-                            value= value.trim();
-                        } else {
-                            value= value.substring(0,i).trim();
+                        switch (fd.typesList.get(j)) {
+                            case 'T':
+                                value= value.trim();
+                                break;
+                            case 'A':
+                                //TODO: jupiter: 2029-02-02T00:00 to  2029-02-12T00:00
+                                if ( fd.deftsList.get(j).contains(":") ) { // allow string to contain colon if default contains colon.
+                                    value= value.trim();
+                                } else {
+                                    value= value.substring(0,i).trim();
+                                }   
+                                break;
+                            default:
+                                value= value.substring(0,i).trim();
+                                break;
                         }
                     }
                 }
