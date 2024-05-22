@@ -1,6 +1,7 @@
 
 package org.autoplot.datasource;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.das2.util.monitor.ProgressMonitor;
@@ -19,7 +20,25 @@ public abstract class AbstractDataSourceFactory implements DataSourceFactory {
 
     @Override
     public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) throws Exception {
-        return Collections.emptyList();
+        if ( cc.context.equals(CompletionContext.CONTEXT_PARAMETER_NAME ) )  {
+            return Collections.singletonList( 
+                new CompletionContext( 
+                    CompletionContext.CONTEXT_PARAMETER_NAME, 
+                    "filePollUpdates=", 
+                    "every so many seconds check for file update and reload when file if updated.") );
+        } else if ( cc.context.equals(CompletionContext.CONTEXT_PARAMETER_VALUE ) ) {
+            String parmname= CompletionContext.get( CompletionContext.CONTEXT_PARAMETER_NAME, cc );
+            if ( parmname.equals("filePollUpdates") ) {
+                return Arrays.asList(
+                        new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "1", "check for updates every second" ),
+                        new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "10", "check for updates every ten seconds (for https)" ) );
+            } else {
+                return Collections.emptyList();
+            }
+
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @Override

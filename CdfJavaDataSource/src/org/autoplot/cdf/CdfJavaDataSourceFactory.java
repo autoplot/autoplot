@@ -25,6 +25,7 @@ import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceFactory;
 import org.autoplot.datasource.URISplit;
+import org.das2.util.monitor.NullProgressMonitor;
 
 /**
  * Read data from CDF files using the Java reader provided by NASA/Goddard.
@@ -80,7 +81,10 @@ public class CdfJavaDataSourceFactory extends AbstractDataSourceFactory implemen
             ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "replaceLabels=", "use DEPEND data to label channels"));
             ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "doDep=", "control dependencies between variables"));
             ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "where=", "only return variables where the condition is true"));            
-            ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "loadErrors=", "load errors as well."));            
+            ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "loadErrors=", "load errors as well."));      
+            
+            ccresult.addAll( super.getCompletions( cc, new NullProgressMonitor() ) );
+            
             return ccresult;
             
         } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
@@ -218,7 +222,8 @@ public class CdfJavaDataSourceFactory extends AbstractDataSourceFactory implemen
                 
                 return ccresult;
             } else {
-                return Collections.emptyList();
+                return super.getCompletions(cc, mon);
+
             }
             
         } else {
