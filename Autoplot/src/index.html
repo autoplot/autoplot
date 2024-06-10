@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Script editor "Insert Code"->"Set Script Description" makes it easier to brand scripts and add instructions.</small></p>
+        <p><small>Experiments with an upcoming new version of the CDAWeb HAPI server.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,9 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-05-21 r27664):</p>
+        <p>Bugfixes (2024-05-21 r27668):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2594/">2594</a>: Jython getParam with {labels} doesn't work for string types
             <li>Script editor Shift+Run and Alt+Run are the same thing, and should always enter the parameters GUI, even when there are no parameters.
             <li>"autoplot --help" indicates that --scriptExit will set an exit code for exception.
             <li>cleanData filter ignored the number of stddevs argument.  Thanks, Sadie!
@@ -52,6 +53,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add completions for filePollUpdates, an old but hidden feature which will be useful on Tracers.
             <li>HAPI dialog has filter for parameter names, to support SSCWeb and CDF files with many parameters.  Thanks, Sadie!
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/829/">829</a>: Script editor dialog for setScriptDescription
             <li>TestRunScripts.java introduced to run a series of scripts reporting any exceptions.
