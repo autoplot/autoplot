@@ -1377,7 +1377,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                     ss[i]= "file:"+ff[i].toString();
                 }
             }
-        } else if ( pd.type=='L' || pd.type=='M' ) {
+        } else if ( pd.type=='L' || pd.type=='M' || ( pd.type=='A' && "file".equals(pd.constraints.get("stringType"))) ) {
             String deft= String.valueOf(pd.deft);
             File f= null;
             try {
@@ -1406,7 +1406,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                     for ( int i=0; i<ff.length; i++ ) {
                         ss[i]= "file:"+ff[i].toString();
                     }
-                } else if ( pd.type=='M' ) {
+                } else if ( pd.type=='M' || ( pd.type=='A' && "file".equals(pd.constraints.get("stringType")) ) ) {
                     for ( int i=0; i<ff.length; i++ ) {
                         ss[i]= ff[i].toString();
                     }

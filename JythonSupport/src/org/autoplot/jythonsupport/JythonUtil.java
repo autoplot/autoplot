@@ -2100,7 +2100,14 @@ public class JythonUtil {
                         constraints.put( "max", Double.parseDouble( pymax.__str__().toString() ) );
                     }
                 }
-                p.constraints.putAll( constraints );
+                PyString stringType= (PyString)pyDict.get( new PyString("stringType"), null );
+                if ( stringType!=null ) {
+                    p.constraints.put( "stringType", stringType.toString() );
+                }
+                PyString regex= (PyString)pyDict.get( new PyString("regex"), null );
+                if ( regex!=null ) {
+                    p.constraints.put( "regex", regex.toString() );
+                }
             }
             p.value = params == null ? null : params.get(p.name);
 
