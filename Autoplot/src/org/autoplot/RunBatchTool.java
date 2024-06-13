@@ -1377,7 +1377,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                     ss[i]= "file:"+ff[i].toString();
                 }
             }
-        } else if ( pd.type=='L' ) {
+        } else if ( pd.type=='L' || pd.type=='M' ) {
             String deft= String.valueOf(pd.deft);
             File f= null;
             try {
@@ -1402,8 +1402,14 @@ public class RunBatchTool extends javax.swing.JPanel {
             if ( cf.showOpenDialog(this)==JFileChooser.APPROVE_OPTION ) {
                 File[] ff= cf.getSelectedFiles();
                 ss= new String[ff.length];
-                for ( int i=0; i<ff.length; i++ ) {
-                    ss[i]= "file:"+ff[i].toString();
+                if ( pd.type=='L' ) {
+                    for ( int i=0; i<ff.length; i++ ) {
+                        ss[i]= "file:"+ff[i].toString();
+                    }
+                } else if ( pd.type=='M' ) {
+                    for ( int i=0; i<ff.length; i++ ) {
+                        ss[i]= ff[i].toString();
+                    }
                 }
             }
         } else {
@@ -1573,6 +1579,10 @@ public class RunBatchTool extends javax.swing.JPanel {
                 break;
             case 'L': 
                 interp.exec("autoplot2017.params[\'"+paramName+"\']=URL(\'"+f1+"\')"); // JythonRefactory okay
+                break;
+            case 'M':
+                interp.exec("from java.io import File");
+                interp.exec("autoplot2017.params[\'"+paramName+"\']=File(\'"+f1+"\')"); // JythonRefactory okay
                 break;
             case 'A':
                 if ( f1.startsWith("'") && f1.endsWith("'") && f1.length()>1 ) {
