@@ -2163,8 +2163,14 @@ public class JythonUtil {
                                     pp = ((PyJavaInstance) p.deft).__tojava__(URL.class);
                                     if (pp == Py.NoConversion) {
                                         pp = ((PyJavaInstance) p.deft).__tojava__(Color.class);
-                                        p.type = 'C';
-                                        p.deft = pp;
+                                        if ( pp == Py.NoConversion ) {
+                                            pp = ((PyJavaInstance) p.deft).__tojava__(File.class);
+                                            p.type = 'M'; // Local File or Directory
+                                            p.deft = pp;                                            
+                                        } else {
+                                            p.type = 'C';
+                                            p.deft = pp;
+                                        }
                                     } else {
                                         p.type = 'L';
                                         p.deft = pp;
