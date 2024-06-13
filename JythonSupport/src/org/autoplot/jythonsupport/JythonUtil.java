@@ -611,7 +611,7 @@ public class JythonUtil {
      */
     final static String[] okay = new String[] {
         "range,", "xrange,", "irange,","map,","join,","len,","dict,","zip,",
-        "getParam,", "lower,", "upper,", "URI,", "URL,", "PWD,",
+        "getParam,", "lower,", "upper,", "URI,", "URL,", "PWD,", "File,",
         "setScriptDescription", "setScriptTitle", "setScriptLabel", "setScriptIcon",
         "DatumRangeUtil,", "TimeParser,",
         "str,", "int,", "long,", "float,", "datum,", "datumRange,","dataset,",
@@ -1546,6 +1546,16 @@ public class JythonUtil {
         return describeScript( null, script, params );
     }
     
+    
+   private static PyObject getConstraintP( PyDictionary dict, PyObject key, PyObject deft ) {
+       PyObject o= dict.get(key,deft);
+       if ( Py.isInstance( o, deft.getType() ) ) {
+           return o;
+       } else {
+           throw new IllegalArgumentException("constaints contains the wrong type");
+       }
+   }
+   
     /**
      * return the script description and arguments.
      * @param env the environment, containing PWD and maybe DOM.
@@ -1719,7 +1729,18 @@ public class JythonUtil {
                         logger.log(Level.WARNING, "should be a list: {0}", enumsObject);
                     }
                 }
-                    
+                
+                PyString regex= (PyString)getConstraintP( pyDict, new PyString("regex"), new PyString("") );
+                if ( regex.__len__()>0 ) {
+                    constraints.put("regex", regex);
+                }
+                
+                PyString stringType= (PyString)getConstraintP( pyDict, new PyString("stringType"), new PyString("") );
+                if ( stringType.__len__()>0 ) {
+                    constraints.put("stringType", stringType);
+                }
+                
+                                
                 p.constraints = constraints;
             }
             p.value = params == null ? null : params.get(p.name);
@@ -1783,8 +1804,14 @@ public class JythonUtil {
                                     pp = ((PyJavaInstance) p.deft).__tojava__(URL.class);
                                     if (pp == Py.NoConversion) {
                                         pp = ((PyJavaInstance) p.deft).__tojava__(Color.class);
-                                        p.type = 'C';
-                                        p.deft = pp;
+                                        if ( pp == Py.NoConversion ) {
+                                            pp = ((PyJavaInstance) p.deft).__tojava__(File.class);
+                                            p.type = 'M'; // Local File or Directory
+                                            p.deft = pp;                                            
+                                        } else {
+                                            p.type = 'C';
+                                            p.deft = pp;
+                                        }
                                     } else {
                                         p.type = 'L';
                                         p.deft = pp;

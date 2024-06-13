@@ -33,7 +33,8 @@ public class Param {
      * <li>D (Datum),
      * <li>S (DatumRange),
      * <li>U (Dataset URI),
-     * <li>L (URL), a file location, not a URI with parameters.
+     * <li>L (URL), a file location, not a URI with parameters,
+     * <li>M (local file or directory),
      * <li>or R (the resource URI)
      * </ul>
      */

@@ -44,13 +44,19 @@ import org.autoplot.datasource.WindowManager;
 import org.autoplot.jythonsupport.JythonUtil;
 import org.das2.util.ColorUtil;
 import java.awt.Color;
+import java.awt.event.ActionListener;
 import java.net.URL;
+import java.util.regex.Pattern;
+import javax.swing.ImageIcon;
 import javax.swing.JColorChooser;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
 import org.autoplot.datasource.RecentComboBox;
 import org.autoplot.jythonsupport.JythonUtil.ScriptDescriptor;
 import org.autoplot.jythonsupport.Param;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.FileUtil;
+import org.python.core.PyString;
 
 /**
  * GUI component for controlling script parameters.  
@@ -131,6 +137,9 @@ public class ParametersFormPanel {
                         } catch (MalformedURLException ex) {
                             logger.log(Level.SEVERE, null, ex);
                         }
+                    } else if ( type.equals('M') ) {
+                        paramsDictionary.__setitem__( param, Py.java2py( new java.io.File( value ) ) );
+                        
                     } else if ( type.equals('A') ) {
                         value= org.autoplot.jythonsupport.Util.popString(value);
                         paramsDictionary.__setitem__( param, Py.java2py( value ) );
@@ -721,6 +730,50 @@ public class ParametersFormPanel {
                                 ctf= tf;
                             }       
                             valuePanel.add( ctf );
+                            
+                            Map<String,Object> c= parm.constraints;
+                            
+                            String stringType= String.valueOf( c.get("stringType") );
+                            
+                            if ( type=='M' || stringType.equals("file") || stringType.equals("directory") ) {
+                                URL fileUrl= ParametersFormPanel.class.getResource("/resources/file.png");
+                                ImageIcon icon= new ImageIcon(fileUrl);
+                                JButton b= new JButton(icon);
+                                final FileFilter filt;
+                                if ( c.containsKey("regex") ) {
+                                    String regex= c.get("regex").toString();
+                                    Pattern p= Pattern.compile(regex);
+                                    filt= new FileFilter() {
+                                        @Override
+                                        public boolean accept(File f) {
+                                            return p.matcher(f.getPath()).matches();
+                                        }
+                                        @Override
+                                        public String getDescription() {
+                                            if ( stringType.equals("file") ) {
+                                                return "Files matching "+regex;
+                                            } else {
+                                                return "Directories matching "+regex;
+                                            }
+                                        }
+                                    };   
+                                } else {
+                                    filt=null;
+                                }
+                                b.addActionListener((ActionEvent e) -> {
+                                    JFileChooser c1 = new JFileChooser();
+                                    if ( filt!=null ) c1.addChoosableFileFilter( filt );
+                                    if ( stringType.equals("directory") ) {
+                                        c1.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                                    }
+                                    c1.setSelectedFile(new File((((JTextField)ctf).getText())));
+                                    if (c1.showOpenDialog((JTextField)ctf) == JFileChooser.APPROVE_OPTION) {
+                                        ((JTextField)ctf).setText(c1.getSelectedFile().toString());
+                                    }
+                                });
+                                valuePanel.add( b );
+                            }
+
                             break;
                         }
                 }
