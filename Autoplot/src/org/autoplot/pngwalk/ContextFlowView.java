@@ -207,6 +207,10 @@ public class ContextFlowView extends PngWalkView {
 
         double sh = useSquashedThumbs ? 1. : 10.;
 
+        for ( int i=0; i<seq.size(); i++ ) {
+            seq.imageAt(i).removeObserver(ContextFlowView.this);
+        }
+                    
         for (int i = 0; i < columns * 2 + 1; i++) {
 
             int index;
@@ -221,6 +225,8 @@ public class ContextFlowView extends PngWalkView {
             if (index >= seq.size())
                 continue;
 
+            seq.imageAt(index).addObserver(ContextFlowView.this);
+            
             boolean usedLastImage = false;
             BufferedImage image = useSquashedThumbs ? seq.imageAt(index).getSquishedThumbnail() : seq.imageAt(index).getThumbnail();
 

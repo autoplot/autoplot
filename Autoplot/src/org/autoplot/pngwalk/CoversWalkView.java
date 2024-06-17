@@ -230,6 +230,11 @@ public class CoversWalkView extends PngWalkView  {
                 return;
             }
 
+            for ( int i=0; i<seq.size(); i++ ) {
+                seq.imageAt(i).removeObserver(CoversWalkView.this);
+            }
+            
+
             int cellWidth = (cellSize / HEIGHT_WIDTH_RATIO);
             int i = bounds.x / cellWidth;
             int imax = Math.min(seq.size() - 1, (bounds.x + bounds.width) / cellWidth);
@@ -245,6 +250,8 @@ public class CoversWalkView extends PngWalkView  {
                     g2.fillRect(i * cellWidth, 0, cellWidth, cellSize);
                 }
 
+                seq.imageAt(i).addObserver(CoversWalkView.this);
+                
                 if ( seq.imageAt(i).getStatus()==WalkImage.Status.MISSING ) {
                     continue;
                 }

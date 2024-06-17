@@ -296,7 +296,13 @@ public final class SinglePngWalkView extends PngWalkView {
 
         if (seq == null || seq.size()==0) return;
 
+        for ( int i=0; i<seq.size(); i++ ) {
+            seq.imageAt(i).removeObserver(SinglePngWalkView.this);
+        }
+        
         BufferedImage i = seq.currentImage().getImage();
+        
+        seq.currentImage().addObserver(SinglePngWalkView.this);
         
         long ageMillis= System.currentTimeMillis()-seq.currentImage().getInitLoadBirthTime();
         

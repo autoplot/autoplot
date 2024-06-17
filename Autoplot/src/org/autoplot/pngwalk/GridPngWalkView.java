@@ -369,6 +369,11 @@ public class GridPngWalkView extends PngWalkView {
             List<DatumRange> drs= seq.getActiveSubrange();
 
             boolean outOfTime= false;
+            
+            for ( int i=0; i<seq.size(); i++ ) {
+                seq.imageAt(i).removeObserver(GridPngWalkView.this);
+            }
+            
             for (int row = rowMin; row < rowMax; row++) {
                 for (int col = colMin; col < colMax; col++) {
                     int i = (row * nCols) + col;
@@ -389,6 +394,9 @@ public class GridPngWalkView extends PngWalkView {
                     }
                     //g2.draw(new Ellipse2D.Double(col * thumbSize + 2, row * thumbSize + 2, thumbSize - 4, thumbSize - 4));
                     WalkImage wimage = seq.imageAt(i);
+                    
+                    wimage.addObserver(GridPngWalkView.this);
+                    
                     BufferedImage thumb = wimage.getThumbnail( false );
                     if ( thumb==null && wimage.getStatus()!=WalkImage.Status.SIZE_THUMB_LOADED ) {
                         thumb = wimage.getThumbnail( !scrollPane.getVerticalScrollBar().getValueIsAdjusting() );

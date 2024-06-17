@@ -285,6 +285,10 @@ public class RowPngWalkView extends PngWalkView {
                 return;
             }
 
+            for ( int i=0; i<seq.size(); i++ ) {
+                seq.imageAt(i).removeObserver(RowPngWalkView.this);
+            }
+            
             int i = bounds.x / cellSize;
             int imax = Math.min(seq.size() - 1, (bounds.x + bounds.width) / cellSize);
 
@@ -296,8 +300,12 @@ public class RowPngWalkView extends PngWalkView {
                     g2.setColor(java.awt.Color.orange);
                     g2.fillRect(i * cellSize, 0, cellSize, cellSize);
                 }
+                
                 //g2.draw(new Ellipse2D.Double(i*cellSize+2, 2, cellSize-4, cellSize-4));
                 WalkImage wimage= seq.imageAt(i);
+                
+                wimage.addObserver(RowPngWalkView.this);
+                
                 BufferedImage thumb = wimage.getThumbnail(!scrollPane.getHorizontalScrollBar().getValueIsAdjusting());
                 Dimension d= wimage.getThumbnailDimension(false);
                 if ( d != null && thumb!=null ) {

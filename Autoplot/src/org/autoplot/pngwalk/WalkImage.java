@@ -13,8 +13,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -66,6 +68,11 @@ public class WalkImage  {
      * the thumbnail, typically 400 pixels corner-to-corner.
      */
     private BufferedImage thumb;
+    
+    /**
+     * list of views which can see at least a thumbnail of this image.
+     */
+    private Set<PngWalkView> observers= new HashSet<>();
 
     private Dimension thumbDimension;
 
@@ -360,6 +367,10 @@ public class WalkImage  {
     public void getThumbnailImmediately( ) {
         logger.log(Level.FINER, "getThumbnailImmediately {0}", caption);
         BufferedImage rawThumb;
+        if ( !hasObservers() ) {
+            logger.log(Level.FINE, "no observers {0}", imgURI);
+        }
+        
         try {
             if ( haveThumbs400!=false ) {
                 URI fsRoot = DataSetURI.toUri( URISplit.parse( imgURI ).path + "thumbs400");
@@ -614,13 +625,17 @@ public class WalkImage  {
                 }
             }
 
-            while ( clear.size()>0 ) {
+            while ( !clear.isEmpty() ) {
                 WalkImage old= clear.poll();
                 synchronized ( old ) {
                     logger.log( Level.FINE, "unloading image for {0}", old);
                     old.im= null;
                     if ( old.getStatus()==Status.IMAGE_LOADED ) { //bugfix: unloading the thumbnails might have set status to SIZE_THUMB_LOADED
-                         old.setStatus( Status.THUMB_LOADED );
+                        if ( old.thumb==null ) {
+                            old.setStatus( Status.UNKNOWN );
+                        } else {
+                            old.setStatus( Status.THUMB_LOADED );
+                        }
                     }
                 }
             }
@@ -677,6 +692,31 @@ public class WalkImage  {
 /*public int compareTo(WalkImage o) {
     return imgURI.compareTo(o.imgURI);
     }*/
+    
+    /**
+     * remove this observer from the list of observers
+     * @param obs 
+     */
+    public void removeObserver( PngWalkView obs ) {
+        this.observers.remove(obs);
+    }
+    
+    /**
+     * mark this image as one which is being used.
+     * @param obs 
+     */
+    public void addObserver( PngWalkView obs ) {
+        this.observers.add(obs);
+    }
+    
+    /**
+     * true if some view can see this image's thumbnail or the image.
+     * @return 
+     */
+    public boolean hasObservers() {
+        return !this.observers.isEmpty();
+    }
+    
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         pcs.addPropertyChangeListener(listener);
     }
