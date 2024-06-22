@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Operation "magnitude" doesn't delete the component traces and show the magnitude trace, as you might expect.  This old bug should be fixed.</small></p>
+        <p><small>ICON data will be available in new version of the CDAWeb HAPI server.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,9 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-06-13 r27670):</p>
+        <p>Bugfixes (2024-06-21 r27670):</p>
         <ul>
+            <li>Study mechanism to avoid unnecessary loading of images which are no longer visible during scrolling.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2528/">2528</a>: Github filesystem listing result would have repeated items.
         </ul>
         <p>Older Bugfixes (2024-06-13 r27670):</p>
