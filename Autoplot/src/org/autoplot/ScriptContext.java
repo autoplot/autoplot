@@ -17,6 +17,7 @@ import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -1683,7 +1684,17 @@ addBottomDecoration( dom.canvases[0], paint )
             throw new IllegalArgumentException("no format for extension: " + file);
         }
 
-        format.formatData( file, ds, monitor );
+        try {
+            format.formatData( file, ds, monitor );
+        } catch ( FileNotFoundException ex ) {
+            if ( file.contains(":") && System.getProperty("os.name").startsWith("Windows") ) {
+                Exception ex2= new FileNotFoundException("Output filenames on Windows cannot contain colons");
+                ex2.initCause(ex);
+                throw ex2;
+            } else {
+                throw ex;
+            }
+        }
 
     }
     
