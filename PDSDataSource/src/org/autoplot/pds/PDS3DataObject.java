@@ -90,7 +90,12 @@ public class PDS3DataObject {
             }
 
             startByte= j.optInt("START_BYTE",0);
-            bytes= j.optInt("BYTES",-1);
+            if ( items>1 ) {
+                bytes= j.optInt("BYTES",-1);
+                if ( bytes>-1 ) bytes= bytes / items;
+            } else {
+                bytes= j.optInt("BYTES",-1);
+            }
             
             if ( column.getNodeName().equals("CONTAINER") ) {
                 // all other properties come from the innermost node.
