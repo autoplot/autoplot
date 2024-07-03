@@ -39,6 +39,8 @@ public class PDS3DataObject {
     private FilePointer filePointer;
     private int recordBytes; // number of bytes in each record.
     private int rowBytes; // number of bytes taken by each row of the dataset.
+    private int rowPrefixBytes; // additional bytes offset for each record (often 0).
+    private int rowSuffixBytes; // additional bytes after the bytes of each record (often 0).
     private int rows;
     private String interchangeFormat;
     private String dataType;
@@ -81,6 +83,8 @@ public class PDS3DataObject {
             interchangeFormat= jtable.optString("INTERCHANGE_FORMAT", "ASCII");
             rowBytes= jtable.getInt("ROW_BYTES");
             recordBytes= labelJSONObject.getInt("RECORD_BYTES");
+            rowPrefixBytes= jtable.optInt("ROW_PREFIX_BYTES",0);
+            rowSuffixBytes= jtable.optInt("ROW_SUFFIX_BYTES",0);
             rows= jtable.optInt("ROWS",-1);
             JSONObject j= toJSONObject(column);
             columnJSONObject= j;
@@ -206,7 +210,7 @@ public class PDS3DataObject {
         if ( recordBytes>-1 ) {
             args.put( "recLength", String.valueOf(recordBytes) );
         } else {
-            args.put( "recLength", String.valueOf(rowBytes) );
+            args.put( "recLength", String.valueOf(rowPrefixBytes+rowBytes+rowSuffixBytes) );
         }
         if ( dataType.equals("DATE") || dataType.equals("TIME") || ( dataType.equals("CHARACTER") && unit.equals("UTC") ) ) {
             args.put("type", "time"+bytes);
@@ -292,7 +296,7 @@ public class PDS3DataObject {
                     throw new IllegalArgumentException("Hmmm, uncoded case.  Contact Jeremy Faden.");
             }
         }
-        args.put( "recOffset", String.valueOf(startByte-1));
+        args.put( "recOffset", String.valueOf(startByte-1+rowPrefixBytes));
         if ( missingConstant!=Double.NaN ) args.put( "fillValue", String.valueOf(missingConstant));
         if ( validMaximum!=Double.POSITIVE_INFINITY ) args.put( "validMax", String.valueOf(validMaximum) );
         if ( validMinimum!=Double.NEGATIVE_INFINITY ) args.put( "validMin", String.valueOf(validMinimum) );
