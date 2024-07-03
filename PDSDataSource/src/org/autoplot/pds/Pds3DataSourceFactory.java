@@ -4,6 +4,7 @@ package org.autoplot.pds;
 import gov.nasa.pds.ppi.label.PDSException;
 import gov.nasa.pds.ppi.label.PDSLabel;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -223,7 +224,19 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
             Node parent= child.getParentNode();
             
             URL childUrl= new URL( labelUrl, child.getTextContent() );
-            File childfile = DataSetURI.getFile( childUrl,new NullProgressMonitor());
+            File childfile;
+            try {
+                childfile= DataSetURI.getFile( childUrl,new NullProgressMonitor());
+            } catch ( FileNotFoundException ex ) {
+                String p= labelUrl.toString();
+                int r= p.lastIndexOf("DATA/");
+                childUrl= new URL( new URL( p.substring(0,r) + "LABEL/" ), child.getTextContent() );
+                try {
+                    childfile= DataSetURI.getFile( childUrl,new NullProgressMonitor());
+                } catch ( FileNotFoundException ex2 ) {
+                    throw ex;
+                }
+            }
             
             PDSLabel label2 = new PDSLabel();
             label2.parse(childfile.toPath());
