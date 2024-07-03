@@ -2701,62 +2701,65 @@ public class RunBatchTool extends javax.swing.JPanel {
         
         boolean header= recordsWrittenAlready==0;
         
-        try (PrintWriter out = new PrintWriter( new FileWriter( pendingFile, true ) ) ) {
+        synchronized (RunBatchTool.class) {
             
-            if ( resultsArray.length()==0 ) {
-                logger.warning("no records in results");
-                return;
+            try (PrintWriter out = new PrintWriter( new FileWriter( pendingFile, true ) ) ) {
+
+                if ( resultsArray.length()==0 ) {
+                    logger.warning("no records in results");
+                    return;
+                }
+
+                JSONObject jo= resultsArray.getJSONObject(0);
+                boolean hasOutputFile= jo.has("writeFile");
+                JSONArray params= results.getJSONArray("params");
+
+                StringBuilder record;
+
+                if ( header ) {
+                    record= new StringBuilder();
+                    record.append("jobNumber");
+
+                    for ( int j=0; j<params.length(); j++ ) {
+                        record.append(",");
+                        record.append(params.get(j));
+                    }
+                    record.append(",").append("executionTime(ms)");
+                    if ( hasOutputFile ) {
+                        record.append(",").append("writeFile");
+                    }
+                    record.append(",").append("exception");
+
+                    out.println(record.toString());
+
+                }
+
+                int stop= recordsWrittenAlready + count;
+                for ( int i=recordsWrittenAlready; i<stop; i++ ) {
+                    jo= resultsArray.getJSONObject(i);
+                    record= new StringBuilder();
+                    record.append(i);
+                    for ( int j=0; j<params.length(); j++ ) {
+                        record.append(",");
+                        record.append( jo.get(params.getString(j)) );
+                    }
+                    record.append(",").append(jo.get("executionTime"));
+                    if ( hasOutputFile ) {
+                        record.append(",").append(jo.get("writeFile"));
+                    }
+                    String resultString= jo.optString("result","");
+                    int inl= resultString.indexOf("\n");
+                    if ( inl>=0 ) inl= resultString.indexOf("\n",inl+1);
+                    if ( inl>=0 ) inl= resultString.indexOf("\n",inl+1);
+                    if ( inl>=0 ) resultString= resultString.substring(0,inl).replaceAll("\n"," ").replaceAll(",","");
+                    record.append(",").append(resultString);
+                    out.println( record.toString() );
+                }
+                out.flush();
+
+            } catch (JSONException ex) {
+                logger.log(Level.SEVERE, null, ex);
             }
-
-            JSONObject jo= resultsArray.getJSONObject(0);
-            boolean hasOutputFile= jo.has("writeFile");
-            JSONArray params= results.getJSONArray("params");
-
-            StringBuilder record;
-                
-            if ( header ) {
-                record= new StringBuilder();
-                record.append("jobNumber");
-
-                for ( int j=0; j<params.length(); j++ ) {
-                    record.append(",");
-                    record.append(params.get(j));
-                }
-                record.append(",").append("executionTime(ms)");
-                if ( hasOutputFile ) {
-                    record.append(",").append("writeFile");
-                }
-                record.append(",").append("exception");
-
-                out.println(record.toString());
-
-            }
-            
-            int stop= recordsWrittenAlready + count;
-            for ( int i=recordsWrittenAlready; i<stop; i++ ) {
-                jo= resultsArray.getJSONObject(i);
-                record= new StringBuilder();
-                record.append(i);
-                for ( int j=0; j<params.length(); j++ ) {
-                    record.append(",");
-                    record.append( jo.get(params.getString(j)) );
-                }
-                record.append(",").append(jo.get("executionTime"));
-                if ( hasOutputFile ) {
-                    record.append(",").append(jo.get("writeFile"));
-                }
-                String resultString= jo.optString("result","");
-                int inl= resultString.indexOf("\n");
-                if ( inl>=0 ) inl= resultString.indexOf("\n",inl+1);
-                if ( inl>=0 ) inl= resultString.indexOf("\n",inl+1);
-                if ( inl>=0 ) resultString= resultString.substring(0,inl).replaceAll("\n"," ").replaceAll(",","");
-                record.append(",").append(resultString);
-                out.println( record.toString() );
-            }
-            out.flush();
-            
-        } catch (JSONException ex) {
-            logger.log(Level.SEVERE, null, ex);
         }
     }
 
