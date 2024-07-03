@@ -253,7 +253,7 @@ public class PDS3DataObject {
                     break;
             }
             args.put("byteOrder", "big");
-        } else if ( dataType.equals("MSB_INTEGER" ) ) {
+        } else if ( dataType.equals("MSB_INTEGER") ) {
             switch (bytes) {
                 case 2: 
                     args.put("type", "short");
@@ -266,6 +266,8 @@ public class PDS3DataObject {
                     break;
             }
             args.put("byteOrder", "big");        
+        } else if ( dataType.equals("UNSIGNED_INTEGER") && bytes==1 ) {
+            args.put("type","ubyte");
         } else if ( dataType.equals("LSB_BIT_STRING" ) ) {
             args.put("type","ubyte");
             args.put("dims","["+bytes+"]");
