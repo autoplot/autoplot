@@ -293,7 +293,16 @@ public class Pds3DataSource extends AbstractDataSource {
         if ( datafile.length()==0 ) {
             datafile= (String)xpath.evaluate("/LABEL/FILE/POINTER[@object='SPREADSHEET']/text()",doc,XPathConstants.STRING);
         }
-        FilePointer fp= new FilePointer(labelUrl, datafile );
+        FilePointer fp;
+        if ( !datafile.equals("") ) {
+            fp= new FilePointer(labelUrl, datafile );
+        } else {
+            // /project/cassini/pds/DATA/RPWS_WAVEFORM_FULL/T20090XX/T2009096/T2009096_2_5KHZ1_WFRFR.LBL
+            String l = labelUrl.getFile();
+            int i1= l.lastIndexOf("/");
+            l= l.substring(i1+1).replace(".LBL",".DAT");
+            fp= new FilePointer(labelUrl, l );
+        }
         
         for ( int i=0; i<names.size(); i++ ) {
             if ( results[i]!=null ) continue;
