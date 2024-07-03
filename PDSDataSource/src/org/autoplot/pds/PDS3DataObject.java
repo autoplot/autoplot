@@ -37,7 +37,8 @@ public class PDS3DataObject {
      * number of records or bytes into the file, 1 is the first offset into the file.
      */
     private FilePointer filePointer;
-    private int rowBytes;
+    private int recordBytes; // number of bytes in each record.
+    private int rowBytes; // number of bytes taken by each row of the dataset.
     private int rows;
     private String interchangeFormat;
     private String dataType;
@@ -79,6 +80,7 @@ public class PDS3DataObject {
             tableJSONObject= jtable;
             interchangeFormat= jtable.optString("INTERCHANGE_FORMAT", "ASCII");
             rowBytes= jtable.getInt("ROW_BYTES");
+            recordBytes= labelJSONObject.getInt("RECORD_BYTES");
             rows= jtable.optInt("ROWS",-1);
             JSONObject j= toJSONObject(column);
             columnJSONObject= j;
@@ -201,7 +203,11 @@ public class PDS3DataObject {
 
     private String getBinaryUri(URL resource) throws IllegalArgumentException {
         Map<String,String> args= new LinkedHashMap<>();
-        args.put( "recLength", String.valueOf(rowBytes) );
+        if ( recordBytes>-1 ) {
+            args.put( "recLength", String.valueOf(recordBytes) );
+        } else {
+            args.put( "recLength", String.valueOf(rowBytes) );
+        }
         if ( dataType.equals("DATE") || dataType.equals("TIME") || ( dataType.equals("CHARACTER") && unit.equals("UTC") ) ) {
             args.put("type", "time"+bytes);
         } else if ( dataType.equals("ASCII_REAL") ) {
