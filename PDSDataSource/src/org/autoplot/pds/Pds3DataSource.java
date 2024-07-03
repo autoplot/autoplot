@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -317,6 +318,9 @@ public class Pds3DataSource extends AbstractDataSource {
             ds= Ops.putProperty( ds, QDataSet.NAME, name );
             ds= Ops.putProperty( ds, QDataSet.LABEL, name );
             ds= Ops.putProperty( ds, QDataSet.DESCRIPTION, obj.getDescription() );
+            HashMap<String,Object> user= new HashMap<>();
+            user.put("delegate_uri",uri);
+            ds= Ops.putProperty( ds, QDataSet.USER_PROPERTIES, user );
             results[i]= ds;
             
         }
