@@ -24,7 +24,7 @@ public class FilePointer {
      * create the label from the specification within the LABEL, like
      * "JED_090_HIERSESP_CDR_2016366_V03.TAB, 1"
      * @param labelFile
-     * @param f 
+     * @param f a string like "JED_090_HIERSESP_CDR_2016366_V03.TAB, 1" or "JED_090_HIERSESP_CDR.TAB, 50 BYTES"
      */
     public FilePointer( URL labelFile, String f) {
         try {
