@@ -380,7 +380,9 @@ public class Util {
             for ( int i=0; i<uris.size(); i++ ) {
                 //System.err.println( "" + monitors[i].getTaskProgress() +" / " + monitors[i].getTaskSize() );
                 if ( monitors[i].getTaskSize()>0 ) {
-                    taskProgress+= ( 10 * monitors[i].getTaskProgress() ) / monitors[i].getTaskSize();
+                    taskProgress+= ( 10. * monitors[i].getTaskProgress() ) / monitors[i].getTaskSize();
+                } else if ( monitors[i].isFinished() ) {
+                    taskProgress+= 10;
                 } else {
                     taskProgress+= 2;
                 }
