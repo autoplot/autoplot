@@ -82,7 +82,7 @@ public class PDS3DataObject {
             tableJSONObject= jtable;
             interchangeFormat= jtable.optString("INTERCHANGE_FORMAT", "ASCII");
             rowBytes= jtable.getInt("ROW_BYTES");
-            recordBytes= labelJSONObject.getInt("RECORD_BYTES");
+            recordBytes= labelJSONObject.optInt("RECORD_BYTES",-1);
             rowPrefixBytes= jtable.optInt("ROW_PREFIX_BYTES",0);
             rowSuffixBytes= jtable.optInt("ROW_SUFFIX_BYTES",0);
             rows= jtable.optInt("ROWS",-1);
@@ -131,7 +131,7 @@ public class PDS3DataObject {
             }
             description= j.optString("DESCRIPTION", "");
         } catch (TransformerException | JSONException ex) {
-            throw new IllegalArgumentException("unable to run");
+            throw new IllegalArgumentException("unable to run",ex);
         } catch (XPathExpressionException ex) {
             Logger.getLogger(PDS3DataObject.class.getName()).log(Level.SEVERE, null, ex);
         }
