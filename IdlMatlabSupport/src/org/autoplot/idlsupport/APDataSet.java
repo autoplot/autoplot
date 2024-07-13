@@ -49,7 +49,7 @@ public class APDataSet extends QDataSetBridge {
     public APDataSet() {
         super();
         if ( logger.isLoggable(Level.INFO) ) {
-            System.err.println("APDataSet v1.8.0");
+            System.err.println("APDataSet v1.9.0");
             try {
                 System.err.println("Autoplot Version "+ AboutUtil.getReleaseTag() );
             } catch ( IOException ex ) {

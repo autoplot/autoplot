@@ -1250,6 +1250,22 @@ public abstract class QDataSetBridge {
     }
 
     /**
+     * provides direct access to the loaded dataset, used when the caller knows how to use a QDataSet.
+     * @return 
+     */
+    public QDataSet getQDataSet() {
+        return datasets.get(name);
+    }
+    
+    /**
+     * provides direct access to the loaded dataset, used when the caller knows how to use a QDataSet.
+     * @return 
+     */
+    public QDataSet getQDataSet(String name) {
+        return datasets.get(name);
+    }
+    
+    /**
      * returns one of String, int, double, float, int[], double, float[]
      * @param name
      * @param propname
@@ -1470,6 +1486,11 @@ public abstract class QDataSetBridge {
         }
     }
     
+    /**
+     * desperate method for debugging where JPype/Python would hang, in hopes that
+     * this might show where it's hanging.
+     * @deprecated this is no longer a problem and will be removed
+     */
     public void dumpStack() {
         Map<Thread,StackTraceElement[]> mm= Thread.getAllStackTraces();
         for ( Entry<Thread,StackTraceElement[]> t: mm.entrySet() ) {
@@ -1485,6 +1506,7 @@ public abstract class QDataSetBridge {
      * desperate method for debugging where JPype/Python would hang, in hopes that
      * this might show where it's hanging.
      * @param n number of seconds.
+     * @deprecated this is no longer a problem and will be removed
      */
     public void dumpStackInNSeconds( final double n ) {
         Runnable run= new Runnable() {
