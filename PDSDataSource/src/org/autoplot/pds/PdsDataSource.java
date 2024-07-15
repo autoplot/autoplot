@@ -274,7 +274,29 @@ public class PdsDataSource extends AbstractDataSource {
                 addAxisArray( n, axisNames );
             }
             
-            if ( axisNames.get(2)!=null ) {
+            if ( axisNames.get(4)!=null ) {
+                String n1= resolveIndependentAxis( doc, axisNames.get(1) );
+                String n2= resolveIndependentAxis( doc, axisNames.get(2) );
+                String n3= resolveIndependentAxis( doc, axisNames.get(3) );
+                String n4= resolveIndependentAxis( doc, axisNames.get(4) );
+                depend= new LinkedList<>(depend);
+                depend.add(0,n1);
+                depend.add(0,n2);
+                depend.add(0,n3);
+                if ( n4!=null && !n4.equals(name) ) {
+                    depend.add(1,n4);
+                }                
+            } else if ( axisNames.get(3)!=null ) {
+                String n1= resolveIndependentAxis( doc, axisNames.get(1) );
+                String n2= resolveIndependentAxis( doc, axisNames.get(2) );
+                String n3= resolveIndependentAxis( doc, axisNames.get(3) );
+                depend= new LinkedList<>(depend);
+                depend.add(0,n1);
+                depend.add(0,n2);
+                if ( n3!=null && !n3.equals(name) ) {
+                    depend.add(1,n3);
+                }                
+            } else if ( axisNames.get(2)!=null ) {
                 String n1= resolveIndependentAxis( doc, axisNames.get(1) );
                 String n2= resolveIndependentAxis( doc, axisNames.get(2) );
                 depend= new LinkedList<>(depend);
@@ -383,7 +405,14 @@ public class PdsDataSource extends AbstractDataSource {
             names.add(name);
         }
 
-        names= seekDependencies(doc, names );
+        List<String> names1= seekDependencies(doc, names );
+        boolean okay= true;
+        for ( int i=0; i<names1.size(); i++ ) {
+            if ( names1.get(i)==null ) okay=false;
+        }
+        if ( okay ) {
+            names1= names;
+        }
             
         QDataSet result=null;
         QDataSet[] results= new QDataSet[names.size()];
@@ -395,10 +424,14 @@ public class PdsDataSource extends AbstractDataSource {
             
             for ( int i=0; i<names.size(); i++ ) {
                 name= names.get(i);
-                for ( FieldDescription fd: t.getFields() ) {
-                    if ( name.equals( fd.getName() ) ) { 
-                        tableColumnNames.add( fd.getName() );
-                        datasetColumnIndexes.add(i);
+                if ( name==null ) {
+                    
+                } else {
+                    for ( FieldDescription fd: t.getFields() ) {
+                        if ( name.equals( fd.getName() ) ) { 
+                            tableColumnNames.add( fd.getName() );
+                            datasetColumnIndexes.add(i);
+                        }
                     }
                 }
             }
@@ -552,6 +585,15 @@ public class PdsDataSource extends AbstractDataSource {
                     } catch ( Exception ex ) {
                         ((MutablePropertyDataSet)results[2]).putProperty(QDataSet.DEPEND_1,null);
                         result= results[2];
+                    }
+                    break;
+                case 4:
+                    try {
+                        result= Ops.link( results[0], results[1], results[2], results[3] );
+                    } catch ( Exception ex ) {
+                        ((MutablePropertyDataSet)results[3]).putProperty(QDataSet.DEPEND_1,null);
+                        ((MutablePropertyDataSet)results[3]).putProperty(QDataSet.DEPEND_2,null);
+                        result= results[3];
                     }
                     break;
                 default:
