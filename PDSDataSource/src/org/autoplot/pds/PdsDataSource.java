@@ -281,10 +281,10 @@ public class PdsDataSource extends AbstractDataSource {
                 String n4= resolveIndependentAxis( doc, axisNames.get(4) );
                 depend= new LinkedList<>(depend);
                 depend.add(0,n1);
-                depend.add(0,n2);
-                depend.add(0,n3);
+                depend.add(1,n2);
+                depend.add(2,n3);
                 if ( n4!=null && !n4.equals(name) ) {
-                    depend.add(1,n4);
+                    depend.add(3,n4);
                 }                
             } else if ( axisNames.get(3)!=null ) {
                 String n1= resolveIndependentAxis( doc, axisNames.get(1) );
@@ -292,9 +292,9 @@ public class PdsDataSource extends AbstractDataSource {
                 String n3= resolveIndependentAxis( doc, axisNames.get(3) );
                 depend= new LinkedList<>(depend);
                 depend.add(0,n1);
-                depend.add(0,n2);
+                depend.add(1,n2);
                 if ( n3!=null && !n3.equals(name) ) {
-                    depend.add(1,n3);
+                    depend.add(2,n3);
                 }                
             } else if ( axisNames.get(2)!=null ) {
                 String n1= resolveIndependentAxis( doc, axisNames.get(1) );
@@ -411,7 +411,7 @@ public class PdsDataSource extends AbstractDataSource {
             if ( names1.get(i)==null ) okay=false;
         }
         if ( okay ) {
-            names1= names;
+            names= names1;
         }
             
         QDataSet result=null;
