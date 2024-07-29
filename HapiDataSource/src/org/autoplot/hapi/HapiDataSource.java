@@ -2738,7 +2738,17 @@ public final class HapiDataSource extends AbstractDataSource {
             ds= Ops.putProperty( ds, QDataSet.FILL_VALUE, pds1.fillValue );
         }
         if ( pds1.labels!=null ) {
-            ds= Ops.putProperty( ds, QDataSet.DEPEND_1, Ops.labelsDataset( pds1.labels ) );
+            MutablePropertyDataSet bds= (MutablePropertyDataSet) ds.property(QDataSet.BUNDLE_1);
+            if ( bds==null ) {
+                ds= Ops.putProperty( ds, QDataSet.DEPEND_1, Ops.labelsDataset( pds1.labels ) );
+            } else {
+                for ( int i=0; i<pds1.labels.length; i++ ) {
+                    bds.putProperty( QDataSet.LABEL, i, pds1.labels[i] );
+                    bds.putProperty( QDataSet.NAME, i, Ops.safeName( pds1.labels[i] ) );
+                }
+                ds= Ops.putProperty( ds, QDataSet.BUNDLE_1, bds );
+            }
+            
         }
         return ds;
     }
