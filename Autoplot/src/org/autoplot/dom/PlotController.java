@@ -1178,7 +1178,7 @@ public final class PlotController extends DomNodeController {
             }
         }
 
-        boolean warnedAboutUnits= false;
+        boolean warnedAboutUnits= false;        
         for (PlotElement p : elements) {
             Plot plot1 = p.getPlotDefaults();
             if (newSettings == null) {
@@ -1216,6 +1216,39 @@ public final class PlotController extends DomNodeController {
             if ( dsf!=null && dsf.getController()!=null && dsf.getController().getTsb()!=null ) {
                 haveTsb= true;
             }
+        }
+        
+        // check that the combined range doesn't leave any of the ranges butt up against the combined
+        // range, extending by 5% if necessary.  Note this is only done in Y, and should probably be
+        // done in X too. TODO: X
+        // 
+        DatumRange range= newSettings.getYaxis().getRange();
+        for (PlotElement p : elements) {
+            Plot plot1 = p.getPlotDefaults();
+            if ( plot1.getYaxis().isLog() ) {
+                double dmin= DatumRangeUtil.normalizeLog( range, plot1.getYaxis().getRange().min() );
+                double dmax= DatumRangeUtil.normalizeLog( range, plot1.getYaxis().getRange().max() );
+                if ( dmax-dmin<0.1 ) {
+                    if ( dmin==0.0 ) {
+                        range= DatumRangeUtil.rescaleLog( range, -0.05, 1 );
+                    } else if ( dmax==1.0 ) {
+                        range= DatumRangeUtil.rescaleLog( range, 0, 1.05 );
+                    }
+                }
+            } else {
+                double dmin= DatumRangeUtil.normalize( range, plot1.getYaxis().getRange().min() );
+                double dmax= DatumRangeUtil.normalize( range, plot1.getYaxis().getRange().max() );
+                if ( dmax-dmin<0.1 ) {
+                    if ( dmin==0.0 ) {
+                        range= DatumRangeUtil.rescale( range, -0.05, 1 );
+                    } else if ( dmax==1.0 ) {
+                        range= DatumRangeUtil.rescale( range, 0, 1.05 );
+                    }
+                }
+            }
+        }
+        if ( !range.equals(newSettings.getYaxis().getRange()) ) {
+            newSettings.getYaxis().setRange(range);
         }
         
         if ( newSettings==null ) {
