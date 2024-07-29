@@ -1220,7 +1220,7 @@ public final class PlotController extends DomNodeController {
         
         // check that the combined range doesn't leave any of the ranges butt up against the combined
         // range, extending by 5% if necessary.  Note this is only done in Y, and should probably be
-        // done in X too. TODO: X
+        // done in X too. TODO: X.  See https://sourceforge.net/p/autoplot/bugs/2603/
         // 
         DatumRange range= newSettings.getYaxis().getRange();
         for (PlotElement p : elements) {
