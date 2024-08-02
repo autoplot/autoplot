@@ -1682,13 +1682,26 @@ public class RunBatchTool extends javax.swing.JPanel {
         // now the tricky part will be to pull out all the fields from the template.
         String[] ss= template.split("\\%");
         
+        boolean packArgments=false;
         if ( argList.size() != ss.length-1 ) {
-            throw new IllegalArgumentException("template and number of parameters don't match");
+            if ( ss.length==3 ) {
+                packArgments= true;
+            } else {
+                throw new IllegalArgumentException("template and number of parameters don't match");
+            }
         }
 
         Object[] args= new Object[argList.size()];
         for ( int i=0; i<argList.size(); i++ ) {
-            String spec= ss[i+1];
+            if ( i>ss.length ) {
+                System.err.println("Do somethng here");
+            }
+            String spec;
+            if ( packArgments ) {
+                spec= "x";
+            } else {
+                spec= ss[i+1];
+            }
             int idx= 0; // find the first letter
             char c= spec.length()>0 ? spec.charAt(0) : ' ';
             while ( idx<spec.length() && ( c=='-' || c=='.' || Character.isDigit(c) ) ) {
@@ -1717,7 +1730,12 @@ public class RunBatchTool extends javax.swing.JPanel {
             }
         }
                 
-        String s= String.format( template, args );
+        String s;
+        if ( packArgments ) {
+            s= String.format( template, f1, f2 );
+        } else {
+            s= String.format( template, args );
+        }
         
         s= s.replaceAll(" ","_"); 
 
