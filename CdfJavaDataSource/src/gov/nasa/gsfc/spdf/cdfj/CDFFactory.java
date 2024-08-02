@@ -143,6 +143,7 @@ public final class CDFFactory {
         return cdf;
     }
     static ByteBuffer uncompressed(ByteBuffer buf, int version) {
+        //TODO: compression type (gzip,huffman,rle0) should be identified and handled.
         int DATA_OFFSET = 8 + 20;
         if (version == 3) DATA_OFFSET = 8 + 32;
         byte[] ba;
@@ -176,6 +177,9 @@ public final class CDFFactory {
                 toRead -= n;
             }
         } catch (IOException ex) {
+            if ( ex.toString().contains("Not in GZIP") ) {
+                throw new IllegalArgumentException("CDF file is not GZIP compressed, and other compression formats are not supported");
+            }
             System.out.println(ex.toString());
             return null;
         }
