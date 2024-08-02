@@ -156,11 +156,15 @@ public class URITemplatesServlet extends HttpServlet {
 
             int count= 0;
             
+            boolean isLink= generateUri.startsWith("https://") || generateUri.startsWith("http://");
+            
             Datum stop= drtr.max().subtract( Datum.create(500,Units.ns ) ); //2010-03-01T00:00:00/10  http://data.org/data_$Y_$j_$H$M$S.$(subsec;places=1) would have extra because of roundoff.
             while ( count<=10000 && dr.min().lt( stop ) ) {
                 for ( String enum1 : enums ) {
                     st= tp.format( dr.min(), dr.max(), Collections.singletonMap( id, enum1 ) ); 
-                    
+                    if ( isLink ) {
+                        st= "<a href=\""+st+"\">" + st + "</a>";
+                    }
                     if ( parseUri.length()==0 ) {
                         out.printf(  "<tr><td>"+st + "</td><td>"+dr + "</td><td>N/A</td><tr>\n" );
                         count++;

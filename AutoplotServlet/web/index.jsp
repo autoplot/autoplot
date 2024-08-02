@@ -42,7 +42,7 @@
         </p>
 
         <p>The <a href="URI_Templates.jsp">"URI_Templates"</a> allows how an Autoplot script can be used to implement a service, here demonstrating
-            Autoplot's implementation of the URI templates (http://tsds.org/uri_templates).
+            Autoplot's implementation of the URI templates (https://github.com/hapi-server/uri-templates/wiki/Specification).
         </p>
         
         <p>The <a href="CdawebVapServlet.jsp">"CdawebVapServlet"</a> creates v1.08 vap files.
