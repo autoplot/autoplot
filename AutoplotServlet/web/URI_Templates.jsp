@@ -21,7 +21,7 @@
         
         
     <form action="SecureScriptServlet" method="GET">
-        Enter URI (<a href="http://tsds.org//uri_templates#Time_Range_Rules">help</a>):
+        Enter URI (<a href="https://github.com/hapi-server/uri-templates/wiki/Specification#Time_Range_Rules">help</a>):
         Examples:
         <a href="#" onclick="document.getElementById('resourceURI1').value='https://emfisis.physics.uiowa.edu/Flight/RBSP-A/L3/$Y/$m/$d/rbsp-a_magnetometer_1sec-gse_emfisis-L3_$Y$m$d_v$(v,sep).cdf';">A</a>
         <a href="#" onclick="document.getElementById('resourceURI1').value='https://cdaweb.gsfc.nasa.gov/sp_phys/data/omni/hourly/$Y/omni2_h0_mrg1hr_$Y$(m;delta=6)01_v$v.cdf';">B</a>
@@ -47,7 +47,7 @@
         </p>
         
     <form action="SecureScriptServlet" method="GET">
-        Enter URI (<a href="http://tsds.org//uri_templates#Time_Range_Rules">help</a>):
+        Enter URI (<a href="https://github.com/hapi-server/uri-templates/wiki/Specification#Time_Range_Rules">help</a>):
         Examples:
         <a href="#" onclick="document.getElementById('resourceURI2').value='http://emfisis.physics.uiowa.edu/Flight/RBSP-A/L3/$Y/$m/$d/rbsp-a_magnetometer_1sec-gse_emfisis-L3_$Y$m$d_v1.3.2.cdf';">A</a>
         <a href="#" onclick="document.getElementById('resourceURI2').value='https://cdaweb.gsfc.nasa.gov/sp_phys/data/omni/hourly/$Y/omni2_h0_mrg1hr_$Y$(m;delta=6)01_v01.cdf';">B</a>
@@ -75,14 +75,15 @@
         
         
     <form action="URITemplatesServlet" method="GET">
-        Enter URI (<a href="http://tsds.org//uri_templates#Time_Range_Rules">help</a>):
+        Enter URI (<a href="https://github.com/hapi-server/uri-templates/wiki/Specification#Time_Range_Rules">help</a>):
         Examples:
         <a href="#" onclick="document.getElementById('resourceURI3').value='http://emfisis.physics.uiowa.edu/Flight/RBSP-A/L3/$Y/$m/$d/rbsp-a_magnetometer_1sec-gse_emfisis-L3_$Y$m$d_v$(v,sep).cdf';">A</a>
         <a href="#" onclick="document.getElementById('resourceURI3').value='https://cdaweb.gsfc.nasa.gov/sp_phys/data/omni/hourly/$Y/omni2_h0_mrg1hr_$Y$(m;delta=6)01_v$v.cdf';">B</a>
-        <a href="#" onclick="document.getElementById('resourceURI3').value='http://autoplot.org/data/agg/hyd/$Y/po_h0_hyd_$Y$m$d_v$v.cdf';document.getElementById('timerange3').value='1999-2000';">C</a>
+        <a href="#" onclick="document.getElementById('resourceURI3').value='https://autoplot.org/data/agg/hyd/$Y/po_h0_hyd_$Y$m$d_v$v.cdf';document.getElementById('timerange3').value='1999-2000';">C</a>
         <a href="#" onclick="document.getElementById('resourceURI3').value='http://sarahandjeremy.net/~jbf/powerMeter/$Y/$m/$d/$H$M$(S,sparse).jpg';document.getElementById('timerange3').value='2015-05-01';">D</a>
+        <a href="#" onclick="document.getElementById('resourceURI3').value='https://spdf.gsfc.nasa.gov/pub/pre_generated_plots/kp_plots/ace/gif/ac_$Y$j00-$(Y;end)$(j;end)00.gif';document.getElementById('timerange3').value='1998-350';">E</a>
         <br>
-        <textarea rows="1" cols="120" id="resourceURI3" name="resourceURI" >http://autoplot.org/data/versioning/data_$Y_$m_$d_v$v.qds</textarea><br>
+        <textarea rows="1" cols="120" id="resourceURI3" name="resourceURI" >https://autoplot.org/data/versioning/data_$Y_$m_$d_v$v.qds</textarea><br>
         <br>Enter ISO8601 Time Range limiting the results printed: <br>
         <textarea rows="1" cols="50" id="timerange3" name="timerange" >2010-03-01/2010-03-10</textarea><br>
         <input type="hidden" name="generate" value="F"/>
