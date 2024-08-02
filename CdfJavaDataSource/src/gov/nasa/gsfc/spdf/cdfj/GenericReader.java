@@ -48,6 +48,9 @@ public class GenericReader extends MetaData {
         try {
             thisCDF = CDFFactory.getCDF(cdfFile);
         } catch (Throwable th) {
+            if ( th instanceof IllegalArgumentException && th.getMessage().contains("CDF file is not GZIP compressed") ) {
+                throw new CDFException.ReaderError(th.getMessage()+": "+cdfFile,th);
+            }
             throw new CDFException.ReaderError(th);
         }
         LOGGER.exiting("GenericReader","constructor");
