@@ -9,6 +9,8 @@ from org.das2.util.filesystem import FileSystem
 setScriptDescription('''Demonstrate parsing and formatting of URI_Templates.  For parsing, we list a remote
 website and interpret the times for each file.  For formatting, the names are generated.''')
 
+setScriptTitle('URI_Templates')
+
 resourceURI= getParam( 'resourceURI', 'http://autoplot.org/data/C1_CP_EDI_EGD__$Y$m$d_V03.cef', 'example file to load', 
     [ 'data_$Y_$(m)_$(d;delta=7;phasestart=2019-05-05).qds', 
       'http://autoplot.org/data/C1_CP_EDI_EGD__$Y$m$d_V03.cef', 
