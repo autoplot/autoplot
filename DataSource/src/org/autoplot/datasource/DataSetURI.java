@@ -1189,7 +1189,7 @@ public class DataSetURI {
             safe= Ops.safeName(safe); // create a Java identifier from this, that will be safe.
             filename= filename.replaceAll("@","_")+"@"+safe.replaceAll("@","_"); // mimic wget on Windows
         } else {
-            filename= filename.replaceAll("@","_")+"@";
+            filename= filename.replaceAll("@","_");
         }
 
         if ( filename.length() > 50 ) { // https://sourceforge.net/support/tracker.php?aid=3509357
@@ -1200,7 +1200,7 @@ public class DataSetURI {
             if ( args.length()>0 ) args= String.format( "%09x", args.hashCode() );
             filename= base + String.format( "%09x", ss[0].hashCode() ) + "@" + args;
         }
-
+        
         filename = new File( localCache, filename ).toString();
 
         Object action;
