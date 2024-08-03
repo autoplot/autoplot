@@ -1,3 +1,14 @@
+import time
+
+from java.util import Collections
+from java.lang import System
+
+from org.das2.fsm import FileStorageModel
+from org.das2.util.filesystem import FileSystem
+
+setScriptDescription('''Demonstrate parsing and formatting of URI_Templates.  For parsing, we list a remote
+website and interpret the times for each file.  For formatting, the names are generated.''')
+
 resourceURI= getParam( 'resourceURI', 'http://autoplot.org/data/C1_CP_EDI_EGD__$Y$m$d_V03.cef', 'example file to load', 
     [ 'data_$Y_$(m)_$(d;delta=7;phasestart=2019-05-05).qds', 
       'http://autoplot.org/data/C1_CP_EDI_EGD__$Y$m$d_V03.cef', 
@@ -5,15 +16,13 @@ resourceURI= getParam( 'resourceURI', 'http://autoplot.org/data/C1_CP_EDI_EGD__$
 
 timerange= getParam( 'timerange', '2005-02-12/2005-02-19', 'timerange to load' )
 
-generate= getParam( 'generate', 'F', 'Generation doesn''t list remote folders', ['T','F'] )
+generate= getParam( 'generate', False, 'Generation doesn''t list remote folders', [True,False] )
 
 if ( len(timerange.split(' '))==10 ):  # make it easier to use Jon V.'s document "uri_template_test_cases.txt"
    trs= timerange.split(' ')   
    timerange= '-'.join( trs[0:3] ) + 'T' + ':'.join( trs[3:5] ) + '/' + '-'.join( trs[5:8] ) + 'T' + ':'.join( trs[8:10] )
 
 drtr= DatumRangeUtil.parseTimeRange(timerange)
-
-import time
 
 count=0
 
@@ -25,10 +34,9 @@ if ( False ):
 
 print '<html><body>'
 
-from java.lang import System
 t0= System.currentTimeMillis()
 
-if ( generate=='T' ):
+if ( generate ):
    if ( resourceURI.find('$v')>-1 ):
        print 'Template cannot contain $v.'
        count=-1
@@ -49,9 +57,7 @@ if ( generate=='T' ):
        else:
            enums= ['']
            id= ''
-       
-       from java.util import Collections
-       
+              
        st= tp.format( drtr.min(), None, Collections.singletonMap( id, enums[0] ) ) 
        dr= tp.parse( st,None ).getTimeRange()
 
@@ -71,9 +77,7 @@ if ( generate=='T' ):
                  print '<tr><td></td><td>Search limited to 10000 results.</td></tr>'
                  break
           dr= dr.next()
-elif ( generate=='F' ):
-    from org.das2.fsm import FileStorageModel
-    from org.das2.util.filesystem import FileSystem
+else:
     i= FileStorageModel.splitIndex( resourceURI )
 
     root= resourceURI[0:i]      # the static part of the name
@@ -98,12 +102,11 @@ elif ( generate=='F' ):
            v= fsm.getField('v',n)
        except:
            v= 'N/A'
-       print '<td>'+root + n + '</td><td>'+tr.toString() + '</td><td>' + v +'</td>'
+       ll= '<a href="'+root + n + '">' + root + n + '</a>'
+       print '<td>'+ll + '</td><td>'+tr.toString() + '</td><td>' + v +'</td>'
        count= count+1
        print '</tr>'
     print '</table>'
-else:
-    raise Exception('generate must be T or F')
 
 if ( count==0 ):
    print '(none found)'
