@@ -11,6 +11,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -138,6 +139,13 @@ public class RunBatchTool extends javax.swing.JPanel {
     public RunBatchTool( final Application dom ) {
         initComponents();
 
+        writeFilenameCB.getEditor().getEditorComponent().addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                checkNumberOfParams();
+            }
+        });
+        
         Preferences prefs= Preferences.userNodeForPackage(RunBatchTool.class );
         String s= prefs.get( "lastTemplate", null );
         if ( s!=null ) {
@@ -212,6 +220,36 @@ public class RunBatchTool extends javax.swing.JPanel {
         param2ScrollPane.getVerticalScrollBar().setUnitIncrement(param2ScrollPane.getFont().getSize());
         
         
+    }
+    
+    /**
+     * check that the number of parameters matches the number of wildcards.
+     * This is disabled unless property 
+     * autoplot.option.runbatch.validate is set to "T"
+     */
+    private void checkNumberOfParams() {
+        if ( "T".equals(System.getProperty("autoplot.option.runbatch.validate","T")) ) {
+            String s= writeFilenameCB.getEditor().getItem().toString();
+            int fields1= s.split("\\$|\\%",-2).length-1;
+            String pp1= param1NameCB.getSelectedItem()!=null ?
+                param1NameCB.getSelectedItem().toString().trim() :
+                "";
+            int npp1= pp1.length()==0 ? 0 : ( pp1.split("\\;",-2).length );
+            String pp2= param2NameCB.getSelectedItem()!=null ?
+                param2NameCB.getSelectedItem().toString().trim() :
+                "";
+            int npp2= pp2.length()==0 ? 0 : ( pp2.split("\\;",-2).length );
+
+            if ( npp1 + npp2 != fields1 && writeCheckBox.isSelected() ) {
+                writeFilenameCB.getEditor().getEditorComponent().setBackground( Color.YELLOW );
+            } else {
+                if ( writeFilenameCB.getEditor().getEditorComponent().getForeground()==Color.WHITE ) {
+                    writeFilenameCB.getEditor().getEditorComponent().setBackground( Color.BLACK );
+                } else {
+                    writeFilenameCB.getEditor().getEditorComponent().setBackground( Color.WHITE );
+                }
+            }
+        }
     }
     
     /**
@@ -307,6 +345,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         jLabel3 = new javax.swing.JLabel();
         jPopupMenu2 = new javax.swing.JPopupMenu();
         generateMenuItem2 = new javax.swing.JMenuItem();
+        loadUriMenuItem2 = new javax.swing.JMenuItem();
         loadFromFileMI2 = new javax.swing.JMenuItem();
         pasteMenuItem2 = new javax.swing.JMenuItem();
         menuBar = new javax.swing.JMenuBar();
@@ -434,6 +473,15 @@ public class RunBatchTool extends javax.swing.JPanel {
             }
         });
         jPopupMenu2.add(generateMenuItem2);
+
+        loadUriMenuItem2.setText("Load Events File...");
+        loadUriMenuItem2.setToolTipText("Load a list of time ranges from an events file.");
+        loadUriMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadUriMenuItem2ActionPerformed(evt);
+            }
+        });
+        jPopupMenu2.add(loadUriMenuItem2);
 
         loadFromFileMI2.setText("Load from File");
         loadFromFileMI2.setToolTipText("Load lines from file into this text area");
@@ -579,12 +627,22 @@ public class RunBatchTool extends javax.swing.JPanel {
                 param1NameCBItemStateChanged(evt);
             }
         });
+        param1NameCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                param1NameCBActionPerformed(evt);
+            }
+        });
 
         param2NameCB.setEditable(true);
         param2NameCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " " }));
         param2NameCB.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 param2NameCBItemStateChanged(evt);
+            }
+        });
+        param2NameCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                param2NameCBActionPerformed(evt);
             }
         });
 
@@ -613,10 +671,15 @@ public class RunBatchTool extends javax.swing.JPanel {
         });
 
         writeCheckBox.setText("Write:");
-        writeCheckBox.setToolTipText("After each iteration, write the file, where $x is replaced");
+        writeCheckBox.setToolTipText("After each iteration, write the file, where each $x is replaced with the parameter value.  The number \nof $x fields must match the number of parameters controlled.");
+        writeCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                writeCheckBoxActionPerformed(evt);
+            }
+        });
 
         writeFilenameCB.setEditable(true);
-        writeFilenameCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "/tmp/ap/$x.png", "/tmp/ap/$x_$x.png", "/tmp/ap/$x.pdf", "/tmp/ap/$x_$x.pdf", "/tmp/ap/%s_%s.pdf", "/tmp/ap/%s_%s_%02d.png", " ", " " }));
+        writeFilenameCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "/tmp/ap/$x.png", "/tmp/ap/$x_$x.png", "/tmp/ap/$x_$x.png", "/tmp/ap/$x_$x_$x.png", "/tmp/ap/$x_$x_$x_$x.png", "/tmp/ap/$x.pdf", "/tmp/ap/$x_$x.pdf", "/tmp/ap/%s_%s.pdf", "/tmp/ap/%s_%s_%02d.png", " ", " " }));
 
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, writeCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), writeFilenameCB, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
@@ -861,7 +924,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         w.setVisible(false);
     }//GEN-LAST:event_closeButtonActionPerformed
 
-    private void loadUriMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadUriMenuItemActionPerformed
+    private void loadUriMenuItemAction(JTextArea paramValues) {
         DataSetSelector eventsDataSetSelector= new DataSetSelector();
         
         List<Bookmark> deft= new ArrayList<>();
@@ -879,11 +942,15 @@ public class RunBatchTool extends javax.swing.JPanel {
                     tr= Ops.putProperty( tr, QDataSet.UNITS, tu );
                     ss.append( DataSetUtil.asDatumRange( tr ).toString() ).append("\n");
                 }
-                param1Values.setText(ss.toString());
+                paramValues.setText(ss.toString());
             } catch (Exception ex) {
                 Logger.getLogger(RunBatchTool.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+    }                                               
+
+    private void loadUriMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadUriMenuItemActionPerformed
+        loadUriMenuItemAction(param1Values);
     }//GEN-LAST:event_loadUriMenuItemActionPerformed
 
     private void generateButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateButton2ActionPerformed
@@ -1019,7 +1086,7 @@ public class RunBatchTool extends javax.swing.JPanel {
     }//GEN-LAST:event_exportResultsMenuItemActionPerformed
 
     private void showHelpMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showHelpMenuItemActionPerformed
-        AutoplotUtil.openBrowser("http://autoplot.org/batch");
+        AutoplotUtil.openBrowser("https://github.com/autoplot/documentation/wiki/batch");
     }//GEN-LAST:event_showHelpMenuItemActionPerformed
 
     
@@ -1065,7 +1132,7 @@ public class RunBatchTool extends javax.swing.JPanel {
     }//GEN-LAST:event_jList2MouseClicked
 
     private void writeFilenameCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_writeFilenameCBActionPerformed
-        // TODO add your handling code here:
+        checkNumberOfParams();
     }//GEN-LAST:event_writeFilenameCBActionPerformed
 
     private void copyScriptUriActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyScriptUriActionPerformed
@@ -1136,6 +1203,22 @@ public class RunBatchTool extends javax.swing.JPanel {
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents( stringSelection, null );
         messageLabel.setText("Copied to system clipboard: "+argValue );
     }//GEN-LAST:event_copyValueMenuItemActionPerformed
+
+    private void loadUriMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadUriMenuItem2ActionPerformed
+        loadUriMenuItemAction(param2Values);
+    }//GEN-LAST:event_loadUriMenuItem2ActionPerformed
+
+    private void param1NameCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_param1NameCBActionPerformed
+        checkNumberOfParams();
+    }//GEN-LAST:event_param1NameCBActionPerformed
+
+    private void param2NameCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_param2NameCBActionPerformed
+        checkNumberOfParams();
+    }//GEN-LAST:event_param2NameCBActionPerformed
+
+    private void writeCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_writeCheckBoxActionPerformed
+        checkNumberOfParams();
+    }//GEN-LAST:event_writeCheckBoxActionPerformed
 
     private void doLoadFromFile( JTextArea paramValues ) {
         JFileChooser chooser= new JFileChooser();
@@ -2688,6 +2771,7 @@ public class RunBatchTool extends javax.swing.JPanel {
     private javax.swing.JMenuItem loadFromFileMI;
     private javax.swing.JMenuItem loadFromFileMI2;
     private javax.swing.JMenuItem loadUriMenuItem;
+    private javax.swing.JMenuItem loadUriMenuItem2;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JLabel messageLabel;
     private javax.swing.JComboBox<String> param1NameCB;

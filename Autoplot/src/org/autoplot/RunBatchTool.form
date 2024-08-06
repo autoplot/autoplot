@@ -174,6 +174,15 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="generateMenuItem2ActionPerformed"/>
           </Events>
         </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="loadUriMenuItem2">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Load Events File..."/>
+            <Property name="toolTipText" type="java.lang.String" value="Load a list of time ranges from an events file."/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="loadUriMenuItem2ActionPerformed"/>
+          </Events>
+        </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="loadFromFileMI2">
           <Properties>
             <Property name="text" type="java.lang.String" value="Load from File"/>
@@ -489,6 +498,7 @@
       </Properties>
       <Events>
         <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="param1NameCBItemStateChanged"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="param1NameCBActionPerformed"/>
       </Events>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
@@ -505,6 +515,7 @@
       </Properties>
       <Events>
         <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="param2NameCBItemStateChanged"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="param2NameCBActionPerformed"/>
       </Events>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
@@ -540,22 +551,28 @@
     <Component class="javax.swing.JCheckBox" name="writeCheckBox">
       <Properties>
         <Property name="text" type="java.lang.String" value="Write:"/>
-        <Property name="toolTipText" type="java.lang.String" value="After each iteration, write the file, where $x is replaced"/>
+        <Property name="toolTipText" type="java.lang.String" value="After each iteration, write the file, where each $x is replaced with the parameter value.  The number &#xa;of $x fields must match the number of parameters controlled."/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="writeCheckBoxActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JComboBox" name="writeFilenameCB">
       <Properties>
         <Property name="editable" type="boolean" value="true"/>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="8">
+          <StringArray count="11">
             <StringItem index="0" value="/tmp/ap/$x.png"/>
             <StringItem index="1" value="/tmp/ap/$x_$x.png"/>
-            <StringItem index="2" value="/tmp/ap/$x.pdf"/>
-            <StringItem index="3" value="/tmp/ap/$x_$x.pdf"/>
-            <StringItem index="4" value="/tmp/ap/%s_%s.pdf"/>
-            <StringItem index="5" value="/tmp/ap/%s_%s_%02d.png"/>
-            <StringItem index="6" value=" "/>
-            <StringItem index="7" value=" "/>
+            <StringItem index="2" value="/tmp/ap/$x_$x.png"/>
+            <StringItem index="3" value="/tmp/ap/$x_$x_$x.png"/>
+            <StringItem index="4" value="/tmp/ap/$x_$x_$x_$x.png"/>
+            <StringItem index="5" value="/tmp/ap/$x.pdf"/>
+            <StringItem index="6" value="/tmp/ap/$x_$x.pdf"/>
+            <StringItem index="7" value="/tmp/ap/%s_%s.pdf"/>
+            <StringItem index="8" value="/tmp/ap/%s_%s_%02d.png"/>
+            <StringItem index="9" value=" "/>
+            <StringItem index="10" value=" "/>
           </StringArray>
         </Property>
       </Properties>
