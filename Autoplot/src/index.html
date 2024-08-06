@@ -30,8 +30,10 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-07-29 r27703):</p>
+        <p>Bugfixes (2024-08-06 r27703):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2606/">2606</a>: improvements to RunBatch, including update link to documentation, and four-parameter examples.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2605/">2605</a>: CDF reader warns when non-gzip compression is used, which is not supported by the Java-based reader.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2604/">2604</a>: properly propagate labels for components from HAPI server. Thanks, Bob!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2603/">2603</a>: properly autorange in Y when three components each have small variance, so the additional 10% is not seen.  Thanks, Bob!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2600/">2600</a>: PDS3 support rank4 data, to the extent supported by the PDS library. (More changes coming!)
@@ -52,6 +54,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>downloadResourceAsTempFile no longer adds "@" to filename when there are no parameters.
             <li>Das2 TimeUtil now has rangeContaining, which will calculate the hour containing data point or hours containing an interval.
             <li>IDL/Matlab/Python interface provides direct access to loaded QDataSet, to support simpler Python interface.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/805/">805</a>: Finish off file parameters in scripts.
