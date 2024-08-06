@@ -284,7 +284,14 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
                 Units uu_jj=u;
                 formats[jj]= u.getDatumFormatterFactory().defaultFormatter();
                 if ( !( uu_jj instanceof EnumerationUnits ) ) {
-                    String ff= bundleDesc!=null ? (String) bundleDesc.property(QDataSet.FORMAT,jj) : null;
+                    String ff= bundleDesc!=null ? (String) dssjj.property(QDataSet.FORMAT) : null;
+                    if ( ff==null ) {
+                        if ( bundleDesc.length()==dss.length-1 && jj>0 ) {
+                            ff= bundleDesc!=null ? (String) bundleDesc.property(QDataSet.FORMAT,jj-1) : null;
+                        } else if ( bundleDesc.length()==dss.length  ) {
+                            ff= bundleDesc!=null ? (String) bundleDesc.property(QDataSet.FORMAT,jj) : null;
+                        }
+                    }
                     if ( df.equals("") ) {
                         if ( ff==null ) {
                             double d1= dssjj.rank()==1 ? dssjj.value(0) : dssjj.value(0,0);
