@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Autoplot's PNG Walk is used to look at PNG Walk described in <a href='https://spdf.gsfc.nasa.gov/pub/catalogs/spdf-plotwalk-catalog.json'>file</a> at NASA.</small></p>
+        <p><small>Data from CSV read from <a href="https://github.com/visgl/deck.gl-data/blob/master/examples/3d-heatmap/heatmap-data.csv">GitHub</a>.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -32,6 +32,10 @@
                 
         <p>Bugfixes (2024-08-06 r27703):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2610/">2610</a>: format bundle to CSV could fail when timetags were DEPEND_0.  Thanks, Sadie!
+        </ul>
+        <p>Older Bugfixes (2024-08-06 r27703):</p>
+        <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2606/">2606</a>: improvements to RunBatch, including update link to documentation, and four-parameter examples.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2605/">2605</a>: CDF reader warns when non-gzip compression is used, which is not supported by the Java-based reader.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2604/">2604</a>: properly propagate labels for components from HAPI server. Thanks, Bob!
@@ -44,13 +48,6 @@
             <li>guessCadence branch where runtime error resulting from single-element dataset is handled properly.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2518/">2518</a>: Study mechanism to avoid unnecessary loading of images which are no longer visible during scrolling in PNG Walk Tool
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2528/">2528</a>: Github filesystem listing result would have repeated items.
-        </ul>
-        <p>Older Bugfixes (2024-06-13 r27670):</p>
-        <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2594/">2594</a>: Jython getParam with {labels} doesn't work for string types
-            <li>Script editor Shift+Run and Alt+Run are the same thing, and should always enter the parameters GUI, even when there are no parameters.
-            <li>"autoplot --help" indicates that --scriptExit will set an exit code for exception.
-            <li>cleanData filter ignored the number of stddevs argument.  Thanks, Sadie!
         </ul>
         <p>Features:</p>
         <ul>
