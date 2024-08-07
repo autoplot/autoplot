@@ -957,6 +957,8 @@ public class JythonUtil {
                     if ( !simplifyScriptToGetParamsCanResolve(ss.slice,variableNames) ) {
                         return false;
                     }
+                } else if ( a1 instanceof Attribute ) {
+                    return false;
                 }
             }
             if (simplifyScriptToGetParamsOkayNoCalls(a.value, variableNames)) {
