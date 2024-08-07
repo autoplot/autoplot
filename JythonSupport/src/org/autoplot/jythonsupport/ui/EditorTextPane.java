@@ -280,8 +280,8 @@ public class EditorTextPane extends JEditorPane {
      */
     JEditorPane completionsEditorPane= null;
 
-    private void showInCompletionsEditorPane( String scriptPrime ) {
-                    JEditorPane a;
+    private void showInCompletionsEditorPane( String scriptPrime, String label) {
+        JEditorPane a;
         JDialog d;
         if ( completionsEditorPane==null ) {
             a= new JEditorPane();
@@ -319,7 +319,7 @@ public class EditorTextPane extends JEditorPane {
             }
             a.setContentType("text/python");
             d= new JDialog();
-            d.setTitle("Completions Peek Editor");
+            d.setTitle(label + " Peek Editor");
             a.setMinimumSize( new Dimension(600,800) );
             a.setPreferredSize( new Dimension(600,800) );
             d.getContentPane().add(new JScrollPane(a));
@@ -327,8 +327,11 @@ public class EditorTextPane extends JEditorPane {
         } else {
             a= completionsEditorPane;
             d= (JDialog)SwingUtilities.getWindowAncestor( completionsEditorPane );
+            d.setTitle(label + " Peek Editor");
         }
         a.setText(scriptPrime);
+        a.setFont( this.getFont() );
+        
         d.setVisible(true);
 
     }
@@ -341,7 +344,7 @@ public class EditorTextPane extends JEditorPane {
         }
         try {
             String scriptPrime= SimplifyScriptSupport.simplifyScriptToCompletions(doThis);
-            showInCompletionsEditorPane(scriptPrime);
+            showInCompletionsEditorPane( scriptPrime, "Completions");
         } catch ( NumberFormatException | PySyntaxError ex ) {
             logger.log( Level.WARNING, ex.getMessage(), ex );
             JOptionPane.showMessageDialog( this, ex.toString() );
@@ -354,7 +357,7 @@ public class EditorTextPane extends JEditorPane {
     public void showParametersView() {
         String script= this.getText();
         String scriptPrime= JythonUtil.simplifyScriptToGetParams( script, true );
-        showInCompletionsEditorPane(scriptPrime);
+        showInCompletionsEditorPane( scriptPrime, "Parameters");
     }
     
     /**
