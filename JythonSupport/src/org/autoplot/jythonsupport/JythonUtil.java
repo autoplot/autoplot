@@ -610,7 +610,7 @@ public class JythonUtil {
      * @see SimplifyScriptSupport#okay
      */
     final static String[] okay = new String[] {
-        "range,", "xrange,", "irange,","map,","join,","len,","dict,","zip,",
+        "range,", "xrange,", "irange,","map,","join,","len,","dict,","zip,","list,",
         "getParam,", "lower,", "upper,", "URI,", "URL,", "PWD,", "File,",
         "setScriptDescription", "setScriptTitle", "setScriptLabel", "setScriptIcon",
         "DatumRangeUtil,", "TimeParser,",
@@ -1413,10 +1413,13 @@ public class JythonUtil {
         variableNames.add("False");
         variableNames.add("range");
         variableNames.add("xrange");
+        variableNames.add("list");
+        variableNames.add("len");
         variableNames.add("map");
         variableNames.add("dict");
         variableNames.add("zip");
         variableNames.add("PWD");
+        variableNames.add("dom");
 
         try {
             Module n = (Module) org.python.core.parser.parse(script, "exec");
