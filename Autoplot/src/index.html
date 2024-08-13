@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Data from CSV read from <a href="https://github.com/visgl/deck.gl-data/blob/master/examples/3d-heatmap/heatmap-data.csv">GitHub</a>.</small></p>
+        <p><small>2-D histogram of data from CSV read from <a href="https://github.com/visgl/deck.gl-data/blob/master/examples/3d-heatmap/heatmap-data.csv">GitHub</a>.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,9 +30,11 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-08-06 r27703):</p>
+        <p>Bugfixes (2024-08-13 r27723):</p>
         <ul>
-            <li>Include dom, list, and len in short list of safe names to use in scripts when generating a GUI.  Thanks, Kristoff!
+            <li><a href="https://github.com/das-developers/das2java/issues/110">110: Tweak logic for autohistogram code for a case where two overlapping peaks prevented the identification of the cadence.
+            <li><a href="https://github.com/das-developers/das2java/issues/109">109: Tighten checks so that dataset('2 20 300 2000') is not interpretted as a valid date.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2611/">2611</a>: Include dom, list, and len in short list of safe names to use in scripts when generating a GUI.  Thanks, Kristoff!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2610/">2610</a>: format bundle to CSV could fail when timetags were DEPEND_0.  Thanks, Sadie!
         </ul>
         <p>Older Bugfixes (2024-08-06 r27703):</p>
