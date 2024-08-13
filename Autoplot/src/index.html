@@ -30,8 +30,9 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-08-13 r27723):</p>
+        <p>Bugfixes (2024-08-13 r27726):</p>
         <ul>
+            <li>rte_2101508600: CDF virtual variable function arr_slice on dim 1 was mistakenly left out.  Thanks, nkarna!
             <li><a href="https://github.com/das-developers/das2java/issues/110">110: Tweak logic for autohistogram code for a case where two overlapping peaks prevented the identification of the cadence.  Thanks, Sadie!
             <li><a href="https://github.com/das-developers/das2java/issues/109">109: Tighten checks so that dataset('2 20 300 2000') is not interpreted as a valid date.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2611/">2611</a>: Include dom, list, and len in short list of safe names to use in scripts when generating a GUI.  Thanks, Kristoff!
@@ -54,6 +55,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Font size controls for vertical and horizontal slice.  Thanks, Connor!
             <li>downloadResourceAsTempFile no longer adds "@" to filename when there are no parameters.
             <li>Das2 TimeUtil now has rangeContaining, which will calculate the hour containing data point or hours containing an interval.
             <li>IDL/Matlab/Python interface provides direct access to loaded QDataSet, to support simpler Python interface.
