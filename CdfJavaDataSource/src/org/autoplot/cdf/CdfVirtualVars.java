@@ -212,6 +212,9 @@ public class CdfVirtualVars {
                 if ( od instanceof Number ) {
                     int i= ((Number)od).intValue();
                     switch ( i ) {
+                        case 0:
+                            result= Ops.slice1(sliceable,((Number)oi).intValue());
+                            break;
                         case 1:
                             result= Ops.slice2(sliceable,((Number)oi).intValue());
                             break;
