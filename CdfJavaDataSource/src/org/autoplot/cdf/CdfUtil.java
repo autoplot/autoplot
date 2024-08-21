@@ -1010,7 +1010,7 @@ public class CdfUtil {
                         }
                     }
                     if ( dims.length>(dim-1) && (result.nrec)!=dims[dim-1] ) {
-                        warn.add("DEPEND_"+dim+" length ("+result.nrec+") is inconsistent with length ("+dims[dim-1]+")" );
+                        warn.add("data dim "+dim+" length ("+dims[dim-1]+") is inconsistent with DEPEND_"+ dim +" length ("+result.nrec+")" );
                     }
                 }
             }
@@ -1030,7 +1030,7 @@ public class CdfUtil {
                         result.nrec = cdf.getDimensions(svar)[0];
                     }
                     if ( dim==1 && dims.length>(dim-1) && (result.nrec)!=dims[dim-1] ) {
-                        warn.add("LABL_PTR_"+dim+" length is inconsistent with length ("+dims[dim-1]+")" );
+                        warn.add("data dim "+dim+" length ("+dims[dim-1]+") is inconsistent with LABL_PTR_"+dim+" length ("+result.nrec+")" );
                     }
                 }
             } else if ( hasAttribute( cdf, svar, "LABL_PTR_"+dim ) ) { // check that the LABL_PTR_i is the right length as well.
@@ -1043,7 +1043,7 @@ public class CdfUtil {
                         nrec = cdf.getDimensions(result.labl)[0];
                     }
                     if ( dim==1 && dims.length>(dim-1) && (nrec)!=dims[dim-1] ) {
-                        warn.add("LABL_PTR_"+dim+" length is inconsistent with length ("+dims[dim-1]+")" );
+                        warn.add("data dim "+dim+" length ("+dims[dim-1]+") is inconsistent with LABL_PTR_"+dim+" length ("+nrec+")" );
                     }
                 }
             }
@@ -1303,11 +1303,11 @@ public class CdfUtil {
                     htmlDescription+= "=" + (xMaxRec);
                 }
                 if ( dep1desc.dep != null) {
-                    htmlDescription += "," + maybeShorten( svar, dep1desc.dep ) + "=" + dep1desc.nrec + ( dep1desc.rank2 ? "*": "" );
+                    htmlDescription += "," + maybeShorten( svar, dep1desc.dep ) + "=" + dims[0] + ( dep1desc.rank2 ? "*": "" );
                     if ( dep2desc.dep != null) {
-                        htmlDescription += "," + maybeShorten( svar, dep2desc.dep ) + "=" + dep2desc.nrec + ( dep2desc.rank2 ? "*": "" );
+                        htmlDescription += "," + maybeShorten( svar, dep2desc.dep ) + "=" + dims[1] + ( dep2desc.rank2 ? "*": "" );
                         if (dep3desc.dep != null) {
-                            htmlDescription += "," + maybeShorten( svar, dep3desc.dep ) + "=" + dep3desc.nrec + ( dep3desc.rank2 ? "*": "" );
+                            htmlDescription += "," + maybeShorten( svar, dep3desc.dep ) + "=" + dims[2] + ( dep3desc.rank2 ? "*": "" );
                         }
                     }
                 } else if ( rank>1 ) {
@@ -1400,11 +1400,11 @@ public class CdfUtil {
                     desc+= "=" + (xMaxRec);
                 }
                 if ( dep1desc.dep != null) {
-                    desc += "," + maybeShorten( svar, dep1desc.dep ) + "=" + dep1desc.nrec + ( dep1desc.rank2 ? "*": "" );
+                    desc += "," + maybeShorten( svar, dep1desc.dep ) + "=" + dims[0] + ( dep1desc.rank2 ? "*": "" );
                     if ( dep2desc.dep != null) {
-                        desc += "," + maybeShorten( svar, dep2desc.dep ) + "=" + dep2desc.nrec + ( dep2desc.rank2 ? "*": "" );
+                        desc += "," + maybeShorten( svar, dep2desc.dep ) + "=" + dims[1] + ( dep2desc.rank2 ? "*": "" );
                         if (dep3desc.dep != null) {
-                            desc += "," + maybeShorten( svar, dep3desc.dep ) + "=" + dep3desc.nrec + ( dep3desc.rank2 ? "*": "" );
+                            desc += "," + maybeShorten( svar, dep3desc.dep ) + "=" + dims[2] + ( dep3desc.rank2 ? "*": "" );
                         }
                     }
                 } else if ( rank>1 ) {
@@ -1657,11 +1657,11 @@ public class CdfUtil {
                     desc+= "=" + (xMaxRec);
                 }
                 if ( dep1desc.dep != null) {
-                    desc += "," + maybeShorten( svar, dep1desc.dep ) + "=" + dep1desc.nrec + ( dep1desc.rank2 ? "*": "" );
+                    desc += "," + maybeShorten( svar, dep1desc.dep ) + "=" + dims[0] + ( dep1desc.rank2 ? "*": "" );
                     if ( dep2desc.dep != null) {
-                        desc += "," + maybeShorten( svar, dep2desc.dep ) + "=" + dep2desc.nrec + ( dep2desc.rank2 ? "*": "" );
+                        desc += "," + maybeShorten( svar, dep2desc.dep ) + "=" + dims[1] + ( dep2desc.rank2 ? "*": "" );
                         if (dep3desc.dep != null) {
-                            desc += "," + maybeShorten( svar, dep3desc.dep ) + "=" + dep3desc.nrec + ( dep3desc.rank2 ? "*": "" );
+                            desc += "," + maybeShorten( svar, dep3desc.dep ) + "=" + dims[2] + ( dep3desc.rank2 ? "*": "" );
                         } else if ( rank>3 ) {
                             desc += "," + DataSourceUtil.strjoin( Arrays.copyOfRange(dims,2,dims.length),"," );
                         }
