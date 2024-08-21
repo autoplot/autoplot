@@ -68,7 +68,7 @@ public class PdsDataSource extends AbstractDataSource {
      * @return
      * @throws IOException 
      */
-    private QDataSet getFromTable( TableObject t, String[] columnNames ) throws IOException {
+    private QDataSet getFromTable( TableObject t, String[] columnNames ) throws Exception {
         
         int ncols= columnNames.length;
         int[] icols= new int[ncols];
