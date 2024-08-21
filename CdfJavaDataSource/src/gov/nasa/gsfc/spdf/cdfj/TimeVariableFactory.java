@@ -77,7 +77,7 @@ public class TimeVariableFactory {
         boolean themisLike = false;
         if (tvar.getNumberOfValues() == 0) { //themis like
             Vector v = (Vector)cdf.getAttribute(var.getName(), "DEPEND_TIME");
-            if (v.size() > 0) {
+            if (!v.isEmpty()) {
                 tname = (String)v.elementAt(0);
                 tvar = cdf.getVariable(tname);
                 themisLike = true;
