@@ -483,7 +483,49 @@ public class CdfDataSource extends AbstractDataSource {
         if ( svariable==null ) {
             throw new IllegalArgumentException("CDF URI needs an argument");
         }
+                
+        MutablePropertyDataSet result= getDataSet( cdfFile, cdf, svariable, attr1, map, mon);
         
+        if ( getParam("loadErrors","F").equals("F") ) {
+            if ( result.property(QDataSet.DELTA_MINUS)!=null ) result.putProperty(QDataSet.DELTA_MINUS,null);
+            if ( result.property(QDataSet.DELTA_PLUS)!=null ) result.putProperty(QDataSet.DELTA_PLUS,null);
+            if ( result.property(QDataSet.BIN_MINUS)!=null ) result.putProperty(QDataSet.BIN_MINUS,null);
+            if ( result.property(QDataSet.BIN_PLUS)!=null ) result.putProperty(QDataSet.BIN_PLUS,null);
+        }
+        
+        if ( "T".equals(getParam("replaceLabels","F")) ) {
+            maybeReplaceLabels(result);
+        }
+        
+        result.makeImmutable(); 
+                
+        logger.exiting( "CdfDataSource", "getDataSet" );
+        return result;
+    }
+    
+    /**
+     * get the dataset for svariable from the CDF file, implementing virtual variables if needed.  This supports for
+     * svariable:
+     * <ul>
+     * <li> X;Y;Z where each is read and linked together
+     * <li> X[0:100] where the first 100 records are read
+     * <li> X[::5] where every fifth record is read
+     * <li> virtual variables.
+     * </ul>
+     * 
+     * Note this 
+     * does not check for cycles, so be careful.  
+     * 
+     * @param cdfFile null or the name of the cdfFile, used only in logger messages.
+     * @param cdf
+     * @param svariable
+     * @param attr1
+     * @param map
+     * @param mon
+     * @return
+     * @throws Exception 
+     */
+    public static MutablePropertyDataSet getDataSet( File cdfFile, CDFReader cdf, String svariable, Map<String,Object> attr1, Map map, ProgressMonitor mon ) throws Exception {
         //latitude[0:1000];longitude[0:1000];altitude[0:1000]"
         //Pattern p= Pattern.compile( "[a-z]+(\\[(0-9:)+\\])?"); TODO: how to match?
         
@@ -532,8 +574,6 @@ public class CdfDataSource extends AbstractDataSource {
         } else {
             svariables= null;
         }
-
-        String interpMeta = (String) map.get(PARAM_INTERPMETA);
 
         boolean doDep= !"no".equals( map.get(PARAM_DODEP) );
 
@@ -599,7 +639,8 @@ public class CdfDataSource extends AbstractDataSource {
             }
         }
 
-        if ( logger.isLoggable(Level.FINE) ) {
+        if ( logger.isLoggable(Level.FINE)&& cdfFile!=null ) {
+            String fileName= cdfFile.toString();
             int islash= fileName.lastIndexOf('/');
             logger.log(Level.FINE, "reading from {0}", fileName.substring(0,islash));
             logger.log(Level.FINE, "read variable {0}?{1} got {2}", new Object[] { fileName.substring(islash), svariable, String.valueOf(result) } );
@@ -672,10 +713,8 @@ public class CdfDataSource extends AbstractDataSource {
                 attr1.remove( "DEPEND_3" );
             }
         }
-
-        if ( "T".equals(getParam("replaceLabels","F")) ) {
-            maybeReplaceLabels(result);
-        }
+        
+        String interpMeta = (String) map.get(PARAM_INTERPMETA);
         
         if (!"no".equals(interpMeta)) {
 
@@ -712,8 +751,8 @@ public class CdfDataSource extends AbstractDataSource {
             }
         }
 
-        synchronized (this) {
-            if ( attributes!=null && "waveform".equals( attributes.get("DISPLAY_TYPE") ) ) {
+        synchronized ( CdfDataSource.class ) {
+            if ( attr1!=null && "waveform".equals( attr1.get("DISPLAY_TYPE") ) ) {
                 QDataSet dep1=   (QDataSet) result.property( QDataSet.DEPEND_1 );
                 if ( dep1!=null ) {
                     Units dep1units= SemanticOps.getUnits(dep1);
@@ -734,10 +773,7 @@ public class CdfDataSource extends AbstractDataSource {
         
         //DataSetUtil.validate( result, new ArrayList<String>() );
 
-        result.makeImmutable(); 
         if ( !mon.isFinished() ) mon.finished();  
-        
-        logger.exiting( "CdfDataSource", "getDataSet" );
         
         return result;
 
@@ -750,7 +786,7 @@ public class CdfDataSource extends AbstractDataSource {
      * https://sourceforge.net/p/autoplot/bugs/1664/
      * @param ds 
      */
-    private void maybeReplaceLabels( MutablePropertyDataSet ds ) {
+    private static void maybeReplaceLabels( MutablePropertyDataSet ds ) {
         for ( int i=1; i<5; i++ ) {
             MutablePropertyDataSet depDs= (MutablePropertyDataSet) (QDataSet) ds.property( "DEPEND_"+i );
             MutablePropertyDataSet lablDs= (MutablePropertyDataSet) (QDataSet) ds.property( "BUNDLE_"+i );            
@@ -760,7 +796,7 @@ public class CdfDataSource extends AbstractDataSource {
         }
     }
 
-    private boolean hasVariable( CDFReader cdf, String var ) {
+    private static boolean hasVariable( CDFReader cdf, String var ) {
         List<String> names= Arrays.asList( cdf.getVariableNames() );
         return names.contains(var);
     }
@@ -771,7 +807,7 @@ public class CdfDataSource extends AbstractDataSource {
      * @param attr the attribute
      * @return null or the attribute value.
      */
-    private Object getAttribute( CDFReader cdf, String attr ) {
+    private static Object getAttribute( CDFReader cdf, String attr ) {
         try {
             return cdf.getAttribute(attr);
         } catch ( NullPointerException ex ) {
@@ -829,7 +865,7 @@ public class CdfDataSource extends AbstractDataSource {
     }
     
     /* read all the variable attributes into a Map */
-    private synchronized HashMap<String, Object> readAttributes(CDFReader cdf, String var, int depth) {
+    private static synchronized HashMap<String, Object> readAttributes(CDFReader cdf, String var, int depth) {
         try {
             LinkedHashMap<String, Object> props = new LinkedHashMap<>();
             LinkedHashMap<String, Object> gattrs = new LinkedHashMap<>();
@@ -970,7 +1006,7 @@ public class CdfDataSource extends AbstractDataSource {
      * @return rank 0 dataset or dataset with rank equal to ds.
      * @throws Exception 
      */
-    private QDataSet getDeltaPlusMinus( final CDFReader cdf, QDataSet ds, final String deltaPlus, final String constraints ) throws Exception {
+    private static QDataSet getDeltaPlusMinus( final CDFReader cdf, QDataSet ds, final String deltaPlus, final String constraints ) throws Exception {
         QDataSet delta= loadVariableAndDependents(cdf, (String)deltaPlus, constraints, false, false, null, -1, ds.length(), new NullProgressMonitor() ); //TODO: slice1
         if ( delta.rank()>0 && delta.length()==1 && ( delta.length()!=ds.length() || ds.length()==1 ) ) {
             delta= delta.slice(0); //vap+cdaweb:ds=C3_PP_CIS&id=T_p_par__C3_PP_CIS&timerange=2005-09-07+through+2005-09-19
@@ -1000,7 +1036,7 @@ public class CdfDataSource extends AbstractDataSource {
      * @throws Exception
      * @throws ParseException 
      */
-    private MutablePropertyDataSet loadVariableAndDependents(final CDFReader cdf, final String svariable, final String constraints, boolean reform) throws Exception, ParseException {
+    private static MutablePropertyDataSet loadVariableAndDependents(final CDFReader cdf, final String svariable, final String constraints, boolean reform) throws Exception, ParseException {
         return loadVariableAndDependents(cdf, svariable, constraints, reform, false, null, -1, -1, new NullProgressMonitor() );
     }
 
@@ -1010,7 +1046,7 @@ public class CdfDataSource extends AbstractDataSource {
      * @param svariable the variable (e.g. Epoch)
      * @return true if another variable uses svariable as DEPEND_0.
      */
-    private boolean someonesDepend0( final CDFReader cdf, String svariable ) throws CDFException.ReaderError {
+    private static boolean someonesDepend0( final CDFReader cdf, String svariable ) throws CDFException.ReaderError {
         cdf.variableAttributeNames(svariable);
         String[] ss= cdf.getVariableNames();
         for ( String s:  ss ) {
@@ -1037,7 +1073,7 @@ public class CdfDataSource extends AbstractDataSource {
      * @param svariable
      * @return 
      */
-    private boolean reformTest( final CDFReader cdf, final String svariable, Map<String,Object> thisAttributes ) throws CDFException.ReaderError {
+    private static boolean reformTest( final CDFReader cdf, final String svariable, Map<String,Object> thisAttributes ) throws CDFException.ReaderError {
         boolean result= true;
         if ( thisAttributes.containsKey("DEPEND_0") ) {
             Object o=  thisAttributes.get("DEPEND_0");
@@ -1089,7 +1125,7 @@ public class CdfDataSource extends AbstractDataSource {
      * @throws ParseException
      * @return the org.das2.qds.MutablePropertyDataSet
      */
-    private synchronized MutablePropertyDataSet loadVariableAndDependents(
+    private static synchronized MutablePropertyDataSet loadVariableAndDependents(
         final CDFReader cdf, final String svariable, final String constraints, boolean reform, boolean loadDependents, 
         Map<String,Object> thisAttributes, int slice1, int expectRec, ProgressMonitor mon) throws Exception, ParseException {
         
@@ -1110,28 +1146,34 @@ public class CdfDataSource extends AbstractDataSource {
         if (numRec == 0) {
             String funct= (String)thisAttributes.get("FUNCTION");
             if ( funct==null ) funct= (String)thisAttributes.get("FUNCT");
-            if (thisAttributes.containsKey("COMPONENT_0") && funct!=null && funct.startsWith("comp_themis_epoch" )) {
-                // themis kludge that CDAWeb supports, so we support it too.  The variable has no records, but has
-                // two attributes, COMPONENT_0 and COMPONENT_1.  These are two datasets that should be added to
-                // get the result.  Note cdf_epoch16 fixes the shortcoming that themis was working around.
-                QDataSet c0 = loadVariableAndDependents(cdf, (String) thisAttributes.get("COMPONENT_0"), constraints, true);
-                if ( thisAttributes.containsKey("COMPONENT_1")) {
-                    QDataSet c1 = loadVariableAndDependents(cdf, (String) thisAttributes.get("COMPONENT_1"), constraints, false);
-                    if (c0.rank() == 1 && CdfDataSetUtil.validCount(c0, 2) == 1 && c1.length() > 1) { // it should have been rank 0.
-                        c0 = DataSetOps.slice0(c0, 0);
-                        // Convert the units to the more precise Units.us2000.  We may still truncate here, and the only way
-                        // to avoid this would be to introduce a new Basis that is equal to c0.
-                        if (Units.cdfEpoch == c0.property(QDataSet.UNITS)) {
-                            double value = ((RankZeroDataSet) c0).value();
-                            double valueUs2000 = Units.cdfEpoch.convertDoubleTo(Units.us2000, value);
-                            c0 = DataSetUtil.asDataSet(Units.us2000.createDatum(valueUs2000));
+            if (thisAttributes.containsKey("COMPONENT_0") && funct!=null ) {
+                if ( funct.startsWith("comp_themis_epoch" ) ) {
+                    // themis kludge that CDAWeb supports, so we support it too.  The variable has no records, but has
+                    // two attributes, COMPONENT_0 and COMPONENT_1.  These are two datasets that should be added to
+                    // get the result.  Note cdf_epoch16 fixes the shortcoming that themis was working around.
+                    QDataSet c0 = loadVariableAndDependents(cdf, (String) thisAttributes.get("COMPONENT_0"), constraints, true);
+                    if ( thisAttributes.containsKey("COMPONENT_1")) {
+                        QDataSet c1 = loadVariableAndDependents(cdf, (String) thisAttributes.get("COMPONENT_1"), constraints, false);
+                        if (c0.rank() == 1 && CdfDataSetUtil.validCount(c0, 2) == 1 && c1.length() > 1) { // it should have been rank 0.
+                            c0 = DataSetOps.slice0(c0, 0);
+                            // Convert the units to the more precise Units.us2000.  We may still truncate here, and the only way
+                            // to avoid this would be to introduce a new Basis that is equal to c0.
+                            if (Units.cdfEpoch == c0.property(QDataSet.UNITS)) {
+                                double value = ((RankZeroDataSet) c0).value();
+                                double valueUs2000 = Units.cdfEpoch.convertDoubleTo(Units.us2000, value);
+                                c0 = DataSetUtil.asDataSet(Units.us2000.createDatum(valueUs2000));
+                            }
+                        }
+                        if ( c0.property( QDataSet.UNITS )!=null && c1.property( QDataSet.UNITS )!=null ) {
+                            c0 = Ops.add(c0, c1);  //tha_l2_esa_20071101_v01.cdf?tha_peif_velocity_gseQ
                         }
                     }
-                    if ( c0.property( QDataSet.UNITS )!=null && c1.property( QDataSet.UNITS )!=null ) {
-                        c0 = Ops.add(c0, c1);  //tha_l2_esa_20071101_v01.cdf?tha_peif_velocity_gseQ
-                    }
+                    return DDataSet.maybeCopy(c0);
+                } else {
+                    return getDataSet( null, cdf, svariable, thisAttributes, new HashMap<>(), mon.getSubtaskMonitor("read virtual var: "+svariable));
+                    //return getDataSet( )
+
                 }
-                return DDataSet.maybeCopy(c0);
             } else {
                 // bug 1211: cdf virtual variable cannot be accessed by single record 
                 throw new NoDataInIntervalException("variable " + svariable + " contains no records!");
@@ -1322,7 +1364,7 @@ public class CdfDataSource extends AbstractDataSource {
 
         // CDF uses DELTA_PLUS and DELTA_MINUS on a dependency to represent the BIN boundaries.
         // vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/po_h0_tim_19960409_v03.cdf?Flux_H has units error.
-        boolean doPlusMinus= loadDependents==false || getParam("loadErrors","F").equals("T");
+        boolean doPlusMinus= loadDependents==false;
         Object deltaPlus= thisAttributes.get( "DELTA_PLUS_VAR" );
         Object deltaMinus= thisAttributes.get( "DELTA_MINUS_VAR" );
         if ( doPlusMinus 
@@ -1395,7 +1437,7 @@ public class CdfDataSource extends AbstractDataSource {
                 if ( labl!=null ) {
                     try {
                         lablDs= loadVariableAndDependents(cdf, labl, constraints, idep > 0);
-                        if ( idep==1 && attributes!=null ) attributes.put( "LABL_PTR_1", lablDs );
+                        //if ( idep==1 && attributes!=null ) attributes.put( "LABL_PTR_1", lablDs );
                     } catch ( Exception ex ) {
                         logger.log(Level.FINE, "unable to load LABL_PTR_"+sidep+" for "+svariable, ex );
                         thisAttributes.remove("LABL_PTR_" + sidep);
