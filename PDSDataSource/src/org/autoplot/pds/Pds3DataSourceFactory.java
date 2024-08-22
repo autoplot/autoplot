@@ -190,12 +190,12 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
 
     /**
      * read in the PDS label, resolving STRUCTURES which are loaded with a pointer.
-     * @param labelUrl
-     * @return
+     * @param labelUrl the URL of the LABEL file
+     * @return a document model of the LABEL, with imports resolved.
      * @throws IOException
      * @throws PDSException 
      */
-    protected static Document getDocumentWithImports( URL labelUrl ) throws IOException, PDSException {
+    public static Document getDocumentWithImports( URL labelUrl ) throws IOException, PDSException {
         
         logger.entering( "Pds3DataSourceFactory", "getDocumentWithImports", labelUrl );
         
