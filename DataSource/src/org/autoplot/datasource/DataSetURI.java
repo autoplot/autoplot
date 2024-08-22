@@ -1196,7 +1196,7 @@ public class DataSetURI {
             String[] ss= filename.split("@",-2);
             String base= ss[0];
             if ( base.length()>50 ) base= base.substring(0,50);
-            String args= ss[1];
+            String args= ss.length==2 ? ss[1] : "";
             if ( args.length()>0 ) args= String.format( "%09x", args.hashCode() );
             filename= base + String.format( "%09x", ss[0].hashCode() ) + "@" + args;
         }
@@ -1249,11 +1249,17 @@ public class DataSetURI {
                 File newName= result;
                 while ( newName.exists() ) {
                     String[] ss= filename.split("@",-2);
-                    if ( ss.length==2 ) {
-                        filename= ss[0] + "@" + ss[1] + "@0";
-                    } else {
-                        int i= Integer.parseInt(ss[2]);
-                        filename= ss[0] + "@" + ss[1] + "@" + ( i+1 );
+                    switch (ss.length) {
+                        case 1:
+                            filename= ss[0] + "@" + "" + "@0";
+                            break;
+                        case 2:
+                            filename= ss[0] + "@" + ss[1] + "@0";
+                            break;
+                        default:
+                            int i= Integer.parseInt(ss[2]);
+                            filename= ss[0] + "@" + ss[1] + "@" + ( i+1 );
+                            break;
                     }
                     newName= new File( filename );
                 }
