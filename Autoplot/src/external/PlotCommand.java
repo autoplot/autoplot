@@ -96,6 +96,7 @@ public class PlotCommand extends PyObject {
             + " <tr><td> rightAxisOf</td><td>specify a plot where a new plot with a new yaxis.</td>"
             + " <tr><td> topAxisOf</td><td>specify a plot where a new plot with a new xaxis above.</td>"
             + " <tr><td> overplotOf</td><td>a plot or plot element with which this should share axes.  Note something should reset the plot!</td>"
+            + " <tr><td> reset=F</td><td>suppress autoranging, default is True"
             + "</table></html>");
 
     public static final PyString __completions__;
