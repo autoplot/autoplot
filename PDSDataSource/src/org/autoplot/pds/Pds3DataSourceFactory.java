@@ -263,14 +263,18 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
     private String summarizeDescription( String desc ) {
         int i= desc.indexOf(".");
         int l= desc.length();
-        int limit=80;
+        int limit=86;
         if ( i==-1 ) {
             if ( l>limit ) {
-                desc= desc.substring(0,limit)+"...";
+                i= desc.lastIndexOf(" ",limit);
+                if ( i==-1 ) i=limit;
+                desc= desc.substring(0,i)+"...";
             } 
         } else {
             if ( i>limit ) {
-                desc= desc.substring(0,limit)+"...";
+                i= desc.lastIndexOf(" ",limit);
+                if ( i==-1 ) i=limit;
+                desc= desc.substring(0,i)+"...";
             } else {
                 desc= desc.substring(0,i+1);
             }
