@@ -303,6 +303,9 @@ public class CDAWebDB {
         InputStream ins= null;
 
         try {
+            
+            long t0= System.currentTimeMillis();
+            
             URL url = new URL(String.format( CDAWeb + "WS/cdasr/1/dataviews/sp_phys/datasets/%s/orig_data/%s,%s", spid, tstart, tstop));
             logger.fine(url.toString());
             Logger loggerUrl= org.das2.util.LoggerManager.getLogger( "das2.url" );
@@ -349,6 +352,9 @@ public class CDAWebDB {
             
             String[] result= r.toArray( new String[ r.size() ] );
             
+            long ms= System.currentTimeMillis() - t0;            
+            logger.log(Level.FINE, "get files and ranges for {0} for {1} in {2}ms", new Object[]{spid, tr, ms});
+     
             return result;
 
         } catch (MalformedURLException ex) {
@@ -381,6 +387,8 @@ public class CDAWebDB {
 
         InputStream ins= null;
 
+        long t0= System.currentTimeMillis();
+        
         try {
             URL url = new URL(String.format( CDAWeb + "WS/cdasr/1/dataviews/sp_phys/datasets/%s/data/%s,%s/ALL-VARIABLES?format=cdf", spid, tstart, tstop));
             URLConnection urlc;
@@ -420,6 +428,9 @@ public class CDAWebDB {
             //((HttpURLConnection)urlc).disconnect(); // https://sourceforge.net/p/autoplot/bugs/1754/
             //Do not call after trivial calls, so that if all the data is downloaded, then the connections are reused.
 
+            long ms= System.currentTimeMillis() - t0;            
+            logger.log(Level.FINE, "get files and ranges for {0} for {1} in {2}ms", new Object[]{spid, tr, ms});
+            
             return result;
 
         } catch (MalformedURLException ex) {
