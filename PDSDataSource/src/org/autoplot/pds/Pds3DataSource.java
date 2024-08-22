@@ -14,6 +14,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -30,6 +32,7 @@ import org.das2.datum.Units;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.w3c.dom.Document;
@@ -45,6 +48,8 @@ import org.xml.sax.SAXException;
  */
 public class Pds3DataSource extends AbstractDataSource {
 
+    private static final Logger logger= LoggerManager.getLogger("apdss.pds");
+    
     public Pds3DataSource(URI uri) {
         super(uri);
     }
@@ -311,15 +316,15 @@ public class Pds3DataSource extends AbstractDataSource {
             
             PDS3DataObject obj= Pds3DataSourceFactory.getDataObjectPds3( labelUrl, name );
                         
-            String uri= obj.resolveUri( fp.getUrl() );
-            
-            DataSource delegate= DataSetURI.getDataSource(uri);
+            String delegateUri= obj.resolveUri( fp.getUrl() );
+            logger.log(Level.FINE, "loading PDS data using delegate URI {0}", delegateUri);
+            DataSource delegate= DataSetURI.getDataSource(delegateUri);
             QDataSet ds= delegate.getDataSet( mon.getSubtaskMonitor( "dataset "+ i ) );
             ds= Ops.putProperty( ds, QDataSet.NAME, name );
             ds= Ops.putProperty( ds, QDataSet.LABEL, name );
             ds= Ops.putProperty( ds, QDataSet.DESCRIPTION, obj.getDescription() );
             HashMap<String,Object> user= new HashMap<>();
-            user.put("delegate_uri",uri);
+            user.put("delegate_uri",delegateUri);
             ds= Ops.putProperty( ds, QDataSet.USER_PROPERTIES, user );
             results[i]= ds;
             
