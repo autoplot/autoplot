@@ -30,7 +30,7 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-08-22 r27736):</p>
+        <p>Bugfixes (2024-08-27 r27740):</p>
         <ul>
             <li>bugfix: code assumed that temporary name would have one @ symbol, so recent change to remove @ when no arguments are used caused runtime error.
             <li>add reset=F to documentation for plot command, which will skip the autoranging.
@@ -62,7 +62,7 @@
         <ul>
             <li>Axis objects can now have the tickValues='none', useful for when the values don't matter in a figure.
             <li>EventsRenderer has new rotate control which prints the event label vertically.
-            <li>DasAnnotation has new padding and lineThink controls.
+            <li>DasAnnotation has new padding and lineThick controls.
             <li>Font size controls for vertical and horizontal slice.  Thanks, Connor!
             <li>downloadResourceAsTempFile no longer adds "@" to filename when there are no parameters.
             <li>Das2 TimeUtil now has rangeContaining, which will calculate the hour containing data point or hours containing an interval.
