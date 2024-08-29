@@ -1141,6 +1141,9 @@ public class ReadIDLSav {
         RandomAccessFile aFile = new RandomAccessFile(f,"r");
         FileChannel inChannel = aFile.getChannel();
         long fileSize = inChannel.size();
+        if ( fileSize>Integer.MAX_VALUE ) {
+            throw new IllegalArgumentException("file is too large to read, and must be less than 2GB: "+f);
+        }
         ByteBuffer buffer = ByteBuffer.allocate((int) fileSize);        
         int bytesRead= 0;
         while ( bytesRead<fileSize ) {
