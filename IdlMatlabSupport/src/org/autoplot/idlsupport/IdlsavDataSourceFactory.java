@@ -92,13 +92,14 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
                     problems.add("no plottable parameters start with "+var);
                 }
                 ReadIDLSav reader= new ReadIDLSav();
-                TagDesc t= reader.readTagDesc( buf, var );
+                TagDesc t= reader.readTagDesc( fc, var );
                 if ( t==null ) {
                     problems.add("no tag desc found for "+var);
                 } else if ( t instanceof StructDesc ) {
                     problems.add("tag is a structure: "+var);                    
                 }
             }
+            fc.close();
             
             return problems.size()>0 ;
             

@@ -233,6 +233,7 @@ public class IdlsavDataSource extends AbstractDataSource {
             if ( z.length()>0 ) {
                 datas = new QDataSet[3];
                 QDataSet array= getArray( reader, buffer, z );
+                //TODO: QDataSet array= getArray( reader, inChannel, z );
                 array= handleDs( array, z );
                 datas[2]= array;
             }

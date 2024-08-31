@@ -98,7 +98,7 @@ public class ReadIDLSav {
     
     /**
      * return the next record buffer, or returns null at the end.
-     * @param ch the bytebuffer
+     * @param inch the file channel
      * @param pos the position.
      * @return the record, including the twelve bytes at the beginning
      * @throws IOException 
@@ -111,19 +111,19 @@ public class ReadIDLSav {
         
         int type= b8.getInt(0);
         int endpos= b8.getInt(4);
-        
-        ByteBuffer ch= ByteBuffer.allocateDirect(endpos-pos);
-        inch.read(ch,pos);
-        
+                
         String stype;
         if ( type==RECTYPE_ENDMARKER ) {
             return null;
         } else {
+            ByteBuffer ch1= ByteBuffer.allocateDirect(endpos-pos);
+            inch.read(ch1,pos);
+        
             switch ( type ) {
                 case RECTYPE_VARIABLE:
                     stype= "variable";
-                    StringData varName= readString( ch, pos+20 );
-                    return slice(ch, pos, endpos, stype, varName.string );
+                    StringData varName= readString( ch1, 20 );
+                    return sliceLabel( ch1, pos, endpos, stype, varName.string );
                 case RECTYPE_VERSION:
                     stype= "version";
                     break;
@@ -137,7 +137,7 @@ public class ReadIDLSav {
                     stype="???";
                     break;
             }
-            return slice(ch, pos, endpos, stype, "" );
+            return ch1;
         }
     }
     
@@ -1123,7 +1123,14 @@ public class ReadIDLSav {
         
     }
     
+    /**
+     * TODO: document me
+     */
     private static final Map<Long,Integer> bufferOffsets= new HashMap<>();
+    
+    /**
+     * Labels for each section of the 
+     */
     private static final Map<Long,String> bufferLabels= new HashMap<>();
     
     private String nameFor( ByteBuffer buf ) {
@@ -1132,6 +1139,10 @@ public class ReadIDLSav {
     
     private static Long getKeyFor( ByteBuffer buf ) {
         return ((long)buf.limit())*Integer.MAX_VALUE + buf.position();
+    }
+    
+    private static Long getKeyFor( int position, int limit ) {
+        return ((long)limit)* Integer.MAX_VALUE +position;
     }
     
     /**
@@ -1168,6 +1179,24 @@ public class ReadIDLSav {
         bufferOffsets.put( getKeyFor(r1), position+offset );
         bufferLabels.put( getKeyFor(r1), label );
         return r1;
+    }
+    
+    private ByteBuffer sliceLabel( ByteBuffer slice, int position, int limit, String type, String label ) {
+        Integer offset= bufferOffsets.get(getKeyFor(position,limit));
+        if ( offset!=null ) {
+            logger.log(Level.CONFIG, "slice {0} {1,number,#} {2,number,#} {3}", 
+                    new Object[]{ type, position+offset, limit+offset, label });
+        } else {
+            logger.log(Level.CONFIG, "slice {0} {1,number,#} {2,number,#} {3}", new Object[]{ type, position, limit, label });
+            offset=0;
+            if ( bufferLabels.get(getKeyFor(slice))==null ) {
+                bufferLabels.put(getKeyFor(slice),"file");
+            }
+        }
+        Long k= getKeyFor(position,position+slice.limit());
+        bufferOffsets.put( k, position+offset );
+        bufferLabels.put( k, label );
+        return slice;
     }
     
     private String labelType( int type ) {
@@ -1257,14 +1286,8 @@ public class ReadIDLSav {
         //  1 ch.write(getBytesByte((byte) 0));
         //  1 ch.write(getBytesByte((byte) 4));
 
-        ByteBuffer buf= ByteBuffer.allocate(4);
-        if ( !(inChannel.read(buf)==4) ) {
-            throw new IllegalArgumentException("not 4 bytes");
-        }
-        int magic= buf.getInt(0);
-        if ( magic!=1397882884 ) {
-            logger.warning("magic number is incorrect");
-        }
+        checkMagic(inChannel);
+
         int pos= 4;
         
         Map<String,Object> result= new LinkedHashMap<>();
@@ -1355,14 +1378,8 @@ public class ReadIDLSav {
      * @throws IOException 
      */
     public String[] readVarNames( FileChannel inChannel ) throws IOException {
-        ByteBuffer buf= ByteBuffer.allocate(4);
-        if ( !(inChannel.read(buf)==4) ) {
-            throw new IllegalArgumentException("not 4 bytes");
-        }
-        int magic= buf.getInt(0);
-        if ( magic!=1397882884 ) {
-            logger.warning("magic number is incorrect");
-        }
+        checkMagic(inChannel);
+        
         int pos= 4;
         
         List<String> names= new ArrayList<>();
@@ -1486,7 +1503,8 @@ public class ReadIDLSav {
         }
         return null;        
         
-    }    
+    }  
+    
     /**
      * scan through the IDLSav and retrieve information about the array.
      * @param in the idlsav loaded into a ByteBuffer.
@@ -1547,6 +1565,89 @@ public class ReadIDLSav {
             }
             pos= nextPos;
             rec= readRecord( in, pos );
+        }
+        return null;        
+    }
+
+    public static boolean checkMagic( FileChannel inChannel ) throws IOException {
+        ByteBuffer buf= ByteBuffer.allocate(4);
+        if ( !(inChannel.read(buf)==4) ) {
+            throw new IllegalArgumentException("not 4 bytes");
+        }
+        int magic= buf.getInt(0);
+        if ( magic!=1397882884 ) {
+            logger.warning("magic number is incorrect");
+            return false;
+        } else {
+            return true;
+        }
+    }
+    
+    /**
+     * scan through the IDLSav and retrieve information about the array.
+     * @param inch the FileChannel for the idlsav
+     * @param name the name of the array
+     * @return
+     * @throws IOException 
+     */    
+    /**
+     * scan through the IDLSav and retrieve information about the array.
+     * @param inch the FileChannel for the idlsav
+     * @param name the name of the array
+     * @return
+     * @throws IOException 
+     */
+    public TagDesc readTagDesc( FileChannel inch, String name ) throws IOException {
+        checkMagic(inch);
+        
+        int pos= 4;
+        
+        ByteBuffer rec= readRecord( inch, pos );
+        while ( rec!=null ) {
+            int type= rec.getInt(0);
+            int nextPos= rec.getInt(4);
+            logger.log(Level.CONFIG, "RecType: {0} Length: {1,number,#}", new Object[]{labelType(type), nextPos-pos});
+            switch ( type ) {
+                case RECTYPE_VARIABLE:
+                    logger.config("variable");
+                    StringData varName= readString( rec, 20 );
+                    if ( name.startsWith(varName.string+".") || name.equals(varName.string) ) {
+                        int nextField= varName._lengthBytes;
+                        ByteBuffer var= slice(rec, 20+nextField, rec.limit(), "variable", varName.string );
+                        if ( var.getInt(0)==8 ) { // TODO: what is 8?
+                            if ( ( var.getInt(4) & VARFLAG_STRUCT ) == VARFLAG_STRUCT ) {
+                                TypeDescStructure typeDescStructure= readTypeDescStructure(var);
+                                if ( name.equals(varName.string) ) {
+                                    return typeDescStructure.structDesc;
+                                } else {
+                                    return findStructureTag( typeDescStructure.structDesc, name.substring(varName.string.length()+1) );
+                                }
+                            } else {
+                                return readTypeDescArray(var).arrayDesc;
+                            }
+                        } else {
+                            if ( ( var.getInt(4) & VARFLAG_ARRAY ) == VARFLAG_ARRAY ) {
+                                TagDesc dd= readTypeDescArray(var).arrayDesc;
+                                dd.typecode= readTypeDescArray(var).typeCode;
+                                return dd;
+                            } else {
+                                return readTagDesc(var);
+                            }
+                        }
+                    }
+                    break;
+                case RECTYPE_VERSION:
+                    logger.config("version");
+                    break;
+                case RECTYPE_TIMESTAMP:
+                    logger.config("timestamp");
+                    break;
+                default:
+                    logger.config("???");
+                    break;
+            }
+            pos= nextPos;
+            rec= readRecord( inch, pos );
         }
         return null;        
     }
