@@ -119,6 +119,10 @@ public abstract class BaseVarContainer implements Runnable {
         }
     }
 
+    /**
+     * if true, use direct memory-mapped buffers.  If false, just allocate a buffer.
+     * @param direct 
+     */
     public void setDirect(boolean direct) {
         if (allocationMode == null) allocationMode = new Boolean(direct);
     }
@@ -153,7 +157,7 @@ public abstract class BaseVarContainer implements Runnable {
         int _words = words*getLength();
         if (allocationMode == null) {
             if (userBuffer == null) {
-                _buf = ByteBuffer.allocateDirect(_words);
+                 _buf = ByteBuffer.allocateDirect(_words);
             } else {
                  _buf = userBuffer;
             }
