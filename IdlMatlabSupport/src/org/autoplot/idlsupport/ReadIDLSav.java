@@ -2,12 +2,15 @@
 package org.autoplot.idlsupport;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -66,6 +69,51 @@ public class ReadIDLSav {
         
         int type= ch.getInt(pos);
         int endpos= ch.getInt(pos+4);
+        
+        String stype;
+        if ( type==RECTYPE_ENDMARKER ) {
+            return null;
+        } else {
+            switch ( type ) {
+                case RECTYPE_VARIABLE:
+                    stype= "variable";
+                    StringData varName= readString( ch, pos+20 );
+                    return slice(ch, pos, endpos, stype, varName.string );
+                case RECTYPE_VERSION:
+                    stype= "version";
+                    break;
+                case RECTYPE_TIMESTAMP:
+                    stype="timestamp";
+                    break;
+                case RECTYPE_PROMOTE64:
+                    stype="promote64";
+                    break;
+                default:
+                    stype="???";
+                    break;
+            }
+            return slice(ch, pos, endpos, stype, "" );
+        }
+    }
+    
+    /**
+     * return the next record buffer, or returns null at the end.
+     * @param ch the bytebuffer
+     * @param pos the position.
+     * @return the record, including the twelve bytes at the beginning
+     * @throws IOException 
+     */    
+    private ByteBuffer readRecord( FileChannel inch, int pos ) throws IOException {
+
+        ByteBuffer b8= ByteBuffer.allocate(8);
+        inch.read(b8,pos);
+        b8.order( ByteOrder.BIG_ENDIAN );
+        
+        int type= b8.getInt(0);
+        int endpos= b8.getInt(4);
+        
+        ByteBuffer ch= ByteBuffer.allocateDirect(endpos-pos);
+        inch.read(ch,pos);
         
         String stype;
         if ( type==RECTYPE_ENDMARKER ) {
@@ -1152,7 +1200,12 @@ public class ReadIDLSav {
         return buffer;
     }
    
-    
+    public static FileChannel readFileIntoChannel( File f ) throws IOException {
+        RandomAccessFile aFile = new RandomAccessFile(f,"r");
+        FileChannel inChannel = aFile.getChannel();
+        return inChannel;
+    }
+   
     public Map<String,Object> readVars( ByteBuffer in ) throws IOException {
         
         //  2  ch.write(getBytesStr("SR"));
@@ -1197,6 +1250,54 @@ public class ReadIDLSav {
         return result;
     }
 
+    public Map<String,Object> readVars( FileChannel inChannel ) throws IOException {
+        
+        //  2  ch.write(getBytesStr("SR"));
+
+        //  1 ch.write(getBytesByte((byte) 0));
+        //  1 ch.write(getBytesByte((byte) 4));
+
+        ByteBuffer buf= ByteBuffer.allocate(4);
+        if ( !(inChannel.read(buf)==4) ) {
+            throw new IllegalArgumentException("not 4 bytes");
+        }
+        int magic= buf.getInt(0);
+        if ( magic!=1397882884 ) {
+            logger.warning("magic number is incorrect");
+        }
+        int pos= 4;
+        
+        Map<String,Object> result= new LinkedHashMap<>();
+        
+        ByteBuffer rec= readRecord( inChannel, pos );
+        while ( rec!=null ) {
+            int type= rec.getInt(0);
+            int nextPos= rec.getInt(4);
+            if ( rec.getInt(8)!=0 ) {
+                throw new IllegalArgumentException("records bigger than 2**32 bytes are not supported.");
+            }
+            logger.log(Level.CONFIG, "RecType: {0} Length: {1,number,#}", new Object[]{labelType(type), nextPos-pos});
+            switch ( type ) {
+                case RECTYPE_VARIABLE:
+                    logger.config("variable");
+                    variable(rec, 0, result);
+                    break;
+                case RECTYPE_VERSION:
+                    logger.config("version");
+                    break;
+                case RECTYPE_TIMESTAMP:
+                    logger.config("timestamp");
+                    break;
+                default:
+                    logger.config("???");
+                    break;
+            }
+            pos= nextPos;
+            rec= readRecord( inChannel, pos );
+        }
+        return result;
+    }
+    
     /**
      * list the names in the IDLSav file.  This is only the supported
      * variable types.
@@ -1245,6 +1346,59 @@ public class ReadIDLSav {
         }
         return names.toArray( new String[names.size()] );
     }
+    
+    /**
+     * list the names in the IDLSav file.  This is only the supported
+     * variable types.
+     * @param in
+     * @return the names found.
+     * @throws IOException 
+     */
+    public String[] readVarNames( FileChannel inChannel ) throws IOException {
+        ByteBuffer buf= ByteBuffer.allocate(4);
+        if ( !(inChannel.read(buf)==4) ) {
+            throw new IllegalArgumentException("not 4 bytes");
+        }
+        int magic= buf.getInt(0);
+        if ( magic!=1397882884 ) {
+            logger.warning("magic number is incorrect");
+        }
+        int pos= 4;
+        
+        List<String> names= new ArrayList<>();
+        
+        ByteBuffer rec= readRecord( inChannel, pos );  
+        while ( rec!=null ) {
+            int type= rec.getInt(0);
+            int nextPos= rec.getInt(4);
+            logger.log(Level.CONFIG, "RecType: {0} Length: {1,number,#}", new Object[]{labelType(type), nextPos-pos});
+            switch ( type ) {
+                case RECTYPE_VARIABLE:
+                    logger.config("variable");
+                    StringData varName= readString( rec, 20 );
+
+                    int nextField= varName._lengthBytes;
+
+                    ByteBuffer var= slice(rec, 20+nextField, rec.limit(), "var_x", "" );
+                    
+                    names.add(varName.string); 
+
+                    break;
+                case RECTYPE_VERSION:
+                    logger.config("version");
+                    break;
+                case RECTYPE_TIMESTAMP:
+                    logger.config("timestamp");
+                    break;
+                default:
+                    logger.config("???");
+                    break;
+            }
+            pos= nextPos;
+            rec= readRecord( inChannel, pos );
+        }
+        return names.toArray( new String[names.size()] );
+    }    
     
     /**
      * scan through the IDLSav and return just the one variable.

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -57,8 +58,8 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
             
             File file= DataSetURI.getFile( split.resourceUri, mon );
             
-            ByteBuffer buf= ReadIDLSav.readFileIntoByteBuffer(file);
-            String[] names= new ReadIDLSav().readVarNames(buf);
+            FileChannel fc= ReadIDLSav.readFileIntoChannel(file);
+            String[] names= new ReadIDLSav().readVarNames(fc);
             
             String[] vars=null;
             if ( var!=null ) {
