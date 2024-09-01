@@ -169,7 +169,7 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
         String append = getParam( "append", "F" );
         WriteIDLSav write= new WriteIDLSav();
 
-        String guessName= "data";
+        String guessName= "DATA";
         String[] names= new String[0];
         
         if ( append.equals("T") ) { 
