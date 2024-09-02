@@ -2,15 +2,12 @@
 package org.autoplot.idlsupport;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -1124,6 +1121,46 @@ public class ReadIDLSav {
     }
     
     /**
+     * read the scalar, array, or structure at this position.  An
+     * array is returned flattened, and readTypeDesc should be used
+     * to unflatten it.  Structures are returned as a LinkedHashMap.
+     * @param rec the byte buffer
+     * @param offset offset into rec
+     * @param vars map containing read data.
+     * @return the read data.
+     */
+    private Object variable( FileChannel inch, int offset, Map<String,Object> vars) throws IOException {
+        
+        ByteBuffer rec= ByteBuffer.allocateDirect(512);  // length of variable name
+        inch.read(rec,offset);
+        
+        logger.log( Level.FINER, "variable @ {0}", bufferOffsets.get(getKeyFor(rec)) );
+        int type= rec.getInt(0+offset);
+        if ( type!=RECTYPE_VARIABLE ) {
+            throw new IllegalArgumentException("not a variable");
+        }
+        
+        StringData varName= readString( rec, 20+offset );
+        logger.log(Level.FINE, "variable name is {0}", varName );
+
+        int nextField= 20 + varName._lengthBytes + offset;
+
+        rec=null;
+        ByteBuffer data= ByteBuffer.allocateDirect(nextField-offset);
+        inch.read( rec, offset );
+                //inch.//slice(rec, nextField, rec.limit(), "typeDesc", "" );
+        TypeDesc typeDesc= readTypeDesc( data );
+        
+        logger.log(Level.CONFIG, "variable_972 {0} {1,number,#} {2,number,#} {3}", new Object[]{data.position(), 0, data.limit(), varName});
+        Object result= typeDesc.readData( data );
+        
+        vars.put( varName.string, result );
+        
+        return result;
+        
+    }    
+    
+    /**
      * TODO: document me
      */
     private static final Map<Long,Integer> bufferOffsets= new HashMap<>();
@@ -1504,6 +1541,85 @@ public class ReadIDLSav {
         return null;        
         
     }  
+    
+    /**
+     * scan through the IDLSav and return just the one variable.
+     * @param inch FileChannel for the IDLSav.
+     * @param name the variable name to look for.
+     * @return
+     * @throws IOException 
+     */
+    public Object readVar( FileChannel inch, String name ) throws IOException {
+        checkMagic(inch);
+
+        bufferOffsets.put( getKeyFor(0,0), 0 );
+        bufferLabels.put( getKeyFor(0,0), "<file>" );
+
+        int pos= 4;
+        String name0= name; // keep name for reference.
+        ByteBuffer rec= readRecord( inch, pos );
+        
+        while ( rec!=null ) {
+    
+            int offset = bufferOffsets.get(getKeyFor(rec));
+        
+            int type= rec.getInt(0);
+            int nextPos= rec.getInt(4);
+            logger.log(Level.CONFIG, "RecType: {0} Length: {1,number,#}", new Object[]{labelType(type), nextPos-pos});
+            switch ( type ) {
+                case RECTYPE_VARIABLE:
+                    StringData varName= readString( rec, 20 );
+                    logger.log(Level.CONFIG, "variable {0} {1,number,#} {2,number,#} {3}", 
+                            new Object[] { type, pos, nextPos, varName } );
+                    String rest= null;
+                    int i= name.indexOf(".");
+                    if ( i>-1 ) {
+                        rest= name.substring(i+1);
+                        name= name.substring(0,i);
+                    }
+                    if ( i==-1 ) {
+                        if ( varName.string.equals(name) ) {
+                            Map<String,Object> result= new HashMap<>();
+                            variable( inch, offset, result);
+                            return result.get(name);
+                        }
+                    } else {
+                        if ( varName.string.equals(name) ) {
+                            Map<String,Object> result= new HashMap<>();
+                            variable( inch, offset, result );
+                            Map<String,Object> res= (Map<String,Object>) result.get(name);
+                            assert rest!=null;
+                            i= rest.indexOf('.');
+                            while ( i>-1 ) {
+                                res= (Map<String,Object>)res.get( rest.substring(0,i) );
+                                rest= rest.substring(i+1);
+                                i= rest.indexOf('.');
+                            }
+                            return res.get(rest);
+                        }
+                    }
+                    break;
+                case RECTYPE_VERSION:
+                    logger.config("version");
+                    break;
+                case RECTYPE_TIMESTAMP:
+                    logger.config("timestamp");
+                    break;
+                case RECTYPE_PROMOTE64:
+                    logger.config("promote64");
+                    throw new IllegalArgumentException("promote64 is not supported.");
+                default:
+                    logger.config("???");
+                    break;
+            }
+            pos= nextPos;
+            rec= readRecord( inch, pos );
+            
+        }
+        return null;        
+        
+    }  
+        
     
     /**
      * scan through the IDLSav and retrieve information about the array.

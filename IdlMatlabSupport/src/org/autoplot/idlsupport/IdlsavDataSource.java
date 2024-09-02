@@ -130,6 +130,77 @@ public class IdlsavDataSource extends AbstractDataSource {
             return Ops.dataset(v);
         }
     }
+
+    public static QDataSet getArray( ReadIDLSav reader, FileChannel inch, String arg ) throws IOException {
+        Object v;
+        
+        int i= arg.indexOf('.');
+        String t=arg;
+        if ( i>-1 ) { // structure
+            String h= t.substring(0,i);
+            t= t.substring(i+1);
+            v= reader.readVar( inch, h );
+            if ( !( v instanceof Map ) ) {
+                throw new IllegalArgumentException("expected map for '"+h+"'");
+            } else {
+                v= getFromStructure( ((Map)v), t );
+                if ( v==null ) throw new IllegalArgumentException("unable to find variable: "+arg);
+            }
+        } else {
+            v= reader.readVar( inch, arg );
+        }
+        
+        if ( v==null ) {
+            throw new IllegalArgumentException("unable to find variable or not supported: "+arg);
+        }
+        
+        if ( v instanceof ReadIDLSav.ArrayData ) {
+            ReadIDLSav.ArrayData arrayData= (ReadIDLSav.ArrayData)v;
+            Class c= arrayData.array.getClass();
+            if ( c.isArray() && c.getComponentType()==String.class ) {
+                if ( arrayData.dims.length>1 ) {
+                    throw new IllegalArgumentException("not supported");
+                }
+                EnumerationUnits u= Units.nominal();
+                ArrayDataSet result= IDataSet.create(arrayData.dims);
+                result.putProperty( QDataSet.UNITS, u );
+                if ( arrayData.dims.length!=1 ) throw new IllegalArgumentException("multi dimensional not supported");
+                for ( int j=0; j<Array.getLength(arrayData.array); j++ ) {
+                    Datum d= u.createDatum( Array.get( arrayData.array, j ) );
+                    result.putValue( j, d.doubleValue(u) );
+                }
+                result.putProperty( QDataSet.USER_PROPERTIES, getUserProperties( arrayData ) );
+                return result;
+            } else {
+                ArrayDataSet result;
+                if ( arrayData.typeCode==ReadIDLSav.TYPECODE_COMPLEX_FLOAT || arrayData.typeCode==ReadIDLSav.TYPECODE_COMPLEX_DOUBLE ) {
+                    result= ArrayDataSet.wrap( arrayData.array, DataSetOps.addElement(arrayData.dims, 2), false );
+                    result.putProperty( QDataSet.DEPEND_1, Schemes.complexCoordinateSystemDepend() );
+                } else {
+                    result= ArrayDataSet.wrap( arrayData.array, arrayData.dims, false );
+                }
+                if ( result instanceof SDataSet || result instanceof IDataSet || result instanceof LDataSet ) {
+                    result.putProperty( QDataSet.FORMAT, "%d" );
+                }
+                result.putProperty( QDataSet.USER_PROPERTIES, getUserProperties( arrayData ) );
+                return result;
+            }
+        } else if ( v instanceof Map ) { 
+            throw new IllegalArgumentException("Map is not supported, select one of its tags");
+        } else if ( v instanceof String ) {
+            return Ops.dataset( Units.nominal().createDatum(v) );
+        } else if ( v instanceof double[] && Array.getLength(v)==2 ) { //
+            ArrayDataSet result= ArrayDataSet.wrap( v, new int [] { 2 }, false );
+            result.putProperty( QDataSet.DEPEND_0, Schemes.complexCoordinateSystemDepend() );
+            return result;
+        } else if ( v instanceof float[] && Array.getLength(v)==2 ) { //
+            ArrayDataSet result= ArrayDataSet.wrap( v, new int [] { 2 }, false );
+            result.putProperty( QDataSet.DEPEND_0, Schemes.complexCoordinateSystemDepend() );
+            return result;
+        } else {
+            return Ops.dataset(v);
+        }
+    }
     
     private QDataSet handleDs( QDataSet array, String name ) {
         int[] qube= DataSetUtil.qubeDims(array);
@@ -232,8 +303,8 @@ public class IdlsavDataSource extends AbstractDataSource {
         if ( name.length()==0 ) {
             if ( z.length()>0 ) {
                 datas = new QDataSet[3];
-                QDataSet array= getArray( reader, buffer, z );
-                //TODO: QDataSet array= getArray( reader, inChannel, z );
+                //QDataSet array= getArray( reader, buffer, z );
+                QDataSet array= getArray( reader, inChannel, z );
                 array= handleDs( array, z );
                 datas[2]= array;
             }
