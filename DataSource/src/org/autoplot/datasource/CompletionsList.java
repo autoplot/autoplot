@@ -50,6 +50,17 @@ public class CompletionsList {
                     if (label.startsWith(labelprefix)) {
                         label = label.substring(labelprefix.length());
                     }
+                    int i2= s1.completion.lastIndexOf("?");
+                    if ( i2>-1 ) {
+                        int i3= s1.completion.indexOf("&",i2);
+                        if ( i3>-1 ) i2=i3;
+                        i3= s1.completion.indexOf("=",i2);
+                        if ( i3>-1 ) i2=i3;
+                    }
+                    String ll= s1.completion.substring(i2+1);
+                    if ( i2>-1 && !label.startsWith(ll) ) {
+                        label= ll + ": "+ label ;
+                    }
                     Action a = new AbstractAction(label) {
                         @Override
                         public void actionPerformed(ActionEvent ev) {
