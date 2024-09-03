@@ -388,7 +388,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
             
             logger.log(Level.FINE, "getCompletions {0}", cc.resourceURI);
             
-            File xmlfile = DataSetURI.getFile(cc.resourceURI.toURL(),new NullProgressMonitor());
+            DataSetURI.getFile(cc.resourceURI.toURL(),new NullProgressMonitor());
              
             Map<String,String> result;
             result = getDataObjectNames(cc.resourceURI.toURL(), mon);
@@ -403,7 +403,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
                 String key= e.getKey();
                 String desc= e.getValue();
                 CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, 
-                        key, this, "arg_0", desc, "", true );
+                        key, this, "arg_0", desc, null, true );
                 ccresult.add(cc1);
             }
             ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "X=",
