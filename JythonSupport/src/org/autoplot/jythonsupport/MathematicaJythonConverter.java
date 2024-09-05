@@ -212,7 +212,7 @@ public class MathematicaJythonConverter extends javax.swing.JPanel {
             if ( t.equals("]") ) {
                 List<String> ss= new LinkedList<>();
                 ss.add(t);
-                while ( stack.size()>0 && !s.equals("[") ) {
+                while ( !stack.isEmpty() && !s.equals("[") ) {
                     s= stack.pop();
                     ss.add(0,s);
                 }
@@ -267,7 +267,7 @@ public class MathematicaJythonConverter extends javax.swing.JPanel {
                 continue;
             }
             
-            if ( stack.size()>0 ) {
+            if ( !stack.isEmpty() ) {
                 stack.add(t);
                 continue;
             }
@@ -289,7 +289,7 @@ public class MathematicaJythonConverter extends javax.swing.JPanel {
                 stack.push(t);
             } else if ( t.equals("]") ) {
                 String lastt= stack.pop();
-                if ( stack.size()>0 && stack.peek().equals("[") ) {
+                if ( !stack.isEmpty() && stack.peek().equals("[") ) {
                     stack.pop();
                     if ( lastNameOrConstant ) {
                         sb.append(" * ");
@@ -334,7 +334,7 @@ public class MathematicaJythonConverter extends javax.swing.JPanel {
                 sb.append(t);
                 lastNameOrConstant= false;
             } else if ( intPattern.matcher(t).matches() ) {
-                if ( stack.size()>0 ) {
+                if ( !stack.isEmpty() ) {
                     stack.push(t);
                 } else {
                     if ( lastNameOrConstant ) {
@@ -348,7 +348,7 @@ public class MathematicaJythonConverter extends javax.swing.JPanel {
                     lastNameOrConstant= true;
                 }
             } else {
-                if ( stack.size()>0 ) {
+                if ( !stack.isEmpty() ) {
                     stack.push(t);
                 } else {
                     boolean isFunctionName= false;
