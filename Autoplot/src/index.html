@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>New tickValues=none control allows axis to be labeled but with no ticks showing.  Green borders are on for debugging.</small></p>
+        <p><small>Kodalith of W. E. Rollins sketch, taken from screenshot of Antiques Roadshow in Portland, Oregon in 2017.  Try out this vap: <a href="https://github.com/autoplot/dev/blob/master/demos/2024/20240907/kodalith.vap">kodalith.vap</a></small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,11 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-08-27 r27740):</p>
+        <p>Bugfixes (2024-09-07 r27750):</p>
         <ul>
+            <li>improvements to labels in PDS3 labels, where the variable name is shown as well as the description.
+            <li>format to IDLSav could create file with two variables having the same name, which is absurd.
+            <li>improve error message when IDLSave is bigger than 2GB.  (Larger file support is coming!)
             <li>bugfix: code assumed that temporary name would have one @ symbol, so recent change to remove @ when no arguments are used caused runtime error.
             <li>add reset=F to documentation for plot command, which will skip the autoranging.
             <li>A CDAWeb "master" file for FA_ESA_L2_EEB which corrects flipped DEPEND_1 and DEPEND_2 wasn't properly supported.
