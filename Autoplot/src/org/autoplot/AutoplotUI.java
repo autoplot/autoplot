@@ -115,6 +115,8 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
 import javax.xml.parsers.ParserConfigurationException;
+import static org.autoplot.ScriptContext.writeToPdf;
+import static org.autoplot.ScriptContext.writeToPng;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.autoplot.pngwalk.CreatePngWalk;
 import org.autoplot.pngwalk.PngWalkTool;
@@ -4934,6 +4936,7 @@ private void updateFrameTitle() {
                 "passed into the script as sys.argv");
         alm.addBooleanSwitchArgument( "scriptExit",null,"scriptExit","force exit after running the script, setting exit status to non-zero for exception");
         alm.addOptionalSwitchArgument("testPngFilename", null, "testPngFilename", "", "write canvas to this png file after script is run" );
+        alm.addOptionalSwitchArgument("outputFile", null, "outputFile", "", "Write canvas to png or pdf output file" );
         alm.addOptionalSwitchArgument("autoLayout",null,"autoLayout",ArgumentList.TRUE,"turn on/off initial autolayout setting");
         alm.addOptionalSwitchArgument("mode","m","mode","expert","start in basic (browse,reduced) mode or expert mode" );
         //alm.addOptionalSwitchArgument("exit", null, "exit", "0", "exit after running script" );
@@ -5074,6 +5077,13 @@ private void updateFrameTitle() {
                         logger.log( Level.WARNING, null, ex );
                     }
                 }
+            }
+        }
+        
+        final String outputFile= alm.getValue("outputFile");
+        if ( !outputFile.equals("") ) {
+            if ( !outputFile.endsWith(".pdf") && !outputFile.endsWith(".png") ) {
+                throw new IllegalArgumentException("outputFile must end with .png or .pdf");
             }
         }
         
@@ -5379,6 +5389,47 @@ APSplash.checkTime("init 240");
                             }
                         };
                         SwingUtilities.invokeLater(run);
+                    }
+                }
+                
+                if ( outputFile.length()>0 ) {
+                    if ( headless ) {
+                        Runnable run= new Runnable() {
+                            public void run() {
+                                if ( outputFile.length()>0 ) {
+                                    ScriptContext.plot(finitialURL);
+                                    ScriptContext.waitUntilIdle();
+                                    Application domm= ScriptContext.getDocumentModel();
+                                    String format= "";
+                                    if ( outputFile.endsWith(".pdf") ) format= "pdf";
+                                    if ( outputFile.endsWith(".png") ) format= "png";
+                                    if ( format.equals("") ) throw new IllegalArgumentException("outputFile must end with .png or .pdf");
+                                    int height= domm.getCanvases()[0].getHeight();
+                                    int width=  domm.getCanvases()[0].getWidth();
+                                    switch (format) {
+                                        case "png":
+                                            logger.log(Level.INFO, "write to {0}", outputFile);
+                                            try {
+                                                ScriptContext.writeToPng( outputFile, width, height, Collections.emptyMap() );
+                                            } catch (IOException ex) {
+                                                logger.log(Level.SEVERE, null, ex);
+                                            }
+                                            break;
+                                        case "pdf":                                
+                                            try {
+                                                ScriptContext.writeToPdf( outputFile );
+                                            } catch (IOException ex) {
+                                                logger.log(Level.SEVERE, null, ex);
+                                            }
+                                            break;
+                                    }
+                                    System.exit(0);
+                                }
+                            }
+                        };
+                        new Thread(run).start();
+                    } else {
+                        throw new IllegalArgumentException("write to png or pdf must be called with --headless");
                     }
                 }
                 
