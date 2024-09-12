@@ -582,7 +582,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                         } else if ( UnitsUtil.isTimeLocation(tu) ) {
                             logger.fine("timetags already have context");
                         } else {
-                            logger.log(Level.FINE, "timetags units cannot be added to time locations. (units={0})", tu);
+                            logger.log(Level.INFO, "timetags units cannot be added to time locations. (units={0})", tu);
                         }
                     }
                     
