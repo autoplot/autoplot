@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Kodalith of W. E. Rollins sketch, taken from screenshot of Antiques Roadshow in Portland, Oregon in 2017.  Try out this vap: <a href="https://github.com/autoplot/dev/blob/master/demos/2024/20240907/kodalith.vap">kodalith.vap</a></small></p>
+        <p><small>Autoplot is used to stress and display performance of development version of CDAWeb HAPI server</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,9 +30,12 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-09-07 r27750):</p>
+        <p>Bugfixes (2024-09-12 r27754):</p>
         <ul>
             <li>improvements to labels in PDS3 labels, where the variable name is shown as well as the description.
+        </ul>
+        <p>Older Bugfixes (2024-09-07 r27750):</p>
+        <ul>
             <li>format to IDLSav could create file with two variables having the same name, which is absurd.
             <li>improve error message when IDLSave is bigger than 2GB.  (Larger file support is coming!)
             <li>bugfix: code assumed that temporary name would have one @ symbol, so recent change to remove @ when no arguments are used caused runtime error.
@@ -46,22 +49,10 @@
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2611/">2611</a>: Include dom, list, and len in short list of safe names to use in scripts when generating a GUI.  Thanks, Kristoff!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2610/">2610</a>: format bundle to CSV could fail when timetags were DEPEND_0.  Thanks, Sadie!
         </ul>
-        <p>Older Bugfixes (2024-08-06 r27703):</p>
-        <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2606/">2606</a>: improvements to RunBatch, including update link to documentation, and four-parameter examples.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2605/">2605</a>: CDF reader warns when non-gzip compression is used, which is not supported by the Java-based reader.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2604/">2604</a>: properly propagate labels for components from HAPI server. Thanks, Bob!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2603/">2603</a>: properly autorange in Y when three components each have small variance, so the additional 10% is not seen.  Thanks, Bob!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2600/">2600</a>: PDS3 support rank4 data, to the extent supported by the PDS library. (More changes coming!)
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2600/">2600</a>: PDS3 support datatype "UNSIGNED_INTEGER" with 1 byte.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2600/">2600</a>: PDS3 ROW_PREFIX_BYTES and ROW_SUFFIX_BYTES corrected, other bugs shown plotting https://pds-ppi.igpp.ucla.edu/data/CO-V_E_J_S_SS-RPWS-2-REFDR-WBRFULL-V1.0/DATA/RPWS_WIDEBAND_FULL/T19990XX/T1999003/T1999003_01_10KHZ2_WBRFR.LBL?WBR_SAMPLE
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2599/">2599</a>: PDS3 LABEL directory must be supported.
-            <li>Use a clear error message when colon is used in file name in formatDataSet on Windows.
-            <li>guessCadence branch where runtime error resulting from single-element dataset is handled properly.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2518/">2518</a>: Study mechanism to avoid unnecessary loading of images which are no longer visible during scrolling in PNG Walk Tool
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2528/">2528</a>: Github filesystem listing result would have repeated items.
-        </ul>
         <p>Features:</p>
+        <ul>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>Axis objects can now have the tickValues='none', useful for when the values don't matter in a figure.
             <li>EventsRenderer has new rotate control which prints the event label vertically.
@@ -71,13 +62,6 @@
             <li>Das2 TimeUtil now has rangeContaining, which will calculate the hour containing data point or hours containing an interval.
             <li>IDL/Matlab/Python interface provides direct access to loaded QDataSet, to support simpler Python interface.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/805/">805</a>: Finish off file parameters in scripts.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>add completions for filePollUpdates, an old but hidden feature which will be useful on Tracers.
-            <li>HAPI dialog has filter for parameter names, to support SSCWeb and CDF files with many parameters.  Thanks, Sadie!
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/829/">829</a>: Script editor dialog for setScriptDescription
-            <li>TestRunScripts.java introduced to run a series of scripts reporting any exceptions.
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
