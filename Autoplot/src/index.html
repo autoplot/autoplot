@@ -32,10 +32,13 @@
                 
         <p>Bugfixes (2024-09-12 r27754):</p>
         <ul>
-            <li>improvements to labels in PDS3 labels, where the variable name is shown as well as the description.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2615/">2615</a>: Correction to completions label, where extra strings were mistakenly included in label.
+            <li>filenameProvidesContext logs at INFO (not FINE) when the time (DEPEND_0) units are not convertible to seconds.
+
         </ul>
         <p>Older Bugfixes (2024-09-07 r27750):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2615/">2615</a>: improvements to labels in PDS3 labels, where the variable name is shown as well as the description.
             <li>format to IDLSav could create file with two variables having the same name, which is absurd.
             <li>improve error message when IDLSave is bigger than 2GB.  (Larger file support is coming!)
             <li>bugfix: code assumed that temporary name would have one @ symbol, so recent change to remove @ when no arguments are used caused runtime error.
@@ -51,6 +54,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/832/">832</a>: add outputFile command line switch which will write the loaded vap or URI to an output pdf or png file.
         </ul>
         <p>Less recent features:</p>
         <ul>
