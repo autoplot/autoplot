@@ -2545,8 +2545,12 @@ APSplash.checkTime("init 52.9");
                 maximizedPixelGain= 10;
             } 
             
-            windowExtraHeight= extraH;
-            windowExtraWidth= extraW;
+            if ( extraW>=0 && extraH>=0 ) {
+                windowExtraHeight= extraH;
+                windowExtraWidth= extraW;
+            } else {
+                resizeLogger.fine("ignoring impossible width or height");
+            }
                         
             resizeLogger.log(Level.FINER, "windowExtraWidth={0} windowExtraHeight={1}", 
                     new Object[] { windowExtraWidth, windowExtraHeight } );
@@ -5540,8 +5544,13 @@ APSplash.checkTime("init 240");
                     } else {
                         app.currentIcon = IDLE_ICON;
                         app.currentIconTooltip = null;
-                        app.windowExtraHeight= app.getHeight() - app.dom.getCanvases(0).getHeight();
-                        app.windowExtraWidth= app.getWidth() - app.dom.getCanvases(0).getWidth();
+                        int windowExtraHeight = app.getHeight() - app.dom.getCanvases(0).getHeight();
+                        int windowExtraWidth= app.getWidth() - app.dom.getCanvases(0).getWidth();        
+                        if ( windowExtraWidth>=0 && windowExtraHeight>=0 ) {
+                            app.windowExtraHeight= windowExtraHeight;
+                            app.windowExtraWidth= windowExtraWidth;
+                        }
+                        
                         resizeLogger.log(Level.FINER, "reset windowExtraWidth and windowExtraHeight to {0},{1}", new Object[]{app.windowExtraWidth, app.windowExtraHeight});
                     }
                 }
