@@ -595,15 +595,6 @@ public class CreatePngWalk {
                 //LoggerManager.markTime("455");
                 String filename = getFilename(params, "", atime);
 
-                /**
-                 * Code for adding images into global arrayList for use in HTML
-                 * method
-                 *
-                 * @author Armond Luthens
-                 * @date 09/21/2015
-                 */
-                pngFilenameArrayThumbs.add(getRelativeFilename(params, "thumbs100", atime));
-                pngFilenameArrayBig.add(getRelativeFilename(params, "", atime));
 
                 //LoggerManager.markTime("469");
                 count = count + 1;
@@ -651,7 +642,9 @@ public class CreatePngWalk {
                         logger.log(Level.WARNING, "unable to make new file: {0}", outTemp);
                     }
                 }
-
+                
+                currentTimeLabel="error";
+                
                 //LoggerManager.markTime("486");
                 try {
                     DatumRange dr;
@@ -667,7 +660,6 @@ public class CreatePngWalk {
                         }
                     }
                     currentTimeLabel = dr.toString();
-                    timeLabels.add(currentTimeLabel);
 
                     if (!dom2.getTimeRange().equals(dr)) { // don't even call it for one png--I don't think it matters.
                         dom2.setTimeRange(dr);
@@ -721,6 +713,17 @@ public class CreatePngWalk {
                     }
                 }
 
+                /**
+                 * Code for adding images into global arrayList for use in HTML
+                 * method
+                 *
+                 * @author Armond Luthens
+                 * @date 09/21/2015
+                 */
+                pngFilenameArrayThumbs.add(getRelativeFilename(params, "thumbs100", atime));
+                pngFilenameArrayBig.add(getRelativeFilename(params, "", atime));
+                timeLabels.add(currentTimeLabel);
+                
                 BufferedImage image = null;
 
                 //LoggerManager.markTime("538");
