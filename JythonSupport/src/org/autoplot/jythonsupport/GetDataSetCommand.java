@@ -1,9 +1,13 @@
 
 package org.autoplot.jythonsupport;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.python.core.Py;
@@ -44,6 +48,15 @@ public class GetDataSetCommand extends PyObject {
             + "<tr><td>sortTime=True</td><td>sort the data by its timetags</td></tr>\n"
             + "</table></html>");
 
+    public static final PyString __completions__;
+    
+    static {
+        String text = new BufferedReader(
+            new InputStreamReader( GetDataSetCommand.class.getResourceAsStream("GetDataSetCommand.json"), StandardCharsets.UTF_8) )
+            .lines().collect(Collectors.joining("\n"));
+        __completions__= new PyString( text );
+    }
+    
     /**
      * implement the python call.
      * @param args the "rightmost" elements are the keyword values.
