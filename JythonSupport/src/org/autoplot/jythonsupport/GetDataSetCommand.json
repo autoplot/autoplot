@@ -1,0 +1,30 @@
+{ 
+    "position": [
+        {
+            "name": "uri",
+            "description": "the data URI"
+        },
+        {
+            "name": "timeRange",
+            "description": "the time range as a string or datumRange"
+        },
+        {
+            "name": "monitor",
+            "description": "progress monitor"
+        }
+    ],
+    "keywords": [
+        {
+            "name": "trim",
+            "description": "if true, then trim to the time range"
+        },
+        {
+            "name": "units",
+            "description": "Convert the data to the given units, or remove the unit if empty string or None"
+        },
+        {
+            "name": "sortTime",
+            "description": "sort the data by its timetags"
+        }
+    ]
+}
