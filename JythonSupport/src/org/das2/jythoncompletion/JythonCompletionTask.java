@@ -29,6 +29,9 @@ import javax.swing.ImageIcon;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Utilities;
+import org.autoplot.jythonsupport.DatasetCommand;
+import org.autoplot.jythonsupport.GetDataSetCommand;
+import org.autoplot.jythonsupport.GetDataSetsCommand;
 import org.das2.jythoncompletion.support.CompletionResultSet;
 import org.das2.jythoncompletion.support.CompletionTask;
 import org.das2.util.LoggerManager;
@@ -58,6 +61,7 @@ import org.autoplot.jythonsupport.JythonRefactory;
 import org.autoplot.jythonsupport.JythonToJavaConverter;
 import org.autoplot.jythonsupport.SimplifyScriptSupport;
 import org.das2.graph.GraphUtil;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -1152,7 +1156,13 @@ public class JythonCompletionTask implements CompletionTask {
                     interp.execfile(in,"imports2017.py");
                 }
             }
+            
             interp.set("PWD","file:/tmp/");
+            interp.set("dataset", new DatasetCommand());
+            interp.set("getDataSet", new GetDataSetCommand() );
+            interp.set("getDataSets", new GetDataSetsCommand() );
+            interp.set("monitor", new NullProgressMonitor());
+            
             return interp;
         } catch (IOException ex) {
             throw new RuntimeException(ex);

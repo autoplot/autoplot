@@ -1,0 +1,55 @@
+{ 
+    "position": [
+        {
+            "name": "ds",
+            "description": "object to be converted to a dataset"
+        }
+    ],
+    "keywords": [
+        {
+            "name": "title",
+            "description": "title for the data, which could be used above a plot."
+        },
+        {
+            "name": "label",
+            "description": "label for the data, which could be used as an axis label."
+        },
+        {
+            "name": "name",
+            "description": "name for the data, which should be a legal Jython variable name."
+        },
+        {
+            "name": "units", 
+            "description": "units for the data, which string representing the units of the data."
+        },
+        {
+            "name": "resetUnits", 
+            "description": "assert units for the data, with no attempt to perform the units conversion."
+        },
+        {
+            "name": "validMin validMax", 
+            "description": "range of valid values for the data."
+        },
+        {
+            "name": "typicalMin typicalMax", 
+            "description": "typical range dataset, used for suggesting axis ranges."
+        },
+        {
+            "name": "scaleType", 
+            "description": "'log' or 'linear'"
+        },
+        {
+            "name": "averageType", 
+            "description": "'linear', 'geometric', 'mod360', 'mod24', 'modpi', 'modtau'"
+        },
+        {
+            "name": "format", 
+            "description": "format specifier, like %d or %.2f"
+        },
+        {
+            "name": "cadence", 
+            "description": "nominal cadence, like 60s or 100Hz.  Note this goes with the independent parameter (timetags)."
+        }
+    ]
+}
+

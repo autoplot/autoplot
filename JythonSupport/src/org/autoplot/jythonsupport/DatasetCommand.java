@@ -5,8 +5,12 @@
 
 package org.autoplot.jythonsupport;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyString;
@@ -49,6 +53,15 @@ public class DatasetCommand extends PyObject {
             + "<tr><td>format</td><td>format specifier, like %d or %.2f</td></tr>\n"
             + "<tr><td>cadence</td><td>nominal cadence, like 60s or 100Hz.  Note this goes with the independent parameter (timetags).</td></tr>\n"
             + "</table></html>");
+    
+    public static final PyString __completions__;
+    
+    static {
+        String text = new BufferedReader(
+            new InputStreamReader( DatasetCommand.class.getResourceAsStream("DatasetCommand.json"), StandardCharsets.UTF_8) )
+            .lines().collect(Collectors.joining("\n"));
+        __completions__= new PyString( text );
+    }
 
     private static QDataSet datasetValue( PyObject arg0 ) {
         Object o = arg0.__tojava__(QDataSet.class);
