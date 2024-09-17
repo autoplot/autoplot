@@ -1,8 +1,12 @@
 
 package external;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import org.autoplot.ScriptContext;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.DomOps;
@@ -32,6 +36,15 @@ public class FixLayoutCommand extends PyObject  {
             + " <tr><td> moveLegendsToOutsideNE=True     </td><td> move legends from default inside position to outside, when there is no colorbar.</td></tr>"
             + "</table>" 
             + "</html>");
+    
+    public static final PyString __completions__;
+    
+    static {
+        String text = new BufferedReader(
+            new InputStreamReader( FixLayoutCommand.class.getResourceAsStream("FixLayoutCommand.json"), StandardCharsets.UTF_8) )
+            .lines().collect(Collectors.joining("\n"));
+        __completions__= new PyString( text );
+    }
     
     /**
      * implement the python call.
