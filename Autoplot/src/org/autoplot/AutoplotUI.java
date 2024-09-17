@@ -2546,7 +2546,7 @@ APSplash.checkTime("init 52.9");
             } 
             
             if ( extraW>=0 && extraH>=0 ) {
-                windowExtraHeight= extraH;
+                windowExtraHeight= extraH; // should be 61 for detacted window in Linux 2024.
                 windowExtraWidth= extraW;
             } else {
                 resizeLogger.fine("ignoring impossible width or height");
@@ -5524,7 +5524,7 @@ APSplash.checkTime("init 240");
                 if (app.statusLabel.getIcon() == WARNING_ICON) {
                 // wait for setMessage to clear this.
                 } else {
-                    if (changes.size() > 0) {
+                    if (!changes.isEmpty()) {
                         app.currentIcon = BUSY_ICON;
                         String chstr = "";
                         for (Entry<Object, Object> e : changes.entrySet()) {
@@ -5544,14 +5544,14 @@ APSplash.checkTime("init 240");
                     } else {
                         app.currentIcon = IDLE_ICON;
                         app.currentIconTooltip = null;
-                        int windowExtraHeight = app.getHeight() - app.dom.getCanvases(0).getHeight();
-                        int windowExtraWidth= app.getWidth() - app.dom.getCanvases(0).getWidth();        
+                        Window w= SwingUtilities.getWindowAncestor(app.dom.getCanvases(0).getController().getDasCanvas());
+                        int windowExtraHeight = w.getHeight() - app.dom.getCanvases(0).getHeight();
+                        int windowExtraWidth= w.getWidth() - app.dom.getCanvases(0).getWidth();        
                         if ( windowExtraWidth>=0 && windowExtraHeight>=0 ) {
                             app.windowExtraHeight= windowExtraHeight;
                             app.windowExtraWidth= windowExtraWidth;
-                        }
-                        
-                        resizeLogger.log(Level.FINER, "reset windowExtraWidth and windowExtraHeight to {0},{1}", new Object[]{app.windowExtraWidth, app.windowExtraHeight});
+                            resizeLogger.log(Level.FINER, "reset windowExtraWidth and windowExtraHeight to {0},{1}", new Object[]{app.windowExtraWidth, app.windowExtraHeight});
+                        }                    
                     }
                 }
                 app.dom.getController().setPendingChangeCount( changes.size() );
