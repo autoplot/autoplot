@@ -1,0 +1,38 @@
+{ 
+    "position": [
+        {
+            "name": "numRows",
+            "description": "number of rows"
+        },
+        {
+            "name": "numColumns",
+            "description": "number of columns"
+        }
+    ],
+    "keywords": [
+        {
+            "name": "horizontalSpacing",
+            "description": "Horizontal spacing between plots, such as 1em"
+        },
+        {
+            "name": "verticalSpacing",
+            "description": "Vertical spacing between plots, such as 1em"
+        },
+        {
+            "name": "hideTitles",
+            "description": "turn off all but the top title"
+        },
+        {
+            "name": "hideTimeAxes",
+            "description": "turn off all but the bottom axis"
+        },
+        {
+            "name": "hideYAxes",
+            "description": "turn off y-axes between plots"
+        },
+        {
+            "name": "moveLegendsToOutsideNE",
+            "description": "move legends from default inside position to outside, when there is no colorbar."
+        }
+    ]
+}
