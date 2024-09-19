@@ -229,17 +229,24 @@ public class WalkImageSequence implements PropertyChangeListener  {
                 if ( ( template.contains("*") || template.contains("$x") ) && fsm!=null ) {
                     String cs= uris.get(i).toString();
                     if ( template.startsWith("file:///") && cs.length()>6 && cs.charAt(6)!='/' ) {
-                        splitIndex= splitIndex-2;
-                    }            
+                        splitIndex -= 2;
+                    }
+                    if ( cs.length()>13 && cs.substring(8,13).equals("user@") ) {
+                        splitIndex += 5;
+                    }
                     String x1= fsm.getField( "x", cs.substring(splitIndex+1) );
                     captionString = captionString + " " + x1;   
                 }
             } else {
                 captionString = FileSystemUtil.uriDecode(uris.get(i).toString());
                 if ( template.startsWith("file:///") && captionString.length()>6 && captionString.charAt(6)!='/' ) {
-                    splitIndex= splitIndex-2;
+                    splitIndex-= 2;
                 }
-                captionString = captionString.substring(splitIndex+1);
+                String cs= captionString;
+                if ( cs.length()>13 && cs.substring(8,13).equals("user@") ) {
+                    splitIndex+=5;
+                }
+                captionString = cs.substring(splitIndex+1);
             }
 
             existingImages.get(i).setCaption(captionString);
