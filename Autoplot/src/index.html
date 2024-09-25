@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Autoplot is used to stress and display performance of development version of CDAWeb HAPI server</small></p>
+        <p><small>"Length" tool used to count pixels for corrections to code which calculates GUI size to get a particular canvas size.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,18 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-09-12 r27754):</p>
-        <ul>
+        <p>Bugfixes (2024-09-25 r27772):</p>
+        <ul> 
+            <li><a href="https://github.com/das-developers/das2java/issues/112">112</a>: applyIndex function was very slow because of useless and excessive metadata handling.
+            <li><a href="https://github.com/das-developers/das2java/issues/112">112</a>: applyIndex would leave fail to propagate metadata for TT2000 times, leaving doubles.
+            <li>kludge to support 
+https://space.physics.uiowa.edu/juno/team/juno-waves-electron-density/browse_jupiter/$x_orbit_$x/wav_$xT00-00-00_e-dens-j_v1.0.png, where user@ is added.
+            <li><a href="https://github.com/das-developers/das2java/issues/111">111</a>:Use explicit cadence, if available, in SeriesRenderer.  Thanks, Bill!
+            <li>check for "set" method (no property name), which would result in a runtime error in Jython completions.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2598/">2598</a>: torn off canvas didn't reset the windowExtraHeight and windowExtraWidth.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2582/">2582</a>: add correct completions for getDataSet and dataset commands in Jython.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2616/">2616</a>: html version of PNG Walk tool shouldn't contain missing images.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2598/">2598</a>: don't keep track of negative margins, which are clearly a transitional state.
             <li><a href="https://github.com/das-developers/das2java/issues/111">111</a>: Check for explicit cadence in SeriesRenderer.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2615/">2615</a>: Correction to completions label, where extra strings were mistakenly included in label.
             <li>filenameProvidesContext logs at INFO (not FINE) when the time (DEPEND_0) units are not convertible to seconds.
@@ -55,6 +65,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>eventsBar has new gantt2 mode which is available in scripts.
+            <li>PDS3/PDS4 label metadata is shown in metadata tab.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/832/">832</a>: add outputFile command line switch which will write the loaded vap or URI to an output pdf or png file.
         </ul>
         <p>Less recent features:</p>
