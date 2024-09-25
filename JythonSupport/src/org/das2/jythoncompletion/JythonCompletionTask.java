@@ -248,6 +248,9 @@ public class JythonCompletionTask implements CompletionTask {
             for ( String s: ss ) {
                 if ( s.startsWith("set") ) {
                     String prop= s.substring(3);
+                    if ( prop.length()==0 ) {
+                        continue;
+                    }
                     if ( mm.get("get"+prop )!=null ) {
                         String propName= Character.toLowerCase( prop.charAt(0) ) + prop.substring(1);
                         if ( mm.containsKey(propName) ) {
