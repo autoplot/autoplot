@@ -28,6 +28,7 @@ import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.URISplit;
+import org.autoplot.metatree.MetadataUtil;
 import org.das2.datum.Units;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
@@ -239,9 +240,18 @@ public class Pds3DataSource extends AbstractDataSource {
     public Map<String, Object> getMetadata(ProgressMonitor mon) throws Exception {
         URISplit split= URISplit.parse( getURI() );
         
-        String name= getParam("arg_0","");
+        String lbl= split.file;
+        File f= getFile( split.resourceUri,mon);
+
+        PDSLabel label = new PDSLabel();
+        Document doc;
+        if ( !label.parse( f.getPath() ) ) {
+            throw new IllegalArgumentException("unable to use file "+lbl);
+        }
+        doc= label.getDocument();
+        //doc.getChildNodes()
         
-        return Pds3DataSourceFactory.getDataObjectPds3(  split.resourceUri.toURL(), name ).getMetadata();
+        return MetadataUtil.toMetaTree(doc);
                            
     }
     
@@ -357,5 +367,5 @@ public class Pds3DataSource extends AbstractDataSource {
         
         return result;
     }
-    
+        
 }
