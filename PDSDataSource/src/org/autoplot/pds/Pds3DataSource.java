@@ -236,6 +236,30 @@ public class Pds3DataSource extends AbstractDataSource {
         return Ops.dataset(csvfile,Units.nominal());
     }
 
+    public static boolean isLeaf( Node node ) {
+        return node.getChildNodes().getLength()==1 && node.getFirstChild().getNodeType()==Node.TEXT_NODE;
+    }
+    
+    public static Map<String, Object> convertDocumentToMap( Node root ) {
+        Map<String, Object> resultMap = new HashMap<>();
+        NodeList nodeList = root.getChildNodes();
+
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Node node = nodeList.item(i);
+            String key = node.getNodeName();
+            if ( isLeaf(node) ) {
+                Object value = node.getTextContent(); // or another method to extract the value
+                resultMap.put(key, value);
+            } else if ( node.getNodeType() == Node.ELEMENT_NODE ) {
+                Map<String,Object> subNode= convertDocumentToMap( node );
+                resultMap.put(key, subNode);
+            }
+        }
+
+        return resultMap;
+    }
+
+    
     @Override
     public Map<String, Object> getMetadata(ProgressMonitor mon) throws Exception {
         URISplit split= URISplit.parse( getURI() );
@@ -251,7 +275,17 @@ public class Pds3DataSource extends AbstractDataSource {
         doc= label.getDocument();
         //doc.getChildNodes()
         
-        return MetadataUtil.toMetaTree(doc);
+        Map<String,Object> metadata= convertDocumentToMap(doc);
+        
+        LinkedHashMap<String,Object> result= new LinkedHashMap<>();
+        
+        String name= URISplit.parseParams(split.params).get("arg_0");
+        PDS3DataObject obj= Pds3DataSourceFactory.getDataObjectPds3( split.resourceUri.toURL(), name );
+        
+        result.putAll( obj.getMetadata() );
+        result.put( "_label", metadata.get("LABEL") );
+        
+        return result;
                            
     }
     
