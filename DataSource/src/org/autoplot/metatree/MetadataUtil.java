@@ -47,6 +47,12 @@ public class MetadataUtil {
         return result;
     }
     
+    /**
+     * get the code for the path.
+     * @param node the root node
+     * @param path the name for each level to pick.
+     * @return the node at this point
+     */
     public static Node getNode( Node node, String[] path ) {
         int i=0;
         Node child= node.getFirstChild();
@@ -97,6 +103,7 @@ public class MetadataUtil {
     }
 
     /**
+     * swap DEPEND_0 and DEPEND_1 and pass on the rest.
      * @param properties
      * @return
      */
