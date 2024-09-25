@@ -610,13 +610,36 @@ public class PdsDataSource extends AbstractDataSource {
         return result;
     }
     
+    protected static boolean isLeaf( Node node ) {
+        return node.getChildNodes().getLength()==1 && node.getFirstChild().getNodeType()==Node.TEXT_NODE;
+    }
+    
+    protected static Map<String, Object> convertDocumentToMap( Node root ) {
+        Map<String, Object> resultMap = new HashMap<>();
+        NodeList nodeList = root.getChildNodes();
+
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Node node = nodeList.item(i);
+            String key = node.getNodeName();
+            if ( isLeaf(node) ) {
+                Object value = node.getTextContent(); // or another method to extract the value
+                resultMap.put(key, value);
+            } else if ( node.getNodeType() == Node.ELEMENT_NODE ) {
+                Map<String,Object> subNode= convertDocumentToMap( node );
+                resultMap.put(key, subNode);
+            }
+        }
+
+        return resultMap;
+    }
+    
     @Override
     public Map<String, Object> getMetadata(ProgressMonitor mon) throws Exception {
         URISplit split= URISplit.parse( getURI() );
             
         File xmlfile = DataSetURI.getFile( split.resourceUri.toURL() , mon );
         Document doc= readXML(xmlfile);
-        return MetadataUtil.toMetaTree(doc);
+        return convertDocumentToMap(doc);
         
     }
     
