@@ -61,6 +61,11 @@ public class WalkImageSequence implements PropertyChangeListener  {
     
     // list of ranges, including gaps between files.
     private List<DatumRange> possibleRanges = null;
+
+    /**
+     * true if the list of possibleRanges is more than the list of datumRanges
+     */
+    private boolean containsGaps;
     
     private List<DatumRange> subRange = null;
 
@@ -166,7 +171,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
             try {
                 setStatus( "busy: listing "+template );
                 uris = WalkUtil.getFilesFor(template, timerange, datumRanges, false, null);
-                if ( uris.size()>0 ) {
+                if ( !uris.isEmpty() ) {
                     setStatus( "Done listing "+template );
                 } else {
                     setStatus( "warning: no files found in "+template );
@@ -254,20 +259,35 @@ public class WalkImageSequence implements PropertyChangeListener  {
         }
 
         for (DatumRange dr : datumRanges) {
-            if (timeSpan == null)
+            if (timeSpan == null) {
                 timeSpan = dr;
-            else
+            } else {
                 timeSpan = DatumRangeUtil.union(timeSpan, dr);
+            }
         }
 
         if (timeSpan != null) {
-            
-            if ( templateHasExplicitEnd() || 
-                    timeSpan.width().divide(datumRanges.get(0).width() ).doubleValue(Units.dimensionless) > 100000 ) {
-                logger.warning("too many spans to indicate gaps.");
+            long approximateSize= (long)( timeSpan.width().divide(datumRanges.get(0).width() ).value() );
+            boolean verySparse= ((double)datumRanges.size()) / approximateSize < 0.1;
+            boolean nonMonoNonUniq=false;
+            if ( !datumRanges.isEmpty() ) {
+                DatumRange lastdr= datumRanges.get(0);
+                for ( DatumRange dr : datumRanges.subList(1,datumRanges.size()) ) {
+                    if ( dr.intersects(lastdr) ) { 
+                        nonMonoNonUniq=true;
+                        break;
+                    }
+                }
+            }
+            if ( templateHasExplicitEnd() 
+                 || approximateSize > 100000 
+                 || verySparse 
+                 || nonMonoNonUniq ) {
                 possibleRanges = datumRanges;
+                containsGaps= false;
             } else {
                 possibleRanges = DatumRangeUtil.generateList(timeSpan, datumRanges.get(0));
+                containsGaps= true;
             }
         }
         
@@ -414,15 +434,25 @@ public class WalkImageSequence implements PropertyChangeListener  {
 
                 if ( displayRange!=null ) {
                     displayImages.clear();
-
+                    
                     boolean hasX= this.template.contains("$x") || this.template.contains("*") || this.template.contains("$(x;") || this.template.contains("$(x,");
                     boolean hasXLogic= this.template!=null && hasX 
                                 && datumRanges.size()==existingImages.size();
                     int i=0;
                     
+                    int idisplayRange=0;
+                    
                     for (DatumRange dr : displayRange) {
                         
-                        int ind= datumRanges.indexOf(dr);
+                        int ind;
+                        if ( containsGaps ) {
+                            ind= datumRanges.indexOf(dr);
+                        } else {
+                            ind= idisplayRange;
+                        }
+                        
+                        idisplayRange++;
+                        
                         if ( ind>-1 ) {
                             if ( qualitySeq!=null && qcFilter.length()>0 ) {
                                 assert statuses!=null;
@@ -431,7 +461,11 @@ public class WalkImageSequence implements PropertyChangeListener  {
                                 }
                             }
                             if ( hasXLogic ) {
-                                displayImages.add(existingImages.get(i));
+                                if ( qualitySeq!=null && qcFilter.length()>0 ) {
+                                    displayImages.add(existingImages.get(ind)); // TODO: I don't understand this code
+                                } else {
+                                    displayImages.add(existingImages.get(ind));
+                                }
                                 i++;
                             } else {
                                 displayImages.add(existingImages.get(ind));//TODO: suspect this is very inefficient.
@@ -602,6 +636,14 @@ public class WalkImageSequence implements PropertyChangeListener  {
         if(useSubRange != oldSubRange) rebuildSequence();
     }
 
+    /**
+     * true if the sequence has been generated so that gaps could be shown.
+     * @return true if the sequence has been generated so that gaps could be shown.
+     */
+    public boolean isContainsGaps() {
+        return containsGaps;
+    }
+    
     /** Set the sequence's active subrange to a range from first to last, inclusive.
      * First and last are indices into the list obtained from <code>getAllTimes()</code>.
      * @param first
@@ -636,6 +678,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
      * <li>o okay are shown
      * <li>p problem are shown
      * <li>i ignore are shown
+     * <li>u is unknown/unmarked
      * </ul>
      * @param s 
      */

@@ -1222,7 +1222,21 @@ public final class PngWalkTool extends javax.swing.JPanel {
         bg.add(qcmi3);
         qcFiltersMenu.add(qcmi3);
         
-     
+        final JCheckBoxMenuItem qcmi5= new JCheckBoxMenuItem("Don't show problem records",false);
+        
+        qcmi5.addActionListener( new AbstractAction(  ) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if ( qcmi5.isSelected() ) {
+                    tool.seq.setQCFilter("uio");
+                }
+            }
+        } );
+        qcmi5.setToolTipText("Don't show QC records with Problem setting.");
+        tool.qcFilterMenuItems.add(qcmi5);
+        bg.add(qcmi5);
+        qcFiltersMenu.add(qcmi5);
+        
         final JCheckBoxMenuItem qcmi4= new JCheckBoxMenuItem("Show All Records",false);
            
         qcmi4.addActionListener( new AbstractAction(  ) {
