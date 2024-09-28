@@ -162,7 +162,7 @@ public class ScreenshotsTool extends EventQueue {
                 ch.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY );
                 ch.setCurrentDirectory( new File( tf.getText() ).getParentFile() );
                 ch.setSelectedFile( new File( tf.getText() ) );
-                if ( ch.showOpenDialog(tf)==JFileChooser.APPROVE_OPTION ) {
+                if ( ch.showSaveDialog(tf)==JFileChooser.APPROVE_OPTION ) {
                     tf.setText(ch.getSelectedFile().toString());
                 }
             }
