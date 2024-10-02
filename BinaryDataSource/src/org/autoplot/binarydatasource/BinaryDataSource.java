@@ -16,6 +16,7 @@ import org.das2.qds.DataSetUtil;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.AbstractDataSource;
+import org.das2.qds.buffer.AsciiDataSet;
 import org.das2.qds.ops.Ops;
 
 /**
@@ -355,23 +356,34 @@ public class BinaryDataSource extends AbstractDataSource {
         String s;
         s= params.get( "validMin" );
         if ( s!= null ) {
-            ds.putProperty( QDataSet.VALID_MIN, java.lang.Double.parseDouble(s) );
+            ds.putProperty(QDataSet.VALID_MIN, Double.valueOf(s) );
         }
         
         s= params.get( "validMax" );
         if ( s!= null ) {
-            ds.putProperty( QDataSet.VALID_MAX, java.lang.Double.parseDouble(s) );
+            ds.putProperty(QDataSet.VALID_MAX, Double.valueOf(s) );
         }
 
         s= params.get( "fillValue" );
         if ( s!=null ) {
-            ds.putProperty( QDataSet.FILL_VALUE, java.lang.Double.parseDouble(s) ); //TODO: consider parsing to Number type (Float or Long as well as Double)
+            ds.putProperty(QDataSet.FILL_VALUE, Double.valueOf(s) ); //TODO: consider parsing to Number type (Float or Long as well as Double)
         }
             
         
         s= params.get( "units" );
         if ( s!=null ) {
-            ds.putProperty( QDataSet.UNITS, Units.lookupUnits(s) );
+            if ( ds instanceof AsciiDataSet ) {
+                Units u;
+                if ( s.equals("nominal") ) {
+                    u= Units.nominal();
+                } else {
+                    u= Units.lookupUnits(s);
+                }
+                ((AsciiDataSet) ds).setUnits(u);
+                ds.putProperty( QDataSet.UNITS, u );
+            } else {
+                ds.putProperty( QDataSet.UNITS, Units.lookupUnits(s) );
+            }
         }
 
         s= params.get( "format" );
