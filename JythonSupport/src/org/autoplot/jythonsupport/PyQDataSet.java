@@ -983,7 +983,7 @@ public final class PyQDataSet extends PyJavaInstance {
         } else {
             QDataSet wds= DataSetUtil.weightsDataSet(val);
             QubeDataSetIterator it = new QubeDataSetIterator(val);
-            if ( SemanticOps.isBundle(val) && !SemanticOps.oneUnit(val) ) {
+            if ( SemanticOps.isBundle(val) && !DataSetUtil.oneUnit(val) ) {
                 while (it.hasNext()) {
                     it.next();
                     if ( !iter.hasNext() ) throw new IllegalArgumentException("assigned dataset has too many elements");
