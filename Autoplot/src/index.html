@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>"Length" tool used to count pixels for corrections to code which calculates GUI size to get a particular canvas size.</small></p>
+        <p><small>New CDAWeb HAPI server can report data availability, quickly showing where burst data is available.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,9 +30,10 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-09-27 r27777):</p>
+        <p>Bugfixes (2024-10-02 r27777):</p>
         <ul> 
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2337/">2337</a>: issues with screenshots tool.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2391/">2391</a>: slow loop used in Jython __setitem__ because BUNDLE_1 was used but units do not change, introduce DataSetUtil.oneUnit.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2337/">2337</a>: issues with screenshots tool and filter by QC in PNG Walk Tool.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2622/">2622</a>: collect screenshots to PngWalkTool fails.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/1359/">1359</a>: logic for scan vs step favors step if the two are similar ranges.
             <li><a href="https://github.com/das-developers/das2java/issues/112">112</a>: applyIndex function was very slow because of useless and excessive metadata handling.
@@ -68,6 +69,7 @@ https://space.physics.uiowa.edu/juno/team/juno-waves-electron-density/browse_jup
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Support vap+bin:...?type=ascii5&units=nominal so that ASCII strings within binary files can be extracted.
             <li>eventsBar has new gantt2 mode which is available in scripts.
             <li>PDS3/PDS4 label metadata is shown in metadata tab.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/832/">832</a>: add outputFile command line switch which will write the loaded vap or URI to an output pdf or png file.
