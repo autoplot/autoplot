@@ -1042,7 +1042,7 @@ public class URISplit {
         //surl = surl.replaceAll("%26", "&" );
         surl = surl.replaceAll("%2B", "+" );
         //surl = surl.replaceAll("%2F", "/" );
-        //surl = surl.replaceAll("%3A", ":" );
+        surl = surl.replaceAll("%3A", ":" );
         //surl = surl.replaceAll("%3B", ";" );
         surl = surl.replaceAll("%3C", "<" );
         surl = surl.replaceAll("%3E", ">" );
