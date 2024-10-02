@@ -43,7 +43,7 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "validMin=") );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "validMax=") );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "fillValue=", "value indicating invalid data.") );
-            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "units=", "indicating unit type, like cmps or TT2000.") );
+            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "units=", "indicating unit type, like cmps or TT2000 or nominal.") );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "byteOrder=", "endianess of the data" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "reportOffset=T", "depend0 is byte offset into file, this is the legacy (2010) behavior"));
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "format=", "specify format"));
@@ -73,6 +73,7 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "cdfTT2000", "CDF time tags") );
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "cmps", "cm per second") );
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "V/m", "Volts per meter") );
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "nominal", "nominal data") );
                     return result;
                 }
                 case "fillValue":
