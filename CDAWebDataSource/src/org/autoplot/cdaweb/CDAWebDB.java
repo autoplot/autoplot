@@ -312,8 +312,8 @@ public class CDAWebDB {
             URLConnection urlc;
 
             urlc = url.openConnection();
-            urlc.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs()*3);
-            urlc.setReadTimeout(FileSystem.settings().getConnectTimeoutMs()*3);
+            urlc.setConnectTimeout(60000);
+            urlc.setReadTimeout(60000);
             //urlc= HttpUtil.checkRedirect(urlc);
             loggerUrl.log(Level.FINE,"GET data from CDAWeb {0}", urlc.getURL() );
 
