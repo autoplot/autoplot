@@ -138,6 +138,7 @@ public class JythonCompletionTask implements CompletionTask {
     public void query(CompletionResultSet arg0) throws PyException {
         try {
             JythonCompletionProvider.getInstance().setMessage("busy: getting completions");
+            //HERE is a nice place for a breakpoint
             CompletionContext cc = CompletionSupport.getCompletionContext(editor);
             if (cc == null) {
                 logger.fine("no completion context");
@@ -1041,13 +1042,11 @@ public class JythonCompletionTask implements CompletionTask {
         if (method.equals("getDataSet") || method.equals("getFile") || method.equals("plot") || method.equals("plotx") || method.equals("getCompletions") ) {
             DataSetUrlCompletionTask task = new DataSetUrlCompletionTask(editor);
             task.query(arg0);
-        } else if ( method.equals("File") && s.startsWith("/") ) {
-            DataSetUrlCompletionTask task = new DataSetUrlCompletionTask(editor);
-            task.query(arg0);
         } else if ( method.equals("'resourceURI'") ) {
             DataSetUrlCompletionTask task = new DataSetUrlCompletionTask(editor);
             task.query(arg0);
-        } else if ( s.startsWith("/") ) {
+        } else if ( s.startsWith("/") || s.startsWith("http://") || s.startsWith("https://") 
+                || s.startsWith("file:/") || s.startsWith("sftp://") ) {
             DataSetUrlCompletionTask task = new DataSetUrlCompletionTask(editor);
             task.query(arg0);
         }
