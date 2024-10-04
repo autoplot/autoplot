@@ -30,8 +30,9 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-10-02 r27777):</p>
+        <p>Bugfixes (2024-10-04 r27790):</p>
         <ul> 
+            <li><a href="https://github.com/das-developers/das2java/issues/114">114</a>: handle where target timetags are bins as in events dataset.
             <li>Add support for CDF files produced by SpacePy on Mac ARM, which produces CDFs with ARM_LITTLE_ENDIAN data.  Thanks Masafumi!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2391/">2391</a>: slow loop used in Jython __setitem__ because BUNDLE_1 was used but units do not change, introduce DataSetUtil.oneUnit.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2337/">2337</a>: issues with screenshots tool and filter by QC in PNG Walk Tool.
@@ -70,6 +71,7 @@ https://space.physics.uiowa.edu/juno/team/juno-waves-electron-density/browse_jup
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Jython string completions on any string starting with "https://..." etc.
             <li>Support vap+bin:...?type=ascii5&units=nominal so that ASCII strings within binary files can be extracted.
             <li>eventsBar has new gantt2 mode which is available in scripts.
             <li>PDS3/PDS4 label metadata is shown in metadata tab.
