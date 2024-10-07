@@ -2208,7 +2208,7 @@ APSplash.checkTime("init 52.9");
                             return;
                     }
                 }
-                AutoplotUI.this.dispose();
+                //AutoplotUI.this.dispose();
                 ScriptContext.close();
                 if ( !isQuit ) {
                     AppManager.getInstance().closeApplication(AutoplotUI.this);
