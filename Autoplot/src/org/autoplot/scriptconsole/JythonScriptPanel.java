@@ -73,7 +73,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     AutoplotUI app; // the app, if available
     ApplicationController applicationController;
     DataSetSelector selector;
-    ScriptPanelSupport support;
+    AppScriptPanelSupport support;
     static final int CONTEXT_DATA_SOURCE = 1;
     static final int CONTEXT_APPLICATION = 0;
     private int context = 0;
@@ -85,7 +85,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
      */
     boolean containsTabs= false;
 
-    private transient DocumentListener dirtyListener; // this contains repeated code in ScriptPanelSupport  
+    private transient DocumentListener dirtyListener; // this contains repeated code in AppScriptPanelSupport  
 
     /**
      * this downloads the URI and loads the local version into the editor.
@@ -117,8 +117,8 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         this.model = app.getApplicationModel();
         this.app= app;
 
-        support = new ScriptPanelSupport(this, model, selector);
-
+        support = new AppScriptPanelSupport(this, model, selector);
+        
         this.applicationController= model.getDocumentModel().getController();
         
         this.selector = selector;
@@ -293,7 +293,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                     if ( JythonScriptPanel.this.filename!=null ) {
                         File f= new File( JythonScriptPanel.this.filename );
                         support.save(); 
-                        ScriptPanelSupport.markChanges( getEditorPanel().getEditorAnnotationsSupport(), f );
+                        AppScriptPanelSupport.markChanges( getEditorPanel().getEditorAnnotationsSupport(), f );
                     } else {
                         JOptionPane.showMessageDialog( JythonScriptPanel.this,
                                 "Script must be from a file in a local git repository" );
@@ -318,7 +318,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             }
         });
 
-        support.addPropertyChangeListener(ScriptPanelSupport.PROP_INTERRUPTABLE,new PropertyChangeListener() {
+        support.addPropertyChangeListener(AppScriptPanelSupport.PROP_INTERRUPTABLE,new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if ( evt.getNewValue()==null ) {

@@ -115,7 +115,7 @@ import org.python.parser.ast.stmtType;
  * @see EditorAnnotationsSupport
  * @author jbf
  */
-public class ScriptPanelSupport {
+public class AppScriptPanelSupport {
 
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.jython");
     
@@ -131,7 +131,7 @@ public class ScriptPanelSupport {
     private InteractiveInterpreter interruptible;
     ThreadState ts;
 
-    ScriptPanelSupport(final JythonScriptPanel panel, final ApplicationModel model, final DataSetSelector selector) {
+    AppScriptPanelSupport(final JythonScriptPanel panel, final ApplicationModel model, final DataSetSelector selector) {
         this.model = model;
         this.applicationController = model.getDocumentModel().getController();
         this.selector = selector;
@@ -250,7 +250,7 @@ public class ScriptPanelSupport {
                     panel.getEditorPanel().getEditorKit();
                     MutableAttributeSet att= new SimpleAttributeSet();
                     StyleConstants.setItalic( att, true);
-                    ScriptPanelSupport.this.file= null;
+                    AppScriptPanelSupport.this.file= null;
                     panel.getEditorPanel().getDocument().remove( 0, panel.getEditorPanel().getDocument().getLength() );
                     panel.getEditorPanel().getDocument().insertString( 0, "loading "+fsfile, att );
                 } catch ( BadLocationException ex ) {
@@ -320,7 +320,7 @@ public class ScriptPanelSupport {
             } else {
                 chooser.setSelectedFile(file);
             }
-            Preferences prefs = AutoplotSettings.getPreferences(ScriptPanelSupport.class);
+            Preferences prefs = AutoplotSettings.getPreferences(AppScriptPanelSupport.class);
             String openFile= prefs.get(PREFERENCE_OPEN_FILE, "");
             if ( !openFile.equals("") && !FileSystemUtil.isChildOf( FileSystem.settings().getLocalCacheDir(), new File(openFile) )  ) {
                 File dir= new File(openFile).getParentFile();
@@ -328,7 +328,7 @@ public class ScriptPanelSupport {
             }
         }
         if ( file==null ) {
-            Preferences prefs = AutoplotSettings.getPreferences(ScriptPanelSupport.class);
+            Preferences prefs = AutoplotSettings.getPreferences(AppScriptPanelSupport.class);
             String openFile = prefs.get(PREFERENCE_OPEN_FILE, "");
             if ( !openFile.equals("") ) {
                 chooser.setCurrentDirectory( new File(openFile).getParentFile() );
@@ -394,13 +394,13 @@ public class ScriptPanelSupport {
                     logger.fine("pausing before restarting watcher");
                     Thread.sleep(10000);
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(AppScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 try {
                     logger.fine("restarting watcher");
                     restartWatcher(ffile);
                 } catch (IOException ex) {
-                    Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(AppScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
                 }
             };
             new Thread(run).start();
@@ -429,7 +429,7 @@ public class ScriptPanelSupport {
                             
                             String newContents;
                             
-                            try ( InputStream in = new FileInputStream( ScriptPanelSupport.this.file ) ) {
+                            try ( InputStream in = new FileInputStream( AppScriptPanelSupport.this.file ) ) {
                                 newContents= new String( FileUtil.readBytes( in ) );
                                 String currentf= panel.getEditorPanel().getText();
                                 currentf= currentf.trim(); // there's a strange bug where newContents has a newline at the end that current doesn't.
@@ -443,15 +443,15 @@ public class ScriptPanelSupport {
                                 break;
                             }
                             
-                            if ( !ScriptPanelSupport.this.panel.isDirty() ) {
+                            if ( !AppScriptPanelSupport.this.panel.isDirty() ) {
                                 try {
-                                    Color color= ScriptPanelSupport.this.panel.getBackground();
-                                    ScriptPanelSupport.this.panel.setBackground(ColorUtil.DODGER_BLUE);
+                                    Color color= AppScriptPanelSupport.this.panel.getBackground();
+                                    AppScriptPanelSupport.this.panel.setBackground(ColorUtil.DODGER_BLUE);
                                     Thread.sleep(300);
-                                    ScriptPanelSupport.this.panel.setBackground(color);
-                                    loadFile( ScriptPanelSupport.this.file );
+                                    AppScriptPanelSupport.this.panel.setBackground(color);
+                                    loadFile(AppScriptPanelSupport.this.file );
                                 } catch ( IOException ex ) {
-                                    ScriptPanelSupport.this.panel.setDirty(true);
+                                    AppScriptPanelSupport.this.panel.setDirty(true);
                                 }
                             } else {
                                 if ( JOptionPane.OK_OPTION==
@@ -460,12 +460,12 @@ public class ScriptPanelSupport {
                                             "File Changed on Disk",
                                             JOptionPane.OK_CANCEL_OPTION ) ) {
                                     try {
-                                        loadFile( ScriptPanelSupport.this.file );
+                                        loadFile(AppScriptPanelSupport.this.file );
                                     } catch (IOException ex) {
                                         logger.log(Level.SEVERE, null, ex);
                                     }
                                 } else {
-                                    ScriptPanelSupport.this.panel.setDirty(true);
+                                    AppScriptPanelSupport.this.panel.setDirty(true);
                                 }
                             }                            
                         }
@@ -1126,7 +1126,7 @@ public class ScriptPanelSupport {
             try {
                 Thread.sleep(10);
             } catch (InterruptedException ex) {
-                Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(AppScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
             }
 
             if ( dc!=null ) dc.print(String.valueOf((char)b),state);
@@ -1284,7 +1284,7 @@ public class ScriptPanelSupport {
                 panel.setFilename(file.toString());
                 restartWatcher(file);
                 
-                Preferences prefs = AutoplotSettings.getPreferences(ScriptPanelSupport.class);
+                Preferences prefs = AutoplotSettings.getPreferences(AppScriptPanelSupport.class);
                 prefs.put(PREFERENCE_OPEN_FILE, file.toString() );
                 
                 if ( file.toString().endsWith(".jyds") ) {
@@ -1487,7 +1487,7 @@ public class ScriptPanelSupport {
                 }
             }
 
-            Preferences prefs = AutoplotSettings.getPreferences(ScriptPanelSupport.class);
+            Preferences prefs = AutoplotSettings.getPreferences(AppScriptPanelSupport.class);
             String openFile = prefs.get(PREFERENCE_OPEN_FILE, "");
 
             JFileChooser chooser = new JFileChooser();
