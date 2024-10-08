@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Old CRRES data viewed with the PNG Walk Tool.</small></p>
+        <p><small>HTML data source plugin is able to conveniently read data from HTML table on NIST website, showing drift between UT1 and UTC.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,9 +30,14 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-10-04 r27790):</p>
+        <p>Bugfixes (2024-10-08 r27790):</p>
         <ul> 
-            <li><a href="https://github.com/das-developers/das2java/issues/114">114</a>: handle where target timetags are bins as in events dataset.
+            <li>Rename ScriptPanelSupport to AppScriptPanelSupport so that it doesn't get confused with ScriptPanelSupport within JythonSupport.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2626/">2626</a>: cancel close because of unsaved script edit when second AutoplotUI is running.
+        </ul>
+        <p>Older Bugfixes (2024-10-04 r27790):</p>
+        <ul>
+            <li><a href="https://github.com/das-developers/das2java/issues/114">114</a>: handle where target timetags are bins as in events dataset.  Thanks, Sadie!
             <li>Add support for CDF files produced by SpacePy on Mac ARM, which produces CDFs with ARM_LITTLE_ENDIAN data.  Thanks Masafumi!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2391/">2391</a>: slow loop used in Jython __setitem__ because BUNDLE_1 was used but units do not change, introduce DataSetUtil.oneUnit.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2337/">2337</a>: issues with screenshots tool and filter by QC in PNG Walk Tool.
@@ -51,42 +56,17 @@ https://space.physics.uiowa.edu/juno/team/juno-waves-electron-density/browse_jup
             <li><a href="https://github.com/das-developers/das2java/issues/111">111</a>: Check for explicit cadence in SeriesRenderer.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2615/">2615</a>: Correction to completions label, where extra strings were mistakenly included in label.
             <li>filenameProvidesContext logs at INFO (not FINE) when the time (DEPEND_0) units are not convertible to seconds.
-
-        </ul>
-        <p>Older Bugfixes (2024-09-07 r27750):</p>
-        <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2615/">2615</a>: improvements to labels in PDS3 labels, where the variable name is shown as well as the description.
-            <li>format to IDLSav could create file with two variables having the same name, which is absurd.
-            <li>improve error message when IDLSave is bigger than 2GB.  (Larger file support is coming!)
-            <li>bugfix: code assumed that temporary name would have one @ symbol, so recent change to remove @ when no arguments are used caused runtime error.
-            <li>add reset=F to documentation for plot command, which will skip the autoranging.
-            <li>A CDAWeb "master" file for FA_ESA_L2_EEB which corrects flipped DEPEND_1 and DEPEND_2 wasn't properly supported.
-            <li>Correct/Clarify message when DEPEND_1 length doesn't match the data's length.
-            <li>Increase CDAWeb timeout to support FA_ESA_L2_EEB.
-            <li>rte_2101508600: CDF virtual variable function arr_slice on dim 1 was mistakenly left out.  Thanks, nkarna!
-            <li><a href="https://github.com/das-developers/das2java/issues/110/">110</a>: Tweak logic for autohistogram code for a case where two overlapping peaks prevented the identification of the cadence.  Thanks, Sadie!
-            <li><a href="https://github.com/das-developers/das2java/issues/109/">109</a>: Tighten checks so that dataset('2 20 300 2000') is not interpreted as a valid date.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2611/">2611</a>: Include dom, list, and len in short list of safe names to use in scripts when generating a GUI.  Thanks, Kristoff!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2610/">2610</a>: format bundle to CSV could fail when timetags were DEPEND_0.  Thanks, Sadie!
         </ul>
         <p>Features:</p>
+        <ul>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>Jython string completions on any string starting with "https://..." etc.
             <li>Support vap+bin:...?type=ascii5&units=nominal so that ASCII strings within binary files can be extracted.
             <li>eventsBar has new gantt2 mode which is available in scripts.
             <li>PDS3/PDS4 label metadata is shown in metadata tab.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/832/">832</a>: add outputFile command line switch which will write the loaded vap or URI to an output pdf or png file.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>Axis objects can now have the tickValues='none', useful for when the values don't matter in a figure.
-            <li>EventsRenderer has new rotate control which prints the event label vertically.
-            <li>DasAnnotation has new padding and lineThick controls.
-            <li>Font size controls for vertical and horizontal slice.  Thanks, Connor!
-            <li>downloadResourceAsTempFile no longer adds "@" to filename when there are no parameters.
-            <li>Das2 TimeUtil now has rangeContaining, which will calculate the hour containing data point or hours containing an interval.
-            <li>IDL/Matlab/Python interface provides direct access to loaded QDataSet, to support simpler Python interface.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/805/">805</a>: Finish off file parameters in scripts.
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
