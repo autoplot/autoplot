@@ -737,6 +737,7 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
             return false;
         } else {
             support.loadFile(file);
+            textArea.putClientProperty( JythonCompletionTask.CLIENT_PROPERTY_PWD, file.getParent() + "/" ); // not correct, https://...
             return true;
         }
     }

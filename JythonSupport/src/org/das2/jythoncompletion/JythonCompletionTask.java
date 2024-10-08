@@ -60,6 +60,8 @@ import org.autoplot.jythonsupport.JythonOps;
 import org.autoplot.jythonsupport.JythonRefactory;
 import org.autoplot.jythonsupport.JythonToJavaConverter;
 import org.autoplot.jythonsupport.SimplifyScriptSupport;
+import org.autoplot.jythonsupport.ui.EditorTextPane;
+import org.autoplot.jythonsupport.ui.ScriptPanelSupport;
 import org.das2.graph.GraphUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.json.JSONArray;
@@ -101,6 +103,8 @@ public class JythonCompletionTask implements CompletionTask {
     private static final int JAVASTATICFIELD_SORT=1;
     
     public static final String CLIENT_PROPERTY_INTERPRETER_PROVIDER = "JYTHON_INTERPRETER_PROVIDER";
+    public static final String CLIENT_PROPERTY_PWD = "JYTHON_INTERPRETER_PWD";
+    
     JTextComponent editor;
     private final JythonInterpreterProvider jythonInterpreterProvider;
 
@@ -1045,6 +1049,20 @@ public class JythonCompletionTask implements CompletionTask {
         } else if ( method.equals("'resourceURI'") ) {
             DataSetUrlCompletionTask task = new DataSetUrlCompletionTask(editor);
             task.query(arg0);
+        } else if ( method.equals("PWD") ) {  // PWD + "demo.dat"
+            // how to find the name of the file we are editing?
+            if ( editor instanceof EditorTextPane ) {
+                EditorTextPane etp= (EditorTextPane)editor;
+                String pwd= (String)etp.getClientProperty( CLIENT_PROPERTY_PWD );
+                if ( pwd!=null ) {
+                    if ( pwd.endsWith("/") ) {
+                        //TODO: consider filesystem completions, which would be really helpful
+                    }
+                    //support.getFile();
+                    //System.err.println("here support is "+pwd);
+                }
+                return 0;
+            }
         } else if ( s.startsWith("/") || s.startsWith("http://") || s.startsWith("https://") 
                 || s.startsWith("file:/") || s.startsWith("sftp://") ) {
             DataSetUrlCompletionTask task = new DataSetUrlCompletionTask(editor);
