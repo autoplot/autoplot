@@ -201,15 +201,8 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             public boolean checkClose() {
                 
                 if ( isDirty() && isVisible() && textArea.getDocument().getLength()>0 ) { 
-                    int l= textArea.getDocument().getLength();
-                    String line;
-                    try {
-                        line=textArea.getDocument().getText(0,Math.min(10,l));
-                    } catch (BadLocationException ex) {
-                        line="???";
-                    }
                     
-                    int resp= JOptionPane.showConfirmDialog( JythonScriptPanel.this, "Script Editor ("+line+") contains unsaved changes.  Save these changes?" );
+                    int resp= JOptionPane.showConfirmDialog( JythonScriptPanel.this, "Script Editor contains unsaved changes.  Save these changes?" );
                     switch (resp) {
                         case JOptionPane.CANCEL_OPTION:       
                             return false;
