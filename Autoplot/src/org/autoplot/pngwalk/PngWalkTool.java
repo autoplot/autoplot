@@ -1013,12 +1013,14 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     if ( JOptionPane.OK_OPTION==
                             JOptionPane.showConfirmDialog( tool,
                             "Quit application?", "Quit PNG Walk", JOptionPane.OK_CANCEL_OPTION ) ) {
-                        frame.dispose();
-                        AppManager.getInstance().closeApplication(tool);
+                        if ( AppManager.getInstance().closeApplication(tool) ) {
+                            frame.dispose();
+                        }
                     }
                 } else {
-                    frame.dispose();
-                    AppManager.getInstance().closeApplication(tool);
+                    if ( AppManager.getInstance().closeApplication(tool) ) {
+                        frame.dispose();
+                    }
                 }
             }
         } );
