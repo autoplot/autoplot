@@ -410,7 +410,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
      * @param model the legacy model that backs the application.
      */
     public AutoplotUI(ApplicationModel model) {
-                     
+                    
         apversion= APSplash.getVersion();
         if ( apversion.equals("untagged_version") ) {
             apversion= "(dev)";
@@ -502,6 +502,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
         }
         
         initComponents();
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         //TODO: this needs to be explored more:  It gets the desired behavior where running an 
         //Autoplot script doesn't steal focus (see sftp:papco.org:/home/jbf/ct/autoplot/script/fun/jeremy/randImages.jy)
         //but makes it so URIs cannot be entered. https://sourceforge.net/tracker/index.php?func=detail&aid=3532217&group_id=199733&atid=970682
@@ -2208,10 +2209,14 @@ APSplash.checkTime("init 52.9");
                             return;
                     }
                 }
-                //AutoplotUI.this.dispose();
-                ScriptContext.close();
+                
                 if ( !isQuit ) {
-                    AppManager.getInstance().closeApplication(AutoplotUI.this);
+                    if ( AppManager.getInstance().closeApplication(AutoplotUI.this) ) {
+                        AutoplotUI.this.dispose();
+                        ScriptContext.close();
+                    }
+                } else {
+                    ScriptContext.close();
                 }
             }
         });
@@ -2988,7 +2993,7 @@ APSplash.checkTime("init 52.9");
         exceptionReport = new javax.swing.JMenuItem();
         aboutAutoplotMenuItem = new javax.swing.JMenuItem();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Autoplot");
         addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {

@@ -68,8 +68,15 @@ public class AppManager {
         return false;
     }
 
-    public void closeApplication( Object app ) {
+    /**
+     * see if everyone agrees that this application can be closed.  If so, the application
+     * this will return true.  If one of the callbacks doesn't allow it, then return false.
+     * @param app
+     * @return 
+     */
+    public boolean closeApplication( Object app ) {
         logger.log(Level.FINE, "closeApplication({0})", app);
+        boolean result= true;
         if ( app instanceof AutoplotUI ) { // there's a bug here--we need to associate just with autoplot app.
             boolean resetMain= false;
             if ( ScriptContext.getViewWindow()==null ) {
@@ -81,8 +88,10 @@ public class AppManager {
                 if ( this.apps.isEmpty() ) {
                     quit();
                 }
+            } else {
+                result= false;
             }
-            if ( resetMain ) {
+            if ( resetMain && result==true ) {
                 for ( Object o: this.apps ) {
                     if ( o instanceof AutoplotUI ) {
                         ScriptContext.setView((AutoplotUI)o); //TODO: if there are running apps, this will cause problems...
@@ -101,6 +110,7 @@ public class AppManager {
                 quit();
             }
         }
+        return result;
     }
 
     public Object getApplication( int i ) {

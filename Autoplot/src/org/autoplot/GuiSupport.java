@@ -821,7 +821,6 @@ public class GuiSupport {
                 model.dom.getOptions().setLayoutVisible( parent.applicationModel.dom.getOptions().isLayoutVisible() );                
                 AutoplotUI view = new AutoplotUI(model);
                 view.setLocationRelativeTo(GuiSupport.this.parent);
-                view.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
                 java.awt.Point p= view.getLocation();
                 p.translate( 20,20 );
                 view.setLocation( p );
