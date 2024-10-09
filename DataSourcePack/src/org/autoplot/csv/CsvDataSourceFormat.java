@@ -185,7 +185,7 @@ public class CsvDataSourceFormat extends AbstractDataSourceFormat {
             
             writer.setForceQualifier(true);
             writer.setUseTextQualifier(true);  // force quotes on header
-
+            
             String[] values;
             String[] labels;
 

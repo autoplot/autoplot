@@ -212,7 +212,13 @@ public class CsvDataSourceFormatEditorPanel extends javax.swing.JPanel implement
         if ( timeUnitsCB.isSelected() ) {
             args.put( "depend0Units",timeUnitsDropList.getSelectedItem().toString() );
         }
-
+        
+        if ( delimiterCheckBox.isSelected() ) {
+            String s= delimiterTextField.getText();
+            if ( s.equals(" ") ) s= "SPACE";
+            args.put("delim", s );
+        }
+        
         String params= URISplit.formatParams(args);
         if ( result==null ) result= "file:///";
         URISplit ss= URISplit.parse(result);
