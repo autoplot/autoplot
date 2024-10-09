@@ -113,10 +113,15 @@ public class PDS3DataObject {
                     String dim0=(String)xpath.evaluate("REPETITIONS/text()",column,XPathConstants.STRING);
                     String dim1=(String)xpath.evaluate("CONTAINER/REPETITIONS/text()",column,XPathConstants.STRING);
                     dims= "["+dim0+","+dim1+"]";
+                    itemBytes= bytes/(Integer.parseInt(dim1));
                 } else {
-                    dims= "["+(String)xpath.evaluate("REPETITIONS/text()",column,XPathConstants.STRING)+"]";
+                    String sitems= (String)xpath.evaluate("REPETITIONS/text()",column,XPathConstants.STRING);
+                    dims= "["+sitems+"]";
+                    itemBytes= bytes/(Integer.parseInt(sitems));
                 }
                 j= toJSONObject(column1);
+            } else {
+                itemBytes = bytes;
             }
                 
             dataType= j.optString("DATA_TYPE","");
@@ -225,7 +230,7 @@ public class PDS3DataObject {
             args.put("type", "float");
             args.put("byteOrder", "big");
         } else if ( dataType.equals("LSB_UNSIGNED_INTEGER" ) ) {
-            switch (bytes) {
+            switch (itemBytes) {
                 case 2: 
                     args.put("type", "ushort");
                     break;
@@ -235,10 +240,12 @@ public class PDS3DataObject {
                 case 8:
                     args.put("type", "ulong");
                     break;
+                default:
+                    throw new IllegalArgumentException("PDS label has LSB_UNSIGNED_INTEGER with "+bytes+" bytes, must be 2, 4, or 8");
             }
             args.put("byteOrder", "little");
         } else if ( dataType.equals("LSB_INTEGER" ) ) {
-            switch (bytes) {
+            switch (itemBytes) {
                 case 2: 
                     args.put("type", "short");
                     break;
@@ -248,10 +255,12 @@ public class PDS3DataObject {
                 case 8:
                     args.put("type", "long");
                     break;
+                default:
+                    throw new IllegalArgumentException("PDS label has LSB_INTEGER with "+bytes+" bytes, must be 2, 4, or 8");
             }
             args.put("byteOrder", "little");
         } else if ( dataType.equals("MSB_UNSIGNED_INTEGER" ) ) {
-            switch (bytes) {
+            switch (itemBytes) {
                 case 2: 
                     args.put("type", "ushort");
                     break;
@@ -261,10 +270,13 @@ public class PDS3DataObject {
                 case 8:
                     args.put("type", "ulong");
                     break;
+                default:
+                    throw new IllegalArgumentException("PDS label has MSB_UNSIGNED_INTEGER with "+bytes+" bytes, must be 2, 4, or 8");
+                    
             }
             args.put("byteOrder", "big");
         } else if ( dataType.equals("MSB_INTEGER") ) {
-            switch (bytes) {
+            switch (itemBytes) {
                 case 2: 
                     args.put("type", "short");
                     break;
@@ -274,6 +286,8 @@ public class PDS3DataObject {
                 case 8:
                     args.put("type", "long");
                     break;
+                default:
+                    throw new IllegalArgumentException("PDS label has MSB_INTEGER with "+bytes+" bytes, must be 2, 4, or 8");
             }
             args.put("byteOrder", "big");        
         } else if ( dataType.equals("UNSIGNED_INTEGER") && bytes==1 ) {
