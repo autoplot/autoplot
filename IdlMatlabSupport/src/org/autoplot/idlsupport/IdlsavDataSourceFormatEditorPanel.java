@@ -37,6 +37,7 @@ public class IdlsavDataSourceFormatEditorPanel extends javax.swing.JPanel implem
         jLabel1 = new javax.swing.JLabel();
         typeComboBox = new javax.swing.JComboBox();
         jLabel2 = new javax.swing.JLabel();
+        appendCB = new javax.swing.JCheckBox();
 
         jLabel1.setText("Time Units:");
 
@@ -45,6 +46,9 @@ public class IdlsavDataSourceFormatEditorPanel extends javax.swing.JPanel implem
 
         jLabel2.setText("1-D, 2-D and 3-D data can be exported to IDLSave sets.");
 
+        appendCB.setText("append");
+        appendCB.setToolTipText("Append this to an existing IDLSav file");
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -52,11 +56,14 @@ public class IdlsavDataSourceFormatEditorPanel extends javax.swing.JPanel implem
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+                    .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 377, Short.MAX_VALUE)
                     .add(layout.createSequentialGroup()
                         .add(jLabel1)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(typeComboBox, 0, 292, Short.MAX_VALUE)))
+                        .add(typeComboBox, 0, 305, Short.MAX_VALUE))
+                    .add(layout.createSequentialGroup()
+                        .add(appendCB)
+                        .add(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -68,12 +75,15 @@ public class IdlsavDataSourceFormatEditorPanel extends javax.swing.JPanel implem
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel1)
                     .add(typeComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(237, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(appendCB)
+                .addContainerGap(60, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox appendCB;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JComboBox typeComboBox;
@@ -97,6 +107,8 @@ public class IdlsavDataSourceFormatEditorPanel extends javax.swing.JPanel implem
 
         String s= getParam( args, "tunits", "t1970" );
         typeComboBox.setSelectedItem(s);
+        
+        appendCB.setSelected(getParam( args, "append", "F" ).equals("T"));
 
         file= split.file;
     }
@@ -109,6 +121,8 @@ public class IdlsavDataSourceFormatEditorPanel extends javax.swing.JPanel implem
         s= (String) typeComboBox.getSelectedItem();
 
         if ( !s.equals("t1970") ) args.put( "tunits", s );
+        
+        if ( appendCB.isSelected() ) args.put( "append", "T" );
 
         String params= URISplit.formatParams(args);
         if ( result==null ) result= "file:///";
