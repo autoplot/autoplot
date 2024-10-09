@@ -81,7 +81,8 @@ public class JavadocLookup {
                 } else if ( s.startsWith("http://www-pw.physics.uiowa.edu/~jbf/autoplot/javadoc2018/") ) {
                     return s + signature.replaceAll("[\\(\\)\\,]", "-");
                 } else if ( s.startsWith("http://www-pw.physics.uiowa.edu/~jbf/autoplot/doc")
-                        || s.startsWith("https://jfaden.net/~jbf/autoplot/doc" ) ) {
+                        || s.startsWith("https://jfaden.net/~jbf/autoplot/doc" )
+                        || s.startsWith("https://cottagesystems.com/jenkins/job/autoplot-javadoc/lastSuccessfulBuild/artifact/doc/") ) {
                     int i= signature.indexOf('(');
                     if ( i>0 ) {
                         signature= signature.substring(0,i);
