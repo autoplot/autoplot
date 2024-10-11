@@ -198,6 +198,21 @@ public class RecentComboBox extends JComboBox {
     }
 
     /**
+     * kludge in way to add an item to the list of recent entries.
+     * @param items items to insert (at the top of the list).
+     */
+    public void addAdditionalToRecentItems( List<String> items ) {
+        ComboBoxModel mm= getModel();
+        if ( mm instanceof DefaultComboBoxModel ) {
+            DefaultComboBoxModel dmm= (DefaultComboBoxModel)mm;
+            for ( int i=0; i<items.size(); i++ ) {
+                String item = items.get(i);
+                dmm.insertElementAt( item, i );
+            }
+        }
+    }
+    
+    /**
      * save the recent items to the disk.  items.get(0) is the most recent item, 
      * and will be the last line of the recent file on the disk.
      * @param items
