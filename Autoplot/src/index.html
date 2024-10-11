@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>HTML data source plugin is able to conveniently read data from HTML table on NIST website, showing drift between UT1 and UTC.</small></p>
+        <p><small><a href="https://github.com/autoplot/dev/blob/master/demos/2024/20241004/countDataSetsHapi.jy">Small script</a> reports the number of datasets in a HAPI server, and the Run Batch Tool runs the script on a list of HAPI servers.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,11 +30,15 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-10-08 r27790):</p>
+        <p>Bugfixes (2024-10-11 r27811):</p>
         <ul> 
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2615/">2615</a>: check that the appended name isn't irrelevant to the completion
             <li>NullPointerException in CSV format fixed. Add format GUI for CSV output.  Thanks, Sadie!
-            <li>Rename ScriptPanelSupport to AppScriptPanelSupport so that it doesn't get confused with ScriptPanelSupport within JythonSupport.
+            <li>Rename ScriptPanelSupport to AppScriptPanelSupport so that it doesn't get confused with ScriptPanelSupport within JythonSupport.  
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2626/">2626</a>: cancel close because of unsaved script edit when second AutoplotUI is running.  Thanks, Sadie!
+            <li>allow https://cottagesystems.com/jenkins/job/autoplot-javadoc/lastSuccessfulBuild/artifact/doc/ to be used for pop-up documentation in script editor.
+            <li>add "append" checkbox to IDLSave format editor panel, so that the feature is not hidden.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2628/">2628</a>: properly calculate the number of bytes per item in integer arrays.
         </ul>
         <p>Older Bugfixes (2024-10-04 r27790):</p>
         <ul>
@@ -46,8 +50,7 @@
             <li><a href="https://sourceforge.net/p/autoplot/bugs/1359/">1359</a>: logic for scan vs step favors step if the two are similar ranges.
             <li><a href="https://github.com/das-developers/das2java/issues/112">112</a>: applyIndex function was very slow because of useless and excessive metadata handling.
             <li><a href="https://github.com/das-developers/das2java/issues/112">112</a>: applyIndex would leave fail to propagate metadata for TT2000 times, leaving doubles.
-            <li>kludge to support 
-https://space.physics.uiowa.edu/juno/team/juno-waves-electron-density/browse_jupiter/$x_orbit_$x/wav_$xT00-00-00_e-dens-j_v1.0.png, where user@ is added.
+            <li>kludge to support https://space.physics.uiowa.edu/juno/team/juno-waves-electron-density/browse_jupiter/$x_orbit_$x/wav_$xT00-00-00_e-dens-j_v1.0.png, where user@ is added.
             <li><a href="https://github.com/das-developers/das2java/issues/111">111</a>:Use explicit cadence, if available, in SeriesRenderer.  Thanks, Bill!
             <li>check for "set" method (no property name), which would result in a runtime error in Jython completions.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2598/">2598</a>: torn off canvas didn't reset the windowExtraHeight and windowExtraWidth.
@@ -60,6 +63,7 @@ https://space.physics.uiowa.edu/juno/team/juno-waves-electron-density/browse_jup
         </ul>
         <p>Features:</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/818/">818</a>: support 1-byte integers in PDS3 files.
         </ul>
         <p>Less recent features:</p>
         <ul>
