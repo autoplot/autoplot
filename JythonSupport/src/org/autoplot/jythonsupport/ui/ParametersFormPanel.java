@@ -514,6 +514,12 @@ public class ParametersFormPanel {
                             }       
                             final RecentComboBox tcb= new RecentComboBox();
                             tcb.setPreferenceNode( RecentComboBox.PREF_NODE_TIMERANGE );
+                            if ( !values.isEmpty() ) {
+                                List<String> svalues= new ArrayList<>();
+                                for ( Object o: values ) svalues.add( String.valueOf(o) );
+                                tcb.addAdditionalToRecentItems(svalues);
+                            }
+                            
                             Dimension x= tcb.getPreferredSize();
                             x.width= Integer.MAX_VALUE;
                             tcb.setMaximumSize(x);
