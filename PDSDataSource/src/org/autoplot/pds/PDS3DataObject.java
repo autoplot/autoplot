@@ -235,7 +235,7 @@ public class PDS3DataObject {
         } else if ( dataType.equals("PC_REAL") ) {
             args.put("type", "float");
             args.put("byteOrder", "little");
-        } else if ( dataType.equals("SUN_REAL") || dataType.equals("IEEE_REAL") || dataType.equals("FLOAT") ) {
+        } else if ( dataType.equals("SUN_REAL") || dataType.equals("IEEE_REAL") || dataType.equals("FLOAT")  || dataType.equals("MAC_REAL") ) {
             args.put("type", "float");
             args.put("byteOrder", "big");
         } else if ( dataType.equals("LSB_UNSIGNED_INTEGER" ) ) {
@@ -293,7 +293,7 @@ public class PDS3DataObject {
                     
             }
             args.put("byteOrder", "big");
-        } else if ( dataType.equals("MSB_INTEGER") ) {
+        } else if ( dataType.equals("MSB_INTEGER") || dataType.equals("INTEGER") ) { // section 3.2 says INTEGER is the same as
             switch (itemBytes) {
                 case 1: 
                     args.put("type", "byte");
