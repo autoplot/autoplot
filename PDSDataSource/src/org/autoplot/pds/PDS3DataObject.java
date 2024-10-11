@@ -19,6 +19,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.autoplot.datasource.URISplit;
+import org.das2.util.LoggerManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
@@ -30,6 +31,8 @@ import org.w3c.dom.Node;
  */
 public class PDS3DataObject {
 
+    private static final Logger logger= LoggerManager.getLogger("apdss.pds");
+    
     private String name;
     private String uri;
     
@@ -131,6 +134,12 @@ public class PDS3DataObject {
             validMaximum= j.optDouble("VALID_MAXIMUM",Double.POSITIVE_INFINITY);
             validMinimum= j.optDouble("VALID_MINIMUM",Double.NEGATIVE_INFINITY);
             missingConstant= j.optDouble("MISSING_CONSTANT",Double.NaN);
+            if ( Double.isNaN(missingConstant) && j.has("MISSING") ) {
+                logger.fine("MISSING used instead of MISSING_CONSTANT, which is okay");
+                missingConstant= j.optDouble("MISSING",missingConstant);
+            }
+            
+            
             if ( Double.isNaN(missingConstant) ) {
                 missingConstant= j.optDouble("INVALID_CONSTANT",Double.NaN);
             }
@@ -226,7 +235,7 @@ public class PDS3DataObject {
         } else if ( dataType.equals("PC_REAL") ) {
             args.put("type", "float");
             args.put("byteOrder", "little");
-        } else if ( dataType.equals("SUN_REAL") || dataType.equals("IEEE_REAL") ) {
+        } else if ( dataType.equals("SUN_REAL") || dataType.equals("IEEE_REAL") || dataType.equals("FLOAT") ) {
             args.put("type", "float");
             args.put("byteOrder", "big");
         } else if ( dataType.equals("LSB_UNSIGNED_INTEGER" ) ) {
