@@ -231,6 +231,9 @@ public class PDS3DataObject {
             args.put("byteOrder", "big");
         } else if ( dataType.equals("LSB_UNSIGNED_INTEGER" ) ) {
             switch (itemBytes) {
+                case 1: 
+                    args.put("type", "ubyte");
+                    break;                
                 case 2: 
                     args.put("type", "ushort");
                     break;
@@ -246,6 +249,9 @@ public class PDS3DataObject {
             args.put("byteOrder", "little");
         } else if ( dataType.equals("LSB_INTEGER" ) ) {
             switch (itemBytes) {
+                case 1: 
+                    args.put("type", "byte");
+                    break;
                 case 2: 
                     args.put("type", "short");
                     break;
@@ -261,6 +267,9 @@ public class PDS3DataObject {
             args.put("byteOrder", "little");
         } else if ( dataType.equals("MSB_UNSIGNED_INTEGER" ) ) {
             switch (itemBytes) {
+                case 1: 
+                    args.put("type", "ubyte");
+                    break;                    
                 case 2: 
                     args.put("type", "ushort");
                     break;
@@ -277,6 +286,9 @@ public class PDS3DataObject {
             args.put("byteOrder", "big");
         } else if ( dataType.equals("MSB_INTEGER") ) {
             switch (itemBytes) {
+                case 1: 
+                    args.put("type", "byte");
+                    break;                   
                 case 2: 
                     args.put("type", "short");
                     break;
