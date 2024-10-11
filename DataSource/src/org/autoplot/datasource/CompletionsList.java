@@ -40,6 +40,7 @@ public class CompletionsList {
             //int stopAt= 10000;
             while (i < completions.size() ) {
                 final CompletionResult s1 = completions.get(i);
+                int icaret= s1.completable.length();
                 if ( s1==CompletionResult.SEPARATOR ) {
                     //menuItem= new javax.swing.JButton("HELLO");
                     menuItem= new javax.swing.JSeparator();
@@ -58,7 +59,7 @@ public class CompletionsList {
                         if ( i3>-1 && i3<s1.completion.length()-1 && i3>i2 ) i2=i3;
                     }
                     String ll= s1.completion.substring(i2+1);
-                    if ( i2>-1 && !label.startsWith(ll) ) {
+                    if ( i2>-1 && !label.startsWith(ll) && (i2<=icaret) ) {
                         label= ll + ": "+ label ;
                     }
                     Action a = new AbstractAction(label) {
