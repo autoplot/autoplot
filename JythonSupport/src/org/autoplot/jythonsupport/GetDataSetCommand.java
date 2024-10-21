@@ -150,6 +150,11 @@ public class GetDataSetCommand extends PyObject {
                     }
                     break;
                 }
+                arg1= args[1].__tojava__(QDataSet.class);
+                if ( arg1!=Py.NoConversion ) {
+                    trimRange= Ops.datumRange(arg1);
+                    break;
+                }
                 break;
             }
             case 3: {
