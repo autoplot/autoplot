@@ -500,7 +500,7 @@ public class SimpleServlet extends HttpServlet {
                     if ( params.containsKey("timerange") && !params.containsKey("timeRange") ) {
                         params.put("timeRange", params.remove("timerange") );
                     }
-                    if ( isLocalVap ) params.put("PWD",split.path);
+                    params.put("PWD",split.path);
                     if ( stimeRange.trim().length()>0 ) {
                         params.put( "timeRange", stimeRange );
                     }
@@ -514,15 +514,15 @@ public class SimpleServlet extends HttpServlet {
                     appmodel.doOpenVap(openable, params);
                 } else {
                     LinkedHashMap<String, String> params = new LinkedHashMap();
-                    if ( isLocalVap ) params.put("PWD",split.path);
+                    params.put("PWD",split.path);
                     if ( stimeRange.trim().length()>0 ) {
                         params.put( "timeRange", stimeRange );
                     }                   
                     appmodel.doOpenVap(openable, params);
                 }
                 logit("opened vap", t0, uniq, debug);
-                width = appmodel.getDocumentModel().getCanvases(0).getWidth();
-                height = appmodel.getDocumentModel().getCanvases(0).getHeight();
+                width = appmodel.getDom().getCanvases(0).getWidth();
+                height = appmodel.getDom().getCanvases(0).getHeight();
                 DasCanvas c = dom.getController().getCanvas().getController().getDasCanvas();
                 c.prepareForOutput(width, height); // KLUDGE, resize all components for TimeSeriesBrowse
             }
