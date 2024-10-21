@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.FileSystemUtil;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -480,7 +481,12 @@ public class JythonOps {
             logger.warning("Jython addToSearchPath will probably fail because this is not supported with Webstart.");
         }
         if ( path.endsWith(".jar") ) {
-            File jarFile= FileSystemUtil.doDownload( path, mon );
+            File jarFile;
+            try {
+                jarFile= FileSystemUtil.doDownload( path, mon );
+            } catch ( IOException e ) {
+                jarFile= DataSetURI.downloadResourceAsTempFile( DataSetURI.getURL(path),mon);
+            }
             File destDir= FileSystem.settings().getLocalCacheDir();
             destDir= new File( destDir, "jar" );
             String ss= path.replace("://", "/");
