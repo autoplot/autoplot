@@ -155,8 +155,9 @@ public class GetDataSetCommand extends PyObject {
                     trimRange= Ops.datumRange(arg1);
                     break;
                 }
-                break;
+                throw new IllegalArgumentException("unable to use second argument: "+args[1].__str__() );
             }
+            
             case 3: {
                 PyString pyuri= args[0].__str__();
                 uri= pyuri.toString();
@@ -177,6 +178,8 @@ public class GetDataSetCommand extends PyObject {
                 Object arg2= args[2].__tojava__(ProgressMonitor.class);
                 if ( arg2!=Py.NoConversion ) {
                     monitor= (ProgressMonitor)arg2;
+                } else {
+                    throw new IllegalArgumentException("unable to use third argument: "+args[2].__str__() );
                 }
                 break;                
             }
