@@ -1181,7 +1181,7 @@ public class DataMashUp extends javax.swing.JPanel {
         jLabel2.setText("Drag functions onto the palette to the right.");
 
         mathematicsList.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "add(x,y)", "subtract(x,y)", "multiply(x,y)", "divide(x,y)", "mod(x,y)", "pow(x,y)", "log10(x)", "sqrt(x)", "abs(x): the absolute value of the data", "magnitude(x): the lengths of the vectors", "toRadians(x)", "toDegrees(x)", "sin(x)", "cos(x)", "tan(x)", "asin(x)", "acos(x)", "atan2(y,x)", "atan(x)", "crossProduct(a,b)" };
+            String[] strings = { "add(x,y)", "add(x,y,z)", "subtract(x,y)", "multiply(x,y)", "divide(x,y)", "mod(x,y)", "pow(x,y)", "log10(x)", "sqrt(x)", "abs(x): the absolute value of the data", "magnitude(x): the lengths of the vectors", "toRadians(x)", "toDegrees(x)", "sin(x)", "cos(x)", "tan(x)", "asin(x)", "acos(x)", "atan2(y,x)", "atan(x)", "crossProduct(a,b)" };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
