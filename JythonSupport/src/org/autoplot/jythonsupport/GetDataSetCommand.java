@@ -136,10 +136,12 @@ public class GetDataSetCommand extends PyObject {
                 arg1= args[1].__tojava__(ProgressMonitor.class);
                 if ( arg1!=Py.NoConversion ) {
                     monitor= (ProgressMonitor)arg1;
+                    break;
                 }
                 arg1= args[1].__tojava__(DatumRange.class);
                 if ( arg1!=Py.NoConversion ) {
                     trimRange= (DatumRange)arg1;
+                    break;
                 }
                 arg1= args[1].__tojava__(String.class);
                 if ( arg1!=Py.NoConversion ) {
