@@ -75,6 +75,7 @@ public class ImageDataSet extends AbstractDataSet {
             this.op= new ChannelColorOp( mask.getRGB() & 0xFFFFFF, (int)log2( Integer.lowestOneBit( mask.getRGB() ) ) );
         }
         putProperty( QDataSet.QUBE, Boolean.TRUE );
+        putProperty( QDataSet.RENDER_TYPE, QDataSet.VALUE_RENDER_TYPE_COMPOSITE_IMAGE );
     }
     
     @Override
