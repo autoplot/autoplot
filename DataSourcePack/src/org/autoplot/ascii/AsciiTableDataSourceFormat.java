@@ -55,9 +55,15 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
 
     private static final Logger logger= Logger.getLogger("apdss.ascii");
 
-    private DatumFormatter getTimeFormatter( ) {
+    private DatumFormatter getTimeFormatter( QDataSet ttag ) {
         DatumFormatter timeFormatter;
         String tformat= getParam( "tformat", "ISO8601" );
+        if ( tformat.equals("ISO8601" ) && ttag!=null ) {
+            String ff= (String)ttag.property(QDataSet.FORMAT);
+            if ( ff!=null ) {
+                tformat= ff;
+            }
+        }
         String ft= tformat.toLowerCase();
         String depend0Units= getParam( "depend0Units", "" );
         Units dep0units= null;
@@ -103,11 +109,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 timeFormatter = new TimeDatumFormatter(tformat);
             } catch (ParseException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
-                try {
-                    timeFormatter = new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S");
-                } catch (ParseException ex1) {
-                    throw new RuntimeException(ex1);
-                }
+                timeFormatter = new FormatStringFormatter(tformat,false);
             }
         } else {
             try {
@@ -500,7 +502,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             maybeOutputProperty(out, data, QDataSet.TITLE);
         }
 
-        DatumFormatter tf= getTimeFormatter( );
+        DatumFormatter tf= getTimeFormatter(dep0 );
         
         String delim= getDelim();
         
@@ -780,7 +782,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         mon.setTaskSize(data.length());
         mon.started();
 
-        DatumFormatter tf= getTimeFormatter();
+        DatumFormatter tf= getTimeFormatter(dep0);
 
         DatumFormatter df;
         String format= getParam( "format", "" );
@@ -979,7 +981,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
 //            }
 //        }
 
-        DatumFormatter tf= getTimeFormatter();
+        DatumFormatter tf= getTimeFormatter(dep0);
 
         Units dep0units= u0; // target output units.
         String depend0Units= getParam( "depend0Units", "" );
