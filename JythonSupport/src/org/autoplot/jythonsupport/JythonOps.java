@@ -40,6 +40,8 @@ import org.das2.datum.InconvertibleUnitsException;
 import org.das2.datum.UnitsConverter;
 import org.das2.datum.UnitsUtil;
 import org.das2.jythoncompletion.JavadocLookup;
+import org.das2.qds.LDataSet;
+import org.das2.qds.LongWriteAccess;
 import org.das2.qds.SemanticOps;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.DataSetBuilder;
@@ -175,6 +177,15 @@ public class JythonOps {
         if ( arg0 instanceof PyQDataSet ) {
             return ((PyQDataSet)arg0).rods;
         } else if ( arg0 instanceof PyDatum ) {
+            Datum d= ((PyDatum)arg0).datum;
+            Units u= d.getUnits();
+            if ( u==Units.cdfTT2000 ) {
+                if ( d instanceof Datum.Long ) {
+                    LDataSet result= LDataSet.wrap( new long[] { ((Datum.Long)d).longValue(u) }, new int[0] );
+                    result.putProperty( QDataSet.UNITS,u );
+                    return result;
+                }
+            }
             return DataSetUtil.asDataSet( ((PyDatum)arg0).datum );
         } else if ( arg0 instanceof PyList ) {
             return PyQDataSetAdapter.adaptList( (PyList)arg0 ) ;
