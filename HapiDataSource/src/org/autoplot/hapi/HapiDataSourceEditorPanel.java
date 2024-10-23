@@ -4,6 +4,8 @@ package org.autoplot.hapi;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Window;
@@ -11,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -24,6 +27,7 @@ import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -33,19 +37,25 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import org.autoplot.datasource.DataSetURI;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -62,6 +72,9 @@ import org.autoplot.datasource.RecentComboBox;
 import org.autoplot.datasource.TimeRangeTool;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.ui.PromptComboBoxEditor;
+import org.das2.dataset.DataSetUtil;
+import org.das2.graph.GraphUtil;
+import org.das2.util.ColorUtil;
 
 /**
  * Swing editor for HAPI URIs
@@ -162,8 +175,16 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
         initComponents();
         
+        hapiServerRecentComboBox.setPreferenceNode("hapi.servers");
+        PromptComboBoxEditor editor= new PromptComboBoxEditor("search");
+        editor.setTooltipText( hapiServerRecentComboBox.getToolTipText() );
+        hapiServerRecentComboBox.setEditor( editor );
+        ((JTextField)editor.getEditorComponent()).setColumns(10);
+        hapiServerRecentComboBox.invalidate();
+        hapiServerRecentComboBox.revalidate();
+        
         datasetFilterComboBox.setPreferenceNode("hapi.filters");
-        PromptComboBoxEditor editor= new PromptComboBoxEditor("search regex");
+        editor= new PromptComboBoxEditor("search regex");
         editor.setTooltipText( datasetFilterComboBox.getToolTipText() );
         datasetFilterComboBox.setEditor( editor );
         ((JTextField)editor.getEditorComponent()).setColumns(10);
@@ -277,17 +298,96 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         }
     });
-            
+    
+    private static URL findFavIcon( URL hapi ) {
+        try {
+            return new URL( hapi.getProtocol() + "://" + hapi.getHost() + "/favicon.ico" );
+        } catch (MalformedURLException ex) {
+            return null;
+        }
+    }
+    
+    private static final Map<String,ImageIcon> icons= Collections.synchronizedMap( new HashMap() );
+    
+    private static Icon iconFor( Object o, boolean wait ) {
+        ImageIcon result= icons.get(o.toString());
+        if (result==null && wait ) {
+            try {
+                long t1= System.currentTimeMillis();
+                
+                try {
+                    URL favicon= findFavIcon( new URL(o.toString()) );
+                    File ff= DataSetURI.getFile( favicon, null );
+                
+                    List<BufferedImage> bbs= net.sf.image4j.codec.ico.ICODecoder.read(ff);
+                    BufferedImage useThis= null;
+                    for ( BufferedImage bb: bbs ) {
+                        if ( bb.getWidth()<20 ) {
+                            useThis= bb;
+                            break;
+                        }
+                    }
+                    if ( useThis==null ) {
+                        BufferedImage im= bbs.get(0);
+                        int h= im.getWidth(null);
+                        int w= im.getHeight(null);
+                        int s= 20;
+                        int h1= Math.min(24,s*w/h);
+                        BufferedImage bi=  new BufferedImage( s, h1, BufferedImage.TYPE_INT_ARGB);
+                        Graphics g= bi.createGraphics();
+                        g.drawImage( im, 0, 0, s, h1, null, null );
+                        useThis= bi;
+                    }
+                    result= new ImageIcon(useThis);
+                } catch ( IOException ex ) {
+                    result= null;
+                }
+                //result= new ImageIcon("https://autoplot.org/favicon.ico");
+                logger.log(Level.FINE, "time to load icon for {0}: {1} ms", new Object[]{ o, System.currentTimeMillis()-t1});
+                icons.put( o.toString(), result );
+            } catch (Exception ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        } 
+        return result;
+    }
+    
+    private static class IconCellRenderer implements ListCellRenderer {
+        DefaultListCellRenderer r= new DefaultListCellRenderer();
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            Component c= r.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            Icon icon= iconFor( value, false );
+            ((DefaultListCellRenderer)c).setIcon(icon);
+            return c;
+        }
+    }
+    
     /**
      * load the known servers and set the GUI.  This should not be called from
      * the event thread, and a runnable for the event thread will be submitted.
      */
     public void loadKnownServersImmediately() {
-        final String[] servers= HapiServer.listHapiServersArray();
+        String[] servers1= HapiServer.listHapiServersArray();
+        String item = (String)hapiServerRecentComboBox.getSelectedItem();
+        if ( item==null ) item = "";
+        item = item.trim();
+        if ( item.length()>0 ) {
+            Pattern p= Pattern.compile(item);
+            List<String> newServers= new ArrayList<>();
+            for ( int i=0; i<servers1.length; i++ ) {
+                if ( p.matcher(servers1[i]).find() ) {
+                    newServers.add(servers1[i]);
+                }
+            }
+            servers1= newServers.toArray( new String[newServers.size()] );
+        }
+        final String[] servers= servers1;
         Runnable run= new Runnable() {
             @Override
             public void run() {
                 serversComboBox.setModel( new DefaultComboBoxModel<>( servers ));
+                serversComboBox.setRenderer( new IconCellRenderer() );
                 try {
                     defaultServer= new URL(servers[0]); //TODO: sometimes server is URL sometimes a string.  How annoying...
                 } catch (MalformedURLException ex) {
@@ -317,6 +417,17 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         };
         new Thread(run,"loadKnownServers").start();
+        run= new Runnable() {
+            @Override
+            public void run() {
+                String[] servers = HapiServer.listHapiServersArray();
+                for ( String s: servers ) {
+                    Icon i= iconFor( s, true ); // force load of icon off the event thread.
+                    if ( i!=null ) logger.log(Level.FINER, "iconHeight={0}", i.getIconHeight());
+                }
+            };
+        };
+        new Thread(run,"loadKnownServerIcons").start();
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -351,6 +462,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         timeRangeComboBox = new org.autoplot.datasource.RecentComboBox();
         exampleTimeRangesCB = new javax.swing.JComboBox<>();
         disableCacheCheckBox = new javax.swing.JCheckBox();
+        hapiServerRecentComboBox = new org.autoplot.datasource.RecentComboBox();
 
         jLabel1.setText("HAPI Server:");
 
@@ -380,7 +492,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         parametersPanel.setLayout(parametersPanelLayout);
         parametersPanelLayout.setHorizontalGroup(
             parametersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 482, Short.MAX_VALUE)
+            .addGap(0, 485, Short.MAX_VALUE)
         );
         parametersPanelLayout.setVerticalGroup(
             parametersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -431,7 +543,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(parametersScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE)
+            .addComponent(parametersScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 497, Short.MAX_VALUE)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addComponent(clearAllB)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -527,18 +639,28 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         disableCacheCheckBox.setText("Disable Cache");
 
+        hapiServerRecentComboBox.setToolTipText("search bar for HAPI server, any server containing regular expression (.* matches anything) is shown");
+        hapiServerRecentComboBox.setMaximumSize(new java.awt.Dimension(1028, 32767));
+        hapiServerRecentComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                hapiServerRecentComboBoxActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 707, Short.MAX_VALUE)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 712, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(serversComboBox, 0, 1, Short.MAX_VALUE))
+                        .addComponent(serversComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(hapiServerRecentComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -561,7 +683,8 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(serversComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(serversComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(hapiServerRecentComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSplitPane1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -753,6 +876,16 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         new Thread( run, "parameterFilter" ).start();
     }//GEN-LAST:event_parameterFilterComboBoxActionPerformed
 
+    private void hapiServerRecentComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hapiServerRecentComboBoxActionPerformed
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                loadKnownServersSoon();
+            }
+        };
+        new Thread( run, "hapiServerFilter" ).start();
+    }//GEN-LAST:event_hapiServerRecentComboBoxActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox binaryCB;
@@ -763,6 +896,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     private javax.swing.JCheckBox disableCacheCheckBox;
     private javax.swing.JComboBox<String> exampleTimeRangesCB;
     private javax.swing.JButton extraInfoButton;
+    private org.autoplot.datasource.RecentComboBox hapiServerRecentComboBox;
     private javax.swing.JList<String> idsList2;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
