@@ -2513,8 +2513,12 @@ public final class HapiDataSource extends AbstractDataSource {
         long modificationDate= 0L;
         if ( doc.has("modificationDate") ) {
             String s= doc.getString("modificationDate");
-            Datum d= parseTime(s);
-            modificationDate= (long)( d.doubleValue(Units.ms1970) );
+            try {
+                Datum d= parseTime(s);
+                modificationDate= (long)( d.doubleValue(Units.ms1970) );
+            } catch ( ParseException ex ) {
+                logger.log(Level.INFO, "Unable to use modificationDate, found: \"{0}\"", s);
+            }
         }
         
         ParamDescription[] pds= new ParamDescription[nparameters];
