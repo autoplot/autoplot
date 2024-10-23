@@ -525,11 +525,11 @@ public final class PyQDataSet extends PyJavaInstance {
      * This implements the Python indexing, such as data[4,:,3:5].  Note this
      * includes many QDataSet operations: a single index represents a slice, a 
      * range like 3:5 is a trim, an array is a sort, and a colon leaves a dimension
-     * alone.  See http://autoplot.org/developer.python.indexing
+     * alone.  See https://github.com/autoplot/documentation/blob/master/md/developer.python.indexing.md
      *
      * TODO: preserve metadata
-	 * TODO: verify all index types.
-     * @param arg0 various python types http://autoplot.org/developer.python.indexing
+     * TODO: verify all index types.
+     * @param arg0 various python types https://github.com/autoplot/documentation/blob/master/md/developer.python.indexing.md
      * @return element or subset of data.
      */
     @Override
