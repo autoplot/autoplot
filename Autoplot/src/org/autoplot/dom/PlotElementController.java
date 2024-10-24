@@ -1103,6 +1103,10 @@ public class PlotElementController extends DomNodeController {
                             getRenderer().setException(ex);
                             renderException= ex;
                         } catch ( RuntimeException ex ) {
+                            if ( getRenderer()==null ) {
+                                System.err.println("NullPointerEx has happened, see bug https://sourceforge.net/p/autoplot/bugs/2635/");
+                                ex.printStackTrace();
+                            }
                             setStatus("warning: Exception in process: " + ex );
                             getRenderer().setDataSet(null);
                             getRenderer().setException(getRootCause(ex));
