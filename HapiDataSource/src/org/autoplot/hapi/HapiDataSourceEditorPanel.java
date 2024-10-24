@@ -4,6 +4,7 @@ package org.autoplot.hapi;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
@@ -299,9 +300,10 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
     });
     
-    private static URL findFavIcon( URL hapi ) {
+    private static String findFavIcon( String hapiString ) {
         try {
-            return new URL( hapi.getProtocol() + "://" + hapi.getHost() + "/favicon.ico" );
+            URL hapi= new URL( hapiString );
+            return new URL( hapi.getProtocol() + "://" + hapi.getHost() + "/favicon.ico" ).toString();
         } catch (MalformedURLException ex) {
             return null;
         }
@@ -310,14 +312,17 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     private static final Map<String,ImageIcon> icons= Collections.synchronizedMap( new HashMap() );
     
     private static Icon iconFor( Object o, boolean wait ) {
-        ImageIcon result= icons.get(o.toString());
+        
+        final String faviconUrl;
+        faviconUrl= findFavIcon( o.toString() );
+        
+        ImageIcon result= icons.get( faviconUrl );
         if (result==null && wait ) {
             try {
                 long t1= System.currentTimeMillis();
                 
                 try {
-                    URL favicon= findFavIcon( new URL(o.toString()) );
-                    File ff= DataSetURI.getFile( favicon, null );
+                    File ff= DataSetURI.getFile( faviconUrl, null );
                 
                     List<BufferedImage> bbs= net.sf.image4j.codec.ico.ICODecoder.read(ff);
                     BufferedImage useThis= null;
@@ -342,9 +347,9 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 } catch ( IOException ex ) {
                     result= null;
                 }
-                //result= new ImageIcon("https://autoplot.org/favicon.ico");
                 logger.log(Level.FINE, "time to load icon for {0}: {1} ms", new Object[]{ o, System.currentTimeMillis()-t1});
-                icons.put( o.toString(), result );
+                icons.put( faviconUrl, result );
+                
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
@@ -422,7 +427,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             public void run() {
                 String[] servers = HapiServer.listHapiServersArray();
                 for ( String s: servers ) {
-                    Icon i= iconFor( s, true ); // force load of icon off the event thread.
+                    Icon i= iconFor( s, true ); // load of icon off the event thread.
                     if ( i!=null ) logger.log(Level.FINER, "iconHeight={0}", i.getIconHeight());
                 }
             };
@@ -785,7 +790,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         final JScrollPane p= new JScrollPane(jep);
         p.setPreferredSize( new Dimension( 800,400 ) );
         p.setMaximumSize( new Dimension( 800,400 ) );
-        SwingUtilities.invokeLater(new Runnable() {  // Grr stupid Java.
+        SwingUtilities.invokeLater(new Runnable() {  
             @Override
             public void run() {
                 jep.setCaretPosition(0);
@@ -807,7 +812,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 resetServerCatalog( currentServer );
             }
         };
-        new Thread( run, "resetServerCatalog2" ).start();
+        SwingUtilities.invokeLater(run);
     }//GEN-LAST:event_datasetFilterComboBoxActionPerformed
 
     private void exampleTimeRangesCBItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_exampleTimeRangesCBItemStateChanged
@@ -866,24 +871,11 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     }//GEN-LAST:event_cachedFileButtonActionPerformed
 
     private void parameterFilterComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_parameterFilterComboBoxActionPerformed
-
-        Runnable run= new Runnable() {
-            @Override
-            public void run() {
-                resetVariableTimer.tickle("resetFilter");
-            }
-        };
-        new Thread( run, "parameterFilter" ).start();
+        resetVariableTimer.tickle("resetFilter");
     }//GEN-LAST:event_parameterFilterComboBoxActionPerformed
 
     private void hapiServerRecentComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hapiServerRecentComboBoxActionPerformed
-        Runnable run= new Runnable() {
-            @Override
-            public void run() {
-                loadKnownServersSoon();
-            }
-        };
-        new Thread( run, "hapiServerFilter" ).start();
+        loadKnownServersSoon();
     }//GEN-LAST:event_hapiServerRecentComboBoxActionPerformed
 
 
@@ -1156,13 +1148,18 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     /**
      * This will load the ids into the GUI.
      * See https://github.com/hapi-server/data-specification#catalog
-     * @param filter
+     * This uses the datasetFilterComboBox's value to filter by regular expression, if non-empty.
+     * This must be called on the event thread.
+     * @param server
      * @throws IOException
      * @throws JSONException 
      */    
     private void resetServerCatalog( URL server ) {
         try {
-            final String filter= datasetFilterComboBox.getSelectedItem().toString();
+            if ( !EventQueue.isDispatchThread() ) {
+                System.err.println("Here Jeremy");
+            }
+            final String filter= datasetFilterComboBox.getSelectedItem().toString().trim();
             DefaultListModel model= new DefaultListModel();
             int maxCharacters=0;
             for ( JSONObject catalogEntry: new JSONArrayIterator(idsJSON) ) {
