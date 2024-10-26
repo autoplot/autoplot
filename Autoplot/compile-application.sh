@@ -96,6 +96,7 @@ function compilef {
 }
 
 function compilef-go {
+   echo "# compilef-go in $PWD"
    echo $JAVAC $JAVAARGS $allcodes
    if ! $JAVAC $JAVAARGS $allcodes; then raiseerror; fi
 }
@@ -105,7 +106,7 @@ if [ "" = "$CODEBASE" ]; then
 fi
 
 if [ "" = "$HUDSON_URL" ]; then
-    HUDSON_URL="http://ci-pw.physics.uiowa.edu/"
+    HUDSON_URL="https://cottagesystems.com/jenkins/"
 fi
 
 if [ "" = "$WGET" ]; then
@@ -404,57 +405,57 @@ cd ..
 
 echo "done make jumbo jar files..."
 
-# See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5078608 "Digital signatures are invalid after unpacking"
-# See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6575373 "Error verifying signatures of pack200 files in some cases"
-# See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6351684 "pack200 doesn't work on/corrupts obfuscated files"
-echo "=== normalize jar file before signing..."
-${JAVA_HOME}/bin/pack200 --repack dist/AutoplotVolatile1.jar dist/AutoplotVolatile.jar
-${JAVA_HOME}/bin/pack200 --repack dist/AutoplotVolatile2.jar dist/AutoplotVolatile1.jar # http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6575373  Note this doesn't appear to have an effect.
-mv dist/AutoplotVolatile2.jar dist/AutoplotVolatile.jar
-rm dist/AutoplotVolatile1.jar
+## See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5078608 "Digital signatures are invalid after unpacking"
+## See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6575373 "Error verifying signatures of pack200 files in some cases"
+## See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6351684 "pack200 doesn't work on/corrupts obfuscated files"
+#echo "=== normalize jar file before signing..."
+#${JAVA_HOME}/bin/pack200 --repack dist/AutoplotVolatile1.jar dist/AutoplotVolatile.jar
+#${JAVA_HOME}/bin/pack200 --repack dist/AutoplotVolatile2.jar dist/AutoplotVolatile1.jar # http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6575373  Note this doesn't appear to have an effect.
+#mv dist/AutoplotVolatile2.jar dist/AutoplotVolatile.jar
+#rm dist/AutoplotVolatile1.jar
+#
+#echo "=== sign and pack the jar file..."
+#
+#if [ "$DO_HIDE" = "true" ]; then 
+#   echo "  use set +x to hide private info"
+#   #echo  ${JAVA_HOME}/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS $JARSIGNER_OPTS dist/AutoplotVolatile.jar "$ALIAS"
+#   set +x
+#fi
+#
+#if ! ${JAVA_HOME}/bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS" $JARSIGNER_OPTS dist/AutoplotVolatile.jar "$ALIAS"; then
+#   echo "Fail to sign resources!"
+#   exit 1
+#fi
+#
+#if [ "$DO_HIDE" = "true" ]; then 
+#   set -x
+#fi
+#
+#echo "=== verify the jar file..."
+#${JAVA_HOME}/bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar | head -10
 
-echo "=== sign and pack the jar file..."
-
-if [ "$DO_HIDE" = "true" ]; then 
-   echo "  use set +x to hide private info"
-   #echo  ${JAVA_HOME}/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS $JARSIGNER_OPTS dist/AutoplotVolatile.jar "$ALIAS"
-   set +x
-fi
-
-if ! ${JAVA_HOME}/bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS" $JARSIGNER_OPTS dist/AutoplotVolatile.jar "$ALIAS"; then
-   echo "Fail to sign resources!"
-   exit 1
-fi
-
-if [ "$DO_HIDE" = "true" ]; then 
-   set -x
-fi
-
-echo "=== verify the jar file..."
-${JAVA_HOME}/bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar | head -10
-
-echo "=== sign and pack the jar file..."
-${JAVA_HOME}/bin/pack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile.jar
-${JAVA_HOME}/bin/unpack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile_pack_gz.jar
-
-if ! ${JAVA_HOME}/bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar | head -10; then
-   echo "jarsigner verify failed on file dist/AutoplotVolatile.jar!"
-   exit 1
-fi
-
-echo "=== verify signed and unpacked jar file..."
-if ! ${JAVA_HOME}/bin/jarsigner -verify -verbose dist/AutoplotVolatile_pack_gz.jar | head -10; then
-   echo "jarsigner verify  failed on pack_gz file dist/AutoplotVolatile_pack_gz.jar!"
-   exit 1
-fi
-rm dist/AutoplotVolatile_pack_gz.jar
-
-echo "=== create jnlp file for build..."
-cp src/autoplot.jnlp dist
-cp src/autoplot_4GB.jnlp dist
-cp src/autoplot_1GB.jnlp dist
-cp src/autoplot_prod_4GB.jnlp dist
-cp src/autoplot_prod_1GB.jnlp dist
+#echo "=== sign and pack the jar file..."
+#${JAVA_HOME}/bin/pack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile.jar
+#${JAVA_HOME}/bin/unpack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile_pack_gz.jar
+#
+#if ! ${JAVA_HOME}/bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar | head -10; then
+#   echo "jarsigner verify failed on file dist/AutoplotVolatile.jar!"
+#   exit 1
+#fi
+#
+#echo "=== verify signed and unpacked jar file..."
+#if ! ${JAVA_HOME}/bin/jarsigner -verify -verbose dist/AutoplotVolatile_pack_gz.jar | head -10; then
+#   echo "jarsigner verify  failed on pack_gz file dist/AutoplotVolatile_pack_gz.jar!"
+#   exit 1
+#fi
+#rm dist/AutoplotVolatile_pack_gz.jar
+#
+#echo "=== create jnlp file for build..."
+#cp src/autoplot.jnlp dist
+#cp src/autoplot_4GB.jnlp dist
+#cp src/autoplot_1GB.jnlp dist
+#cp src/autoplot_prod_4GB.jnlp dist
+#cp src/autoplot_prod_1GB.jnlp dist
 
 echo "=== copy branding for release, such as png icon images"
 cp src/*.png dist
