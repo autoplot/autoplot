@@ -1,6 +1,7 @@
 
 package org.autoplot.pds;
 
+import com.opencsv.exceptions.CsvValidationException;
 import gov.nasa.pds.label.Label;
 import gov.nasa.pds.label.object.ArrayObject;
 import gov.nasa.pds.label.object.FieldDescription;
@@ -63,6 +64,23 @@ public class PdsDataSource extends AbstractDataSource {
     }
 
     /**
+     * new version of PDS library now throws CsvValidationException, catch this and
+     * wrap it to look like IOException for now.
+     * TODO: review this.
+     * @param t the table
+     * @return the TableRecord
+     * @throws Exception 
+     */
+    private static TableRecord readNextTableRecord(TableObject t ) throws Exception {
+        try {
+            return t.readNext();
+        } catch ( CsvValidationException ex ) {
+            throw new IOException(ex);
+        }
+    }
+    
+    
+    /**
      * bootstrap routine for getting data from fields of a TableObject.  TODO: rewrite so that
      * multiple fields are read at once.
      * @param t
@@ -114,7 +132,7 @@ public class PdsDataSource extends AbstractDataSource {
         boolean doTimeCheck= true; // allow ASCII_STRING to contain times, flipping from nominal units to time location units.
         
         TableRecord r;
-        while ( ( r= t.readNext())!=null ) {
+        while ( ( r= readNextTableRecord(t) )!=null ) {
             for ( int i=0; i<ncols; i++ ) {
                 try {
                     if ( doTimeCheck ) {
