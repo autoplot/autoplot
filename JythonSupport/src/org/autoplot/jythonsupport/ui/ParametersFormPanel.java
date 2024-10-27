@@ -514,7 +514,7 @@ public class ParametersFormPanel {
                             }       
                             final RecentComboBox tcb= new RecentComboBox();
                             tcb.setPreferenceNode( RecentComboBox.PREF_NODE_TIMERANGE );
-                            if ( !values.isEmpty() ) {
+                            if ( values!=null && !values.isEmpty() ) {
                                 List<String> svalues= new ArrayList<>();
                                 for ( Object o: values ) svalues.add( String.valueOf(o) );
                                 tcb.addAdditionalToRecentItems(svalues);
@@ -555,7 +555,7 @@ public class ParametersFormPanel {
                             }       
                             final JComponent fjcf;
                                                         
-                            if ( values!=null && values.size()>0 ) {
+                            if ( values!=null && !values.isEmpty() ) {
                                 Object[] labels;
                                 if ( parm.examples!=null ) {
                                     labels= parm.examples.toArray();
@@ -661,7 +661,7 @@ public class ParametersFormPanel {
                                 val= String.valueOf( parm.deft );
                                 params.put( vname, val );
                             }       
-                            if ( values!=null && values.size()>0 ) {
+                            if ( values!=null && !values.isEmpty() ) {
                                 if ( isBool ) {
                                     JCheckBox jcb= new JCheckBox( label );
                                     jcb.setSelected( val.equals("T") || val.equals("1") || val.equals("True") );
