@@ -82,7 +82,7 @@ public class JavadocLookup {
                     return s + signature.replaceAll("[\\(\\)\\,]", "-");
                 } else if ( s.startsWith("http://www-pw.physics.uiowa.edu/~jbf/autoplot/doc")
                         || s.startsWith("https://jfaden.net/~jbf/autoplot/doc" )
-                        || s.startsWith("https://cottagesystems.com/jenkins/job/autoplot-javadoc/lastSuccessfulBuild/artifact/doc/") ) {
+                        || s.startsWith("https://cottagesystems.com/jenkins/job/autoplot-javadoc/") ) {
                     int i= signature.indexOf('(');
                     if ( i>0 ) {
                         signature= signature.substring(0,i);
