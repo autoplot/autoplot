@@ -543,6 +543,18 @@ public class ReadIDLSav {
             logger.log(Level.CONFIG, "readData @ {0,number,#}", offsetToFile+ offsToArray );
             
             switch (typeCode) {
+                case TYPECODE_BYTE: { // unsigned byte
+                    short[] result= new short[arrayDesc.nelements];
+                    for ( int i=0; i<result.length; i++ ) {
+                        byte ubyte= buf.get(offsToArray+i+4); // I have no idea where the "4" is coming from...
+                        if ( ubyte<0 ) {
+                            result[i]= (short)(ubyte+256);
+                        } else {
+                            result[i]= (short)ubyte;
+                        }
+                    }
+                    return makeArrayData(result, offsetToFile+ offsToArray, result.length*4 );
+                }
                 case TYPECODE_INT16: {
                     short[] result= new short[arrayDesc.nelements];
                     for ( int i=0; i<result.length; i++ ) {
@@ -613,8 +625,14 @@ public class ReadIDLSav {
                     //System.err.println("");
                     for ( int i=0; i<result.length; i++ ) {
                         int len= buf.getInt(offs);
+                        buf.getInt(offs-4);
                         if ( len<0 || len>1024 ) {
-                            throw new IllegalArgumentException("string has unbelievable len, something has gone wrong.");
+                            logger.info("recovery kludge!");
+                            offs= offs-4;
+                            len = buf.getInt(offs);
+                            if ( len<0 || len>1024 ) {
+                                throw new IllegalArgumentException("string has unbelievable len, something has gone wrong.");
+                            }
                         }
                         byte[] bb= new byte[len];
                         for ( int k=0; k<len; k++ ) {
