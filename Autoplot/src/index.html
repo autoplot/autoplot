@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small><a href="https://cottagesystems.com/server/ct/hapi">HAPI server</a> contains new pool temperature data, allowing study of surrounding ground temperature along pool temperature.</small></p>
+        <p><small>Fun plot of ground temperature vs pool temperature.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,10 +30,14 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-10-21 r27827):</p>
+        <p>Bugfixes (2024-10-29 r27862):</p>
         <ul> 
+            <li>Das2 TimeParser library gets $N to keep in sync with URI_Templates.
+            <li>Add support for byte arrays to IDLSave files, thanks Sadie!
+            <li>"Fourier Filters" area renamed to "Fourier Spectra", thanks Connor!
+            <li>Old QStream and QDataSet projects (not the ones in dasCore) are removed because they broke the JavaDoc generation and were not used.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/143/">0143</a>: format to ASCII now checks timetag FORMAT property.
-            <li>Mash-up tool now has 3-argument add function for readability, expression area is larger now.
+            <li>Mash-up tool now has 3-argument add function for readability, expression area is larger now.  Thanks, Darrelle!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2625/">2625</a>: improve feedback when getDataSet arguments cannot be used.
             <li><a href="https://github.com/das-developers/das2java/issues/112">112</a>: Slowness with https://github.com/autoplot/dev/blob/master/bugs/sf/2619/demo2619.jy, caused by excessive dataset metadata handling.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2619/">2619</a>: PWD is now set when loading remote .vap files with AutoplotServlet.
