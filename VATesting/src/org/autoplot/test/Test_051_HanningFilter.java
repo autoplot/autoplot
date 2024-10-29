@@ -63,7 +63,7 @@ public class Test_051_HanningFilter implements Scenario {
             
             ScriptContext.waitUntilIdle();
             
-            FiltersTreePicker.pickFilter( mainFrame, "Filters|Fourier Filtering|Hanning".split("\\|") );
+            FiltersTreePicker.pickFilter( mainFrame, "Filters|Fourier Spectra|Hanning".split("\\|") );
         
             DialogOperator hanningFrame = new DialogOperator( new RegexComponentChooser( "Edit Operations") );
         
