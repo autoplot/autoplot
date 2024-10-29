@@ -72,11 +72,11 @@ public class PdsDataSource extends AbstractDataSource {
      * @throws Exception 
      */
     private static TableRecord readNextTableRecord(TableObject t ) throws Exception {
-        try {
+        //try {
             return t.readNext();
-        } catch ( CsvValidationException ex ) {
-            throw new IOException(ex);
-        }
+        //} catch ( CsvValidationException ex ) {
+        //    throw new IOException(ex);
+        //}
     }
     
     
