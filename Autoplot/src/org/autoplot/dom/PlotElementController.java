@@ -1125,6 +1125,9 @@ public class PlotElementController extends DomNodeController {
                         }
                     }
                 } else if (resetRanges) {
+                    if ( comp.length()>0 ) {
+                        plotElement.setActive(true);
+                    }
                     doResetRanges();
                     setResetRanges(false);
                 } else if (resetRenderType) {
