@@ -59,7 +59,7 @@ public final class Options extends DomNode {
      */
     public static final String PROP_DATAVISIBLE = "dataVisible";
 
-    protected boolean dataVisible = false;
+    protected boolean dataVisible = true;
 
     public boolean isDataVisible() {
         return dataVisible;
@@ -76,7 +76,7 @@ public final class Options extends DomNode {
      */
     public static final String PROP_LAYOUTVISIBLE = "layoutVisible";
 
-    protected boolean layoutVisible = false;
+    protected boolean layoutVisible = true;
 
     public boolean isLayoutVisible() {
         return layoutVisible;
