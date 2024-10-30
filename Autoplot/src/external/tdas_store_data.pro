@@ -1,7 +1,7 @@
 ;+
 ; demonstrate how Autoplot's IDL interface could be used to read data into the TDAS data system
 ;
-; tdas_store_data, 'protonvel', 'http://autoplot.org/data/proton_velocity_rtn.qds'
+; tdas_store_data, 'protonvel', 'https://autoplot.org/data/proton_velocity_rtn.qds'
 ; tplot, 'protonvel'
 ;-
 pro tdas_store_data, name, uri

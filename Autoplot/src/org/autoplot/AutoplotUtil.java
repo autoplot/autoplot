@@ -146,6 +146,7 @@ import org.autoplot.dom.PlotController;
 import org.das2.graph.BoundsRenderer;
 import org.das2.graph.PolarPlotRenderer;
 import org.das2.util.AboutUtil;
+import org.das2.util.FileUtil;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -1140,7 +1141,7 @@ public class AutoplotUtil {
 
     /**
      * @see org.autoplot.datasource.DataSourceUtil#guessRenderType(org.das2.qds.QDataSet), which will become the official version.
-     * @see http://autoplot.org/developer.guessRenderType
+     * @see https://autoplot.org/developer.guessRenderType
      * @param fillds
      * @return
      */
@@ -1800,7 +1801,7 @@ public class AutoplotUtil {
         }
         String bits= is32bit ? "32" : "64";
         String bitsWarning;
-        bitsWarning= is32bit ? "(<a href=\"http://autoplot.org/32bit\">severely limiting capabilities</a>)" : "(recommended)";
+        bitsWarning= is32bit ? "(<a href=\"https://autoplot.org/32bit\">severely limiting capabilities</a>)" : "(recommended)";
 
         String javaVersionWarning= "";
         Pattern p= Pattern.compile("(\\d+\\.\\d+)\\.\\d+\\_(\\d+)");
@@ -1809,7 +1810,7 @@ public class AutoplotUtil {
             double major= Double.parseDouble( m.group(1) );
             int minor= Integer.parseInt( m.group(2) );
             if ( major<1.8 || ( major==1.8 && minor<102 ) ) {
-                javaVersionWarning= "(<a href=\"http://autoplot.org/javaVersion\">limiting access to CDAWeb</a>)";
+                javaVersionWarning= "(<a href=\"https://autoplot.org/javaVersion\">limiting access to CDAWeb</a>)";
             } else {
                 javaVersionWarning= "(recommended)";
             }

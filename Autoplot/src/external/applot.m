@@ -46,7 +46,7 @@ end
     yy = java.io.OutputStreamWriter(y);
     yyy = java.io.BufferedWriter(yy);
     com = sprintf('plot(''file://%s/applot.bin'')\n',pwd());
-%    com = sprintf('plot(''http://autoplot.org/data/autoplot.ncml'')\n');
+%    com = sprintf('plot(''https://autoplot.org/data/autoplot.ncml'')\n');
     com = sprintf('setTitle(''Hello%f'')\n',rand(1));
     yyy.write(com);
     yyy.flush();

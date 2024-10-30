@@ -145,8 +145,8 @@ public class AddSampListener {
         Metadata meta = new Metadata();
         meta.setName("Autoplot");
         meta.setDescriptionText("Autoplot");
-        meta.setIconUrl("http://autoplot.org/wiki/images/logo32.png");
-        meta.setDocumentationUrl("http://autoplot.org");
+        meta.setIconUrl("https://autoplot.org/Logo32.png");
+        meta.setDocumentationUrl("https://autoplot.org");
 
         hubConnector.declareMetadata(meta);
 

@@ -25,7 +25,7 @@ public class FixLayoutCommand extends PyObject  {
     public static final PyString __doc__ =
         new PyString("<html><H2>fixLayout([named parameters])</H2>"
             + "fixLayout cleans up the layout of the canvas.\n"
-            + "See <a href='http://autoplot.org/fixlayout'>http://autoplot.org/fixlayout</a><br>\n"
+            + "See <a href='https://autoplot.org/fixlayout'>https://autoplot.org/fixlayout</a><br>\n"
             + "<br><b>named parameters:</b>\n"
             + "<table>"
             + " <tr><td> horizontalSpacing=1em </td><td>Spacing between plots, such as 1em</td></tr>\n"

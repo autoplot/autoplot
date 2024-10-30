@@ -120,7 +120,7 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
         help.setAction( new AbstractAction("Help") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                AutoplotUtil.openBrowser( "http://autoplot.org/help#Aggregation" );
+                AutoplotUtil.openBrowser( "https://autoplot.org/help#Aggregation" );
             }
         } );
 
@@ -362,7 +362,7 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
     }//GEN-LAST:event_allUrisButtonActionPerformed
 
     private void showWildcardsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showWildcardsButtonActionPerformed
-        AutoplotUtil.openBrowser("http://autoplot.org/help#Wildcard_codes");
+        AutoplotUtil.openBrowser("https://autoplot.org/help#Wildcard_codes");
     }//GEN-LAST:event_showWildcardsButtonActionPerformed
 
 

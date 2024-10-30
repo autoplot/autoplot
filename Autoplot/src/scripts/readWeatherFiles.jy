@@ -13,7 +13,7 @@ import java.lang.Integer
 
 for j in xrange(4): 
   
-  ss= 'http://autoplot.org/data/xml/weather.gov/forecast_201205%02d.xml' % (j+27)  # from http://forecast.weather.gov/
+  ss= 'https://autoplot.org/data/xml/weather.gov/forecast_201205%02d.xml' % (j+27)  # from http://forecast.weather.gov/
   
   try:
       file= getFile( URI(ss), monitor.getSubtaskMonitor( j,j+1,ss) )

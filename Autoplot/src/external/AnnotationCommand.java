@@ -32,7 +32,7 @@ import org.python.core.PyList;
  * annotation( 2, 'Anno3', anchorType='DATA',pointAt='2016-10-14T07:51Z,-100', xrange='2016-10-20T00:00/PT30S', yrange='-150 to -100',
  *     anchorPosition='OutsideNE', anchorOffset='' )
  *}</small></pre></blockquote>
- * @see http://autoplot.org/help.annotationCommand
+ * @see https://autoplot.org/help.annotationCommand
  * @author jbf
  */
 public class AnnotationCommand extends PyObject {
@@ -42,7 +42,7 @@ public class AnnotationCommand extends PyObject {
     public static final PyString __doc__ =
         new PyString("<html><H2>annotation([index],[named parameters])</H2>"
             + "annotation puts an annotation on the canvas.\n"
-            + "See <a href='http://autoplot.org/help.annotationCommand'>http://autoplot.org/help.annotationCommand</a><br>\n"
+            + "See <a href='https://autoplot.org/help.annotationCommand'>https://autoplot.org/help.annotationCommand</a><br>\n"
             + "<br><b>named parameters:</b>\n"
             + "<table>"
             + "<tr><td>text</td><td>The message, allowing Granny codes</td></tr>"

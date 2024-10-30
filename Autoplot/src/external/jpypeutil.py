@@ -12,7 +12,7 @@ import urllib2
 
 def javaaddpath( url, jdwpPort=-1 ):
     '''Start up JVM and import the url, and import the path into the Python namespace.
-jpype= javaaddpath('http://autoplot.org/jnlp/devel/autoplot.jar')
+jpype= javaaddpath('https://autoplot.org/jnlp/devel/autoplot.jar')
     '''
     file_name = url.split('/')[-1]
     u = urllib2.urlopen(url)

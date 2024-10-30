@@ -2326,9 +2326,9 @@ APSplash.checkTime("init 52.9");
                         String s= "<li>scheme:arguments</li>"
                                 + "vap+cdaweb:ds=AC_H3_SWI&id=SW_type<br>"
                                 + "<li>scheme:URL?scheme-arguments</li>"
-                                + "vap+dat:http://autoplot.org/data/somedata.dat?column=field1<br>"
+                                + "vap+dat:https://autoplot.org/data/somedata.dat?column=field1<br>"
                                 + "<li>URL?scheme-arguments</li>"
-                                + "http://autoplot.org/data/somedata.dat?column=field1</br>";
+                                + "https://autoplot.org/data/somedata.dat?column=field1</br>";
 
                         JOptionPane.showMessageDialog( this, "<html><p>URI Syntax Error found when parsing.</p>"+s, "URI Syntax Error", JOptionPane.OK_OPTION );
                         return;
@@ -3877,7 +3877,7 @@ APSplash.checkTime("init 52.9");
 
     private void autoplotHomepageButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoplotHomepageButtonActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
-        AutoplotUtil.openBrowser("http://autoplot.org/");
+        AutoplotUtil.openBrowser("https://autoplot.org/");
 }//GEN-LAST:event_autoplotHomepageButtonActionPerformed
 
     private void helpMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_helpMenuActionPerformed
@@ -6013,7 +6013,7 @@ APSplash.checkTime("init 240");
                 
                 InputStream ins=null;
                 try {
-                    URL url = new URL("http://autoplot.org/data/tools.xml");
+                    URL url = new URL("https://autoplot.org/data/tools.xml");
                     ins= url.openStream();
                     Document doc = AutoplotUtil.readDoc(ins);
                     List<Bookmark> importBook = Bookmark.parseBookmarks(doc.getDocumentElement());

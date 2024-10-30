@@ -1125,9 +1125,6 @@ public class PlotElementController extends DomNodeController {
                         }
                     }
                 } else if (resetRanges) {
-                    if ( comp.length()>0 ) {
-                        plotElement.setActive(true);
-                    }
                     doResetRanges();
                     setResetRanges(false);
                 } else if (resetRenderType) {
@@ -1575,7 +1572,21 @@ public class PlotElementController extends DomNodeController {
                     shouldHaveChildren= false;
                 }
             }
+            
+            boolean alreadyHaveChildren= !getChildPlotElements().isEmpty();
 
+            if ( alreadyHaveChildren && shouldHaveChildren ) {
+                shouldHaveChildren= false;
+            }
+
+            synchronized (dom) {
+                System.err.println("###############");
+                System.err.println(""+this.plotElement.getId()+" " +getChildPlotElements() );
+                System.err.println("shouldHaveChildren: "+shouldHaveChildren );
+                System.err.println("###############");
+            }
+            
+            
             String[] lnames = null;
             String[] llabels= null;
             if ( shouldHaveChildren ) {

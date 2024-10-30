@@ -23,7 +23,7 @@ import org.das2.qds.ops.Ops;
 
 /**
  * little GUI for printing the PDB output and sending commands to it.
- * See http://autoplot.org/developer.jython.pdb
+ * See https://autoplot.org/developer.jython.pdb
  * @author jbf
  */
 public class DebuggerConsole extends javax.swing.JPanel {

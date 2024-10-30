@@ -116,19 +116,19 @@
         },
         {
             "name": "xautoRangeHints",
-            "description": "hints to the autorange, see http://autoplot.org/AxisAutoRangeHints"
+            "description": "hints to the autorange, see https://autoplot.org/AxisAutoRangeHints"
         },
         {
             "name": "yautoRangeHints",
-            "description": "hints to the autorange, see http://autoplot.org/AxisAutoRangeHints"
+            "description": "hints to the autorange, see https://autoplot.org/AxisAutoRangeHints"
         },
         {
             "name": "zautoRangeHints",
-            "description": "hints to the autorange, see http://autoplot.org/AxisAutoRangeHints"
+            "description": "hints to the autorange, see https://autoplot.org/AxisAutoRangeHints"
         },
         {
             "name": "renderer",
-            "description": "add custom renderer, a class extending org.das2.graph.Renderer, see http://autoplot.org/CustomRenderers"
+            "description": "add custom renderer, a class extending org.das2.graph.Renderer, see https://autoplot.org/CustomRenderers"
         },
         {
             "name": "rightAxisOf",

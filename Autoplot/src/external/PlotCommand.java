@@ -57,7 +57,7 @@ import org.python.core.PyMethod;
  * plot( 1, ripples(20), color=Color.BLUE )
  * plot( 2, ripples(20), renderType='series>color=blue' )
  *}</small></pre></blockquote>
- * @see http://autoplot.org/help.plotCommand
+ * @see https://autoplot.org/help.plotCommand
  * @author jbf
  */
 public class PlotCommand extends PyObject {
@@ -67,7 +67,7 @@ public class PlotCommand extends PyObject {
     public static final PyString __doc__ =
         new PyString("<html><H2>plot([index],x,y,z,[named parameters])</H2>"
             + "plot (or plotx) plots the data or URI for data on the canvas.\n"
-            + "See http://autoplot.org/help.plotCommand<br>\n"
+            + "See https://autoplot.org/help.plotCommand<br>\n"
             + "<br><b>named parameters:</b>\n"
             + "<table>"
             + "<tr><td>xlog ylog zlog </td><td>explicitly set this axis to log (or linear when set equal to 0.).</td></tr>\n"
@@ -91,8 +91,8 @@ public class PlotCommand extends PyObject {
             + " <tr><td> ypos    </td><td>override vertical position of plot, eg. '0%+1em,25%-2em', 0 is top\n</td>"
             + " <tr><td> [xy]drawTickLabels</td><td>False turns off the x or y tick labels for the plot\n</td>"
             + " <tr><td> [xy]tickValues</td><td>explicitly control the tick locations.</td>"
-            + " <tr><td> [xyz]autoRangeHints</td><td>hints to the autorange, see http://autoplot.org/AxisAutoRangeHints\n</td>"
-            + " <tr><td> renderer</td><td>add custom renderer, a class extending org.das2.graph.Renderer, see http://autoplot.org/CustomRenderers</td>"
+            + " <tr><td> [xyz]autoRangeHints</td><td>hints to the autorange, see https://autoplot.org/AxisAutoRangeHints\n</td>"
+            + " <tr><td> renderer</td><td>add custom renderer, a class extending org.das2.graph.Renderer, see https://autoplot.org/CustomRenderers</td>"
             + " <tr><td> rightAxisOf</td><td>specify a plot where a new plot with a new yaxis.</td>"
             + " <tr><td> topAxisOf</td><td>specify a plot where a new plot with a new xaxis above.</td>"
             + " <tr><td> overplotOf</td><td>a plot or plot element with which this should share axes.  Note something should reset the plot!</td>"

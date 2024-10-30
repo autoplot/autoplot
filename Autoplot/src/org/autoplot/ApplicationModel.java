@@ -639,7 +639,7 @@ public final class ApplicationModel {
         String sbookmark = prefs.get("bookmarks", "");
 
         if (sbookmark.equals("") || !sbookmark.startsWith("<")) {
-            String surl = AutoplotUtil.getProperty("autoplot.default.bookmarks", "http://autoplot.org/data/demos.xml");
+            String surl = AutoplotUtil.getProperty("autoplot.default.bookmarks", "https://autoplot.org/data/demos.xml");
             if (!surl.equals("")) {
                 try {
                     URL url = new URL(surl);

@@ -93,7 +93,7 @@ import org.das2.util.filesystem.FileSystem;
  * the application.  For example, 
  * 
  *<blockquote><pre><small>{@code
- ScriptContext.load('http://autoplot.org/data/somedata.dat')
+ ScriptContext.load('https://autoplot.org/data/somedata.dat')
  ScriptContext.writeToPdf('/tmp/foo.pdf')
  *}</small></pre></blockquote>
  * 
@@ -1615,10 +1615,10 @@ addBottomDecoration( dom.canvases[0], paint )
      * return a list of completions.  This is useful in the IDL context
      * as well as Jython scripts.  This will perform the completion for where the carot is
      * at the end of the string.  Only completions where maybePlot indicates the URI is now 
-     * valid are returned, so for example http://autoplot.org/data/somedata.cdf?noDep is not
-     * returned and http://autoplot.org/data/somedata.cdf?Magnitude is.
-     * Note this is included to continue support as this is described in http://autoplot.org/developer.idlMatlab.
-     * @param file, for example http://autoplot.org/data/somedata.cdf?
+     * valid are returned, so for example https://autoplot.org/data/somedata.cdf?noDep is not
+     * returned and https://autoplot.org/data/somedata.cdf?Magnitude is.
+     * Note this is included to continue support as this is described in https://autoplot.org/developer.idlMatlab.
+     * @param file, for example https://autoplot.org/data/somedata.cdf?
      * @return list of completions, containing the entire URI.
      * @throws java.lang.Exception any exception thrown by the data source.
      */

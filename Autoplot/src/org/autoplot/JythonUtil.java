@@ -638,7 +638,7 @@ public class JythonUtil {
                 } else {
                     File readme= new File(lastVersionDir,"README.txt");
                     try ( PrintStream out= new PrintStream(readme) ) {
-                        out.print("Files here have been okayed to run and can be run again without a warning.  See http://autoplot.org/1310\n");
+                        out.print("Files here have been okayed to run and can be run again without a warning.  See https://autoplot.org/1310\n");
                     }
                 }
             }
