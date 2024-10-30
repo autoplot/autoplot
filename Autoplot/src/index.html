@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Fun plot of ground temperature vs pool temperature.</small></p>
+        <p><small>HAPI support now shows favicon.png for servers.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,15 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-10-29 r27862):</p>
+        <p>Bugfixes (2024-10-30 r27862):</p>
         <ul> 
+            <li>Restore missing tools.xml file.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2638/">2638</a>: data tab and layout tab are now initially on for new installations, since this was confusing.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2217/">2217</a>: experiment with turning on hidden trace when "|magnitude()" is added to vector time series.
+        </ul>
+        <p>Older Bugfixes (2024-10-29 r27862):</p>
+        <ul>
+            <li>Back of PDS4 library which has issue with existing file.
             <li>Das2 TimeParser library gets $N to keep in sync with URI_Templates.
             <li>Add support for byte arrays to IDLSave files, thanks Sadie!
             <li>"Fourier Filters" area renamed to "Fourier Spectra", thanks Connor!
@@ -50,41 +57,15 @@
             <li>add "append" checkbox to IDLSave format editor panel, so that the feature is not hidden.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2628/">2628</a>: properly calculate the number of bytes per item in integer arrays.
         </ul>
-        <p>Older Bugfixes (2024-10-04 r27790):</p>
-        <ul>
-            <li><a href="https://github.com/das-developers/das2java/issues/114">114</a>: handle where target timetags are bins as in events dataset.  Thanks, Sadie!
-            <li>Add support for CDF files produced by SpacePy on Mac ARM, which produces CDFs with ARM_LITTLE_ENDIAN data.  Thanks Masafumi!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2391/">2391</a>: slow loop used in Jython __setitem__ because BUNDLE_1 was used but units do not change, introduce DataSetUtil.oneUnit.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2337/">2337</a>: issues with screenshots tool and filter by QC in PNG Walk Tool.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2622/">2622</a>: collect screenshots to PngWalkTool fails.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/1359/">1359</a>: logic for scan vs step favors step if the two are similar ranges.
-            <li><a href="https://github.com/das-developers/das2java/issues/112">112</a>: applyIndex function was very slow because of useless and excessive metadata handling.
-            <li><a href="https://github.com/das-developers/das2java/issues/112">112</a>: applyIndex would leave fail to propagate metadata for TT2000 times, leaving doubles.
-            <li>kludge to support https://space.physics.uiowa.edu/juno/team/juno-waves-electron-density/browse_jupiter/$x_orbit_$x/wav_$xT00-00-00_e-dens-j_v1.0.png, where user@ is added.
-            <li><a href="https://github.com/das-developers/das2java/issues/111">111</a>:Use explicit cadence, if available, in SeriesRenderer.  Thanks, Bill!
-            <li>check for "set" method (no property name), which would result in a runtime error in Jython completions.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2598/">2598</a>: torn off canvas didn't reset the windowExtraHeight and windowExtraWidth.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2582/">2582</a>: add correct completions for getDataSet and dataset commands in Jython.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2616/">2616</a>: html version of PNG Walk tool shouldn't contain missing images.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2598/">2598</a>: don't keep track of negative margins, which are clearly a transitional state.
-            <li><a href="https://github.com/das-developers/das2java/issues/111">111</a>: Check for explicit cadence in SeriesRenderer.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2615/">2615</a>: Correction to completions label, where extra strings were mistakenly included in label.
-            <li>filenameProvidesContext logs at INFO (not FINE) when the time (DEPEND_0) units are not convertible to seconds.
-        </ul>
         <p>Features:</p>
+        <ul>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>include Image4J library for reading .ico files.  Look up HAPI server favicon.ico files.
             <li>improve label propagation through pow(ds,2) and sqrt.
             <li>Allow Jython addToSearchPath to use files outside of HTTP FileSystem, including Github releases.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/818/">818</a>: support 1-byte integers in PDS3 files, MAC_REAL, and MISSING keywords.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>Jython string completions on any string starting with "https://..." etc.
-            <li>Support vap+bin:...?type=ascii5&units=nominal so that ASCII strings within binary files can be extracted.
-            <li>eventsBar has new gantt2 mode which is available in scripts.
-            <li>PDS3/PDS4 label metadata is shown in metadata tab.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/832/">832</a>: add outputFile command line switch which will write the loaded vap or URI to an output pdf or png file.
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
