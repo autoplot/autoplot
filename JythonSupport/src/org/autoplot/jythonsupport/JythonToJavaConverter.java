@@ -33,6 +33,7 @@ import org.python.parser.ast.Attribute;
 import org.python.parser.ast.AugAssign;
 import org.python.parser.ast.BinOp;
 import org.python.parser.ast.BoolOp;
+import org.python.parser.ast.Break;
 import org.python.parser.ast.Call;
 import org.python.parser.ast.ClassDef;
 import org.python.parser.ast.Compare;
@@ -48,6 +49,7 @@ import org.python.parser.ast.ImportFrom;
 import org.python.parser.ast.Index;
 import org.python.parser.ast.Name;
 import org.python.parser.ast.Num;
+import org.python.parser.ast.Pass;
 import org.python.parser.ast.Print;
 import org.python.parser.ast.Raise;
 import org.python.parser.ast.Return;
@@ -88,6 +90,8 @@ public class JythonToJavaConverter {
     public static String TYPE_STRING_ARRAY="String[]";
     
     public static String TYPE_OBJECT="Object";
+    
+    public static String TYPE_DICT="Dict";
     
     /**
      * scan through the list of imports in /importLookup.jy, to see
@@ -588,7 +592,8 @@ public class JythonToJavaConverter {
                     if ( i>0 ) builder.append(",");
                     builder.append(g.names[i]);
                 }
-
+            } else if (sn instanceof Break ) {
+                builder.append("break");
             } else if (sn instanceof Expr) {
                 Expr ex = (Expr) sn;
                 traverse(builder,"", ex.value, true);
@@ -641,6 +646,12 @@ public class JythonToJavaConverter {
                     builder.append(",");
                     traverse(builder,"", as.right, true);
                     builder.append(")");
+                } else if ( as.left instanceof Str && as.op==3 && as.right instanceof Num ) { // '#'*50
+                    builder.append("new StringBuilder().repeat(");
+                    traverse(builder,"", as.left, true);
+                    builder.append(",");
+                    traverse(builder,"", as.right, true);
+                    builder.append(")");
                 } else {
                     traverse(builder,"", as.left, true);
                     String sop= ops.get(as.op);
@@ -650,12 +661,19 @@ public class JythonToJavaConverter {
                 }
             } else if ( sn instanceof BoolOp ) {
                 BoolOp as = ((BoolOp) sn);
-                if ( as.op==1 ) {
+                if ( as.op==1 || as.op==2 ) {
+                    String opstr;
+                    switch ( as.op ) {
+                        case 1: opstr=" && "; break;
+                        case 2: opstr=" || "; break;
+                        default: throw new UnsupportedOperationException("operator is not supported: "+ as);
+                    }
+                        
                     builder.append("(");
                     traverse(builder,"", as.values[0], true);
                     builder.append(")");
                     for ( exprType o: Arrays.copyOfRange( as.values, 1, as.values.length ) ) {
-                        builder.append(" && ");
+                        builder.append(opstr);
                         builder.append("(");
                         traverse(builder,"", o, true);
                         builder.append(")");
@@ -721,7 +739,11 @@ public class JythonToJavaConverter {
                         return;
                     }
                 }
-                traverse(builder,"", cp.left, true);
+                
+                if ( cp.ops[0]!=Compare.In ) {
+                    traverse(builder,"", cp.left, true);
+                }
+                
                 for ( int i : cp.ops ) {
                     switch (i) {
                         case Compare.Gt:
@@ -742,13 +764,32 @@ public class JythonToJavaConverter {
                         case Compare.NotEq:
                             builder.append("!=");
                             break;
+                        case Compare.In:
+                            if ( cp.comparators.length==1 && guessType( cp.comparators[0] )==TYPE_DICT ) {
+                                traverse(builder,"", cp.comparators[0], inline);
+                                builder.append(".containsKey(");
+                                traverse(builder,"", cp.left, inline);
+                                builder.append(")");
+                            } else {
+                                traverse(builder,"", cp.left, inline);
+                                builder.append("<in>");
+                                for (exprType t : cp.comparators) {
+                                    traverse(builder,"", t, inline);
+                                }
+                            }
+                            break;
+                        case Compare.Is:
+                            builder.append(" instanceof ");
+                            break;
                         default:
-                            builder.append("?in?");
+                            builder.append("?<>?");
                             break;
                     }   
                 }
-                for (exprType t : cp.comparators) {
-                    traverse(builder,"", t, inline);
+                if ( cp.ops[0]!=Compare.In ) {
+                    for (exprType t : cp.comparators) {
+                        traverse(builder,"", t, inline);
+                    }
                 }
             } else if (sn instanceof Continue) {
                 builder.append("continue");
@@ -893,7 +934,8 @@ public class JythonToJavaConverter {
             } else if ( sn instanceof aliasType ) {
                 aliasType at= (aliasType)sn;
                 builder.append( indent ).append( at.name );
-                                
+            } else if ( sn instanceof Pass ) {
+                builder.append( indent ).append( "//pass" );
             } else {
                 builder.append(sn.toString()).append("\n");
                 lineNumber++;
@@ -1456,11 +1498,12 @@ public class JythonToJavaConverter {
         String code;
         //String code= "def foo():\n  print 'hello'\nfoo()";
         //System.err.println( convert(code) );
-
+        System.err.println( convert("'XXX'*50") );
         //String furi= "/home/jbf/project/autoplot/script/lookAtUserComments.jy";
         //String furi= "/home/jbf/project/autoplot/script/curveFitting.jy";
         //String furi = "/home/jbf/project/autoplot/script/addLabelToPng.jy";
-        String furi = "/home/jbf/ct/autoplot/git/dev/demos/2023/20231115/demoDas2Gui.jy";
+        //String furi = "/home/jbf/ct/autoplot/git/dev/demos/2023/20231115/demoDas2Gui.jy";
+        String furi = "/home/jbf/ct/autoplot/u/2024/sadie/20241029/idlsav.py";
         File src = DataSetURI.getFile(furi, new NullProgressMonitor());
 
         try (FileReader reader = new FileReader(src)) {
