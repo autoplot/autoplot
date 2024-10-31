@@ -38,6 +38,7 @@ import org.python.parser.ast.Call;
 import org.python.parser.ast.ClassDef;
 import org.python.parser.ast.Compare;
 import org.python.parser.ast.Continue;
+import org.python.parser.ast.Dict;
 import org.python.parser.ast.Expr;
 import org.python.parser.ast.ExtSlice;
 import org.python.parser.ast.For;
@@ -91,7 +92,7 @@ public class JythonToJavaConverter {
     
     public static String TYPE_OBJECT="Object";
     
-    public static String TYPE_DICT="Dict";
+    public static String TYPE_MAP="Map";
     
     /**
      * scan through the list of imports in /importLookup.jy, to see
@@ -765,7 +766,7 @@ public class JythonToJavaConverter {
                             builder.append("!=");
                             break;
                         case Compare.In:
-                            if ( cp.comparators.length==1 && guessType( cp.comparators[0] )==TYPE_DICT ) {
+                            if ( cp.comparators.length==1 && guessType( cp.comparators[0] )==TYPE_MAP ) {
                                 traverse(builder,"", cp.comparators[0], inline);
                                 builder.append(".containsKey(");
                                 traverse(builder,"", cp.left, inline);
@@ -936,6 +937,8 @@ public class JythonToJavaConverter {
                 builder.append( indent ).append( at.name );
             } else if ( sn instanceof Pass ) {
                 builder.append( indent ).append( "//pass" );
+            } else if ( sn instanceof Dict ) {
+                builder.append( indent ).append( "new HashMap<>()" );
             } else {
                 builder.append(sn.toString()).append("\n");
                 lineNumber++;
@@ -1185,6 +1188,8 @@ public class JythonToJavaConverter {
                 } else {
                     return TYPE_OBJECT;
                 }
+            } else if ( iter instanceof Dict ) {
+                return TYPE_MAP;
             }
             return "Object";
         }
@@ -1261,6 +1266,20 @@ public class JythonToJavaConverter {
 
         private void handleAssign(StringBuilder builder, Assign as, String indent, boolean inline) throws Exception {
             logger.log(Level.FINE, "handleAssign at {0}", as.beginLine);
+            if ( as.targets[0] instanceof Subscript && as.targets.length==1 )  { // is this an assignment to a dictionary
+                Subscript subscript = (Subscript)as.targets[0];
+                if ( subscript.value instanceof Name ) {
+                    Name name= (Name)subscript.value;
+                    if ( guessType( subscript.value ).equals("Map") ) {
+                        builder.append(indent).append(name.id).append(".put(");
+                        traverse(builder,"", subscript.slice, true);
+                        builder.append(indent).append(",");
+                        traverse(builder,"", as.value, true);
+                        builder.append(indent).append(")");
+                        return;
+                    }
+                }
+            }
             if ( as.targets.length==1 && ( as.targets[0] instanceof Name ) )  {
                 String typeOf1= guessType( ((Name)as.targets[0]) );
                 if ( typeOf1==null || typeOf1==TYPE_OBJECT ) {
