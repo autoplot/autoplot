@@ -163,6 +163,7 @@ public class PlotElementController extends DomNodeController {
         if ( parent!=null ) {
             parent.removePropertyChangeListener( getParentComponentLister() );
         }
+        plotElement.removePropertyChangeListener( getParentComponentLister() );
     }
 
     /**
@@ -362,6 +363,9 @@ public class PlotElementController extends DomNodeController {
                 String[] childComponents= component.split("\\|",-2);
                 String[] parentComponents= s.split("\\|",-2);
                 if ( !extendedOperation(parentComponents, childComponents) ) {
+                    logger.info("releasing child "+plotElement.id);
+                    parentPlotElement.setActive(true);
+                    dom.controller.deletePlotElement(plotElement);
                     return; // transitional state
                 }
                 System.arraycopy(parentComponents, 0, childComponents, 0, parentComponents.length);
@@ -380,6 +384,9 @@ public class PlotElementController extends DomNodeController {
                 String[] childComponents= component.split("\\|",-2);
                 String[] parentComponents= parentPlotElement.component.split("\\|",-2);
                 if ( !extendedOperation(parentComponents, childComponents) ) {
+                    logger.info("releasing child "+plotElement.id);
+                    parentPlotElement.setActive(true);
+                    dom.controller.deletePlotElement(plotElement);
                     return; // transitional state
                 }                
                 StringBuilder sb= new StringBuilder();
@@ -1632,19 +1639,21 @@ public class PlotElementController extends DomNodeController {
                 }
             }
             
-            boolean alreadyHaveChildren= !getChildPlotElements().isEmpty();
+            List<PlotElement> children= getChildPlotElements();
+            boolean alreadyHaveChildren= !children.isEmpty();
 
             if ( alreadyHaveChildren && shouldHaveChildren ) {
                 //shouldHaveChildren= false;
             }
-
-            synchronized (dom) {
-                System.err.println("###############");
-                System.err.println(""+this.plotElement.getId()+" " +getChildPlotElements() );
-                System.err.println("shouldHaveChildren: "+shouldHaveChildren );
-                System.err.println("###############");
-            }
             
+            if ( logger.isLoggable(Level.FINER) ) {
+                synchronized (dom) {
+                    logger.finer("###############");
+                    logger.finer(""+this.plotElement.getId()+" " +getChildPlotElements() );
+                    logger.finer("shouldHaveChildren: "+shouldHaveChildren );
+                    logger.finer("###############");
+                }
+            }
             
             String[] lnames = null;
             String[] llabels= null;
