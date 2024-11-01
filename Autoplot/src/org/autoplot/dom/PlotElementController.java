@@ -366,6 +366,7 @@ public class PlotElementController extends DomNodeController {
                     logger.info("releasing child "+plotElement.id);
                     parentPlotElement.setActive(true);
                     dom.controller.deletePlotElement(plotElement);
+                    plotElement.removePropertyChangeListener(parentComponentListener); // TODO:why?  This plotElement was still in memory!
                     return; // transitional state
                 }
                 System.arraycopy(parentComponents, 0, childComponents, 0, parentComponents.length);
@@ -387,6 +388,7 @@ public class PlotElementController extends DomNodeController {
                     logger.info("releasing child "+plotElement.id);
                     parentPlotElement.setActive(true);
                     dom.controller.deletePlotElement(plotElement);
+                    plotElement.removePropertyChangeListener(parentComponentListener); // TODO:why?  This plotElement was still in memory!
                     return; // transitional state
                 }                
                 StringBuilder sb= new StringBuilder();
