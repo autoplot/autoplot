@@ -303,37 +303,89 @@ public class PlotElementController extends DomNodeController {
         logger.exiting("PlotElementController", "resetRenderTypeImp" );
     }
 
+    /**
+     * return true if the two are the same operation, but have only
+     * different arguments.  For example, slice1(0) and slice1(10) are 
+     * the same operation, but slice1(0) and slice2(0) are not.
+     * @param c1 an operation, like "slice1(0)"
+     * @param c2 an operation, like "slice1(10)"
+     * @return true if the two are the same operation.
+     */
+    private boolean sameOperation( String c1, String c2 ) {
+        int ic1= c1.indexOf("(");
+        int ic2= c2.indexOf("(");
+        if ( ic1!=ic2 ) {
+            return false;
+        } else {
+            if ( c1.substring(0,ic1).equals(c2.substring(0,ic1) ) ) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+    
+    /**
+     * return true when the childComponents are compatible with the 
+     * parentComponents, but then have additional operations.
+     * Apologies for using component and operation interchangeably.
+     * @param parentComponents ['slice1(0)']
+     * @param childComponents ['slice1(0)','unbundle(Bx)']
+     * @return true if the child components are an extension of the parent's
+     */
+    private boolean extendedOperation( String[] parentComponents, String[] childComponents ) {
+        if ( childComponents.length<parentComponents.length ) {
+            return false;
+        }
+        for ( int i=1; i<parentComponents.length; i++ ) {
+            if ( !sameOperation( parentComponents[i], childComponents[i] ) ) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    /**
+     * the job of the parentComponentListener is to listen for changes
+     * in the parent and to stay in sync with it.  For example, if the parent's
+     * component is "|slice1(0)" and the child's is "|slice1(0)|unbundle('X')"
+     * then a change in the parent to "|slice1(1)" should also change the child's
+     * component.  Similarly, if the child's component is updated, then reset
+     * the parent's component.  When the parent's component is no longer 
+     */
     PropertyChangeListener parentComponentListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if ( evt.getSource()==parentPlotElement ) {                
                 String s= (String)evt.getNewValue();
                 String component= plotElement.component;
-                String[] components= component.split("\\|",-2);
-                String[] ss= s.split("\\|",-2);
-                if ( components.length<ss.length ) {
+                String[] childComponents= component.split("\\|",-2);
+                String[] parentComponents= s.split("\\|",-2);
+                if ( !extendedOperation(parentComponents, childComponents) ) {
                     return; // transitional state
                 }
-                System.arraycopy(ss, 0, components, 0, ss.length);
-                StringBuilder sb= new StringBuilder(components[0]);
-                for ( int i=1; i<ss.length; i++ ) {
+                System.arraycopy(parentComponents, 0, childComponents, 0, parentComponents.length);
+                StringBuilder sb= new StringBuilder(childComponents[0]);
+                for ( int i=1; i<parentComponents.length; i++ ) {
                     sb.append("|");
-                    sb.append(ss[i]);
+                    sb.append(parentComponents[i]);
                 }
-                for ( int i=ss.length; i<components.length; i++ ) {
+                for ( int i=parentComponents.length; i<childComponents.length; i++ ) {
                     sb.append("|");
-                    sb.append(components[i]);
+                    sb.append(childComponents[i]);
                 }
                 plotElement.setComponent(sb.toString());
             } else if ( evt.getSource()==plotElement ) {
-                String t= (String)evt.getNewValue();
-                String component= (String)t;
-                String[] components= component.split("\\|",-2);
-                String[] ss= parentPlotElement.component.split("\\|",-2);
+                String component= (String)evt.getNewValue();;
+                String[] childComponents= component.split("\\|",-2);
+                String[] parentComponents= parentPlotElement.component.split("\\|",-2);
+                if ( !extendedOperation(parentComponents, childComponents) ) {
+                    return; // transitional state
+                }                
                 StringBuilder sb= new StringBuilder();
-                for ( int i=1; i<ss.length; i++ ) {
+                for ( int i=1; i<parentComponents.length; i++ ) {
                     sb.append("|");
-                    sb.append(components[i]);
+                    sb.append(childComponents[i]);
                 }
                 parentPlotElement.setComponent(sb.toString());
             }
@@ -1039,6 +1091,13 @@ public class PlotElementController extends DomNodeController {
         
     }
 
+    /**
+     * Get the dataset from the DataSourceFilter and if resetPlotElement is true,
+     * then guess at a reasonable rendering method.
+     * 
+     * @throws Exception 
+     * @see #resolveRenderType(org.das2.qds.QDataSet) 
+     */
     private void updateDataSetImmediately() throws Exception {
         performingChange( this, PENDING_UPDATE_DATASET );
         try {
@@ -1576,7 +1635,7 @@ public class PlotElementController extends DomNodeController {
             boolean alreadyHaveChildren= !getChildPlotElements().isEmpty();
 
             if ( alreadyHaveChildren && shouldHaveChildren ) {
-                shouldHaveChildren= false;
+                //shouldHaveChildren= false;
             }
 
             synchronized (dom) {
