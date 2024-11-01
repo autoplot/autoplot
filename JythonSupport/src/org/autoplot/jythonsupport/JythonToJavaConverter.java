@@ -48,6 +48,7 @@ import org.python.parser.ast.If;
 import org.python.parser.ast.Import;
 import org.python.parser.ast.ImportFrom;
 import org.python.parser.ast.Index;
+import org.python.parser.ast.ListComp;
 import org.python.parser.ast.Name;
 import org.python.parser.ast.Num;
 import org.python.parser.ast.Pass;
@@ -66,6 +67,7 @@ import org.python.parser.ast.aliasType;
 import org.python.parser.ast.excepthandlerType;
 import org.python.parser.ast.exprType;
 import org.python.parser.ast.keywordType;
+import org.python.parser.ast.listcompType;
 import org.python.parser.ast.sliceType;
 import org.python.parser.ast.stmtType;
 
@@ -947,6 +949,8 @@ public class JythonToJavaConverter {
                 builder.append( indent ).append( "//pass" );
             } else if ( sn instanceof Dict ) {
                 builder.append( indent ).append( "new HashMap<>()" );
+            } else if ( sn instanceof ListComp ) {
+                handleListComp(builder, (ListComp)sn, indent, inline);
             } else {
                 builder.append(sn.toString()).append("\n");
                 lineNumber++;
@@ -1308,6 +1312,24 @@ public class JythonToJavaConverter {
             builder.append(" = ");
             traverse(builder,"", as.value, true);
 
+        }
+        
+        private void handleListComp( StringBuilder builder, ListComp lc, String indent, boolean inline) throws Exception {
+            if ( lc.generators.length==1 ) {
+                if ( lc.generators[0] instanceof listcompType ) {                    
+                    listcompType lct= (listcompType)lc.generators[0];
+                    if ( lct.ifs.length==0 ) {
+                        traverse(builder,"", lct.iter, true );
+                        builder.append(".stream().map( ");
+                        traverse(builder,"", lct.target, true );
+                        builder.append(" -> ");
+                        traverse(builder,"", lc.elt, true );
+                        builder.append(").collect(Collectors.toList())");
+                        return;
+                    }
+                }
+            } 
+            builder.append(lc.toString());
         }
 
         private void handleName(StringBuilder builder, Name nn, String indent, boolean inline) {
