@@ -1,6 +1,7 @@
 
 package org.autoplot.hapi;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
@@ -97,6 +98,18 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     private boolean initialized= false;
 	
     private List<JCheckBox> parameterCheckboxes= new ArrayList<>();
+    
+    private static final Icon NULL_ICON;
+    
+    static { 
+        BufferedImage image= new BufferedImage( 16, 16, BufferedImage.TYPE_INT_ARGB );
+        Graphics g= image.getGraphics();
+        g.setColor(new Color(255,255,255,0) );
+        g.fillRect( 0, 0, 16, 16 );
+        //g.setColor( Color.LIGHT_GRAY );
+        g.drawRect(0,0,15,15);
+        NULL_ICON= new ImageIcon(image);
+    }
     
     /**
      * return the range of available data. For example, Polar/Hydra data is available
@@ -354,6 +367,9 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 logger.log(Level.SEVERE, null, ex);
             }
         } 
+        if ( result==null ) {
+            return NULL_ICON;
+        }
         return result;
     }
     
