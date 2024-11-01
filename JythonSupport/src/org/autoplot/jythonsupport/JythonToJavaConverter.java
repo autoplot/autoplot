@@ -664,7 +664,9 @@ public class JythonToJavaConverter {
                 } else {
                     traverse(builder,"", as.left, true);
                     String sop= ops.get(as.op);
-                    if ( sop==null ) sop= " ?? ";
+                    if ( sop==null ) {
+                        sop= " ?? ";
+                    }
                     builder.append( sop );
                     traverse(builder,"", as.right, true);
                 }
@@ -1485,51 +1487,57 @@ public class JythonToJavaConverter {
             }
         }
         
-        private void handleSubscript( StringBuilder builder, Subscript s, String indent, boolean inline ) throws Exception {
+        private void handleSubscript(StringBuilder builder, Subscript s, String indent, boolean inline) throws Exception {
             logger.log(Level.FINE, "Subscript at line {0}", ((Subscript) s).beginLine);
-                
-                traverse( builder,"", s.value, true );
+            if (guessType(s.value).equals(TYPE_MAP)) {
+                traverse(builder, "", s.value, true);
+                builder.append(".get(");
+                traverse(builder, "", s.slice, true);
+                builder.append(")");
+            } else {
+                traverse(builder, "", s.value, true);
                 String t;
-                if ( s.value instanceof Subscript ) {
-                    t= guessType( ((Subscript)s.value).value );
+                if (s.value instanceof Subscript) {
+                    t = guessType(((Subscript) s.value).value);
                 } else {
-                    t= guessType( s.value );
+                    t = guessType(s.value);
                 }
-                if ( t.equals("Object") && ( s.value instanceof Name ) ) {
-                    String n= ((Name)s.value).id ;
-                    t= getTypeForName(n);
-                    if ( t==null ) {
-                        t= "Object";
+                if (t.equals("Object") && (s.value instanceof Name)) {
+                    String n = ((Name) s.value).id;
+                    t = getTypeForName(n);
+                    if (t == null) {
+                        t = "Object";
                     }
                 }
-                sliceType st= s.slice;
-                if ( st instanceof Slice ) {
-                    Slice slice= (Slice)st;
-                    if ( t.equals(TYPE_STRING) ) { 
+                sliceType st = s.slice;
+                if (st instanceof Slice) {
+                    Slice slice = (Slice) st;
+                    if (t.equals(TYPE_STRING)) {
                         builder.append(".substring(");
-                        traverse(builder,"",slice.lower,true);
-                        if ( slice.step!=null ) {
+                        traverse(builder, "", slice.lower, true);
+                        if (slice.step != null) {
                             builder.append("[ERR slice.step!=null]");
                         }
-                        if ( slice.upper!=null ) {
+                        if (slice.upper != null) {
                             builder.append(",");
-                            traverse(builder,"",slice.upper,true);
+                            traverse(builder, "", slice.upper, true);
                         }
                         builder.append(")");
                     } else {
-                        traverse(builder,"",slice,true);
+                        traverse(builder, "", slice, true);
                     }
-                } else if ( st instanceof Index ) {
+                } else if (st instanceof Index) {
                     builder.append("[");
-                    traverse(builder,"",((Index)st).value,true);
+                    traverse(builder, "", ((Index) st).value, true);
                     builder.append("]");
                 } else {
                     builder.append("[");
-                    traverse(builder,"",st,true);
+                    traverse(builder, "", st, true);
                     builder.append("]");
                 }
-        }
+            }
 
+        }
     }
 
     /**
