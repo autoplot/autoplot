@@ -553,7 +553,7 @@ public class JythonToJavaConverter {
             ops.put( 2, "-" );
             ops.put( 3, "*" );
             ops.put( 4, "/" );
-            ops.put( 6, "^" );
+            ops.put( 5, "%" );
             ops.put( 12, "/floordiv/" );
         };
                 
@@ -651,6 +651,12 @@ public class JythonToJavaConverter {
                     builder.append(")");
                 } else if ( as.left instanceof Str && as.op==3 && as.right instanceof Num ) { // '#'*50
                     builder.append("new StringBuilder().repeat(");
+                    traverse(builder,"", as.left, true);
+                    builder.append(",");
+                    traverse(builder,"", as.right, true);
+                    builder.append(")");
+                } else if ( as.op==6 ) {
+                    builder.append("Math.pow(");
                     traverse(builder,"", as.left, true);
                     builder.append(",");
                     traverse(builder,"", as.right, true);
