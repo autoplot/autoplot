@@ -729,15 +729,23 @@ public class JythonToJavaConverter {
 
             } else if (sn instanceof Compare) {
                 Compare cp = (Compare) sn;
-                if ( cp.ops.length==1 && cp.ops[0]==Compare.In && cp.comparators.length==1 ) {
-                    String t1= guessType(cp.left);
-                    String t2= guessType(cp.comparators[0]);
-                    if ( t1==TYPE_STRING && t2==TYPE_STRING ) {                        
-                        traverse(builder,"",cp.comparators[0],true);
-                        builder.append(".contains(");
-                        traverse(builder,"",cp.left,true);
-                        builder.append(")");
-                        return;
+                if ( cp.ops.length==1 ) {
+                    if ( cp.ops[0]==Compare.In && cp.comparators.length==1 ) {
+                        String t1= guessType(cp.left);
+                        String t2= guessType(cp.comparators[0]);
+                        if ( t1==TYPE_STRING && t2==TYPE_STRING ) {                        
+                            traverse(builder,"",cp.comparators[0],true);
+                            builder.append(".contains(");
+                            traverse(builder,"",cp.left,true);
+                            builder.append(")");
+                            return;
+                        } else if ( t1==TYPE_STRING && t2.equals(TYPE_STRING_ARRAY) ) {
+                            traverse(builder,"",cp.comparators[0],true);
+                            builder.append(".contains(");
+                            traverse(builder,"",cp.left,true);
+                            builder.append(")");
+                            return;
+                        }
                     }
                 }
                 
@@ -764,7 +772,7 @@ public class JythonToJavaConverter {
                             break;
                         case Compare.NotEq:
                             builder.append("!=");
-                            break;
+                            break;                       
                         case Compare.In:
                             if ( cp.comparators.length==1 && guessType( cp.comparators[0] )==TYPE_MAP ) {
                                 traverse(builder,"", cp.comparators[0], inline);
