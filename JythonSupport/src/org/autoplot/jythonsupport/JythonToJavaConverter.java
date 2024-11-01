@@ -554,6 +554,9 @@ public class JythonToJavaConverter {
             ops.put( 3, "*" );
             ops.put( 4, "/" );
             ops.put( 5, "%" );
+            ops.put( 9, "|" );
+            ops.put( 10, "^" );
+            ops.put( 11, "&" );
             ops.put( 12, "/floordiv/" );
         };
                 
