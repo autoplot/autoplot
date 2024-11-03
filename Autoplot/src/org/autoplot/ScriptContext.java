@@ -954,7 +954,7 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
      */
     public static MouseModule addMouseModule( Plot plot, String label, final PyFunction listener ) {
         DasPlot p= plot.getController().getDasPlot();
-        BoxSelectorMouseModule mm= new BoxSelectorMouseModule( p, p.getXAxis(), p.getYAxis(), null, new BoxRenderer(p), label );
+        BoxSelectorMouseModule mm= new BoxSelectorMouseModule( p, p.getXAxis(), p.getYAxis(), null, new BoxRenderer(p,true), label );
         BoxSelectionListener bsl= (BoxSelectionEvent e) -> {
             listener.__call__(Py.java2py(e));
         };
