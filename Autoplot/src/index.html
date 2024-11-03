@@ -32,6 +32,7 @@
                 
         <p>Bugfixes (2024-11-01 r27873):</p>
         <ul> 
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2641/">2641</a>: misconfiguration of mouse module meant box events received from keystrokes were incorrect.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2217/">2217</a>: "|magnitude()" is added to vector time series support, switching from component traces to one magnitude trace.
             <li>Restore missing tools.xml file.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2638/">2638</a>: data tab and layout tab are now initially on for new installations, since this was confusing.
@@ -59,6 +60,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Buffer sizes used to transfer data increased from 1024 bytes to 8*1024 bytes, possibly showing small performance gains.
             <li>More enhancements to Python-to-Java converter while porting new IDLSave reader.
         </ul>
         <p>Less recent features:</p>
