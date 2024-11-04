@@ -362,6 +362,15 @@ public class PlotElementController extends DomNodeController {
                 String component= plotElement.component;
                 String[] childComponents= component.split("\\|",-2);
                 String[] parentComponents= s.split("\\|",-2);
+                if ( childComponents.length==parentComponents.length ) {
+                    if ( extendedOperation( Arrays.copyOfRange( parentComponents, 0, parentComponents.length-1 ), 
+                        Arrays.copyOfRange( childComponents, 0, parentComponents.length-1 ) ) ) {
+                        if ( !DataSetOps.changesDimensions(parentComponents[parentComponents.length-1]) ) {
+                            String newc= "|" + parentComponents[parentComponents.length-1] + String.join("|", childComponents);
+                            childComponents= newc.split("\\|",-2);
+                        }
+                    }
+                }
                 if ( !extendedOperation(parentComponents, childComponents) ) {
                     logger.info("releasing child "+plotElement.id);
                     parentPlotElement.setActive(true);
