@@ -458,6 +458,7 @@ public class CdfUtil {
     
     /**
      * implements slice1 by packing all the remaining elements towards the front and trimming.
+     * TODO: this needs to be verified.  See https://sourceforge.net/p/autoplot/bugs/2639/
      * @param buf the byte buffer, which can be read-only.
      * @param varType the variable type, see sizeOf(varType)
      * @param qube the dimensions of the unsliced dataset
@@ -498,6 +499,7 @@ public class CdfUtil {
    
     /**
      * implements slice1 by packing all the remaining elements towards the front and trimming.
+     * TODO: this needs to be verified.
      * @param buf the byte buffer, which can be read-only.
      * @param varType the variable type, see sizeOf(varType)
      * @param qube the dimensions of the unsliced dataset
