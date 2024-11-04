@@ -473,16 +473,68 @@ public class CdfUtil {
             int p1= slice1 * recSizeBytes / qube[1];
             int p2= ( slice1 * recSizeBytes / qube[1] + recSizeBytes / qube[1] );
             for ( int irec=0; irec<qube[0]; irec++ ) {
-                buf.limit(irec*recSizeBytes + p2 );
-                buf.position(irec*recSizeBytes + p1);
-                ByteBuffer b= buf.slice();
-                result.put(b);
-            }
+                    buf.limit(irec*recSizeBytes + p2 );
+                    buf.position(irec*recSizeBytes + p1);
+                    ByteBuffer b= buf.slice();
+                    result.put(b);
+                    }
         } else {
             int varSize= sizeOf(varType);
             for ( int irec=0; irec<qube[0]; irec++ ) {
                 for ( int j=0; j<recSizeBytes; j++ ) {
                     if ( (j/varSize) % qube[1] == slice1 ) {
+                        result.put( buf.get( irec*recSizeBytes + j ) );                        
+                    } else {
+                        // skip to slice
+                    }
+                }
+            }            
+        }
+        result.flip();
+        buf.position(0);
+        buf.limit(recSizeBytes*qube[0]);
+        return result;
+    }
+   
+    /**
+     * implements slice1 by packing all the remaining elements towards the front and trimming.
+     * @param buf the byte buffer, which can be read-only.
+     * @param varType the variable type, see sizeOf(varType)
+     * @param qube the dimensions of the unsliced dataset
+     * @param componentSlice the index to slice 
+     * @param rowMajority true if the buffer is row majority.
+     * @return a copy containing just the slice1 of the input buffer.
+     */
+    private static ByteBuffer doComponentSlice( ByteBuffer buf, long varType, int[] qube, int componentSlice, boolean rowMajority ) {
+        int recSizeBytes= DataSetUtil.product(qube) / qube[0] * sizeOf(varType);
+        int newRecSizeBytes= recSizeBytes / qube[qube.length-1];
+        ByteBuffer result= ByteBuffer.allocate( newRecSizeBytes * qube[0] );
+        result.order(buf.order());
+        if ( rowMajority ) { // TODO: one of these two is wrong.
+            int p1= componentSlice * newRecSizeBytes;
+            int p2= ( componentSlice + 1 ) * newRecSizeBytes + newRecSizeBytes;
+            for ( int irec=0; irec<qube[0]; irec++ ) {
+                if ( qube.length==2 ) {
+                    buf.limit(irec*recSizeBytes + p2 );
+                    buf.position(irec*recSizeBytes + p1);
+                    ByteBuffer b= buf.slice();
+                    result.put(b);
+                } else {
+                    int offset= qube[2] * sizeOf(varType);
+                    for ( int i=0; i<qube[1]; i++ ) {
+                        buf.limit(irec*recSizeBytes + i*offset + p2 );
+                        buf.position(irec*recSizeBytes + i*offset + p1);
+                        ByteBuffer b= buf.slice();
+                        result.put(b);
+                    }
+                }
+            }
+        } else {
+            int varSize= sizeOf(varType);
+            int componentDimensionSize= qube[qube.length-1]; // typically 3 for 3 components.
+            for ( int irec=0; irec<qube[0]; irec++ ) {
+                for ( int j=0; j<recSizeBytes; j++ ) {
+                    if ( (j/varSize) % componentDimensionSize == componentSlice ) {
                         result.put( buf.get( irec*recSizeBytes + j ) );                        
                     } else {
                         // skip to slice
@@ -703,7 +755,7 @@ public class CdfUtil {
             nqube[0]= qube[0];
             for ( int i=2;i<qube.length;i++ ) {
                 nqube[i-1]= qube[i];
-            }
+        }
             recLenBytes= recLenBytes/qube[1];
             qube= nqube;
         }
@@ -869,7 +921,7 @@ public class CdfUtil {
 
     /**
      * return the data type for the encoding.  From
-     * ftp://cdaweb.gsfc.nasa.gov/pub/cdf/doc/cdf33/cdf33ifd.pdf  page 33.
+     * https://cdaweb.gsfc.nasa.gov/pub/software/cdf/doc/cdf380/cdf38ifd.pdf  page 41.
      * @param type integer type, such as 44 for CDF_FLOAT
      * @return string like "CDF_FLOAT"
      */
