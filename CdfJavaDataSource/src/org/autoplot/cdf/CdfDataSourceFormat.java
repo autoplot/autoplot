@@ -107,11 +107,12 @@ public class CdfDataSourceFormat implements DataSourceFormat {
 
             boolean append= "T".equals( params.get("append") );
             boolean insert= "T".equals( params.get("insert") );
+            boolean useRowMajority= "row".equals(params.get("majority") ); // note default is column, which might have been a poor choice.
             
             if ( !append && !insert ) {
                 logger.log(Level.FINE, "create CDF file {0}", ffile);
                 logger.log(Level.FINE, "call cdf= new CDFWriter( false )");
-                cdf = new CDFWriter( false );
+                cdf = new CDFWriter( useRowMajority );
             } else if ( insert ) {
                 //CDFReader read= ReaderFactory.getReader( ffile.toString() );
                 String name= (String)data.property(QDataSet.NAME);
@@ -122,20 +123,27 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 int itype= 21;
                 
                 String type= CdfUtil.getStringDataType(itype);
-                if ( type.equals("CDF_CHAR") ) {
-                    type="string";
-                } else if ( type.equals("CDF_DOUBLE") ) {
-                    type="double";
-                } else if ( type.equals("CDF_FLOAT") ) {
-                    type="float";
-                } else if ( type.equals("CDF_REAL4") ) {
-                    type="float";
-                } else if ( type.equals("CDF_UINT1") ) {
-                    type="short";
+                switch (type) {
+                    case "CDF_CHAR":
+                        type="string";
+                        break;
+                    case "CDF_REAL8":
+                    case "CDF_DOUBLE":
+                        type="double";
+                        break;
+                    case "CDF_FLOAT":
+                    case "CDF_REAL4":
+                        type="float";
+                        break;
+                    case "CDF_UINT1":
+                        type="short";
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Unsupported type: "+type+", must be CHAR, REAL8, REAL4, DOUBLE, FLOAT, or UINT1.");
                 }
                 params.put("type",type);
                 logger.log(Level.FINE, "call cdf= new CDFWriter( {0}, false )", ffile.toString() );
-                cdf = new CDFWriter( ffile.toString(), false ); // read in the old file first
+                cdf = new CDFWriter( ffile.toString(), useRowMajority ); // read in the old file first
                 
             } else {
                 CDFReader read= ReaderFactory.getReader( ffile.toString() );
@@ -144,7 +152,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                     //TODO: there's a problem here, where it puts in a set of timetags for each variable.  https://sourceforge.net/p/autoplot/bugs/2514/
                 }
                 logger.log(Level.FINE, "call cdf= new CDFWriter( {0}, false )", ffile.toString() );
-                cdf = new CDFWriter( ffile.toString(), false ); // read in the old file first
+                cdf = new CDFWriter( ffile.toString(), useRowMajority ); // read in the old file first
 
             }
 
