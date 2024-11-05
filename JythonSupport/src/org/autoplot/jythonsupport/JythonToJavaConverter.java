@@ -640,6 +640,14 @@ public class JythonToJavaConverter {
                         builder.append("-");
                         traverse(builder,"",op.operand,true);
                         break;
+                    case UnaryOp.Not:
+                        builder.append("!");
+                        traverse(builder,"",op.operand,true);
+                        break;              
+                    case UnaryOp.Invert:
+                        builder.append("~");
+                        traverse(builder,"",op.operand,true);
+                        break;                                
                     default:
                         builder.append(op.toString());
                         break;
