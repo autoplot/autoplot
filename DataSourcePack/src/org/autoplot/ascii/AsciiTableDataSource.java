@@ -1139,6 +1139,8 @@ public class AsciiTableDataSource extends AbstractDataSource {
             Units u;
             if ( sunits.equals("enum") ) {
                 u = EnumerationUnits.create("default");
+            } else if ( sunits.equals("nominal") ) {
+                u= Units.nominal();
             } else {
                 u= Units.lookupUnits(sunits);
             }
