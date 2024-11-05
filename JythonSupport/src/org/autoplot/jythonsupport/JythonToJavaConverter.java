@@ -1375,6 +1375,17 @@ public class JythonToJavaConverter {
                     builder.append(")");
                     return;
                 }
+            } else if ( cc.func instanceof Attribute ) { // static method
+                exprType clas= ((Attribute) cc.func).value;
+                String method = ((Attribute) cc.func).attr;
+                if ( clas instanceof Name ) {
+                    String n= ((Name)clas).id;
+                    if ( n.equals("struct") ) {
+                        if ( method.equals("pack") ) {
+                            System.err.println( "struct.pack could be implemented with ByteBuffer maybe" );
+                        }
+                    }
+                }
             }
             traverse(builder,"", cc.func, true);
             builder.append("(");
