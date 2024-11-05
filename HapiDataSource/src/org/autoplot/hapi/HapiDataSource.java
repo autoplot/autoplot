@@ -1275,7 +1275,7 @@ public final class HapiDataSource extends AbstractDataSource {
         return useCache;
     }
     
-    private static AbstractLineReader getCsvReader( AbstractLineReader cacheReader, URL url, HttpURLConnection httpConnect, boolean gzip ) throws IOException {
+    private static AbstractLineReader getCsvReader( AbstractLineReader cacheReader, URL url, Connector httpConnect, boolean gzip ) throws IOException {
         if ( cacheReader!=null ) {
             return cacheReader;
         } else {
@@ -1283,17 +1283,6 @@ public final class HapiDataSource extends AbstractDataSource {
             if ( httpConnect!=null ) {
                 ins1= httpConnect.getInputStream();
             } else {
-                httpConnect= ((HttpURLConnection) url.openConnection());
-                if ( httpConnect.getResponseCode()==HttpURLConnection.HTTP_MOVED_PERM ||
-                       httpConnect.getResponseCode()==HttpURLConnection.HTTP_MOVED_TEMP ) {
-                    String newLocation = httpConnect.getHeaderField("Location");
-                    if ( !newLocation.contains("?") ) {
-                        String args= url.getQuery();
-                        newLocation= newLocation + args;
-                    }
-                    url= new URL( newLocation );
-                    httpConnect= ((HttpURLConnection) url.openConnection());
-                }
                 ins1= httpConnect.getInputStream();
             }
             if ( gzip ) {
@@ -1343,7 +1332,7 @@ public final class HapiDataSource extends AbstractDataSource {
             cacheReader= null;
         }
         
-        HttpURLConnection httpConnect=null;
+        Connector connect= getConnection(url);
         boolean gzip=false;  // Let Java decompress the stream
         if ( cacheReader==null ) {
             if ( FileSystem.settings().isOffline() ) {
@@ -1351,20 +1340,9 @@ public final class HapiDataSource extends AbstractDataSource {
                 //throw new FileSystem.FileSystemOfflineException("file system is offline");
             } else {
                 loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );   
-                boolean doAllowGZip= false;
-                if ( doAllowGZip ) {
-                    httpConnect= (HttpURLConnection)url.openConnection();
-                    httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
-                    httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
-                    httpConnect.setRequestProperty( "Accept-Encoding", "gzip" );
-                    httpConnect= (HttpURLConnection)HttpUtil.checkRedirect(httpConnect); // There's a problem, because it looks like the entire response is read here.
-                    httpConnect.connect();
-                    loggerUrl.log(Level.FINE, "--> {0} {1}", new Object[]{httpConnect.getResponseCode(), httpConnect.getResponseMessage()});
-                    gzip=true;
-                }
             }
         } else {
-            httpConnect= null;
+            connect= null;
         }
                 
         //Check to see what time ranges are from entire days, then only call writeToCachedData for these intervals. 
@@ -1399,7 +1377,7 @@ public final class HapiDataSource extends AbstractDataSource {
             }
         }
 
-        try ( AbstractLineReader in = getCsvReader(cacheReader,url,httpConnect,gzip) ) {
+        try ( AbstractLineReader in = getCsvReader(cacheReader,url,connect,gzip) ) {
 
             String line= in.readLine();
             
@@ -1550,9 +1528,9 @@ public final class HapiDataSource extends AbstractDataSource {
         } catch ( IOException e ) {
             logger.log( Level.WARNING, e.getMessage(), e );
             monitor.finished();
-            if ( httpConnect!=null ) {
-                logger.log(Level.WARNING, "IOException when trying to read {0}", httpConnect.getURL());
-                throw new IOException( httpConnect.getURL() + " results in\n"+String.valueOf(httpConnect.getResponseCode())+": "+httpConnect.getResponseMessage() );
+            if ( connect!=null ) {
+                logger.log(Level.WARNING, "IOException when trying to read {0}", connect.getURL());
+                throw new IOException( connect.getURL() + " results in\n"+String.valueOf(connect.getResponseCode())+": "+connect.getResponseMessage() );
             } else {
                 throw e;
             }
@@ -1562,7 +1540,7 @@ public final class HapiDataSource extends AbstractDataSource {
             monitor.finished();
             throw e;
         } finally {
-            if ( httpConnect!=null ) httpConnect.disconnect();
+            if ( connect!=null ) connect.disconnect();
         }
         
         if ( !warnings.isEmpty() ) {
@@ -1921,6 +1899,89 @@ public final class HapiDataSource extends AbstractDataSource {
         QDataSet ds = builder.getDataSet();
         return ds;
     }
+    
+    private interface Connector {
+        URL getURL();
+        InputStream getInputStream() throws IOException;
+        InputStream getErrorStream() throws IOException;
+        int getResponseCode() throws IOException;
+        String getResponseMessage() throws IOException;
+        void disconnect();
+    }
+    
+    /**
+     * see if all traffic can come through here, so we can optionally cache results.
+     * @param url
+     * @return
+     * @throws IOException 
+     */
+    private static Connector getConnection( final URL url ) throws IOException {
+        loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );
+        HttpURLConnection httpConnect=  ((HttpURLConnection)url.openConnection());
+        loggerUrl.log(Level.FINE, "--> {0} {1}", new Object[]{httpConnect.getResponseCode(), httpConnect.getResponseMessage()});        
+        httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
+        httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
+        httpConnect= (HttpURLConnection) HttpUtil.checkRedirect(httpConnect);
+        
+                //httpConnect= ((HttpURLConnection) url.openConnection());
+                //if ( httpConnect.getResponseCode()==HttpURLConnection.HTTP_MOVED_PERM ||
+                //       httpConnect.getResponseCode()==HttpURLConnection.HTTP_MOVED_TEMP ) {
+                //    String newLocation = httpConnect.getHeaderField("Location");
+                //    if ( !newLocation.contains("?") ) {
+                //        String args= url.getQuery();
+                //        newLocation= newLocation + args;
+                //    }
+                //    url= new URL( newLocation );
+                //    httpConnect= ((HttpURLConnection) url.openConnection());
+                //}
+
+        
+                //boolean doAllowGZip= false;
+                //if ( doAllowGZip ) {
+                //    httpConnect= (HttpURLConnection)url.openConnection();
+                //    httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
+                //    httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
+                //    httpConnect.setRequestProperty( "Accept-Encoding", "gzip" );
+                //    httpConnect= (HttpURLConnection)HttpUtil.checkRedirect(httpConnect); // There's a problem, because it looks like the entire response is read here.
+                //    httpConnect.connect();
+                //    loggerUrl.log(Level.FINE, "--> {0} {1}", new Object[]{httpConnect.getResponseCode(), httpConnect.getResponseMessage()});
+                //    gzip=true;
+                //}        
+        final HttpURLConnection fhttpConnect= httpConnect;
+        return new Connector() {
+            @Override
+            public URL getURL() {
+                return url;
+            }
+            
+            @Override
+            public InputStream getInputStream() throws IOException {
+                return fhttpConnect.getInputStream();
+            }
+
+            @Override
+            public InputStream getErrorStream() throws IOException {
+                return fhttpConnect.getErrorStream();
+            }
+            
+            @Override
+            public String getResponseMessage() throws IOException {
+                return fhttpConnect.getResponseMessage();
+            }
+
+            @Override
+            public int getResponseCode() throws IOException {
+                return fhttpConnect.getResponseCode();
+            }
+            
+            @Override
+            public void disconnect() {
+                fhttpConnect.disconnect();
+            }
+            
+        };
+        
+    }
 
     /**
      * read data embedded within a JSON response.  This current reads in the entire JSON document,
@@ -1940,14 +2001,9 @@ public final class HapiDataSource extends AbstractDataSource {
         
         StringBuilder builder= new StringBuilder();
         logger.log(Level.FINE, "getDocument {0}", url.toString());
-        loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );
-        HttpURLConnection httpConnect=  ((HttpURLConnection)url.openConnection());
-        httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
-        httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
-        httpConnect= (HttpURLConnection) HttpUtil.checkRedirect(httpConnect);
-        loggerUrl.log(Level.FINE, "--> {0} {1}", new Object[]{httpConnect.getResponseCode(), httpConnect.getResponseMessage()});
+        Connector connect= getConnection(url);
         try ( BufferedReader in= new BufferedReader( 
-                new InputStreamReader( httpConnect.getInputStream(), HapiServer.UTF8 ) ) ) {
+                new InputStreamReader( connect.getInputStream(), HapiServer.UTF8 ) ) ) {
             String line= in.readLine();
             lineNum++;
             while ( line!=null ) {
@@ -1964,10 +2020,10 @@ public final class HapiDataSource extends AbstractDataSource {
             }
         } catch ( IOException ex ) {
             ByteArrayOutputStream baos= new ByteArrayOutputStream();
-            FileSystemUtil.copyStream( httpConnect.getErrorStream(), baos, new NullProgressMonitor() );
+            FileSystemUtil.copyStream( connect.getErrorStream(), baos, new NullProgressMonitor() );
             String s= baos.toString("UTF-8");
             if ( s.contains("No data available") ) {
-                logger.log(Level.FINE, "No data available, server responded with {0}: {1}", new Object[]{httpConnect.getResponseCode(), httpConnect.getResponseMessage()});
+                logger.log(Level.FINE, "No data available, server responded with {0}: {1}", new Object[]{connect.getResponseCode(), connect.getResponseMessage()});
                 throw new NoDataInIntervalException("No data available");
             } else {
                 if ( s.length()<256 ) {
@@ -1977,7 +2033,7 @@ public final class HapiDataSource extends AbstractDataSource {
                 }
             }
         }
-        httpConnect.disconnect();  // See unix tcptrack which shows there are many connections to the server. jbf@gardenhousepi:~ $ sudo tcptrack -i eth0
+        connect.disconnect();  // See unix tcptrack which shows there are many connections to the server. jbf@gardenhousepi:~ $ sudo tcptrack -i eth0
 
         monitor.setProgressMessage("parsing data");
                 
