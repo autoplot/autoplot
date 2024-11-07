@@ -20,7 +20,12 @@ public abstract class Connection {
         return url;
     }
     public static Connection openConnection( URL url ) throws IOException {
-        return new HttpConnection(url);
+        boolean useCache= false;
+        if ( useCache ) {
+            return new HapiCacheConnection(url);
+        } else {
+            return new HttpConnection(url);
+        }
     }
     
     abstract InputStream getInputStream() throws IOException;
