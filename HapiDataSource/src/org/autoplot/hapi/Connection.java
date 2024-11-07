@@ -4,6 +4,9 @@ package org.autoplot.hapi;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.das2.util.LoggerManager;
 
 /**
  * Abstract the interface to get a connection so that the HAPI Cache 
@@ -12,6 +15,9 @@ import java.net.URL;
  * @author jbf
  */
 public abstract class Connection {
+    
+    private static final Logger logger= LoggerManager.getLogger("apdss.hapi");
+    
     URL url;
     public Connection( URL url ) {
         this.url= url;
@@ -20,7 +26,17 @@ public abstract class Connection {
         return url;
     }
     public static Connection openConnection( URL url ) throws IOException {
-        boolean useCache= false;
+        boolean useCache= true;
+        if ( useCache ) {
+            String scommand = System.getProperty( "hapi-cache-command" );
+            if ( scommand==null ) scommand = System.getenv( "hapi-cache-command" );
+            if ( scommand==null ) {
+                useCache = false;
+            }
+            if ( useCache ) {
+                logger.log(Level.FINE, "using cache with: {0}", scommand);
+            }
+        }
         if ( useCache ) {
             return new HapiCacheConnection(url);
         } else {
