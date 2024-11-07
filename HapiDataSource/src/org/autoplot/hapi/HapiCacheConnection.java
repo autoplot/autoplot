@@ -16,8 +16,13 @@ public class HapiCacheConnection extends Connection {
     
     public HapiCacheConnection( URL url ) throws IOException {
         super(url);
-        String scommand = "java -jar /home/jbf/ct/hapi/git/cache-tools/java/dist/cache-tools.jar"
-            + " --fetchOnce --cache-dir=/home/jbf/hapi-cache/ --url="+url;
+        String scommand = System.getProperty( "hapi-cache-command" );
+        if ( scommand==null ) scommand = System.getenv( "hapi-cache-command" );
+        // "java -jar /home/jbf/ct/hapi/git/cache-tools/java/dist/cache-tools.jar"
+        if ( scommand==null ) {
+            throw new IllegalArgumentException("System property hapi-cache-command is not set.");
+        }
+        scommand = scommand + " --fetchOnce --cache-dir=/home/jbf/hapi-cache/ --url="+url;
         String[] command= scommand.split("\\s+");
         p= new ProcessBuilder(command).start();
     }
