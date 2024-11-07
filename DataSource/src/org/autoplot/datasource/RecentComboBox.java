@@ -151,6 +151,7 @@ public class RecentComboBox extends JComboBox {
         List<String> items= new ArrayList( RECENT_SIZE+2 );
         try {
             if ( recentFile!=null && recentFile.exists() ) {
+                boolean empty=true;
                 try (BufferedReader r = new BufferedReader(new FileReader(recentFile))) {
                     String s= r.readLine();
                     while ( s!=null ) {
@@ -160,8 +161,14 @@ public class RecentComboBox extends JComboBox {
                                 continue;
                             }
                         }
+                        empty= false;
                         items.add(s);
                         s= r.readLine();
+                    }
+                }
+                if ( empty ) {
+                    if ( !recentFile.delete() ) {
+                        logger.fine("unable to remove empty file");
                     }
                 }
             }
@@ -222,7 +229,7 @@ public class RecentComboBox extends JComboBox {
         if ( recentFile==null || !bookmarksFolder.exists() ) {
             return; //not yet, we're initializing for the first time.
         }
-        
+        boolean empty= true;
         File recentFileTemp;
         try {
             recentFileTemp= File.createTempFile( "recent."+ this.preferenceNode, ".txt", bookmarksFolder );
@@ -238,6 +245,7 @@ public class RecentComboBox extends JComboBox {
             for ( String s:items ) {
                 w.append( s, 0, s.length() );
                 w.append("\n");
+                empty= false;
             }
             w.close();
         } catch (IOException ex) {
@@ -253,8 +261,12 @@ public class RecentComboBox extends JComboBox {
         if ( recentFile.exists() && !recentFile.delete() ) {
             logger.log(Level.WARNING, "unable to delete recent file {0}", recentFile);
         } else {
-            if ( !recentFileTemp.renameTo(recentFile) ) {
-                logger.log(Level.WARNING, "unable to overwrite file {0}", recentFile);
+            if ( empty ) {
+                recentFileTemp.delete();
+            } else {
+                if ( !recentFileTemp.renameTo(recentFile) ) {
+                    logger.log(Level.WARNING, "unable to overwrite file {0}", recentFile);
+                }
             }
         }
     }
