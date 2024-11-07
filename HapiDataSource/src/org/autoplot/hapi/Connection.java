@@ -11,16 +11,16 @@ import java.net.URL;
  * Something, maybe a caching layer, which provides connections.   
  * @author jbf
  */
-public abstract class Connector {
+public abstract class Connection {
     URL url;
-    public Connector( URL url ) {
+    public Connection( URL url ) {
         this.url= url;
     }
     public URL getURL() {
         return url;
     }
-    public static Connector openConnection( URL url ) throws IOException {
-        return new HttpConnector(url);
+    public static Connection openConnection( URL url ) throws IOException {
+        return new HttpConnection(url);
     }
     
     abstract InputStream getInputStream() throws IOException;

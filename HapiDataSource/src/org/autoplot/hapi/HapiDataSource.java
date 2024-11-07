@@ -1275,7 +1275,7 @@ public final class HapiDataSource extends AbstractDataSource {
         return useCache;
     }
     
-    private static AbstractLineReader getCsvReader( Connector hapiConnect ) throws IOException {
+    private static AbstractLineReader getCsvReader( Connection hapiConnect ) throws IOException {
         InputStream ins1;
         ins1= hapiConnect.getInputStream();
 
@@ -1308,7 +1308,7 @@ public final class HapiDataSource extends AbstractDataSource {
         monitor.setTaskProgress(20);
         long t0= System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
                         
-        Connector connect= getConnection(url);
+        Connection connect= getConnection(url);
                 
         logger.log(Level.FINER, "parse {0}", url);
                 
@@ -1516,7 +1516,7 @@ public final class HapiDataSource extends AbstractDataSource {
         monitor.setTaskProgress(20);
         long t0 = System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
                                         
-        Connector httpConnect = getConnection(url);
+        Connection httpConnect = getConnection(url);
         
         //Check to see what time ranges are from entire days, then only call writeToCachedData for these intervals. 
         Datum midnight= TimeUtil.prevMidnight( tr.min() );
@@ -1682,14 +1682,14 @@ public final class HapiDataSource extends AbstractDataSource {
      * @return
      * @throws IOException 
      */
-    private static Connector getConnection( final URL url ) throws IOException {
+    private static Connection getConnection( final URL url ) throws IOException {
         
         boolean useCache= false;
         
         if ( useCache ) {
             throw new IllegalArgumentException("not yet supported");
         } else {
-            return new HttpConnector(url);   
+            return new HttpConnection(url);   
         }
         
     }
@@ -1712,7 +1712,7 @@ public final class HapiDataSource extends AbstractDataSource {
         
         StringBuilder builder= new StringBuilder();
         logger.log(Level.FINE, "getDocument {0}", url.toString());
-        Connector connect= getConnection(url);
+        Connection connect= getConnection(url);
         try ( BufferedReader in= new BufferedReader( 
                 new InputStreamReader( connect.getInputStream(), HapiServer.UTF8 ) ) ) {
             String line= in.readLine();

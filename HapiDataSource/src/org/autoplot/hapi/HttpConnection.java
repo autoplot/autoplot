@@ -14,12 +14,12 @@ import org.das2.util.filesystem.HttpUtil;
  *
  * @author jbf
  */
-public class HttpConnector extends Connector {
+public class HttpConnection extends Connection {
     
     static final Logger loggerUrl= org.das2.util.LoggerManager.getLogger( "das2.url" );
     final HttpURLConnection fhttpConnect;
         
-    public HttpConnector( URL url ) throws IOException {
+    public HttpConnection( URL url ) throws IOException {
         super(url);
         
         loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );
