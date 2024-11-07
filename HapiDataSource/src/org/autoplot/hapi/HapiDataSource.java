@@ -379,36 +379,6 @@ public final class HapiDataSource extends AbstractDataSource {
     
     private static final Map<String,Datum> lastRecordFound= new HashMap<>();
           
-    private static String[] cacheFilesFor( URL url, ParamDescription[] pp, Datum xx ) {
-        String s= AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE);
-        if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
-        StringBuilder ub= new StringBuilder( url.getProtocol() + "/" + url.getHost() + "/" + url.getPath() );
-        if ( url.getQuery()!=null ) {
-            String[] querys= url.getQuery().split("\\&");
-            Pattern p= Pattern.compile("id=(.+)");
-            for ( String q : querys ) {
-                Matcher m= p.matcher(q);
-                if ( m.matches() ) {
-                    ub.append("/").append(m.group(1));
-                    break;
-                }
-            }
-        } else {
-            throw new IllegalArgumentException("query must be specified, implementation error");
-        }
-        
-        TimeParser tp= TimeParser.create( "$Y/$m/$Y$m$d" );
-        String sxx= tp.format(xx);
-        
-        String u= ub.toString();
-        String[] result= new String[pp.length];
-        for ( int i=0; i<pp.length; i++ ){
-            result[i]= s + "/" + u + "/" + sxx + "." + pp[0].name + ".csv";
-        }
-        
-        return result;
-    }
-    
     private static final Map<String,ArrayList<ByteBuffer>> binaryCache= new ConcurrentHashMap<>();
    
     private static final Map<String,ArrayList<String>> csvCache= new ConcurrentHashMap<>();
@@ -471,269 +441,6 @@ public final class HapiDataSource extends AbstractDataSource {
         }
         return hapiCache;
 
-    }
-    
-    private static void writeToBinaryCachedData(String location, ParamDescription[] pp, Datum xx, ByteBuffer buf) throws IOException {
-                
-        String hapiCache= getHapiCache();
-        
-        TimeParser tp= TimeParser.create( "$Y/$m/$Y$m$d" );
-        
-        String sxx= tp.format(xx);
-                
-        String format= "binary";
-        
-        String u= location;
-        Datum t0= lastRecordFound.get( u + "/" + sxx );
-        if ( t0==null ) {
-            String f= hapiCache + u + "/" + sxx + "." + pp[0].name + "." + format;
-            File ff= new File(f);
-            if ( ff.exists() ) {
-                try ( BufferedReader read= new BufferedReader(
-                        new InputStreamReader( new FileInputStream(ff), HapiServer.UTF8 ) ) ) {
-                    String line= read.readLine();
-                    String lastLine= null;
-                    while ( line!=null ) {
-                        lastLine= line;
-                        line= read.readLine();
-                    }
-                    if ( lastLine!=null ) {
-                        try {
-                            t0= Units.us2000.parse(lastLine);
-                            lastRecordFound.put( u + "/" + sxx,t0);
-                        } catch (ParseException ex) {
-                            t0= null;
-                        }
-                    } else {
-                        t0= null;
-                    }
-                }
-            }
-        }
-        if ( t0!=null && t0.ge(xx) ) {
-            logger.log(Level.FINE, "clear all cached files for {0}", sxx);
-            for (ParamDescription pp1 : pp) {
-                String f = hapiCache + u + "/" + sxx + "." + pp1.name + "." +format;
-                File ff= new File(f);
-                if ( ff.exists() ) {
-                    if ( !ff.delete() ) logger.log(Level.INFO, "unable to delete file: {0}", ff);
-                }
-            }
-        }
-        
-        for (ParamDescription pp1 : pp) {
-            String f = u + "/" + sxx + "." + pp1.name + "." + format + "." + Thread.currentThread().getId();
-            logger.log(Level.FINER, "cache.get({0})", f);
-            ArrayList<ByteBuffer> sparam= binaryCache.get(f);
-            if ( sparam==null ) {
-                sparam= new ArrayList<>();
-                binaryCache.put(f,sparam);
-                logger.log(Level.FINE, "cache.put({0},ArrayList({1}))", new Object[]{f, sparam.size()});
-            }
-            
-            ByteBuffer buf2= ByteBuffer.allocate( buf.capacity() );
-            buf2.put(buf);
-            
-            sparam.add( buf2 );
-            
-        }
-        
-        lastRecordFound.put( u + "/" + sxx,xx);
-        
-    }
-    
-     
-    private static void writeToCsvCachedData( String location, ParamDescription[] pp, Datum xx, String[] ss, boolean allParam) throws IOException {
-        
-        String hapiCache= getHapiCache();
-        
-        TimeParser tp= TimeParser.create( "$Y/$m/$Y$m$d" );
-        
-        String sxx= tp.format(xx);
-                
-        String u= location;
-        
-        Datum t0= lastRecordFound.get( u + "/" + sxx );
-        if ( t0==null ) {
-            String f= hapiCache + u + "/" + sxx + "." + pp[0].name + ".csv";
-            File ff= new File(f);
-            if ( ff.exists() ) {
-                try ( BufferedReader read= new BufferedReader(
-                        new InputStreamReader( new FileInputStream(ff), HapiServer.UTF8 ) ) ) {
-                    String line= read.readLine();
-                    String lastLine= null;
-                    while ( line!=null ) {
-                        lastLine= line;
-                        line= read.readLine();
-                    }
-                    if ( lastLine!=null ) {
-                        try {
-                            t0= Units.us2000.parse(lastLine);
-                            lastRecordFound.put( u + "/" + sxx,t0);
-                        } catch (ParseException ex) {
-                            t0= null;
-                        }
-                    } else {
-                        t0= null;
-                    }
-                }
-            }
-        }
-        if ( t0!=null && t0.ge(xx) ) {
-            logger.log(Level.FINE, "clear all cached files for {0}", sxx);
-            for (ParamDescription pp1 : pp) {
-                String f = hapiCache + u + "/" + sxx + "." + pp1.name + ".csv";
-                File ff= new File(f);
-                if ( ff.exists() ) {
-                    if ( !ff.delete() ) logger.log(Level.INFO, "unable to delete file: {0}", ff);
-                }
-            }
-        }
-        
-        int ifield=0;
-        for (ParamDescription pp1 : pp) {
-            String f = u + "/" + sxx + "." + pp1.name + ".csv" + "." + Thread.currentThread().getId();
-            logger.log(Level.FINER, "cache.get({0})", f);
-            ArrayList<String> sparam= csvCache.get(f);
-            if ( sparam==null ) {
-                sparam= new ArrayList<>();
-                csvCache.put(f,sparam);
-                logger.log(Level.FINE, "cache.put({0},ArrayList({1}))", new Object[]{f, sparam.size()});
-            }
-            
-            StringBuilder build= new StringBuilder();
-            
-            int length = pp1.nFields;
-            for ( int k=0; k<length; k++ ) {
-                if ( k>0 ) build.append(",");
-                build.append( ss[ifield++] );
-            }
-            
-            sparam.add(build.toString());
-            
-        }
-        
-        lastRecordFound.put( u + "/" + sxx,xx);
-        
-    }
-    
-    /** 
-     * See https://sourceforge.net/p/autoplot/bugs/2043/
-     * @param url url used to locate position in cache.
-     * @param pp parameters 
-     * @param xx time used to id the file.
-     */
-    private static void writeToBinaryCachedDataFinish(String location, ParamDescription[] pp, Datum xx, boolean allParam) throws IOException {
-        
-        logger.log(Level.FINE, "writeToBinaryCachedDataFinish: {0}", xx);
-
-        String hapiCache= getHapiCache();
-        
-        String format= "binary";
-
-        long currentTimeMillis= pp[0].modifiedDateMillis;
-        TimeParser tp= TimeParser.create( "$Y/$m/$Y$m$d" );
-        String sxx= tp.format(xx);
-        String u= location;
-        
-        int ipos=0;
-        for (ParamDescription pp1 : pp) {
-            String f = u + "/" + sxx + "." + pp1.name + "." + format + "."+ Thread.currentThread().getId();
-            logger.log(Level.FINE, "remove from cache: {0}", f);
-            
-            File ff= new File( hapiCache + u + "/" + sxx + "." + pp1.name + "." + format +"");
-            if ( !ff.getParentFile().exists() ) {
-                if ( !ff.getParentFile().mkdirs() ) {
-                    throw new IOException("unable to mkdirs "+ff.getParent() );
-                }
-            }
-            File ffTemp= new File( hapiCache + u + "/" + sxx + "." + pp1.name + "."+ format + "."+Thread.currentThread().getId() );
-            
-            ArrayList<ByteBuffer> data= binaryCache.get(f); //TODO: use "remove" after debugging.
-            
-            int ilen= BufferDataSet.byteCount(pp1.type) * DataSetUtil.product(pp1.size);
-            try ( FileChannel ffTempChannel= new FileOutputStream(ffTemp).getChannel() ) {
-                for ( ByteBuffer buf: data ) {
-                    buf.position(ipos);
-                    buf.limit(ipos+ilen);
-                    ffTempChannel.write(buf);
-                }
-            }
-            ipos+= pp1.length;
-        } 
-        
-        
-        synchronized ( HapiDataSource.class ) {
-            for (ParamDescription pp1 : pp) {
-                File ffTemp= new File( hapiCache + u + "/" + sxx + "." + pp1.name + "."+ format + "."+Thread.currentThread().getId() );
-                File ff= new File( hapiCache + u + "/" + sxx + "." + pp1.name + "." + format +"");
-                if ( !ffTemp.renameTo(ff) ) {
-                    logger.log(Level.WARNING, "rename to {0} failed", ff);
-                }
-                if ( currentTimeMillis>0 ) {
-                    if ( !ff.setLastModified(currentTimeMillis) ) {
-                        logger.log(Level.WARNING, "setLastModified for {0} failed", ff);
-                    }
-                }
-            }
-        }
-    }
-    
-    /** 
-     * See https://sourceforge.net/p/autoplot/bugs/2043/
-     * @param url url used to locate position in cache.
-     * @param pp parameters 
-     * @param xx time used to id the file.
-     */
-    private static void writeToCsvCachedDataFinish(String location, ParamDescription[] pp, Datum xx) throws IOException {
-        logger.log(Level.FINE, "writeToCachedDataFinish: {0}", xx);
-        
-        String hapiCache= getHapiCache();
-        
-        String format= "csv";
-
-        long currentTimeMillis= pp[0].modifiedDateMillis;
-        TimeParser tp= TimeParser.create( "$Y/$m/$Y$m$d" );
-        String sxx= tp.format(xx);
-        String u= location;
-        for (ParamDescription pp1 : pp) {
-            String f = u + "/" + sxx + "." + pp1.name + "." + format + "."+ Thread.currentThread().getId();
-            logger.log(Level.FINE, "remove from cache: {0}", f);
-            ArrayList<String> sparam= csvCache.remove(f);
-            File ff= new File( hapiCache + u + "/" + sxx + "." + pp1.name + "." + format +".gz");
-            if ( !ff.getParentFile().exists() ) {
-                if ( !ff.getParentFile().mkdirs() ) {
-                    throw new IOException("unable to mkdirs "+ff.getParent() );
-                }
-            }
-            File ffTemp= new File( hapiCache + u + "/" + sxx + "." + pp1.name + "."+ format + ".gz."+Thread.currentThread().getId() );
-            //int line=0;
-            try (final BufferedWriter w = new BufferedWriter( new OutputStreamWriter( new GZIPOutputStream( new FileOutputStream(ffTemp) ) ) ) ) {
-                if ( sparam!=null ) {
-                    for ( String s123: sparam ) {
-                        //line++;
-                        w.write(s123);
-                        w.newLine();
-                    }
-                }
-            }
-        }
-         
-        synchronized ( HapiDataSource.class ) {
-            for (ParamDescription pp1 : pp) {
-                File ff= new File( hapiCache + u + "/" + sxx + "." + pp1.name + "." + format +".gz");
-                File ffTemp= new File( hapiCache + u + "/" + sxx + "." + pp1.name + "."+ format + ".gz."+Thread.currentThread().getId() );
-                if ( !ffTemp.renameTo(ff) ) {
-                    logger.log(Level.WARNING, "renameTo {0} failed", ff);
-                }
-                if ( currentTimeMillis>0 ) {
-                    if ( !ff.setLastModified(currentTimeMillis) ) {
-                        logger.log(Level.WARNING, "setLastModified for {0} failed", ff);
-                    }
-                }
-            }
-        }
-        
     }
     
     /**
@@ -1308,7 +1015,7 @@ public final class HapiDataSource extends AbstractDataSource {
         monitor.setTaskProgress(20);
         long t0= System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
                         
-        Connection connect= getConnection(url);
+        Connection connect= Connection.openConnection(url);
                 
         logger.log(Level.FINER, "parse {0}", url);
                 
@@ -1516,7 +1223,7 @@ public final class HapiDataSource extends AbstractDataSource {
         monitor.setTaskProgress(20);
         long t0 = System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
                                         
-        Connection httpConnect = getConnection(url);
+        Connection httpConnect = Connection.openConnection(url);
         
         //Check to see what time ranges are from entire days, then only call writeToCachedData for these intervals. 
         Datum midnight= TimeUtil.prevMidnight( tr.min() );
@@ -1676,23 +1383,6 @@ public final class HapiDataSource extends AbstractDataSource {
         return ds;
     }
     
-    /**
-     * see if all traffic can come through here, so we can optionally cache results.
-     * @param url
-     * @return
-     * @throws IOException 
-     */
-    private static Connection getConnection( final URL url ) throws IOException {
-        
-        boolean useCache= false;
-        
-        if ( useCache ) {
-            throw new IllegalArgumentException("not yet supported");
-        } else {
-            return new HttpConnection(url);   
-        }
-        
-    }
 
     /**
      * read data embedded within a JSON response.  This current reads in the entire JSON document,
@@ -1712,7 +1402,7 @@ public final class HapiDataSource extends AbstractDataSource {
         
         StringBuilder builder= new StringBuilder();
         logger.log(Level.FINE, "getDocument {0}", url.toString());
-        Connection connect= getConnection(url);
+        Connection connect= Connection.openConnection(url);
         try ( BufferedReader in= new BufferedReader( 
                 new InputStreamReader( connect.getInputStream(), HapiServer.UTF8 ) ) ) {
             String line= in.readLine();
