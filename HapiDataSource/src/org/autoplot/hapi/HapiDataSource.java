@@ -1275,23 +1275,13 @@ public final class HapiDataSource extends AbstractDataSource {
         return useCache;
     }
     
-    private static AbstractLineReader getCsvReader( AbstractLineReader cacheReader, URL url, Connector httpConnect, boolean gzip ) throws IOException {
-        if ( cacheReader!=null ) {
-            return cacheReader;
-        } else {
-            InputStream ins1;
-            if ( httpConnect!=null ) {
-                ins1= httpConnect.getInputStream();
-            } else {
-                ins1= httpConnect.getInputStream();
-            }
-            if ( gzip ) {
-               ins1 = new GZIPInputStream( ins1 );
-            }
-            InputStreamReader isread= new InputStreamReader( ins1, HapiServer.UTF8 );
-            AbstractLineReader result= new SingleFileBufferedReader( new BufferedReader(isread) );
-            return result;
-        }
+    private static AbstractLineReader getCsvReader( Connector hapiConnect ) throws IOException {
+        InputStream ins1;
+        ins1= hapiConnect.getInputStream();
+
+        InputStreamReader isread= new InputStreamReader( ins1, HapiServer.UTF8 );
+        AbstractLineReader result= new SingleFileBufferedReader( new BufferedReader(isread) );
+        return result;
     }
     
     /**
@@ -1317,67 +1307,16 @@ public final class HapiDataSource extends AbstractDataSource {
         monitor.setProgressMessage("reading data");
         monitor.setTaskProgress(20);
         long t0= System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
-        
-        boolean cacheIsEnabled= useCache(useCacheUriParam);
-        
-        AbstractLineReader cacheReader;
-        if ( cacheIsEnabled ) { // this branch posts the request, expecting that the server may respond with 304, indicating the cache should be used.
-            String[] parameters= new String[pds.length];
-            for ( int i=0; i<pds.length; i++ ) parameters[i]= pds[i].name;
-            cacheReader= getCsvCacheReader(url, parameters, tr, FileSystem.settings().isOffline(), 0L );
-            if ( cacheReader!=null ) {
-                logger.fine("reading from cache");
-            }
-        } else {
-            cacheReader= null;
-        }
-        
+                        
         Connector connect= getConnection(url);
-        boolean gzip=false;  // Let Java decompress the stream
-        if ( cacheReader==null ) {
-            if ( FileSystem.settings().isOffline() ) {
-                throw new NoDataInIntervalException("HAPI server is offline.");
-                //throw new FileSystem.FileSystemOfflineException("file system is offline");
-            } else {
-                loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );   
-            }
-        } else {
-            connect= null;
-        }
                 
-        //Check to see what time ranges are from entire days, then only call writeToCachedData for these intervals. 
-        Datum midnight= TimeUtil.prevMidnight( tr.min() );
-        DatumRange currentDay= new DatumRange( midnight, TimeUtil.next( TimeUtil.DAY, midnight) );
-        boolean completeDay= tr.contains(currentDay);
-
-        logger.log(Level.FINER, "parse {0}", cacheReader);
-        
-        boolean writeDataToCache= cacheIsEnabled && cacheReader==null;
-        
+        logger.log(Level.FINER, "parse {0}", url);
+                
         int linenumber=0;
 
         Map<String,Integer> warnings= new LinkedHashMap<>();
         
-        String cacheLocation=null;
-        if ( writeDataToCache ) {
-            StringBuilder ub= new StringBuilder( url.getProtocol() + "/" + url.getHost() + url.getPath() );
-            if ( url.getQuery()!=null ) {
-                String[] querys= url.getQuery().split("\\&");
-                Pattern p= Pattern.compile("id=(.+)");
-                for ( String q : querys ) {
-                    Matcher m= p.matcher(q);
-                    if ( m.matches() ) {
-                        ub.append("/").append(m.group(1));
-                        break;
-                    }
-                }
-                cacheLocation= ub.toString();
-            } else {
-                throw new IllegalArgumentException("query must be specified, implementation error");
-            }
-        }
-
-        try ( AbstractLineReader in = getCsvReader(cacheReader,url,connect,gzip) ) {
+        try ( AbstractLineReader in = getCsvReader(connect) ) {
 
             String line= in.readLine();
             
@@ -1452,46 +1391,7 @@ public final class HapiDataSource extends AbstractDataSource {
                     line= in.readLine();
                     continue;
                 }
-                
-                // if a cache file is opened for the previous day, then close the file for the day, gzipping it.
-                if ( writeDataToCache ) {
-                    if ( !currentDay.contains(xx) && tr.intersects(currentDay) && completeDay ) {
-                        // https://sourceforge.net/p/autoplot/bugs/1968/ HAPI caching must not cache after "modificationDate" or partial days remain in cache
-                        if ( pds[0].modifiedDateMillis==0 || currentDay.middle().doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
-                            writeToCsvCachedDataFinish(cacheLocation, pds, currentDay.middle() );
-                        } else {
-                            logger.fine("data after modification date is not cached.");
-                        }
-                    }
-                    
-                    while ( !currentDay.contains(xx) && tr.intersects(currentDay ) ) { // find the new current day, writing empty files for any missing days.
-                        currentDay= currentDay.next();
-                        completeDay= tr.contains(currentDay);
-                        if ( !currentDay.contains(xx) && tr.intersects(currentDay ) ) {
-                            if ( pds[0].modifiedDateMillis==0 || currentDay.middle().doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
-                                // put empty file which is placeholder.
-                                writeToCsvCachedDataFinish(cacheLocation, pds, currentDay.middle() ); 
-                            }
-                        }
-                    }
-                
-                    if ( !currentDay.contains(xx) ) {
-                        if ( !warnings.containsKey( WARNING_TIME_ORDER ) ) {
-                            logger.log(Level.INFO, "something's gone wrong, perhaps out-of-order timetags: {0}", xx);
-                            warnings.put( WARNING_TIME_ORDER, 1 );
-                        } else {
-                            warnings.put( WARNING_TIME_ORDER, warnings.get( WARNING_TIME_ORDER ) + 1 );
-                        }
-                        completeDay= false;
-                    }
-
-                    if ( completeDay ) {
-                        if ( pds[0].modifiedDateMillis==0 || xx.doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
-                            writeToCsvCachedData(cacheLocation, pds, xx, ss, false );
-                        }
-                    }
-                }
-                        
+                                        
                 builder.putValue( -1, ifield, xx );
                 ifield++;
                 for ( int i=1; i<nparam; i++ ) {  // nparam is number of parameters, which may have multiple fields.
@@ -1513,18 +1413,7 @@ public final class HapiDataSource extends AbstractDataSource {
                 builder.nextRecord();
                 line= in.readLine();
             }
-            
-            if ( writeDataToCache ) {
-                while ( completeDay && tr.intersects(currentDay) ) {
-                    if ( pds[0].modifiedDateMillis==0 || currentDay.middle().doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
-                        // put empty file which is placeholder.
-                        writeToCsvCachedDataFinish(cacheLocation, pds, currentDay.middle() ); 
-                    }
-                    currentDay= currentDay.next();
-                    completeDay= tr.contains(currentDay);
-                }
-            }
-            
+                        
         } catch ( IOException e ) {
             logger.log( Level.WARNING, e.getMessage(), e );
             monitor.finished();
@@ -1550,14 +1439,8 @@ public final class HapiDataSource extends AbstractDataSource {
             }
         }
         
-        logger.log(Level.FINER, "done parsing {0}", cacheReader);
-        
-        if ( cacheReader!=null ) {
-            Map<String,String> cacheFiles= new HashMap<>();
-            cacheFiles.put( "cached", "true" );
-            builder.putProperty( QDataSet.USER_PROPERTIES, cacheFiles );
-        }
-        
+        logger.log(Level.FINER, "done parsing {0}", url);
+                
         monitor.setTaskProgress(95);
         QDataSet ds= builder.getDataSet();
         return ds;
@@ -1632,67 +1515,12 @@ public final class HapiDataSource extends AbstractDataSource {
         monitor.setProgressMessage("reading data");
         monitor.setTaskProgress(20);
         long t0 = System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
-        
-        boolean cacheIsEnabled= useCache(useCacheUriParam);
-                
-        AbstractBinaryRecordReader cacheReader;
-        if ( cacheIsEnabled ) { // this branch posts the request, expecting that the server may respond with 304, indicating the cache should be used.
-            String[] parameters= new String[pds.length];
-            for ( int i=0; i<pds.length; i++ ) parameters[i]= pds[i].name;
-            cacheReader= getBinaryCacheReader( url, parameters, tr, FileSystem.settings().isOffline(), 0L );
-            if ( cacheReader!=null ) {
-                logger.fine("reading from cache");
-            }
-        } else {
-            cacheReader= null;
-        }        
-                
-        HttpURLConnection httpConnect;
-        if ( cacheReader==null ) {
-            if ( FileSystem.settings().isOffline() ) {
-                throw new NoDataInIntervalException("HAPI server is offline.");
-                //throw new FileSystem.FileSystemOfflineException("file system is offline");
-            } else {
-                loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );            
-                httpConnect= (HttpURLConnection)url.openConnection();
-                httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
-                httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
-                httpConnect.setRequestProperty( "Accept-Encoding", "gzip" );
-                httpConnect= (HttpURLConnection)HttpUtil.checkRedirect(httpConnect);
-                httpConnect.connect();
-                loggerUrl.log(Level.FINE, "--> {0} {1}", new Object[]{httpConnect.getResponseCode(), httpConnect.getResponseMessage()});
-            }
-        } else {
-            httpConnect= null;
-        }
+                                        
+        Connector httpConnect = getConnection(url);
         
         //Check to see what time ranges are from entire days, then only call writeToCachedData for these intervals. 
         Datum midnight= TimeUtil.prevMidnight( tr.min() );
         DatumRange currentDay= new DatumRange( midnight, TimeUtil.next( TimeUtil.DAY, midnight) );
-        boolean completeDay= tr.contains(currentDay);
-
-        boolean gzip =  cacheReader==null ? "gzip".equals( httpConnect.getContentEncoding() ) : false;
-
-        boolean writeDataToCache= cacheIsEnabled && cacheReader==null;
-        
-        String cacheLocation=null;   
-        if ( writeDataToCache ) {
-            StringBuilder ub= new StringBuilder( url.getProtocol() + "/" + url.getHost() + url.getPath() );
-            if ( url.getQuery()!=null ) {
-                String[] querys= url.getQuery().split("\\&");
-                Pattern p= Pattern.compile("id=(.+)");
-                for ( String q : querys ) {
-                    Matcher m= p.matcher(q);
-                    if ( m.matches() ) {
-                        ub.append("/").append(m.group(1));
-                        break;
-                    }
-                }
-                cacheLocation= ub.toString();
-            } else {
-                throw new IllegalArgumentException("query must be specified, implementation error");
-            }
-        }
         
         int recordLengthBytes = 0;
         TransferType[] tts = new TransferType[pds.length];
@@ -1721,8 +1549,7 @@ public final class HapiDataSource extends AbstractDataSource {
         
         Map<String,Integer> warnings= new LinkedHashMap<>();
         
-        try ( AbstractBinaryRecordReader in = ( cacheReader!=null ? cacheReader :  
-                new InputStreamBinaryRecordReader( gzip ? new GZIPInputStream(httpConnect.getInputStream()) : httpConnect.getInputStream() ) ) ) {
+        try ( AbstractBinaryRecordReader in = new InputStreamBinaryRecordReader( httpConnect.getInputStream() ) ) {
             
             ByteBuffer buf = TransferType.allocate( recordLengthBytes,ByteOrder.LITTLE_ENDIAN );
             
@@ -1805,29 +1632,6 @@ public final class HapiDataSource extends AbstractDataSource {
                     bytesRead = in.readRecord(buf);
                     continue;
                 }
-                                // if a cache file is opened for the previous day, then close the file for the day, gzipping it.
-                if ( writeDataToCache ) {
-                    if ( !currentDay.contains(xx) && tr.intersects(currentDay) && completeDay ) {
-                        // https://sourceforge.net/p/autoplot/bugs/1968/ HAPI caching must not cache after "modificationDate" or partial days remain in cache
-                        if ( pds[0].modifiedDateMillis==0 || currentDay.middle().doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
-                            writeToBinaryCachedDataFinish( cacheLocation, pds, currentDay.middle(), false );
-                        } else {
-                            logger.fine("data after modification date is not cached.");
-                        }
-                    }
-                    
-                    while ( !currentDay.contains(xx) && tr.intersects(currentDay ) ) { // find the new current day, writing empty files for any missing days.
-                        currentDay= currentDay.next();
-                        completeDay= tr.contains(currentDay);
-                        if ( !currentDay.contains(xx) && tr.intersects(currentDay ) ) {
-                            if ( pds[0].modifiedDateMillis==0 || currentDay.middle().doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
-                                // put empty file which is placeholder.
-                                writeToBinaryCachedDataFinish( cacheLocation, pds, currentDay.middle(), false ); 
-                            }
-                        }
-                    }
-
-                }
 
                 if ( !currentDay.contains(xx) ) {
                     if ( !warnings.containsKey( WARNING_TIME_ORDER ) ) {
@@ -1835,17 +1639,6 @@ public final class HapiDataSource extends AbstractDataSource {
                         warnings.put( WARNING_TIME_ORDER, 1 );
                     } else {
                         warnings.put( WARNING_TIME_ORDER, warnings.get( WARNING_TIME_ORDER ) + 1 );
-                    }
-                    completeDay= false;
-                }
-                
-                if ( writeDataToCache ) {
-                    if ( completeDay ) {
-                        if ( pds[0].modifiedDateMillis==0 || xx.doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
-                            buf.flip();
-                            writeToBinaryCachedData(cacheLocation, pds, xx, buf );
-                        }
-
                     }
                 }
                 
@@ -1864,18 +1657,7 @@ public final class HapiDataSource extends AbstractDataSource {
                 bytesRead = in.readRecord(buf);
                 
             }
-            
-            if ( writeDataToCache ) {
-                while ( completeDay && tr.intersects(currentDay) ) {
-                    if ( pds[0].modifiedDateMillis==0 || currentDay.middle().doubleValue(Units.ms1970) - pds[0].modifiedDateMillis <= 0 ) {
-                        // put empty file which is placeholder.
-                        writeToBinaryCachedDataFinish(null, pds, currentDay.middle(), false ); 
-                    }
-                    currentDay= currentDay.next();
-                    completeDay= tr.contains(currentDay);
-                }
-            }
-            
+                        
         } catch (IOException e) {
             logger.log( Level.WARNING, e.getMessage(), e );
             monitor.finished();
@@ -1887,12 +1669,6 @@ public final class HapiDataSource extends AbstractDataSource {
             throw e;
         } finally {
             if ( httpConnect!=null ) httpConnect.disconnect();
-        }
-
-        if ( cacheReader!=null ) {
-            Map<String,String> cacheFiles= new HashMap<>();
-            cacheFiles.put( "cached", "true" );
-            builder.putProperty( QDataSet.USER_PROPERTIES, cacheFiles );
         }
         
         monitor.setTaskProgress(95);
@@ -2088,475 +1864,26 @@ public final class HapiDataSource extends AbstractDataSource {
         }
         return ss;
     }
-    
-    /**
-     * return the folder containing data for this id.
-     * @param url the hapi URL, such as http://jfaden.net/HapiServerDemo/hapi
-     * @param id the ID, such as "Iowa City Conditions"
-     * @return the folder containing the cache.
-     */
-    public static File cacheFolder( URL url, String id ) {
-        String cache= getHapiCache();
-        String dsroot= cache + "/" + url.getProtocol() + "/" + url.getHost() + "/" + url.getPath() + "/" + id.replaceAll(" ","+"); 
-        return new File( dsroot );
-    }
-    
-    /**
-     * return the files that would be used for these parameters and time interval.
-     * This is repeated code from getCacheReader.
-     * @param url HAPI data request URL
-     * @param id identifier for the dataset on the server.
-     * @param parameters
-     * @param timeRange
-     * @param format
-     * @see #getCsvCacheReader(java.net.URL, java.lang.String[], org.das2.datum.DatumRange, boolean, long) 
-     * @return 
-     */
-    protected static LinkedHashMap<String,DatumRange> getCacheFiles( URL url, String id, String[] parameters, DatumRange timeRange, String format ) {
-        String s= getHapiCache();
-        if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
-        String u= url.getProtocol() + "/" + url.getHost() + url.getPath();
-        u= u + "/data/" + id.replaceAll(" ","+");        
-                
-        LinkedHashMap<String,DatumRange> result= new LinkedHashMap<>();
-         
-        try {
-            for (String parameter : parameters) {
-                String theFile= s + "/"+ u ;
-                FileStorageModel fsm = FileStorageModel.create(FileSystem.create( "file:" +theFile ), "$Y/$m/$Y$m$d." + parameter + "."+format+".gz");
-                String[] ff= fsm.getNamesFor(null);
-                for (String ff1 : ff) {
-                    DatumRange tr1= fsm.getRangeFor(ff1);
-                    if ( timeRange==null || timeRange.intersects(tr1)) {
-                        result.put(ff1,tr1);
-                    }
-                }
-            }
-        } catch ( IOException | IllegalArgumentException ex) {
-            logger.log(Level.FINE, "exception in cache", ex );
-            return null;
-        }
-                        
-        return result;
-  
-    }
-    
-    private static AbstractLineReader calculateCsvCacheReader( File[][] files ) {
-        
-        ConcatenateBufferedReader cacheReader= new ConcatenateBufferedReader();
-        for (File[] file1 : files) {
-            boolean haveAllForDay= true;
-            if (haveAllForDay) {
-                PasteBufferedReader r1= new PasteBufferedReader();
-                r1.setDelim(',');
-                for (File file : file1) {
-                    try {
-                        FileInputStream fin = new FileInputStream(file);
-                        InputStreamReader read= new InputStreamReader(fin,HapiServer.UTF8);
-                        BufferedReader buff= new BufferedReader(read);
-                        r1.pasteBufferedReader(
-                                new SingleFileBufferedReader( 
-                                        buff ) );
-                    }catch ( IOException ex ) {
-                        logger.log( Level.SEVERE, ex.getMessage(), ex );
-                        return null;
-                    }
-                }
-                cacheReader.concatenateBufferedReader(r1);
-            }   
-        }
-        return cacheReader;
-    }
-    
-    private static AbstractBinaryRecordReader calculateBinaryCacheReader( File[][] files ) {
-        
-        ConcatenateBinaryRecordReader cacheReader= new ConcatenateBinaryRecordReader();
-        for (File[] file : files) {
-            boolean haveAllForDay= true;
-            if (haveAllForDay) {
-                PasteBinaryRecordReader r1= new PasteBinaryRecordReader();
-                for (File oneDayOneParam : file) {
-                    try {
-                        r1.pasteBufferedReader( new SingleFileBinaryReader( oneDayOneParam ) );
-                    } catch (FileNotFoundException ex) {
-                        Logger.getLogger(HapiDataSource.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-                cacheReader.concatenateReader(r1);
-            }   
-        }
-        return cacheReader;
-    }
-    
-    /**
-     * make a connection to the server, expecting that the server might send back a 
-     * 304 indicating the cache files should be used.
-     * @param url HAPI data request URL
-     * @param files corresponding files within cache.
-     * @param lastModified non-zero to indicate time stamp of the oldest file found locally.
-     * @return null or the cache reader.
-     * @throws IOException 
-     */
-    private static AbstractLineReader maybeGetCsvCacheReader( URL url, File[][] files, long lastModified) throws IOException {
-        HttpURLConnection httpConnect;
-        if ( FileSystem.settings().isOffline() ) {
-            return null;
-            //throw new FileSystem.FileSystemOfflineException("file system is offline");
-        } else {
-            loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );            
-            httpConnect= (HttpURLConnection)url.openConnection();
-            httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
-            httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
-            httpConnect.setRequestProperty( "Accept-Encoding", "gzip" );
-            String s= new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z").format(new Date(lastModified));
-            httpConnect.setRequestProperty( "If-Modified-Since", s );
-            httpConnect= (HttpURLConnection)HttpUtil.checkRedirect(httpConnect);
-            httpConnect.connect();
-            loggerUrl.log(Level.FINE, "--> {0} {1}", new Object[]{httpConnect.getResponseCode(), httpConnect.getResponseMessage()});
-        }
-        if ( httpConnect.getResponseCode()==304 ) {
-            logger.fine("using cache files because server says nothing has changed (304)");
-            return calculateCsvCacheReader( files );
-        }
-        boolean gzip= "gzip".equals( httpConnect.getContentEncoding() );
-        return new SingleFileBufferedReader( new BufferedReader( 
-            new InputStreamReader( gzip ? 
-                    new GZIPInputStream( httpConnect.getInputStream() ) 
-                    : httpConnect.getInputStream(), HapiServer.UTF8 ) ) );
-    }
-
-    /**
-     * See if it's possible to create a Reader based on the contents of the HAPI
-     * cache.  null is returned when cached files cannot be used.
-     * @param url URL data request URL, where the time range parameters are ignored.
-     * @param parameters the parameters to load, from ParameterDescription.name
-     * @param timeRange the span to cover.  This should be from midnight-to-midnight.
-     * @param offline if true, we are offline and anything available should be used.
-     * @param lastModified 
-     * @return null or the reader to use.
-     * @see HapiServer#cacheAgeLimitMillis()
-     * @see #getCacheFiles which has copied code.  TODO: fix this.
-     */
-    private static AbstractLineReader getCsvCacheReader( URL url, String[] parameters, DatumRange timeRange, boolean offline, long lastModified) {
-        String s= getHapiCache();
-        if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
-        StringBuilder ub= new StringBuilder( url.getProtocol() + "/" + url.getHost() + "/" + url.getPath() );
-        if ( url.getQuery()!=null ) {
-            String[] querys= url.getQuery().split("\\&");
-            Pattern p= Pattern.compile("id=(.+)");
-            for ( String q : querys ) {
-                Matcher m= p.matcher(q);
-                if ( m.matches() ) {
-                    ub.append("/").append(m.group(1));
-                    break;
-                }
-            }
-        } else {
-            throw new IllegalArgumentException("query must be specified, implementation error");
-        }
-        
-        
-        DatumRange aday= TimeUtil.dayContaining(timeRange.min());
-        List<DatumRange> trs= DatumRangeUtil.generateList( timeRange, aday );
-        
-        // which granules are available for all parameters?
-        boolean[][] hits= new boolean[trs.size()][parameters.length];
-        File[][] files= new File[trs.size()][parameters.length];
-        
-        boolean staleCacheFiles;
-        
-        String u= ub.toString();
-        
-        if ( ! new File( s + "/" + u  ).exists() ) {
-            return null;
-        }
-        
-        try {
-            FileSystem fs= FileSystem.create( "file:" + s + "/"+ u );
-            staleCacheFiles= getCacheFilesWithTime( trs, parameters, fs, "csv", hits, files, offline, lastModified );
-        } catch ( IOException | IllegalArgumentException ex) {
-            logger.log(Level.FINE, "exception in cache", ex );
-            return null;
-        }
-                
-        if ( staleCacheFiles && !offline ) {
-            logger.fine("old cache files found, but new data is available and accessible");
-            return null;
-        }
-    
-        boolean haveSomething= false;
-        boolean haveAll= true;
-        for ( int i=0; i<trs.size(); i++ ) {
-            for ( int j=0; j<parameters.length; j++ ) {
-                if ( hits[i][j]==false ) {
-                    haveAll= false;
-                }
-            }
-            if ( haveAll ) {
-                haveSomething= true;
-            }
-        }
-        
-        if ( !haveAll ) {
-            checkMissingRange(trs, hits, timeRange);
-        }
-        
-        if ( !offline && !haveAll ) {
-            logger.fine("some cache files missing, but we are on-line and should retrieve all of them");
-            return null;
-        }
-        
-        if ( !haveSomething ) {
-            logger.fine("no cached data found");
-            return null;
-        }
-        
-        AbstractLineReader result;
-        
-        long timeStamp= getEarliestTimeStamp(files);
-        
-        try {
-            result= maybeGetCsvCacheReader( url, files, timeStamp );
-            if ( result!=null ) return result;
-        } catch ( IOException ex ) {
-            logger.log( Level.WARNING, null, ex );
-        }
             
-        AbstractLineReader cacheReader= calculateCsvCacheReader( files );
-        return cacheReader;
-                
-    }
-
-    /**
-     * make a connection to the server, expecting that the server might send back a 
-     * 304 indicating the cache files should be used.
-     * @param url HAPI data request URL
-     * @param files corresponding files within cache.
-     * @param lastModified non-zero to indicate time stamp of the oldest file found locally.
-     * @return null or the cache reader.
-     * @throws IOException 
-     */
-    private static AbstractBinaryRecordReader maybeGetBinaryCacheReader( URL url, File[][] files, long lastModified) throws IOException {
-        HttpURLConnection httpConnect;
-        if ( FileSystem.settings().isOffline() ) {
-            return null;
-            //throw new FileSystem.FileSystemOfflineException("file system is offline");
-        } else {
-            loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );            
-            httpConnect= (HttpURLConnection)url.openConnection();
-            httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
-            httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
-            httpConnect.setRequestProperty( "Accept-Encoding", "gzip" );
-            String s= new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z").format(new Date(lastModified));
-            httpConnect.setRequestProperty( "If-Modified-Since", s );
-            httpConnect= (HttpURLConnection)HttpUtil.checkRedirect(httpConnect);
-            httpConnect.connect();
-            loggerUrl.log(Level.FINE, "--> {0} {1}", new Object[]{httpConnect.getResponseCode(), httpConnect.getResponseMessage()});
-        }
-        if ( httpConnect.getResponseCode()==304 ) {
-            logger.fine("using cache files because server says nothing has changed (304)");
-            return calculateBinaryCacheReader( files );
-        }
-        boolean gzip= "gzip".equals( httpConnect.getContentEncoding() );
-        return new InputStreamBinaryRecordReader( gzip ? new GZIPInputStream( httpConnect.getInputStream() ) : httpConnect.getInputStream() );
-    }
-
-    /**
-     * See if it's possible to create a Reader based on the contents of the HAPI
-     * cache.  null is returned when cached files cannot be used.
-     * @param url URL data request URL, where the time range parameters are ignored.
-     * @param parameters the parameters to load, from ParameterDescription.name
-     * @param timeRange the span to cover.  This should be from midnight-to-midnight.
-     * @param offline if true, we are offline and anything available should be used.
-     * @param lastModified 
-     * @return null or the reader to use.
-     * @see HapiServer#cacheAgeLimitMillis()
-     * @see #getCacheFiles which has copied code.  TODO: fix this.
-     */
-    private static AbstractBinaryRecordReader getBinaryCacheReader( URL url, String[] parameters, DatumRange timeRange, boolean offline, long lastModified) {
-        String s= getHapiCache();
-        if ( s.endsWith("/") ) s= s.substring(0,s.length()-1);
-        StringBuilder ub= new StringBuilder( url.getProtocol() + "/" + url.getHost() + "/" + url.getPath() );
-        if ( url.getQuery()!=null ) {
-            String[] querys= url.getQuery().split("\\&");
-            Pattern p= Pattern.compile("id=(.+)");
-            for ( String q : querys ) {
-                Matcher m= p.matcher(q);
-                if ( m.matches() ) {
-                    ub.append("/").append(m.group(1));
-                    break;
-                }
-            }
-        } else {
-            throw new IllegalArgumentException("query must be specified, implementation error");
-        }
-        
-        
-        DatumRange aday= TimeUtil.dayContaining(timeRange.min());
-        List<DatumRange> trs= DatumRangeUtil.generateList( timeRange, aday );
-        
-        // which granules are available for all parameters?
-        boolean[][] hits= new boolean[trs.size()][parameters.length];
-        File[][] files= new File[trs.size()][parameters.length];
-        
-        boolean staleCacheFiles;
-        
-        String u= ub.toString();
-        
-        if ( ! new File( s + "/" + u  ).exists() ) {
-            return null;
-        }
-        
-        try {
-            FileSystem fs= FileSystem.create( "file:" + s + "/"+ u );
-            staleCacheFiles= getCacheFilesWithTime( trs, parameters, fs, "binary", hits, files, offline, lastModified );
-        } catch ( IOException | IllegalArgumentException ex) {
-            logger.log(Level.FINE, "exception in cache", ex );
-            return null;
-        }
-                
-        if ( staleCacheFiles && !offline ) {
-            logger.fine("old cache files found, but new data is available and accessible");
-            return null;
-        }
-    
-        boolean haveSomething= false;
-        boolean haveAll= true;
-        for ( int i=0; i<trs.size(); i++ ) {
-            for ( int j=0; j<parameters.length; j++ ) {
-                if ( hits[i][j]==false ) {
-                    haveAll= false;
-                }
-            }
-            if ( haveAll ) {
-                haveSomething= true;
-            }
-        }
-        
-        if ( !haveAll ) {
-            checkMissingRange(trs, hits, timeRange);
-        }
-        
-        if ( !offline && !haveAll ) {
-            logger.fine("some cache files missing, but we are on-line and should retrieve all of them");
-            return null;
-        }
-        
-        if ( !haveSomething ) {
-            logger.fine("no cached data found");
-            return null;
-        }
-        
-        AbstractBinaryRecordReader result;
-        
-        long timeStamp= getEarliestTimeStamp(files);
-        
-        try {
-            result= maybeGetBinaryCacheReader( url, files, timeStamp );
-            if ( result!=null ) return result;
-        } catch ( IOException ex ) {
-            logger.log( Level.WARNING, null, ex );
-        }
-            
-        AbstractBinaryRecordReader cacheReader= calculateBinaryCacheReader( files );
-        return cacheReader;
-                
-    }
-    
-    
-    private static void checkMissingRange(List<DatumRange> trs, boolean[][] hits, DatumRange timeRange) throws IllegalArgumentException {
-        DatumRange missingRange=null;
-        for ( int i=0; i<trs.size(); i++ ) {
-            for ( int j=0; j<hits[i].length; j++ ) {
-                if ( hits[i][j]==false ) {
-                    if ( missingRange==null ) {
-                        missingRange= trs.get(i);
-                    } else {
-                        missingRange= DatumRangeUtil.union( missingRange, trs.get(i) );
-                    }
-                }
-            }
-        }
-        logger.log(Level.FINE, "missingRange={0}", missingRange);
-        if ( missingRange!=null ) {
-            if ( missingRange.min().equals(timeRange.min()) || missingRange.max().equals(timeRange.max()) ) {
-                logger.log(Level.FINE, "candidate for new partial cache, only {0} needs to be loaded.", missingRange);
-            }
-        }
-    }
-
-    private static long getEarliestTimeStamp( File[][] files ) {
-        // digest all this into a single timestamp.  
-        // For each day, what is the oldest any of the granules was created?
-        // For each interval, what was the oldest of any granule?
-        long timeStamp= Long.MAX_VALUE;
-        for (File[] files1 : files) {
-            for (File file1 : files1 ) {
-                timeStamp = Math.min(timeStamp, file1.lastModified());
-            }
-        }
-        return timeStamp;
-    }
-    
-    private static boolean getCacheFilesWithTime(List<DatumRange> trs, String[] parameters, FileSystem fs, String format, boolean[][] hits, File[][] files, boolean offline, long lastModified) throws IOException, IllegalArgumentException {
-        boolean staleCacheFiles;
-        long timeNow= System.currentTimeMillis();
-        staleCacheFiles= false;
-        for ( int i=0; i<trs.size(); i++ ) {
-            DatumRange tr= trs.get(i);
-            for ( int j=0; j<parameters.length; j++ ) {
-                String parameter= parameters[j];
-                FileStorageModel fsm = FileStorageModel.create( fs, "$Y/$m/$Y$m$d." + parameter + "." + format );
-                File[] ff= fsm.getFilesFor(tr);
-                if ( ff.length==0 ) {
-                    FileStorageModel fsmgz = FileStorageModel.create( fs, "$Y/$m/$Y$m$d." + parameter + "."+format+".gz");
-                    ff= fsmgz.getFilesFor(tr);
-                }
-                if ( ff.length>1 ) {
-                    throw new IllegalArgumentException("implementation error, should get just one file per day.");
-                } else if ( ff.length==0 ) {
-                    hits[i][j]= false;
-                } else {
-                    File f= ff[0];
-                    long ageMillis= timeNow - f.lastModified();
-                    boolean isStale= ( ageMillis > HapiServer.cacheAgeLimitMillis() );
-                    if ( lastModified>0 ) {
-                        isStale= f.lastModified() < lastModified; // Note FAT32 only has 4sec resolution, which could cause problems.
-                        if ( !isStale ) {
-                            logger.fine("server lastModified indicates the cache file can be used");
-                        } else {
-                            logger.fine("server lastModified indicates the cache file should be updated");
-                        }
-                    }
-                    if ( offline || !isStale ) {
-                        hits[i][j]= true;
-                        files[i][j]= f;
-                    } else {
-                        logger.log(Level.FINE, "cached file is too old to use: {0}", f);
-                        hits[i][j]= false;
-                        staleCacheFiles= true;
-                    }
-                }
-            }
-        }
-        return staleCacheFiles;
-    }
-    
     protected static Datum parseTime( String stopDate ) throws ParseException {
         try {
             return Units.ms1970.parse(stopDate);
         } catch ( ParseException ex ) {
-            if ( stopDate.equals("lastday") ) {
-                stopDate= TimeUtil.prevMidnight( TimeUtil.now() ).toString();
-                logger.warning("\"lastday\" is not a valid time, and this should be fixed.");
-            } else if ( stopDate.equals("lasthour") ) {
-                stopDate= TimeUtil.prev( TimeUtil.HOUR, TimeUtil.now() ).toString();
-                logger.warning("\"lasthour\" is not a valid time, and this should be fixed.");
-            } else if ( stopDate.equals("now") ) {
-                stopDate= TimeUtil.now().toString();
-                logger.warning("\"now\" is not a valid time, and this should be fixed.");
-            } else {
-                throw ex;
+            switch (stopDate) {
+                case "lastday":
+                    stopDate= TimeUtil.prevMidnight( TimeUtil.now() ).toString();
+                    logger.warning("\"lastday\" is not a valid time, and this should be fixed.");
+                    break;
+                case "lasthour":
+                    stopDate= TimeUtil.prev( TimeUtil.HOUR, TimeUtil.now() ).toString();
+                    logger.warning("\"lasthour\" is not a valid time, and this should be fixed.");
+                    break;
+                case "now":
+                    stopDate= TimeUtil.now().toString();
+                    logger.warning("\"now\" is not a valid time, and this should be fixed.");
+                    break;
+                default:
+                    throw ex;
             }
             return TimeUtil.create(stopDate); 
         }

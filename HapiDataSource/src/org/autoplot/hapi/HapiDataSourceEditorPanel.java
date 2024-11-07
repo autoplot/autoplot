@@ -858,7 +858,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 JOptionPane.showMessageDialog(this,"id doesn't provide range");
                 return;
             }
-            ff = HapiDataSource.getCacheFiles( this.currentServer, this.currentId, params, tr, format );
+            ff = HapiUtil.getCacheFiles( this.currentServer, this.currentId, params, tr, format );
             
         } catch ( ParseException ex ) {
             JOptionPane.showMessageDialog( this, "Unable to parse timerange: "+str);
@@ -869,7 +869,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             JOptionPane.showMessageDialog( this, "No cache files found in the interval");
             return;
         }
-        File cacheFolder= HapiDataSource.cacheFolder(  this.currentServer, "/data/" + this.currentId  );
+        File cacheFolder= HapiUtil.cacheFolder(  this.currentServer, "/data/" + this.currentId  );
         HapiCacheManager mm= new HapiCacheManager();
         String[] ss= ff.keySet().toArray( new String[ff.size()] );
         mm.setFiles( cacheFolder, ss );
