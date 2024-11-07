@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package org.autoplot.hapi;
 
 import java.io.IOException;
@@ -17,15 +14,13 @@ import org.das2.util.filesystem.HttpUtil;
  *
  * @author jbf
  */
-public class HttpConnector implements Connector {
+public class HttpConnector extends Connector {
     
     static final Logger loggerUrl= org.das2.util.LoggerManager.getLogger( "das2.url" );
     final HttpURLConnection fhttpConnect;
-    
-    final URL url;
-    
+        
     public HttpConnector( URL url ) throws IOException {
-        this.url= url;
+        super(url);
         
         loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );
         HttpURLConnection httpConnect=  ((HttpURLConnection)url.openConnection());

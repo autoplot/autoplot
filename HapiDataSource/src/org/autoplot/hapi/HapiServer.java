@@ -517,17 +517,12 @@ public class HapiServer {
      * @return non-empty string
      * @throws IOException 
      */
-    public static String readFromURL( URL url, String type) throws IOException {
+    public static String readFromURL( URL url, String type ) throws IOException {
         
-        if ( FileSystem.settings().isOffline() ) {
-            String s= readFromCachedURL( url, type );
-            if ( s!=null ) return s;
-        }
         loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );
-        URLConnection urlc= url.openConnection();
-        urlc= HttpUtil.checkRedirect(urlc);
-        urlc.setConnectTimeout( FileSystem.settings().getConnectTimeoutMs() );
-        urlc.setReadTimeout( FileSystem.settings().getReadTimeoutMs() );
+        
+        Connector urlc= Connector.openConnection(url);
+        
         StringBuilder builder= new StringBuilder();
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( urlc.getInputStream(), UTF8 ) ) ) {
             String line= in.readLine();
@@ -537,40 +532,28 @@ public class HapiServer {
                 line= in.readLine();
             }
         } catch ( IOException ex ) {
-            if ( urlc instanceof HttpURLConnection ) {
-                StringBuilder builder2= new StringBuilder();
-                InputStream err= ((HttpURLConnection)urlc).getErrorStream();
-                if ( err==null ) {
-                    throw ex;
+            StringBuilder builder2= new StringBuilder();
+            InputStream err= urlc.getErrorStream();
+            if ( err==null ) {
+                throw ex;
+            }
+            try ( BufferedReader in2= new BufferedReader( new InputStreamReader( err, UTF8 ) ) ) {
+                String line= in2.readLine();
+                while ( line!=null ) {
+                    builder2.append(line);
+                    builder2.append("\n");
+                    line= in2.readLine();
                 }
-                try ( BufferedReader in2= new BufferedReader( new InputStreamReader( err, UTF8 ) ) ) {
-                    String line= in2.readLine();
-                    while ( line!=null ) {
-                        builder2.append(line);
-                        builder2.append("\n");
-                        line= in2.readLine();
-                    }
-                    String s2= builder2.toString().trim();
-                    if ( type.equals("json") && s2.length()>0 && s2.charAt(0)=='{' ) {
-                        logger.warning("incorrect error code returned, content is JSON");
-                        return s2;
-                    }
-                } catch ( IOException ex2 ) {
-                    logger.log( Level.FINE, ex2.getMessage(), ex2 );
+                String s2= builder2.toString().trim();
+                if ( type.equals("json") && s2.length()>0 && s2.charAt(0)=='{' ) {
+                    logger.warning("incorrect error code returned, content is JSON");
+                    return s2;
                 }
+            } catch ( IOException ex2 ) {
+                logger.log( Level.FINE, ex2.getMessage(), ex2 );
             }
             logger.log( Level.FINE, ex.getMessage(), ex );
-            lock.lock();
-            try {
-                if ( useCache() ) {
-                    String s= readFromCachedURL( url, type );
-                    if ( s!=null ) return s;
-                } else {
-                    throw ex;
-                }
-            } finally {
-                lock.unlock();
-            }
+            throw ex;
         }
         
         if ( builder.length()==0 ) {
@@ -578,14 +561,6 @@ public class HapiServer {
         }
         String result=builder.toString();
         
-        lock.lock();
-        try {
-            if ( useCache() ) {
-                writeToCachedURL( url, type, result );
-            }
-        } finally {
-            lock.unlock();
-        }
         return result;
     }
     

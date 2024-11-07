@@ -11,11 +11,21 @@ import java.net.URL;
  * Something, maybe a caching layer, which provides connections.   
  * @author jbf
  */
-public interface Connector {
-    URL getURL();
-    InputStream getInputStream() throws IOException;
-    InputStream getErrorStream() throws IOException;
-    int getResponseCode() throws IOException;
-    String getResponseMessage() throws IOException;
-    void disconnect();    
+public abstract class Connector {
+    URL url;
+    public Connector( URL url ) {
+        this.url= url;
+    }
+    public URL getURL() {
+        return url;
+    }
+    public static Connector openConnection( URL url ) throws IOException {
+        return new HttpConnector(url);
+    }
+    
+    abstract InputStream getInputStream() throws IOException;
+    abstract InputStream getErrorStream() throws IOException;
+    abstract int getResponseCode() throws IOException;
+    abstract String getResponseMessage() throws IOException;
+    abstract void disconnect();    
 }
