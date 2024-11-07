@@ -840,7 +840,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                     
                     JPanel p2= new JPanel();
                     p2.setLayout( new BoxLayout( p2, BoxLayout.X_AXIS ) );
-                    JTextField tf= new JFormattedTextField( 32 );
+                    JTextField tf= new JFormattedTextField( 8 );
                     p2.add( new JLabel("Number of threads:") );
                     p2.add( tf );
                     int size= tf.getFont().getSize();
