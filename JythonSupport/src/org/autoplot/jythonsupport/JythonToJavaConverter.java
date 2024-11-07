@@ -1382,7 +1382,59 @@ public class JythonToJavaConverter {
                     String n= ((Name)clas).id;
                     if ( n.equals("struct") ) {
                         if ( method.equals("pack") ) {
-                            System.err.println( "struct.pack could be implemented with ByteBuffer maybe" );
+                            String format = ((Str)cc.args[0]).s;
+                            boolean isBig= format.startsWith(">");
+                            char typech= format.charAt(format.length()-1);
+                            String type;
+                            switch (typech) {
+                                case 'h':
+                                    type=".putShort(0,";
+                                    break;
+                                case 'i':
+                                case 'l':
+                                    type=".putInt(0,";
+                                    break;
+                                case 'q':
+                                    type=".putLong(0,";
+                                    break;
+                                default:
+                                    type=".put???(0,";
+                            }
+                            int byteLen= 2;
+                            String bba= String.format("ByteBuffer.allocate(%d)",byteLen);
+                            builder.append(bba);
+                            if ( isBig ) {
+                                builder.append(".order(ByteOrder.BIG_ENDIAN)");
+                            }
+                            builder.append(type);
+                            traverse(builder,"",cc.args[1],true);
+                            builder.append(")");
+                            return;
+                        } else if ( method.equals("unpack") ) {
+                            String format = ((Str)cc.args[0]).s;
+                            boolean isBig= format.startsWith(">");
+                            char typech= format.charAt(format.length()-1);
+                            String type;
+                            switch (typech) {
+                                case 'h':
+                                    type=".getShort(0)";
+                                    break;
+                                case 'i':
+                                case 'l':
+                                    type=".getInt(0)";
+                                    break;
+                                case 'q':
+                                    type=".getLong(0)";
+                                    break;
+                                default:
+                                    type=".get???(0)";
+                            }
+                            traverse(builder,"",cc.args[1],true);
+                            if ( isBig ) {
+                                builder.append(".order(ByteOrder.BIG_ENDIAN)");
+                            }
+                            builder.append(type);
+                            return;
                         }
                     }
                 }
