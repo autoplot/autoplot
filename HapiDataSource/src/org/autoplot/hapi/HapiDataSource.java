@@ -1676,15 +1676,6 @@ public final class HapiDataSource extends AbstractDataSource {
         return ds;
     }
     
-    private interface Connector {
-        URL getURL();
-        InputStream getInputStream() throws IOException;
-        InputStream getErrorStream() throws IOException;
-        int getResponseCode() throws IOException;
-        String getResponseMessage() throws IOException;
-        void disconnect();
-    }
-    
     /**
      * see if all traffic can come through here, so we can optionally cache results.
      * @param url
@@ -1692,70 +1683,14 @@ public final class HapiDataSource extends AbstractDataSource {
      * @throws IOException 
      */
     private static Connector getConnection( final URL url ) throws IOException {
-        loggerUrl.log(Level.FINE, "GET {0}", new Object[] { url } );
-        HttpURLConnection httpConnect=  ((HttpURLConnection)url.openConnection());
-        loggerUrl.log(Level.FINE, "--> {0} {1}", new Object[]{httpConnect.getResponseCode(), httpConnect.getResponseMessage()});        
-        httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
-        httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
-        httpConnect= (HttpURLConnection) HttpUtil.checkRedirect(httpConnect);
         
-                //httpConnect= ((HttpURLConnection) url.openConnection());
-                //if ( httpConnect.getResponseCode()==HttpURLConnection.HTTP_MOVED_PERM ||
-                //       httpConnect.getResponseCode()==HttpURLConnection.HTTP_MOVED_TEMP ) {
-                //    String newLocation = httpConnect.getHeaderField("Location");
-                //    if ( !newLocation.contains("?") ) {
-                //        String args= url.getQuery();
-                //        newLocation= newLocation + args;
-                //    }
-                //    url= new URL( newLocation );
-                //    httpConnect= ((HttpURLConnection) url.openConnection());
-                //}
-
+        boolean useCache= false;
         
-                //boolean doAllowGZip= false;
-                //if ( doAllowGZip ) {
-                //    httpConnect= (HttpURLConnection)url.openConnection();
-                //    httpConnect.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
-                //    httpConnect.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
-                //    httpConnect.setRequestProperty( "Accept-Encoding", "gzip" );
-                //    httpConnect= (HttpURLConnection)HttpUtil.checkRedirect(httpConnect); // There's a problem, because it looks like the entire response is read here.
-                //    httpConnect.connect();
-                //    loggerUrl.log(Level.FINE, "--> {0} {1}", new Object[]{httpConnect.getResponseCode(), httpConnect.getResponseMessage()});
-                //    gzip=true;
-                //}        
-        final HttpURLConnection fhttpConnect= httpConnect;
-        return new Connector() {
-            @Override
-            public URL getURL() {
-                return url;
-            }
-            
-            @Override
-            public InputStream getInputStream() throws IOException {
-                return fhttpConnect.getInputStream();
-            }
-
-            @Override
-            public InputStream getErrorStream() throws IOException {
-                return fhttpConnect.getErrorStream();
-            }
-            
-            @Override
-            public String getResponseMessage() throws IOException {
-                return fhttpConnect.getResponseMessage();
-            }
-
-            @Override
-            public int getResponseCode() throws IOException {
-                return fhttpConnect.getResponseCode();
-            }
-            
-            @Override
-            public void disconnect() {
-                fhttpConnect.disconnect();
-            }
-            
-        };
+        if ( useCache ) {
+            throw new IllegalArgumentException("not yet supported");
+        } else {
+            return new HttpConnector(url);   
+        }
         
     }
 
