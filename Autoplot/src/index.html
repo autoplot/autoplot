@@ -32,6 +32,8 @@
                 
         <p>Bugfixes (2024-11-01 r27873):</p>
         <ul> 
+            <li>Don't leave empty recent files in autoplot_data/bookmarks/
+            <li>CDF export has "majority" control for output with values "row" or "column"
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2641/">2641</a>: misconfiguration of mouse module meant box events received from keystrokes were incorrect.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2217/">2217</a>: "|magnitude()" is added to vector time series support, switching from component traces to one magnitude trace.
             <li>Restore missing tools.xml file.
@@ -60,6 +62,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Remove old HAPI cache code, put in support for external HAPI cache mechanism.
+            <li>Jython to Java conversion checks for struct.pack.
+            <li>units=enum or units=nominal to mean nominal data.
             <li>Buffer sizes used to transfer data increased from 1024 bytes to 8*1024 bytes, possibly showing small performance gains.
             <li>More enhancements to Python-to-Java converter while porting new IDLSave reader.
         </ul>
