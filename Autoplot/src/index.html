@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>HAPI support now shows favicon.png for servers.</small></p>
+        <p><small>"|magnitude()" operation will delete the components and show the magnitude properly now.  <a href="https://sourceforge.net/p/autoplot/bugs/2217/" target="_blank">Here</a> is the ticket.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,10 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-11-01 r27873):</p>
+        <p>Bugfixes (2024-11-08 r27905):</p>
         <ul> 
+            <li>Codes which transfer data from one buffer to another do so in larger chunks now, using 8K buffers as Google suggests.
+            <li>Run Batch Tool uses 8 threads by default when multi-threaded runs are done. 32 was too many, even for a 48-core machine.
             <li>Don't leave empty recent files in autoplot_data/bookmarks/
             <li>CDF export has "majority" control for output with values "row" or "column"
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2641/">2641</a>: misconfiguration of mouse module meant box events received from keystrokes were incorrect.
@@ -62,7 +64,7 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>Remove old HAPI cache code, put in support for external HAPI cache mechanism.
+            <li>Remove old HAPI local cache code, put in support for external HAPI cache mechanism (at 
             <li>Jython to Java conversion checks for struct.pack.
             <li>units=enum or units=nominal to mean nominal data.
             <li>Buffer sizes used to transfer data increased from 1024 bytes to 8*1024 bytes, possibly showing small performance gains.
