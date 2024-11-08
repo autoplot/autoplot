@@ -372,10 +372,10 @@ public class PlotElementController extends DomNodeController {
                     }
                 }
                 if ( !extendedOperation(parentComponents, childComponents) ) {
-                    logger.info("releasing child "+plotElement.id);
+                    //logger.log(Level.INFO, "releasing child {0}", plotElement.id);
                     parentPlotElement.setActive(true);
-                    dom.controller.deletePlotElement(plotElement);
-                    plotElement.removePropertyChangeListener(parentComponentListener); // TODO:why?  This plotElement was still in memory!
+                    //dom.controller.deletePlotElement(plotElement);
+                    //plotElement.removePropertyChangeListener(parentComponentListener); // TODO:why?  This plotElement was still in memory!
                     return; // transitional state
                 }
                 System.arraycopy(parentComponents, 0, childComponents, 0, parentComponents.length);
@@ -394,7 +394,7 @@ public class PlotElementController extends DomNodeController {
                 String[] childComponents= component.split("\\|",-2);
                 String[] parentComponents= parentPlotElement.component.split("\\|",-2);
                 if ( !extendedOperation(parentComponents, childComponents) ) {
-                    logger.info("releasing child "+plotElement.id);
+                    logger.log(Level.INFO, "releasing child {0}", plotElement.id);
                     parentPlotElement.setActive(true);
                     dom.controller.deletePlotElement(plotElement);
                     plotElement.removePropertyChangeListener(parentComponentListener); // TODO:why?  This plotElement was still in memory!
