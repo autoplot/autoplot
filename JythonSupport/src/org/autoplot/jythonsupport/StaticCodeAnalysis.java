@@ -209,11 +209,31 @@ public class StaticCodeAnalysis {
                     }
                     if ( ist.orelse!=null ) {
                         Map<String,SimpleNode> afterIf= new HashMap<>(this.assignButNotReadWarning);
+                        List<String> ifClears= new ArrayList<>();
+                        for ( String n: beforeIf.keySet() ) {
+                            if ( !afterIf.containsKey(n) ) {
+                                ifClears.add(n);
+                            }
+                        }
                         this.assignButNotReadWarning= beforeIf;
+                        Map<String,SimpleNode> beforeElse= new HashMap<>(this.assignButNotReadWarning);
                         for ( stmtType sst: ist.orelse ) {
                             handleStmtType(sst);
                         }
+                        Map<String,SimpleNode> afterElse= new HashMap<>(this.assignButNotReadWarning);
+                        List<String> elseClears= new ArrayList<>();
+                        for ( String n: beforeElse.keySet() ) {
+                            if ( !afterElse.containsKey(n) ) {
+                                elseClears.add(n);
+                            }
+                        }
                         this.assignButNotReadWarning.putAll(afterIf);
+                        for ( String n: ifClears ) {
+                            this.assignButNotReadWarning.remove(n);
+                        }
+                        for ( String n: elseClears ) {
+                            this.assignButNotReadWarning.remove(n);
+                        }
                     }
                 } else if ( st instanceof For ) {
                     For fst= ((For) st);
