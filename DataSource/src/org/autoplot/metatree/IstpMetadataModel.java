@@ -468,7 +468,24 @@ public class IstpMetadataModel extends MetadataModel {
                     if ( attrs.get("DEPEND_2")==null ) {                        
                         QDataSet lablDs= (QDataSet) attrs.get("slice1_labels");
                         if ( lablDs!=null ) { // TODO: I think this is trivially true.
-                            Units u= (Units) lablDs.property(QDataSet.UNITS);
+                            label= lablDs.slice(islice).svalue();
+                        }
+                    }
+                }
+            } 
+            Object oslice2= attrs.get("slice2");
+            String sslice2= (String) oslice2;
+            if ( sslice2!=null ) {
+                int islice= Integer.parseInt(sslice2);
+                Object o = (Object) attrs.get("slice2_labels");
+                if ( ! ( o instanceof QDataSet ) ) {
+                    if ( o!=null ) {
+                        logger.log(Level.WARNING, "slice2_labels property of {0} should be a QDataSet", name);
+                    }
+                } else {
+                    if ( attrs.get("DEPEND_3")==null ) {                        
+                        QDataSet lablDs= (QDataSet) attrs.get("slice2_labels");
+                        if ( lablDs!=null ) { // TODO: I think this is trivially true.
                             label= lablDs.slice(islice).svalue();
                         }
                     }
