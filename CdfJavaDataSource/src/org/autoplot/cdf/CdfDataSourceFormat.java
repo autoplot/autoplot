@@ -142,8 +142,9 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                         throw new IllegalArgumentException("Unsupported type: "+type+", must be CHAR, REAL8, REAL4, DOUBLE, FLOAT, or UINT1.");
                 }
                 params.put("type",type);
+                CDFReader read= ReaderFactory.getReader( ffile.toString() );
                 logger.log(Level.FINE, "call cdf= new CDFWriter( {0}, false )", ffile.toString() );
-                cdf = new CDFWriter( ffile.toString(), useRowMajority ); // read in the old file first
+                cdf = new CDFWriter( ffile.toString(), read.rowMajority() ); // read in the old file first
                 
             } else {
                 CDFReader read= ReaderFactory.getReader( ffile.toString() );
@@ -152,7 +153,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                     //TODO: there's a problem here, where it puts in a set of timetags for each variable.  https://sourceforge.net/p/autoplot/bugs/2514/
                 }
                 logger.log(Level.FINE, "call cdf= new CDFWriter( {0}, false )", ffile.toString() );
-                cdf = new CDFWriter( ffile.toString(), useRowMajority ); // read in the old file first
+                cdf = new CDFWriter( ffile.toString(), read.rowMajority() ); // read in the old file first
 
             }
 
