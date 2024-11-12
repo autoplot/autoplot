@@ -78,7 +78,7 @@
     </Component>
     <Component class="javax.swing.JCheckBox" name="insertCB">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Insert instead of overwriting existing cdf file"/>
+        <Property name="text" type="java.lang.String" value="Insert instead of overwriting existing cdf file, allowing skeleton to be used."/>
       </Properties>
     </Component>
     <Component class="javax.swing.JCheckBox" name="epochTimeTagsCB">

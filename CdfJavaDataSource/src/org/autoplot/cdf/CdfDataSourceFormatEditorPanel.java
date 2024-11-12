@@ -51,7 +51,7 @@ public class CdfDataSourceFormatEditorPanel extends javax.swing.JPanel implement
 
         typeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "double", "float", "int4", "int2", "byte" }));
 
-        insertCB.setText("Insert instead of overwriting existing cdf file");
+        insertCB.setText("Insert instead of overwriting existing cdf file, allowing skeleton to be used.");
 
         epochTimeTagsCB.setText("Use legacy Epoch timetags instead of TT2000");
 
