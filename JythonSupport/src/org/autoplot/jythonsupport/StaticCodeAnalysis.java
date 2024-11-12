@@ -41,7 +41,7 @@ import org.python.parser.ast.stmtType;
 import org.python.util.InteractiveInterpreter;
 
 /**
- *
+ * Static Code Analysis checks for bug patterns like variable writes without a read.
  * @author jbf
  */
 public class StaticCodeAnalysis {
@@ -132,7 +132,9 @@ public class StaticCodeAnalysis {
          * @param name 
          */
         public void addName( String name ) {
-            definedNames.put( name, null );
+            if ( !definedNames.containsKey(name) ) {
+                definedNames.put( name, null );
+            }
         }
 
         private void handleStmtType( stmtType st ) {
@@ -200,13 +202,18 @@ public class StaticCodeAnalysis {
                 } else if ( st instanceof If ) {
                     If ist= ((If) st);
                     handleExprTypeRead(ist.test);
+                    
+                    Map<String,SimpleNode> beforeIf= new HashMap<>(this.assignButNotReadWarning);
                     for ( stmtType sst: ist.body ) {
                         handleStmtType(sst);
                     }
                     if ( ist.orelse!=null ) {
+                        Map<String,SimpleNode> afterIf= new HashMap<>(this.assignButNotReadWarning);
+                        this.assignButNotReadWarning= beforeIf;
                         for ( stmtType sst: ist.orelse ) {
                             handleStmtType(sst);
                         }
+                        this.assignButNotReadWarning.putAll(afterIf);
                     }
                 } else if ( st instanceof For ) {
                     For fst= ((For) st);
