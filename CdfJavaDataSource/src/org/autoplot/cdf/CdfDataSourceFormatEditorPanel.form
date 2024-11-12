@@ -30,6 +30,7 @@
                   <Component id="insertCB" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="epochTimeTagsCB" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="bundleCB" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="majorityCB" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -49,7 +50,9 @@
               <Component id="epochTimeTagsCB" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="bundleCB" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="181" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="majorityCB" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="154" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -86,6 +89,11 @@
     <Component class="javax.swing.JCheckBox" name="bundleCB">
       <Properties>
         <Property name="text" type="java.lang.String" value="Unpack bundled data into separate variables"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="majorityCB">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Use row majority (faster in some situations)"/>
       </Properties>
     </Component>
   </SubComponents>

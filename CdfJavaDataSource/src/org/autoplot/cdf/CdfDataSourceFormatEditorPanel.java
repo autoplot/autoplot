@@ -43,6 +43,7 @@ public class CdfDataSourceFormatEditorPanel extends javax.swing.JPanel implement
         insertCB = new javax.swing.JCheckBox();
         epochTimeTagsCB = new javax.swing.JCheckBox();
         bundleCB = new javax.swing.JCheckBox();
+        majorityCB = new javax.swing.JCheckBox();
 
         setName("dataSourceFormatEditorPanel"); // NOI18N
 
@@ -55,6 +56,8 @@ public class CdfDataSourceFormatEditorPanel extends javax.swing.JPanel implement
         epochTimeTagsCB.setText("Use legacy Epoch timetags instead of TT2000");
 
         bundleCB.setText("Unpack bundled data into separate variables");
+
+        majorityCB.setText("Use row majority (faster in some situations)");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -69,7 +72,8 @@ public class CdfDataSourceFormatEditorPanel extends javax.swing.JPanel implement
                         .add(typeComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 123, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(insertCB)
                     .add(epochTimeTagsCB)
-                    .add(bundleCB))
+                    .add(bundleCB)
+                    .add(majorityCB))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -85,7 +89,9 @@ public class CdfDataSourceFormatEditorPanel extends javax.swing.JPanel implement
                 .add(epochTimeTagsCB)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(bundleCB)
-                .addContainerGap(181, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(majorityCB)
+                .addContainerGap(154, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -95,6 +101,7 @@ public class CdfDataSourceFormatEditorPanel extends javax.swing.JPanel implement
     private javax.swing.JCheckBox epochTimeTagsCB;
     private javax.swing.JCheckBox insertCB;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JCheckBox majorityCB;
     private javax.swing.JComboBox typeComboBox;
     // End of variables declaration//GEN-END:variables
 
@@ -127,6 +134,9 @@ public class CdfDataSourceFormatEditorPanel extends javax.swing.JPanel implement
         s= getParam( args, "bundle", "F" );
         bundleCB.setSelected(s.equals("T"));
         
+        s= getParam( args, "marjority", "column" );
+        majorityCB.setSelected(s.equals("row"));
+
         file= split.file;
     }
 
@@ -154,6 +164,12 @@ public class CdfDataSourceFormatEditorPanel extends javax.swing.JPanel implement
             args.put("bundle", "T");
         } else {
             args.remove("bundle");
+        }
+        
+        if ( majorityCB.isSelected() ) {
+            args.put("majority", "row");
+        } else {
+            args.remove("majority");
         }
         
         String params= URISplit.formatParams(args);
