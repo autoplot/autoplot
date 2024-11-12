@@ -1835,7 +1835,7 @@ public class CdfUtil {
         if ( constraint==null ) {
             result.putProperty(QDataSet.LABEL, istpProps.get(QDataSet.LABEL) );
         } else if ( constraint.matches("\\[:\\,\\d+\\]") ) {
-            QDataSet labels= (QDataSet)attr1.get("slice1_labels");
+            QDataSet labels= (QDataSet)attr1.get(CdfDataSource.ATTR_SLICE1_LABELS);
             if ( labels!=null ) {
                 Pattern p= Pattern.compile("\\[:\\,(\\d+)\\]");
                 Matcher m= p.matcher(constraint);
@@ -1845,7 +1845,20 @@ public class CdfUtil {
             } else {
                 result.putProperty(QDataSet.LABEL, istpProps.get(QDataSet.LABEL)  );
             }
+        } else if ( constraint.matches("\\[:\\,\\:\\,\\d+\\]") ) {
+            attr1.put("LABLAXIS", null );
+            QDataSet labels= (QDataSet)attr1.get(CdfDataSource.ATTR_SLICE2_LABELS);
+            if ( labels!=null ) {
+                Pattern p= Pattern.compile("\\[:\\,\\:\\,(\\d+)\\]");
+                Matcher m= p.matcher(constraint);
+                if ( m.matches() ) {
+                    result.putProperty(QDataSet.LABEL, labels.slice(Integer.parseInt(m.group(1))).svalue() );
+                }
+            } else {
+                result.putProperty(QDataSet.LABEL, istpProps.get(QDataSet.LABEL)  );
+            }
         } else {
+            
             result.putProperty(QDataSet.LABEL, istpProps.get(QDataSet.LABEL) );
         }
         result.putProperty(QDataSet.TITLE, istpProps.get(QDataSet.TITLE) );

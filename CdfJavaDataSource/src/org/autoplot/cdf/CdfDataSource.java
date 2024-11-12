@@ -72,9 +72,11 @@ public class CdfDataSource extends AbstractDataSource {
     protected static final String PARAM_INTERPMETA = "interpMeta";
     protected static final String PARAM_ID = "id";
     protected static final String PARAM_SLICE1 = "slice1";
-    
+    protected static final String PARAM_SLICE2 = "slice2";
     protected static final String ATTR_SLICE1_LABELS= "slice1_labels";
     protected static final String ATTR_SLICE1= "slice1";
+    protected static final String ATTR_SLICE2_LABELS= "slice2_labels"; // waveform dataset
+    protected static final String ATTR_SLICE2= "slice2";
     
     private static final Logger logger= LoggerManager.getLogger("apdss.cdf");
     private Map<String, Object> attributes;
@@ -387,6 +389,10 @@ public class CdfDataSource extends AbstractDataSource {
                         Matcher m= Pattern.compile("\\[\\:\\,(\\d+)\\]").matcher(constraint); // TODO: this should also match ds[::5,0]
                         if ( m.matches() ) {
                             attributes.put( PARAM_SLICE1, m.group(1) );
+                        }
+                        m= Pattern.compile("\\[\\:\\,\\:\\,(\\d+)\\]").matcher(constraint); // TODO: this should also match ds[::5,:,0]
+                        if ( m.matches() ) {
+                            attributes.put( PARAM_SLICE2, m.group(1) );
                         }
                     }
                     if ( map.get(PARAM_X)!=null ) {
@@ -823,25 +829,32 @@ public class CdfDataSource extends AbstractDataSource {
      */
     private Map<String,Object> readXorYAttributes( CDFReader cdf, String var, int depth ) {
         int i= var.indexOf("[");
-        String slice=null;
+        String slice1=null;
+        String slice2=null;
         if ( i>-1 ) {
             Matcher m= Pattern.compile("\\[\\:\\,(\\d+)\\]").matcher(var.substring(i));
             if ( m.matches() ) {
-                slice= m.group(1);
+                slice1= m.group(1);
             } else {
-                logger.warning("only [:,i] supported");
+                m= Pattern.compile("\\[\\:\\,\\:\\,(\\d+)\\]").matcher(var.substring(i));
+                if ( m.matches() ) {
+                    slice2= m.group(1);
+                } else {
+                    logger.warning("only [:,i] or [:,:,i] supported");
+                }
             }
             var= var.substring(0,i);
         }
+        
         HashMap<String,Object> xyAttributes = readAttributes(cdf, var, depth);
-        if ( slice!=null ) {
+        if ( slice1!=null ) {
             String labl_ptr_1= (String)xyAttributes.get("LABL_PTR_1");
             boolean labelsAreRead= false;
             if ( labl_ptr_1!=null ){
                 try {
                     MutablePropertyDataSet v= CdfUtil.loadVariable(cdf, labl_ptr_1);                    
                     xyAttributes.put( ATTR_SLICE1_LABELS,v);
-                    xyAttributes.put( ATTR_SLICE1, slice );
+                    xyAttributes.put( ATTR_SLICE1, slice1 );
                     labelsAreRead= true;
                 } catch (Exception ex) {
                     Logger.getLogger(CdfDataSource.class.getName()).log(Level.SEVERE, null, ex);
@@ -855,12 +868,39 @@ public class CdfDataSource extends AbstractDataSource {
                         labels[j]= "ch_"+j;
                     }
                     xyAttributes.put( ATTR_SLICE1_LABELS, Ops.labelsDataset(labels) );
-                    xyAttributes.put( ATTR_SLICE1, slice );
+                    xyAttributes.put( ATTR_SLICE1, slice1 );
                 } catch (CDFException.ReaderError ex) {
                     Logger.getLogger(CdfDataSource.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
+        if ( slice2!=null ) {
+            String labl_ptr_2= (String)xyAttributes.get("LABL_PTR_2");
+            boolean labelsAreRead= false;
+            if ( labl_ptr_2!=null ){
+                try {
+                    MutablePropertyDataSet v= CdfUtil.loadVariable(cdf, labl_ptr_2);
+                    xyAttributes.put( ATTR_SLICE2_LABELS,v);
+                    xyAttributes.put( ATTR_SLICE2, slice2 );
+                    labelsAreRead= true;
+                } catch (Exception ex) {
+                    Logger.getLogger(CdfDataSource.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } 
+            if ( !labelsAreRead ) {
+                try {
+                    int[] qube= cdf.getDimensions(var);
+                    String[] labels= new String[qube[0]];
+                    for ( int j=0; j<qube[0]; j++ ) {
+                        labels[j]= "ch_"+j;
+                    }
+                    xyAttributes.put( ATTR_SLICE2_LABELS, Ops.labelsDataset(labels) );
+                    xyAttributes.put( ATTR_SLICE2, slice2 );
+                } catch (CDFException.ReaderError ex) {
+                    Logger.getLogger(CdfDataSource.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }        
         return xyAttributes;
     }
     
@@ -969,6 +1009,16 @@ public class CdfDataSource extends AbstractDataSource {
                 try {
                     Object v= CdfUtil.loadVariable(cdf,(String)o);
                     props.put( ATTR_SLICE1_LABELS, v );
+                } catch (Exception ex) {
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
+                }
+            }
+            
+            o= props.get("LABL_PTR_2");
+            if ( o!=null ) {
+                try {
+                    Object v= CdfUtil.loadVariable(cdf,(String)o);
+                    props.put( ATTR_SLICE2_LABELS, v );
                 } catch (Exception ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
@@ -1256,13 +1306,6 @@ public class CdfDataSource extends AbstractDataSource {
             // note this will be replaced in caller code.
         } else {
             result.putProperty(QDataSet.NAME, svariable);
-        }
-        
-        if ( mc.size()==3 ) {
-            long[] slice2s= mc.get(2);
-            if ( slice2s!=null && ( slice2s[0]!=-1 && slice2s[1]==-1 && slice2s[2]==-1 ) ) {
-                result= (MutablePropertyDataSet)Ops.slice2( result, (int)slice2s[0] );
-            }
         }
 
         final boolean doUnits = true;
@@ -1590,6 +1633,14 @@ public class CdfDataSource extends AbstractDataSource {
 
                         }
                 }
+            }
+        }
+        
+        if ( mc.size()==3 && result.rank()==3 ) { // we slice on the tail down here so that the bundle has been loaded.
+            long[] slice2s= mc.get(2);
+            if ( slice2s!=null && ( slice2s[0]!=-1 && slice2s[1]==-1 && slice2s[2]==-1 ) ) {
+                int index= (int)slice2s[0];
+                result= (MutablePropertyDataSet)Ops.copy( Ops.slice2( result, index ) );
             }
         }
 
