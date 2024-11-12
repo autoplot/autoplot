@@ -1257,6 +1257,13 @@ public class CdfDataSource extends AbstractDataSource {
         } else {
             result.putProperty(QDataSet.NAME, svariable);
         }
+        
+        if ( mc.size()==3 ) {
+            long[] slice2s= mc.get(2);
+            if ( slice2s!=null && ( slice2s[0]!=-1 && slice2s[1]==-1 && slice2s[2]==-1 ) ) {
+                result= (MutablePropertyDataSet)Ops.slice2( result, (int)slice2s[0] );
+            }
+        }
 
         final boolean doUnits = true;
         Units units=null;

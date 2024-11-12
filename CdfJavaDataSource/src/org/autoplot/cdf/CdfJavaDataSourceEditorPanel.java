@@ -2,6 +2,7 @@
 package org.autoplot.cdf;
 
 import gov.nasa.gsfc.spdf.cdfj.CDFException;
+import gov.nasa.gsfc.spdf.cdfj.CDFException.ReaderError;
 import gov.nasa.gsfc.spdf.cdfj.CDFReader;
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +11,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -798,7 +800,8 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
             }
             
             Pattern slice1pattern= Pattern.compile("\\[\\:\\,(\\d+)\\]");
-            String slice1= lparams.remove("slice1"); // legacy
+            String slice= lparams.remove("slice1"); // legacy
+            Pattern slice2pattern= Pattern.compile("\\[\\:\\,\\:\\,(\\d+)\\]");
 
             String subset= null;
             if ( param!=null ) {
@@ -808,7 +811,12 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
                     param= param.substring(0,i);
                     Matcher m= slice1pattern.matcher(subset);
                     if ( m.matches() ) {
-                        slice1= m.group(1);
+                        slice= m.group(1);
+                        subset= null;
+                    }
+                    m= slice2pattern.matcher(subset);
+                    if ( m.matches() ) {
+                        slice= m.group(1); 
                         subset= null;
                     }
                 }
@@ -822,9 +830,9 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
             
             listening= false;
             if ( params!=null && params.length>1 ) {
-                fillTree( this.parameterTree, parameterInfo, cdf, param, slice1 );
+                fillTree( this.parameterTree, parameterInfo, cdf, param, slice );
             } else {
-                fillTree( this.parameterTree, parameterInfo, cdf, param, slice1 );
+                fillTree( this.parameterTree, parameterInfo, cdf, param, slice );
             }
             listening= true;
             
@@ -970,8 +978,19 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
                 String p= String.valueOf( treePath.getPathComponent(1) );
                 p= p.replaceAll("=", "%3D");
                 String val=  String.valueOf( treePath.getPathComponent(2) );
-                int idx= val.indexOf(":");
-                ps.append(p).append("[:,").append(val.substring(0,idx).trim()).append("]");
+                int dims= 1;
+                try {
+                    dims= cdf.getDimensions(p).length;
+                } catch ( ReaderError e ) {
+                    e.printStackTrace();
+                }
+                if ( dims==2  ) {
+                    int idx= val.indexOf(":");
+                    ps.append(p).append("[:,:,").append(val.substring(0,idx).trim()).append("]");                    
+                } else {
+                    int idx= val.indexOf(":");
+                    ps.append(p).append("[:,").append(val.substring(0,idx).trim()).append("]");
+                }
             } else {
                 String p= String.valueOf( treePath.getPathComponent(1) );
                 p= p.replaceAll("=", "%3D");
@@ -1091,33 +1110,48 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
                 
         TreePath selection=null;
         for ( Entry<String,String> e: mm.entrySet() ) {
-
+            String varname = e.getKey();
+            
             if ( filterPattern!=null ) {
-                if ( filterPattern.matcher( e.getKey() ).find() || 
+                if ( filterPattern.matcher( varname ).find() || 
                         filterPattern.matcher( e.getValue() ).find() ) {
-                    logger.log(Level.FINER, "found pattern for {0}", e.getKey());
+                    logger.log(Level.FINER, "found pattern for {0}", varname );
                 } else {
                     continue;
                 }
             }
             
             try {
-                Object oattr= cdf.getAttribute( e.getKey(), "LABL_PTR_1");
-                String lablPtr1=null;
+                Object oattr= cdf.getAttribute( varname, "LABL_PTR_2");
+                String lablPtr=null;
+                
                 if ( oattr!=null && oattr instanceof List ) {
                     List voattr= (List)oattr;
                     if ( voattr.size()>0 ) {
-                        lablPtr1= (String)((List)oattr).get(0);
+                        lablPtr= (String)((List)oattr).get(0);
                     } else {
-                        oattr= null;
+                        oattr= Collections.emptyList();
+                    }
+                } 
+                
+                if ( oattr!=null && oattr instanceof List && ((List)oattr).size()==0 ) {
+                    oattr= cdf.getAttribute( varname, "LABL_PTR_1");
+                    if ( oattr!=null && oattr instanceof List ) {
+                        List voattr= (List)oattr;
+                        if ( voattr.size()>0 ) {
+                            lablPtr= (String)((List)oattr).get(0);
+                        } else {
+                            oattr= null;
+                        }
                     }
                 }
+                
 
-                int[] dimensions= cdf.getDimensions( e.getKey() );
-                boolean doComponents= oattr!=null && dimensions.length==1 && dimensions[0]<=MAX_SLICE1_OFFER;
+                int[] dimensions= cdf.getDimensions( varname );
+                boolean doComponents= oattr!=null && ( dimensions.length==1 || dimensions.length==2 ) && dimensions[dimensions.length-1]<=MAX_SLICE1_OFFER;
                 if ( doComponents ) {
-                    String s= lablPtr1;
-                    DefaultMutableTreeNode node= new DefaultMutableTreeNode( e.getKey() );
+                    String s= lablPtr;
+                    DefaultMutableTreeNode node= new DefaultMutableTreeNode( varname );
                     try {
                         Object o = cdf.get(s);
                         String[] rec;
@@ -1135,7 +1169,7 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
                             String snode=  String.format("%d: %s", i, rec[i] ) ;
                             DefaultMutableTreeNode child= new DefaultMutableTreeNode( snode );
                             node.add( child );
-                            if ( e.getKey().equals(param) ) {
+                            if ( varname.equals(param) ) {
                                 if ( slice1!=null ) {
                                     if ( String.valueOf(i).equals(slice1) ) {
                                         selection= new TreePath( new Object[] { root, node, child } );
@@ -1151,17 +1185,17 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
                         }
                         
                     } catch (CDFException.ReaderError | ArrayIndexOutOfBoundsException | IllegalArgumentException ex ) {
-                        logger.log(Level.WARNING,"parameter name found: "+s+" referred to by " +e.getKey(),ex);
+                        logger.log(Level.WARNING,"parameter name found: "+s+" referred to by " +varname,ex);
                         root.add( node );
                     }
 
                 } else {
-                    DefaultMutableTreeNode node=  new DefaultMutableTreeNode( e.getKey() );
+                    DefaultMutableTreeNode node=  new DefaultMutableTreeNode( varname );
                     root.add( node );
-                    if ( params.contains(e.getKey()) ) {
+                    if ( params.contains(varname) ) {
                         selections.add( new TreePath( new Object[] { root, node } ) );
                     }
-                    if ( e.getKey().equals(param) ) {
+                    if ( varname.equals(param) ) {
                         selection= new TreePath( new Object[] { root, node } );
                     }
                 }
