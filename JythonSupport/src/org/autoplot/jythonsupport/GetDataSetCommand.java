@@ -8,6 +8,10 @@ import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.autoplot.datasource.DataSource;
+import org.autoplot.datasource.DataSourceFactory;
+import org.autoplot.datasource.DataSourceUtil;
+import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.python.core.Py;
@@ -88,6 +92,7 @@ public class GetDataSetCommand extends PyObject {
         DatumRange trimRange= null;
         ProgressMonitor monitor= null;
         QDataSet result=null;
+        boolean doTrim= false;
         
         for ( int i=nparm; i<args.length; i++ ) { 
             String kw= keywords[i-nparm];
@@ -117,6 +122,13 @@ public class GetDataSetCommand extends PyObject {
                            trimRange= DatumRangeUtil.parseTimeRange((String)v);
                         } catch ( ParseException ex ) {
                             throw Py.JavaError(ex);
+                        }
+                    } else {
+                        v= val.__tojava__(int.class);
+                        if ( v!=Py.NoConversion ) {
+                            if ( v.equals(1) ) {
+                                doTrim= true;
+                            }
                         }
                     }
                 }
@@ -195,6 +207,18 @@ public class GetDataSetCommand extends PyObject {
             throw Py.JavaError(ex);
         }
         if ( result==null ) return Py.None;
+        
+        if ( doTrim ) {
+            try {
+                DataSource dss= org.autoplot.datasource.DataSetURI.getDataSource(uri);
+                TimeSeriesBrowse tsb= DataSourceUtil.getTimeSeriesBrowse(dss);
+                tsb.setURI(uri);
+                trimRange= tsb.getTimeRange();
+            } catch (Exception ex) {
+                Logger.getLogger(GetDataSetCommand.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        }
         
         for ( int i=nparm; i<args.length; i++ ) { //HERE nargs
             String kw= keywords[i-nparm];
