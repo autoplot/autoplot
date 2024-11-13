@@ -1149,7 +1149,7 @@ public class JythonToJavaConverter {
                     } else if ( Character.isUpperCase(n.id.charAt(0)) ) {
                         return n.id; // assume it's a constructor
                     } else if ( n.id.equals("open") ) {
-                        return "Stream<String>";
+                        return "FileChannel";
                     }
                 } else if ( cc.func instanceof Attribute ) { 
                     Attribute attr= (Attribute)cc.func;
@@ -1385,6 +1385,21 @@ public class JythonToJavaConverter {
                     traverse(builder,"",cc.args[0],true);
                     builder.append(")");
                     return;
+                } else if ( name.equals("open") ) {
+                    String rw= cc.args.length==1 ? "r" : ((Str)cc.args[1]).s;
+                    if ( rw.equals("r") ) {
+                        builder.append("new RandomAccessFile(");
+                        traverse(builder,"",cc.args[0],true);
+                        builder.append(").getChannel()");
+                        return;
+                    } else if ( rw.equals("w") ) {
+                        builder.append("new RandomAccessFile(");
+                        traverse(builder,"",cc.args[0],true);
+                        builder.append(").getChannel()");
+                        return;
+                    } else if ( rw.equals("a") ) {
+                        
+                    }
                 }
             } else if ( cc.func instanceof Attribute ) { // static method
                 exprType clas= ((Attribute) cc.func).value;
