@@ -1235,15 +1235,19 @@ public class JythonToJavaConverter {
             contexts.peek().names.put( name, type );
         }
         
-        private String guessReturnType( stmtType[] statements ) {
+        private String guessReturnType( stmtType[] body ) {
             this.lastReturnType= "Object";
             StringBuilder dummy= new StringBuilder();
             try {
-                handleBody(dummy,statements,"");
+                handleBody(dummy,body,"");
             } catch (Exception ex) {
                 Logger.getLogger(JythonToJavaConverter.class.getName()).log(Level.SEVERE, null, ex);
             }
-            return this.lastReturnType;
+            if ( body[body.length-1] instanceof Return && ((Return)body[body.length-1]).value==null ) { 
+                return "void";
+            } else {
+                return this.lastReturnType;
+            }
         }
         
         private void handleFunctionDef( StringBuilder builder, FunctionDef fd, String indent, boolean inline ) throws Exception {
@@ -1268,8 +1272,15 @@ public class JythonToJavaConverter {
             }
             builder.append(") {\n");
             lineNumber++;
-            handleBody(builder, fd.body, indent+spaces4 );
-            builder.append(indent).append("}");
+            
+            stmtType[] body= fd.body;
+            if ( returnType.equals("void") ) {
+                if ( body[body.length-1] instanceof Return ) {
+                    body= Arrays.copyOfRange( body, 0, body.length-1 );
+                } 
+            }
+            handleBody(builder, body, indent+spaces4 );
+            builder.append(indent).append("}\n");
         }
 
         private void handlePrint( StringBuilder builder, Print pr, String indent, boolean inline) throws Exception {
