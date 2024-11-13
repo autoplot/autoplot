@@ -14,7 +14,10 @@ import org.das2.jythoncompletion.support.CompletionTask;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSetURI.CompletionResult;
+import org.autoplot.datasource.URISplit;
 import org.autoplot.jythonsupport.SimplifyScriptSupport;
+import org.autoplot.jythonsupport.ui.EditorTextPane;
+import static org.das2.jythoncompletion.JythonCompletionTask.CLIENT_PROPERTY_PWD;
 import org.python.parser.Node;
 import org.python.parser.SimpleNode;
 import org.python.parser.ast.Assign;
@@ -120,6 +123,19 @@ class DataSetUrlCompletionTask implements CompletionTask {
             String surl1 = (String)r.get("string");
             int carotPos = ipos - pos[0] + (int)r.get("offset");
 
+            if ( editor instanceof EditorTextPane ) {
+                EditorTextPane etp= (EditorTextPane)editor;
+                String pwd= (String)etp.getClientProperty( CLIENT_PROPERTY_PWD );
+                if ( pwd!=null ) {
+                    if ( pwd.endsWith("/") ) {
+                        if ( !( surl1.startsWith("/") || (surl1.length()>6 && surl1.substring(0,6).contains(":") ) ) ) {
+                            surl1= pwd + surl1;
+                            carotPos+= pwd.length();
+                        }
+                    }
+                }
+            }
+            
             List<CompletionResult> rs = DataSetURI.getCompletions(surl1, carotPos, new NullProgressMonitor());
 
             for (CompletionResult rs1 : rs) {

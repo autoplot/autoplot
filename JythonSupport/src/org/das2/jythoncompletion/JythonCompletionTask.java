@@ -1043,6 +1043,12 @@ public class JythonCompletionTask implements CompletionTask {
         int [] pos= new int[2];
         Map<String,Object> r= DataSetUrlCompletionTask.popString(editor,pos);
         String s= (String)r.get("string");
+        
+        EditorTextPane etp= (EditorTextPane)editor;
+        String pwd= (String)etp.getClientProperty( CLIENT_PROPERTY_PWD );
+        if ( pwd!=null ) {
+            if ( !pwd.endsWith("/") ) pwd=null;
+        }
         if (method.equals("getDataSet") || method.equals("getFile") || method.equals("plot") || method.equals("plotx") || method.equals("getCompletions") ) {
             DataSetUrlCompletionTask task = new DataSetUrlCompletionTask(editor);
             task.query(arg0);
@@ -1052,14 +1058,9 @@ public class JythonCompletionTask implements CompletionTask {
         } else if ( method.equals("PWD") ) {  // PWD + "demo.dat"
             // how to find the name of the file we are editing?
             if ( editor instanceof EditorTextPane ) {
-                EditorTextPane etp= (EditorTextPane)editor;
-                String pwd= (String)etp.getClientProperty( CLIENT_PROPERTY_PWD );
                 if ( pwd!=null ) {
-                    if ( pwd.endsWith("/") ) {
-                        //TODO: consider filesystem completions, which would be really helpful
-                    }
-                    //support.getFile();
-                    //System.err.println("here support is "+pwd);
+                    DataSetUrlCompletionTask task = new DataSetUrlCompletionTask(editor);
+                    task.query(arg0);
                 }
                 return 0;
             }
