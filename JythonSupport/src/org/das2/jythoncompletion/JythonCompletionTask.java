@@ -1064,6 +1064,10 @@ public class JythonCompletionTask implements CompletionTask {
                 }
                 return 0;
             }
+        } else if ( method.startsWith("/") || method.startsWith("http" ) ) {
+            DataSetUrlCompletionTask task = new DataSetUrlCompletionTask(editor);
+            task.query(arg0);
+            return 0;
         } else if ( s.startsWith("/") || s.startsWith("http://") || s.startsWith("https://") 
                 || s.startsWith("file:/") || s.startsWith("sftp://") ) {
             DataSetUrlCompletionTask task = new DataSetUrlCompletionTask(editor);
