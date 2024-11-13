@@ -488,6 +488,11 @@ public class CompletionSupport {
                     return new CompletionContext( CompletionContext.STRING_LITERAL_ARGUMENT, tokens.get(myTokenIndex-2).image, tokens.get(myTokenIndex).image );
                 } else if ( myTokenIndex>1 && tokens.get(myTokenIndex-2).kind==PythonGrammarConstants.SINGLE_STRING && tokens.get(myTokenIndex-2).image.equals("'resourceURI'") ) { // getParam
                     return new CompletionContext( CompletionContext.STRING_LITERAL_ARGUMENT, tokens.get(myTokenIndex-2).image, tokens.get(myTokenIndex).image );
+                } else if ( myTokenIndex>1 
+                    && tokens.get(myTokenIndex-2).kind==PythonGrammarConstants.SINGLE_STRING 
+                    && tokens.get(myTokenIndex-1).kind==PythonGrammarConstants.PLUS 
+                    && tokens.get(myTokenIndex-0).kind==PythonGrammarConstants.SINGLE_STRING) { // "  " + "  "
+                    return new CompletionContext( CompletionContext.STRING_LITERAL_ARGUMENT, tokens.get(myTokenIndex-2).image, tokens.get(myTokenIndex).image );                    
                 } else {
                     return null;
                 }
