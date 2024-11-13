@@ -768,6 +768,10 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
                 }
             }
             
+            if ( dataParameterInfo.isEmpty() && !cdfParameterInfo.isEmpty() ) {
+                this.showAllVarTypeCB.setSelected(true);
+            }
+            
             String label;
             if ( this.showAllVarTypeCB.isSelected() ) {
                 parameterInfo= allParameterInfo;
