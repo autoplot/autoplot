@@ -86,6 +86,8 @@ public class JythonToJavaConverter {
     
     public static String TYPE_INT="int";
     
+    public static String TYPE_LONG="long";
+    
     public static String TYPE_FLOAT="float";
     
     public static String TYPE_STRING="String";
@@ -717,10 +719,14 @@ public class JythonToJavaConverter {
                                 if (a1 instanceof Name ) {
                                     exprType a2 = cc.args[1];
                                     if ( a2 instanceof Name ) {
-                                        if ( ((Name) a2).id.equals("str") ) {
-                                            assertType( ((Name) a1).id, "String" );
+                                        String id= ((Name) a1).id;
+                                        String typs= ((Name) a2).id;
+                                        if ( typs.equals("str") ) {
+                                            assertType( id, "String" );
+                                        } else if (  typs.equals("file") ) {
+                                            assertType( id, "FileChannel" );
                                         } else {
-                                            assertType( ((Name) a1).id, ((Name) a2).id );
+                                            assertType( id, typs );
                                         }
                                         return;
                                     }
@@ -1165,6 +1171,8 @@ public class JythonToJavaConverter {
                             return TYPE_STRING;
                         } else if ( attr2.attr.equals("split") ) {
                             return TYPE_STRING_ARRAY;
+                        } else if ( attr2.attr.equals("tell") ) { // "tell" is pretty unique, right?
+                            return TYPE_LONG;
                         }
                     }
                     if ( staticClass.equals("FileUtil") && attr.attr.equals("readFileToString") ) {
@@ -1462,6 +1470,30 @@ public class JythonToJavaConverter {
                             builder.append(type);
                             return;
                         }
+                    } else {
+                        String type= getTypeForName(((Name)clas).id);
+                        if ( type!=null && type.equals("FileChannel")) { // remember the type is the Java type, and the method is the Python method.
+                            if ( method.equals("read") ) {
+                                traverse(builder,"",clas,true);
+                                builder.append( ".map( FileChannel.MapMode.READ_ONLY, " );
+                                traverse(builder,"",clas,true);
+                                builder.append( ".position(), ");
+                                traverse(builder,"",cc.args[0],true);
+                                builder.append(")");
+                                return;
+                            } else if ( method.equals("seek") ) {
+                                traverse(builder,"",clas,true);
+                                builder.append(".position(");
+                                traverse(builder,"",cc.args[0],true);
+                                builder.append(")");
+                                return;
+                            } else if ( method.equals("tell") ) {
+                                traverse(builder,"",clas,true);
+                                builder.append(".position(");
+                                builder.append(")");
+                                return;
+                            }
+                        }
                     }
                 }
             }
@@ -1492,6 +1524,9 @@ public class JythonToJavaConverter {
 
         private void handleBody( StringBuilder builder, stmtType[] body, String thisIndent ) throws Exception {
             contexts.push( new Context() );
+            if ( contexts.size()==2 ) {
+                System.err.println("Top level");
+            }
             for (int i = 0; i < body.length; i++) {
                 traverse(builder,thisIndent, body[i], false);
             }
