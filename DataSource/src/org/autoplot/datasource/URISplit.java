@@ -152,7 +152,7 @@ public class URISplit {
     }
 
     /**
-     * ensure that the reference, which may be relative, absolute.
+     * ensure that the reference, which may be relative, is absolute.
      * NOTE this is only implemented for unix filenames. TODO: Windows.
      * For example:<ul>
      * <li>/tmp/,foo.dat &rarr; /home/t/foo.dat
