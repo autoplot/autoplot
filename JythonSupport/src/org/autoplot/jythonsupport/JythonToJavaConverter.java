@@ -1251,6 +1251,24 @@ public class JythonToJavaConverter {
             } catch (Exception ex) {
                 Logger.getLogger(JythonToJavaConverter.class.getName()).log(Level.SEVERE, null, ex);
             }
+            boolean hasReturn= false;
+            boolean hasSecondBody= false;
+            for ( stmtType t: body ) {
+                if ( t instanceof If ) {
+                    //TODO: we could scan this for Return, maybe by recursing
+                    hasSecondBody= true;
+                } else if ( t instanceof While ) {
+                    hasSecondBody= true;
+                } else if ( t instanceof TryExcept ) {
+                    hasSecondBody= true;
+                } else if ( t instanceof Return ) {
+                    hasReturn= true;
+                }
+            }
+            if ( !( hasReturn || hasSecondBody ) ) {
+                return "void";
+            }
+            
             if ( body[body.length-1] instanceof Return && ((Return)body[body.length-1]).value==null ) { 
                 return "void";
             } else {
@@ -1271,15 +1289,21 @@ public class JythonToJavaConverter {
                     fd.body= Arrays.copyOfRange( fd.body, 1, fd.body.length );
                 }
             }
-            builder.append("private ").append(returnType).append(" ").append(fd.name).append("(");
+            
+            inferDictionaries( fd.body );
+            
+            builder.append("private static ").append(returnType).append(" ").append(fd.name).append("(");
             for (int i = 0; i < fd.args.args.length; i++) {
                 if (i > 0) {
                     builder.append(",");
                 }
+                String type= guessType(fd.args.args[i]);
+                builder.append(type).append(" ");
                 traverse( builder,"", fd.args.args[i], true );
             }
             builder.append(") {\n");
             lineNumber++;
+            
             
             stmtType[] body= fd.body;
             if ( returnType.equals("void") ) {
@@ -1474,12 +1498,16 @@ public class JythonToJavaConverter {
                         String type= getTypeForName(((Name)clas).id);
                         if ( type!=null && type.equals("FileChannel")) { // remember the type is the Java type, and the method is the Python method.
                             if ( method.equals("read") ) {
+                                builder.append("readChannel(");
                                 traverse(builder,"",clas,true);
-                                builder.append( ".map( FileChannel.MapMode.READ_ONLY, " );
-                                traverse(builder,"",clas,true);
-                                builder.append( ".position(), ");
+                                builder.append(",");
                                 traverse(builder,"",cc.args[0],true);
                                 builder.append(")");
+                                //builder.append( ".map( FileChannel.MapMode.READ_ONLY, " );
+                                //traverse(builder,"",clas,true);
+                                //builder.append( ".position(), ");
+                                //traverse(builder,"",cc.args[0],true);
+                                //builder.append(")");
                                 return;
                             } else if ( method.equals("seek") ) {
                                 traverse(builder,"",clas,true);
@@ -1524,9 +1552,6 @@ public class JythonToJavaConverter {
 
         private void handleBody( StringBuilder builder, stmtType[] body, String thisIndent ) throws Exception {
             contexts.push( new Context() );
-            if ( contexts.size()==2 ) {
-                System.err.println("Top level");
-            }
             for (int i = 0; i < body.length; i++) {
                 traverse(builder,thisIndent, body[i], false);
             }
@@ -1672,6 +1697,24 @@ public class JythonToJavaConverter {
                 }
             }
 
+        }
+
+        private void inferDictionaries(stmtType[] body) {
+            for ( stmtType t: body ) {
+                if ( t instanceof Assign ) {
+                    Assign a= (Assign)t;
+                    if ( a.targets.length==1 && a.targets[0] instanceof Subscript ) {
+                        Subscript s= (Subscript)a.targets[0];
+                        if ( s.slice instanceof Index ) {
+                            Index index= (Index)s.slice;
+                            if ( index.value instanceof Str && s.value instanceof Name ) {
+                                assertType( ((Name)s.value).id, "Map" );
+                            }
+                        }
+                    }
+                } 
+                //TODO: we also can check for dereference. x= m['foo'] implies m is a dictionary.
+            }
         }
     }
 
