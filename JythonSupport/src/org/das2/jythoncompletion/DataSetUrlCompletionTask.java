@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JComponent;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import org.das2.jythoncompletion.support.CompletionResultSet;
@@ -123,15 +124,12 @@ class DataSetUrlCompletionTask implements CompletionTask {
             String surl1 = (String)r.get("string");
             int carotPos = ipos - pos[0] + (int)r.get("offset");
 
-            if ( editor instanceof EditorTextPane ) {
-                EditorTextPane etp= (EditorTextPane)editor;
-                String pwd= (String)etp.getClientProperty( CLIENT_PROPERTY_PWD );
-                if ( pwd!=null ) {
-                    if ( pwd.endsWith("/") ) {
-                        if ( !( surl1.startsWith("/") || (surl1.length()>6 && surl1.substring(0,6).contains(":") ) ) ) {
-                            surl1= pwd + surl1;
-                            carotPos+= pwd.length();
-                        }
+            String pwd= (String)editor.getClientProperty( CLIENT_PROPERTY_PWD );
+            if ( pwd!=null ) {
+                if ( pwd.endsWith("/") ) {
+                    if ( !( surl1.startsWith("/") || (surl1.length()>6 && surl1.substring(0,6).contains(":") ) ) ) {
+                        surl1= pwd + surl1;
+                        carotPos+= pwd.length();
                     }
                 }
             }
