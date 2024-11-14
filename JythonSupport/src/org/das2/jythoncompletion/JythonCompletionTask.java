@@ -26,6 +26,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Utilities;
@@ -1044,11 +1046,15 @@ public class JythonCompletionTask implements CompletionTask {
         Map<String,Object> r= DataSetUrlCompletionTask.popString(editor,pos);
         String s= (String)r.get("string");
         
-        EditorTextPane etp= (EditorTextPane)editor;
-        String pwd= (String)etp.getClientProperty( CLIENT_PROPERTY_PWD );
-        if ( pwd!=null ) {
-            if ( !pwd.endsWith("/") ) pwd=null;
+        String pwd=null;        
+        if ( editor instanceof JComponent ) {
+            JComponent etp= (JComponent)editor;
+            pwd = (String)etp.getClientProperty( CLIENT_PROPERTY_PWD );
+            if ( pwd!=null ) {
+                if ( !pwd.endsWith("/") ) pwd=null;
+            }
         }
+        
         if (method.equals("getDataSet") || method.equals("getFile") || method.equals("plot") || method.equals("plotx") || method.equals("getCompletions") ) {
             DataSetUrlCompletionTask task = new DataSetUrlCompletionTask(editor);
             task.query(arg0);
