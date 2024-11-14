@@ -1345,11 +1345,11 @@ public class JythonToJavaConverter {
                 if ( subscript.value instanceof Name ) {
                     Name name= (Name)subscript.value;
                     if ( guessType( subscript.value ).equals("Map") ) {
-                        builder.append(indent).append(name.id).append(".put(");
+                        builder.append(name.id).append(".put(");
                         traverse(builder,"", subscript.slice, true);
-                        builder.append(indent).append(",");
+                        builder.append(",");
                         traverse(builder,"", as.value, true);
-                        builder.append(indent).append(")");
+                        builder.append(")");
                         return;
                     }
                 }
