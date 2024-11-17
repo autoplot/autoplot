@@ -2,6 +2,7 @@
 package org.autoplot.idlsupport;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Array;
@@ -28,6 +29,7 @@ import org.das2.qds.QDataSet;
 import org.das2.qds.SDataSet;
 import org.das2.qds.examples.Schemes;
 import org.das2.qds.ops.Ops;
+import org.das2.qds.util.DataSetBuilder;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 
@@ -268,11 +270,43 @@ public class IdlsavDataSource extends AbstractDataSource {
         return result;
     }
     
+    /**
+     * return a list of start,stop,name positions.
+     * @param f
+     * @return
+     * @throws IOException 
+     */
+    public QDataSet getTagDescriptions( File f ) throws IOException {
+        ReadIDLSav reader= new ReadIDLSav();
+        RandomAccessFile aFile = new RandomAccessFile(f,"r");
+        FileChannel inChannel = aFile.getChannel();
+        ByteBuffer fileBuffer= inChannel.map( FileChannel.MapMode.READ_ONLY,0, f.length() );
+        String[] names= reader.readVarNames(fileBuffer);
+        DataSetBuilder dsb= new DataSetBuilder(2,100,3);
+        for ( String n: names ) {
+            ReadIDLSav.TagDesc t= reader.readTagDesc(fileBuffer, n);
+            if ( t instanceof ReadIDLSav.ArrayDesc ) {
+                ReadIDLSav.ArrayDesc ad= (ReadIDLSav.ArrayDesc)t;
+                ReadIDLSav.ArrayData arrayData= (ReadIDLSav.ArrayData)reader.readVar(fileBuffer, n);
+                dsb.nextRecord( arrayData._fileOffset, arrayData._fileOffset+arrayData._lengthBytes, n );
+            } else {
+                dsb.nextRecord( t.fileOffset, t.fileOffset+t._lengthBytes, n );
+            }
+        }
+        dsb.putProperty(QDataSet.RENDER_TYPE, "eventsBar>ganttMode=T" );
+        return dsb.getDataSet();
+    }
+    
     @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
         File f= getFile( uri, mon );
-        ReadIDLSav reader= new ReadIDLSav();
-        
+
+        if ( getParam("locations","").equals("true") ) {
+            return getTagDescriptions(f);
+        }
+
+        ReadIDLSav reader= new ReadIDLSav();        
+
         RandomAccessFile aFile = new RandomAccessFile(f,"r");
         FileChannel inChannel = aFile.getChannel();
         long fileSize = inChannel.size();
@@ -293,6 +327,7 @@ public class IdlsavDataSource extends AbstractDataSource {
                 throw new IllegalArgumentException("name or X must be set");
             }
         }
+        
         
         QDataSet[] datas=null;
 

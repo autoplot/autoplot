@@ -46,7 +46,11 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
             URISplit split= URISplit.parse(surl);
             Map<String,String> params= URISplit.parseParams(split.params);
             String var= params.get(URISplit.PARAM_ARG_0);
-            
+             
+            if ( "true".equals(params.get("locations")) ) {
+                return false;
+            }
+             
             String x= params.get("X");
             String y= params.get("Y");
             String z= params.get("Z");
@@ -228,7 +232,6 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
             ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "xunits=", "units for the x values"));
             ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "yunits=", "units for the y values"));
             ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "units=", "units for the values"));
-            
             return ccresult;
         } else if ( cc.context.equals(CompletionContext.CONTEXT_PARAMETER_VALUE ) ) {
             String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
