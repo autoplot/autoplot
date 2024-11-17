@@ -1478,7 +1478,7 @@ public class ReadIDLSav {
             pos= nextPos;
             rec= readRecord( inChannel, pos );
         }
-        return names.toArray( new String[names.size()] );
+        return names.toArray( new String[0] );
     }    
     
     /**
