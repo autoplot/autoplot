@@ -264,12 +264,12 @@ public class ReadIDLSav {
                     if ( name.startsWith(varName.string) ) {
                         int nextField= 20 + varName._lengthBytes;
                         ByteBuffer var= slice(rec, nextField, rec.limit(), "variablestruct", name );
-                        TypeDesc td= readTypeDesc(var);
+                        TypeDesc td= readTypeDesc(var, nextField);
                         return td; // struct
                     } else if ( varName.string.equals(name) ) {
                         int nextField= 20 + varName._lengthBytes;
                         ByteBuffer var= slice(rec, nextField, rec.limit(), "variable", name );
-                        TypeDesc td= readTypeDesc(var);
+                        TypeDesc td= readTypeDesc(var, nextField);
                         return td;
                     }
                     break;
@@ -960,7 +960,7 @@ public class ReadIDLSav {
         abstract Object readData( ByteBuffer data );
     }
     
-    private TypeDescScalar readTypeDescScalar( ByteBuffer rec ) {
+    private TypeDescScalar readTypeDescScalar( ByteBuffer rec, long fileOffset) {
         logger.log(Level.FINER, "readTypeDescScalar @ {0}", bufferOffsets.get(getKeyFor(rec)));
         TypeDescScalar result= new TypeDescScalar();
         result.typeCode= rec.getInt(0);
@@ -968,7 +968,7 @@ public class ReadIDLSav {
         return result;
     }
     
-    private ArrayDesc readArrayDesc( ByteBuffer rec ) {
+    private ArrayDesc readArrayDesc( ByteBuffer rec, long fileOffset) {
         logger.log(Level.FINER, "readArrayDesc @ {0}", bufferOffsets.get(getKeyFor(rec)));
         ArrayDesc result= new ArrayDesc();
         if ( rec.getInt(0)!=8 ) {
@@ -987,7 +987,7 @@ public class ReadIDLSav {
         return result;
     }
     
-    public StructDesc readStructDesc( ByteBuffer rec ) {
+    public StructDesc readStructDesc( ByteBuffer rec, long fileOffset) {
         logger.log(Level.FINER, "readStructDesc @ {0}", bufferOffsets.get(getKeyFor(rec)));
         StructDesc result= new StructDesc();
         if ( rec.getInt(0)!=9 ) {
@@ -1040,13 +1040,15 @@ public class ReadIDLSav {
         
         result.arrTable= new ArrayDesc[narray];
         for ( int i=0; i<narray; i++ ) {
-            result.arrTable[i]= readArrayDesc(slice(rec, ipos, rec.limit(), "arrayDesc", result.tagnames[arrayMap.get(i)] ) );
+            ByteBuffer slice1= slice(rec, ipos, rec.limit(), "arrayDesc", result.tagnames[arrayMap.get(i)] );
+            result.arrTable[i]= readArrayDesc(slice1, ipos+fileOffset );
             ipos+= result.arrTable[i]._lengthBytes;           
         }
         
         result.structTable= new StructDesc[nstruct];
         for ( int i=0; i<nstruct; i++ ) {
-            result.structTable[i]= readStructDesc(slice(rec, ipos, rec.limit(), "structDesc", result.tagnames[structMap.get(i)] ) );
+            ByteBuffer slice1= slice(rec, ipos, rec.limit(), "structDesc", result.tagnames[structMap.get(i)] );
+            result.structTable[i]= readStructDesc( slice1, ipos+fileOffset );
             ipos+= result.structTable[i]._lengthBytes;           
         }
         if ( ( result.predef & PREDEF_INHERITS ) == PREDEF_INHERITS
@@ -1063,24 +1065,31 @@ public class ReadIDLSav {
                 
     }
     
-    private TypeDescStructure readTypeDescStructure( ByteBuffer rec ) {
+    /**
+     * read the type description starting at the fileOffset.
+     * @param rec ByteBuffer at the fileOffset.
+     * @param fileOffset the fileOffset.
+     * @return 
+     */
+    private TypeDescStructure readTypeDescStructure( ByteBuffer rec, long fileOffset) {
         logger.log(Level.FINER, "readTypeDescStructure @ {0}", bufferOffsets.get(getKeyFor(rec)));
         TypeDescStructure result= new TypeDescStructure();
         result.typeCode= rec.getInt(0);
         result.varFlags= rec.getInt(4);
-        result.structArrayDesc= readArrayDesc(slice(rec, 8, rec.limit(), "arrayDesc", "" ) );
-        result.structDesc= readStructDesc(slice(rec, 10*4+result.structArrayDesc.nmax*4, rec.limit(), "structDesc", "" ) );
+        result.structArrayDesc= readArrayDesc(slice(rec, 8, rec.limit(), "arrayDesc", "" ), fileOffset+8 );
+        long fileOffsetSub= fileOffset + 10*4+result.structArrayDesc.nmax*4;
+        result.structDesc= readStructDesc(slice(rec, 10*4+result.structArrayDesc.nmax*4, rec.limit(), "structDesc", "" ), fileOffsetSub );
         result.offsetToData= 10*4+result.structArrayDesc.nmax*4 + result.structDesc._lengthBytes;
         result.isSubstructure= false;
         return result;
     }
     
-    private TypeDescArray readTypeDescArray( ByteBuffer rec ) {
+    private TypeDescArray readTypeDescArray( ByteBuffer rec, long fileOffset) {
         logger.log(Level.FINER, "readTypeDescStructure @ {0}", bufferOffsets.get(getKeyFor(rec)));
         TypeDescArray result= new TypeDescArray();
         result.typeCode= rec.getInt(0);
         result.varFlags= rec.getInt(4);
-        result.arrayDesc= readArrayDesc(slice(rec, 8, rec.limit(), "arrayDesc", "" ) );
+        result.arrayDesc= readArrayDesc(slice(rec, 8, rec.limit(), "arrayDesc", "" ), fileOffset + 8 );
         return result;
     }
     
@@ -1089,7 +1098,7 @@ public class ReadIDLSav {
      * @param typeDescBuf
      * @return 
      */
-    private TypeDesc readTypeDesc( ByteBuffer typeDescBuf ) {
+    private TypeDesc readTypeDesc( ByteBuffer typeDescBuf, long fileOffset) {
         logger.log(Level.FINER, "readTypeDesc @ {0}", bufferOffsets.get(getKeyFor(typeDescBuf)));
         int typeCode= typeDescBuf.getInt(0);
         int varFlags= typeDescBuf.getInt(4);
@@ -1097,11 +1106,11 @@ public class ReadIDLSav {
             throw new IllegalArgumentException("expected 0-14 for type code in readTypeDesc");
         }
         if ( ( varFlags & VARFLAG_STRUCT ) == VARFLAG_STRUCT ) {
-            return readTypeDescStructure(typeDescBuf);
+            return readTypeDescStructure(typeDescBuf, fileOffset);
         } else if ( ( varFlags & VARFLAG_ARRAY ) == VARFLAG_ARRAY ) {
-            return readTypeDescArray(typeDescBuf);
+            return readTypeDescArray(typeDescBuf, fileOffset);
         } else {
-            return readTypeDescScalar(typeDescBuf);
+            return readTypeDescScalar(typeDescBuf, fileOffset);
         }
     }
     
@@ -1127,7 +1136,7 @@ public class ReadIDLSav {
         int nextField= 20 + varName._lengthBytes + offset;
 
         ByteBuffer data= slice(rec, nextField, rec.limit(), "typeDesc", "" );
-        TypeDesc typeDesc= readTypeDesc( data );
+        TypeDesc typeDesc= readTypeDesc(data, nextField );
         
         logger.log(Level.CONFIG, "variable_972 {0} {1,number,#} {2,number,#} {3}", new Object[]{data.position(), 0, data.limit(), varName});
         Object result= typeDesc.readData( data );
@@ -1167,7 +1176,7 @@ public class ReadIDLSav {
         ByteBuffer data= ByteBuffer.allocateDirect(nextField-offset);
         inch.read( rec, offset );
                 //inch.//slice(rec, nextField, rec.limit(), "typeDesc", "" );
-        TypeDesc typeDesc= readTypeDesc( data );
+        TypeDesc typeDesc= readTypeDesc(data, offset );
         
         logger.log(Level.CONFIG, "variable_972 {0} {1,number,#} {2,number,#} {3}", new Object[]{data.position(), 0, data.limit(), varName});
         Object result= typeDesc.readData( data );
@@ -1664,22 +1673,23 @@ public class ReadIDLSav {
                     StringData varName= readString( rec, 20 );
                     if ( name.startsWith(varName.string+".") || name.equals(varName.string) ) {
                         int nextField= varName._lengthBytes;
-                        ByteBuffer var= slice(rec, 20+nextField, rec.limit(), "variable", varName.string );
+                        int fileOffset= 20+nextField;
+                        ByteBuffer var= slice(rec, fileOffset, rec.limit(), "variable", varName.string );
                         if ( var.getInt(0)==8 ) { // TODO: what is 8?
                             if ( ( var.getInt(4) & VARFLAG_STRUCT ) == VARFLAG_STRUCT ) {
-                                TypeDescStructure typeDescStructure= readTypeDescStructure(var);
+                                TypeDescStructure typeDescStructure= readTypeDescStructure(var, fileOffset);
                                 if ( name.equals(varName.string) ) {
                                     return typeDescStructure.structDesc;
                                 } else {
                                     return findStructureTag( typeDescStructure.structDesc, name.substring(varName.string.length()+1) );
                                 }
                             } else {
-                                return readTypeDescArray(var).arrayDesc;
+                                return readTypeDescArray(var, fileOffset).arrayDesc;
                             }
                         } else {
                             if ( ( var.getInt(4) & VARFLAG_ARRAY ) == VARFLAG_ARRAY ) {
-                                TagDesc dd= readTypeDescArray(var).arrayDesc;
-                                dd.typecode= readTypeDescArray(var).typeCode;
+                                TagDesc dd= readTypeDescArray(var, fileOffset).arrayDesc;
+                                dd.typecode= readTypeDescArray(var, fileOffset).typeCode;
                                 return dd;
                             } else {
                                 return readTagDesc(var);
@@ -1747,22 +1757,23 @@ public class ReadIDLSav {
                     StringData varName= readString( rec, 20 );
                     if ( name.startsWith(varName.string+".") || name.equals(varName.string) ) {
                         int nextField= varName._lengthBytes;
-                        ByteBuffer var= slice(rec, 20+nextField, rec.limit(), "variable", varName.string );
+                        int fileOffset= 20+nextField;
+                        ByteBuffer var= slice(rec, fileOffset, rec.limit(), "variable", varName.string );
                         if ( var.getInt(0)==8 ) { // TODO: what is 8?
                             if ( ( var.getInt(4) & VARFLAG_STRUCT ) == VARFLAG_STRUCT ) {
-                                TypeDescStructure typeDescStructure= readTypeDescStructure(var);
+                                TypeDescStructure typeDescStructure= readTypeDescStructure(var, 20+nextField);
                                 if ( name.equals(varName.string) ) {
                                     return typeDescStructure.structDesc;
                                 } else {
                                     return findStructureTag( typeDescStructure.structDesc, name.substring(varName.string.length()+1) );
                                 }
                             } else {
-                                return readTypeDescArray(var).arrayDesc;
+                                return readTypeDescArray(var, fileOffset).arrayDesc;
                             }
                         } else {
                             if ( ( var.getInt(4) & VARFLAG_ARRAY ) == VARFLAG_ARRAY ) {
-                                TagDesc dd= readTypeDescArray(var).arrayDesc;
-                                dd.typecode= readTypeDescArray(var).typeCode;
+                                TagDesc dd= readTypeDescArray(var, fileOffset).arrayDesc;
+                                dd.typecode= readTypeDescArray(var, fileOffset).typeCode;
                                 return dd;
                             } else {
                                 return readTagDesc(var);
