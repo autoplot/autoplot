@@ -1437,7 +1437,7 @@ public class ReadIDLSav {
     /**
      * list the names in the IDLSav file.  This is only the supported
      * variable types.
-     * @param in
+     * @param inChannel
      * @return the names found.
      * @throws IOException 
      */
