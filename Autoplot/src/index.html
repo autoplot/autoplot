@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Mouse action shows the histogram of the data in the dragged box in one of two panels, using <a href="https://github.com/autoplot/dev/blob/master/demos/2024/20241031/demoBoxMouseAction.jy">this script</a></small></p>
+        <p><small>Mouse action shows the histogram of the data in the dragged box in one of two panels, using <a href="https://github.com/autoplot/dev/blob/master/demos/digitizers/boxHistogramCompare.jy">this script</a></small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,9 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-11-12 r27914):</p>
+        <p>Bugfixes (2024-11-18 r27936):</p>
         <ul> 
+            <li>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/1687/">1687</a>: Support completions with PWD + "demo&lt;C&gt;" to list PWD while coding.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2633/">2633</a>: use the URI to get the timerange when trim=True.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2635/">2635</a>: bug sequence with data processing clean-up is now fixed as well.
@@ -42,7 +43,6 @@
             <li>Codes which transfer data from one buffer to another do so in larger chunks now, using 8K buffers as Google suggests.
             <li>Run Batch Tool uses 8 threads by default when multi-threaded runs are done. 32 was too many, even for a 48-core machine.
             <li>Don't leave empty recent files in autoplot_data/bookmarks/
-            <li>CDF export has "majority" control for output with values "row" or "column"
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2641/">2641</a>: misconfiguration of mouse module in <a href="https://jfaden.net/~jbf/autoplot/doc/org/autoplot/ScriptContext.html#addMouseModule">addMouseModule</a> meant box events received from keystrokes were incorrect.  Thanks, Dave!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2217/">2217</a>: "|magnitude()" is added to vector time series support, switching from component traces to one magnitude trace.  Thanks, Pedro!
             <li>Restore missing tools.xml file.
