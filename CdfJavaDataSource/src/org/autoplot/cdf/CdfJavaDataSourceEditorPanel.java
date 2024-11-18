@@ -818,10 +818,12 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
                         slice= m.group(1);
                         subset= null;
                     }
-                    m= slice2pattern.matcher(subset);
-                    if ( m.matches() ) {
-                        slice= m.group(1); 
-                        subset= null;
+                    if ( subset!=null ) {
+                        m= slice2pattern.matcher(subset);
+                        if ( m.matches() ) {
+                            slice= m.group(1); 
+                            subset= null;
+                        }
                     }
                 }
             }
