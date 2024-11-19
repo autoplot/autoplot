@@ -210,12 +210,14 @@ public class GetDataSetCommand extends PyObject {
         
         if ( doTrim ) {
             try {
-                DataSource dss= org.autoplot.datasource.DataSetURI.getDataSource(uri);
-                TimeSeriesBrowse tsb= DataSourceUtil.getTimeSeriesBrowse(dss);
-                tsb.setURI(uri);
-                trimRange= tsb.getTimeRange();
+                if ( trimRange==null ) {
+                    DataSource dss= org.autoplot.datasource.DataSetURI.getDataSource(uri);
+                    TimeSeriesBrowse tsb= DataSourceUtil.getTimeSeriesBrowse(dss);
+                    tsb.setURI(uri);
+                    trimRange= tsb.getTimeRange();
+                }
             } catch (Exception ex) {
-                Logger.getLogger(GetDataSetCommand.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
             
         }
