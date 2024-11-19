@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Mouse action shows the histogram of the data in the dragged box in one of two panels, using <a href="https://github.com/autoplot/dev/blob/master/demos/digitizers/boxHistogramCompare.jy">this script</a></small></p>
+        <p><small>Labels correctly indicate slice location in script.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -32,6 +32,10 @@
                 
         <p>Bugfixes (2024-11-18 r27936):</p>
         <ul> 
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/789/">789</a>: New code which would grab the timerange from the URI when trim=True was set broke old interface.
+        </ul>
+        <p>Older Bugfixes (2024-11-18 r27936):</p>
+        <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2639/">2639</a>: New code would cause NullPointerException with rank 2 Vector Data Sets.  Thanks, Sadie!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/1687/">1687</a>: Support completions with PWD + "demo&lt;C&gt;" to list PWD while coding.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2633/">2633</a>: use the URI to get the timerange when trim=True.
@@ -48,28 +52,10 @@
             <li>Restore missing tools.xml file.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2638/">2638</a>: data tab and layout tab are now initially on for new installations, since this was confusing.
         </ul>
-        <p>Older Bugfixes (2024-10-29 r27862):</p>
-        <ul>
-            <li>Back of PDS4 library which has issue with existing file.
-            <li>Das2 TimeParser library gets $N to keep in sync with URI_Templates.
-            <li>Add support for byte arrays to IDLSave files, thanks Sadie!
-            <li>"Fourier Filters" area renamed to "Fourier Spectra", thanks Connor!
-            <li>Old QStream and QDataSet projects (not the ones in dasCore) are removed because they broke the JavaDoc generation and were not used.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/143/">0143</a>: format to ASCII now checks timetag FORMAT property.
-            <li>Mash-up tool now has 3-argument add function for readability, expression area is larger now.  Thanks, Darrelle!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2625/">2625</a>: improve feedback when getDataSet arguments cannot be used.
-            <li><a href="https://github.com/das-developers/das2java/issues/112">112</a>: Slowness with https://github.com/autoplot/dev/blob/master/bugs/sf/2619/demo2619.jy, caused by excessive dataset metadata handling.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2619/">2619</a>: PWD is now set when loading remote .vap files with AutoplotServlet.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2631/">2631</a>: include examples in timerange droplist for scripts.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2615/">2615</a>: check that the appended name isn't irrelevant to the completion.
-            <li>NullPointerException in CSV format fixed. Add format GUI for CSV output.  Thanks, Sadie!
-            <li>Rename ScriptPanelSupport to AppScriptPanelSupport so that it doesn't get confused with ScriptPanelSupport within JythonSupport.  
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2626/">2626</a>: cancel close because of unsaved script edit when second AutoplotUI is running.  Thanks, Sadie!
-            <li>allow https://cottagesystems.com/jenkins/job/autoplot-javadoc/lastSuccessfulBuild/artifact/doc/ to be used for pop-up documentation in script editor.
-            <li>add "append" checkbox to IDLSave format editor panel, so that the feature is not hidden.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2628/">2628</a>: properly calculate the number of bytes per item in integer arrays.
-        </ul>
         <p>Features:</p>
+        <ul>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>Color chooser dialog with named colors subpanel has "find close" button to find close named color.
             <li>Remove old HAPI local cache code, put in support for external HAPI cache mechanism
@@ -77,13 +63,6 @@
             <li>units=enum or units=nominal to mean nominal data.
             <li>Buffer sizes used to transfer data increased from 1024 bytes to 8*1024 bytes, possibly showing small performance gains.
             <li>More enhancements to Python-to-Java converter while porting new IDLSave reader.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>include Image4J library for reading .ico files.  Look up HAPI server favicon.ico files.
-            <li>improve label propagation through pow(ds,2) and sqrt.
-            <li>Allow Jython addToSearchPath to use files outside of HTTP FileSystem, including Github releases.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/818/">818</a>: support 1-byte integers in PDS3 files, MAC_REAL, and MISSING keywords.
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
