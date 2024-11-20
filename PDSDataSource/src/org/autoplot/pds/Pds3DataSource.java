@@ -161,7 +161,7 @@ public class Pds3DataSource extends AbstractDataSource {
         
             String name= depend.get(0);
             
-            DocumentUtil.dumpToXML(doc, new File("/home/jbf/peek."+name+".xml"));
+            //DocumentUtil.dumpToXML(doc, new File("/home/jbf/peek."+name+".xml"));
             
             NodeList oo= (NodeList) xpath.evaluate( "//LABEL/TABLE/COLUMN[NAME='"+name+"']", doc, XPathConstants.NODESET );
             //TODO: If it's a CONTAINER, then we don't find it.  See https://pds-ppi.igpp.ucla.edu/data/JNO-J_SW-JAD-5-CALIBRATED-V1.0/DATA/2016/2016240/ELECTRONS/JAD_L50_HRS_ELC_TWO_DEF_2016240_V01.LBL?DATA
