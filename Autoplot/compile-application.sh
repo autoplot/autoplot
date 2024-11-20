@@ -347,6 +347,7 @@ compilef 'test/Unicode.java'
 compilef 'org/das2/util/Expect.java'
 compilef 'external/AuralizationHandler.java'
 compilef 'org/das2/util/filesystem/GitCommand.java'
+compilef 'org/autoplot/scriptconsole/ScriptPanelSupport.java'
 
 cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceFactory.extensions | cut -d' ' -f1
 for i in `cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
