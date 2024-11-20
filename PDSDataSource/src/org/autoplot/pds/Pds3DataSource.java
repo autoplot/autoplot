@@ -154,34 +154,25 @@ public class Pds3DataSource extends AbstractDataSource {
      */
     public static List<String> seekDependencies( Document doc, List<String> depend ) throws XPathExpressionException {
         if ( depend.size()==1 ) { // always will have one element.
-        
+            List<String> result= new ArrayList<>();
+            
             XPathFactory factory= XPathFactory.newInstance();
             XPath xpath= factory.newXPath();
         
             String name= depend.get(0);
             
-            Map<Integer,String> axisNames= new LinkedHashMap<>();
+            DocumentUtil.dumpToXML(doc, new File("/home/jbf/peek."+name+".xml"));
             
-            NodeList oo= (NodeList) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/Axis_Array", doc, XPathConstants.NODESET );
-            
-            for ( int i=0; i<oo.getLength(); i++ ) {
-                Node n = oo.item(i);
-                addAxisArray( n, axisNames );
-            }
-            
-            if ( axisNames.get(2)!=null ) {
-                String n1= resolveIndependentAxis( doc, axisNames.get(1) );
-                String n2= resolveIndependentAxis( doc, axisNames.get(2) );
-                depend= new LinkedList<>(depend);
-                depend.add(0,n1);
-                if ( n2!=null && !n2.equals(name) ) {
-                    depend.add(1,n2);
-                }
-            } else if ( axisNames.get(1)!=null ) {
-                String n1= resolveIndependentAxis( doc, axisNames.get(1) );
-                depend= new LinkedList<>(depend);
-                if ( !n1.equals(name) ) {
-                    depend.add(0,n1);
+            NodeList oo= (NodeList) xpath.evaluate( "//LABEL/TABLE/COLUMN[NAME='"+name+"']", doc, XPathConstants.NODESET );
+            //TODO: If it's a CONTAINER, then we don't find it.  See https://pds-ppi.igpp.ucla.edu/data/JNO-J_SW-JAD-5-CALIBRATED-V1.0/DATA/2016/2016240/ELECTRONS/JAD_L50_HRS_ELC_TWO_DEF_2016240_V01.LBL?DATA
+            if ( oo.getLength()==1 ) {  // we found it
+                Node time= (Node) xpath.evaluate( "//LABEL/TABLE/COLUMN[1]", doc, XPathConstants.NODE );
+                String dataType= (String)xpath.evaluate( "DATA_TYPE/text()", time, XPathConstants.STRING );
+                if ( "TIME".equals(dataType) || "DATE".equals(dataType) ) {
+                    String timeName= (String)xpath.evaluate( "NAME/text()", time, XPathConstants.STRING );
+                    result.add(timeName);
+                    result.add(name);
+                    depend= result;
                 }
             }
             
