@@ -4,6 +4,9 @@ package org.autoplot.hapi;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.das2.util.LoggerManager;
 
 /**
  * The Connection implementation wraps the command line version 
@@ -12,6 +15,8 @@ import java.net.URL;
  */
 public class HapiCacheConnection extends Connection {
 
+    private static final Logger logger= LoggerManager.getLogger("apdss.hapi");
+    
     Process p;
     
     public HapiCacheConnection( URL url ) throws IOException {
@@ -22,7 +27,11 @@ public class HapiCacheConnection extends Connection {
         if ( scommand==null ) {
             throw new IllegalArgumentException("System property hapi-cache-command is not set.");
         }
-        scommand = scommand + " --fetchOnce --cache-dir=/home/jbf/hapi-cache/ --url="+url;
+        if ( scommand.trim().length()==0 ) {
+            throw new IllegalArgumentException("hapi-cache-command should not be empty here");
+        }
+        scommand = scommand + " --fetchOnce --url="+url+"";
+        logger.log(Level.FINE, "executing: {0}", scommand);
         String[] command= scommand.split("\\s+");
         p= new ProcessBuilder(command).start();
     }
