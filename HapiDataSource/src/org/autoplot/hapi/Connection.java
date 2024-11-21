@@ -30,7 +30,7 @@ public abstract class Connection {
         if ( useCache ) {
             String scommand = System.getProperty( "hapi-cache-command" );
             if ( scommand==null ) scommand = System.getenv( "hapi-cache-command" );
-            if ( scommand==null ) {
+            if ( scommand==null || scommand.trim().length()==0 ) {
                 useCache = false;
             }
             if ( useCache ) {
