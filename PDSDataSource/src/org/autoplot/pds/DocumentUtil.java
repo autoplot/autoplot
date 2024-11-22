@@ -15,6 +15,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.das2.util.FileUtil;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 /**
  * Document and XML utilities.

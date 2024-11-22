@@ -81,8 +81,10 @@ public class PDS3DataObject {
     public PDS3DataObject( Node label, Node table, Node column) {
         try {
             labelJSONObject= toJSONObject( label );
+            labelJSONObject.toString(4);
             JSONObject jtable= toJSONObject(table);
             tableJSONObject= jtable;
+            tableJSONObject.toString(4);
             interchangeFormat= jtable.optString("INTERCHANGE_FORMAT", "ASCII");
             rowBytes= jtable.getInt("ROW_BYTES");
             recordBytes= labelJSONObject.optInt("RECORD_BYTES",-1);
@@ -91,7 +93,6 @@ public class PDS3DataObject {
             rows= jtable.optInt("ROWS",-1);
             JSONObject j= toJSONObject(column);
             columnJSONObject= j;
-            j.toString(4);
             if ( j.has("ITEMS") ) {
                 items= j.getInt("ITEMS");
             } else {
@@ -226,7 +227,7 @@ public class PDS3DataObject {
         } else {
             args.put( "recLength", String.valueOf(rowPrefixBytes+rowBytes+rowSuffixBytes) );
         }
-        if ( dataType.equals("DATE") || dataType.equals("TIME") || ( dataType.equals("CHARACTER") && unit.equals("UTC") ) ) {
+        if ( Pds3DataSource.isTimeTag( dataType, unit) ) {
             args.put("type", "time"+bytes);
         } else if ( dataType.equals("ASCII_REAL") ) {
             args.put("type", "ascii"+bytes);

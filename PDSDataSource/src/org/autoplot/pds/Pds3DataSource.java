@@ -143,6 +143,18 @@ public class Pds3DataSource extends AbstractDataSource {
     }
     
     /**
+     * here is the one place for this logic which identifies if the column contains timetags.
+     * @param dataType
+     * @param unit
+     * @return true if this column will be interpreted as time tags.
+     */
+    public static boolean isTimeTag( String dataType, String unit ) {
+        return dataType.equals("DATE") 
+            || dataType.equals("TIME") 
+            || ( dataType.equals("CHARACTER") && ( unit.equals("UTC") || unit.equals("TIME") ) );
+    }
+    
+    /**
      * look through the PDS label document to see if dependencies can be 
      * identified.  Presently, this is simply one other dataset with the 
      * same axis (as in sample_offset) or the same axis name as something
@@ -169,7 +181,8 @@ public class Pds3DataSource extends AbstractDataSource {
             if ( oo.getLength()==1 ) {  // we found it
                 Node time= (Node) xpath.evaluate( "//LABEL/TABLE/COLUMN[1]", doc, XPathConstants.NODE );
                 String dataType= (String)xpath.evaluate( "DATA_TYPE/text()", time, XPathConstants.STRING );
-                if ( "TIME".equals(dataType) || "DATE".equals(dataType) ) {
+                String units= (String)xpath.evaluate( "UNIT/text()", time, XPathConstants.STRING );
+                if ( isTimeTag( dataType, units) ) {
                     String timeName= (String)xpath.evaluate( "NAME/text()", time, XPathConstants.STRING );
                     result.add(timeName);
                     result.add(name);
