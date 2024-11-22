@@ -319,6 +319,9 @@ public class PDS3DataObject {
         } else if ( dataType.equals("CHARACTER" ) ) {
             args.put("type","ascii"+bytes);
             unit= "nominal";
+        } else if ( dataType.equals("BIT_STRING" ) ) {
+            args.put("type","ubyte");
+            args.put("dims","["+bytes+"]");
         } else {
             throw new IllegalArgumentException("unsupported type:" +dataType);
         }
