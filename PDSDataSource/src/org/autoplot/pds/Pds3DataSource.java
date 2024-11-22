@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
@@ -239,7 +240,10 @@ public class Pds3DataSource extends AbstractDataSource {
             Node node = nodeList.item(i);
             String key = node.getNodeName();
             if ( isLeaf(node) ) {
-                Object value = node.getTextContent(); // or another method to extract the value
+                String value = node.getTextContent(); // or another method to extract the value
+                if ( key.equals("DESCRIPTION") ) {
+                    value= cleanDescriptionString(value);
+                }
                 resultMap.put(key, value);
             } else if ( node.getNodeType() == Node.ELEMENT_NODE ) {
                 Map<String,Object> subNode= convertDocumentToMap( node );
@@ -273,11 +277,31 @@ public class Pds3DataSource extends AbstractDataSource {
         String name= URISplit.parseParams(split.params).get("arg_0");
         PDS3DataObject obj= Pds3DataSourceFactory.getDataObjectPds3( split.resourceUri.toURL(), name );
         
-        result.putAll( obj.getMetadata() );
+        for ( Entry<String,Object> entry : obj.getMetadata().entrySet() ) {
+            String key= entry.getKey();
+            Object value= entry.getValue();
+            if ( key.equals("DESCRIPTION") && value instanceof String ) {
+                value= cleanDescriptionString( (String)value );
+            }
+            result.put( key, value );
+        }
         result.put( "_label", metadata.get("LABEL") );
         
         return result;
                            
+    }
+    
+    /**
+     * remove whitespace intended to format nicely with fixed-with fonts and replace &#13; with &lt;br&gt;.
+     * @param desc
+     * @return 
+     */
+    public static String cleanDescriptionString( String desc ) {
+        if ( desc==null ) return null;
+        //desc= String.join(" ",desc.split("[\\s|\\&\\#13\\;]+"));
+        desc= String.join(" ",desc.trim().split("\\s+"));
+        desc= String.join("<br>",desc.split("\\&\\#13\\;"));
+        return "<html>"+desc;
     }
     
     @Override
@@ -355,9 +379,9 @@ public class Pds3DataSource extends AbstractDataSource {
             logger.log(Level.FINE, "loading PDS data using delegate URI {0}", delegateUri);
             DataSource delegate= DataSetURI.getDataSource(delegateUri);
             QDataSet ds= delegate.getDataSet( mon.getSubtaskMonitor( "dataset "+ i ) );
-            ds= Ops.putProperty( ds, QDataSet.NAME, name );
+            ds= Ops.putProperty( ds, QDataSet.NAME, Ops.safeName(name) );
             ds= Ops.putProperty( ds, QDataSet.LABEL, name );
-            ds= Ops.putProperty( ds, QDataSet.DESCRIPTION, obj.getDescription() );
+            ds= Ops.putProperty( ds, QDataSet.DESCRIPTION, cleanDescriptionString( obj.getDescription() ) );
             HashMap<String,Object> user= new HashMap<>();
             user.put("delegate_uri",delegateUri);
             ds= Ops.putProperty( ds, QDataSet.USER_PROPERTIES, user );
