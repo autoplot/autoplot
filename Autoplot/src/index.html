@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Labels correctly indicate slice location in script.</small></p>
+        <p><small>Revolver Maps has suddenly quit operating.  Goodbye, friend, and thanks for the years of service!</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,7 +30,7 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-11-20 r27944):</p>
+        <p>Bugfixes (2024-11-22 r27951):</p>
         <ul> 
             <li>Compile in old name org.autoplot.scriptconsole.ScriptPanelSupport to support old scripts until they can be updated.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/789/">789</a>: New code which would grab the timerange from the URI when trim=True was set broke old interface.
@@ -55,11 +55,12 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>PDS3 with time column as the first column will use it as the independent values.  This will have to do for AGU!
         </ul>
         <p>Less recent features:</p>
         <ul>
             <li>Color chooser dialog with named colors subpanel has "find close" button to find close named color.
-            <li>Remove old HAPI local cache code, put in support for external HAPI cache mechanism
+            <li>Remove old HAPI local cache code, put in support for external HAPI cache mechanism.
             <li>Jython to Java conversion checks for struct.pack.
             <li>units=enum or units=nominal to mean nominal data.
             <li>Buffer sizes used to transfer data increased from 1024 bytes to 8*1024 bytes, possibly showing small performance gains.
