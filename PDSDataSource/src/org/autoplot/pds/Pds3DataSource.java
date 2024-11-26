@@ -56,30 +56,6 @@ public class Pds3DataSource extends AbstractDataSource {
         super(uri);
     }
 
-    /**
-     * Read the XML file into a document.
-     * @param f the file
-     * @return the document object
-     * @throws IOException
-     * @throws SAXException
-     */
-    public static Document readXML( File f ) throws IOException, SAXException {
-        DocumentBuilder builder= null;
-        try {
-            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        } catch (ParserConfigurationException ex) {
-            throw new RuntimeException(ex);
-        }
-
-        Document document;
-        
-        try (InputStream in = new FileInputStream(f)) {
-            InputSource source = new InputSource( in );
-            document = builder.parse(source);
-        }     
-        
-        return document;
-    }
     
     private static void addAxisArray( Node n,  Map<Integer,String> axisNames ) throws XPathExpressionException {
         XPathFactory factory= XPathFactory.newInstance();
@@ -241,31 +217,6 @@ public class Pds3DataSource extends AbstractDataSource {
         return Ops.dataset(csvfile,Units.nominal());
     }
 
-    public static boolean isLeaf( Node node ) {
-        return node.getChildNodes().getLength()==1 && node.getFirstChild().getNodeType()==Node.TEXT_NODE;
-    }
-    
-    public static Map<String, Object> convertDocumentToMap( Node root ) {
-        Map<String, Object> resultMap = new HashMap<>();
-        NodeList nodeList = root.getChildNodes();
-
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node node = nodeList.item(i);
-            String key = node.getNodeName();
-            if ( isLeaf(node) ) {
-                String value = node.getTextContent(); // or another method to extract the value
-                if ( key.equals("DESCRIPTION") ) {
-                    value= cleanDescriptionString(value);
-                }
-                resultMap.put(key, value);
-            } else if ( node.getNodeType() == Node.ELEMENT_NODE ) {
-                Map<String,Object> subNode= convertDocumentToMap( node );
-                resultMap.put(key, subNode);
-            }
-        }
-
-        return resultMap;
-    }
 
     
     @Override
@@ -283,7 +234,7 @@ public class Pds3DataSource extends AbstractDataSource {
         doc= label.getDocument();
         //doc.getChildNodes()
         
-        Map<String,Object> metadata= convertDocumentToMap(doc);
+        Map<String,Object> metadata= DocumentUtil.convertDocumentToMap(doc);
         
         LinkedHashMap<String,Object> result= new LinkedHashMap<>();
         
@@ -294,7 +245,7 @@ public class Pds3DataSource extends AbstractDataSource {
             String key= entry.getKey();
             Object value= entry.getValue();
             if ( key.equals("DESCRIPTION") && value instanceof String ) {
-                value= cleanDescriptionString( (String)value );
+                value= DocumentUtil.cleanDescriptionString( (String)value );
             }
             result.put( key, value );
         }
@@ -304,18 +255,6 @@ public class Pds3DataSource extends AbstractDataSource {
                            
     }
     
-    /**
-     * remove whitespace intended to format nicely with fixed-with fonts and replace &#13; with &lt;br&gt;.
-     * @param desc
-     * @return 
-     */
-    public static String cleanDescriptionString( String desc ) {
-        if ( desc==null ) return null;
-        //desc= String.join(" ",desc.split("[\\s|\\&\\#13\\;]+"));
-        desc= String.join(" ",desc.trim().split("\\s+"));
-        desc= String.join("<br>",desc.split("\\&\\#13\\;"));
-        return "<html>"+desc;
-    }
     
     @Override
     public org.das2.qds.QDataSet getDataSet(ProgressMonitor mon) throws Exception {
@@ -394,7 +333,7 @@ public class Pds3DataSource extends AbstractDataSource {
             QDataSet ds= delegate.getDataSet( mon.getSubtaskMonitor( "dataset "+ i ) );
             ds= Ops.putProperty( ds, QDataSet.NAME, Ops.safeName(name) );
             ds= Ops.putProperty( ds, QDataSet.LABEL, name );
-            ds= Ops.putProperty( ds, QDataSet.DESCRIPTION, cleanDescriptionString( obj.getDescription() ) );
+            ds= Ops.putProperty(ds, QDataSet.DESCRIPTION, DocumentUtil.cleanDescriptionString( obj.getDescription() ) );
             HashMap<String,Object> user= new HashMap<>();
             user.put("delegate_uri",delegateUri);
             ds= Ops.putProperty( ds, QDataSet.USER_PROPERTIES, user );
