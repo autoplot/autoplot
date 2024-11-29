@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Revolver Maps has suddenly quit operating.  Goodbye, friend, and thanks for the years of service!</small></p>
+        <p><small>Bug where one tick is showing found.  This should not happen.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,12 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-11-22 r27951):</p>
-        <ul> 
+        <p>Bugfixes (2024-11-29 r27958):</p>
+        <ul><li><a href="https://sourceforge.net/p/autoplot/feature-requests/795/">795</a>: bugs with identifyContinuousBlocks found in untested modes.
+            <li><a href="https://github.com/das-developers/das2java/issues/83/">0083</a>: bug where loglin axis labeller would miscount second decade.
+            <li><a href="https://github.com/das-developers/das2java/issues/83/">0083</a>: bug where single tick was used. (There should always be at least two major ticks.)
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2649/">2649</a>: AutoplotSettings.settings().getPreferences used inconsistently
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2647/">2647</a>: always show the context in the title when it is found.
             <li>AsciiDataSet used to grab ASCII from binary tables dropped its units with slice operation, making nominal data unusable.
             <li>Compile in old name org.autoplot.scriptconsole.ScriptPanelSupport to support old scripts until they can be updated.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/789/">789</a>: New code which would grab the timerange from the URI when trim=True was set broke old interface.  Thanks, Sadie!
@@ -56,6 +60,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>extract common codes btw PDS3 and PDS4 working with Document to get titles.  When getting the title from the description, just use the first sentence.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/835/">835</a>: script in tools will switch to Dark LAF.  Thanks, Chris!
             <li>PDS3 with time column as the first column will use it as the independent values.  This will have to do for AGU!
         </ul>
