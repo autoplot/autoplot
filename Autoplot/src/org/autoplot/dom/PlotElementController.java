@@ -871,7 +871,7 @@ public class PlotElementController extends DomNodeController {
                         if ( context.rank()==1 ) {
                             cdr= DataSetUtil.asDatumRange( context, true );
                         } else {
-                            cdr= DatumRange.newDatumRange( context.value(), context.value(), SemanticOps.getUnits(context) );
+                            cdr= DatumRange.newRange( context.value(), context.value(), SemanticOps.getUnits(context) );
                         }
                         Plot plot= this.dom.getController().getPlotFor(plotElement);
                         plot.getController().getDasPlot().setDisplayContext( cdr );  // note this property is just a placeholder, and is sensed by ColumnColumnConnector.
@@ -2207,6 +2207,8 @@ public class PlotElementController extends DomNodeController {
                     title += "!c%{CONTEXT}";
                 } else if ( appliedFilters != null && appliedFilters.length()>0 ) {
                     title += "!c"+appliedFilters;
+                } else if ( fillDs.property(QDataSet.CONTEXT_0)!=null ) {
+                    title += "!c%{CONTEXT}";
                 }
                 peleCopy.getPlotDefaults().setTitle(title);
             }
