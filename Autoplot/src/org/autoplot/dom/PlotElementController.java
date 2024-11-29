@@ -780,11 +780,8 @@ public class PlotElementController extends DomNodeController {
                     // && !SemanticOps.isBundle(fillDs) ) {
                     return true;
                 default:
-                    if ( fillDs.property(QDataSet.PLANE_0)!=null ) {
-                        return true;
-                    } else {
-                        return false;
-                    }
+                return fillDs.property(QDataSet.PLANE_0)!=null;
+
             }
         } else if ( getRenderer() instanceof SeriesRenderer) {
             switch (fillDs.rank()) {
@@ -1294,14 +1291,7 @@ public class PlotElementController extends DomNodeController {
                             || oldRenderType==RenderType.series
                             || oldRenderType==RenderType.fillToZero 
                             || oldRenderType==RenderType.stairSteps ) {
-                        if ( newRenderType==RenderType.scatter 
-                            || newRenderType==RenderType.series
-                            || newRenderType==RenderType.fillToZero 
-                            || newRenderType==RenderType.stairSteps ) {
-                            return false;
-                        } else {
-                            return true;
-                        }
+                        return false;
                     } else {
                         return false;
                     }
@@ -2068,7 +2058,7 @@ public class PlotElementController extends DomNodeController {
         propertyChangeSupport.firePropertyChange(PROP_SLICEAUTORANGES, oldSliceAutoranges, sliceAutoranges);
     }
 
-    private static AtomicInteger renderCount= new AtomicInteger();
+    private static final AtomicInteger renderCount= new AtomicInteger();
 
     protected Renderer renderer = null;
 
@@ -3152,7 +3142,7 @@ public class PlotElementController extends DomNodeController {
             dsfl.getController().setDataSetInternal(ds); // setDataSet doesn't autorange, etc.
             p.getYaxis().syncTo(focus.zaxis);
             List<BindingModel> bms= controller.findBindings( dom, Application.PROP_TIMERANGE, focus.getXaxis(), Axis.PROP_RANGE );
-            if ( bms.size()>0 && UnitsUtil.isTimeLocation( p.getXaxis().getRange().getUnits() ) ) {
+            if ( !bms.isEmpty() && UnitsUtil.isTimeLocation( p.getXaxis().getRange().getUnits() ) ) {
                 controller.bind( controller.getApplication(), Application.PROP_TIMERANGE, p.getXaxis(), Axis.PROP_RANGE );
             }
             p.setTitle(focus.getTitle() + " @ " + y );
