@@ -170,7 +170,7 @@ public class PersistentStateSupport {
         this.strategy= strategy;
         this.ext= "."+extension;
         this.component= parent;
-        Preferences prefs= AutoplotSettings.getPreferences(PersistentStateSupport.class);
+        Preferences prefs= AutoplotSettings.settings().getPreferences(PersistentStateSupport.class);
         setDirectory( "" );
         String recentFileString= prefs.get( PREF_FILE+ext+"_recent", "" );
         setRecentFiles( recentFileString );

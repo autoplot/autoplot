@@ -89,7 +89,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
                     return;
                 }
                 ExportDataPanel edp= new ExportDataPanel();
-                Preferences prefs= AutoplotSettings.getPreferences(AutoplotUI.class);
+                Preferences prefs= AutoplotSettings.settings().getPreferences(AutoplotUI.class);
                 String currentFileString = prefs.get("ExportDataCurrentFile", "");
                 String currentExtString = prefs.get("ExportDataCurrentExt", ".txt");
                 if ( !currentExtString.equals("") ) {

@@ -1103,7 +1103,7 @@ public class GuiSupport {
                 final JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setDialogTitle("Print to "+ext.toUpperCase());
                 fileChooser.setFileFilter( new FileNameExtensionFilter( ext + " files", ext )) ;
-                Preferences prefs = AutoplotSettings.getPreferences(DasCanvas.class);
+                Preferences prefs = AutoplotSettings.settings().getPreferences(DasCanvas.class);
                 String savedir = prefs.get("savedir", null);
                 if (savedir != null) fileChooser.setCurrentDirectory(new File(savedir));
                 if (currentFile != null) {

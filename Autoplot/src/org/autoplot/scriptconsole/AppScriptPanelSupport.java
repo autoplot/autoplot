@@ -320,7 +320,7 @@ public class AppScriptPanelSupport {
             } else {
                 chooser.setSelectedFile(file);
             }
-            Preferences prefs = AutoplotSettings.getPreferences(AppScriptPanelSupport.class);
+            Preferences prefs = AutoplotSettings.settings().getPreferences(AppScriptPanelSupport.class);
             String openFile= prefs.get(PREFERENCE_OPEN_FILE, "");
             if ( !openFile.equals("") && !FileSystemUtil.isChildOf( FileSystem.settings().getLocalCacheDir(), new File(openFile) )  ) {
                 File dir= new File(openFile).getParentFile();
@@ -328,7 +328,7 @@ public class AppScriptPanelSupport {
             }
         }
         if ( file==null ) {
-            Preferences prefs = AutoplotSettings.getPreferences(AppScriptPanelSupport.class);
+            Preferences prefs = AutoplotSettings.settings().getPreferences(AppScriptPanelSupport.class);
             String openFile = prefs.get(PREFERENCE_OPEN_FILE, "");
             if ( !openFile.equals("") ) {
                 chooser.setCurrentDirectory( new File(openFile).getParentFile() );
@@ -1284,7 +1284,7 @@ public class AppScriptPanelSupport {
                 panel.setFilename(file.toString());
                 restartWatcher(file);
                 
-                Preferences prefs = AutoplotSettings.getPreferences(AppScriptPanelSupport.class);
+                Preferences prefs = AutoplotSettings.settings().getPreferences(AppScriptPanelSupport.class);
                 prefs.put(PREFERENCE_OPEN_FILE, file.toString() );
                 
                 if ( file.toString().endsWith(".jyds") ) {
@@ -1487,7 +1487,7 @@ public class AppScriptPanelSupport {
                 }
             }
 
-            Preferences prefs = AutoplotSettings.getPreferences(AppScriptPanelSupport.class);
+            Preferences prefs = AutoplotSettings.settings().getPreferences(AppScriptPanelSupport.class);
             String openFile = prefs.get(PREFERENCE_OPEN_FILE, "");
 
             JFileChooser chooser = new JFileChooser();

@@ -775,7 +775,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
      * @throws java.io.IOException
      */
     protected static void savePngwalkFile( PngWalkTool parent, String ssrc ) throws IOException {
-        Preferences prefs = AutoplotSettings.getPreferences(PngWalkTool.class);
+        Preferences prefs = AutoplotSettings.settings().getPreferences(PngWalkTool.class);
         String srecent = prefs.get( PngWalkTool.PREF_RECENT, System.getProperty("user.home") );
         JFileChooser chooser= new JFileChooser( srecent );
         chooser.setFileFilter( new FileNameExtensionFilter( "pngwalk files", "pngwalk" ) );

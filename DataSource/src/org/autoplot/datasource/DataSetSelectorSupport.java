@@ -58,7 +58,7 @@ public class DataSetSelectorSupport {
      * @return the URI for the vap file, or null if cancel was pressed.
      */
     public static String browseLocalVap( java.awt.Component parent, String initialSelection) {
-        Preferences prefs = AutoplotSettings.getPreferences( AutoplotSettings.class);
+        Preferences prefs = AutoplotSettings.settings().getPreferences( AutoplotSettings.class);
 
         String currentDirectory = prefs.get( AutoplotSettings.PREF_LAST_OPEN_VAP_FOLDER, prefs.get(AutoplotSettings.PREF_LAST_OPEN_FOLDER, userHome().toString() ) );
         String currentFile=  prefs.get( AutoplotSettings.PREF_LAST_OPEN_VAP_FILE, "" );
