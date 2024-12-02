@@ -944,8 +944,10 @@ public class AsciiTableDataSource extends AbstractDataSource {
             column = o;
             if ( parser.getFieldIndex(column)!=0 ) {
                 timeColumn= 0;
-                final Units u = AsciiParser.UNIT_UTC;
-                parser.setUnits(0, u);
+                if ( UnitsUtil.isTimeLocation( parser.getUnits(0) ) ) { 
+                    final Units u = AsciiParser.UNIT_UTC;
+                    parser.setUnits(0, u);
+                }
                 depend0= "0";
             }
         } 
