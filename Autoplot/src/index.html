@@ -32,11 +32,12 @@
                 
         <p>Bugfixes (2024-12-03 r27962):</p>
         <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2650/">2650</a>: kludgy code would assume first column was a time in the ASCII parser.
+            <li>Manual ticks, when empty, would result in a runtime error and prevented printing.  Thanks, Masafumi!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2650/">2650</a>: kludgy code would assume first column was a time in the ASCII parser.  Thanks, Masafumi!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2650/">2650</a>: Check validity of Red, Green, Blue arrays.
             <li><a href="https://github.com/das-developers/das2java/issues/83/">0083</a>: bug where loglin axis labeller would miscount second decade (linear is 0.5).
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/795/">795</a>: bugs with identifyContinuousBlocks found in untested modes.
-            <li><a href="https://github.com/das-developers/das2java/issues/83/">0083</a>: bug where loglin axis labeller would miscount second decade.
+            <li><a href="https://github.com/das-developers/das2java/issues/83/">0083</a>: bug where loglin axis labeller would miscount second decade.  
             <li><a href="https://github.com/das-developers/das2java/issues/83/">0083</a>: bug where single tick was used. (There should always be at least two major ticks.)
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2649/">2649</a>: AutoplotSettings.settings().getPreferences used inconsistently
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2647/">2647</a>: always show the context in the title when it is found.
