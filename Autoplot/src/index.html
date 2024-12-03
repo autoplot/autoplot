@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Bug where one tick is showing found.  This should not happen.</small></p>
+        <p><small>ASCII file with Tempest sensor wind speed and direction, and the "where" control loads only records with a wind speed of greater than three.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,9 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-12-01 r27960):</p>
+        <p>Bugfixes (2024-12-03 r27962):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2650/">2650</a>: kludgy code would assume first column was a time in the ASCII parser.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2650/">2650</a>: Check validity of Red, Green, Blue arrays.
             <li><a href="https://github.com/das-developers/das2java/issues/83/">0083</a>: bug where loglin axis labeller would miscount second decade (linear is 0.5).
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/795/">795</a>: bugs with identifyContinuousBlocks found in untested modes.
