@@ -1229,7 +1229,7 @@ public class AutoplotUtil {
         if (fillds.rank() >= 2) {
             boolean trivialBundle= false; // is the bundle really describing anything?
             if ( dep1!=null && !isVectorOrBundleIndex(dep1) ) {
-                if ( bundle1.length()>0 ) {
+                if ( bundle1!=null && bundle1.length()>0 ) {
                     trivialBundle= true;
                     Units u0= (Units)bundle1.property(QDataSet.UNITS,0);
                     for ( int j=0; j<bundle1.length(); j++ ) {
