@@ -1227,10 +1227,24 @@ public class AutoplotUtil {
         }
 
         if (fillds.rank() >= 2) {
+            boolean trivialBundle= false; // is the bundle really describing anything?
+            if ( dep1!=null && !isVectorOrBundleIndex(dep1) ) {
+                if ( bundle1.length()>0 ) {
+                    trivialBundle= true;
+                    Units u0= (Units)bundle1.property(QDataSet.UNITS,0);
+                    for ( int j=0; j<bundle1.length(); j++ ) {
+                        if ( bundle1.property(QDataSet.NAME)!=null && bundle1.property(QDataSet.UNITS)!=u0 ) {
+                            trivialBundle= false;
+                        }
+                    }
+                }
+            }
+            if ( trivialBundle ) {
+                return specPref;
 //            if ( dep1!=null && !isVectorOrBundleIndex(dep1) ) {
 //                spec = specPref; // favor spectrograms when we have a BUNDLE_1 and DEPEND_1.
 //            } else if ( bundle1!=null || (dep1 != null && isVectorOrBundleIndex(dep1) ) ) {
-            if ( ( bundle1!=null && bundle1.length()<30 ) || (dep1 != null && isVectorOrBundleIndex(dep1) ) ) {
+            } else if ( ( bundle1!=null && bundle1.length()<30 ) || (dep1 != null && isVectorOrBundleIndex(dep1) ) ) {
                 if ( useHugeScatter && fillds.length() > SERIES_SIZE_LIMIT) {
                     spec = RenderType.hugeScatter;
                 } else {
