@@ -176,6 +176,8 @@ public final class WriteIDLSav {
             return 4;
         } else if ( data.getClass()==Double.class ) {
             return 5;
+        } else if ( data.getClass()==String.class ) {
+            return 7;
         } else {
             throw new IllegalArgumentException("unsupported type: "+data.getClass() );
         }
@@ -202,6 +204,8 @@ public final class WriteIDLSav {
         } else if ( data.getClass()==Float.class ) {
             return writeScalarDesc( data );
         } else if ( data.getClass()==Double.class ) {
+            return writeScalarDesc( data );
+        } else if ( data.getClass()==String.class ) {
             return writeScalarDesc( data );
         } else {
             throw new RuntimeException("not implemented");
@@ -299,8 +303,12 @@ public final class WriteIDLSav {
             && data.getClass().getComponentType().getComponentType().isArray()
             && data.getClass().getComponentType().getComponentType().getComponentType()==double.class ) {
             varData= writeDDDoubleArray( (double[][][])data );
-        } else if (data.getClass().isArray() && data.getClass().getComponentType() == long.class) {
+        } else if (data.getClass().isArray() && data.getClass().getComponentType()==long.class) {
             varData= writeLongArray( (long[])data );
+        } else if ( data.getClass().isArray() && data.getClass().getComponentType()==String.class ) {
+            varData= writeString( ((String[])data)[0] );
+        } else if ( data.getClass()==String.class ) {
+            varData= writeString( (String)data );
         } else if ( data.getClass()==Short.class ) {
             varData= writeShort( (Short)data );
         } else {
@@ -377,9 +385,12 @@ public final class WriteIDLSav {
             c1= c1.getComponentType();
             rank++;
         }
+        if ( !c1.isArray() && c1==String.class ) {
+            return;
+        }
         componentType= c1.getComponentType();
         if ( rank==0 || rank>3 ) throw new IllegalArgumentException("unsupported rank, only rank 1 or rank 2 data");
-        if ( !( c.isArray() && ( componentType==double.class || componentType==long.class ) ) && c!=Short.class ) {
+        if ( !( c.isArray() && ( componentType==String.class || componentType==double.class || componentType==long.class ) ) && c!=Short.class ) {
             throw new IllegalArgumentException("\"" + name + "\" is unsupported data type: "+data.getClass() );
         }
     }

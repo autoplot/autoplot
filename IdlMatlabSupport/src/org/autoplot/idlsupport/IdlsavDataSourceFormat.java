@@ -39,16 +39,37 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
         String su= getParam( "tunits", "t1970" );
 
         QDataSet wds= Ops.valid(data);
-
+        boolean isString = UnitsUtil.isNominalMeasurement( SemanticOps.getUnits(data) );
+        
+        if ( isString ) {
+            throw new IllegalArgumentException("Nominal data is currently not supported");
+        }
+        
+        if ( UnitsUtil.isNominalMeasurement( SemanticOps.getUnits(data) ) && data.rank()>1 ) {
+            throw new IllegalArgumentException("Nominal data of rank greater than 1 is not supported");
+        }
         Object odd;
         if ( data.rank()==0 ) {
-            odd= data.value();
-        } else if ( data.rank()==1 ) {
-            double[] dd= new double[data.length()];
-            for ( int i=0; i<dd.length; i++ ) {
-                dd[i]= wds.value(i)==0 ? Double.NaN : data.value(i);
+            if ( isString ) {
+                odd= data.svalue();
+            } else {
+                odd= data.value();
             }
-            odd= dd;
+        } else if ( data.rank()==1 ) {
+            if ( isString ) {
+                String[] ss= new String[data.length()];
+                for ( int i=0; i<ss.length; i++ ) {
+                    ss[i]= wds.value(i)==0 ? "" : data.slice(i).svalue();
+                }
+                odd= ss;
+                
+            } else {
+                double[] dd= new double[data.length()];
+                for ( int i=0; i<dd.length; i++ ) {
+                    dd[i]= wds.value(i)==0 ? Double.NaN : data.value(i);
+                }
+                odd= dd;
+            }
         } else if ( data.rank()==2 ) {
             double[][] dd= new double[data.length()][];
             for ( int i=0; i<dd.length; i++ ) {
@@ -169,7 +190,7 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
         String append = getParam( "append", "F" );
         WriteIDLSav write= new WriteIDLSav();
 
-        String guessName= "DATA";
+        String guessName= getParam( "arg_0", "DATA" );
         String[] names= new String[0];
         
         if ( append.equals("T") ) { 
