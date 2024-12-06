@@ -1086,7 +1086,7 @@ public class RunBatchTool extends javax.swing.JPanel {
     }//GEN-LAST:event_exportResultsMenuItemActionPerformed
 
     private void showHelpMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showHelpMenuItemActionPerformed
-        AutoplotUtil.openBrowser("https://github.com/autoplot/documentation/wiki/batch");
+        AutoplotUtil.openBrowser("https://github.com/autoplot/documentation/blob/main/md/batch.md");
     }//GEN-LAST:event_showHelpMenuItemActionPerformed
 
     

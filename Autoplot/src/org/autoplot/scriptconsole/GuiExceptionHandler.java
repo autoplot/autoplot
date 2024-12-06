@@ -385,7 +385,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         }
         
         if ( checkOutOfMemoryError(t) ) {
-            errorMessage= errorMessage + "\n\nThe wiki page at \"http://autoplot.org/outOfMemory\" might be helpful in resolving this issue.";
+            errorMessage= errorMessage + "\n\nThe wiki page at \"https://github.com/autoplot/documentation/md/outOfMemory.md\" might be helpful in resolving this issue.";
         }
 
         
