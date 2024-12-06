@@ -362,7 +362,7 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
     }//GEN-LAST:event_allUrisButtonActionPerformed
 
     private void showWildcardsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showWildcardsButtonActionPerformed
-        AutoplotUtil.openBrowser("https://autoplot.org/help#Wildcard_codes");
+        AutoplotUtil.openBrowser("https://github.com/autoplot/documentation/blob/main/md/help.md#wildcard-codes");
     }//GEN-LAST:event_showWildcardsButtonActionPerformed
 
 
