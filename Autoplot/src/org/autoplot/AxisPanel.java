@@ -111,18 +111,21 @@ public class AxisPanel extends javax.swing.JPanel {
         xredit.setValue(plot.getXAxis().getDatumRange());
         xredit.addFocusListener( createDatumRangeEditorListener(xredit) );
         xredit.setToolTipText("X axis range");
+        xredit.setAllowZeroWidth(false);
         xAxisRangePanel.add(xredit, BorderLayout.CENTER);
 
         yredit = new DatumRangeEditor();
         yredit.setValue(plot.getYAxis().getDatumRange());
         yredit.addFocusListener( createDatumRangeEditorListener(yredit) );
         yredit.setToolTipText("Y axis range");
+        yredit.setAllowZeroWidth(false);
         yAxisRangePanel.add(yredit, BorderLayout.CENTER);
 
         zredit = new DatumRangeEditor();
         zredit.setValue(colorbar.getDatumRange());
         zredit.addFocusListener( createDatumRangeEditorListener(zredit) );
         zredit.setToolTipText("Z axis range");
+        zredit.setAllowZeroWidth(false);
         zAxisRangePanel.add(zredit, BorderLayout.CENTER);
         APSplash.checkTime("in axispanel 30");
 
