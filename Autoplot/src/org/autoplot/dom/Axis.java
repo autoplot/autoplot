@@ -43,6 +43,10 @@ public class Axis extends DomNode {
             logger.log( Level.WARNING, "range set to null!");
             return;
         }
+        if ( range.width().value()==0 ) {
+            logger.log( Level.WARNING, "range set to zero-width datum range!");
+            return;
+        }
 //        System.err.println("range="+range);
 //        if ( this.controller==null 
 //            && this.getId().equals("")
