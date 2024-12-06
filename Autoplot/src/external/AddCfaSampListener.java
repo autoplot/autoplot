@@ -45,7 +45,7 @@ public class AddCfaSampListener {
         Metadata meta = new Metadata();
         meta.setName("Autoplot");
         meta.setDescriptionText("Autoplot");
-        meta.setIconUrl("https://autoplot.org/wiki/images/Logo32.png");
+        meta.setIconUrl("https://autoplot.org/Logo32.png");
         meta.setDocumentationUrl("https://autoplot.org");
 
         hubConnector.declareMetadata(meta);
