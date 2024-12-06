@@ -822,6 +822,14 @@ public class AutoplotUtil {
                 }
             }
         }
+        if ( range!=null && range.width().value()==0 ) {
+            logger.info("Y autorange returns zero-width");
+            if ( UnitsUtil.isRatioMeasurement(range.getUnits()) && range.min().value()!=0 ) {
+                range= DatumRangeUtil.union( range, range.getUnits().createDatum(0) );
+            } else {
+                range=null;
+            }
+        }
         if ( range!=null ) axis.getController().setRangeAutomatically( range, axis.isLog() );
         PlotController.doHints( axis, axis.getAutoRangeHints() );
         
@@ -892,6 +900,14 @@ public class AutoplotUtil {
                     range= DatumRangeUtil.union( range, pcopy1.getPlotDefaults().getXaxis().getRange() );
                 }
             }
+        }        
+        if ( range!=null && range.width().value()==0 ) {
+            logger.info("X autorange returns zero-width");
+            if ( UnitsUtil.isRatioMeasurement(range.getUnits()) && range.min().value()!=0 ) {
+                range= DatumRangeUtil.union( range, range.getUnits().createDatum(0) );
+            } else {
+                range=null;
+            }            
         }
         if ( range!=null ) axis.getController().setRangeAutomatically( range, axis.isLog() );
         PlotController.doHints( axis, axis.getAutoRangeHints() );
