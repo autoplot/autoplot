@@ -398,7 +398,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
                     CompletionContext.CONTEXT_PARAMETER_NAME, 
                     "", 
                     this, "arg_0", 
-                    "Select parameter to plot", "", false ) );
+                    "Select parameter to plot:", "", false ) );
             for ( java.util.Map.Entry<String,String> e:result.entrySet() ) {
                 String key= e.getKey();
                 String desc= e.getValue();
