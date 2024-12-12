@@ -1016,8 +1016,14 @@ public class DataSetURI {
                            return downloadResourceAsTempFile(  url, mon);
                         }
                         if ( fs instanceof WebFileSystem && ((WebFileSystem)fs).isOffline() ) {
-                            throw new FileNotFoundException( "File not found in cache of offline filesystem: " 
-                                + split.resourceUri +"\n(Offline because of \""+ ((WebFileSystem)fs).getOfflineMessage() + "\")" );
+                            String msg= ((WebFileSystem)fs).getOfflineMessage();
+                            if ( msg!=null && msg.length()>0 ) {
+                                msg= "File not found in cache of offline filesystem: " 
+                                + split.resourceUri +"\n(Offline because of \""+ msg + "\")";
+                            } else {
+                                msg= "File not found in cache of offline filesystem: "+ split.resourceUri;
+                            }
+                            throw new FileNotFoundException( msg );
                         } else {
                             if ( fo.exists() ) {
                                 throw new IOException( "Unknown I/O Exception occurred" );
