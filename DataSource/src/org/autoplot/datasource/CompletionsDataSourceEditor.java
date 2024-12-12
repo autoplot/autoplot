@@ -252,7 +252,11 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
                     }
                 }
                 if ( arg0.get(ii).label!=null ) {
-                    arg0options.add( arg0.get(ii).completable + ": " +arg0.get(ii).label );
+                    //if ( arg0.get(ii).completable.length()==0 ) {
+                    //    arg0options.add( arg0.get(ii).label );  // "Select parameter to plot:"
+                    //} else {
+                        arg0options.add( arg0.get(ii).completable + ": " +arg0.get(ii).label );
+                    //}
                 } else {
                     arg0options.add( arg0.get(ii).completable );
                 }
