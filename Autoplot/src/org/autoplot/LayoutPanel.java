@@ -1621,12 +1621,17 @@ public class LayoutPanel extends javax.swing.JPanel {
             if ( uri.startsWith("vap+internal:") ) {
                 GuiSupport.editPlotElement( applicationModel, this );
             } else {
-                JPanel parent= new JPanel();
-                parent.setLayout( new BorderLayout() );
-                DataSourceEditorPanel p= DataSourceEditorPanelUtil.getDataSourceEditorPanel( parent, uri );
-                if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, parent, "Edit "+((DataSourceFilter)s).getId(), JOptionPane.OK_CANCEL_OPTION ) ) {
-                    uri= p.getURI();
-                    ((DataSourceFilter)s).setUri(uri);
+                if ( uri.length()==0 ) {
+                    AutoplotUtil.showMessageDialog( this, 
+                        "Please select this empty data source and use the address bar to set its URI.", "Empty URI", JOptionPane.INFORMATION_MESSAGE );
+                } else {
+                    JPanel parent= new JPanel();
+                    parent.setLayout( new BorderLayout() );
+                    DataSourceEditorPanel p= DataSourceEditorPanelUtil.getDataSourceEditorPanel( parent, uri );
+                    if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, parent, "Edit "+((DataSourceFilter)s).getId(), JOptionPane.OK_CANCEL_OPTION ) ) {
+                        uri= p.getURI();
+                        ((DataSourceFilter)s).setUri(uri);
+                    }
                 }
             }
         }
