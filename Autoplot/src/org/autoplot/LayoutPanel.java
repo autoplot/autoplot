@@ -1622,7 +1622,7 @@ public class LayoutPanel extends javax.swing.JPanel {
                 GuiSupport.editPlotElement( applicationModel, this );
             } else {
                 if ( uri.length()==0 ) {
-                    AutoplotUtil.showMessageDialog( this, 
+                    AutoplotUtil.showMessageDialog( this,
                         "Please select this empty data source and use the address bar to set its URI.", "Empty URI", JOptionPane.INFORMATION_MESSAGE );
                 } else {
                     JPanel parent= new JPanel();
