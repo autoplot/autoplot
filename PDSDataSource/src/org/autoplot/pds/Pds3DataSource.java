@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,6 +38,8 @@ import org.das2.qds.ops.Ops;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -217,7 +220,28 @@ public class Pds3DataSource extends AbstractDataSource {
         return Ops.dataset(csvfile,Units.nominal());
     }
 
-
+    private static Map<String, Object> transferAndCleanMeta( Iterator<Entry<String,Object>> entries , Map<String,Object> result ) throws Exception {
+        while ( entries.hasNext() ) {
+            Entry<String,Object> entry=  entries.next();
+            String key= entry.getKey();
+            Object value= entry.getValue();
+            if ( value instanceof Map ) {
+                Map<String,Object> childResult= new LinkedHashMap<>();
+                transferAndCleanMeta( ((Map) value).entrySet().iterator(), childResult );
+                value= childResult;
+            } else {
+                if ( key.equals("DESCRIPTION") && value instanceof String ) {
+                    value= DocumentUtil.cleanString( (String)value );
+                }
+                if ( key.equals("CONTAINER")  && value instanceof JSONArray ) {                    
+                    JSONArray ja= (JSONArray)value;
+                    DocumentUtil.cleanJSONArray(ja);
+                }
+            }
+            result.put( key, value );
+        }
+        return result;
+    }
     
     @Override
     public Map<String, Object> getMetadata(ProgressMonitor mon) throws Exception {
@@ -241,14 +265,7 @@ public class Pds3DataSource extends AbstractDataSource {
         String name= URISplit.parseParams(split.params).get("arg_0");
         PDS3DataObject obj= Pds3DataSourceFactory.getDataObjectPds3( split.resourceUri.toURL(), name );
         
-        for ( Entry<String,Object> entry : obj.getMetadata().entrySet() ) {
-            String key= entry.getKey();
-            Object value= entry.getValue();
-            if ( key.equals("DESCRIPTION") && value instanceof String ) {
-                value= DocumentUtil.cleanDescriptionString( (String)value );
-            }
-            result.put( key, value );
-        }
+        transferAndCleanMeta( obj.getMetadata().entrySet().iterator(), result );
         result.put( "_label", metadata.get("LABEL") );
         
         return result;

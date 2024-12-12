@@ -144,7 +144,7 @@ public class PDS3DataObject {
             if ( Double.isNaN(missingConstant) ) {
                 missingConstant= j.optDouble("INVALID_CONSTANT",Double.NaN);
             }
-            description= j.optString("DESCRIPTION", "");
+            description= DocumentUtil.cleanDescriptionString( j.optString("DESCRIPTION", "") );
         } catch (TransformerException | JSONException ex) {
             throw new IllegalArgumentException("unable to run",ex);
         } catch (XPathExpressionException ex) {
