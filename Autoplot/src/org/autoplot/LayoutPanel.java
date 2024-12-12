@@ -10,6 +10,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -54,6 +55,7 @@ import org.das2.graph.DasDevicePosition;
 import org.das2.graph.DasPlot;
 import org.das2.graph.Renderer;
 import static org.autoplot.GuiSupport.getStylePanel;
+import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.ApplicationController;
 import org.autoplot.dom.Axis;
@@ -1622,8 +1624,25 @@ public class LayoutPanel extends javax.swing.JPanel {
                 GuiSupport.editPlotElement( applicationModel, this );
             } else {
                 if ( uri.length()==0 ) {
-                    AutoplotUtil.showMessageDialog( this,
-                        "Please select this empty data source and use the address bar to set its URI.", "Empty URI", JOptionPane.INFORMATION_MESSAGE );
+                    JPanel parent= new JPanel();
+                    parent.setMinimumSize( new Dimension(600,400) );
+                    parent.setPreferredSize( new Dimension(600,400) );
+                    parent.setLayout( new BorderLayout() );
+                    
+                    DataSetSelector sss= new DataSetSelector();
+                    sss.setRecent(AutoplotUtil.getUrls(applicationModel.getRecent()));
+                    
+                    parent.add( sss, BorderLayout.NORTH );
+                    
+                    if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, parent, "Edit URI for "+((DataSourceFilter)s).getId(), JOptionPane.OK_CANCEL_OPTION ) ) {
+                        uri= sss.getValue();
+                        try {
+                            DataSourceEditorPanel x= DataSourceEditorPanelUtil.getDataSourceEditorPanel( parent, uri );
+                            ((DataSourceFilter)s).setUri(uri);
+                        } catch ( IllegalArgumentException ex ) {
+                            
+                        }
+                    }
                 } else {
                     JPanel parent= new JPanel();
                     parent.setLayout( new BorderLayout() );
