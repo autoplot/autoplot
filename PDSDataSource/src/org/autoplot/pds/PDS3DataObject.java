@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.transform.OutputKeys;
@@ -102,7 +103,14 @@ public class PDS3DataObject {
             startByte= j.optInt("START_BYTE",0);
             if ( items>1 ) {
                 bytes= j.optInt("BYTES",-1);
-                if ( bytes>-1 ) bytes= bytes / items;
+                if ( bytes>-1 ) {
+                    if ( bytes>items ) {
+                        bytes= bytes / items;
+                    } else {
+                        // https://pds-ppi.igpp.ucla.edu/data/VG2-U-PRA-3-RDR-LOWBAND-6SEC-V1.0/DATA/VG2_URN_PRA_6SEC.LBL
+                        System.err.println("huh.  ");
+                    }
+                }
             } else {
                 bytes= j.optInt("BYTES",-1);
             }
