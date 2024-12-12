@@ -243,7 +243,12 @@ public class CDAWebDB {
         String[] result;
         logger.log(Level.FINE, "getFiles {0} {1} ws={2}", new Object[]{spid, tr, useService});
         if ( useService ) {
-            String[] ff= getOriginalFilesAndRangesFromWebService(spid, tr, mon );
+            String[] ff;
+            try {
+                ff = getOriginalFilesAndRangesFromWebService(spid, tr, mon );
+            } catch ( IOException ex ) {
+                return getFiles( spid, tr, "F", mon );
+            }
             List<String> resultList= new ArrayList(ff.length);
             for ( String ff1 : ff ) {
                 try {
