@@ -433,7 +433,7 @@ public abstract class QDataSetBridge {
         UnitsConverter uc= UnitsConverter.IDENTITY;
         if ( prefUnits!=null ) {
             for ( Units prefUnit: prefUnits ) {
-                if ( prefUnit.isConvertableTo(u) ) {
+                if ( prefUnit.isConvertibleTo(u) ) {
                     uc= u.getConverter(prefUnit);
                     if ( uc!=UnitsConverter.IDENTITY ) {
                         if ( debug ) {
