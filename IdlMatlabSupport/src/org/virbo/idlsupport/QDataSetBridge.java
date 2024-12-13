@@ -4,13 +4,20 @@
  */
 package org.virbo.idlsupport;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import org.autoplot.datasource.AutoplotSettings;
 import org.das2.qds.buffer.FloatDataSet;
 import org.das2.qds.buffer.LongDataSet;
 import org.das2.datum.LoggerManager;
@@ -377,6 +384,19 @@ public abstract class QDataSetBridge {
         copyValues( ds1, result );
     }
 
+    public void svalues( String name, String[] result) {
+        if ( debug ) {
+            System.err.println("reading "+name+" into double["+result.length+"]" );
+        }
+        QDataSet ds1 = datasets.get(name);
+        if (ds1==null ) {
+            throw new IllegalArgumentException("no dataset with the name \""+name+"\"" );
+        }
+        for ( int i=0; i<ds1.length(); i++ ) {
+            result[i]= ds1.slice(i).svalue();
+        }
+    }
+    
     public void values(String name, double[][] result) {
         if ( debug ) {
             System.err.println("reading "+name+" into double["+result.length+","+result[0].length+"]" );
@@ -406,6 +426,10 @@ public abstract class QDataSetBridge {
         copyValues( ds1, result );
     }
 
+    public void svalues(String[] result) {
+        svalues(this.name(), result);
+    }
+    
     public void values(double[] result) {
         values(this.name(), result);
     }
@@ -422,6 +446,19 @@ public abstract class QDataSetBridge {
         values(this.name(), result);
     }
 
+    private Units getUnitFor( QDataSet ds ) {
+        Units u= SemanticOps.getUnits(ds);
+        for ( Units prefUnit: prefUnits ) {
+            if ( prefUnit.isConvertibleTo(u) ) {
+                UnitsConverter uc= u.getConverter(prefUnit);
+                if ( uc!=UnitsConverter.IDENTITY ) {
+                    return prefUnit;
+                }
+            }
+        }
+        return u;
+    }
+            
     /**
      * returns the converter if there is one.  If no converter is
      * registered, then UnitsConverter.IDENTITY is returned.
@@ -430,20 +467,14 @@ public abstract class QDataSetBridge {
      */
     private UnitsConverter maybeGetConverter( QDataSet ds1 ) {
         Units u= SemanticOps.getUnits(ds1);
-        UnitsConverter uc= UnitsConverter.IDENTITY;
         if ( prefUnits!=null ) {
-            for ( Units prefUnit: prefUnits ) {
-                if ( prefUnit.isConvertibleTo(u) ) {
-                    uc= u.getConverter(prefUnit);
-                    if ( uc!=UnitsConverter.IDENTITY ) {
-                        if ( debug ) {
-                            System.err.println("Using units converter to get "+prefUnit );
-                        }
-                    }
-                }
+            Units u1= getUnitFor( ds1 );
+            if ( debug ) {
+                System.err.println("Using units converter to get "+u1 );
             }
+            return UnitsConverter.getConverter( u, u1 );
         }
-        return uc;
+        return UnitsConverter.IDENTITY;
     }
 
     /* -- convert qubes to float arrays -- */
@@ -528,41 +559,49 @@ public abstract class QDataSetBridge {
         UnitsConverter uc= maybeGetConverter(ds1);
         QDataSet wds= DataSetUtil.weightsDataSet(ds1);
         for (int i0 = 0; i0 < ds1.length(); i0++) {
+            float[] result1= result[i0];
             for (int i1 = 0; i1 < ds1.length(i0); i1++) {
                 if ( useFill && wds.value(i0, i1 )==0 ) {
-                    result[i0][i1] = ffill;
+                    result1[i1] = ffill;
                 } else {
-                    result[i0][i1] = (float)uc.convert( ds1.value(i0, i1) );
+                    result1[i1] = (float)uc.convert( ds1.value(i0, i1) );
                 }
             }
         }
     }
+    
     private void copyValues( QDataSet ds1, float[][][] result ) {
         UnitsConverter uc= maybeGetConverter(ds1);
         QDataSet wds= DataSetUtil.weightsDataSet(ds1);
         for (int i0 = 0; i0 < ds1.length(); i0++) {
+            float[][] result1= result[i0];            
             for (int i1 = 0; i1 < ds1.length(i0); i1++) {
+                float[] result2= result1[i1];            
                 for (int i2 = 0; i2 < ds1.length(i0,i1); i2++) {
                     if ( useFill && wds.value(i0, i1, i2 )==0 ) {
-                        result[i0][i1][i2] = ffill;
+                        result2[i2] = ffill;
                     } else {
-                        result[i0][i1][i2] = (float)uc.convert( ds1.value(i0, i1, i2) );
+                        result2[i2] = (float)uc.convert( ds1.value(i0, i1, i2) );
                     }
                 }
             }
         }
     }
+    
     private void copyValues( QDataSet ds1, float[][][][] result ) {
         UnitsConverter uc= maybeGetConverter(ds1);
         QDataSet wds= DataSetUtil.weightsDataSet(ds1);
         for (int i0 = 0; i0 < ds1.length(); i0++) {
+            float[][][] result1= result[i0];  
             for (int i1 = 0; i1 < ds1.length(i0); i1++) {
+                float[][] result2= result1[i1];  
                 for (int i2 = 0; i2 < ds1.length(i0,i1); i2++) {
+                    float[] result3= result2[i2];   
                     for (int i3 = 0; i3 < ds1.length(i0,i1,i2); i2++) {
                         if ( useFill && wds.value(i0, i1, i2, i3 )==0 ) {
-                            result[i0][i1][i2][i3] = ffill;
+                            result3[i3] = ffill;
                         } else {
-                            result[i0][i1][i2][i3] = (float)uc.convert( ds1.value(i0, i1, i2, i3 ) );
+                            result3[i3] = (float)uc.convert( ds1.value(i0, i1, i2, i3 ) );
                         }
                     }
                 }
@@ -590,11 +629,12 @@ public abstract class QDataSetBridge {
         UnitsConverter uc= maybeGetConverter(ds1);
         QDataSet wds= DataSetUtil.weightsDataSet(ds1);
         for (int i0 = 0; i0 < ds1.length(); i0++) {
+            double[] result1= result[i0];
             for (int i1 = 0; i1 < ds1.length(i0); i1++) {
                 if ( useFill && wds.value(i0, i1 )==0 ) {
-                    result[i0][i1] = fill;
+                    result1[i1] = fill;
                 } else {
-                    result[i0][i1] = uc.convert( ds1.value(i0, i1) );
+                    result1[i1] = uc.convert( ds1.value(i0, i1) );
                 }
             }
         }
@@ -603,12 +643,14 @@ public abstract class QDataSetBridge {
         UnitsConverter uc= maybeGetConverter(ds1);
         QDataSet wds= DataSetUtil.weightsDataSet(ds1);
         for (int i0 = 0; i0 < ds1.length(); i0++) {
+            double[][] result1= result[i0];            
             for (int i1 = 0; i1 < ds1.length(i0); i1++) {
+                double[] result2= result1[i1];            
                 for (int i2 = 0; i2 < ds1.length(i0,i1); i2++) {
                     if ( useFill && wds.value(i0, i1, i2 )==0 ) {
-                        result[i0][i1][i2] = fill;
+                        result2[i2] = fill;
                     } else {
-                        result[i0][i1][i2] = uc.convert( ds1.value(i0, i1, i2) );
+                        result2[i2] = uc.convert( ds1.value(i0, i1, i2) );
                     }
                 }
             }
@@ -618,13 +660,16 @@ public abstract class QDataSetBridge {
         UnitsConverter uc= maybeGetConverter(ds1);
         QDataSet wds= DataSetUtil.weightsDataSet(ds1);
         for (int i0 = 0; i0 < ds1.length(); i0++) {
+            double[][][] result1= result[i0];  
             for (int i1 = 0; i1 < ds1.length(i0); i1++) {
+                double[][] result2= result1[i1];  
                 for (int i2 = 0; i2 < ds1.length(i0,i1); i2++) {
+                    double[] result3= result2[i2];   
                     for (int i3 = 0; i3 < ds1.length(i0,i1,i2); i2++) {
                         if ( useFill && wds.value(i0, i1, i2, i3 )==0 ) {
-                            result[i0][i1][i2][i3] = fill;
+                            result3[i3] = fill;
                         } else {
-                            result[i0][i1][i2][i3] = uc.convert( ds1.value(i0, i1, i2, i3 ) );
+                            result3[i3] = uc.convert( ds1.value(i0, i1, i2, i3 ) );
                         }
                     }
                 }
@@ -646,6 +691,7 @@ public abstract class QDataSetBridge {
         if ( datasets.get(name)!=null ) {
             ds1 = datasets.get(name).slice(i);
         } else {
+            System.err.println("No datasets with that name: "+name);
             throw new IllegalArgumentException("did not find dataset name="+name );
         }
         copyValues( ds1, result );
@@ -667,6 +713,7 @@ public abstract class QDataSetBridge {
         if ( datasets.get(name)!=null ) {
             ds1 = datasets.get(name).slice(i);
         } else {
+            System.err.println("No datasets with that name: "+name);
             throw new IllegalArgumentException("did not find dataset name="+name );
         }
         copyValues( ds1, result );
@@ -702,6 +749,41 @@ public abstract class QDataSetBridge {
         
     /**
      * return an 1,2,or 3-D array of doubles or floats containing the values
+     * in the default dataset.
+     * @return
+     */
+    public Object values() {
+        return values(name);
+    }
+
+    /**
+     * return a array of strings, which can be useful for data discovery,
+     * for a rank 1 dataset.
+     * @return a string array.
+     */
+    public String[] svalues(  ) {
+        return svalues(name);
+    }
+    
+    /**
+     * return a array of strings, which can be useful for data discovery,
+     * for a rank 1 dataset.
+     * @param name the dataset name, such as "Epoch"
+     * @return a string array.
+     */
+    public String[] svalues( String name ) {
+        QDataSet ds1 = datasets.get(name);
+        if ( ds1==null ) {
+            System.err.println("No datasets with that name: "+name);
+            throw new IllegalArgumentException("No datasets with the name: "+name);
+        }
+        String[] result = new String[ds1.length()];
+        svalues( name, result );
+        return result;
+    }
+        
+    /**
+     * return an 1,2,or 3-D array of doubles or floats containing the values
      * in the specified dataset.
      * @param name
      * @return
@@ -712,12 +794,16 @@ public abstract class QDataSetBridge {
         }
         QDataSet ds1 = datasets.get(name);
         if ( ds1==null ) {
+            System.err.println("No datasets with that name: "+name);
             throw new IllegalArgumentException("No datasets with the name: "+name);
         }
         
         UnitsConverter uc= maybeGetConverter(ds1);
         
         if ( ds1 instanceof FDataSet || ds1 instanceof FloatDataSet ) {
+            if ( debug ) {
+                System.err.println("reading values as 4-byte floats: " + name );
+            }
             switch (ds1.rank()) {
                 case 1:
                 {
@@ -747,6 +833,9 @@ public abstract class QDataSetBridge {
                     throw new IllegalArgumentException("rank limit");
             }
         } else if ( ds1 instanceof LongDataSet && uc==UnitsConverter.IDENTITY ) { // Special support for CDF TT2000
+            if ( debug ) {
+                System.err.println("reading values as 64-bit longs: " + name );
+            }            
             switch (ds1.rank()) {
                 case 1:
                 {
@@ -776,6 +865,9 @@ public abstract class QDataSetBridge {
                     throw new IllegalArgumentException("rank limit");
             }
         } else {
+            if ( debug ) {
+                System.err.println("reading values as 8-byte doubles: " + name );
+            }
             switch (ds1.rank()) {
                 case 1:
                 {
@@ -941,15 +1033,6 @@ public abstract class QDataSetBridge {
 
     /**
      * return an 1,2,or 3-D array of doubles or floats containing the values
-     * in the default dataset.
-     * @return
-     */
-    public Object values() {
-        return values(name);
-    }
-
-    /**
-     * return an 1,2,or 3-D array of doubles or floats containing the values
      * in a slice on the zeroth dimension of the default dataset.
      * @param i0 the index to slice on.
      * @return 1,2,or 3-D  array of doubles or floats.
@@ -984,10 +1067,20 @@ public abstract class QDataSetBridge {
         else return nameFor(result);
     }
 
+    /**
+     * return the default dataset property value as a string.
+     * @param property property name 
+     * @return 
+     */
     public String propertyAsString(String property) {
         Object result = this.ds.property(property);
-        if (result == null) return "";
-        else return String.valueOf(result);
+        if ( property.equals("UNITS") ) {
+            return String.valueOf( getUnitFor( this.ds ) );
+        } else if (result == null) {
+            return "";
+        } else {    
+            return String.valueOf(result);
+        }
     }
 
     public double propertyAsDouble(String property) {
@@ -996,14 +1089,35 @@ public abstract class QDataSetBridge {
         else return ((Number) result).doubleValue();
     }
 
+    /**
+     * return the property value as a string.
+     * @param name dataset name
+     * @param property property name like "UNITS" or "LABEL"
+     * @return 
+     */
     public String propertyAsString(String name, String property) {
-        Object result = datasets.get(name).property(property);
-        if (result == null) return "";
-        else return String.valueOf(result);
+        QDataSet ds1= datasets.get(name);
+        if ( ds1==null ) {
+            System.err.println("No datasets with that name: "+name);
+            throw new IllegalArgumentException("No datasets with the name: "+name);
+        }
+        Object result = ds1.property(property);
+        if ( property.equals("UNITS") ) {
+            return String.valueOf( getUnitFor( datasets.get(name) ) );
+        } else if (result == null) {
+            return "";
+        } else {    
+            return String.valueOf(result);
+        }
     }
 
     public double propertyAsDouble(String name, String property) {
-        Object result = datasets.get(name).property(property);
+        QDataSet ds1= datasets.get(name);
+        if ( ds1==null ) {
+            System.err.println("No datasets with that name: "+name);
+            throw new IllegalArgumentException("No datasets with the name: "+name);
+        }
+        Object result = ds1.property(property);
         if (result == null) return Double.NaN;
         else return ((Number) result).doubleValue();
     }
@@ -1016,6 +1130,10 @@ public abstract class QDataSetBridge {
      */
     public void valuesAlias(String name, double[] result) {
         QDataSet ds1 = datasets.get(name);
+        if ( ds1==null ) {
+            System.err.println("No datasets with that name: "+name);
+            throw new IllegalArgumentException("No datasets with the name: "+name);
+        }
         QubeDataSetIterator it = new QubeDataSetIterator(ds1);
         int iele = 0;
         while (it.hasNext()) {
@@ -1134,6 +1252,22 @@ public abstract class QDataSetBridge {
         return DataSetUtil.isQube( datasets.get(name) );
     }
 
+    /**
+     * provides direct access to the loaded dataset, used when the caller knows how to use a QDataSet.
+     * @return 
+     */
+    public QDataSet getQDataSet() {
+        return datasets.get(name);
+    }
+    
+    /**
+     * provides direct access to the loaded dataset, used when the caller knows how to use a QDataSet.
+     * @return 
+     */
+    public QDataSet getQDataSet(String name) {
+        return datasets.get(name);
+    }
+    
     /**
      * returns one of String, int, double, float, int[], double, float[]
      * @param name
@@ -1300,8 +1434,8 @@ public abstract class QDataSetBridge {
         System.err.println( "Java version: " + javaVersion + " " + javaVersionWarning );
         System.err.println( "Arch: " + arch );
         System.err.println( "Max memory (MB): " + mem + " (memory available to process)" );
-        System.err.println( "total memory (MB): " + tmem + " (amount allocated to the process)" );
-        System.err.println( "free memory (MB): " + fmem + " (amount available before more must be allocated)" );
+        System.err.println( "Total memory (MB): " + tmem + " (amount allocated to the process)" );
+        System.err.println( "Free memory (MB): " + fmem + " (amount available before more must be allocated)" );
 
     }
     
@@ -1320,7 +1454,6 @@ public abstract class QDataSetBridge {
 
     }
 
-    
     /**
      * clear existing data from memory, in case the bridge object is not cleared
      * from in IDL or Matlab memory.
@@ -1328,5 +1461,68 @@ public abstract class QDataSetBridge {
      */
     public void clearMemory() {
         datasets.clear();
+    }
+    
+    /**
+     * load the configuration from autoplot_data/config/logging.properties
+     */
+    public void readLogConfiguration() {
+        // read in the file $HOME/autoplot_data/config/logging.properties, if it exists.
+        File f1= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "config" );
+        File f2= new File( f1, "logging.properties" );
+        if ( f2.exists() ) {
+            if ( !f2.canRead() ) logger.log(Level.WARNING, "Unable to read {0}", f2);
+            InputStream in=null;
+            try {
+                logger.log(Level.INFO, "Reading {0}", f2);
+                in= new FileInputStream(f2);
+                LogManager.getLogManager().readConfiguration(in);
+            } catch ( IOException ex ) {
+                logger.log(Level.WARNING, "IOException during read of {0}", f2);
+            } finally {
+                try {
+                    if ( in!=null ) in.close();
+                } catch ( IOException ex ) {
+                    logger.log(Level.WARNING, "IOException during close of {0}", f2);
+}
+            }                
+        }
+    }
+    
+    /**
+     * desperate method for debugging where JPype/Python would hang, in hopes that
+     * this might show where it's hanging.
+     * @deprecated this is no longer a problem and will be removed
+     */
+    public void dumpStack() {
+        Map<Thread,StackTraceElement[]> mm= Thread.getAllStackTraces();
+        for ( Entry<Thread,StackTraceElement[]> t: mm.entrySet() ) {
+            System.err.println("Thread: "+t.getKey().getName());
+            for ( StackTraceElement st: t.getValue() ) {
+                System.err.println("    "+st.toString() );
+            }
+            System.err.println("");
+        }
+    }
+    
+    /**
+     * desperate method for debugging where JPype/Python would hang, in hopes that
+     * this might show where it's hanging.
+     * @param n number of seconds.
+     * @deprecated this is no longer a problem and will be removed
+     */
+    public void dumpStackInNSeconds( final double n ) {
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep( (int)( n * 1000 ) );
+                } catch (InterruptedException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
+                dumpStack();
+            }
+        };
+        new Thread(run).start();
     }
 }
