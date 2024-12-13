@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
-import org.autoplot.util.MigratePreference;
 import org.das2.util.filesystem.FileSystem;
 
 /**
@@ -115,24 +114,7 @@ public final class AutoplotSettings {
     public Preferences getPreferences( Class c ) {
         String s= c.getPackage().getName();
         Preferences p1= Preferences.userRoot().node("/"+s.replace('.','/'));
-        switch (s) {
-            case "org.autoplot.dom":
-                s= "org.virbo.autoplot.dom";
-                break;
-            case "org.autoplot":
-                s= "org.virbo.autoplot";
-                break;
-            case "org.autoplot.scriptconsole":
-                s= "org.virbo.autoplot.scriptconsole";
-                break;
-            case "org.autoplot.datasource":
-                s= "org.virbo.datasource";
-                break;
-            default:
-                break;
-        }
-        Preferences p2= Preferences.userRoot().node("/"+s.replace('.','/'));
-        return new MigratePreference(p1,p2); // use org.autoplot before org.virbo.
+        return p1; 
         
     }
     
