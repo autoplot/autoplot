@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>ASCII file with Tempest sensor wind speed and direction, and the "where" control loads only records with a wind speed of greater than three.</small></p>
+        <p><small>ASCII file with Tempest sensor wind speed and direction.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -32,6 +32,7 @@
                 
         <p>Bugfixes (2024-12-12 r27975):</p>
         <ul>
+            <li>String "null" would appear in HAPI dataset titles incorrectly.
             <li>Don't throw runtime error when empty data source is edited.  Thanks, Scott C!
             <li>like CDAWeb reverts to offline mode, using template in all.xml automatically when internet is not available.
             <li>miscellaneous minor items, like feedback when internet is not available.
