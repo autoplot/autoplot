@@ -285,10 +285,11 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
     
     /**
      * return a list of parameters and their summarized descriptions.  The
-     * summaries are the first sentence of the description.
+     * summaries are the first sentence of the description.  The description
+     * will be HTML and will be formatted properly when used with JLabels, etc.
      * @param url the LBL file location.
      * @param mon a monitor.
-     * @return a map from id to description of the id.
+     * @return a map from id to description of the id.  
      */
     private Map<String,String> getDataObjectNames( URL url, ProgressMonitor mon) throws Exception {
         
@@ -382,6 +383,30 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
 
     }
     
+    /**
+     * other codes now try hard to HTML-ize the description, but sometimes we don't 
+     * need this, and we want just the first line.
+     * @param description for example &lt;html&gt;&lt;br&gt; Spacecraft Event Time (SCET) at the start of the first sweep in year, &lt;br&gt;...
+     * @return for example "Spacecraft Event Time (SCET) at the start of the first sweep in year..."
+     */
+    private static String removeHtml( String description ) {
+        if ( description==null ) return null;
+        if ( description.startsWith("<html>") ) {
+            description= description.substring(6);
+            if ( description.startsWith("<br>") ) {
+                description= description.substring(4);
+            }
+        }
+        
+        String more = "";
+        int i= description.indexOf("<br>");
+        if ( i>-1 ) {
+            description= description.substring(0,i);
+            more= "...";
+        }
+        return description.trim() + more;
+    }
+    
     @Override
     public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
         if ( cc.context.equals(CompletionContext.CONTEXT_PARAMETER_NAME) ) {
@@ -398,10 +423,11 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
                     CompletionContext.CONTEXT_PARAMETER_NAME, 
                     "", 
                     this, "arg_0", 
-                    "Select parameter to plot:", "", false ) );
+                    "Select parameter to plot", "", false ) );
             for ( java.util.Map.Entry<String,String> e:result.entrySet() ) {
                 String key= e.getKey();
                 String desc= e.getValue();
+                desc= removeHtml( desc );
                 CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, 
                         key, this, "arg_0", desc, null, true );
                 ccresult.add(cc1);
@@ -428,6 +454,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
                 for ( java.util.Map.Entry<String,String> e:result.entrySet() ) {
                     String key= e.getKey();
                     String desc= e.getValue();
+                    desc= removeHtml( desc );
                     CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, key, this, "arg_0", 
                             desc, null, true );
                     ccresult.add(cc1);
