@@ -88,7 +88,7 @@ public class JavadocLookup {
                     if ( i>0 ) {
                         signature= signature.substring(0,i);
                     }
-                    if ( signature.startsWith("org/das2/qds/ops/Ops.html") ) {
+                    if ( signature.startsWith("org/das2/qds/ops/Ops.html") && signature.length()>26 ) {
                         char let= signature.charAt(26);
                         return s + signature.substring(0,20) + "_" + let + signature.substring(20);
                     } else {
