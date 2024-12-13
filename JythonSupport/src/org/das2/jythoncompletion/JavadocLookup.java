@@ -41,7 +41,7 @@ public class JavadocLookup {
             instance.setLinkForJavaSignature("org/jdesktop","https://docs.oracle.com/javase/8/docs/api/");
             instance.setLinkForJavaSignature("org/apache/commons/math3", "https://commons.apache.org/proper/commons-math/javadocs/api-3.6/" );
             instance.setLinkForJavaSignature("org/apache/commons/math", "https://commons.apache.org/proper/commons-math/javadocs/api-2.0/" );
-            instance.setLinkForJavaSignature("gov/nasa/gsfc/spdf/cdfj", "https://jfaden.net/~jbf/autoplot/cdf/doc/" );
+            instance.setLinkForJavaSignature("gov/nasa/gsfc/spdf/cdfj", "https://cottagesystems.com/~jbf/autoplot/cdf/doc/" );
             instance.setLinkForJavaSignature("org/json", "https://stleary.github.io/JSON-java/" );
             instance.setLinkForJavaSignature("org/autoplot", JythonCompletionProvider.getInstance().settings.getDocHome() );
             instance.setLinkForJavaSignature("org/das2", JythonCompletionProvider.getInstance().settings.getDocHome() );
@@ -82,6 +82,7 @@ public class JavadocLookup {
                     return s + signature.replaceAll("[\\(\\)\\,]", "-");
                 } else if ( s.startsWith("http://www-pw.physics.uiowa.edu/~jbf/autoplot/doc")
                         || s.startsWith("https://jfaden.net/~jbf/autoplot/doc" )
+                        || s.startsWith("https://cottagesystems.com/~jbf/autoplot/doc" )
                         || s.startsWith("https://cottagesystems.com/jenkins/job/autoplot-javadoc/") ) {
                     int i= signature.indexOf('(');
                     if ( i>0 ) {
