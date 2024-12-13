@@ -181,7 +181,7 @@ public class CompletionSettings {
     }
 
     public void loadPreferences() {
-        docHome= prefs.get( PROP_DOCHOME, "https://cottagesystems.com/~jbf/autoplot/doc/" ) ;
+        docHome= prefs.get( PROP_DOCHOME, "https://cottagesystems.com/~jbf/autoplot/doc/" );
         tabIsCompletion= prefs.getBoolean( PROP_TAB_IS_COMPLETION, true );
         tabIsSpaces= prefs.getBoolean( PROP_TABISSPACES, false );
         showTabs= prefs.getBoolean( PROP_SHOWTABS, true );
