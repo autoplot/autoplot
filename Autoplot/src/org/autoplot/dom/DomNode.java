@@ -97,7 +97,8 @@ public abstract class DomNode implements Cloneable {
      * differences describe how to mutate that node to make it like this
      * node.
      * @param that
-     * @return
+     * @return the list of differences
+     * @see Diff
      */
     public List<Diff> diffs( DomNode that ) {
         List<Diff> result = new ArrayList();
