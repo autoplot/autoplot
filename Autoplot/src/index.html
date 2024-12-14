@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>ASCII files of Tempest sensor wind speed and direction are aggregated to cover long span.</small></p>
+        <p><small>A <a href="https://github.com/autoplot/dev/blob/master/demos/2024/20241214/VG2-U-PRA-3-RDR-LOWBAND-6SEC.jyds">jyds script</a> is needed to read data from Voyager 2 PRA files.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -32,6 +32,7 @@
                 
         <p>Bugfixes (2024-12-12 r28000):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2615/">2615</a>: label for PDS3 completion must include parameter name to work in script editor completions.
             <li>Remove migrate preferences, which moved preferences from 2016 Autoplot, and makes it difficult to test a fresh session.
             <li>String "null" would appear in HAPI dataset titles incorrectly.
             <li>Don't throw runtime error when empty data source is edited.  Thanks, Scott C!
