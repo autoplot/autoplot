@@ -111,7 +111,7 @@ public class CompletionContext {
      * @param completable the value to use, if the completion is accepted.
      * @param owner the code responsible for creating the completion (not used).
      * @param implicitName often "arg_0" for positional parameters.
-     * @param label label to use.
+     * @param label label to use, including the parameter name so that it can be understood out of context. (SWEEP1: This column contains values)
      * @param doc additional information that is shown in a tooltip.
      * @param maybePlot url should be valid if this proposal is accepted.
      */
@@ -127,6 +127,7 @@ public class CompletionContext {
         this.label= label==null ? completable : label;
         this.doc= doc;
         this.maybePlot= maybePlot;
+        // this is a good place for a breakpoint.
     }
     
     /**
