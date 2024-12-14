@@ -429,7 +429,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
                 String desc= e.getValue();
                 desc= removeHtml( desc );
                 CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, 
-                        key, this, "arg_0", desc, null, true );
+                        key, this, "arg_0", key + ": " +desc, null, true );
                 ccresult.add(cc1);
             }
             ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "X=",
