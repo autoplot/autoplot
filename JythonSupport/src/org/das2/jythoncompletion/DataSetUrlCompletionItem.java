@@ -124,4 +124,11 @@ public class DataSetUrlCompletionItem implements CompletionItem {
     public String getLabel() {
         return rs.completion;
     }
+
+    @Override
+    public String toString() {
+        return "completion "+ rs.completion;
+    }
+    
+    
 }
