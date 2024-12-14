@@ -1,5 +1,5 @@
 This has the PDS header and data in one file.  Also, a runtime error was attempting to read the file:
-*https://archives.esac.esa.int/psa/ftp/VENUS-EXPRESS/MAG/VEX-V-Y-MAG-4-V1.0/DATA/CAPTORBIT_S004/MAG_20060424_DOY114_S004_V1.TAB
+* https://archives.esac.esa.int/psa/ftp/VENUS-EXPRESS/MAG/VEX-V-Y-MAG-4-V1.0/DATA/CAPTORBIT_S004/MAG_20060424_DOY114_S004_V1.TAB
 
 # PDS3
 This shows a couple of problems with the location of pointer file and bytes per field in items>1.
@@ -15,6 +15,13 @@ Bunch from test144:
 * https://pds-ppi.igpp.ucla.edu/data/GO-J-PWS-2-EDR-WAVEFORM-80KHZ-V1.0/DATA/C032095/80KHZ_0320950402.LBL?WAVEFORM_SAMPLES
 * https://pds-ppi.igpp.ucla.edu/data/GO-J-PWS-5-DDR-PLASMA-DENSITY-FULL-V1.0/DATA/00_JUPITER/FPE_1996_05_26_V01.LBL?FREQ_CE
 
+Juno:
+* https://pds-ppi.igpp.ucla.edu/data/JNO-J_SW-JAD-5-CALIBRATED-V1.0/DATA/2018/2018091/ELECTRONS/JAD_L50_HRS_ELC_TWO_DEF_2018091_V01.LBL?DATA
+
 Pathological cases:
 * https://github.com/autoplot/dev/blob/master/demos/2024/20241214/VG2-U-PRA-3-RDR-LOWBAND-6SEC.jyds
 * https://pds-ppi.igpp.ucla.edu/data/VG1-J-PRA-3-RDR-LOWBAND-6SEC-V1.0/DATA/PRA_I.LBL?SWEEP1
+
+# PDS4
+* https://pds-ppi.igpp.ucla.edu/data/cassini-rpws-electron_density/data/2017/rpws_fpe_2017-102_v1.xml uses Java 11 csv parser.
+* https://pds-ppi.igpp.ucla.edu/data/cassini-caps-calibrated/data-els/2012/092_121_APR/ELS_201209206_V01.xml?DATA&X=SC_POS_R  Doesn't pick up timetags.
