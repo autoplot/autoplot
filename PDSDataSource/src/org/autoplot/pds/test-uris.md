@@ -25,3 +25,10 @@ Pathological cases:
 # PDS4
 * https://pds-ppi.igpp.ucla.edu/data/cassini-rpws-electron_density/data/2017/rpws_fpe_2017-102_v1.xml uses Java 11 csv parser.
 * https://pds-ppi.igpp.ucla.edu/data/cassini-caps-calibrated/data-els/2012/092_121_APR/ELS_201209206_V01.xml?DATA&X=SC_POS_R  Doesn't pick up timetags.
+
+Does not work with the last production release:
+* https://pds-ppi.igpp.ucla.edu/data/juno-waves-electron-density/data_io/2024017_orbit_58/wav_2024-034T00-00-00_e-dens-i_v1.0.lblx?Fpe&X=SCET
+
+Here is the search engine:
+* https://pds.nasa.gov/tools/doi/#/search
+
