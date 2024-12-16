@@ -1905,7 +1905,8 @@ public class DataSetURI {
     }
 
     /**
-     * Get the completions from the FileSystem, including aggregation suggestions.
+     * Get the completions from the FileSystem, including aggregation suggestions.  Note that one only folder of the 
+     * aggregation will be listed, presuming that each folder looks the same as the others. 
      * @param surl the URI, e.g. file:/home/jbf/pngwalk/product_$Y$m.png
      * @param carotpos the position of the editor carot (cursor) where the completions
      * @param inclAgg include aggregations it sees.  These are a guess.
@@ -1950,7 +1951,7 @@ public class DataSetURI {
 
         if ( surlDir.contains("$Y") ) { // $Y must be first for now.  This will be generalized after verified
             
-            DatumRange timeRange= null;
+            DatumRange timeRange=null;
             try {
                 URISplit split1= URISplit.parse(surl);
                 Map<String,String> parms= URISplit.parseParams(split1.params);
@@ -1970,6 +1971,12 @@ public class DataSetURI {
 
             fs= fsp; // careful, we only use this for case insensitive check
             List<String> ss= new ArrayList();
+            
+            if ( timeRange!=null ) {
+                String ss1= fsm.getRepresentativeFile(mon);
+                timeRange= fsm.getRangeFor(ss1);
+            }
+            
             String [] ss2= fsm.getNamesFor(timeRange);
 
             int nn= Math.min( 2, ss2.length );
