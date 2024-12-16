@@ -1,7 +1,6 @@
 
 package org.autoplot.pds;
 
-import com.opencsv.exceptions.CsvValidationException;
 import gov.nasa.pds.label.Label;
 import gov.nasa.pds.label.object.ArrayObject;
 import gov.nasa.pds.label.object.FieldDescription;
@@ -15,7 +14,6 @@ import java.net.URI;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,11 +29,8 @@ import javax.xml.xpath.XPathFactory;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
-import org.autoplot.metatree.MetadataUtil;
 import org.das2.datum.DatumRangeUtil;
-import org.das2.datum.DatumUtil;
 import org.das2.datum.NumberUnits;
-import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.qds.ArrayDataSet;
