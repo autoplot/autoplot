@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>A <a href="https://github.com/autoplot/dev/blob/master/demos/2024/20241214/VG2-U-PRA-3-RDR-LOWBAND-6SEC.jyds">jyds script</a> is needed to read data from Voyager 2 PRA files.</small></p>
+        <p><small>CDAWeb HAPI server performance is clearly improved since October fix.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -31,6 +31,10 @@
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
         <p>Bugfixes (2024-12-12 r28000):</p>
+        <ul>
+            <li>Completions on URI with aggregation would list the entire filesystem, effectively hanging in some cases.
+        </ul>
+        <p>Older Bugfixes (2024-12-12 r28000):</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2615/">2615</a>: label for PDS3 completion must include parameter name to work in script editor completions.
             <li>Remove migrate preferences, which moved preferences from 2016 Autoplot, and makes it difficult to test a fresh session.
@@ -56,38 +60,14 @@
             <li>Compile in old name org.autoplot.scriptconsole.ScriptPanelSupport to support old scripts until they can be updated.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/789/">789</a>: New code which would grab the timerange from the URI when trim=True was set broke old interface.  Thanks, Sadie!
         </ul>
-        <p>Older Bugfixes (2024-11-18 r27936):</p>
-        <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2639/">2639</a>: New code would cause NullPointerException with rank 2 Vector Data Sets.  Thanks, Sadie!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/1687/">1687</a>: Support completions with PWD + "demo&lt;C&gt;" to list PWD while coding.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2633/">2633</a>: use the URI to get the timerange when trim=True.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2635/">2635</a>: bug sequence with data processing clean-up is now fixed as well.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2642/">2642</a>: show all if no support metadata is found (as with Python and IDL export to CDF).  Thanks Connor and Sadie!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2639/">2639</a>: support rank 3 waveform scheme dataset with x,y,z components.  Thanks, Chris!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2643/">2643</a>: Static Code Analysis correctly detects use within if/else blocks.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2644/">2644</a>: add checkbox for majority in CDF export.
-            <li>Codes which transfer data from one buffer to another do so in larger chunks now, using 8K buffers as Google suggests.
-            <li>Run Batch Tool uses 8 threads by default when multi-threaded runs are done. 32 was too many, even for a 48-core machine.
-            <li>Don't leave empty recent files in autoplot_data/bookmarks/
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2641/">2641</a>: misconfiguration of mouse module in <a href="https://jfaden.net/~jbf/autoplot/doc/org/autoplot/ScriptContext.html#addMouseModule">addMouseModule</a> meant box events received from keystrokes were incorrect.  Thanks, Dave!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2217/">2217</a>: "|magnitude()" is added to vector time series support, switching from component traces to one magnitude trace.  Thanks, Pedro!
-            <li>Restore missing tools.xml file.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2638/">2638</a>: data tab and layout tab are now initially on for new installations, since this was confusing.
-        </ul>
         <p>Features:</p>
+        <ul>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>extract common codes btw PDS3 and PDS4 working with Document to get titles.  When getting the title from the description, just use the first sentence.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/835/">835</a>: script in tools will switch to Dark LAF.  Thanks, Chris!
             <li>PDS3 with time column as the first column will use it as the independent values.  This will have to do for AGU!
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>Color chooser dialog with named colors subpanel has "find close" button to find close named color.
-            <li>Remove old HAPI local cache code, put in support for external HAPI cache mechanism.
-            <li>Jython to Java conversion checks for struct.pack.
-            <li>units=enum or units=nominal to mean nominal data.
-            <li>Buffer sizes used to transfer data increased from 1024 bytes to 8*1024 bytes, possibly showing small performance gains.
-            <li>More enhancements to Python-to-Java converter while porting new IDLSave reader.
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
