@@ -4,6 +4,7 @@ package org.autoplot.pds;
 import gov.nasa.pds.label.Label;
 import gov.nasa.pds.label.object.ArrayObject;
 import gov.nasa.pds.label.object.FieldDescription;
+import gov.nasa.pds.label.object.FieldType;
 import gov.nasa.pds.label.object.TableObject;
 import gov.nasa.pds.label.object.TableRecord;
 import java.io.File;
@@ -106,7 +107,7 @@ public class PdsDataSource extends AbstractDataSource {
             dsb.setLabel( i, fieldDescription.getName() );
             //TODO: Larry has nice descriptions.  How to get at those? https://space.physics.uiowa.edu/pds/cassini-rpws-electron_density/data/2006/rpws_fpe_2006-141_v1.xml
             //TODO: also https://pds-ppi.igpp.ucla.edu/data/cassini-caps-fitted-parameters/Data/CAS_CAPS_FITTED_PARAMETERS_WILSON_V01.xml?Sc_lat&X=Utc
-            switch (fieldDescription.getType()) {
+            switch (fieldDescription.getType()) { // see isTimeType, which is redundant
                 case ASCII_DATE:
                 case ASCII_DATE_DOY:
                 case ASCII_DATE_TIME_DOY_UTC:
@@ -378,6 +379,15 @@ public class PdsDataSource extends AbstractDataSource {
         return Ops.dataset(csvfile,Units.nominal());
     }
     
+    private static boolean isTimeType( FieldType ft ) {
+        return ft==FieldType.ASCII_DATE ||  
+                ft==FieldType.ASCII_DATE_DOY ||
+                ft==FieldType.ASCII_DATE_TIME ||
+                ft==FieldType.ASCII_DATE_TIME_DOY_UTC ||
+                ft==FieldType.ASCII_DATE_TIME_UTC ||
+                ft==FieldType.ASCII_DATE_TIME_YMD ||
+                ft==FieldType.ASCII_DATE_TIME_YMD_UTC ;          
+    }
     
     @Override
     public org.das2.qds.QDataSet getDataSet(ProgressMonitor mon) throws Exception {
@@ -428,7 +438,32 @@ public class PdsDataSource extends AbstractDataSource {
         if ( okay ) {
             names= names1;
         }
-            
+        
+        // See if there's an obvious connection between table columns (and
+        // the first time column)
+        for ( TableObject t : label.getObjects( TableObject.class) ) {
+            String dep0name= null;
+            if ( isTimeType( t.getFields()[0].getType() ) ) {
+                dep0name= t.getFields()[0].getName();
+            }
+            List<String> newNames= new ArrayList<>(names);
+            for ( int i=0; i<names.size(); i++ ) {
+                name= names.get(i);
+                if ( name==null ) {
+                    
+                } else {
+                    for ( FieldDescription fd: t.getFields() ) {
+                        if ( name.equals( fd.getName() ) ) { 
+                            if ( !newNames.get(0).equals(dep0name) ) {
+                                newNames.add( 0, dep0name );
+                            }
+                        }
+                    }
+                }
+            }
+            if ( newNames.size()>names.size() ) names= newNames;
+        }
+        
         QDataSet result=null;
         QDataSet[] results= new QDataSet[names.size()];
         
@@ -450,7 +485,7 @@ public class PdsDataSource extends AbstractDataSource {
                     }
                 }
             }
-            if ( tableColumnNames.size()>0 ) {
+            if ( !tableColumnNames.isEmpty() ) {
                 QDataSet bresults= getFromTable( t, tableColumnNames.toArray(new String[tableColumnNames.size()]) );
                 for ( int iii=0; iii<datasetColumnIndexes.size(); iii++ ) {
                     int i= datasetColumnIndexes.get(iii);
