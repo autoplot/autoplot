@@ -1611,6 +1611,11 @@ public class DataSetURI {
             this.doc = doc;
             this.maybePlot = maybePlot;
         }
+        
+        @Override
+        public String toString() {
+            return "CompletionResult "+completion;
+        }
      
         public static final CompletionResult SEPARATOR= new CompletionResult("====", "Used to request a separator");
     }
