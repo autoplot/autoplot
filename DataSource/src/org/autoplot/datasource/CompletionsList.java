@@ -40,7 +40,7 @@ public class CompletionsList {
             //int stopAt= 10000;
             while (i < completions.size() ) {
                 final CompletionResult s1 = completions.get(i);
-                int icaret= s1.completable.length();
+                int icaret= s1.completable==null ? 0 : s1.completable.length();
                 if ( s1==CompletionResult.SEPARATOR ) {
                     //menuItem= new javax.swing.JButton("HELLO");
                     menuItem= new javax.swing.JSeparator();
