@@ -91,6 +91,8 @@ public class PdsDataSource extends AbstractDataSource {
         
         DataSetBuilder dsb= new DataSetBuilder(2,100,ncols);
         
+        int currentColumn= -1;
+        int firstColumn= -1;
         for ( int i=0; i<ncols; i++ ) {
             int icol= -1;
             FieldDescription[] fields= t.getFields();
@@ -101,27 +103,24 @@ public class PdsDataSource extends AbstractDataSource {
                 }
             }
             //TODO: what is returned when column isn't found?
-            icols[i]= icol;
+            if ( icol==currentColumn ) {
+                icols[i]= currentColumn + ( i-firstColumn );
+            } else {
+                icols[i]= icol;
+                currentColumn= icol;
+                firstColumn= i;
+            }
             FieldDescription fieldDescription= t.getFields()[icol];
             dsb.setName( i, fieldDescription.getName() );
             dsb.setLabel( i, fieldDescription.getName() );
             //TODO: Larry has nice descriptions.  How to get at those? https://space.physics.uiowa.edu/pds/cassini-rpws-electron_density/data/2006/rpws_fpe_2006-141_v1.xml
             //TODO: also https://pds-ppi.igpp.ucla.edu/data/cassini-caps-fitted-parameters/Data/CAS_CAPS_FITTED_PARAMETERS_WILSON_V01.xml?Sc_lat&X=Utc
-            switch (fieldDescription.getType()) { // see isTimeType, which is redundant
-                case ASCII_DATE:
-                case ASCII_DATE_DOY:
-                case ASCII_DATE_TIME_DOY_UTC:
-                case ASCII_DATE_TIME_UTC:
-                case ASCII_DATE_TIME_DOY:
-                case ASCII_DATE_TIME_YMD:
-                case ASCII_DATE_TIME_YMD_UTC:
-                    dsb.setUnits(i, Units.us2000);
-                    break;
-                    //TODO: create timeparser 
-                case ASCII_STRING:
-                    dsb.setUnits(i, Units.nominal(fieldDescription.getName()) );
-                default:
-                    dsb.setUnits(i, Units.dimensionless ); // TODO: how to get "unit" from label
+            if ( isTimeType(fieldDescription) ) {
+                dsb.setUnits(i, Units.us2000);
+            } else if ( fieldDescription.getType()==FieldType.ASCII_STRING ) {
+                dsb.setUnits(i, Units.nominal(fieldDescription.getName()) );
+            } else {
+                dsb.setUnits(i, Units.dimensionless ); // TODO: how to get "unit" from label
             }
         }
         
@@ -379,7 +378,11 @@ public class PdsDataSource extends AbstractDataSource {
         return Ops.dataset(csvfile,Units.nominal());
     }
     
-    private static boolean isTimeType( FieldType ft ) {
+    private static boolean isTimeType( FieldDescription ff ) {
+        if ( ff.getType()==FieldType.ASCII_STRING && ff.getName().equals("UTC") ) { //https://pds-ppi.igpp.ucla.edu/data/cassini-caps-calibrated/data-ion/2010/001_031_JAN/ION_201000100_V01.xml
+            return true;
+        }
+        FieldType ft= ff.getType();
         return ft==FieldType.ASCII_DATE ||  
                 ft==FieldType.ASCII_DATE_DOY ||
                 ft==FieldType.ASCII_DATE_TIME ||
@@ -444,7 +447,7 @@ public class PdsDataSource extends AbstractDataSource {
         
         if ( names.size()==1 ) {
             for ( TableObject t : label.getObjects( TableObject.class) ) {
-                if ( isTimeType( t.getFields()[0].getType() ) ) {
+                if ( isTimeType( t.getFields()[0] ) ) {
                     String dep0name= t.getFields()[0].getName();
                     List<String> newNames= new ArrayList<>(names);
                     for ( int i=0; i<names.size(); i++ ) {
@@ -489,11 +492,20 @@ public class PdsDataSource extends AbstractDataSource {
             }
             if ( !tableColumnNames.isEmpty() ) {
                 QDataSet bresults= getFromTable( t, tableColumnNames.toArray(new String[tableColumnNames.size()]) );
-                for ( int iii=0; iii<datasetColumnIndexes.size(); iii++ ) {
+                int iii=0;
+                while ( iii<datasetColumnIndexes.size() ) {
                     int i= datasetColumnIndexes.get(iii);
                     name= tableColumnNames.get(iii);
-                    ArrayDataSet result1= DDataSet.copy( Ops.unbundle( bresults, i ) );
-                    
+                    int iii2= i+1;
+                    while ( iii2<datasetColumnIndexes.size() && datasetColumnIndexes.get(iii2)==i ) {
+                        iii2++;
+                    }
+                    ArrayDataSet result1;
+                    if ( iii2-iii>1 ) {
+                        result1= DDataSet.copy( Ops.trim1( bresults, i, i+(iii2-iii) ) );
+                    } else {
+                        result1= DDataSet.copy( Ops.unbundle( bresults, i ) );
+                    }
                     results[i]= result1;
                     Units units= (Units) result1.property(QDataSet.UNITS);
                     if ( doc!=null ) {
@@ -534,6 +546,7 @@ public class PdsDataSource extends AbstractDataSource {
                             }
                         }
                     }
+                    iii= iii2;
                 }
             }
         }
