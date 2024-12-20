@@ -444,26 +444,25 @@ public class PdsDataSource extends AbstractDataSource {
         
         if ( names.size()==1 ) {
             for ( TableObject t : label.getObjects( TableObject.class) ) {
-                String dep0name= null;
                 if ( isTimeType( t.getFields()[0].getType() ) ) {
-                    dep0name= t.getFields()[0].getName();
-                }
-                List<String> newNames= new ArrayList<>(names);
-                for ( int i=0; i<names.size(); i++ ) {
-                    name= names.get(i);
-                    if ( name==null ) {
+                    String dep0name= t.getFields()[0].getName();
+                    List<String> newNames= new ArrayList<>(names);
+                    for ( int i=0; i<names.size(); i++ ) {
+                        name= names.get(i);
+                        if ( name==null ) {
 
-                    } else {
-                        for ( FieldDescription fd: t.getFields() ) {
-                            if ( name.equals( fd.getName() ) ) { 
-                                if ( !newNames.get(0).equals(dep0name) ) {
-                                    newNames.add( 0, dep0name );
+                        } else {
+                            for ( FieldDescription fd: t.getFields() ) {
+                                if ( name.equals( fd.getName() ) ) { 
+                                    if ( !newNames.get(0).equals(dep0name) ) {
+                                        newNames.add( 0, dep0name );
+                                    }
                                 }
                             }
                         }
                     }
+                    if ( newNames.size()>names.size() ) names= newNames;
                 }
-                if ( newNames.size()>names.size() ) names= newNames;
             }
         }
         
