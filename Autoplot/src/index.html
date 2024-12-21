@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>CDAWeb HAPI server performance is clearly improved since October fix.</small></p>
+        <p><small>New <a href="https://github.com/autoplot/dev/blob/master/demos/2024/20241220/sunriseSunset.jyds">jyds script</a> reads sunrise and sunset data to compare with sun received by Tempest Weather Station.  Happy holidays!</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,13 +30,17 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-12-12 r28000):</p>
+        <p>Bugfixes (2024-12-21 r28024):</p>
         <ul>
+            <li>rte_1083526881: PDS4 code which automatically adds time column failed to check that a time column was actually found, causing Null Pointer Exception.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2657/">2657</a>: detect rank 2 datasets in PDS4 Group_Field_Binary.
             <li>Completions on URI with aggregation would list the entire filesystem, effectively hanging in some cases.
             <li>Demo bookmarks #16 updated to CDAWeb, since elasticbeanstalk (Cassini) one is not available.
+            <li>check for null in completions, which happens for "vap+cdf:<t>"
         </ul>
         <p>Older Bugfixes (2024-12-12 r28000):</p>
         <ul>
+            <li>Use version of opencsv-2.3 for PDS4 reader which supports Java 8.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2615/">2615</a>: label for PDS3 completion must include parameter name to work in script editor completions.
             <li>Remove migrate preferences, which moved preferences from 2016 Autoplot, and makes it difficult to test a fresh session.
             <li>String "null" would appear in HAPI dataset titles incorrectly.
