@@ -392,6 +392,8 @@ public class AutoplotDataServer {
 
     public static void main(String[] args) throws Exception {
 
+        System.setProperty("java.awt.headless","true");
+        
         ArgumentList alm = new ArgumentList("AutoplotDataServer");
         alm.addOptionalSwitchArgument("uri", "u", "uri", "", "URI to plot");
         alm.addOptionalSwitchArgument("format", "f", "format", "", "output format qds, d2s (default=d2s if no filename) which support streaming, or xls bin dat hapi-info hapi-csv hapi-binary");
