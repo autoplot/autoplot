@@ -394,7 +394,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         if ( item==null ) item = "";
         item = item.trim();
         if ( item.length()>0 ) {
-            Pattern p= Pattern.compile(item);
+            Pattern p= Pattern.compile(item,Pattern.CASE_INSENSITIVE);
             List<String> newServers= new ArrayList<>();
             for ( int i=0; i<servers1.length; i++ ) {
                 if ( p.matcher(servers1[i]).find() ) {
