@@ -1543,8 +1543,10 @@ public class LayoutPanel extends javax.swing.JPanel {
                 d2[0]= d1[0] + size;
                 d2[1]= emMaxBottom;
                 d1[1]= emMaxTop;
-                r.setBottom( DasDevicePosition.formatFormatStr(d2) );
-                r.setTop( DasDevicePosition.formatFormatStr(d1) );
+                String bottomStr=  DasDevicePosition.formatLayoutStr(d2);
+                String topStr= DasDevicePosition.formatLayoutStr(d1);
+                r.setBottom( bottomStr);
+                r.setTop( topStr );
             } catch ( ParseException ex ) {
                 logger.log(Level.INFO, "ParseException ignored: {0}", ex);
             }
