@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>New <a href="https://github.com/autoplot/dev/blob/master/demos/2024/20241220/sunriseSunset.jyds">jyds script</a> reads sunrise and sunset data to compare with sun received by Tempest Weather Station.  Happy holidays!</small></p>
+        <p><small>Parker Solar Probe visits Venus</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,13 +30,17 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2024-12-21 r28024):</p>
+        <p>Bugfixes (2025-01-07 r28029):</p>
         <ul>
+            <li>HAPI server matcher constraint should be case-insensitive.
+            <li>Odl parser (used for .sts files) rejects when parameter is missing.
+            <li>server mode always sets headless to true.
             <li>rte_1083526881: PDS4 code which automatically adds time column failed to check that a time column was actually found, causing Null Pointer Exception.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2657/">2657</a>: detect rank 2 datasets in PDS4 Group_Field_Binary.
             <li>Completions on URI with aggregation would list the entire filesystem, effectively hanging in some cases.
             <li>Demo bookmarks #16 updated to CDAWeb, since elasticbeanstalk (Cassini) one is not available.
-            <li>check for null in completions, which happens for "vap+cdf:<t>"
+            <li>check for null in completions, which happens for "vap+cdf:&lt;t&gt;>"
+            <li>parseISO8601 just uses parseISO8601Datum now.  Prep for URI_Template_Time integration.
         </ul>
         <p>Older Bugfixes (2024-12-12 r28000):</p>
         <ul>
