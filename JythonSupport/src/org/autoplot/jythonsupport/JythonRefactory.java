@@ -121,7 +121,7 @@ public class JythonRefactory {
         m.put("org.virbo.idlsupport", "org.autoplot.idlsupport" );
         m.put("org.virbo.jythonsupport", "org.autoplot.jythonsupport");
         m.put("org","org");  //mark that some things under org will change.
-        m.put("autoplot","autoplot2017");
+        m.put("autoplot","autoplot2023");
         m.put("autoplotapp","autoplotapp2017");
         //m.put("zipfs", "org.das2.util.filesystem.zipfs");
         //forwardMap = new HashMap<>();

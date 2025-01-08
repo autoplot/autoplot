@@ -73,7 +73,7 @@ public class Util {
     
     /**
      * this returns a double indicating the current scripting version, found
-     * at the top of autoplot2017.py in AUTOPLOT_DATA/jython/autoplot2017.py.  Do
+     * at the top of autoplot2023.py in AUTOPLOT_DATA/jython/autoplot2023.py.  Do
      * not parse this number and expect it to work in future versions!
      * @return the version, such as v1.50.
      * @throws IOException 
@@ -81,14 +81,14 @@ public class Util {
     public static String getAutoplotScriptingVersion() throws IOException {
         File ff2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA ) );
         File ff3= new File( ff2.toString() + "/jython" );
-        File ff4= new File( ff3, "autoplot2017.py" );
+        File ff4= new File( ff3, "autoplot2023.py" );
         String vers= null;
         
         if ( ff4.exists() ) {
             try (BufferedReader r = new BufferedReader( new FileReader( ff4 ) )) {
                 String line= r.readLine();
                 if ( line!=null ) {
-                    Pattern versPattern= Pattern.compile("# autoplot2017.py v([\\d\\.]+) .*");  // must be parsable as a double.
+                    Pattern versPattern= Pattern.compile("# autoplot2023.py v([\\d\\.]+) .*");  // must be parsable as a double.
                     Matcher m= versPattern.matcher(line);
                     if ( m.matches() ) {
                         vers= m.group(1);
