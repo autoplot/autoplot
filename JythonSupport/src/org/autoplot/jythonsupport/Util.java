@@ -84,11 +84,12 @@ public class Util {
         File ff4= new File( ff3, "autoplot2023.py" );
         String vers= null;
         
+        Pattern versPattern= Pattern.compile("# autoplot2023.py v([\\d\\.]+) .*");  // must be parsable as a double.
+                    
         if ( ff4.exists() ) {
             try (BufferedReader r = new BufferedReader( new FileReader( ff4 ) )) {
                 String line= r.readLine();
                 if ( line!=null ) {
-                    Pattern versPattern= Pattern.compile("# autoplot2023.py v([\\d\\.]+) .*");  // must be parsable as a double.
                     Matcher m= versPattern.matcher(line);
                     if ( m.matches() ) {
                         vers= m.group(1);
@@ -133,7 +134,7 @@ public class Util {
                 throw new IllegalArgumentException("unable to resolve scripting version number supported by Autoplot.",ex);
             }
         } else {
-            throw new IllegalArgumentException("invalid version number, which must be N.NN");
+            throw new IllegalArgumentException("invalid version number, which must be vN.NN");
         }
     }
 
