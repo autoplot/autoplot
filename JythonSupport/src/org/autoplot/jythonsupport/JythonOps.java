@@ -432,6 +432,7 @@ public class JythonOps {
      * validate the parameter value against the constraint.  This will
      * raise an exception when the constraint is not met, or returns a modified
      * value conforming (with format).  See https://github.com/autoplot/dev/blob/master/demos/2025/20250108/getParamsValidation.jy
+     * @see #validateParam(java.lang.String, java.lang.Object, java.util.Map) 
      */
     public static Object validateParam( String name, Object v, List constraint ) {
         if ( !constraint.contains(v) ) {
@@ -448,10 +449,11 @@ public class JythonOps {
      * 
      * Constraints include:
      * <ul>
-     * <li>regex
-     * <li>min
-     * <li>max
-     * <li>format
+     * <li>regex -- regular expression which must be matched.
+     * <li>min -- minimum value allowed, and for timerange parameter this is interpretted as time range.
+     * <li>max -- maximum value allowed, and for timerange parameter this is interpretted as time range.
+     * <li>format -- if URI template with $Y etc, then reformat with this, if starts with % then reformat double.
+     * <li>values -- list/array of allowed values
      * </ul>
      * @param name the parameter name or null (None), where "timerange" is special.
      * @param v the value
@@ -503,26 +505,18 @@ public class JythonOps {
         }
         return v;
     }
-    
+        
     /**
-     * validate the parameter, possibly modifying it to match constraints.  For example,
-     * a double less than the minimum would throw an IllegalArgumentException.  However a 
-     * time range is reformatted to match the format, and a double can be formatted to
-     * limit resolution.
-     * 
-     * Constraints include:
-     * <ul>
-     * <li>regex
-     * <li>min
-     * <li>max
-     * <li>format
-     * </ul>
-     * @param name the parameter name, where "timerange" is special.
+     * validate the parameter value against the constraint.  This will
+     * raise an exception when the constraint is not met, or returns a modified
+     * value conforming (with format).  
+     * @param name the parameter name or null (None), where "timerange" is special.
      * @param v the value
      * @param constraint the constraint map.
      * @return the parameter, possibly modified to match constraints.
      * @throws IllegalArgumentException if the constraint is not met
      * @see  https://github.com/autoplot/dev/blob/master/demos/2025/20250108/getParamsValidation.jy
+     * @see #validateParam(java.lang.String, java.lang.Object, java.util.Map) 
      */
     public static Object validateParam( String name, Object v, PyDictionary constraint ) {
         return validateParam( name, v, JythonUtil.pyDictionaryToMap(constraint) );
