@@ -498,6 +498,9 @@ public class JythonOps {
                 }
             }
         }
+        if ( constraint.containsKey("values") ) {
+            validateParam( name, v, (List)constraint.get("values") );
+        }
         return v;
     }
     
