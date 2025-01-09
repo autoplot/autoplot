@@ -36,6 +36,7 @@ import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.jythonsupport.Util;
 import org.autoplot.jythonsupport.ui.DataMashUp;
+import org.das2.util.ColorUtil;
 
 /**
  * Editor panel for inline URIs.  This supports events lists and short 
@@ -858,10 +859,14 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                             str = String.format("%s-%s", tm.getValueAt(i,0), tm.getValueAt(i,1) );
                             // do nothing, just use the old format, which will fail and reject.
                         }
+                        String color= tm.getValueAt(i,2).toString();
+                        if ( !color.startsWith("0x") ) {
+                            color= "0x" + Integer.toHexString(ColorUtil.decodeColor(color).getRGB());
+                        }
                         if ( i==0 ) {
-                            s.append(String.format("ds=createEvent('%s',%s,'%s')", str, tm.getValueAt(i,2), tm.getValueAt(i,3) ) );
+                            s.append(String.format("ds=createEvent('%s',%s,'%s')", str, color, tm.getValueAt(i,3) ) );
                         } else {
-                            s.append(String.format("&ds=createEvent(ds,'%s',%s,'%s')", str, tm.getValueAt(i,2), tm.getValueAt(i,3) ) );
+                            s.append(String.format("&ds=createEvent(ds,'%s',%s,'%s')", str, color, tm.getValueAt(i,3) ) );
                         }
                     }
                     s.append("&ds");
