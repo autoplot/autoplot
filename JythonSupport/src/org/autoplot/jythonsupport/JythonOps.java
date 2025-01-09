@@ -453,7 +453,7 @@ public class JythonOps {
      * <li>max
      * <li>format
      * </ul>
-     * @param name the parameter name, where "timerange" is special.
+     * @param name the parameter name or null (None), where "timerange" is special.
      * @param v the value
      * @param constraint the constraint map.
      * @return the parameter, possibly modified to match constraints.
@@ -461,7 +461,7 @@ public class JythonOps {
      * @see  https://github.com/autoplot/dev/blob/master/demos/2025/20250108/getParamsValidation.jy
      */
     public static Object validateParam( String name, Object v, Map<String,Object> constraint ) {
-        
+        if ( name==null ) name="";
         if ( constraint.containsKey("regex") ) {
             if ( !Pattern.matches( (String)constraint.get("regex"), v.toString() ) ) {
                 throw new IllegalArgumentException(String.format("value does not match regular expression: %s %s",name,v));
