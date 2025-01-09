@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.FileSystemUtil;
 import org.das2.datum.Datum;
@@ -37,6 +38,7 @@ import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.URISplit;
 import org.das2.datum.InconvertibleUnitsException;
+import org.das2.datum.TimeParser;
 import org.das2.datum.UnitsConverter;
 import org.das2.datum.UnitsUtil;
 import org.das2.jythoncompletion.JavadocLookup;
@@ -424,6 +426,103 @@ public class JythonOps {
             }
         }
         return c;
+    }
+    
+    /**
+     * validate the parameter value against the constraint.  This will
+     * raise an exception when the constraint is not met, or returns a modified
+     * value conforming (with format).  See https://github.com/autoplot/dev/blob/master/demos/2025/20250108/getParamsValidation.jy
+     */
+    public static Object validateParam( String name, Object v, List constraint ) {
+        if ( !constraint.contains(v) ) {
+            throw new IllegalArgumentException(String.format("value is not one of allowed values: %s %s",name,v));
+        }
+        return v;
+    }
+    
+    /**
+     * validate the parameter, possibly modifying it to match constraints.  For example,
+     * a double less than the minimum would throw an IllegalArgumentException.  However a 
+     * time range is reformatted to match the format, and a double can be formatted to
+     * limit resolution.
+     * 
+     * Constraints include:
+     * <ul>
+     * <li>regex
+     * <li>min
+     * <li>max
+     * <li>format
+     * </ul>
+     * @param name the parameter name, where "timerange" is special.
+     * @param v the value
+     * @param constraint the constraint map.
+     * @return the parameter, possibly modified to match constraints.
+     * @throws IllegalArgumentException if the constraint is not met
+     * @see  https://github.com/autoplot/dev/blob/master/demos/2025/20250108/getParamsValidation.jy
+     */
+    public static Object validateParam( String name, Object v, Map<String,Object> constraint ) {
+        
+        if ( constraint.containsKey("regex") ) {
+            if ( !Pattern.matches( (String)constraint.get("regex"), v.toString() ) ) {
+                throw new IllegalArgumentException(String.format("value does not match regular expression: %s %s",name,v));
+            }
+        }
+        if ( name.equals("timerange") ) {
+            if ( constraint.containsKey("min") ) {
+                if ( Ops.datumRange(v).min().lt( Ops.datumRange(constraint.get("min")).min() ) ) {
+                    throw new IllegalArgumentException(String.format("value is less than minimum: %s %s",name,v));
+                }
+            }
+            if ( constraint.containsKey("max") ) {
+                if ( Ops.datumRange(v).max().gt( Ops.datumRange(constraint.get("max")).max() ) ) {
+                    throw new IllegalArgumentException(String.format("value is greater than maximum: %s %s",name,v));
+                }
+            }
+        } else {
+            if ( constraint.containsKey("min") && Ops.datum(v).lt( Ops.datum(constraint.get("min"))) ) {
+                throw new IllegalArgumentException(String.format("value is less than minimum: %s %s",name,v));
+            }
+            if ( constraint.containsKey("max") && Ops.datum(v).gt( Ops.datum(constraint.get("max"))) ) {
+                throw new IllegalArgumentException(String.format("value is greater than maximum: %s %s",name,v));
+            }
+        }
+        if ( constraint.containsKey("format") ) {
+            String spec = (String)constraint.get("format");
+            if ( spec.length()==0 ) throw new IllegalArgumentException("format cannot be empty string");
+            if ( spec.charAt(0)=='$' ) {
+                v = TimeParser.create(spec).format( Ops.datumRange(v).min() );
+            } else if ( spec.charAt(0)=='%' ) {
+                if ( v instanceof Double ) { // allow format to limit resolution
+                    String s= String.format( spec, v );
+                    v = Double.parseDouble( s );
+                }
+            }
+        }
+        return v;
+    }
+    
+    /**
+     * validate the parameter, possibly modifying it to match constraints.  For example,
+     * a double less than the minimum would throw an IllegalArgumentException.  However a 
+     * time range is reformatted to match the format, and a double can be formatted to
+     * limit resolution.
+     * 
+     * Constraints include:
+     * <ul>
+     * <li>regex
+     * <li>min
+     * <li>max
+     * <li>format
+     * </ul>
+     * @param name the parameter name, where "timerange" is special.
+     * @param v the value
+     * @param constraint the constraint map.
+     * @return the parameter, possibly modified to match constraints.
+     * @throws IllegalArgumentException if the constraint is not met
+     * @see  https://github.com/autoplot/dev/blob/master/demos/2025/20250108/getParamsValidation.jy
+     */
+    public static Object validateParam( String name, Object v, PyDictionary constraint ) {
+        return validateParam( name, v, JythonUtil.pyDictionaryToMap(constraint) );
     }
     
     /**
