@@ -702,7 +702,16 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                         mtm.setValueAt( m.group(3), i, 2 );
                         mtm.setValueAt( m.group(4), i, 3 );
                     } catch ( ParseException ex ) {
-                        return null;
+                        int i1= time.indexOf("-");
+                        if ( i1>0 ) {
+                            mtm.setValueAt( time.substring(0,i1).trim(), i, 0 );
+                            mtm.setValueAt( time.substring(i1+1).trim(), i, 1 );
+                            mtm.setValueAt( m.group(3), i, 2 );
+                            mtm.setValueAt( m.group(4), i, 3 );
+                        } else {
+                            return null;
+                        }
+                        
                     }
                 }
 
@@ -840,11 +849,13 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 StringBuilder s= new StringBuilder( "vap+inline:" );
                 if ( scheme.equals(SCHEME_EVENT_LIST_COLORS) ) {
                     for ( int i=0; i<tm.getRowCount(); i++ ) {
-                        String str= String.format("%s/%s", tm.getValueAt(i,0), tm.getValueAt(i,1) );
+                        String str;
+                        str = String.format("%s/%s", tm.getValueAt(i,0), tm.getValueAt(i,1) );
                         try {
                             DatumRange drtr= DatumRangeUtil.parseTimeRange(str);
                             str= drtr.toString().replaceAll(" ","+");
                         } catch (ParseException ex) {
+                            str = String.format("%s-%s", tm.getValueAt(i,0), tm.getValueAt(i,1) );
                             // do nothing, just use the old format, which will fail and reject.
                         }
                         if ( i==0 ) {
