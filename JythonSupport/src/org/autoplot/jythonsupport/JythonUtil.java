@@ -62,6 +62,7 @@ import org.python.util.PythonInterpreter;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
+import org.das2.qds.ops.Ops;
 import org.python.core.PyTuple;
 import org.python.parser.ast.BinOp;
 import org.python.parser.ast.TryExcept;
@@ -383,7 +384,7 @@ public class JythonUtil {
     /**
      * copy the two Jython files specific to Autoplot into the user's
      * autoplot_data/jython folder. This reads the version from the first line
-     * of the autoplot2017.py.
+     * of autoplot2023.py.
      *
      * @return the item to add to the Jython search path.
      * @throws IOException
@@ -401,7 +402,7 @@ public class JythonUtil {
             try (BufferedReader r = new BufferedReader(new FileReader(ff4))) {
                 String line = r.readLine();
                 if (line != null) {
-                    Pattern versPattern = Pattern.compile("# autoplot2017.py v([\\d\\.]+) .*");  // must be parsable as a double.
+                    Pattern versPattern = Pattern.compile("# autoplot2023.py v([\\d\\.]+) .*");  // must be parsable as a double.
                     Matcher m = versPattern.matcher(line);
                     if (m.matches()) {
                         vers = m.group(1);
@@ -880,7 +881,7 @@ public class JythonUtil {
      * @param paramsl
      */
     public static void setParams(PythonInterpreter interp, Map<String, String> paramsl) {
-        interp.exec("import autoplot2017 as autoplot");
+        interp.exec("import autoplot2023 as autoplot");
         interp.exec("autoplot.params=dict()");
         for (Entry<String, String> e : paramsl.entrySet()) {
             String s = e.getKey();
@@ -2022,7 +2023,7 @@ public class JythonUtil {
         }
 
         interp.exec(prog);
-        interp.exec("import autoplot2017 as autoplot\n");
+        interp.exec("import autoplot2023 as autoplot\n");
         PyList sort = (PyList) interp.eval("autoplot._paramSort");
 
         boolean altWhy = false; // I don't know why things are suddenly showing up in this other space.
@@ -2093,6 +2094,8 @@ public class JythonUtil {
                 if ( pymin!=null ) {
                     if ( pymin instanceof PyInteger ) {
                         constraints.put( "min", ((PyInteger)pymin).__tojava__(Integer.class) );
+                    } else if ( p.name.equals("timerange") ) {
+                        constraints.put( "min", pymin.toString() );
                     } else {
                         constraints.put( "min", Double.parseDouble( pymin.__str__().toString() ) );
                     }
@@ -2101,6 +2104,8 @@ public class JythonUtil {
                 if ( pymax!=null ) {
                     if ( pymax instanceof PyInteger ) {
                         constraints.put( "max", (pymax).__tojava__(Integer.class) );
+                    } else if ( p.name.equals("timerange") ) {
+                        constraints.put( "max", pymax.toString() );
                     } else {
                         constraints.put( "max", Double.parseDouble( pymax.__str__().toString() ) );
                     }
