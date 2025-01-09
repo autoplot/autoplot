@@ -2303,18 +2303,26 @@ public class JythonUtil {
             String k = ((PyTuple) tt).get(0).toString();
             Object o = ((PyTuple) tt).get(1);
             if (o instanceof PyString) {
-                m.put(String.valueOf(k), o.toString());
+                m.put(k, o.toString());
             } else if (o instanceof PyQDataSet) {
-                m.put(String.valueOf(k), ((PyQDataSet) o).ds);
+                m.put(k, ((PyQDataSet) o).ds);
             } else if (o instanceof PyDatum) {
-                m.put(String.valueOf(k), ((PyDatum) o).datum);
+                m.put(k, ((PyDatum) o).datum);
             } else if (o instanceof PyFloat) {
-                m.put(String.valueOf(k), Py.tojava((PyObject) o, "java.lang.Double"));
+                m.put(k, Py.tojava((PyObject) o, "java.lang.Double"));
             } else if (o instanceof PyDictionary) {
-                m.put(String.valueOf(k), pyDictionaryToMap((PyDictionary) o));
+                m.put(k, pyDictionaryToMap((PyDictionary) o));
+            } else if (o instanceof String) {
+                m.put(k, o );
+            } else if (o instanceof Integer) {
+                m.put(k, o );
+            } else if (o instanceof Double) {
+                m.put(k, o );
+            } else if (o instanceof PyList) {
+                m.put(k, o );
             } else {
                 logger.log(Level.INFO, "assuming Java type where conversion is not implemented: {0}", o);
-                m.put(String.valueOf(k), o);
+                m.put(k, o);
             }
         }
         return m;
