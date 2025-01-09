@@ -151,11 +151,7 @@ public class JythonDataSourceTimeSeriesBrowse implements TimeSeriesBrowse {
                     DatumRange tr= DatumRangeUtil.parseTimeRange(str);
                     tsb1.setTimeRange(tr);
                 } else if ( line.contains("timerange") && line.contains("getParam(") ) {
-                    int i0= line.indexOf("timerange");
-                    int i1= line.indexOf("getParam(");
-                    if ( i1<30 && i0-i1<12 ) { // and they are sort of close...
-                        logger.log(Level.WARNING, "warning: getParam(''timerange'') default cannot contain spaces: {0}", line); //TODO: come on, this is still cheesy....
-                    }
+                    // There was a strange test here which seemed unnecessary.  TODO: remove this branch
                 }
                 line= reader.readLine();
             }
