@@ -1180,9 +1180,9 @@ public class JythonCompletionTask implements CompletionTask {
                 interp = new PythonInterpreter();
             }
             if ( org.autoplot.jythonsupport.Util.isLegacyImports() ) {
-                URL imports = JythonOps.class.getResource("/imports2017.py");
+                URL imports = JythonOps.class.getResource("/imports2023.py");
                 try (InputStream in = imports.openStream()) {
-                    interp.execfile(in,"imports2017.py");
+                    interp.execfile(in,"imports2023.py");
                 }
             }
             
