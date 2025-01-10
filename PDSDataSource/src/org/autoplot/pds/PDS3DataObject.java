@@ -322,6 +322,9 @@ public class PDS3DataObject {
             args.put("byteOrder", "big");        
         } else if ( dataType.equals("UNSIGNED_INTEGER") && bytes==1 ) {
             args.put("type","ubyte");
+        } else if ( dataType.equals("UNSIGNED_INTEGER") ) {
+            args.put("type","ubyte"); 
+            args.put("dims","["+bytes+"]");
         } else if ( dataType.equals("LSB_BIT_STRING" ) ) {
             args.put("type","ubyte");
             args.put("dims","["+bytes+"]");
@@ -346,7 +349,7 @@ public class PDS3DataObject {
                     throw new IllegalArgumentException("Hmmm, uncoded case.  Contact Jeremy Faden.");
             }
         }
-        args.put( "recOffset", String.valueOf(startByte-1+rowPrefixBytes));
+        args.put( "recOffset", String.valueOf(startByte-1)); // +rowPrefixBytes
         if ( missingConstant!=Double.NaN ) args.put( "fillValue", String.valueOf(missingConstant));
         if ( validMaximum!=Double.POSITIVE_INFINITY ) args.put( "validMax", String.valueOf(validMaximum) );
         if ( validMinimum!=Double.NEGATIVE_INFINITY ) args.put( "validMin", String.valueOf(validMinimum) );
