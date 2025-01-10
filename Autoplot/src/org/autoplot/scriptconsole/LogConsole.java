@@ -375,30 +375,17 @@ public class LogConsole extends javax.swing.JPanel {
         firePropertyChange(PROP_SCRIPTCONTEXT, oldScriptContext, scriptContext);
     }
 
-    private synchronized LogConsoleSettingsDialog getSettingsDialog() {
+    private LogConsoleSettingsDialog getSettingsDialog() {
         LogConsoleSettingsDialog settingsDialog = new LogConsoleSettingsDialog( GuiSupport.getFrameForComponent(this), true, this);
         return settingsDialog;
     }
 
-    private Handler handler;
+    private volatile Handler handler;
 
-    /**
-     * create a handler that listens for log messages.  This handler is added
-     * to the Loggers that should be displayed here.  Also, the log levels of
-     * the Loggers should be set to ALL, since the filtering is done here.
-     * For example:
-     * <blockquote><pre><small>{@code
-     *    Handler h = lc.getHandler();
-     *    Logger.getLogger("autoplot").setLevel(Level.ALL);
-     *    Logger.getLogger("autoplot").addHandler(h);
-     *}</small></pre></blockquote>
-     * @return handler for receiving messages.
-     */
-    public synchronized Handler getHandler() {
-        if ( handler==null ) {
-            handler = new Handler() {
+    private Handler newHandler() {
+        return new Handler() {
                 @Override
-                public synchronized void publish(LogRecord rec) {
+                public void publish(LogRecord rec) {
                     Object[] parms= rec.getParameters();
 
                     String recMsg;
@@ -511,10 +498,35 @@ public class LogConsole extends javax.swing.JPanel {
                     return "LogConsole.Handler";
                 }
             };
-            handler.setLevel(Level.ALL);
         }
-        return handler;
+    
+    /**
+     * create a handler that listens for log messages.  This handler is added
+     * to the Loggers that should be displayed here.  Also, the log levels of
+     * the Loggers should be set to ALL, since the filtering is done here.
+     * For example:
+     * <blockquote><pre><small>{@code
+     *    Handler h = lc.getHandler();
+     *    Logger.getLogger("autoplot").setLevel(Level.ALL);
+     *    Logger.getLogger("autoplot").addHandler(h);
+     *}</small></pre></blockquote>
+     * @return handler for receiving messages.
+     */
+    public Handler getHandler() {
+        Handler h = this.handler;
+        if ( h==null ) {
+            synchronized ( this ) {
+                h = this.handler;
+                if ( h==null ) {
+                    h = newHandler();
+                    this.handler = h;
+                    h.setLevel(Level.ALL);
+                }
+            }
+        }
+        return h;
     }
+    
     private static boolean alreadyLoggingStdout = false;
 
     /**
@@ -525,7 +537,7 @@ public class LogConsole extends javax.swing.JPanel {
      * 
      * @see turnOffConsoleHandlers
      */
-    public synchronized void logConsoleMessages() {
+    public void logConsoleMessages() {
         Logger llogger;
         LoggingOutputStream los;
 
@@ -550,7 +562,7 @@ public class LogConsole extends javax.swing.JPanel {
     /**
      * remove this hook for listening to stdout and stderr messages.
      */
-    public synchronized void undoLogConsoleMessages() {
+    public void undoLogConsoleMessages() {
         if ( oldStdOut!=null ) 
             System.setOut(oldStdOut);
         if ( oldStdErr!=null )
