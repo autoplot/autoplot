@@ -306,8 +306,8 @@ public class InlineDataSource extends AbstractDataSource {
         interp= JythonUtil.createInterpreter(true);
         if ( ! org.autoplot.jythonsupport.Util.isLegacyImports() ) { // we need to always bring this in to support legacy URIs.
             logger.log( Level.FINER, "import the stuff we don't import automatically anymore");
-            try (InputStream in = org.autoplot.jythonsupport.Util.class.getResource("imports2017.py").openStream()) {
-                interp.execfile( in, "imports2017.py");
+            try (InputStream in = org.autoplot.jythonsupport.Util.class.getResource("imports2023.py").openStream()) {
+                interp.execfile( in, "imports2023.py");
             }
         }
                         
