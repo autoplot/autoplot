@@ -31,6 +31,7 @@ import org.das2.datum.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -42,7 +43,7 @@ import org.xml.sax.SAXException;
 public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
 
     private static Logger logger= LoggerManager.getLogger("apdss.pds");
-    
+
     @Override
     public DataSource getDataSource(URI uri) throws Exception {
         URISplit split= URISplit.parse(uri);
@@ -75,6 +76,19 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
         Node column= (Node) xpath.evaluate(String.format("/LABEL/TABLE[1]/COLUMN[NAME='%s']",name),doc,XPathConstants.NODE);
 
         FilePointer p= null;
+        
+        if ( table==null || column==null) {
+            table= (Node) xpath.evaluate(String.format("/LABEL/*[contains(name(),'_TABLE')][1]",name),doc,XPathConstants.NODE);
+            column= (Node) xpath.evaluate(String.format("/LABEL/*[contains(name(),'_TABLE')]/COLUMN[NAME='%s']",name),doc,XPathConstants.NODE);
+            if ( table!=null ) {
+                String tableName= table.getNodeName();
+                String pointer= (String)xpath.evaluate("/LABEL/POINTER[@object='"+tableName+"']/text()",doc,XPathConstants.STRING);
+                if ( pointer!=null && pointer.length()>0 ) {
+                    p= new FilePointer(url,pointer);
+                }
+            }
+        }
+        
         if ( table==null || column==null) {
             table= (Node) xpath.evaluate(String.format("/LABEL/BINARY_TABLE[1]",name),doc,XPathConstants.NODE);
             column= (Node) xpath.evaluate(String.format("/LABEL/BINARY_TABLE[1]/COLUMN[NAME='%s']",name),doc,XPathConstants.NODE);
@@ -202,7 +216,9 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
     
     /**
      * read in the PDS label, resolving STRUCTURES which are loaded with a pointer.  This will look in the current
-     * directory, and in the LABEL directory next to the DATA directory.
+     * directory, and in the LABEL directory next to the DATA directory.  Note the Pointer must appear 
+     * at /LABEL/&ast;/POINTER[@object="STRUCTURE"] or /LABEL/POINTER[@object="STRUCTURE"], and
+     * Pointer is left in the Document.
      * @param labelUrl the URL of the LABEL file
      * @param depth number of levels deep, this is limited to 4.
      * @return a document model of the LABEL, with imports resolved.
@@ -232,6 +248,9 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
         NodeList structures;
         try {
             structures = (NodeList) xpath.evaluate("/LABEL/*/POINTER[@object=\"STRUCTURE\"]",doc,XPathConstants.NODESET);
+            if ( structures.getLength()==0 ) {
+                structures = (NodeList) xpath.evaluate("/LABEL/POINTER[@object=\"STRUCTURE\"]",doc,XPathConstants.NODESET);
+            }
         } catch (XPathExpressionException ex) {
             throw new RuntimeException(ex);
         }
@@ -257,8 +276,9 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
             Document doc2= getDocumentWithImports( childUrl, depth+1 );
             Node newChild= doc2.getDocumentElement();
             NodeList importKids= newChild.getChildNodes();
-            for ( int j=0; j<importKids.getLength(); j++ ) {
-                Node kid= importKids.item(j);
+            List<Node> importK= removeComments( importKids );
+            for ( int j=0; j<importK.size(); j++ ) {
+                Node kid= importK.get(j);
                 doc.adoptNode(kid);
                 parent.insertBefore(kid, child);
             }
@@ -297,6 +317,27 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
         return desc;
     }
     
+    private static List appendNodeList( List nl1, NodeList nodeList2 ) {
+        for (int i = 0; i < nodeList2.getLength(); i++) {
+            Node node = nodeList2.item(i);
+            Node copiedNode = node.cloneNode(true);
+            nl1.add(copiedNode);
+        }
+        return nl1;
+    }
+    
+    private static List removeComments(NodeList nodeList2) {
+        List<Node> result= new ArrayList<>();
+        for (int i = 0; i < nodeList2.getLength(); i++) {
+            Node node = nodeList2.item(i);
+            if ( node.getNodeName().equals("COLUMN") ) {
+                result.add(node);
+            }
+        }
+        return result;
+    }
+    
+    
     /**
      * return a list of parameters and their summarized descriptions.  The
      * summaries are the first sentence of the description.  The description
@@ -314,24 +355,29 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
         XPathFactory factory = XPathFactory.newInstance();
         XPath xpath = factory.newXPath();
         
+        List<Node> alldat= new ArrayList<>();
         // page 4-1 (p53) of https://pds.nasa.gov/datastandards/pds3/standards/sr/StdRef_20090227_v3.8.pdf
         // https://pds.nasa.gov/datastandards/pds3/standards/sr/AppendixA.pdf
         NodeList dat= (NodeList) xpath.evaluate("/LABEL/TABLE/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
-        if ( dat.getLength()==0 ) {
-            dat= (NodeList) xpath.evaluate("/LABEL/BINARY_TABLE/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
-        }
-        if ( dat.getLength()==0 ) {
-            dat= (NodeList) xpath.evaluate("/LABEL/ASCII_TABLE/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
-        }
-        if ( dat.getLength()==0 ) {
-            dat= (NodeList) xpath.evaluate("/LABEL/TIME_SERIES/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
-        }
-        if ( dat.getLength()==0 ) {
-            dat= (NodeList) xpath.evaluate("/LABEL/FILE/SPREADSHEET/FIELD/NAME/text()",doc,XPathConstants.NODESET);
-        }
+        appendNodeList( alldat, dat );
         
-        for ( int i=0; i<dat.getLength(); i++ ) {
-            Node n= dat.item(i);
+        dat= (NodeList) xpath.evaluate("/LABEL/*[contains(name(),'_TABLE')]/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
+        appendNodeList( alldat, dat );
+
+        dat= (NodeList) xpath.evaluate("/LABEL/BINARY_TABLE/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
+        appendNodeList( alldat, dat );
+        
+        dat= (NodeList) xpath.evaluate("/LABEL/ASCII_TABLE/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
+        appendNodeList( alldat, dat );
+        
+        dat= (NodeList) xpath.evaluate("/LABEL/TIME_SERIES/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
+        appendNodeList( alldat, dat );
+        
+        dat= (NodeList) xpath.evaluate("/LABEL/FILE/SPREADSHEET/FIELD/NAME/text()",doc,XPathConstants.NODESET);
+        appendNodeList( alldat, dat );
+        
+        for ( int i=0; i<alldat.size(); i++ ) {
+            Node n= alldat.get(i);
             String name= n.getTextContent();
             PDS3DataObject dd= getDataObjectPds3( url, name );
             result.put( name, summarizeDescription(dd.getDescription()) );
