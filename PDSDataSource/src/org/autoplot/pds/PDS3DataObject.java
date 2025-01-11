@@ -82,10 +82,8 @@ public class PDS3DataObject {
     public PDS3DataObject( Node label, Node table, Node column) {
         try {
             labelJSONObject= toJSONObject( label );
-            labelJSONObject.toString(4);
             JSONObject jtable= toJSONObject(table);
             tableJSONObject= jtable;
-            tableJSONObject.toString(4);
             interchangeFormat= jtable.optString("INTERCHANGE_FORMAT", "ASCII");
             rowBytes= jtable.getInt("ROW_BYTES");
             recordBytes= labelJSONObject.optInt("RECORD_BYTES",-1);
@@ -340,7 +338,7 @@ public class PDS3DataObject {
         if ( this.filePointer!=null ) {
             switch (this.filePointer.getOffsetUnits()) {
                 case LINES:
-                    args.put("byteOffset", String.valueOf(this.filePointer.getOffset()*this.rowBytes) );
+                    args.put("byteOffset", String.valueOf(this.filePointer.getOffset()*this.recordBytes) );
                     break;
                 case BYTES:
                     args.put("byteOffset", String.valueOf(this.filePointer.getOffset()) );
