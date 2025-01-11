@@ -189,15 +189,31 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
     }
 
     /**
-     * read in the PDS label, resolving STRUCTURES which are loaded with a pointer.
+     * read in the PDS label, resolving STRUCTURES which are loaded with a pointer.  This will look in the current
+     * directory, and in the LABEL directory next to the DATA directory.
      * @param labelUrl the URL of the LABEL file
      * @return a document model of the LABEL, with imports resolved.
      * @throws IOException
      * @throws PDSException 
-     */
+     */    
     public static Document getDocumentWithImports( URL labelUrl ) throws IOException, PDSException {
+        return getDocumentWithImports( labelUrl, 0 );
+    }
+    
+    /**
+     * read in the PDS label, resolving STRUCTURES which are loaded with a pointer.  This will look in the current
+     * directory, and in the LABEL directory next to the DATA directory.
+     * @param labelUrl the URL of the LABEL file
+     * @param depth number of levels deep, this is limited to 4.
+     * @return a document model of the LABEL, with imports resolved.
+     * @throws IOException
+     * @throws PDSException 
+     */
+    public static Document getDocumentWithImports( URL labelUrl, int depth ) throws IOException, PDSException {
         
         logger.entering( "Pds3DataSourceFactory", "getDocumentWithImports", labelUrl );
+        
+        if ( depth>4 ) throw new IllegalArgumentException("something has gone terribly wrong, too many nested structures");
         
         File xmlfile = DataSetURI.getFile( labelUrl,new NullProgressMonitor());
 
@@ -238,9 +254,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
                 }
             }
             
-            PDSLabel label2 = new PDSLabel();
-            label2.parse(childfile.toPath());
-            Document doc2= label2.getDocument();
+            Document doc2= getDocumentWithImports( childUrl, depth+1 );
             Node newChild= doc2.getDocumentElement();
             NodeList importKids= newChild.getChildNodes();
             for ( int j=0; j<importKids.getLength(); j++ ) {
