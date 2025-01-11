@@ -106,7 +106,8 @@ public class PDS3DataObject {
                         bytes= bytes / items;
                     } else {
                         // https://pds-ppi.igpp.ucla.edu/data/VG2-U-PRA-3-RDR-LOWBAND-6SEC-V1.0/DATA/VG2_URN_PRA_6SEC.LBL
-                        System.err.println("huh.  ");
+                        // file:///project/cassini/pds/DATA/RPWS_WIDEBAND_FULL/T20040XX/T2004001/T2004001_01_325KHZ2_WBRFR.LBL?WBR_SAMPLE
+                        logger.fine("bytes don't appear to be needing normalization.");
                     }
                 }
             } else {
