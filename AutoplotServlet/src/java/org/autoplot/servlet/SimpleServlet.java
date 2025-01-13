@@ -575,9 +575,9 @@ public class SimpleServlet extends HttpServlet {
                 try {
                     dsource = DataSetURI.getDataSource(suri);
                     
-                    DatumRange timeRange = null;
+                    DatumRange timeRange;
                     if (!stimeRange.equals("")) {
-                        timeRange = DatumRangeUtil.parseTimeRangeValid(stimeRange);
+                        timeRange = DatumRangeUtil.parseTimeRange(stimeRange);
                         TimeSeriesBrowse tsb = dsource.getCapability(TimeSeriesBrowse.class);
                         if (tsb != null) {
                             tsb.setURI(suri);
