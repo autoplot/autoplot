@@ -159,7 +159,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
             if ( sss.contains("-") ) {
                 String[] sss4= sss.split("-");
                 if ( sss4.length!=2 ) {
-                    throw new IllegalArgumentException("must be name-name");
+                    throw new IllegalArgumentException("range of columns must be START-END, and includes the END column.");
                 }
                 int i1= columnIndex( sss4[0], fieldCount );
                 int i2= columnIndex( sss4[1], fieldCount );
