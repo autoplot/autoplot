@@ -593,15 +593,15 @@ function formatISO8601Range(arr) {
     uu = ["Y", "M", "D", "H", "M", "S"];
     dur = "P";
     havet = false;
-    for (i = 0; i < ds.length; i++) {
-        if (ds[i] !== 0) {
-            if (i > 2 && havet === false) {
-                dur = dur + "T";
-                havet = true;
-            }
-            dur = dur + ds[i] + uu[i];
-        }
-    }
+//    for (i = 0; i < ds.length; i++) {
+//        if (ds[i] !== 0) {
+//            if (i > 2 && havet === false) {
+//                dur = dur + "T";
+//                havet = true;
+//            }
+//            dur = dur + ds[i] + uu[i];
+//        }
+//    }
     s1 = formatISO8601(arr, 0);
     if (dur.length > 1 && dur.length < 6) {
         if ( dur==='P1D' && s1.endsWith("T00:00") ) {
