@@ -593,15 +593,15 @@ function formatISO8601Range(arr) {
     uu = ["Y", "M", "D", "H", "M", "S"];
     dur = "P";
     havet = false;
-    for (i = 0; i < ds.length; i++) {
-        if (ds[i] !== 0) {
-            if (i > 2 && havet === false) {
-                dur = dur + "T";
-                havet = true;
-            }
-            dur = dur + ds[i] + uu[i];
-        }
-    }
+//    for (i = 0; i < ds.length; i++) {
+//        if (ds[i] !== 0) {
+//            if (i > 2 && havet === false) {
+//                dur = dur + "T";
+//                havet = true;
+//            }
+//            dur = dur + ds[i] + uu[i];
+//        }
+//    }
     s1 = formatISO8601(arr, 0);
     if (dur.length > 1 && dur.length < 6) {
         if ( dur==='P1D' && s1.endsWith("T00:00") ) {
@@ -638,8 +638,8 @@ function width( r ) {
         dt[3]= dt[3]-1;
     }
     while ( dt[3]<0 && dt[2]>0 ) {
-        dt[4]= dt[4]+24;
-        dt[3]= dt[3]-1;
+        dt[3]= dt[3]+24;
+        dt[2]= dt[2]-1;
     }
     while ( dt[2]<0 && dt[1]>0 ) {
         dt[2]= dt[2]+daysInMonth(r[0],r[1]-1);  // TODO: this needs to be tested
