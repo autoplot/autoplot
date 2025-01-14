@@ -263,16 +263,22 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         TreePath tp= evt.getPath();
         parameter= String.valueOf(tp.getPathComponent(1));
 //        String longName= parameters.get(parameter);
-        String longName= "<html>"+ parameters.get(parameter) + "<br><em>" + allParameterInfo.get(parameter) + "</em>";
-        parameterInfoLabel.setText( longName );
+        String longName= parameters.get(parameter);
+        int ibr= longName.indexOf("<br>");
+        String longNameSansDescription = ibr>-1 ? longName.substring(0,ibr) : longName;
+        
+        parameterInfoLabel.setText( "<html>"+ longName + "<br><em>" + allParameterInfo.get(parameter) + "</em>" );
 
-        String dims= longName.substring(parameter.length());
+        String dims= longNameSansDescription.substring(parameter.length());
         
         List<String> varnames= new ArrayList<>();
         for ( Entry<String,String> ps : parameters.entrySet() ) {
             String v= ps.getValue();
             int i= v.indexOf("[");
-            if ( dims.startsWith( v.substring(i,v.length()-1) ) ) {
+            String vdims= v.substring(i,v.length()-1);
+            i= vdims.indexOf("]");
+            if ( i>-1 ) vdims= vdims.substring(0,i+1);
+            if ( vdims.startsWith( dims ) ) {
                 varnames.add(ps.getKey());
             }
         }
