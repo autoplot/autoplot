@@ -283,7 +283,9 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
             }
         }
         
+        Object item= whereParamList.getSelectedItem();
         whereParamList.setModel( new DefaultComboBoxModel( varnames.toArray() ) );            
+        if ( item!=null ) whereParamList.setSelectedItem(item);
         
     }//GEN-LAST:event_parameterTreeValueChanged
 
