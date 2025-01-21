@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Parker Solar Probe visits Venus.  This is another case where cadence-guessing is poor, breaking the connections on the early and late in the day.</small></p>
+        <p><small>Slices of movie frames, where movie is of cat sleeping, breathing once per two seconds.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,10 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-01-11 r28054):</p>
+        <p>Bugfixes (2025-01-22 r28066):</p>
         <ul>
+            <li>move ZipFileSystem to DasCore so that it can properly implement subfilesystem when zip file is local.
+            <li>Corrections to Autoplot Servlet, where "thin" client would misformat some time strings.
             <li>PDS UNSIGNED_INTEGER arrays supported.
             <li>Remove excessive use of synchronized blocks in LogConsole after seeing deadlock.  
             <li>HAPI server matcher constraint should be case-insensitive.
