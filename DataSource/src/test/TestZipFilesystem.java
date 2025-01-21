@@ -11,7 +11,7 @@ import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
-import zipfs.ZipFileSystemFactory;
+import org.das2.util.filesystem.ZipFileSystemFactory;
 
 /**
  *

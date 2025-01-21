@@ -89,7 +89,6 @@ public class DataSetURI {
 
 
     static {
-        FileSystem.registerFileSystemFactory("zip", new zipfs.ZipFileSystemFactory());
         FileSystem.registerFileSystemFactory("tar", new org.das2.util.filesystem.VFSFileSystemFactory());
         FileSystem.registerFileSystemFactory("ftp", new FTPBeanFileSystemFactory());
         if ( System.getProperty("AP_CURL")!=null || System.getProperty("AP_WGET")!=null ) {
