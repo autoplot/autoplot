@@ -227,9 +227,9 @@ public class LayoutUtil {
                        
                 if ( cc.isVisible() && ( cc.getColumn() == marginColumn || cc.getColumn().getParentDevicePosition() == marginColumn
                     || ( cc.getColumn().getParentDevicePosition()!=null && cc.getColumn().getParentDevicePosition().getParentDevicePosition() == marginColumn ) ) ) {
-               
-                   rows.add( cc.getRow() );
-               
+                    if ( !rows.contains(cc.getRow() ) ) { 
+                        rows.add( cc.getRow() );
+                    }
                 }
                
             }
