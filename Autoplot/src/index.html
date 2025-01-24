@@ -30,8 +30,11 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-01-22 r28066):</p>
+        <p>Bugfixes (2025-01-24 r28068):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2663/">2663</a>: slices GUI corrections, enabling slice index and don't quote : to improve readability.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2663/">2663</a>: slice3 index out of bounds check was against the wrong dimension.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2665/">2665</a>: clean up code which renormalizes layout (code is disabled until after the production release)
             <li>move ZipFileSystem to DasCore so that it can properly implement subfilesystem when zip file is local.
             <li>Corrections to Autoplot Servlet, where "thin" client would misformat some time strings.
             <li>PDS UNSIGNED_INTEGER arrays supported.
@@ -75,6 +78,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add whereR1, since some scripts assume a rank 1 input but then a rank 2 output results in confusing errors later in the script.
             <li>extent propagates format metadata, to improve readability of extent(where(...)).
             <li>Allow use of integer ranges in vap+inline (not only time ranges), which is useful when marking ranges in binary file.  Color names can be used in GUI.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/360/">360</a>: Jython getParam and setOutputParam validate inputs now when constraints are used.
