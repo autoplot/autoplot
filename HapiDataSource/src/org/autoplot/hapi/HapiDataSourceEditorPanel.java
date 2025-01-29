@@ -74,9 +74,6 @@ import org.autoplot.datasource.RecentComboBox;
 import org.autoplot.datasource.TimeRangeTool;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.ui.PromptComboBoxEditor;
-import org.das2.dataset.DataSetUtil;
-import org.das2.graph.GraphUtil;
-import org.das2.util.ColorUtil;
 
 /**
  * Swing editor for HAPI URIs
@@ -1490,7 +1487,12 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             DatumRange sampleRange=null;
             if ( info.has("sampleStartDate") && info.has("sampleStopDate") ) {
                 try {
-                    sampleRange = new DatumRange( Units.us2000.parse(info.getString("sampleStartDate")), Units.us2000.parse(info.getString("sampleStopDate")) );
+                    Datum t1= Units.us2000.parse(info.getString("sampleStartDate"));
+                    Datum t2= Units.us2000.parse(info.getString("sampleStopDate"));
+                    if ( !t1.isFill() ) {
+                        logger.info("parse error in sampleStartDate");
+                        sampleRange = new DatumRange( t1, t2 );
+                    }
                 } catch (JSONException | ParseException ex) {
                     logger.log(Level.SEVERE, null, ex);
                 }
