@@ -584,7 +584,7 @@ public class HapiServer {
             throw new IllegalArgumentException("here fail");
         } else {
             DatumRange sampleRange=null;
-            if ( info.has("sampleStartDate") && info.has("sampleStopDate") ) {
+            if ( info.has("sampleStartDate") && info.has("sampleStopDate") && !info.getString("sampleStartDate").trim().isEmpty() ) {
                 try {
                     sampleRange = new DatumRange( Units.us2000.parse(info.getString("sampleStartDate")), Units.us2000.parse(info.getString("sampleStopDate")) );
                 } catch (JSONException | ParseException ex) {
