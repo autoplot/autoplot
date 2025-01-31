@@ -821,6 +821,7 @@ public class URISplit {
      * already.  Items without equals (=) are inserted as "arg_N"=name.
      * @param params null or String containing the list of ampersand-delimited parameters.
      * @return the map, which will be empty when there are no params.
+     * @throws IllegalArgumentException if a parameter appears twice.
      */
     public static LinkedHashMap<String, String> parseParams(String params) {
         LinkedHashMap<String, String> result = new LinkedHashMap<>();
@@ -862,6 +863,10 @@ public class URISplit {
                 }
                 value = value.replaceAll("%3D", "=" ); // https://sourceforge.net/tracker/?func=detail&aid=3049295&group_id=199733&atid=970682
                 value = value.replaceAll("%26", "&");
+                if ( result.containsKey(name) ) {
+                    throw new IllegalArgumentException("named parameter appears twice: "
+                            + name );
+                }
                 result.put(name, value);
             }
         }
