@@ -64,6 +64,7 @@ import static org.autoplot.hapi.HapiServer.readFromURL;
 import org.das2.datum.TimeUtil;
 import org.das2.util.ColorUtil;
 import org.das2.qds.IDataSet;
+import org.das2.qds.examples.Schemes;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.DataSetBuilder;
 import org.das2.qstream.TransferType;
@@ -934,7 +935,9 @@ public final class HapiDataSource extends AbstractDataSource {
             xds= ds;
         }
         
-        if ( timeStampLocation.equalsIgnoreCase("BEGIN") || timeStampLocation.equalsIgnoreCase("END" ) ) {
+        if ( !Schemes.isEventsList(ds) && 
+            timeStampLocation.equalsIgnoreCase("BEGIN") || timeStampLocation.equalsIgnoreCase("END" ) ) {
+
             if ( cadence==null ) {
                 cadence= DataSetUtil.asDatum( DataSetUtil.guessCadenceNew( xds, null ) );
             }
