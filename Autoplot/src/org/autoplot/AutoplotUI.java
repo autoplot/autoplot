@@ -4946,6 +4946,8 @@ private void updateFrameTitle() {
         alm.addBooleanSwitchArgument( "scriptExit",null,"scriptExit","force exit after running the script, setting exit status to non-zero for exception");
         alm.addOptionalSwitchArgument("testPngFilename", null, "testPngFilename", "", "write canvas to this png file after script is run" );
         alm.addOptionalSwitchArgument("outputFile", null, "outputFile", "", "Write canvas to png or pdf output file" );
+        alm.addOptionalSwitchArgument("runBatch", "", "runBatch", "", "Run the Run Batch Tool .batch and exit.");
+        
         alm.addOptionalSwitchArgument("autoLayout",null,"autoLayout",ArgumentList.TRUE,"turn on/off initial autolayout setting");
         alm.addOptionalSwitchArgument("mode","m","mode","expert","start in basic (browse,reduced) mode or expert mode" );
         //alm.addOptionalSwitchArgument("exit", null, "exit", "0", "exit after running script" );
@@ -5094,6 +5096,12 @@ private void updateFrameTitle() {
             if ( !outputFile.endsWith(".pdf") && !outputFile.endsWith(".png") ) {
                 throw new IllegalArgumentException("outputFile must end with .png or .pdf");
             }
+        }
+        
+        final String runBatch=alm.getValue("runBatch");
+        if ( !runBatch.equals("") ) {
+            System.err.println("runBatch is not supported.  Run the GUI and"
+                    + " use the Run Batch GUI.");
         }
         
         final String finitialURL= initialURL;
