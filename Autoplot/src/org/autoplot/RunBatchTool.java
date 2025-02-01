@@ -1658,31 +1658,31 @@ public class RunBatchTool extends javax.swing.JPanel {
                 } catch ( URISyntaxException ex ) {
                     throw new IOException(ex);
                 }   interp.set("_apuri", uri );
-                interp.exec("autoplot2017.params[\'"+paramName+"\']=_apuri"); // JythonRefactory okay
+                interp.exec("autoplot2023.params[\'"+paramName+"\']=_apuri"); // JythonRefactory okay
                 break;
             case 'L': 
-                interp.exec("autoplot2017.params[\'"+paramName+"\']=URL(\'"+f1+"\')"); // JythonRefactory okay
+                interp.exec("autoplot2023.params[\'"+paramName+"\']=URL(\'"+f1+"\')"); // JythonRefactory okay
                 break;
             case 'M':
                 interp.exec("from java.io import File");
-                interp.exec("autoplot2017.params[\'"+paramName+"\']=File(\'"+f1+"\')"); // JythonRefactory okay
+                interp.exec("autoplot2023.params[\'"+paramName+"\']=File(\'"+f1+"\')"); // JythonRefactory okay
                 break;
             case 'A':
                 if ( f1.startsWith("'") && f1.endsWith("'") && f1.length()>1 ) {
                     f1= f1.substring(1,f1.length()-1);
                 }
-                interp.exec("autoplot2017.params[\'"+paramName+"\']=\'"+f1+"\'");// JythonRefactory okay
+                interp.exec("autoplot2023.params[\'"+paramName+"\']=\'"+f1+"\'");// JythonRefactory okay
                 break;
             case 'T':
                 try {
                     DatumRange timeRange= DatumRangeUtil.parseTimeRange(f1);
                     interp.set("_apdr", timeRange );
-                    interp.exec("autoplot2017.params[\'"+paramName+"\']=_apdr");// JythonRefactory okay
+                    interp.exec("autoplot2023.params[\'"+paramName+"\']=_apdr");// JythonRefactory okay
                 } catch (ParseException ex) {
                     Logger.getLogger(RunBatchTool.class.getName()).log(Level.SEVERE, null, ex);
                 }   break;
             default:
-                interp.exec("autoplot2017.params[\'"+paramName+"\']="+f1);// JythonRefactory okay
+                interp.exec("autoplot2023.params[\'"+paramName+"\']="+f1);// JythonRefactory okay
                 break;
         }
         
@@ -2009,7 +2009,7 @@ public class RunBatchTool extends javax.swing.JPanel {
             }; // subtask would reset indeterminate.
             
             InteractiveInterpreter interp = JythonUtil.createInterpreter( true, false, myDom, myMonitor );
-            interp.exec(JythonRefactory.fixImports("import autoplot2017")); 
+            interp.exec(JythonRefactory.fixImports("import autoplot2023")); 
             Map<String,Object> scriptParams= new LinkedHashMap<>();
             scriptParams.putAll( params );
 
@@ -2044,9 +2044,12 @@ public class RunBatchTool extends javax.swing.JPanel {
                         throw new IllegalArgumentException("param1Name not set");
                     }
                 }
+                // set all the default values, and values set for all runs
                 for ( Entry<String,String> e: params.entrySet() ) {
                     String pname= e.getKey();
-                    setParam( interp, pwd, parms.get(pname), pname, e.getValue() );
+                    if ( parms.get(pname)!=null ) { //TODO: When does this happen?  See file:/Users/jbf/Desktop/git/dev/demos/2025/20250130/brokenParamDescription.jy?resourceURI='https://pds-ppi.igpp.ucla.edu/data/JNO-J_SW-JAD-5-CALIBRATED-V1.0/DATA/2018/2018091/ELECTRONS/JAD_L50_HRS_ELC_TWO_DEF_2018091_V01.LBL'&doplot=False
+                        setParam( interp, pwd, parms.get(pname), pname, e.getValue() );
+                    }
                 }
                 setParam( interp, pwd, parms.get(paramName), paramName, paramValue );
                 runResults.put(paramName,paramValue);
@@ -2166,7 +2169,7 @@ public class RunBatchTool extends javax.swing.JPanel {
             monitor.setTaskSize(ff1.length);
             monitor.started();
             
-            Map<String,String> params= URISplit.parseParams(split.params);
+            Map<String,String> splitParams= URISplit.parseParams(split.params);
             Map<String,Object> env= new HashMap<>();
             env.put("dom",this.dom);
             env.put("PWD",pwd);
@@ -2174,14 +2177,14 @@ public class RunBatchTool extends javax.swing.JPanel {
             final File scriptFile= DataSetURI.getFile( split.file, monitor.getSubtaskMonitor("download script") );
             String script= readScript( scriptFile );
             
-            Map<String,org.autoplot.jythonsupport.Param> parms= Util.getParams( env, script, params, new NullProgressMonitor() );
+            Map<String,org.autoplot.jythonsupport.Param> parms= Util.getParams( env, script, splitParams, new NullProgressMonitor() );
 
             InteractiveInterpreter interp = JythonUtil.createInterpreter( true, false );
-            interp.exec(JythonRefactory.fixImports("import autoplot2017")); 
+            interp.exec(JythonRefactory.fixImports("import autoplot2023")); 
             
             ParametersFormPanel pfp= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
-            pfp.doVariables( env, scriptFile, params, null );
-            params.entrySet().forEach((ent) -> {
+            pfp.doVariables( env, scriptFile, splitParams, null );
+            splitParams.entrySet().forEach((ent) -> {
                 try {
                     pfp.getFormData().implement( interp, ent.getKey(), ent.getValue() );
                 } catch (ParseException ex) {
@@ -2231,7 +2234,7 @@ public class RunBatchTool extends javax.swing.JPanel {
             for ( String f1 : ff1 ) {
                 final String final_f1= f1;
                 final String final_param1= param1;
-                final Map<String,String> final_params= params;
+                final Map<String,String> final_params= splitParams;
                 final JLabel jobLabel= jobs1.get(i1);
                 final JSONObject frunResults= new JSONObject();
                 ja.put(i1,frunResults);  // note runResults must be mutable
@@ -2934,7 +2937,7 @@ public class RunBatchTool extends javax.swing.JPanel {
     private InteractiveInterpreter createInterpretter(
         Map<String,Object> env, File scriptFile, Map<String,String> params, String pwd ) throws IOException {
         InteractiveInterpreter interp = JythonUtil.createInterpreter( true, false );
-        interp.exec(JythonRefactory.fixImports("import autoplot2017")); 
+        interp.exec(JythonRefactory.fixImports("import autoplot2023")); 
 
         ParametersFormPanel pfp= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
         pfp.doVariables( env, scriptFile, params, null );
