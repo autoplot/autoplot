@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Slices of movie frames, where movie is of cat sleeping, breathing once per two seconds.</small></p>
+        <p><small>Corrections to "slices" tool allows display of MAVEN/SWIA data from PDS-PPI.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,13 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-01-24 r28068):</p>
+        <p>Bugfixes (2025-02-01 r28076):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2668/">2668</a>: loosen up HAPI to support KNMI and EarthCARE servers.
+            <li>autoplot2017.py -> autoplot2023.py was never done to Run Batch, having the effect of run batch would not work for multi-thread.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2669/">2669</a>: check for duplicate keys and throw IllegalArgumentException when this is detected.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2668/">2668</a>: events list with BEGIN for timeStampLocation would cause exception.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2671/">2671</a>: properly set parameters in runBatch with multithread.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2663/">2663</a>: slices GUI corrections, enabling slice index and don't quote : to improve readability.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2663/">2663</a>: slice3 index out of bounds check was against the wrong dimension.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2665/">2665</a>: clean up code which renormalizes layout (code is disabled until after the production release)
