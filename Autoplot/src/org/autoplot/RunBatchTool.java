@@ -2937,7 +2937,7 @@ public class RunBatchTool extends javax.swing.JPanel {
     private InteractiveInterpreter createInterpretter(
         Map<String,Object> env, File scriptFile, Map<String,String> params, String pwd ) throws IOException {
         InteractiveInterpreter interp = JythonUtil.createInterpreter( true, false );
-        interp.exec(JythonRefactory.fixImports("import autoplot2023")); 
+        interp.exec(JythonRefactory.fixImports("import autoplot2023"));   
 
         ParametersFormPanel pfp= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
         pfp.doVariables( env, scriptFile, params, null );
