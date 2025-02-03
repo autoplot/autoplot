@@ -843,7 +843,8 @@ public class URISplit {
 //            //params = params.replaceAll("\\+", " "); // in the parameters, plus (+) is the same as space ( ).
 //        }
 
-        String[] ss = params.split("&");
+        
+        String[] ss = guardedSplit( params, '&', '\'', '\"' );
 
         int argc = 0;
 
@@ -864,8 +865,7 @@ public class URISplit {
                 value = value.replaceAll("%3D", "=" ); // https://sourceforge.net/tracker/?func=detail&aid=3049295&group_id=199733&atid=970682
                 value = value.replaceAll("%26", "&");
                 if ( result.containsKey(name) ) {
-                    throw new IllegalArgumentException("named parameter appears twice: "
-                            + name );
+                    throw new IllegalArgumentException("named parameter in URI appears twice: " + name );
                 }
                 result.put(name, value);
             }
