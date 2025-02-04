@@ -133,6 +133,16 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
             }
         }
         
+        if ( table==null || column==null ) { ///LABEL/SPREADSHEET/FIELD/NAME/text()
+            table= (Node) xpath.evaluate(String.format("/LABEL/SPREADSHEET"),doc,XPathConstants.NODE);
+            column= (Node) xpath.evaluate(String.format("/LABEL/SPREADSHEET/FIELD[NAME='%s']",name),doc,XPathConstants.NODE); 
+            if ( table!=null ) {
+                String pointer= (String)xpath.evaluate("/LABEL/POINTER[@object='SPREADSHEET']/text()",doc,XPathConstants.STRING);
+                if ( pointer!=null && pointer.length()>0 ) {
+                    p= new FilePointer(url,pointer);
+                }
+            }
+        }        
         if ( table==null ) {
             // maybe they are high-rank
             table= (Node) xpath.evaluate(String.format("/LABEL/TABLE[1]",name),doc,XPathConstants.NODE);
@@ -351,6 +361,10 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
         Map<String,String> result= new LinkedHashMap<>();
         
         Document doc= getDocumentWithImports(url);
+        //String s= url.getFile();
+        //int iss=s.lastIndexOf("/");
+        //s= s.substring(iss+1,s.length()-4);        
+        //DocumentUtil.dumpToXML( doc, new File("/tmp/ap/"+s + ".xml" ) );
         
         XPathFactory factory = XPathFactory.newInstance();
         XPath xpath = factory.newXPath();
@@ -359,23 +373,33 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
         // page 4-1 (p53) of https://pds.nasa.gov/datastandards/pds3/standards/sr/StdRef_20090227_v3.8.pdf
         // https://pds.nasa.gov/datastandards/pds3/standards/sr/AppendixA.pdf
         NodeList dat= (NodeList) xpath.evaluate("/LABEL/TABLE/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
-        appendNodeList( alldat, dat );
-        
+        if ( dat.getLength()>0 ) {
+            appendNodeList( alldat, dat );
+        }
         dat= (NodeList) xpath.evaluate("/LABEL/*[contains(name(),'_TABLE')]/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
-        appendNodeList( alldat, dat );
-
+        if ( dat.getLength()>0 ) {
+            appendNodeList( alldat, dat );
+        }
         dat= (NodeList) xpath.evaluate("/LABEL/BINARY_TABLE/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
-        appendNodeList( alldat, dat );
-        
+        if ( dat.getLength()>0 ) {
+            appendNodeList( alldat, dat );
+        }
         dat= (NodeList) xpath.evaluate("/LABEL/ASCII_TABLE/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
-        appendNodeList( alldat, dat );
-        
+        if ( dat.getLength()>0 ) {
+            appendNodeList( alldat, dat );
+        }
         dat= (NodeList) xpath.evaluate("/LABEL/TIME_SERIES/COLUMN/NAME/text()",doc,XPathConstants.NODESET);
-        appendNodeList( alldat, dat );
-        
+        if ( dat.getLength()>0 ) {
+            appendNodeList( alldat, dat );
+        }
         dat= (NodeList) xpath.evaluate("/LABEL/FILE/SPREADSHEET/FIELD/NAME/text()",doc,XPathConstants.NODESET);
-        appendNodeList( alldat, dat );
-        
+        if ( dat.getLength()>0 ) {
+            appendNodeList( alldat, dat );
+        }
+        dat= (NodeList) xpath.evaluate("/LABEL/SPREADSHEET/FIELD/NAME/text()",doc,XPathConstants.NODESET);
+        if ( dat.getLength()>0 ) {
+            appendNodeList( alldat, dat );
+        }        
         for ( int i=0; i<alldat.size(); i++ ) {
             Node n= alldat.get(i);
             String name= n.getTextContent();
