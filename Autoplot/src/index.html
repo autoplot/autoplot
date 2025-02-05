@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Corrections to "slices" tool allows display of MAVEN/SWIA data from PDS-PPI.</small></p>
+        <p><small>Studying fix layout of regression test which occasionally fails.  The margin row which sizes the entire display is off the page.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,9 +30,10 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-02-01 r28076):</p>
+        <p>Bugfixes (2025-02-05 r28076):</p>
         <ul>
-            <li>Support PDS3 JAD_L50_HLS_ELC_MOM_ISO_2D_ELECTRONS_*_V01.LBL
+            <li><a href="https://github.com/das-developers/das2java/issues/122">0112</a>: monotonic decreasing ytags were not properly clipped.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2673">2673</a>: Support PDS3 JAD_L50_HLS_ELC_MOM_ISO_2D_ELECTRONS_*_V01.LBL with the PDS3 data source.
         </ul>
         <p>Older Bugfixes (2025-02-01 r28076):</p>
         <ul>
