@@ -63,7 +63,7 @@ public class SecureScriptServlet extends HttpServlet {
      * @param interp
      */
     private static void setParams( Map<String,String> parms, PythonInterpreter interp ) {
-        interp.exec("import autoplot2017 as autoplot");
+        interp.exec("import autoplot2023 as autoplot");
         interp.exec("autoplot.params=dict()");
         for ( Entry<String,String> e: parms.entrySet() ) {
             String s= e.getKey();
