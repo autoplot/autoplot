@@ -24,6 +24,7 @@ import java.beans.PropertyChangeListener;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -205,7 +206,8 @@ public class LayoutPanel extends javax.swing.JPanel {
         dataSourceList.addMouseListener(popupTrigger);
         bindingListComponent.addMouseListener(popupTrigger);
         annotationsListComponent.addMouseListener(popupTrigger);
-
+        plotListComponent.addMouseListener(popupTrigger);
+        
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "layoutPanel");
     }
 
@@ -482,6 +484,7 @@ public class LayoutPanel extends javax.swing.JPanel {
                     if ( plot!=null ) {
                         dom.getController().setPlot(plot);
                         dom.getController().setPlotElement(pe);
+                        LayoutPanel.this.plotListComponent.setSelectedValue(plot,true);
                     } else {
                         logger.fine("plot not found for plotElement");
                     }
@@ -496,6 +499,13 @@ public class LayoutPanel extends javax.swing.JPanel {
             updatePlotElementList();
         }
     };
+    
+    private transient PropertyChangeListener plotsListener = new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            updatePlotsList();
+        }
+    };    
 
     private transient PropertyChangeListener bindingsListener = new PropertyChangeListener() {
         @Override
@@ -565,6 +575,7 @@ public class LayoutPanel extends javax.swing.JPanel {
                     logger.finer("enter plotListener");
                     plotElementListComponent.setSelectedIndices(iindices);
                     selectionChanged= true;
+                    updatePlotsList();
                     repaint();
                 }
             };
@@ -647,30 +658,32 @@ public class LayoutPanel extends javax.swing.JPanel {
         sameHeightButton.setEnabled( true );
     }
 
-    public void setApplication(Application app) {
-        this.dom = app;
+    public void setApplication(Application dom) {
+        this.dom = dom;
         updatePlotElementList();
         updateBindingList();
         updateAnnotationsList();
         updateDataSourceList();
-        canvasLayoutPanel1.setContainer(app.getController().getDasCanvas());
-        app.getController().getDasCanvas().addPropertyChangeListener( DasCanvas.PROP_PAINTCOUNT, new PropertyChangeListener() {
+        updatePlotsList();
+        canvasLayoutPanel1.setContainer(dom.getController().getDasCanvas());
+        dom.getController().getDasCanvas().addPropertyChangeListener( DasCanvas.PROP_PAINTCOUNT, new PropertyChangeListener() {
             public void propertyChange( PropertyChangeEvent ev ) {
                 plotElementListComponent.repaint();
             }
         });
         canvasLayoutPanel1.addComponentType(DasPlot.class, Color.BLUE);
-        app.getController().bind(app.getOptions(), Options.PROP_BACKGROUND, canvasLayoutPanel1, "background");
-        app.addPropertyChangeListener(Application.PROP_PLOT_ELEMENTS, plotElementsListener);
-        app.addPropertyChangeListener(Application.PROP_BINDINGS, bindingsListener);
-        app.addPropertyChangeListener(Application.PROP_ANNOTATIONS, annotationsListener);
-        app.addPropertyChangeListener(Application.PROP_DATASOURCEFILTERS, dataSourcesListener );
-        app.getController().addPropertyChangeListener(ApplicationController.PROP_PLOT, plotListener);
-        app.getController().addPropertyChangeListener(ApplicationController.PROP_PLOT_ELEMENT, plotElementListener);
+        dom.getController().bind(dom.getOptions(), Options.PROP_BACKGROUND, canvasLayoutPanel1, "background");
+        dom.addPropertyChangeListener(Application.PROP_PLOT_ELEMENTS, plotElementsListener);
+        dom.addPropertyChangeListener(Application.PROP_PLOTS, plotsListener);
+        dom.addPropertyChangeListener(Application.PROP_BINDINGS, bindingsListener);
+        dom.addPropertyChangeListener(Application.PROP_ANNOTATIONS, annotationsListener);
+        dom.addPropertyChangeListener(Application.PROP_DATASOURCEFILTERS, dataSourcesListener );
+        dom.getController().addPropertyChangeListener(ApplicationController.PROP_PLOT, plotListener);
+        dom.getController().addPropertyChangeListener(ApplicationController.PROP_PLOT_ELEMENT, plotElementListener);
         for ( DataSourceFilter dsf: dom.getDataSourceFilters() ) {
             dsf.addPropertyChangeListener( DataSourceFilter.PROP_URI, dataSourceListener );
             dsf.getController().addPropertyChangeListener( DataSourceController.PROP_TSB, dataSourceListener );
-        }        
+        }
     }
 
     private ListCellRenderer plotElementListCellRenderer=  new DefaultListCellRenderer() {
@@ -780,6 +793,23 @@ public class LayoutPanel extends javax.swing.JPanel {
         annotationsListComponent.setModel(elementsList);
         annotationsListComponent.repaint();
     }
+    
+    private void updatePlotsList() {
+        final List plots= new ArrayList( Arrays.asList(dom.getPlots()) );
+        AbstractListModel elementsList = new AbstractListModel() {
+            @Override
+            public int getSize() {
+                return plots.size();
+            }
+            @Override
+            public Object getElementAt(int index) {
+                return plots.get(index);
+            }
+        };
+        plotListComponent.setModel(elementsList);
+        plotListComponent.setSelectedValue( dom.getController().getPlot(), true );
+        plotListComponent.repaint();
+    }    
     
     private static final ImageIcon blueIcon= new ImageIcon( LayoutPanel.class.getResource("/resources/blue.gif" ) );
     private static final ImageIcon idleIcon= new ImageIcon( LayoutPanel.class.getResource("/org/autoplot/resources/idle-icon.png" ) );
@@ -892,6 +922,9 @@ public class LayoutPanel extends javax.swing.JPanel {
         jPanel5 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         bindingListComponent = new javax.swing.JList();
+        plotsListPanel = new javax.swing.JPanel();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        plotListComponent = new javax.swing.JList<>();
         jPanel1 = new javax.swing.JPanel();
         canvasLayoutPanel1 = new org.autoplot.util.CanvasLayoutPanel();
         tallerButton = new javax.swing.JButton();
@@ -1122,11 +1155,11 @@ public class LayoutPanel extends javax.swing.JPanel {
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 322, Short.MAX_VALUE)
+            .add(jScrollPane5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
+            .add(jScrollPane5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("Annotations", jPanel6);
@@ -1143,18 +1176,38 @@ public class LayoutPanel extends javax.swing.JPanel {
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 322, Short.MAX_VALUE)
+            .add(0, 330, Short.MAX_VALUE)
             .add(jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 322, Short.MAX_VALUE))
+                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 168, Short.MAX_VALUE)
+            .add(0, 219, Short.MAX_VALUE)
             .add(jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE))
+                .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Bindings", jPanel5);
+
+        plotListComponent.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                plotListComponentValueChanged(evt);
+            }
+        });
+        jScrollPane6.setViewportView(plotListComponent);
+
+        org.jdesktop.layout.GroupLayout plotsListPanelLayout = new org.jdesktop.layout.GroupLayout(plotsListPanel);
+        plotsListPanel.setLayout(plotsListPanelLayout);
+        plotsListPanelLayout.setHorizontalGroup(
+            plotsListPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jScrollPane6, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
+        );
+        plotsListPanelLayout.setVerticalGroup(
+            plotsListPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jScrollPane6, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("Plots", plotsListPanel);
 
         org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -1248,7 +1301,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
-                .add(canvasLayoutPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
+                .add(canvasLayoutPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 129, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(selectedPlotLabel)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -1715,6 +1768,14 @@ public class LayoutPanel extends javax.swing.JPanel {
         edit.showDialog(LayoutPanel.this);
     }//GEN-LAST:event_editAnnotationsMenuItemActionPerformed
 
+    private void plotListComponentValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_plotListComponentValueChanged
+        logger.log(Level.FINE, "panelListComponentValueChanged {0}", evt.getValueIsAdjusting());
+        if ( !evt.getValueIsAdjusting() ) {
+            selectionChanged= true;
+            repaint();
+        }        
+    }//GEN-LAST:event_plotListComponentValueChanged
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem addHiddenMenuItem;
     private javax.swing.JMenuItem addPlotsBelowMenuItem;
@@ -1745,6 +1806,7 @@ public class LayoutPanel extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JSplitPane jSplitPane3;
@@ -1752,7 +1814,9 @@ public class LayoutPanel extends javax.swing.JPanel {
     private javax.swing.JTable jTable1;
     private javax.swing.JPopupMenu plotActionsMenu;
     private javax.swing.JList plotElementListComponent;
+    private javax.swing.JList<Plot> plotListComponent;
     private javax.swing.JMenu plotMenu;
+    private javax.swing.JPanel plotsListPanel;
     private javax.swing.JMenu plotsMenu;
     private javax.swing.JMenuItem propertiesMenuItem;
     private javax.swing.JMenuItem removeBindingsMenuItem;
