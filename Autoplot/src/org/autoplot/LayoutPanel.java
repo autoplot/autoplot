@@ -1772,6 +1772,10 @@ public class LayoutPanel extends javax.swing.JPanel {
         logger.log(Level.FINE, "panelListComponentValueChanged {0}", evt.getValueIsAdjusting());
         if ( !evt.getValueIsAdjusting() ) {
             selectionChanged= true;
+            Plot selected= plotListComponent.getSelectedValue();
+            if ( selected!=null ) {
+                dom.getController().setPlot(selected);
+            }
             repaint();
         }        
     }//GEN-LAST:event_plotListComponentValueChanged
