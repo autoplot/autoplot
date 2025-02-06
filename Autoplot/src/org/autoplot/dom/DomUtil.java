@@ -1431,17 +1431,31 @@ public class DomUtil {
     /**
      * this was made public for bug 1520.  This returns a 1-plot dom, but 
      * this may change.
+     * We find all plots sharing the same row and column as the plot.
      * @param application
      * @param domPlot
      * @return 
      */
     public static String getPlotAsString(Application application, Plot domPlot) {
         Application newApp= new Application();
-        newApp.setPlots( new Plot[] { domPlot } );
-        List<PlotElement> pes= getPlotElementsFor( application, domPlot );
-        newApp.setPlotElements(pes.toArray(new PlotElement[pes.size()] ) );
-        List<DataSourceFilter> dsfs= getDataSourceFiltersFor( application, domPlot );
-        newApp.setDataSourceFilters( dsfs.toArray(new DataSourceFilter[dsfs.size()]) );
+        List<Plot> plots= new ArrayList<>();
+        for ( Plot p: application.getPlots() ) {
+            if ( p.getRowId().equals(domPlot.getRowId()) &&
+                p.getColumnId().equals(domPlot.getColumnId()) ) {
+                plots.add(p);
+            }
+        }
+        newApp.setPlots( plots.toArray(new Plot[0]) );
+        List<PlotElement> pes= new ArrayList<>();
+        List<DataSourceFilter> dsfs= new ArrayList<>();
+        for ( Plot p: plots ) {
+            List<PlotElement> pes1= getPlotElementsFor( application, p );
+            pes.addAll(pes1);
+            List<DataSourceFilter> dsfs1= getDataSourceFiltersFor( application, p );
+            dsfs.addAll(dsfs1);
+        }
+        newApp.setPlotElements(pes.toArray(new PlotElement[0]) );
+        newApp.setDataSourceFilters( dsfs.toArray(new DataSourceFilter[0]) );
         newApp.setCanvases(application.getCanvases());
         newApp.setId( application.id+"_"+domPlot.id );
         
