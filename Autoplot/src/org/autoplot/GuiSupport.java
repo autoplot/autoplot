@@ -1954,6 +1954,17 @@ public class GuiSupport {
             targetPlot.setTicksURI("");
             targetPlot.setEphemerisLabels("");
             targetPlot.setEphemerisLineCount(-1);
+
+            Map<String,String> nameMap= new HashMap<>();
+            nameMap.put( srcPlot.getId(), targetPlot.getId() );
+            
+            // check to see if there are any other plots sharing the same row and column.
+            for ( int i=1; i<state.getPlots().length; i++ ) {
+                Plot newPlot= controller.addPlot( targetPlot, null );
+                exclude= Arrays.asList(Plot.PROP_ID, Plot.PROP_ROWID,Plot.PROP_COLUMNID );
+                newPlot.syncTo( state.getPlots(i), exclude );
+                nameMap.put( state.getPlots(i).getId(), newPlot.getId() );
+            }
             
             // if everything else is bound, then bind this one too.
             Application dom= controller.getApplication();
@@ -1973,8 +1984,6 @@ public class GuiSupport {
                 }
             }
             
-            Map<String,String> nameMap= new HashMap<>();
-            nameMap.put( srcPlot.getId(), targetPlot.getId() );
             //List<DataSourceFilter> unresolved= new ArrayList<>();
             for ( int i=0; i<state.getDataSourceFilters().length; i++ ) {
                 DataSourceFilter newDsf= controller.addDataSourceFilter();
