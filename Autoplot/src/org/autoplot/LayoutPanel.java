@@ -364,6 +364,7 @@ public class LayoutPanel extends javax.swing.JPanel {
 
         contextMenus.put( canvasLayoutPanel1, plotActionsMenu );
         contextMenus.put( dataSourceList, dataSourceActionsMenu );
+        contextMenus.put( plotListComponent, plotActionsMenu );
 
         JPopupMenu plotElementContextMenu = new JPopupMenu();
 
