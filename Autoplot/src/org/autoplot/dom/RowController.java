@@ -4,7 +4,6 @@ package org.autoplot.dom;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.ParseException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,8 +31,34 @@ public class RowController extends DomNodeController {
         this.row= row;
         this.applicationController= applicationController;
         row.controller= this;
+        createNameListener(  );
+        row.addPropertyChangeListener( Row.PROP_PARENT, nameListener );
     }
 
+    PropertyChangeListener nameListener;
+    
+    void createNameListener(  ) {
+        nameListener= (PropertyChangeEvent evt) -> {
+            LoggerManager.logPropertyChangeEvent(evt);
+            
+            if ( evt.getPropertyName().equals(Row.PROP_PARENT) ) {
+                String newid= (String)evt.getNewValue();
+                doSetParentRow( (String)evt.getOldValue(),newid);
+            }
+        };
+    }
+    
+    private void doSetParentRow( String old, String newid ) {
+        if ( newid.isEmpty() ) return;
+        DomNode n= applicationController.getElementById(newid);
+        if ( n==null ) throw new IllegalArgumentException("unable to find parent with id: "+newid);
+        if ( !(n instanceof Row) ) {
+            if ( old==null ) throw new IllegalArgumentException("unable to find Row for id: "+newid );
+            RowController.this.row.setParent( old );
+        }
+        Row newrow= (Row)n;
+        RowController.this.row.controller.dasRow.setParentRow(newrow.getController().getDasRow());        
+    }
     PropertyChangeListener dasRowPosListener;
     
     PropertyChangeListener createDasRowPosListener( final List<String> minList, final List<String> maxList ) {
@@ -94,7 +119,7 @@ public class RowController extends DomNodeController {
         }
         applicationController.bind( row, Row.PROP_TOP, dasRow, DasDevicePosition.PROP_MINLAYOUT );
         applicationController.bind( row, Row.PROP_BOTTOM, dasRow, DasDevicePosition.PROP_MAXLAYOUT );
-        
+        doSetParentRow(null,this.row.getParent());
         this.canvas= canvas;
     }
     
@@ -115,6 +140,7 @@ public class RowController extends DomNodeController {
 
     public void removeBindings() {
         applicationController.unbind(row);
+        row.removePropertyChangeListener( Row.PROP_PARENT, nameListener );
     }
     
     public void removeReferences() {

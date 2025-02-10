@@ -37,8 +37,35 @@ public class ColumnController extends DomNodeController {
         this.column= column;
         this.applicationController= applicationController;
         column.controller= this;
+        createNameListener(  );
+        column.addPropertyChangeListener( Row.PROP_PARENT, nameListener );
     }
 
+    PropertyChangeListener nameListener;
+    
+    void createNameListener(  ) {
+        nameListener= (PropertyChangeEvent evt) -> {
+            LoggerManager.logPropertyChangeEvent(evt);
+            
+            if ( evt.getPropertyName().equals(Row.PROP_PARENT) ) {
+                String newid= (String)evt.getNewValue();
+                doSetParentColumn( (String)evt.getOldValue(), newid );
+            }
+        };
+    }
+    
+    private void doSetParentColumn( String old, String newid ) {
+        if ( newid.isEmpty() ) return;
+        DomNode n= applicationController.getElementById(newid);
+        if ( n==null ) throw new IllegalArgumentException("unable to find parent with id: "+newid);
+        if ( !(n instanceof Column) ) {
+            if ( old==null ) throw new IllegalArgumentException("unable to find Column for id: "+newid );
+            ColumnController.this.column.setParent( old );
+        }
+        Column newcolumn= (Column)n;
+        ColumnController.this.column.controller.dasColumn.setParentColumn(newcolumn.getController().getDasColumn());        
+    }
+        
     PropertyChangeListener dasColumnPosListener;
     
     PropertyChangeListener createDasColumnPosListener( final List<String> minList, final List<String> maxList ) {
@@ -91,7 +118,7 @@ public class ColumnController extends DomNodeController {
         }                
         applicationController.bind( column, Column.PROP_LEFT, dasColumn, DasDevicePosition.PROP_MINLAYOUT );
         applicationController.bind( column, Column.PROP_RIGHT, dasColumn, DasDevicePosition.PROP_MAXLAYOUT );
-        
+        doSetParentColumn(null,this.column.getParent());
         this.canvas= canvas;
     }
 
@@ -112,6 +139,7 @@ public class ColumnController extends DomNodeController {
     
     public void removeBindings() {
         applicationController.unbind(column);
+        column.removePropertyChangeListener( Column.PROP_PARENT, nameListener );
     }
     
     public void removeReferences() {
