@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Studying fix layout of regression test which occasionally fails.  The margin row which sizes the entire display is off the page.</small></p>
+        <p><small>Studying CDF files with moments from Polar/Hydra.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -32,6 +32,9 @@
                 
         <p>Bugfixes (2025-02-06 r28076):</p>
         <ul>
+            <li>Properly support where row or column has another row or column as a parent.  Code assumed marginRow or marginColumn was always the parent.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2669/">2669</a>: allow the check for repeats to be disabled, so that parsing can be used to check for one switch.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2667/">2667</a>: copy and paste of plot will allow overlapping plots to be copied as well.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2672/">2672</a>: axisOffset properly controls colorbar location, allowing multiple colorbars to be used on one plot.  Thanks, Sadie!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2674/">2674</a>: More places where autoplot2023.py was needed.  Thanks, Kristoff!
             <li><a href="https://github.com/das-developers/das2java/issues/122">0112</a>: monotonic decreasing ytags were not properly clipped.  Thanks, Sadie!
@@ -63,6 +66,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>support rank 3 ordinal data, found in Parker Solar Probe EPILO CDF files.
+            <li>"plots" list added to layout panel, to better support overlapping plots.
         </ul>
         <p>Less recent features:</p>
         <ul>
