@@ -62,6 +62,10 @@ public abstract class AbstractDataSource implements DataSource {
     protected URI resourceURI;
 
     public AbstractDataSource(java.net.URI uri) {
+        this(uri,true);
+    }
+    
+    public AbstractDataSource(java.net.URI uri, boolean validCheck) {
         this.uri = uri;
         String s = DataSetURI.fromUri(uri);
         if ( !s.startsWith("vap") ) {
@@ -74,7 +78,7 @@ public abstract class AbstractDataSource implements DataSource {
                 logger.log(Level.WARNING, "URI contains two question marks:{0}", uri);
             }
         }
-        params = URISplit.parseParams(split.params);
+        params = URISplit.parseParams(split.params,validCheck);
 
         String f= split.file;
         if ( split.scheme!=null ) {

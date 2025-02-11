@@ -815,15 +815,28 @@ public class URISplit {
         }
         return i;
     }
-
+    
     /**
      * Split the parameters (if any) into name,value pairs. URLEncoded parameters are decoded, but the string may be decoded 
-     * already.  Items without equals (=) are inserted as "arg_N"=name.
+     * already.  Items without equals (=) are inserted as "arg_N"=name.  This will check that each parameter is unique.
      * @param params null or String containing the list of ampersand-delimited parameters.
      * @return the map, which will be empty when there are no params.
      * @throws IllegalArgumentException if a parameter appears twice.
      */
     public static LinkedHashMap<String, String> parseParams(String params) {
+        return parseParams(params,true);
+    }
+    
+    /**
+     * Split the parameters (if any) into name,value pairs. URLEncoded parameters are decoded, but the string may be decoded 
+     * already.  Items without equals (=) are inserted as "arg_N"=name.
+     * @param params null or String containing the list of ampersand-delimited parameters.
+     * @param validCheck true will check to see if each param is unique, and possibly other checks in the future
+     * @return the map, which will be empty when there are no params.
+     * @throws IllegalArgumentException if a parameter appears twice.
+     * 
+     */
+    public static LinkedHashMap<String, String> parseParams(String params,boolean validCheck) {
         LinkedHashMap<String, String> result = new LinkedHashMap<>();
         if (params == null) {
             return result;
@@ -864,7 +877,7 @@ public class URISplit {
                 }
                 value = value.replaceAll("%3D", "=" ); // https://sourceforge.net/tracker/?func=detail&aid=3049295&group_id=199733&atid=970682
                 value = value.replaceAll("%26", "&");
-                if ( result.containsKey(name) ) {
+                if ( result.containsKey(name) && validCheck ) {
                     throw new IllegalArgumentException("named parameter in URI appears twice: " + name );
                 }
                 result.put(name, value);
