@@ -739,7 +739,7 @@ public class CdfUtil {
         }
         
         if ( stype.equals("string") ) {
-            result = readStringData(svariable, recInterval, cdf, recCount, qube );
+             result = readStringData(svariable, recInterval, cdf, recCount, qube );
             if ( recCount==-1 && result.rank()==2 ) {
                 return (MutablePropertyDataSet)result.slice(0);
             } else {
@@ -870,9 +870,23 @@ public class CdfUtil {
         Object o0= Array.get(o,0);
         String[] sdata;
         if ( o0.getClass().isArray() ) {
-            sdata= new String[ Array.getLength(o0) ];
-            for ( int j=0; j<Array.getLength(o0); j++ ) {
-                sdata[j]= (String) Array.get(o0, j);
+            if ( qube.length==3 ) {
+                sdata= new String[ DataSetUtil.product(qube) ];
+                for ( int i=0; i<qube[0]; i++ ) {
+                    o0= Array.get(o,i);
+                    for ( int j=0; j<qube[1]; j++ ) {
+                        for ( int k=0; k<qube[2]; k++ ) {
+                            sdata[i*qube[1]*qube[2]+j*qube[2]+k]= (String)Array.get(Array.get(o0, j), k) ;
+                        }
+                    }
+                }
+            } else if ( qube.length==2 ) {
+                sdata= new String[ Array.getLength(o0) ];
+                for ( int j=0; j<Array.getLength(o0); j++ ) {
+                    sdata[j]= (String) Array.get(o0, j);
+                }
+            } else {
+                throw new IllegalArgumentException("rank not supported"); // w
             }
         } else if ( o0.getClass()==String.class ) {
             //sdata= new String[ 1 ]; //vap+cdaweb:ds=ALOUETTE2_AV_LIM&id=freq_mark&timerange=1967-01-15+12:59:00+to+12:59:01
