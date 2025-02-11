@@ -228,7 +228,7 @@ public class AppScriptPanelSupport {
             
             final String fsfile;
             URISplit split= URISplit.parse(sfile);
-            Map<String,String> params= URISplit.parseParams(split.params);
+            Map<String,String> params= URISplit.parseParams(split.params,false);
             String script= params.get(JythonDataSource.PARAM_SCRIPT);
             if ( script!=null && script.trim().length()>0 ) {
                 fsfile= script;
