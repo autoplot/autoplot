@@ -60,7 +60,7 @@ public class InlineDataSource extends AbstractDataSource {
     TimeSeriesBrowse tsb=null;
     
     public InlineDataSource(URI uri) {
-        super(uri);
+        super(uri,false);
         List<String> script= new ArrayList<>();
         String timerange= InlineDataSourceFactory.getScript( uri.toString(), script );
         if ( timerange!=null ) {
