@@ -1902,7 +1902,7 @@ public class GuiSupport {
      * @param app GUI component used as the client for the lock.
      * @param controller
      * @param targetPlot the plot to insert plot elements, which will be recycled to implement the plot in the .vap
-     * @param theVap string containing a single-plot vap.
+     * @param theVap string containing a single-plot vap or multiple plots which share a row and column, and inset.
      * @throws HeadlessException
      * @throws IOException 
      * @throws IllegalArgumentException if the string is not a vap.
@@ -1994,10 +1994,20 @@ public class GuiSupport {
                     newPlot.syncTo( p, exclude );
                     nameMap.put( p.getId(), newPlot.getId() );
                 }
-            }            
-            
+            }
+
             // if everything else is bound, then bind this one too.
             Application dom= controller.getApplication();
+            
+//            for ( int i=0; i<state.getBindings().length; i++ ) {
+//                BindingModel bm= state.getBindings(i);
+//                String newSrc= nameMap.get( bm.getSrcId() );
+//                String newDst= nameMap.get( bm.getDstId() );
+//                DomNode src= dom.getController().getElementById(newSrc);
+//                DomNode dst= dom.getController().getElementById(newDst);
+//                controller.bind( dom.getController().getdom, Application.PROP_TIMERANGE, targetPlot.getXaxis(), Axis.PROP_RANGE );
+//            }
+            
             boolean doBindX= dom.getController().findBindings( dom, Application.PROP_TIMERANGE ).size()>0 &&
                     dom.getController().findBindings( targetPlot, Plot.PROP_CONTEXT ).isEmpty() &&
                     UnitsUtil.isTimeLocation( targetPlot.getXaxis().getRange().getUnits() ) &&
