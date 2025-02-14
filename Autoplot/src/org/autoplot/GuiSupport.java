@@ -148,6 +148,8 @@ import org.xml.sax.SAXException;
 import ZoeloeSoft.projects.JFontChooser.JFontChooser;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import org.autoplot.dom.Column;
+import org.autoplot.dom.Row;
 import org.autoplot.renderer.AnnotationEditorPanel;
 import org.das2.components.propertyeditor.EnumerationEditor;
 import org.das2.datum.Datum;
@@ -1899,7 +1901,7 @@ public class GuiSupport {
      * <code>theVap</code>.  This should be called from the event thread.
      * @param app GUI component used as the client for the lock.
      * @param controller
-     * @param targetPlot the plot to insert plot elements.
+     * @param targetPlot the plot to insert plot elements, which will be recycled to implement the plot in the .vap
      * @param theVap string containing a single-plot vap.
      * @throws HeadlessException
      * @throws IOException 
@@ -1960,11 +1962,39 @@ public class GuiSupport {
             
             // check to see if there are any other plots sharing the same row and column.
             for ( int i=1; i<state.getPlots().length; i++ ) {
-                Plot newPlot= controller.addPlot( targetPlot, null );
-                exclude= Arrays.asList(Plot.PROP_ID, Plot.PROP_ROWID,Plot.PROP_COLUMNID );
-                newPlot.syncTo( state.getPlots(i), exclude );
-                nameMap.put( state.getPlots(i).getId(), newPlot.getId() );
+                Plot p= state.getPlots(i);
+                if ( p==srcPlot ) continue;
+                if ( p.getRowId().equals( srcPlot.getRowId() ) &&
+                    p.getColumnId().equals( srcPlot.getColumnId() ) ) {
+                    Row r= DomUtil.getRow( controller.getApplication(), targetPlot.getRowId() );
+                    Column c= DomUtil.getColumn( controller.getApplication(), targetPlot.getColumnId() );
+                    Plot newPlot= controller.addPlot( r, c );
+                    exclude= Arrays.asList(Plot.PROP_ID, Plot.PROP_ROWID,Plot.PROP_COLUMNID );
+                    newPlot.syncTo( state.getPlots(i), exclude );
+                    nameMap.put( state.getPlots(i).getId(), newPlot.getId() );
+                }
             }
+            
+            // check to see if there are any inset plots sharing the same parent row and parent column.
+            for ( int i=1; i<state.getPlots().length; i++ ) {
+                Plot p= state.getPlots(i);
+                if ( p==srcPlot ) continue;
+                Row r= DomUtil.getRow( state, p.getRowId() );
+                Column c= DomUtil.getColumn( state, p.getColumnId() );
+                if ( r.getParent().equals( srcPlot.getRowId() ) &&
+                    c.getParent().equals( srcPlot.getColumnId() ) ) {
+                    Row newRow=  controller.getCanvas().getController().addRow();
+                    Column newColumn= controller.getCanvas().getController().addColumn();
+                    newRow.syncTo( r, Arrays.asList(Row.PROP_ID,Row.PROP_PARENT) );
+                    newRow.setParent( targetPlot.getRowId() );
+                    newColumn.syncTo( c, Arrays.asList(Column.PROP_ID,Column.PROP_PARENT) );
+                    newColumn.setParent( targetPlot.getColumnId() );
+                    Plot newPlot= controller.addPlot( newRow, newColumn );
+                    exclude= Arrays.asList(Plot.PROP_ID, Plot.PROP_ROWID,Plot.PROP_COLUMNID );
+                    newPlot.syncTo( p, exclude );
+                    nameMap.put( p.getId(), newPlot.getId() );
+                }
+            }            
             
             // if everything else is bound, then bind this one too.
             Application dom= controller.getApplication();

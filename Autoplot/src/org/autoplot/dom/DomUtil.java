@@ -1427,14 +1427,90 @@ public class DomUtil {
 
         }
     }
+    
+    /**
+     * return the row with the ID.
+     * @param dom the application
+     * @param id the row's id.
+     * @return the row
+     * @see #getElementById(org.autoplot.dom.DomNode, java.lang.String) which is slower.
+     */
+    public static Row getRow( Application dom, String id ) {
+        Canvas canvas= dom.getCanvases(0);
+        if ( canvas.marginRow.id.equals(id) ) {
+            return canvas.marginRow;
+        } else {
+            for ( Row r: canvas.getRows() ) {
+                if ( r.id.equals(id) ) {
+                    return r;
+                }
+            }
+        }
+        throw new IllegalArgumentException("Unable to find row: "+id );
+    }
 
+    /**
+     * return the column with the ID.
+     * @param dom the application
+     * @param id the column's id.
+     * @return the column
+     * @see #getElementById(org.autoplot.dom.DomNode, java.lang.String) which is slower.
+     */
+    public static Column getColumn( Application dom, String id ) {
+        Canvas canvas= dom.getCanvases(0);
+        if ( canvas.marginColumn.id.equals(id) ) {
+            return canvas.marginColumn;
+        } else {
+            for ( Column c: canvas.getColumns() ) {
+                if ( c.id.equals(id) ) {
+                    return c;
+                }
+            }
+        }
+        throw new IllegalArgumentException("Unable to find column: "+id );
+    }
+    
+    /**
+     * return the plot with the ID.
+     * @param dom the application
+     * @param id the plot's id
+     * @return the plot
+     * @see #getElementById(org.autoplot.dom.DomNode, java.lang.String) which is slower.
+     */
+    public static Plot getPlot( Application dom, String id ) {
+        for ( Plot p: dom.plots ) {
+            if ( p.id.equals(id) ) {
+                return p;
+            }
+        }
+        throw new IllegalArgumentException("Unable to find plot: "+id );
+    }
+
+    /**
+     * return the plotElement with the ID.
+     * @param dom the application
+     * @param id the plotElement's id
+     * @return the plot
+     * @see #getElementById(org.autoplot.dom.DomNode, java.lang.String) which is slower.
+     */
+    public static PlotElement getPlotElement( Application dom, String id ) {
+        for ( PlotElement p: dom.plotElements ) {
+            if ( p.id.equals(id) ) {
+                return p;
+            }
+        }
+        throw new IllegalArgumentException("Unable to find plotElement: "+id );
+    }
+    
     /**
      * this was made public for bug 1520.  This returns a 1-plot dom, but 
      * this may change.
-     * We find all plots sharing the same row and column as the plot.
-     * @param application
-     * @param domPlot
-     * @return 
+     * We find all plots sharing the same row and column as the plot, and
+     * also any plots belonging to the rows and columns which are children
+     * of the plot's rows and columns (inset plot).
+     * @param application the application (with a controller)
+     * @param domPlot the target plot
+     * @return a String containing .vap for the one plot, plus any other coincident or inset plots.
      */
     public static String getPlotAsString(Application application, Plot domPlot) {
         Application newApp= new Application();
@@ -1443,8 +1519,16 @@ public class DomUtil {
             if ( p.getRowId().equals(domPlot.getRowId()) &&
                 p.getColumnId().equals(domPlot.getColumnId()) ) {
                 plots.add(p);
+            } else {
+                Row row= getRow( application, p.getRowId() );
+                Column col= getColumn( application, p.getColumnId() );
+                if ( row.getParent().equals(domPlot.getRowId() ) &&
+                    col.getParent().equals(domPlot.getColumnId()) ) {
+                    plots.add(p);
+                }
             }
         }
+        
         newApp.setPlots( plots.toArray(new Plot[0]) );
         List<PlotElement> pes= new ArrayList<>();
         List<DataSourceFilter> dsfs= new ArrayList<>();
