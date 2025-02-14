@@ -1503,6 +1503,28 @@ public class DomUtil {
     }
     
     /**
+     * return true if the binding is between properties of the plots.
+     * @param ps a list of plots.
+     * @param bm the binding to test
+     * @return true if the binding is between properties of the plots.
+     */
+    private static boolean isContained( List<Plot> ps, BindingModel bm ) {
+        boolean srcContained= false;
+        boolean dstContained= false;
+        for ( Plot p: ps ) {
+            String id= p.getId();
+            boolean srcContained1= 
+                id.equals(bm.srcId) || p.getXaxis().getId().equals(bm.srcId) || p.getYaxis().getId().equals(bm.srcId);
+            boolean dstContained1=
+                id.equals(bm.dstId) || p.getXaxis().getId().equals(bm.dstId) || p.getYaxis().getId().equals(bm.dstId);
+            srcContained= srcContained || srcContained1;
+            dstContained= dstContained || dstContained1;
+        }
+        
+        return srcContained && dstContained;
+    }
+    
+    /**
      * this was made public for bug 1520.  This returns a 1-plot dom, but 
      * this may change.
      * We find all plots sharing the same row and column as the plot, and
@@ -1542,6 +1564,17 @@ public class DomUtil {
         newApp.setDataSourceFilters( dsfs.toArray(new DataSourceFilter[0]) );
         newApp.setCanvases(application.getCanvases());
         newApp.setId( application.id+"_"+domPlot.id );
+        
+        ArrayList<BindingModel> newAppBm= new ArrayList<>();
+        for ( BindingModel bm: application.getBindings() ) {
+            if ( isContained( plots, bm ) ) {
+                newAppBm.add(bm);
+            }
+        }
+        
+        if ( !newAppBm.isEmpty() ) {
+            newApp.setBindings( newAppBm.toArray(new BindingModel[0]) );
+        }
         
         ByteArrayOutputStream baos= new ByteArrayOutputStream(1000);
         try {
