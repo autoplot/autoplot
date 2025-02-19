@@ -322,7 +322,7 @@ public class PdsDataSource extends AbstractDataSource {
             } else if ( axisNames.get(1)!=null ) {
                 String n1= resolveIndependentAxis( doc, axisNames.get(1) );
                 depend= new LinkedList<>(depend);
-                if ( !n1.equals(name) ) {
+                if ( n1!=null && !n1.equals(name) ) {
                     depend.add(0,n1);
                 }
             }
@@ -563,7 +563,7 @@ public class PdsDataSource extends AbstractDataSource {
                                 double[] dd= a.getElements1D();
                                 int[] qube= new int[] { dd.length };
                                 DDataSet ddresult= DDataSet.wrap( dd, qube );
-                                if ( name.equals("Epoch") ) {
+                                if ( name.equalsIgnoreCase("Epoch") ) {
                                     logger.info("Epoch kludge results in CDF_TT2000 units");
                                     units= Units.cdfTT2000;
                                     ddresult.putProperty( QDataSet.UNITS, units );
