@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Studying CDF files with moments from Polar/Hydra.</small></p>
+        <p><small>Copy and paste a plot now copies an inset plot as well.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,9 +30,11 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-02-06 r28076):</p>
+        <p>Bugfixes (2025-02-20 r28102):</p>
         <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2669/">2669</a>: allow the check for repeats to be disabled (for vap+inline), so that parsing can be used to check for one switch.
+            <li>put a comment in about multiplying a vector and a matrix, instead of matrix times a vector.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2677/">2677</a>: PDS4 describing CDF file doesn't work, but CDF file is fine
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2669/">2669</a>: relax redundant switch check since inline scripts often have these.
             <li>Properly support where row or column has another row or column as a parent.  Code assumed marginRow or marginColumn was always the parent.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2667/">2667</a>: copy and paste of plot will allow overlapping plots to be copied as well.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2672/">2672</a>: axisOffset properly controls colorbar location, allowing multiple colorbars to be used on one plot.  Thanks, Sadie!
@@ -66,6 +68,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Copy plot copies inset plots which have the same row and column as parents.
             <li>support rank 3 ordinal data, found in Parker Solar Probe EPILO CDF files.
             <li>"plots" list added to layout panel, to better support overlapping plots.
         </ul>
