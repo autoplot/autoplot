@@ -149,6 +149,7 @@ import ZoeloeSoft.projects.JFontChooser.JFontChooser;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import org.autoplot.dom.Column;
+import org.autoplot.dom.DomNode;
 import org.autoplot.dom.Row;
 import org.autoplot.renderer.AnnotationEditorPanel;
 import org.das2.components.propertyeditor.EnumerationEditor;
@@ -1961,6 +1962,9 @@ public class GuiSupport {
 
             Map<String,String> nameMap= new HashMap<>();
             nameMap.put( srcPlot.getId(), targetPlot.getId() );
+            nameMap.put( srcPlot.getXaxis().getId(), targetPlot.getXaxis().getId() );
+            nameMap.put( srcPlot.getYaxis().getId(), targetPlot.getYaxis().getId() );
+            nameMap.put( srcPlot.getZaxis().getId(), targetPlot.getZaxis().getId() );
             
             // check to see if there are any other plots sharing the same row and column.
             for ( int i=1; i<state.getPlots().length; i++ ) {
@@ -1974,6 +1978,9 @@ public class GuiSupport {
                     exclude= Arrays.asList(Plot.PROP_ID, Plot.PROP_ROWID,Plot.PROP_COLUMNID );
                     newPlot.syncTo( state.getPlots(i), exclude );
                     nameMap.put( state.getPlots(i).getId(), newPlot.getId() );
+                    nameMap.put( state.getPlots(i).getXaxis().getId(), newPlot.getXaxis().getId() );
+                    nameMap.put( state.getPlots(i).getYaxis().getId(), newPlot.getYaxis().getId() );
+                    nameMap.put( state.getPlots(i).getZaxis().getId(), newPlot.getZaxis().getId() );
                 }
             }
             
@@ -1995,20 +2002,22 @@ public class GuiSupport {
                     exclude= Arrays.asList(Plot.PROP_ID, Plot.PROP_ROWID,Plot.PROP_COLUMNID );
                     newPlot.syncTo( p, exclude );
                     nameMap.put( p.getId(), newPlot.getId() );
+                    nameMap.put( p.getXaxis().getId(), newPlot.getXaxis().getId() );
+                    nameMap.put( p.getYaxis().getId(), newPlot.getYaxis().getId() );
+                    nameMap.put( p.getZaxis().getId(), newPlot.getZaxis().getId() );
                 }
             }
 
             // if everything else is bound, then bind this one too.
             Application dom= controller.getApplication();
-            
-//            for ( int i=0; i<state.getBindings().length; i++ ) {
-//                BindingModel bm= state.getBindings(i);
-//                String newSrc= nameMap.get( bm.getSrcId() );
-//                String newDst= nameMap.get( bm.getDstId() );
-//                DomNode src= dom.getController().getElementById(newSrc);
-//                DomNode dst= dom.getController().getElementById(newDst);
-//                controller.bind( dom.getController().getdom, Application.PROP_TIMERANGE, targetPlot.getXaxis(), Axis.PROP_RANGE );
-//            }
+            for ( int i=0; i<state.getBindings().length; i++ ) {
+                BindingModel bm= state.getBindings(i);
+                String newSrc= nameMap.get( bm.getSrcId() );
+                String newDst= nameMap.get( bm.getDstId() );
+                DomNode src= dom.getController().getElementById(newSrc);
+                DomNode dst= dom.getController().getElementById(newDst);
+                controller.bind( src, bm.getSrcProperty(), dst, bm.getDstProperty() );
+            }
             
             boolean doBindX= dom.getController().findBindings( dom, Application.PROP_TIMERANGE ).size()>0 &&
                     dom.getController().findBindings( targetPlot, Plot.PROP_CONTEXT ).isEmpty() &&
