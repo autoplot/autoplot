@@ -1856,6 +1856,7 @@ public class GuiSupport {
      * @param controller the application controller where we 
      * @param newP the plotElements are added to this plot 
      * @throws HeadlessException 
+     * @see #insertStringVapIntoPlot(java.awt.Component, org.autoplot.dom.ApplicationController, org.autoplot.dom.Plot, java.lang.String) 
      */
     public static void pasteClipboardIntoPlot( final Component app, 
             final ApplicationController controller, 
@@ -1906,6 +1907,7 @@ public class GuiSupport {
      * @throws HeadlessException
      * @throws IOException 
      * @throws IllegalArgumentException if the string is not a vap.
+     * @see DomUtil#getPlotAsString(org.autoplot.dom.Application, org.autoplot.dom.Plot) 
      */
     private static void insertStringVapIntoPlot( 
             Component app, 
