@@ -27,6 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.autoplot.GuiSupport;
 import org.das2.beans.BeansUtil;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -1286,13 +1287,13 @@ public class DomUtil {
     }
             
     /**
-     * Find the binding, if it exists.  All bindingImpls are symmetric, so the src and dst order is ignored in this
-     * search.
+     * Find the first binding matching this search, if one exists.  If a 
+     * property name or node is null, then the search is unconstrained.
      * @param dom the dom tree
-     * @param src
-     * @param srcProp
-     * @param dst
-     * @param dstProp
+     * @param src null or the source node containing the property
+     * @param srcProp null or the binding name
+     * @param dst null or the target node containing the property
+     * @param dstProp null or the binding name
      * @return the BindingModel or null if it doesn't exist.
      */
     public static BindingModel findBinding( Application dom, DomNode src, String srcProp, DomNode dst, String dstProp) {
@@ -1308,8 +1309,8 @@ public class DomUtil {
     /**
      * returns a list of bindings of the node for the property
      * @param dom the dom tree
-     * @param src the node to which or from which a binding exists
-     * @param srcProp the property name of the binding.
+     * @param src null or the node to which or from which a binding exists
+     * @param srcProp null or the property name of the binding.
      * @return
      */
     public static List<BindingModel> findBindings( Application dom, DomNode src, String srcProp ) {
@@ -1324,10 +1325,10 @@ public class DomUtil {
      * Find the bindings that match given constraints.  If a property name or node is null, then the
      * search is unconstrained.
      * @param dom the dom tree
-     * @param src
-     * @param srcProp
-     * @param dst
-     * @param dstProp
+     * @param src null or the source node containing the property
+     * @param srcProp null or the binding name
+     * @param dst null or the target node containing the property
+     * @param dstProp null or the binding name
      * @return the BindingModel or null if it doesn't exist.
      */
     public static List<BindingModel> findBindings( Application dom, DomNode src, String srcProp, DomNode dst, String dstProp) {
@@ -1352,7 +1353,54 @@ public class DomUtil {
         }
         return result;
     }
+    
+    /**
+     * Find the bindings that match given constraints.  If a property name or node is null, then the
+     * search is unconstrained.
+     * @param dom the dom tree
+     * @param src null or the source node containing the property
+     * @param srcProp null or the binding name
+     * @param dst null or the target node containing the property
+     * @param dstProp null or the binding name
+     * @return the BindingModel or null if it doesn't exist.
+     */
+    public static List<BindingModel> findBindings( Application dom, List<DomNode> src, String srcProp, List<DomNode> dst, String dstProp) {
+        List<BindingModel> result= new ArrayList();
+        List<String> ssrc= null;
+        List<String> sdst= null;
+        if ( src!=null ) {
+            ssrc= new ArrayList<>();
+            for ( DomNode n: src ) {
+                ssrc.add( n.id );
+            }
+        }
+        if ( dst!=null ) {
+            sdst= new ArrayList<>();
+            for ( DomNode n: dst ) {
+                sdst.add( n.id );
+            }
+        }
+        for (BindingModel b : dom.getBindings()) {
+            try {
+                if (  ( ssrc==null || ssrc.contains(b.getSrcId()) )
+                        && ( sdst==null || sdst.contains(b.getDstId()) )
+                        && ( srcProp==null || b.getSrcProperty().equals(srcProp) )
+                        && ( dstProp==null || b.getDstProperty().equals(dstProp) ) ){
+                    result.add(b);
+                } else if ( ( sdst==null || sdst.contains(b.getDstId()) )
+                        && ( ssrc==null || ssrc.contains(b.getSrcId()) )
+                        && ( dstProp==null || b.getSrcProperty().equals(dstProp) )
+                        && ( srcProp==null || b.getDstProperty().equals(srcProp) ) ) {
+                    result.add(b);
+                }
+            } catch (NullPointerException ex) {
+                throw ex;
+            }
 
+        }
+        return result;
+    }
+    
     /**
      * print a list of who is listening to the property
      * @param o the dom node or dom node controller.
@@ -1533,6 +1581,7 @@ public class DomUtil {
      * @param application the application (with a controller)
      * @param domPlot the target plot
      * @return a String containing .vap for the one plot, plus any other coincident or inset plots.
+     * @see GuiSupport#insertStringVapIntoPlot(java.awt.Component, org.autoplot.dom.ApplicationController, org.autoplot.dom.Plot, java.lang.String) 
      */
     public static String getPlotAsString(Application application, Plot domPlot) {
         Application newApp= new Application();
@@ -1549,9 +1598,19 @@ public class DomUtil {
                     plots.add(p);
                 }
             }
-        }
-        
+        }        
         newApp.setPlots( plots.toArray(new Plot[0]) );
+        
+        List<DomNode> dnplots= new ArrayList<>(); // ???  I really have to convert these to DomNodes  ???
+        for ( Plot p: plots ) {
+            dnplots.add( p );
+            dnplots.add( p.getXaxis() );
+            dnplots.add( p.getYaxis() );
+            dnplots.add( p.getZaxis() );
+        }
+        List<BindingModel> bb= findBindings( application, dnplots, null, dnplots, null );
+        newApp.setBindings( bb.toArray( new BindingModel[0] ) );
+        
         List<PlotElement> pes= new ArrayList<>();
         List<DataSourceFilter> dsfs= new ArrayList<>();
         for ( Plot p: plots ) {
