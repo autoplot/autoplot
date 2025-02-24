@@ -1,16 +1,12 @@
 
 package org.autoplot.dom;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
-import org.das2.datum.DatumRangeUtil;
-//import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
-//import org.das2.datum.UnitsUtil;
 
 /**
  * The state of an axis, X, Y, or a Z axis colorbar, such as range and the
