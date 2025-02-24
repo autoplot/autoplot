@@ -1927,7 +1927,7 @@ public class GuiSupport {
         try {
             lock.lock("pasting plot");
             controller.performingChange( app, lockObject );
-
+            
             List<PlotElement> pes= controller.getPlotElementsFor(targetPlot);
             pes.forEach((pe) -> {
                 controller.deletePlotElement(pe);
@@ -1937,8 +1937,10 @@ public class GuiSupport {
             List<String> exclude= Arrays.asList(Plot.PROP_ID,
                     Axis.PROP_DRAWTICKLABELS, Axis.PROP_VISIBLE, Axis.PROP_OPPOSITE );
             if ( targetPlot.getXaxis().getRange().getUnits().isConvertibleTo( srcPlot.getXaxis().getRange().getUnits() ) ) {
-                srcPlot.getXaxis().setRange(targetPlot.getXaxis().getRange());
-                srcPlot.getXaxis().setLog(targetPlot.getXaxis().isLog());
+                if ( !targetPlot.getXaxis().isAutoRange() ) { // TODO: or if it is bound to the application timerange and others are controlling it.
+                    srcPlot.getXaxis().setRange(targetPlot.getXaxis().getRange());
+                    srcPlot.getXaxis().setLog(targetPlot.getXaxis().isLog());
+                }
             }
             targetPlot.getXaxis().syncTo( srcPlot.getXaxis(), exclude );
             
