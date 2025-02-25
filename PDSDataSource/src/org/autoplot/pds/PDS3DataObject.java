@@ -1,6 +1,7 @@
 package org.autoplot.pds;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -21,6 +22,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.autoplot.datasource.URISplit;
 import org.das2.util.LoggerManager;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
@@ -60,9 +62,15 @@ public class PDS3DataObject {
     private String description;
     
     /**
-     * spreadsheet field number, 1 is the first column.
+     * spreadsheet field number, 1 is the first column.  Note that when some fields have more than
+     * one item (spectrogram for example), the fieldNumber will be less than the columnNumber.
      */
     private int fieldNumber;
+    
+    /**
+     * the column number in the text file.  This will be equal to the field number when each field has one item.
+     */
+    private int columnNumber;
     
     JSONObject labelJSONObject;
     JSONObject columnJSONObject;
@@ -138,6 +146,22 @@ public class PDS3DataObject {
             dataType= j.optString("DATA_TYPE","");
             fieldNumber= j.optInt("FIELD_NUMBER",-1);
 
+            JSONArray fields= tableJSONObject.getJSONArray("FIELD");
+            
+            int acolumnNumber= 1;
+            for ( int i=0; i<fields.length(); i++ ) {
+                if (fieldNumber==i+1 ) {
+                    break;
+                }
+                JSONObject field= fields.getJSONObject(i);
+                if ( field.has("ITEMS") ) {
+                    acolumnNumber+= field.getInt("ITEMS");
+                } else {
+                    acolumnNumber+= 1;
+                }
+            }
+            columnNumber=acolumnNumber;
+            
             unit= j.optString("UNIT","");
             validMaximum= j.optDouble("VALID_MAXIMUM",Double.POSITIVE_INFINITY);
             validMinimum= j.optDouble("VALID_MINIMUM",Double.NEGATIVE_INFINITY);
@@ -219,7 +243,12 @@ public class PDS3DataObject {
                     throw new IllegalArgumentException("unsupported file pointer");
             }
         }
-        args.put("column",String.valueOf(fieldNumber-1));
+        if ( items==1 ) {
+            args.put("column",String.valueOf(columnNumber-1));
+        } else {
+            args.put("column",String.format("%d-%d",columnNumber-1,columnNumber-1+items-1));
+        }
+        
         return "vap+txt:" + resource.toString() + "?" + URISplit.formatParams(args) ;
     }
     /**
