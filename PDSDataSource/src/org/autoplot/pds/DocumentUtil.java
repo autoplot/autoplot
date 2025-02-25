@@ -1,10 +1,13 @@
 
 package org.autoplot.pds;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -67,7 +70,25 @@ public class DocumentUtil {
         }
         
     }
+    
+    /**
+     * dump the JSONObject to a file for inspection while debugging.
+     * @param jo the JSON Object.
+     * @param f the file
+     */
+    public static void dumpToFile( JSONObject jo, File f ) throws Exception {
+        try ( PrintWriter p= new PrintWriter( new FileWriter( f ) ) ) {
+            p.print( jo.toString(4) );
+        } catch ( Exception e ) {
+            e.printStackTrace();       
+        }
+    }
 
+    /**
+     * return true if the node has no children other than the text node.
+     * @param node the node
+     * @return 
+     */
     /**
      * return true if the node has no children other than the text node.
      * @param node the node
