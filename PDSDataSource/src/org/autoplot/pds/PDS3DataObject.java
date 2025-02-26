@@ -247,7 +247,7 @@ public class PDS3DataObject {
                     throw new IllegalArgumentException("unsupported file pointer");
             }
         }
-        if ( items==1 ) {
+        if ( items==1 || items==-1 ) {
             args.put("column",String.valueOf(columnNumber-1));
         } else {
             args.put("column",String.format("%d-%d",columnNumber-1,columnNumber-1+items-1));
