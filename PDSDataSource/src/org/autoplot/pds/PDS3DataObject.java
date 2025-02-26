@@ -146,21 +146,25 @@ public class PDS3DataObject {
             dataType= j.optString("DATA_TYPE","");
             fieldNumber= j.optInt("FIELD_NUMBER",-1);
 
-            JSONArray fields= tableJSONObject.getJSONArray("FIELD");
+            if ( tableJSONObject.has("FIELD") ) {
+                JSONArray fields= tableJSONObject.getJSONArray("FIELD");
             
-            int acolumnNumber= 1;
-            for ( int i=0; i<fields.length(); i++ ) {
-                if (fieldNumber==i+1 ) {
-                    break;
+                int acolumnNumber= 1;
+                for ( int i=0; i<fields.length(); i++ ) {
+                    if (fieldNumber==i+1 ) {
+                        break;
+                    }
+                    JSONObject field= fields.getJSONObject(i);
+                    if ( field.has("ITEMS") ) {
+                        acolumnNumber+= field.getInt("ITEMS");
+                    } else {
+                        acolumnNumber+= 1;
+                    }
                 }
-                JSONObject field= fields.getJSONObject(i);
-                if ( field.has("ITEMS") ) {
-                    acolumnNumber+= field.getInt("ITEMS");
-                } else {
-                    acolumnNumber+= 1;
-                }
+                columnNumber=acolumnNumber;
+            } else {
+                columnNumber=fieldNumber;
             }
-            columnNumber=acolumnNumber;
             
             unit= j.optString("UNIT","");
             validMaximum= j.optDouble("VALID_MAXIMUM",Double.POSITIVE_INFINITY);
