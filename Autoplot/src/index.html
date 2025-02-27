@@ -30,8 +30,12 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-02-20 r28102):</p>
+        <p>Bugfixes (2025-02-27 r28119):</p>
         <ul>
+            <li>Don't print debugging information to stderr when parsing ODL.
+            <li>Ant build files must have all sources marked as Java 8, so that Netbeans 24 can be used.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2682/">2682</a>: look for FIELD and ITEMS in SPREADSHEETS, which might have multi-item fields.
+            <li>https://github.com/das-developers/das2java/issues/120: handle '2016-05-20T07:46/07:46:30' with special code. 
             <li>two-column fields in PDS3 spreadsheets are handled properly.  Thanks, Joe!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2667/">2667</a>: bindings, except for scale, are copied as well.
             <li>put a comment in about multiplying a vector and a matrix, instead of matrix times a vector.
@@ -70,6 +74,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>fixHorizontalLayout removes redundant columns, which old .vap files had.
             <li>Copy plot copies inset plots which have the same row and column as parents.
             <li>support rank 3 ordinal data, found in Parker Solar Probe EPILO CDF files.
             <li>"plots" list added to layout panel, to better support overlapping plots.
