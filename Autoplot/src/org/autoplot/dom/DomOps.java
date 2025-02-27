@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -999,12 +1000,40 @@ public class DomOps {
                rm.add( columns[i] );
            }
         }
-        ArrayList columnsList= new ArrayList(Arrays.asList(columns));
+        ArrayList<Column> columnsList= new ArrayList(Arrays.asList(columns));
         rm.forEach((r) -> {
             columnsList.remove(r);
         });
-        canvas.setColumns((Column[]) columnsList.toArray( new Column[columnsList.size()]));
 
+        // see if we can remove redundant columns.
+        Map<Column,Column> replace= new HashMap<>();
+        ncolumn= columnsList.size();
+        for ( int i=0; i<ncolumn; i++ ) {
+            Column c= columnsList.get(i);
+            for ( int j=i+1; j<ncolumn; j++ ) {
+                Column nj= columnsList.get(j);
+                if ( nj==c ) continue;
+                if ( c.left.equals(nj.left) && c.right.equals(nj.right) && c.parent.equals(nj.parent) ) {
+                    replace.put(nj,c);
+                }
+            }
+        }
+        for ( Entry<Column,Column> rm1 : replace.entrySet() ) {
+            for ( Plot p: dom.plots ) {
+                if ( p.getColumnId().equals(rm1.getKey().id ) ) {
+                    p.setColumnId(rm1.getValue().id);
+                }
+            }
+            for ( Annotation ann: dom.annotations ) {
+                if ( ann.getColumnId().equals(rm1.getKey().id ) ) {
+                    ann.setColumnId(rm1.getValue().id);
+                }
+            }
+            columnsList.remove(rm1.getKey());
+        }
+        
+        canvas.setColumns((Column[]) columnsList.toArray( new Column[columnsList.size()]));
+        
         columns= new Column[ columnsList.size() ];
         ncolumn= columns.length;
         for ( int i=0; i<ncolumn; i++ ) {
