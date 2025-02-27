@@ -35,8 +35,6 @@ public class OdlDataSource extends AbstractDataSource {
         String ss = OdlParser.readOdl(reader,record);
 
         String format = OdlParser.getFormat(record);
-        System.err.println(format);
-        System.err.println(OdlParser.getColumns(record,0,"TIME.DOY")[0]);
         
         QDataSet ds = OdlParser.readStream( reader,record,mon.getSubtaskMonitor("read stream") );
         if ( param.equals("") ) {
