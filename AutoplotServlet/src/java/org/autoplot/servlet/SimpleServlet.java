@@ -303,7 +303,7 @@ public class SimpleServlet extends HttpServlet {
             String zrange = ServletUtil.getStringParameter(request, "plot.zaxis.range", "");
             String zlog = ServletUtil.getStringParameter(request, "plot.zaxis.log", "");
             String zdrawTickLabels = ServletUtil.getStringParameter(request, "plot.zaxis.drawTickLabels", "");
-            String grid= ServletUtil.getStringParameter( request, "drawGrid", "" );
+            String grid= ServletUtil.getStringParameter( request, "drawGrid", "" ); // T or true
             String stamp= ServletUtil.getStringParameter( request, "stamp", "false" );  // print a stamp for debugging.  If not false, the value is printed in blue along with a timestamp.
 
             for (Enumeration en = request.getParameterNames(); en.hasMoreElements();) {
@@ -754,7 +754,8 @@ public class SimpleServlet extends HttpServlet {
             }
 
             if ( !grid.equals("") ) {
-                dom.getOptions().setDrawGrid( grid.equals("true") );
+                boolean setGrid= grid.equals("true") || grid.equals("T");
+                dom.getOptions().setDrawGrid( setGrid );
             }
 
             logit("done with setStyle", t0, uniq, debug);
