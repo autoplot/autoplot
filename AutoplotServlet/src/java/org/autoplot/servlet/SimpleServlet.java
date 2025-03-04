@@ -625,6 +625,9 @@ public class SimpleServlet extends HttpServlet {
                             break;
                         case "magnitude(fft)":
                             r = Ops.magnitude(Ops.fft(r));
+                            QDataSet tt= (QDataSet)r.property(QDataSet.DEPEND_0);
+                            QDataSet s= Ops.sort(tt);
+                            r= Ops.applyIndex(r, s);
                             appmodel.setDataSet(r);
                             break;
                         case "nop":
