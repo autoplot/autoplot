@@ -701,7 +701,9 @@ public class SimpleServlet extends HttpServlet {
             if ( !ssymbolSize.equals("") ) { 
                 dom.getController().getPlotElement().getStyle().setSymbolSize( Double.parseDouble( ssymbolSize ) );
             }
-            
+            if ( scolor.equals("") ) {
+                scolor= sforegroundColor;
+            }
             if (!scolor.equals("")) {
                 String[] scolors= scolor.split("[,;]"); // allow for comma-delimited list.
                 if ( scolors.length==1 ) {
