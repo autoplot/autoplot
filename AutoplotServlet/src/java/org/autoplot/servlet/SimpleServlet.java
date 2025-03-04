@@ -5,7 +5,12 @@ import org.autoplot.RenderType;
 import org.autoplot.ApplicationModel;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -657,7 +662,28 @@ public class SimpleServlet extends HttpServlet {
             // axis settings
             Plot p = dom.getController().getPlot();
 
-            if (!title.equals("")) p.setTitle(title);
+            if (!title.equals("")) {
+                Font f= appmodel.getCanvas().getBaseFont();
+                BufferedImage im= new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g2d= im.createGraphics();
+                g2d.setFont(f);
+                FontRenderContext frc= g2d.getFontRenderContext();
+                int plotWidth= p.getController().getColumn().getController().getDasColumn().getWidth();
+                plotWidth-=10; // room for ellipsis
+                Rectangle2D rect= f.getStringBounds(title,frc);
+                boolean shortened= false;
+                while ( rect.getWidth()>plotWidth && title.length()>10 ) {
+                    if ( rect.getWidth()-plotWidth>f.getSize()*10 ) {
+                        title= title.substring(0,title.length()-10);
+                    } else {
+                        title= title.substring(0,title.length()-1);
+                    }
+                    rect= f.getStringBounds(title,frc);
+                    shortened= true;
+                }
+                if ( shortened ) title+="...";
+                p.setTitle(title);
+            }
 
             Axis axis = p.getXaxis();
             if (!xlabel.equals("")) axis.setLabel(xlabel);
