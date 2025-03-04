@@ -109,6 +109,7 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
         <div class="tooltip">fill color<span class="tooltiptext">fill color is the color used when "fill_to_zero" is used.</span></div>: <input name="fillColor" value="#aaaaff"><br>
         <div class="tooltip">foreground<span class="tooltiptext">color used for axes and labels.</span></div>: <input name="foregroundColor" value="#ffffff"><br>
         <div class="tooltip">background<span class="tooltiptext">canvas color, or "none" for transparent.</span></div>: <input name="backgroundColor" value="#000000"><br>
+        <input type="checkbox" name="autolayout" value="true" ><div class="tooltip">drawGrid<span class="tooltiptext">T or true will draw a grid.</span></div></input><br>
         <input value="Plot" type="submit">
     </form>
     </body>
