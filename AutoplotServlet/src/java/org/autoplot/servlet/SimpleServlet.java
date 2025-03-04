@@ -635,11 +635,9 @@ public class SimpleServlet extends HttpServlet {
                             if ( datatitle!=null ) datatitle= "histogram of "+datatitle;
                             break;
                         case "magnitude(fft)":
-                            r = Ops.magnitude(Ops.fft(r));
-                            QDataSet tt= (QDataSet)r.property(QDataSet.DEPEND_0);
-                            QDataSet s= Ops.sort(tt);
-                            r= Ops.applyIndex(r, s);
-                            appmodel.setDataSet(r);
+                            QDataSet ff = Ops.magnitude(Ops.fft(r));
+                            ff= Ops.multiply( ff.trim( 0, ff.length()/2 ), 2 );
+                            appmodel.setDataSet(ff);
                             if ( datatitle!=null ) datatitle= "FFT of "+datatitle;
                             break;
                         case "nop":
