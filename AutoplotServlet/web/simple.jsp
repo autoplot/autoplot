@@ -17,6 +17,30 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Autoplot Simple Servlet</title>
     </head>
+    <style>
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+}
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+</style>
     <body>
 
     <h1>Autoplot Simple Servlet</h1>
@@ -66,13 +90,13 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
         width: <input name="width" value="700" ><br>
         height: <input name="height" value="400" > <br>
         <br>
-        <input type="checkbox" name="autolayout" value="true" >autolayout</input><br>
-        layout horiz position: <input name="column" value="5em,100%-10em"> (<a href="http://autoplot.org/help#layout">help</a>)<br>
-        layout vert position: <input name="row" value="3em,100%-3em">  (<a href="http://autoplot.org/help#layout">help</a>)<br>
+        <input type="checkbox" name="autolayout" value="true" ><div class="tooltip">autolayout<span class="tooltiptext">automatically position the plot to make room for labels and colorbars.</span></div></input><br>
+        <div class="tooltip">layout horiz position<span class="tooltiptext">horizontal position of the plot.</span></div>: <input name="column" value="5em,100%-10em"> (<a href="https://github.com/autoplot/documentation/blob/master/md/help.md#modifying-layout">help</a>)<br>
+        <div class="tooltip">layout vert position<span class="tooltiptext">vertical position of the plot.</span></div>: <input name="row" value="3em,100%-3em">  (<a href="https://github.com/autoplot/documentation/blob/master/md/help.md#modifying-layout">help</a>)<br>
         <br>
         time range: <input name="timeRange" value="2003-mar"><br>
         <br>
-        plot style: <select name="renderType">
+        <div class="tooltip">plot style<span class="tooltiptext">style of the plot.</span></div>: <select name="renderType">
             <option selected></option>
             <option>spectrogram</option>
             <option>series</option>
@@ -80,11 +104,11 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
             <option>stairSteps</option>
             <option>fill_to_zero</option>
         </select><br>
-        color: <input name="color" value="#e0e0ff"><br>
-        symbol size: <input name="symbolSize" value=""><br>
-        fill color: <input name="fillColor" value="#aaaaff"><br>
-        foreground: <input name="foregroundColor" value="#ffffff"><br>
-        background: <input name="backgroundColor" value="#000000"><br>
+        <div class="tooltip">color<span class="tooltiptext">symbol and lineplot color.</span></div>: <input name="color" value="#e0e0ff"><br>
+        <div class="tooltip">symbol size<span class="tooltiptext">size (in pixels) of plot symbols.</span></div>: <input name="symbolSize" value=""><br>
+        <div class="tooltip">fill color<span class="tooltiptext">fill color is the color used when "fill_to_zero" is used.</span></div>: <input name="fillColor" value="#aaaaff"><br>
+        <div class="tooltip">foreground<span class="tooltiptext">color used for axes and labels.</span></div>: <input name="foregroundColor" value="#ffffff"><br>
+        <div class="tooltip">background<span class="tooltiptext">canvas color, or "none" for transparent.</span></div>: <input name="backgroundColor" value="#000000"><br>
         <input value="Plot" type="submit">
     </form>
     </body>
