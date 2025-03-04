@@ -69,6 +69,7 @@ import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.autoplot.datasource.jython.JythonDataSourceFactory;
 import org.das2.qds.ops.Ops;
+import org.das2.util.ColorUtil;
 import org.das2.util.TimingConsoleFormatter;
 
 /**
@@ -707,16 +708,16 @@ public class SimpleServlet extends HttpServlet {
             if (!scolor.equals("")) {
                 String[] scolors= scolor.split("[,;]"); // allow for comma-delimited list.
                 if ( scolors.length==1 ) {
-                    dom.getController().getPlotElement().getStyle().setColor(Color.decode(scolor));
+                    dom.getController().getPlotElement().getStyle().setColor(ColorUtil.decodeColor(scolor));
                     for ( PlotElement pe: dom.getPlotElements() ) { // bug where Bob saw red
-                        pe.getStyle().setColor(Color.decode(scolor));
+                        pe.getStyle().setColor(ColorUtil.decodeColor(scolor));
                     }
                 } else {
-                    dom.getController().getPlotElement().getStyle().setColor(Color.decode(scolors[0]));
+                    dom.getController().getPlotElement().getStyle().setColor(ColorUtil.decodeColor(scolors[0]));
                     int i=0;
                     for ( PlotElement pe: dom.getPlotElements() ) { 
                         if ( pe.isActive() ) {
-                            pe.getStyle().setColor(Color.decode(scolors[i]));
+                            pe.getStyle().setColor(ColorUtil.decodeColor(scolors[i]));
                             if ( i<scolors.length-1 ) i+=1;
                         }
                     }
@@ -726,29 +727,29 @@ public class SimpleServlet extends HttpServlet {
             if (!sfillColor.equals("")) {
                 String[] sfillColors= sfillColor.split("[,;]"); // allow for comma-delimited list.
                 if ( sfillColors.length==1 ) {
-                    dom.getController().getPlotElement().getStyle().setFillColor(Color.decode(sfillColor));
+                    dom.getController().getPlotElement().getStyle().setFillColor(ColorUtil.decodeColor(sfillColor));
                     for ( PlotElement pe: dom.getPlotElements() ) { // bug where Bob saw red
-                        pe.getStyle().setFillColor(Color.decode(sfillColor));
+                        pe.getStyle().setFillColor(ColorUtil.decodeColor(sfillColor));
                     }
                 } else {
-                    dom.getController().getPlotElement().getStyle().setFillColor(Color.decode(sfillColors[0]));
+                    dom.getController().getPlotElement().getStyle().setFillColor(ColorUtil.decodeColor(sfillColors[0]));
                     int i=0;
                     for ( PlotElement pe: dom.getPlotElements() ) { 
                         if ( pe.isActive() ) {
-                            pe.getStyle().setFillColor(Color.decode(sfillColors[i]));
+                            pe.getStyle().setFillColor(ColorUtil.decodeColor(sfillColors[i]));
                             if ( i<sfillColors.length-1 ) i+=1;
                         }
                     }
                 }
             }
             if (!sforegroundColor.equals("")) {
-                dom.getOptions().setForeground(Color.decode(sforegroundColor));
+                dom.getOptions().setForeground(ColorUtil.decodeColor(sforegroundColor));
             }
             if (!sbackgroundColor.equals("")) {
                 if ( sbackgroundColor.equals("none") ) {
                     dom.getOptions().setBackground(new Color( 255,0,0,0 ) ); // transparent
                 } else {
-                    dom.getOptions().setBackground(Color.decode(sbackgroundColor));
+                    dom.getOptions().setBackground(ColorUtil.decodeColor(sbackgroundColor));
                 }
             }
 
