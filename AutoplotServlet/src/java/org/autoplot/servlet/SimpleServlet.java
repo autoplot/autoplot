@@ -625,9 +625,14 @@ public class SimpleServlet extends HttpServlet {
                 if (!process.equals("")) {
                     QDataSet r = dsource.getDataSet(new NullProgressMonitor());
                     logit("done with read", t0, uniq, debug);
+                    
+                    String datatitle= (String) r.property(QDataSet.TITLE);
+                    if ( datatitle==null ) datatitle="data";
+                    
                     switch (process) {
                         case "histogram":
                             appmodel.setDataSet(Ops.histogram(r, 100));
+                            if ( datatitle!=null ) datatitle= "histogram of "+datatitle;
                             break;
                         case "magnitude(fft)":
                             r = Ops.magnitude(Ops.fft(r));
@@ -635,11 +640,16 @@ public class SimpleServlet extends HttpServlet {
                             QDataSet s= Ops.sort(tt);
                             r= Ops.applyIndex(r, s);
                             appmodel.setDataSet(r);
+                            if ( datatitle!=null ) datatitle= "FFT of "+datatitle;
                             break;
                         case "nop":
                             appmodel.setDataSet(r);
                             break;
                     }
+                    
+                    if ( title.equals("") ) {
+                        title = datatitle;
+                    } 
                     logit("done with process", t0, uniq, debug);
                 } else {
                     appmodel.setDataSource(dsource);
@@ -662,6 +672,8 @@ public class SimpleServlet extends HttpServlet {
             // axis settings
             Plot p = dom.getController().getPlot();
 
+            if ( title.equals("") ) title= p.getTitle();
+            
             if (!title.equals("")) {
                 Font f= appmodel.getCanvas().getBaseFont();
                 BufferedImage im= new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
