@@ -5,3 +5,4 @@ org.autoplot.html.HtmlTableDataSourceFactory htm html
 org.autoplot.csv.CsvDataSourceFactory csv0
 org.autoplot.orbit.OrbitDataSourceFactory orbit
 org.autoplot.ascii.OdlDataSourceFactory sts odl
+org.autoplot.json.JSONDataSourceFactory jsonl

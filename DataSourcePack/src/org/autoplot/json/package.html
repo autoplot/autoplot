@@ -1,0 +1,18 @@
+<html>
+    <body>
+This is a simple start to a data source for accessing data in JSON and JSONJ 
+files.  This first version reads only JSONJ files, where an array of JSONArrays
+or JSONObjects can be read to retrieve data.  A future version of this will 
+allow reading data from a single JSONObject spanning multiple lines.
+
+Expected features:
+<ul>
+    <li> NEST thermostats appearently have extra quotes, and this needs to be investigated and supported
+    <li> multi-line JSONObjects and JSONArrays will be supported, looking for the terminal
+character  '}' or ']' at the end of a line.
+    <li> support for dependencies (as with ASCII data) { 'time':'2025-03-05T07:34', 'temperature':37.0, 'windspeed':4.5 }
+    <li> support for units controls similar to ASCII table, so that units and labels can be asserted
+    <li> access to embedded tags with a.b.c { 'a':{'b':{'c':42 } } }
+</ul>
+    </body>
+</html>
