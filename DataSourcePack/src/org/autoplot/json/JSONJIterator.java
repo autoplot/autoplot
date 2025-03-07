@@ -15,6 +15,24 @@ public class JSONJIterator implements Iterator<Object>, AutoCloseable {
         advance();
     }
 
+    /**
+     * We observed files from the NEST Thermostat which have oddly-formatted
+     * JSON records.  Each record is quoted, and then quotes within the JSONObject
+     * are double-quote-pairs.  So:
+     * <code>"{""device_id"":""xxxxxxxxxx"",""structure_id"":""xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"",""interval_start"":""2024-12-01T00:00:00Z""}"</code>
+     * will be rewritten as 
+     * <code>{"device_id":"xxxxxxxxxx","structure_id":"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx","interval_start":"2024-12-01T00:00:00Z"}</code>.
+     * @param rec
+     * @return 
+     */
+    private static String handleOddFileNest( String rec ) {
+        if ( rec.startsWith("\"{\"\"") && rec.endsWith("}\"")) {
+            rec= rec.substring(1,rec.length()-1);
+            rec= rec.replaceAll("\"\"", "\"");
+        }
+        return rec;
+    }
+    
     private void advance() {
         try {
             nextLine = reader.readLine();
@@ -38,6 +56,10 @@ public class JSONJIterator implements Iterator<Object>, AutoCloseable {
         }
         
         String jsonText = nextLine.trim();
+        if ( jsonText.startsWith("\"") ) {
+            jsonText= handleOddFileNest(jsonText);
+        }
+        
         Object parsed=null;
         try {
             if (jsonText.startsWith("{")) {
