@@ -30,7 +30,12 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-02-27 r28119):</p>
+        <p>Bugfixes (2025-03-07 r28136):</p>
+        <ul>
+            <li>Remove unneeded decimal point from "0." tick when exponents are shown otherwise.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2684/">2684</a>: don't drop title in fft operation
+        </ul>
+        <p>Older Bugfixes (2025-02-27 r28119):</p>
         <ul>
             <li>Don't print debugging information to stderr when parsing ODL.
             <li>Ant build files must have all sources marked as Java 8, so that Netbeans 24 can be used.
@@ -46,47 +51,18 @@
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2672/">2672</a>: axisOffset properly controls colorbar location, allowing multiple colorbars to be used on one plot.  Thanks, Sadie!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2674/">2674</a>: More places where autoplot2023.py was needed.  Thanks, Kristoff!
             <li><a href="https://github.com/das-developers/das2java/issues/122">0112</a>: monotonic decreasing ytags were not properly clipped.  Thanks, Sadie!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2673">2673</a>: Support PDS3 JAD_L50_HLS_ELC_MOM_ISO_2D_ELECTRONS_*_V01.LBL with the PDS3 data source.
-        </ul>
-        <p>Older Bugfixes (2025-02-01 r28076):</p>
-        <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2668/">2668</a>: loosen up HAPI to support KNMI and EarthCARE servers.
-            <li>autoplot2017.py -> autoplot2023.py was never done to Run Batch, having the effect of run batch would not work for multi-thread.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2669/">2669</a>: check for duplicate keys and throw IllegalArgumentException when this is detected.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2668/">2668</a>: events list with BEGIN for timeStampLocation would cause exception.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2671/">2671</a>: properly set parameters in runBatch with multithread.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2663/">2663</a>: slices GUI corrections, enabling slice index and don't quote : to improve readability.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2663/">2663</a>: slice3 index out of bounds check was against the wrong dimension.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2665/">2665</a>: clean up code which renormalizes layout (code is disabled until after the production release)
-            <li>move ZipFileSystem to DasCore so that it can properly implement subfilesystem when zip file is local.
-            <li>Corrections to Autoplot Servlet, where "thin" client would misformat some time strings.
-            <li>PDS UNSIGNED_INTEGER arrays supported.
-            <li>Remove excessive use of synchronized blocks in LogConsole after seeing deadlock.  
-            <li>HAPI server matcher constraint should be case-insensitive.
-            <li>Odl parser (used for .sts files) rejects when parameter is missing.  Thanks, Jaya!
-            <li>server mode always sets headless to true.
-            <li>rte_1083526881: PDS4 code which automatically adds time column failed to check that a time column was actually found, causing Null Pointer Exception.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2657/">2657</a>: detect rank 2 datasets in PDS4 Group_Field_Binary.
-            <li>Completions on URI with aggregation would list the entire filesystem, effectively hanging in some cases.
-            <li>Demo bookmarks #16 updated to CDAWeb, since elasticbeanstalk (Cassini) one is not available.
-            <li>check for null in completions, which happens for "vap+cdf:&lt;C&gt;"
-            <li>parseISO8601 just uses parseISO8601Datum now.  Prep for URI_Template_Time integration.
-        </ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2673">2673</a>: Support PDS3 JAD_L50_HLS_ELC_MOM_ISO_2D_ELECTRONS_*_V01.LBL with the PDS3 data source.        </ul>
         <p>Features:</p>
+        <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/840/">840</a>: Initial support for jsonl data files, returned by the NEST and other devices.
+            <li>Various improvements to the SimpleServlet, including support for named colors, drawGrid option and tooltips in the GUI.
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>fixHorizontalLayout removes redundant columns, which old .vap files had.
             <li>Copy plot copies inset plots which have the same row and column as parents.
             <li>support rank 3 ordinal data, found in Parker Solar Probe EPILO CDF files.
             <li>"plots" list added to layout panel, to better support overlapping plots.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>add whereR1, since some scripts assume a rank 1 input but then a rank 2 output results in confusing errors later in the script.
-            <li>extent propagates format metadata, to improve readability of extent(where(...)).
-            <li>Allow use of integer ranges in vap+inline (not only time ranges), which is useful when marking ranges in binary file.  Color names can be used in GUI.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/360/">360</a>: Jython getParam and setOutputParam validate inputs now when constraints are used.
-            <li>PDS4 Tables will automatically use the first column for timetags.
-            <li>Add PDS3 demo to bookmarks (#17).
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
