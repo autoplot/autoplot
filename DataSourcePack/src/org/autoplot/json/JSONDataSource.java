@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import org.autoplot.datasource.AbstractDataSource;
+import org.autoplot.datasource.URISplit;
 import org.das2.datum.Datum;
 import org.das2.datum.Units;
 import org.das2.qds.QDataSet;
@@ -29,9 +30,11 @@ public class JSONDataSource extends AbstractDataSource {
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
         File f= getFile(mon);
         String key= getParam("arg_0", "0");
-        int ikey;
+        final String dep0= getParam("depend0",null);
+        int ikey=-1;
+        int idep0=-1;
         Class expecting=null;
-        DataSetBuilder build= new DataSetBuilder(2,100,1);
+        DataSetBuilder build= new DataSetBuilder(2, 100, 1 + (dep0==null ? 0 : 1) );
         try ( InputStream ins= new FileInputStream(f) ) {
             JSONJIterator iter= new JSONJIterator( ins );
             if ( iter.hasNext() ) {
@@ -39,12 +42,23 @@ public class JSONDataSource extends AbstractDataSource {
                 if ( ob instanceof JSONArray ) {
                     JSONArray job= (JSONArray)ob;
                     ikey= Integer.parseInt(key);
+                    idep0= Integer.parseInt(dep0);
                     Datum d= Ops.datum(job.get(ikey));
-                    build.nextRecord( new Object[] { d } );
+                    if ( dep0==null ) {
+                        build.nextRecord( new Object[] { d } );
+                    } else {
+                        Datum d0= Ops.datum(job.get(idep0));
+                        build.nextRecord( new Object[] { d0, d } );
+                    }
                 } else if ( ob instanceof JSONObject ) {
                     JSONObject job= (JSONObject)ob;
                     Datum d= Ops.datum(job.get(key));
-                    build.nextRecord( new Object[] { d } );
+                    if ( dep0==null ) {
+                        build.nextRecord( new Object[] { d } );
+                    } else {
+                        Datum d0= Ops.datum(job.get(dep0));
+                        build.nextRecord( new Object[] { d0, d } );
+                    }
                 }
                 expecting= ob.getClass();
             }
@@ -52,11 +66,19 @@ public class JSONDataSource extends AbstractDataSource {
                 Object ob= iter.next();
                 if ( ob instanceof JSONArray && expecting==ob.getClass() ) {
                     JSONArray job= (JSONArray)ob;
-                    ikey= Integer.parseInt(key);
-                    build.nextRecord( job.get(ikey) );
-                } else if ( ob instanceof JSONObject  && expecting==ob.getClass() ) {
-                    JSONObject job= (JSONObject)ob;
-                    build.nextRecord( job.get(key) );   
+                    if ( dep0==null ) {
+                        build.nextRecord( job.get(ikey) );
+                    } else {
+                        build.nextRecord( new Object[] { job.get(idep0), job.get(ikey) } );
+                    }
+                } else if ( ob instanceof JSONObject && expecting==ob.getClass() ) {
+                    if ( dep0==null ) {
+                        JSONObject job= (JSONObject)ob;
+                        build.nextRecord( job.get(key) );   
+                    } else {
+                        JSONObject job= (JSONObject)ob;
+                        build.nextRecord( job.get(dep0), job.get(key) );
+                    }
                 }
             }
         }
