@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Length tool is used to read the frequency of a repeating feature in MMS1 E-Field data.</small></p>
+        <p><small>A bundle comes up as color scatter (middle), when sometimes we wanted a time series plot like the top one.  Timetags must be explicitly added to get the top plot.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,9 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-03-07 r28136):</p>
+        <p>Bugfixes (2025-03-08 r28136):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2685/">2685</a>: check for unbelievable valid_max in PDS4 (mvn_sta_l2_c6-32e64m_20141013_v02_r01.xml)
             <li>Remove unneeded decimal point from "0." tick when exponents are shown otherwise.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2684/">2684</a>: don't drop title in fft operation
         </ul>
