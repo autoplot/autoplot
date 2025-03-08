@@ -563,7 +563,7 @@ public class PdsDataSource extends AbstractDataSource {
                                 double[] dd= a.getElements1D();
                                 int[] qube= new int[] { dd.length };
                                 DDataSet ddresult= DDataSet.wrap( dd, qube );
-                                if ( name.equalsIgnoreCase("Epoch") ) {
+                                if ( name.equalsIgnoreCase("Epoch") || name.equalsIgnoreCase("tt2000") ) { 
                                     logger.info("Epoch kludge results in CDF_TT2000 units");
                                     units= Units.cdfTT2000;
                                     ddresult.putProperty( QDataSet.UNITS, units );
@@ -626,7 +626,11 @@ public class PdsDataSource extends AbstractDataSource {
                         }
                         if ( svalidMax.trim().length()>0 ) {
                             double validMax= Double.parseDouble(svalidMax);
-                            result1.putProperty( QDataSet.VALID_MAX, validMax );
+                            if ( Math.log10(validMax)>-50  ) {  //https://pds-ppi.igpp.ucla.edu/data/maven-static-c/data/c6_32e64m/2014/10/mvn_sta_l2_c6-32e64m_20141013_v02_r01.xml?TT2000
+                                result1.putProperty( QDataSet.VALID_MAX, validMax );
+                            } else {
+                                logger.warning("Unbelievable value found for Special_Constants/valid_maximum, ignoring: "+svalidMax );
+                            }
                         }
                         if ( svalidMin.trim().length()>0 ) {
                             double validMin= Double.parseDouble(svalidMin);
