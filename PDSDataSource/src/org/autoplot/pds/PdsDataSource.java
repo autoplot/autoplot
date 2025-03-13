@@ -417,19 +417,23 @@ public class PdsDataSource extends AbstractDataSource {
         List<String> names= new ArrayList<>();
         String X= getParam("X","");
         if ( !X.equals("") ) {
+            X = X.replaceAll("\\+", " ");
             names.add(X);
         }
         String Y= getParam("Y","");
         if ( !Y.equals("") ) {
+            Y = Y.replaceAll("\\+", " ");
             names.add(Y);
         }
         
         String Z= getParam("Z","");
         if ( !Z.equals("") ) {
+            Z = Z.replaceAll("\\+", " ");
             names.add(Z);
         }
 
         if ( !name.equals("") ) {
+            name = name.replaceAll("\\+", " ");
             names.add(name);
         }
 
