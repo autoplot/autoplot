@@ -397,24 +397,26 @@ public final class PlotController extends DomNodeController {
         
         if ( ds!=null && ( ds.rank()==0 || ds.length()>10000000 ) ) {
             logger.fine("simple next and previous used because data is very large");
-            scanNextRange= dr0.next();
             scanPrevRange= dr0.previous();
+            scanNextRange= dr0.next();
             
         } else {
-            scanNextRange= DataSetUtil.getNextInterval(ds, dr0);
             scanPrevRange= DataSetUtil.getPreviousInterval(ds, dr0);
+            scanNextRange= DataSetUtil.getNextInterval(ds, dr0);
+            System.err.println( DatumRangeUtil.normalize( dr0, scanPrevRange.max() ) );
+            System.err.println( DatumRangeUtil.normalize( dr0, scanPrevRange.min() ) );
         }
         
-        double rescaleFactor;
-        rescaleFactor= scanNextRange.width().divide(dr0.width()).value();
-        if ( rescaleFactor<0.1 || rescaleFactor>10 ) {
-            logger.log(Level.WARNING, "scan next fails to find acceptable range: {0} -> {1} rescaleFactor={2}", new Object[]{dr0, scanNextRange, rescaleFactor});
-            scanNextRange= dr0.next();
-        }
+        double rescaleFactor; // note rescaleFactor is always 1.0 now.
         rescaleFactor= scanPrevRange.width().divide(dr0.width()).value();
         if ( rescaleFactor<0.1 || rescaleFactor>10 ) {
             logger.log(Level.WARNING, "scan prev fails to find acceptable range: {0} -> {1} rescaleFactor={2}", new Object[]{dr0, scanPrevRange, rescaleFactor});
             scanPrevRange= dr0.previous();
+        }
+        rescaleFactor= scanNextRange.width().divide(dr0.width()).value();
+        if ( rescaleFactor<0.1 || rescaleFactor>10 ) {
+            logger.log(Level.WARNING, "scan next fails to find acceptable range: {0} -> {1} rescaleFactor={2}", new Object[]{dr0, scanNextRange, rescaleFactor});
+            scanNextRange= dr0.next();
         }
         
         Runnable run= new Runnable() {
