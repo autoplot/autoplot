@@ -403,8 +403,6 @@ public final class PlotController extends DomNodeController {
         } else {
             scanPrevRange= DataSetUtil.getPreviousInterval(ds, dr0);
             scanNextRange= DataSetUtil.getNextInterval(ds, dr0);
-            System.err.println( DatumRangeUtil.normalize( dr0, scanPrevRange.max() ) );
-            System.err.println( DatumRangeUtil.normalize( dr0, scanPrevRange.min() ) );
         }
         
         double rescaleFactor; // note rescaleFactor is always 1.0 now.
