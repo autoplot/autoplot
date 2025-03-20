@@ -431,12 +431,14 @@ public final class PlotController extends DomNodeController {
                 if ( scanNextRange.min().equals(dr0.max()) ) {
                     da.setNextActionLabel("step >>","<html>step to next interval<br>"+scanNextRange);
                 } else {
-                    da.setNextActionLabel("scan >>","<html>scan to <br>"+scanNextRange);
+                    String amount= scanNextRange.min().subtract(dr0.min()).toString();
+                    da.setNextActionLabel("scan >>","<html>scan "+amount+ " to <br>"+scanNextRange);
                 }
                 if ( scanPrevRange.max().equals(dr0.min()) ) {
                     da.setPreviousActionLabel("<< step","<html>step to previous interval<br>"+scanPrevRange);
                 } else {
-                    da.setPreviousActionLabel("<< scan","<html>scan to <br>"+scanPrevRange);
+                    String amount= scanPrevRange.min().subtract(dr0.min()).abs().toString();
+                    da.setPreviousActionLabel("<< scan","<html>scan "+amount+ " to <br>"+scanPrevRange);
                 }
             }
         };
