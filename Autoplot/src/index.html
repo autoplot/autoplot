@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Code which implemented scan next/scan previous is revisited and works nicely with MMS EDI Burst data.  Happy Spring!</small></p>
+        <p><small>Two window's time ranges are bound together with a <a href="https://github.com/autoplot/dev/blob/master/demos/2025/20250322/bindTwoApplicationTimeRanges.jy">small script</a></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,9 +30,10 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-03-20 r28146):</p>
+        <p>Bugfixes (2025-03-22 r28151):</p>
         <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/1359/">1359</a>: redo code which implements the scan next and scan previous.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2687/">2687</a>: trigger a repaint in slice mouse action when axis units are changed.  Thanks, Connor!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/1359/">1359</a>: redo code which implements the scan next and scan previous.  Thanks, Larry!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2685/">2685</a>: check for unbelievable valid_max in PDS4 (mvn_sta_l2_c6-32e64m_20141013_v02_r01.xml)
             <li>FiltersChainPanel should always use unbundle('X') and not just 'X'.
             <li>Remove unneeded decimal point from "0." tick when exponents are shown otherwise.
