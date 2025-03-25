@@ -28,7 +28,7 @@ public class FilePointer {
      */
     public FilePointer( URL labelFile, String f) {
         try {
-            Pattern p= Pattern.compile("([^,]+)(,\\s*(\\d+)(\\s*\\<BYTES\\>)?)?");
+            Pattern p= Pattern.compile("([^,]+)(,\\s*(\\d+)(\\s*\\<BYTES\\>)?)?",Pattern.CASE_INSENSITIVE);
             Matcher m= p.matcher(f);
             if ( !m.matches() ) {
                 throw new IllegalArgumentException("LABEL/POINTER should match ([^,]+)(,\\s*(\\d+)(\\s*\\<BYTES\\>)?)?");
@@ -36,7 +36,7 @@ public class FilePointer {
             URL url= new URL(labelFile,m.group(1));
             this.url= url;
             if ( m.group(3)!=null ) {
-                if ( m.group(4)!=null && m.group(4).endsWith("<BYTES>") ) {
+                if ( m.group(4)!=null && m.group(4).toUpperCase().endsWith("<BYTES>") ) {
                     offsetUnits= Unit.BYTES;
                 } else {
                     offsetUnits= Unit.LINES;
