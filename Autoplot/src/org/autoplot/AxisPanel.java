@@ -166,7 +166,7 @@ public class AxisPanel extends javax.swing.JPanel {
 
         APSplash.checkTime("in axispanel 40");
 
-        AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "axisPanel");
+        AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "axesPanel");
         APSplash.checkTime("in axispanel 50");
 
     }

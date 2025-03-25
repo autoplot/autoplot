@@ -93,8 +93,7 @@ public class DataPanel extends javax.swing.JPanel {
             }
         });
                 
-        AutoplotHelpSystem.getHelpSystem().registerHelpID(this.jPanel1, "dataPanel_1");
-        AutoplotHelpSystem.getHelpSystem().registerHelpID(this.jPanel2, "dataPanel_2");
+        AutoplotHelpSystem.getHelpSystem().registerHelpID(this.jPanel1, "dataPanel");
 
         plotElementFiltersPanel.setFilter("");
         
