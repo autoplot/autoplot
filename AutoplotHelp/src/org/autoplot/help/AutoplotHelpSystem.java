@@ -31,6 +31,8 @@ import javax.swing.border.TitledBorder;
  */
 public class AutoplotHelpSystem {
     
+    private static String helpPage= "https://github.com/autoplot/documentation/blob/main/md/help.md";
+    
     private static AutoplotHelpSystem instance;
 
     private static final Logger log= Logger.getLogger("org.autoplot.help");
@@ -162,6 +164,14 @@ public class AutoplotHelpSystem {
      */
     public final void registerHelpID( final Component c, final String helpID) {
      //  broker.enableHelp(c, helpID, mainHS);
+
+        final String link;
+        if ( helpID.endsWith("Panel") ) {
+            link= helpPage + "#" + helpID.substring(0,helpID.length()-5);
+        } else {
+            link= helpPage + "#" + helpID;
+        }
+        
         c.setFocusable(true);
         helpIds.put(c, helpID);
         KeyListener kl=  new KeyListener() {
@@ -174,7 +184,7 @@ public class AutoplotHelpSystem {
             @Override
             public void keyReleased(KeyEvent e) {
                 if ( e.getKeyCode()==KeyEvent.VK_F1 ) {
-                    Util.openBrowser( "http://autoplot.org/help#"+helpID );
+                    Util.openBrowser( link );
                     e.consume();
                 }
             }
@@ -201,7 +211,7 @@ public class AutoplotHelpSystem {
                 TitledBorderDecorator.makeLink( jPanel1, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        Util.openBrowser( "http://autoplot.org/help#"+helpID );
+                        Util.openBrowser( link );
                     }
                 });
             }
@@ -214,7 +224,7 @@ public class AutoplotHelpSystem {
                         TitledBorderDecorator.makeLink( jPanel2, new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                Util.openBrowser( "http://autoplot.org/help#"+helpID );
+                                Util.openBrowser( link );
                             }
                         });
                     }
@@ -251,13 +261,13 @@ public class AutoplotHelpSystem {
             Component c= (Component)focus;
             c= findRegisteredParent(c);
             if (c==null ) {
-                Util.openBrowser( "http://autoplot.org/help" );
+                Util.openBrowser( helpPage );
             } else {
                 String helpId =helpIds.get(c);
-                Util.openBrowser( "http://autoplot.org/help#"+helpId );
+                Util.openBrowser( helpPage + "#"+helpId );
             }
         } else {
-            Util.openBrowser( "http://autoplot.org/help" );
+            Util.openBrowser( helpPage );
         }
 
         
@@ -267,7 +277,7 @@ public class AutoplotHelpSystem {
     public void displayDefaultHelp() {
         //broker.setCurrentID("aphelp_main");
         //broker.setDisplayed(true);
-        Util.openBrowser( "http://autoplot.org/help" );
+        Util.openBrowser( helpPage );
     }
 
     /** Request another helpset be merged with the main help. This way, plugin
