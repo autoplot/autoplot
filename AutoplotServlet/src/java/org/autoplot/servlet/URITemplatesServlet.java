@@ -162,11 +162,14 @@ public class URITemplatesServlet extends HttpServlet {
             while ( count<=10000 && dr.min().lt( stop ) ) {
                 for ( String enum1 : enums ) {
                     st= tp.format( dr.min(), dr.max(), Collections.singletonMap( id, enum1 ) ); 
+                    String lst;
                     if ( isLink ) {
-                        st= "<a href=\""+st+"\">" + st + "</a>";
+                        lst= "<a href=\""+st+"\">" + st + "</a>";
+                    } else {
+                        lst= st;
                     }
                     if ( parseUri.length()==0 ) {
-                        out.printf(  "<tr><td>"+st + "</td><td>"+dr + "</td><td>N/A</td><tr>\n" );
+                        out.printf(  "<tr><td>"+ lst + "</td><td>"+dr + "</td><td>N/A</td><tr>\n" );
                         count++;
                     } else {
                         count+= doParse( drtr, st, parseUri, out );
