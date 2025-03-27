@@ -60,7 +60,7 @@
         <textarea rows="1" cols="120" id="resourceURI2" name="resourceURI" >http://autoplot.org/data/versioning/data_$Y_$m_$d_v1.00.qds</textarea><br>
         <br>Enter ISO8601 Time Range limiting the results printed: <br>
         <textarea rows="1" cols="50" name="timerange" >2010-03-01/2010-03-10</textarea><br>
-        <input type="hidden" name="generate" value="T" />
+        <input type="hidden" name="generate" value="1"/>
         <input type="hidden" name="scriptFile" value="URI_Templates.jy" />
         <br>
         <input type="submit" value="Try it out" />
@@ -86,7 +86,7 @@
         <textarea rows="1" cols="120" id="resourceURI3" name="resourceURI" >https://autoplot.org/data/versioning/data_$Y_$m_$d_v$v.qds</textarea><br>
         <br>Enter ISO8601 Time Range limiting the results printed: <br>
         <textarea rows="1" cols="50" id="timerange3" name="timerange" >2010-03-01/2010-03-10</textarea><br>
-        <input type="hidden" name="generate" value="F"/>
+        <input type="hidden" name="generate" value="0"/>
         <input type="hidden" name="mode" value="hybrid" />
         <br>
         <input type="submit" value="Try it out" />

@@ -147,7 +147,9 @@ public class SecureScriptServlet extends HttpServlet {
                 String k= (String)e.nextElement();
                 if ( !k.equals("scriptFile") ) {
                     String v= request.getParameter(k);
-                    if ( v.equals("on") ) v= "T"; // kludge for checkbox
+                    if ( v.equals("on") ) {
+                        v= "1"; // True
+                    } // kludge for checkbox
                     m.put( k,v );
                 }
             }
