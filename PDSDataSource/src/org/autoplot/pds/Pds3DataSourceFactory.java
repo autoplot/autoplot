@@ -229,12 +229,15 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
     }
     
     /**
-     * identify the root of the volume.  This was motivated by a LABL in SOFTWARE in a volume which didn't 
-     * have DATA, and I had everything mounted in /project/pds/mirror/DATA.  The root will often have
-     * DATA, DOCUMENT, and a README.txt file.
+     * identify the root of the volume.This was motivated by a LABL in SOFTWARE in a volume which 
+     * didn't have DATA, and I had everything mounted in /project/pds/mirror/DATA.The root will 
+     * often have DATA, DOCUMENT, and a README.txt file.
      * 
      * @param location a location within the volume
      * @return the root of the volume or null if it can't be found.
+     * @throws org.das2.util.filesystem.FileSystem.FileSystemOfflineException
+     * @throws java.net.UnknownHostException
+     * @throws java.io.FileNotFoundException
      */
     public static URL identifyRoot( URL location ) throws FileSystem.FileSystemOfflineException, UnknownHostException, FileNotFoundException, IOException {
         String p= location.toString();
