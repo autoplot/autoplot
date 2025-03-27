@@ -14,9 +14,9 @@ setScriptTitle('URI_Templates')
 # see also https://github.com/autoplot/dev/blob/master/demos/2024/20240802/URI_Templates.jy
 
 resourceURI= getParam( 'resourceURI', 'http://autoplot.org/data/C1_CP_EDI_EGD__$Y$m$d_V03.cef', 'example file to load', 
-    [ 'data_$Y_$(m)_$(d;delta=7;phasestart=2019-05-05).qds', 
+    { 'examples': [ 'data_$Y_$(m)_$(d;delta=7;phasestart=2019-05-05).qds', 
       'http://autoplot.org/data/C1_CP_EDI_EGD__$Y$m$d_V03.cef', 
-      'C1_CP_EDI_EGD__$Y$m$d_$(enum,values=A|B).cef' ] )
+      'C1_CP_EDI_EGD__$Y$m$d_$(enum,values=A|B).cef' ] } )
 
 timerange= getParam( 'timerange', '2005-02-12/2005-02-19', 'timerange to load' )
 
