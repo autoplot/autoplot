@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -16,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -28,6 +31,7 @@ import static org.autoplot.datasource.DataSetURI.fromUri;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.URISplit;
 import org.das2.datum.LoggerManager;
+import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.w3c.dom.Document;
@@ -225,6 +229,37 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
     }
     
     /**
+     * identify the root of the volume.  This was motivated by a LABL in SOFTWARE in a volume which didn't 
+     * have DATA, and I had everything mounted in /project/pds/mirror/DATA.  The root will often have
+     * DATA, DOCUMENT, and a README.txt file.
+     * 
+     * @param location a location within the volume
+     * @return the root of the volume or null if it can't be found.
+     */
+    public static URL identifyRoot( URL location ) throws FileSystem.FileSystemOfflineException, UnknownHostException, FileNotFoundException, IOException {
+        String p= location.toString();
+        int r= p.lastIndexOf("DATA/");
+        FileSystem fs= FileSystem.create( p.substring(0,r) );
+        String[] ffs= fs.listDirectory("/");
+        for ( String f: ffs ) {
+            if ( f.equalsIgnoreCase("document") ) {
+                return fs.getRootURI().toURL();
+            }
+        }
+        Pattern patt= Pattern.compile("/cassini-|/clps-|/CO-|/DS1-|/galileo-|/GIO-|/GO-|/go-|/ICE-|/insight-"
+                + "|/JNO-|/juno-|/lp-|/LP-|/LRO-|/lunar-|/M10-|/maven-|/mess-|/messenger-|/MEX-|/MGN-|/mgs-|/MR9"
+                + "|/MSL-|/NEAR-|/NH-|/ODY-|/P10-|/P11-|/pvo-|/radiojove-|/suisei-|/ULY-|/ulysses-"
+                + "|/V15_V16-|/VEGA1-|/VEGA2-|/vex-|/vg1-|/vg2-|/voyager-|/voyager1-|/voyager2-", Pattern.CASE_INSENSITIVE );
+        //patt= Pattern.compile("co-",Pattern.CASE_INSENSITIVE);
+        Matcher m= patt.matcher(p);
+        if ( m.find() ) {
+            int i2= p.indexOf("/",m.start()+1);
+            return new URL(p.substring(0,i2));
+        }
+        return null;
+    } 
+    
+    /**
      * read in the PDS label, resolving STRUCTURES which are loaded with a pointer.  This will look in the current
      * directory, and in the LABEL directory next to the DATA directory.  Note the Pointer must appear 
      * at /LABEL/&ast;/POINTER[@object="STRUCTURE"] or /LABEL/POINTER[@object="STRUCTURE"], and
@@ -279,7 +314,13 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
                 try {
                     childfile= DataSetURI.getFile( childUrl,new NullProgressMonitor());
                 } catch ( FileNotFoundException ex2 ) {
-                    throw ex;
+                    URL root= identifyRoot(labelUrl);
+                    childUrl= new URL( new URL( root.toString() + "/LABEL/" ), child.getTextContent() );
+                    try { 
+                        childfile= DataSetURI.getFile( childUrl,new NullProgressMonitor());
+                    } catch ( FileNotFoundException ex3 ) {
+                        throw ex;
+                    }
                 }
             }
             
