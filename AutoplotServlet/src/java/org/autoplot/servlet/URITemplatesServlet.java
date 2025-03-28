@@ -188,7 +188,7 @@ public class URITemplatesServlet extends HttpServlet {
             long dt= System.currentTimeMillis() - t0;
             
             out.printf("%d results calculated in %d milliseconds.\n",count,dt);
-            out.println("<br><small>v20240802</small>");
+            out.println("<br><small>v20250327.1</small>");
             out.println("</body>");
             out.println("</html>");
         }
