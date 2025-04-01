@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Two windows' time ranges are bound together with a <a href="https://github.com/autoplot/dev/blob/master/demos/2025/20250322/bindTwoApplicationTimeRanges.jy">small script</a></small></p>
+        <p><small>Two parameters are compared day-by-day.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,7 +30,10 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-03-27 r28157):</p>
+        <p>Bugfixes (2025-04-01 r28157):</p>
+        <ul>
+        </ul>
+        <p>Older Bugfixes (2025-03-27 r28157):</p>
         <ul>
             <li>Clean up bugs in servlet's <a href="https://cottagesystems.com/AutoplotServlet/URI_Templates.jsp">URI_Templates</a> demonstration, which was broken when script security was tightened.
             <li>New code in PDS3 library for finding the volume root allows more datasets to be read in.
@@ -41,37 +44,16 @@
             <li>FiltersChainPanel should always use unbundle('X') and not just 'X'.
             <li>Remove unneeded decimal point from "0." tick when exponents are shown otherwise.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2684/">2684</a>: don't drop title in fft operation
-        </ul>
-        <p>Older Bugfixes (2025-02-27 r28119):</p>
-        <ul>
-            <li>Don't print debugging information to stderr when parsing ODL.
-            <li>Ant build files must have all sources marked as Java 8, so that Netbeans 24 can be used.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2682/">2682</a>: look for FIELD and ITEMS in SPREADSHEETS, which might have multi-item fields.
-            <li>https://github.com/das-developers/das2java/issues/120: handle '2016-05-20T07:46/07:46:30' with special code. 
-            <li>two-column fields in PDS3 spreadsheets are handled properly.  Thanks, Joe!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2667/">2667</a>: bindings, except for scale, are copied as well.
-            <li>put a comment in about multiplying a vector and a matrix, instead of matrix times a vector.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2677/">2677</a>: PDS4 describing CDF file doesn't work, but CDF file is fine
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2669/">2669</a>: relax redundant switch check since inline scripts often have these.
-            <li>Properly support where row or column has another row or column as a parent.  Code assumed marginRow or marginColumn was always the parent.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2667/">2667</a>: copy and paste of plot will allow overlapping plots to be copied as well.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2672/">2672</a>: axisOffset properly controls colorbar location, allowing multiple colorbars to be used on one plot.  Thanks, Sadie!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2674/">2674</a>: More places where autoplot2023.py was needed.  Thanks, Kristoff!
-            <li><a href="https://github.com/das-developers/das2java/issues/122">0112</a>: monotonic decreasing ytags were not properly clipped.  Thanks, Sadie!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2673">2673</a>: Support PDS3 JAD_L50_HLS_ELC_MOM_ISO_2D_ELECTRONS_*_V01.LBL with the PDS3 data source.        </ul>
         <p>Features:</p>
         <ul>
             <li>fftPower now allows missing timetags, using indgen for tags.
-            <li>Scan buttons indicate the amount of the scan (e.g. seconds to next burst).
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/840/">840</a>: Initial support for jsonl data files, returned by the NEST and other devices.
-            <li>Various improvements to the SimpleServlet, including support for named colors, drawGrid option and tooltips in the GUI.
+            <li>filename=T control for aggregation will return the filename for each data point.
         </ul>
         <p>Less recent features:</p>
         <ul>
-            <li>fixHorizontalLayout removes redundant columns, which old .vap files had.
-            <li>Copy plot copies inset plots which have the same row and column as parents.
-            <li>support rank 3 ordinal data, found in Parker Solar Probe EPILO CDF files.
-            <li>"plots" list added to layout panel, to better support overlapping plots.
+            <li>Scan buttons indicate the amount of the scan (e.g. seconds to next burst).
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/840/">840</a>: Initial support for jsonl data files, returned by the NEST and other devices.
+            <li>Various improvements to the SimpleServlet, including support for named colors, drawGrid option and tooltips in the GUI.
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
