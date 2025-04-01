@@ -402,10 +402,11 @@ public final class AggregatingDataSource extends AbstractDataSource {
             }
             
             boolean avail= getParam( "avail", "F" ).equals("T");
+            boolean fln= getParam( "filename", "F" ).equals("T");
             boolean reduce= getParam( "reduce", "F" ).equals("T");
             boolean filenameProvidesContext= getParam( "filenameProvidesContext", "F" ).equals("T");
             boolean addDimension= getParam( "addDim","F" ).equals("T");
-
+            
             if ( avail ) {
                 logger.log(Level.FINE, "availablility {0} ", new Object[]{ lviewRange});
                 DataSetBuilder build= new DataSetBuilder(2,ss.length,4);
@@ -638,6 +639,12 @@ public final class AggregatingDataSource extends AbstractDataSource {
                         }
                     }
                     
+                    if ( fln ) {
+                        QDataSet tt= Ops.xtags(ds1);
+                        String uri= delegateDataSource.getURI();
+                        EnumerationUnits units= Units.nominal();
+                        ds1= Ops.link( tt, Ops.replicate( Ops.dataset( units.createDatum(uri) ), tt.length() ) );
+                    }
                     
                     if (result!=null ) { // check for special case where non-time-varying data has been loaded.
                         QDataSet dep0 = (QDataSet) result.property(QDataSet.DEPEND_0);
