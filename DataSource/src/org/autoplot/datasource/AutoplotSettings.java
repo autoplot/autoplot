@@ -124,6 +124,11 @@ public final class AutoplotSettings {
      * secondary vfsCache.
      */
     protected String autoplotData = ""; // see loadPreferences
+    /**
+     * autoplotData is the home where Autoplot's metadata is kept.
+     * This includes history (bookmarks), add-on tools, and the
+     * secondary vfsCache.
+     */
     public static final String PROP_AUTOPLOTDATA = "autoplotData";
 
     /**
@@ -141,6 +146,10 @@ public final class AutoplotSettings {
      * code for unloading the cache.
      */
     private String fscache= "";// see loadPreferences
+    /**
+     * fscache is where downloaded data is kept.  Note there is no automatic
+     * code for unloading the cache.
+     */    
     public static final String PROP_FSCACHE = "fscache";
 
     public String getFscache() {
