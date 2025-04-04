@@ -644,6 +644,13 @@ public class URISplit {
             }         
         }
 
+        if ( ( surl.startsWith("'") || surl.startsWith("getDataSet(") ) && surl.endsWith(")") ) {
+            //'https://spdf.gsfc.nasa.gov/pub/data/mms/mms1/fgm/srvy/l2/$Y/$m/mms1_fgm_srvy_l2_$Y$m$d_v$(v,sep).cdf?mms1_fgm_b_gsm_srvy_l2',tr)
+            int i0= surl.indexOf("'");
+            int i1= surl.lastIndexOf("'");
+            surl= surl.substring(i0+1,i1);
+        }
+        
         URISplit result = maybeAddFile(surl, caretPos);
 
         if ( result==null ) {
