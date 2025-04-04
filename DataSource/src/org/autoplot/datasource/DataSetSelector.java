@@ -786,6 +786,18 @@ public class DataSetSelector extends javax.swing.JPanel {
                 return;
             }
         }
+        
+        if ( surl.startsWith("getDataSet(") || ( surl.startsWith("'") && surl.endsWith(")") ) ) {
+            //TODO: repeated code
+            //'https://spdf.gsfc.nasa.gov/pub/data/mms/mms1/fgm/srvy/l2/$Y/$m/mms1_fgm_srvy_l2_$Y$m$d_v$(v,sep).cdf?mms1_fgm_b_gsm_srvy_l2',tr)
+            int i0= surl.indexOf("'");
+            int i1= surl.lastIndexOf("'");
+            if ( i1>surl.length()-20 ) {
+                surl= surl.substring(i0+1,i1);
+            } else {
+                surl= surl.substring(i0+1);
+            }
+        }
 
         setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
         
