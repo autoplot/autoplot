@@ -436,7 +436,12 @@ public class JythonOps {
      */
     public static Object validateParam( String name, Object v, List constraint ) {
         if ( !constraint.contains(v) ) {
-            throw new IllegalArgumentException(String.format("value is not one of allowed values: %s %s",name,v));
+            String sconstraint= constraint.toString();
+            if ( sconstraint.length()<40 ) {
+                throw new IllegalArgumentException(String.format("value is not one of allowed values for \"%s\" which are %s: %s",name,sconstraint,v));
+            } else {
+                throw new IllegalArgumentException(String.format("value is not one of allowed values for \"%s\": %s",name,v));
+            }
         }
         return v;
     }
