@@ -929,7 +929,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 AsciiParser.FieldParser timeFieldParser = new AsciiParser.FieldParser() {
                     @Override
                     public double parseField(String field, int fieldIndex) throws ParseException {
-                        if ( timeFormats.length==1 && timeFormats[0].equals("$Y") ) { // decimal year
+                        if ( timeFormats[0].length()==2 && timeFormats.length==1 && timeFormats[0].equals("$Y") ) { // decimal year
                             if ( field.length()>4 ) {
                                 double dyear= Double.parseDouble(field);
                                 int year= (int)(dyear);
