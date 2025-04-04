@@ -60,7 +60,7 @@ min, max, examples, values, and regex.<ul>"""
             v = t(params[name])
             if isinstance(constraint, list):
                 if v not in constraint:
-                    raise Exception('value is not one of allowed values: %s %s' % (name, v))
+                    raise Exception('value is not one of allowed values for \"%s\": %s' % (name, v))
                 if t==int:
                     for c in constraint:
                         if type(c)!=int:
