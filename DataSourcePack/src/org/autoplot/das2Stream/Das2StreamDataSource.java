@@ -152,7 +152,7 @@ public class Das2StreamDataSource extends AbstractDataSource {
 
             DataSet r= handler.getDataSet();
             if ( r!=null ) {
-                return DataSetAdapter.create(handler.getDataSet());
+                return DataSetAdapter.create(r);
             } else {
                 return null;
             }
