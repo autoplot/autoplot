@@ -80,9 +80,18 @@ public class JavadocLookup {
                     return s + signature.replaceAll("[\\(\\)\\,]", "-");
                 } else if ( s.startsWith("http://www-pw.physics.uiowa.edu/~jbf/autoplot/javadoc2018/") ) {
                     return s + signature.replaceAll("[\\(\\)\\,]", "-");
+                } else if ( s.startsWith("https://jfaden.net/~jbf/autoplot/doc" ) 
+                        || s.startsWith("https://cottagesystems.com/~jbf/autoplot/doc" )) {
+                    String result;
+                    if ( signature.startsWith("org/das2/qds/ops/Ops.html") && signature.length()>26 ) {
+                        char let= signature.charAt(26);
+                        result= s + signature.substring(0,20) + "_" + let + signature.substring(20).replaceAll("[\\(\\)\\,]", "-");
+                    } else {
+                        result= s + signature.replaceAll("[\\(\\)\\,]", "-");
+                    }
+                    if ( result.endsWith("-") ) result= result.substring(0,result.length()-1);
+                    return result;
                 } else if ( s.startsWith("http://www-pw.physics.uiowa.edu/~jbf/autoplot/doc")
-                        || s.startsWith("https://jfaden.net/~jbf/autoplot/doc" )
-                        || s.startsWith("https://cottagesystems.com/~jbf/autoplot/doc" )
                         || s.startsWith("https://cottagesystems.com/jenkins/job/autoplot-javadoc/") ) {
                     int i= signature.indexOf('(');
                     if ( i>0 ) {
