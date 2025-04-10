@@ -588,34 +588,39 @@ public abstract class Bookmark {
         if ( ! root.getNodeName().equals("bookmark-list") ) {
             throw new IllegalArgumentException( String.format( "Expected XML element to be \"bookmark-list\" not \"%s\"", root.getNodeName() ) );
         }
-        ArrayList<Bookmark> result = new ArrayList<Bookmark>();
-        NodeList list = root.getChildNodes();
-        Bookmark lastBook=null;
-        for (int i = 0; i < list.getLength(); i++) {
-            Node n = list.item(i);
-            if ( ! ( n instanceof Element ) ) continue;
-            try {
-                Bookmark book = parseBookmark(n,vers,remoteLevel );
-                result.add(book);
-                lastBook= book;
-            } catch (Exception ex) {
+        try {
+            ArrayList<Bookmark> result = new ArrayList<Bookmark>();
+            NodeList list = root.getChildNodes();
+            Bookmark lastBook=null;
+            for (int i = 0; i < list.getLength(); i++) {
+                Node n = list.item(i);
+                if ( ! ( n instanceof Element ) ) continue;
                 try {
-                    parseBookmark( n, vers, remoteLevel );
-                } catch (UnsupportedEncodingException ex1) {
-                    logger.log(Level.SEVERE, ex1.getMessage(), ex1);
-                } catch (IOException ex1) {
-                    logger.log(Level.SEVERE, ex1.getMessage(), ex1);
+                    Bookmark book = parseBookmark(n,vers,remoteLevel );
+                    result.add(book);
+                    lastBook= book;
+                } catch (Exception ex) {
+                    try {
+                        parseBookmark( n, vers, remoteLevel );
+                    } catch (UnsupportedEncodingException ex1) {
+                        logger.log(Level.SEVERE, ex1.getMessage(), ex1);
+                    } catch (IOException ex1) {
+                        logger.log(Level.SEVERE, ex1.getMessage(), ex1);
+                    }
+                    logger.log(Level.FINE, "## bookmark number={0}", i);
+                    logger.log( Level.SEVERE, ex.getMessage(), ex );
+                    logger.log(Level.FINE, "last bookmark parsed:{0}", lastBook);
+                    //continue;
+                    throw new BookmarksException(ex);
                 }
-                logger.log(Level.FINE, "## bookmark number={0}", i);
-                logger.log( Level.SEVERE, ex.getMessage(), ex );
-                logger.log(Level.FINE, "last bookmark parsed:{0}", lastBook);
-                //continue;
-                throw new BookmarksException(ex);
+
             }
 
+            return result;
+        } catch ( OutOfMemoryError ex ) {
+            return Collections.singletonList( new Bookmark.Folder("Out of Memory while reading bookmarks.") );
+            
         }
-
-        return result;
     }
 
     /**
