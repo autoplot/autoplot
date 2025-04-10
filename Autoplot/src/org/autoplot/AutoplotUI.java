@@ -4875,8 +4875,8 @@ private void updateFrameTitle() {
             }
         }, AWTEvent.KEY_EVENT_MASK );
         
-        if ( Runtime.getRuntime().totalMemory() < 500E6 ) { // 
-            throw new IllegalArgumentException("Autoplot needs at least 500MB of memory to run.");
+        if ( Runtime.getRuntime().totalMemory() < 256E6 ) { // 
+            throw new IllegalArgumentException("Autoplot needs at least 256MB of memory to run.");
         }
         
         //I get a message on the stdout and sometimes as a popup containing:
