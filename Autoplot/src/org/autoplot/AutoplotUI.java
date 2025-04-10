@@ -4875,6 +4875,10 @@ private void updateFrameTitle() {
             }
         }, AWTEvent.KEY_EVENT_MASK );
         
+        if ( Runtime.getRuntime().totalMemory() < 500E6 ) { // 
+            throw new IllegalArgumentException("Autoplot needs at least 500MB of memory to run.");
+        }
+        
         //I get a message on the stdout and sometimes as a popup containing:
         //   (at java.util.TimSort.mergeHi(TimSort.java:895))
         //http://stackoverflow.com/questions/13575224/comparison-method-violates-its-general-contract-timsort-and-gridlayout 

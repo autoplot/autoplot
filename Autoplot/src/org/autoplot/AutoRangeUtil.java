@@ -492,6 +492,7 @@ public class AutoRangeUtil {
      * @param properties Additional constraints for properties, such as SCALE_TYPE
      * @param ignoreDsProps Don't check ds for TYPICAL_MIN and SCALE_TYPE.  MONOTONIC is never ignored.
      * @return the range.
+     * @see #autoRange(org.das2.qds.QDataSet, java.util.Map) 
      */
     public static AutoRangeDescriptor autoRange(QDataSet ds, Map properties, boolean ignoreDsProps) {
         Logger logger1 = LoggerManager.getLogger("qdataset.ops.autorange");

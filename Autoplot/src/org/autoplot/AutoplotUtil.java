@@ -977,7 +977,7 @@ public class AutoplotUtil {
      * @param ds the dataset, a non-bundle, to be autoranged.
      * @param properties Additional constraints for properties, such as SCALE_TYPE
      * @return  the range.
-     * @see #autoRange(org.das2.qds.QDataSet, java.util.Map, boolean) 
+     * @see AutoRangeUtil#autoRange(org.das2.qds.QDataSet, java.util.Map) 
      */
     @Deprecated
     public static AutoRangeUtil.AutoRangeDescriptor autoRange( QDataSet ds, Map properties ) {
@@ -1001,7 +1001,7 @@ public class AutoplotUtil {
      * @param ignoreDsProps Don't check ds for TYPICAL_MIN and SCALE_TYPE.  MONOTONIC is never ignored.
      * @return the range.
      * @deprecated 
-     * @see AutoRangeUtil#autoRange
+     * @see AutoRangeUtil#autoRange(org.das2.qds.QDataSet, java.util.Map, boolean) 
      */
     @Deprecated
     public static AutoRangeUtil.AutoRangeDescriptor autoRange(QDataSet ds, Map properties, boolean ignoreDsProps) {
