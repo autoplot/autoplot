@@ -32,12 +32,14 @@
                 
         <p>Bugfixes (2025-04-08 r28183):</p>
         <ul>
-            <li><a href="https://github.com/das-developers/das2java/issues/130">130</a>: fully support error bars in x.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2694/">2694</a>: scripts run from tools menu on second Autoplot window would modify the first window.  Thanks, Andrew!
+            <li><a href="https://github.com/das-developers/das2java/issues/130">130</a>: fully support error bars in x.   Thanks, Bill!
             <li>Do a sanity check on amount of memory available, don't even start if memory is less than 256M.
-            <li>Catch out-of-memory error which can occur when reading bookmarks during startup, returning one empty folder instead with "Out of Memory" title.
-            <li><a href="https://github.com/das-developers/das2java/issues/128">128</a>: support XYZ scatter in das2streams.
-            <li><a href="https://github.com/das-developers/das2java/issues/127">127</a>: double array of complex numbers supported.  Thanks, Sadie!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2689/">2689</a>: clarify error message.
+            <li>Catch out-of-memory error which can occur when reading bookmarks during startup, returning one empty folder instead with "Out of Memory" title.  Thanks, Matvey!
+            <li><a href="https://github.com/das-developers/das2java/issues/128">128</a>: support XYZ scatter in das2streams.  Thanks, Chris!
+            <li>clarify linear interpolation used in documentation for synchronize, "interpolation" is too vague.  Thanks, Sadie!
+            <li><a href="https://github.com/das-developers/das2java/issues/127">127</a>: double array of complex numbers (ds[m,n,2]) supported.  Thanks, Sadie!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2689/">2689</a>: clarify error message when jyds argument doesn't meet constraints.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2691/">2691</a>: Add support for decimal years.
             <li><a href="https://github.com/das-developers/das2java/issues/126">0126</a>: Commented test code from review of FFTPower removed.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2688/">2688</a>: clean up getDataSet('URI') when entered into address bar, providing convenient way to test URIs in scripts.
@@ -56,6 +58,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Jython popup-documentation doesn't try to fold together functions which vary only by arguments, like with fftPower, since this doesn't work consistently.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2397/">2397</a>: don't coalesce functions that differ only by arguments (findgen), update to new conventional Javadoc location at https://cottagesystems.com/~jbf/autoplot/doc2018/
             <li><a href="https://github.com/das-developers/das2java/issues/127">127</a>: support two-index array of complex numbers in crossProduct and complexConj.
             <li>fftPower now allows missing timetags, using indgen for tags.
