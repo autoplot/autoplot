@@ -24,7 +24,7 @@ public class CompletionSettings {
     private static final Logger logger= LoggerManager.getLogger( "jython.editor" );
     Preferences prefs= AutoplotSettings.settings().getPreferences( CompletionSettings.class );
 
-    private String docHome = "http://www-pw.physics.uiowa.edu/~jbf/autoplot/javadoc2018/"; // // see repeat code in loadPreferences
+    private String docHome = "https://cottagesystems.com/~jbf/autoplot/doc/"; // // see repeat code in loadPreferences
     
     public static final String PROP_DOCHOME = "docHome";
 
