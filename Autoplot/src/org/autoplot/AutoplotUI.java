@@ -871,6 +871,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                     runScript( dataSetSelector.getValue(), !AutoplotUI.this.noAskParams );
                 } else {
                     org.das2.util.LoggerManager.logGuiEvent(ev);     
+                    
                     if ( JOptionPane.YES_OPTION==
                             JOptionPane.showConfirmDialog( AutoplotUI.this, "Scripts can only be run from the main window.  Make this the main window?", 
                                     "Set Main Window", JOptionPane.YES_NO_OPTION ) ) {
@@ -6425,7 +6426,16 @@ APSplash.checkTime("init 240");
      * @param script the URI of the script to run
      */
     public void runScriptTools( final String script ) {
-        runScript(script);
+        if ( ScriptContext.getViewWindow()==AutoplotUI.this ) {
+            runScript( script );
+        } else {
+            if ( JOptionPane.YES_OPTION==
+                    JOptionPane.showConfirmDialog( AutoplotUI.this, "Scripts can only be run from the main window.  Make this the main window?", 
+                            "Set Main Window", JOptionPane.YES_NO_OPTION ) ) {
+                ScriptContext.setApplication(AutoplotUI.this);
+            }
+            runScript( script );
+        }
     }
         
     /**
