@@ -156,14 +156,14 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
         short columnNumber;
         short columnNumber1;
 
-        Pattern pc= Pattern.compile("([a-zA-Z_\\d]*)");
+        Pattern pc= Pattern.compile("([a-zA-Z_\\d]+)");
         Matcher m= pc.matcher(spec);
         if ( m.matches() ) { // kludge for http://www.autoplot.org/data/swe-np.xls?column=data&depend0=dep0
             columnNumber= getColumnNumber(m.group(1), firstRow);
             return new int[] { columnNumber, -1, Math.max(0,firstRow), sheet.getLastRowNum()+1 };
         }
 
-        Pattern p = Pattern.compile("([a-zA-Z_]*)((\\d+):([a-zA-Z_]*)?(\\d+)?)?");
+        Pattern p = Pattern.compile("([^\\s:]+)((\\d+):([a-zA-Z_]*)?(\\d+)?)?");
         m = p.matcher(spec);
 
 
