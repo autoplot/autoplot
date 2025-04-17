@@ -189,7 +189,7 @@
 <p>Click and drag a range on the plot to zoom in.  Buttons below zoom out
         and scan.  Click to read coordinates, and the center button will center the 
         plot on this click position.</p>
-Note there is also a version of this at http://autoplot.org/git/web/thin/zoom/demo.html.<br>
+Note there is also a version of this at https://github.com/autoplot/web/tree/gh-pages.<br>
         
         <!-- <p>img src url: 
             <pre><small><div id="idechourl"></div></small></pre></p> -->
