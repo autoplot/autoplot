@@ -284,8 +284,6 @@ public class JythonCompletionTask implements CompletionTask {
         PythonInterpreter interp;
 
         interp = getInterpreter();
-        interp.exec("from org.das2.event import MouseModule");
-        interp.exec("MouseModule__CLASSTYPE=MouseModule");
 
         String eval;
         if ( JythonCompletionProvider.getInstance().settings().isSafeCompletions() ) {
