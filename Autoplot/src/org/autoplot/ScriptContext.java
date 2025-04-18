@@ -938,7 +938,7 @@ public class ScriptContext extends PyJavaInstance {
      * event following the mouse release when a box is dragged out.
      *<blockquote><pre><small>{@code
 def boxLookup( evt ):
-    showMessageDialog( '<html>start: (%s,%s)<br>finish: (%s,%s)' %
+    showMessageDialog( 'start: (%s,%s)\nfinish: (%s,%s)' %
         ( evt.getStartX(), evt.getStartY(), 
         evt.getFinishX(), evt.getFinishY() ) )
   
