@@ -1081,11 +1081,21 @@ public class SimplifyScriptSupport {
             String funcName = ((Name) c.func).id;
             switch (funcName) {
                 case "getApplication":
-                    return "from org.autoplot import AutoplotUI\n" + id + JythonCompletionTask.__CLASSTYPE + " = AutoplotUI\n";
+                    return "from org.autoplot import AutoplotUI\n" 
+                            + id + JythonCompletionTask.__CLASSTYPE + " = AutoplotUI\n";
                 case "getApplicationModel":
-                    return "from org.autoplot import ApplicationModel\n" + id + JythonCompletionTask.__CLASSTYPE + " = ApplicationModel\n";
+                    return "from org.autoplot import ApplicationModel\n" 
+                            + id + JythonCompletionTask.__CLASSTYPE + " = ApplicationModel\n";
                 case "getDataSource":
-                    return "from org.autoplot.datasource import DataSource\n" + id + JythonCompletionTask.__CLASSTYPE + " = DataSource\n";
+                    return "from org.autoplot.datasource import DataSource\n" 
+                            + id + JythonCompletionTask.__CLASSTYPE + " = DataSource\n";
+                case "addMouseModule":
+                    return "import org.das2.event.MouseModule\n" 
+                            + id + JythonCompletionTask.__CLASSTYPE + " = org.das2.event.MouseModule    # return type from " + funcName + " (spot line898)\n";
+                case "createDataPointRecorder":
+                    return "import org.das2.components.DataPointRecorder\n" 
+                            + id + JythonCompletionTask.__CLASSTYPE + " = org.das2.components.DataPointRecorder    # return type from " + funcName + " (spot line898)\n";
+
                 case "getParam": // weird--there's a special getParam loaded, but this doesn't work for  getParam( 'allowCache', True, 'allow storage of ephemeris to local file', [ True,False ] )
                     exprType e1= c.args[1];
                     String vv= maybeIndentifyValue(e1);
@@ -1122,8 +1132,6 @@ public class SimplifyScriptSupport {
                     return id + JythonCompletionTask.__CLASSTYPE + " = DatumRange    # return type from " + funcName + " (spot line896)\n";
                 case "datum":
                     return id + JythonCompletionTask.__CLASSTYPE + " = Datum    # return type from " + funcName + " (spot line898)\n";
-                case "addMouseModule":
-                    return id + JythonCompletionTask.__CLASSTYPE + " = MouseModule    # return type from " + funcName + " (spot line898)\n";
                 default:
                     break;
             }
