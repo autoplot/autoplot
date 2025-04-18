@@ -89,7 +89,7 @@ public class JavadocLookup {
                     } else {
                         result= s + signature.replaceAll("[\\(\\)\\,]", "-");
                     }
-                    if ( result.endsWith("-") ) result= result.substring(0,result.length()-1);
+                    while ( result.endsWith("-") ) result= result.substring(0,result.length()-1);
                     return result;
                 } else if ( s.startsWith("http://www-pw.physics.uiowa.edu/~jbf/autoplot/doc")
                         || s.startsWith("https://cottagesystems.com/jenkins/job/autoplot-javadoc/") ) {
