@@ -1122,6 +1122,8 @@ public class SimplifyScriptSupport {
                     return id + JythonCompletionTask.__CLASSTYPE + " = DatumRange    # return type from " + funcName + " (spot line896)\n";
                 case "datum":
                     return id + JythonCompletionTask.__CLASSTYPE + " = Datum    # return type from " + funcName + " (spot line898)\n";
+                case "addMouseModule":
+                    return id + JythonCompletionTask.__CLASSTYPE + " = MouseModule    # return type from " + funcName + " (spot line898)\n";
                 default:
                     break;
             }
