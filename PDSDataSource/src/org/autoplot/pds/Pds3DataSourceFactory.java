@@ -348,9 +348,26 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
      * @param desc
      * @return 
      */
-    private String summarizeDescription( String desc ) {
+    private String summarizeDescription( String name, String desc) {
+        
+        // does the description start with the name?  Trim it out if so.
+        if ( desc.length()> name.length()+6 ) { // +6 is for <html>
+            char nextChar= desc.charAt(name.length()+6);
+            String test= desc.substring(6,name.length()+6).toLowerCase().replace(" ","_");
+            if ( !Character.isAlphabetic(nextChar) ) {
+                if ( test.equals(name.toLowerCase()) ) {
+                    String d= desc.substring(name.length()+6+1).trim();
+                    if ( d.startsWith("<br>") ) {
+                        d= d.substring(4).trim();
+                    }
+                    desc= "<html>" + d;
+                }
+            }
+        }
+
         int i= desc.indexOf(".");
         int l= desc.length();
+        
         int limit=86;
         if ( i==-1 ) {
             if ( l>limit ) {
@@ -448,7 +465,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
             Node n= alldat.get(i);
             String name= n.getTextContent();
             PDS3DataObject dd= getDataObjectPds3( url, name );
-            result.put( name, summarizeDescription(dd.getDescription()) );
+            result.put(name, summarizeDescription(name, dd.getDescription()) );
         }
         
         // check for high-rank containers
@@ -467,7 +484,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
                     Node column= columns.item(i);
                     String name= (String)xpath.evaluate("NAME/text()",column,XPathConstants.STRING);
                     PDS3DataObject dd= getDataObjectPds3( url, name );
-                    result.put( name, summarizeDescription(dd.getDescription()) );                      
+                    result.put(name, summarizeDescription(name, dd.getDescription()) );                      
                 }
                 columns= (NodeList) xpath.evaluate("CONTAINER/CONTAINER/COLUMN",table,XPathConstants.NODESET);
                 for ( int i=0; i<columns.getLength(); i++ ) {
@@ -475,7 +492,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
                     if ( column!=null ) {   
                         String name= (String)xpath.evaluate("NAME/text()",column,XPathConstants.STRING);
                         PDS3DataObject dd= getDataObjectPds3( url, name );
-                        result.put( name, summarizeDescription(dd.getDescription()) );  
+                        result.put(name, summarizeDescription(name, dd.getDescription()) );  
                     }
                 }
             }
@@ -557,7 +574,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
                 String desc= e.getValue();
                 desc= removeHtml( desc );
                 CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, 
-                        key, this, "arg_0", key + ": " +desc, null, true );
+                        key, this, "arg_0", desc, null, true );
                 ccresult.add(cc1);
             }
             ccresult.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "X=",
