@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Resetting the yaxis units properly updates the axis on the vertical slice as well.</small></p>
+        <p><small>Blooper from this week, where script editor completions and documentation popup were improved.  Java can't correctly render the search results page from Github.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,10 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-04-11 r28196):</p>
+        <p>Bugfixes (2025-04-18 r28207):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2692/">2692</a>: improvements to pop-up documentation in Jython editor.
+            <li>Rank 4 flatten added to complete function.
             <li>rte_0753429255: support non-ASCII column names in xls files.  Thanks, EDY!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2694/">2694</a>: scripts run from tools menu on second Autoplot window would modify the first window.  Thanks, Andrew!
             <li><a href="https://github.com/das-developers/das2java/issues/130">130</a>: fully support error bars in x.   Thanks, Bill!
@@ -59,6 +61,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>DataSetBuilder nextRecord method accepts Color object and inserts Datum with rgbColor units.
             <li>Jython popup-documentation doesn't try to fold together functions which vary only by arguments, like with fftPower, since this doesn't work consistently.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2397/">2397</a>: don't coalesce functions that differ only by arguments (findgen), update to new conventional Javadoc location at https://cottagesystems.com/~jbf/autoplot/doc2018/
             <li><a href="https://github.com/das-developers/das2java/issues/127">127</a>: support two-index array of complex numbers in crossProduct and complexConj.
