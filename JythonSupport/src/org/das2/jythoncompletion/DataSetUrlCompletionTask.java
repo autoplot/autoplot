@@ -126,10 +126,12 @@ class DataSetUrlCompletionTask implements CompletionTask {
 
             String pwd= (String)editor.getClientProperty( CLIENT_PROPERTY_PWD );
             if ( pwd!=null ) {
-                if ( pwd.endsWith("/") ) {
-                    if ( !( surl1.startsWith("/") || (surl1.length()>6 && surl1.substring(0,6).contains(":") ) ) ) {
-                        surl1= pwd + surl1;
-                        carotPos+= pwd.length();
+                if ( pwd.endsWith("/") ) { // is the URI a relative filename?
+                    if ( ! surl1.startsWith(pwd) ) {
+                        surl1= URISplit.makeAbsolute( pwd, surl1 );
+                        if ( surl1.startsWith(pwd) ) {
+                            carotPos+= pwd.length();
+                        }
                     }
                 }
             }
