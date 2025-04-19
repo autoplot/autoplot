@@ -533,17 +533,21 @@ public class DocumentationScrollPane extends JScrollPane {
             if (e != null && HyperlinkEvent.EventType.ACTIVATED.equals(e.getEventType())) {
                 final String desc = e.getDescription();
                 if (desc != null) {
-                    CompletionDocumentation doc = currentDocumentation.resolveLink(desc);
-                    if (doc == null) {
-                        try {
-                            URL url = currentDocumentation.getURL();
-                            url = url != null ? new URL(url, desc) : new URL(desc);
-                            doc = new DefaultDoc(url);
-                        } catch (MalformedURLException ex) {
+                    if ( desc.startsWith( "https://github.com/" ) ) {
+                        DataSourceUtil.openBrowser(desc);
+                    } else {
+                        CompletionDocumentation doc = currentDocumentation.resolveLink(desc);
+                        if (doc == null) {
+                            try {
+                                URL url = currentDocumentation.getURL();
+                                url = url != null ? new URL(url, desc) : new URL(desc);
+                                doc = new DefaultDoc(url);
+                            } catch (MalformedURLException ex) {
+                            }
                         }
-                    }
-                    if (doc != null) {
-                        setData(doc);
+                        if (doc != null) {
+                            setData(doc);
+                        }
                     }
                 }
             }
