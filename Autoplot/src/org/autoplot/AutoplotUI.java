@@ -4876,9 +4876,9 @@ private void updateFrameTitle() {
             }
         }, AWTEvent.KEY_EVENT_MASK );
         
-        if ( Runtime.getRuntime().totalMemory() < 256E6 ) { // 
-            throw new IllegalArgumentException("Autoplot needs at least 256MB of memory to run.");
-        }
+        //if ( Runtime.getRuntime().totalMemory() < 256E6 ) { // 
+        //    throw new IllegalArgumentException("Autoplot needs at least 256MB of memory to run.");
+        //}
         
         //I get a message on the stdout and sometimes as a popup containing:
         //   (at java.util.TimSort.mergeHi(TimSort.java:895))
