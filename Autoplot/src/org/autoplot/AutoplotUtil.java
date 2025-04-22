@@ -679,6 +679,9 @@ public class AutoplotUtil {
                 w.println("# Enable HAPI Caching.");
                 w.println("#hapiServerCache=true");
                 w.println("");
+                w.println("# Enable Flat LAF, a consistent Look and Feel which can be run on any platform");
+                w.println("#flatLAF=true");
+                w.println("");
                 w.close();
             } catch ( IOException ex ) {
                 logger.log(Level.WARNING, "write initial {0} failed.  {1}", new Object[] { propFile, ex } );
