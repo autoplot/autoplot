@@ -638,7 +638,7 @@ public class AutoplotUtil {
         File propFile= new File( config, "system.properties" );
         if ( !propFile.exists() ) {
             try (PrintWriter w = new PrintWriter( new FileWriter( propFile ) )) {
-                w.println("# Autoplot loads these system properties on startup.  See http://autoplot.org/systemProperties");
+                w.println("# Autoplot loads these system properties on startup.  See https://github.com/autoplot/documentation/blob/main/md/systemProperties.md");
                 w.println("");
                 w.println("# reference cache allows some URIs to be resolved once per plot.");
                 w.println("#enableReferenceCache=true");
