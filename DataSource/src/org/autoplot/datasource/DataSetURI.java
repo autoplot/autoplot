@@ -2445,7 +2445,9 @@ public class DataSetURI {
                     if (dontYetHave == false) {
                         continue;  // skip it
                     }
-                    result.add(new CompletionResult(ss, cc1.label, cc1.doc, surl1.substring(0, carotPos), cc1.maybePlot));
+                    //result.add(new CompletionResult(ss, cc1.label, cc1.doc, surl1.substring(0, carotPos), cc1.maybePlot));
+                    String label= cc1.label.startsWith( cc1.completable ) ?  cc1.label : ( cc1.completable+ ": "+ cc1.label );
+                    result.add(new CompletionResult(ss, label, cc1.doc, surl1.substring(0, carotPos), cc1.maybePlot));
                     i = i + 1;
                 }
 
@@ -2473,7 +2475,8 @@ public class DataSetURI {
                 if ( cc1.completable.startsWith(cc.completable)) {
                     String ss= CompletionContext.insert(cc, cc1);
                     if ( split.vapScheme!=null && !ss.startsWith( split.vapScheme ) ) ss = split.vapScheme + ":" + ss;
-                    result.add(new CompletionResult(ss, cc1.label, cc1.doc, surl1.substring(0, carotPos), cc1.maybePlot));
+                    String label= cc1.label.startsWith( cc1.completable ) ?  cc1.label : ( cc1.completable+ ": "+ cc1.label );
+                    result.add(new CompletionResult(ss,  label, cc1.doc, surl1.substring(0, carotPos), cc1.maybePlot));
                     i = i + 1;
                 }
 
