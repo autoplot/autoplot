@@ -5141,15 +5141,24 @@ private void updateFrameTitle() {
         
         if ( !headless ) {
             try {
-                if ( alm.getBooleanValue("flatLAF")==true ) {
+                if ( System.getProperty("flatLAF","false").equals("true") ) {
                     UIManager.setLookAndFeel( new FlatLightLaf() );
                     UIManager.put( "TabbedPane.selectedBackground", Color.white );
                     UIManager.put( "ScrollBar.showButtons", true );
-                } else if ( nativeLAF ) {
-                    logger.fine("nativeLAF");
-                    String s= javax.swing.UIManager.getSystemLookAndFeelClassName();
-                    javax.swing.UIManager.setLookAndFeel(s);
+                        
+                } else {
+                                    
+                    if ( alm.getBooleanValue("flatLAF")==true ) {
+                        UIManager.setLookAndFeel( new FlatLightLaf() );
+                        UIManager.put( "TabbedPane.selectedBackground", Color.white );
+                        UIManager.put( "ScrollBar.showButtons", true );
+                    } else if ( nativeLAF ) {
+                        logger.fine("nativeLAF");
+                        String s= javax.swing.UIManager.getSystemLookAndFeelClassName();
+                        javax.swing.UIManager.setLookAndFeel(s);
+                    }
                 }
+                
             } catch ( ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e ) {
                 logger.log( Level.SEVERE, e.getMessage(), e );
             }
