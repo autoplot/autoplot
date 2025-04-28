@@ -15,7 +15,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Verify that rarely-used OpenDAP plugin still works by pointing Autoplot at a .dds file.</small></p>
+        <p><small>New general-purpose polar plot is coming.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,6 +30,9 @@
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
         <p>Bugfixes (2025-04-19 r28214):</p>
+        <ul>
+        </ul>
+        <p>Older Bugfixes (2025-03-27 r28157):</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2695/">2695</a>: Temporarily disable the sanity check on amount of memory available.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2692/">2692</a>: Jython editor "search for examples on github" action opens a new browser.
@@ -51,19 +54,11 @@
             <li><a href="https://github.com/das-developers/das2java/issues/126">0126</a>: Commented test code from review of FFTPower removed.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2688/">2688</a>: clean up getDataSet('URI') when entered into address bar, providing convenient way to test URIs in scripts.
         </ul>
-        <p>Older Bugfixes (2025-03-27 r28157):</p>
-        <ul>
-            <li>Clean up bugs in servlet's <a href="https://cottagesystems.com/AutoplotServlet/URI_Templates.jsp">URI_Templates</a> demonstration, which was broken when script security was tightened.
-            <li>New code in PDS3 library for finding the volume root allows more datasets to be read in.
-            <li>Correct target URL for help links ([?]) within tabs.  Thanks, Erika!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2687/">2687</a>: trigger a repaint in slice mouse action when axis units are changed.  Thanks, Connor!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/1359/">1359</a>: redo code which implements the scan next and scan previous.  Thanks, Larry!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2685/">2685</a>: check for unbelievable valid_max in PDS4 (mvn_sta_l2_c6-32e64m_20141013_v02_r01.xml)
-            <li>FiltersChainPanel should always use unbundle('X') and not just 'X'.
-            <li>Remove unneeded decimal point from "0." tick when exponents are shown otherwise.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2684/">2684</a>: don't drop title in fft operation
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li>Add copy filename to clipboard action in the cache tool.
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>Add flatLAF to config/system.properties so that one can always get flatLAF on Linux.
             <li>DataSetBuilder nextRecord method accepts Color object and inserts Datum with rgbColor units.
@@ -72,12 +67,6 @@
             <li><a href="https://github.com/das-developers/das2java/issues/127">127</a>: support two-index array of complex numbers in crossProduct and complexConj.
             <li>fftPower now allows missing timetags, using indgen for tags.
             <li>filename=T control for aggregation will return the filename for each data point.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>Scan buttons indicate the amount of the scan (e.g. seconds to next burst).
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/840/">840</a>: Initial support for jsonl data files, returned by the NEST and other devices.
-            <li>Various improvements to the SimpleServlet, including support for named colors, drawGrid option and tooltips in the GUI.
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
