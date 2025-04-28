@@ -7,6 +7,11 @@ package com.cottagesystems.jdiskhog;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseListener;
 import java.io.BufferedWriter;
@@ -126,6 +131,28 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
         };
     }
 
+    Action getCopyClipboardAction(final JTree jtree) {
+        return new AbstractAction("Copy to Filename to Clipboard") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);
+                
+                File f = getSelectedFile(jTree1);
+                if ( f==null ) return;
+                String sf = f.toString();
+                String outsideName= outsideName( sf );     
+                
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clipboard.setContents(  new StringSelection( sf ), new ClipboardOwner() {
+                    @Override
+                    public void lostOwnership(Clipboard clipboard, Transferable contents) {
+                    }
+                } );
+            }
+
+        };
+    }
+
     Action getPlotAction(final JTree jtree) {
         return new AbstractAction("Plot") {
             @Override
@@ -141,7 +168,7 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
 
         };
     }
-
+    
     /**
      * return null or the url of the folder.
      * @param sf
@@ -291,7 +318,7 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
         CopyToAction a= new CopyToAction(getSelectedFile(jtree),jtree);
         return a;
     }
-
+    
     private boolean writeROCacheLink( File src, File dest ) throws IOException {
         try (BufferedWriter write = new BufferedWriter( new OutputStreamWriter( new FileOutputStream( new File( src, "ro_cache.txt" ) ), "UTF-8" ) )) {
             write.append( dest.toString() );
