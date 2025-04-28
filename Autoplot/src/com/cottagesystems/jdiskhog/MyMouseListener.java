@@ -66,6 +66,10 @@ public class MyMouseListener extends MouseAdapter {
         mi.setToolTipText( "Make a copy of files or folders to location outside of file cache." );
         popup.add(mi);
 
+        mi= new JMenuItem( panel.getCopyClipboardAction(jtree) );
+        mi.setToolTipText( "Copy the name to the system clipboard." );
+        popup.add(mi);
+
         mi= new JMenuItem( panel.getLocalROCacheAction(jtree) );
         mi.setToolTipText( "Specify a local copy of the remote files, and use files from here before downloading." );
         popup.add(mi);
