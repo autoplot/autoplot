@@ -1522,7 +1522,11 @@ public class ApplicationController extends DomNodeController implements RunLater
             // the logic for columns is different because we optimize the application for a stack of time
             // series.
             if ( direction==null || direction==LayoutConstants.ABOVE || direction==LayoutConstants.BELOW ) {
-                domColumn= c.marginColumn;
+                if ( focus!=null ) {
+                    domColumn= ccontroller.getColumnFor(focus);
+                } else {
+                    domColumn= c.marginColumn;
+                }
             } else {
                 if ( focus!=null && ccontroller.getColumnFor(focus)==c.marginColumn ) {
                     String srcColumn;
