@@ -344,9 +344,13 @@ public class LayoutPanel extends javax.swing.JPanel {
                     int nr= (Integer)dia.getNumberOfRowsSpinner().getValue();
                     int nc= (Integer)dia.getNumberOfColumnsSpinner().getValue();
                     if ( nr>6 || nc>6 ) {
-                        JOptionPane.showMessageDialog( LayoutPanel.this, "No more than 6 rows or columns can be added at once.");
+                        AutoplotUtil.showMessageDialog( LayoutPanel.this, "No more than 6 rows or columns can be added at once.");
                     } else {
                         Plot p= dom.getController().getPlot();
+                        if ( !p.getColumnId().equals( dom.getController().getCanvas().getMarginColumn().getId() ) ) {
+                            AutoplotUtil.showMessageDialog(dia, "plots can only be added when the plot column is the margin column");
+                            return;
+                        }
                         dom.getController().addPlots( nr,nc, dia.getDirection() );
                         if ( dia.getDirection()==null ) {
                             dom.getController().deletePlot(p);
