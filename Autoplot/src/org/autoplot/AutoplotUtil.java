@@ -1678,6 +1678,15 @@ public class AutoplotUtil {
     }
     
     /**
+     * Show message with OK option.
+     * @param parentComponent the parent
+     * @param message the message
+     */
+    public static void showMessageDialog( Component parentComponent, Object message ) {
+        showMessageDialog(parentComponent, message,"Message",JOptionPane.OK_OPTION);
+    }
+    
+    /**
      * Wrapper for displaying ok,cancel dialogs.  
      * If the message is a component, then the dialog will be resizeable.
      * @param parentComponent determines the Frame in which the dialog is displayed; if null, or if the parentComponent has no Frame, a default Frame is used
