@@ -34,6 +34,8 @@ public class GenericReader extends MetaData {
     void setImpl(CDFImpl impl) {thisCDF = impl;}
     /**
      * Constructs a reader for the given CDF file.
+     * @param string
+     * @throws gov.nasa.gsfc.spdf.cdfj.CDFException.ReaderError
      */
     public GenericReader(String cdfFile) throws CDFException.ReaderError {
         LOGGER.entering("GenericReader","constructor",cdfFile);
@@ -48,10 +50,7 @@ public class GenericReader extends MetaData {
         try {
             thisCDF = CDFFactory.getCDF(cdfFile);
         } catch (Throwable th) {
-            if ( th instanceof IllegalArgumentException && th.getMessage().contains("CDF file is not GZIP compressed") ) {
-                throw new CDFException.ReaderError(th.getMessage()+": "+cdfFile,th);
-            }
-            throw new CDFException.ReaderError(th);
+            throw new CDFException.ReaderError(th.getMessage());
         }
         LOGGER.exiting("GenericReader","constructor");
         //setup();
@@ -61,12 +60,14 @@ public class GenericReader extends MetaData {
     }
     /**
      * Constructs a reader for the given CDF URL.
+     * @param url
+     * @throws gov.nasa.gsfc.spdf.cdfj.CDFException.ReaderError
      */
     public GenericReader(URL url) throws CDFException.ReaderError {
         try {
             thisCDF = CDFFactory.getCDF(url);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th);
+            throw new CDFException.ReaderError(th.getMessage());
         }
         //setup();
     }
@@ -100,7 +101,7 @@ public class GenericReader extends MetaData {
             }
             return method.invoke(null, new Object [] {thisCDF, var});
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th);
+            throw new CDFException.ReaderError(th.getMessage());
         }
     }
 
@@ -127,7 +128,7 @@ public class GenericReader extends MetaData {
         try {
             return thisCDF.getLong(varName);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th);
+            throw new CDFException.ReaderError(th.getMessage());
         }
     }
 
@@ -158,7 +159,7 @@ public class GenericReader extends MetaData {
             }
             return da;
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th);
+            throw new CDFException.ReaderError(th.getMessage());
         }
     }
 
@@ -178,8 +179,8 @@ public class GenericReader extends MetaData {
                     ndim + "(" + varName + ") for " + ndim +
                     "-dimensional variable " + varName);
             return (double[][])get(varName);
-        } catch (Throwable th) {
-            throw new CDFException.ReaderError(th);
+        } catch (CDFException.ReaderError th) {
+            throw new CDFException.ReaderError(th.getMessage());
         }
     }
 
@@ -199,8 +200,8 @@ public class GenericReader extends MetaData {
                     ndim + "(" + varName + ") for " + ndim +
                     "-dimensional variable " + varName);
             return (double[][][])get(varName);
-        } catch (Throwable th) {
-            throw new CDFException.ReaderError(th);
+        } catch (CDFException.ReaderError th) {
+            throw new CDFException.ReaderError(th.getMessage());
         }
     }
 
@@ -220,8 +221,8 @@ public class GenericReader extends MetaData {
                     ndim + "(" + varName + ") for " + ndim +
                     "-dimensional variable " + varName);
             return (double[][][][])get(varName);
-        } catch (Throwable th) {
-            throw new CDFException.ReaderError(th);
+        } catch (CDFException.ReaderError th) {
+            throw new CDFException.ReaderError(th.getMessage());
         }
     }
 
@@ -247,7 +248,7 @@ public class GenericReader extends MetaData {
         try {
             return (double[])thisCDF.getOneD(varName, columnMajor);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th);
+            throw new CDFException.ReaderError(th.getMessage());
         }
     }
 
@@ -281,10 +282,9 @@ public class GenericReader extends MetaData {
                 return thisCDF.getRange(varName, first, last);
             }
             return method.invoke(null,
-                new Object[] {thisCDF, var, new Integer(first),
-                new Integer(last)});
+                new Object[] {thisCDF, var, first, last});
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th);
+            throw new CDFException.ReaderError(th.getMessage());
         }
     }
 
@@ -313,7 +313,7 @@ public class GenericReader extends MetaData {
             return (double[]) thisCDF.getRangeOneD(varName, first, last,
             columnMajor);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th);
+            throw new CDFException.ReaderError(th.getMessage());
         }
     }
 /*
@@ -325,7 +325,7 @@ public class GenericReader extends MetaData {
         try {
             return thisCDF.get1D(varName, first, last, stride);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th);
+            throw new CDFException.ReaderError(th.getMessage());
         }
     }
 */
@@ -334,6 +334,7 @@ public class GenericReader extends MetaData {
      * variable of numeric types other than INT8 or TT2000.
      * @param    varName   variable name
      * @param    component   component
+     * @return 
      * @throws CDFException.ReaderError for character, INT8 or TT2000 types,
      * and if the variable's effective rank is not 1.
      * @see #get(String varName)
@@ -350,9 +351,9 @@ public class GenericReader extends MetaData {
                 return (double[])thisCDF.get(varName, component);
             }
             return (double[])method.invoke(null,
-                new Object[] {thisCDF, var, new Integer(component)});
+                new Object[] {thisCDF, var, component});
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th);
+            throw new CDFException.ReaderError(th.getMessage());
         }
     }
 
@@ -361,6 +362,7 @@ public class GenericReader extends MetaData {
      * variable of numeric types other than INT8 or TT2000.
      * @param    varName   variable name
      * @param    components   array containg components to be extracted
+     * @return 
      * @throws CDFException.ReaderError for character, INT8 or TT2000 types,
      * and if the variable's effective rank is not 1.
      * @see #get(String varName)
@@ -379,7 +381,7 @@ public class GenericReader extends MetaData {
             return (double[][])method.invoke(null,
                 new Object[] {thisCDF, var, components});
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th);
+            throw new CDFException.ReaderError(th.getMessage());
         }
     }
 
@@ -391,6 +393,7 @@ public class GenericReader extends MetaData {
      * @param    first     first record of range
      * @param    last     last record of range
      * @param    component   component
+     * @return 
      * @throws CDFException.ReaderError for character, INT8 or TT2000 types,
      * and if the variable's effective rank is not 1.
      * @see #getRange(String varName, int first, int last)
@@ -408,10 +411,9 @@ public class GenericReader extends MetaData {
                 component);
             }
             return (double[])method.invoke(null,
-                new Object[] {thisCDF, var, new Integer(first),
-                new Integer(last), new Integer(component)});
+                new Object[] {thisCDF, var, first, last, component});
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th);
+            throw new CDFException.ReaderError(th.getMessage());
         }
     }
 
@@ -423,6 +425,7 @@ public class GenericReader extends MetaData {
      * @param    first     first record of range
      * @param    last     last record of range
      * @param    components   components
+     * @return 
      * @throws CDFException.ReaderError for character, INT8 or TT2000 types,
      * and if the variable's effective rank is not 1.
      * @see #getRange(String varName, int first, int last)
@@ -440,10 +443,9 @@ public class GenericReader extends MetaData {
                 components);
             }
             return (double[][])method.invoke(null,
-                new Object[] {thisCDF, var, new Integer(first),
-                new Integer(last), components});
+                new Object[] {thisCDF, var, first, last, components});
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th);
+            throw new CDFException.ReaderError(th.getMessage());
         }
     }
 
@@ -471,7 +473,7 @@ public class GenericReader extends MetaData {
             return startContainerThread(varName, targetType, recordRange,
             preserve, ByteOrder.nativeOrder());
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th);
+            throw new CDFException.ReaderError(th.getMessage());
         }
     }
 
@@ -512,6 +514,9 @@ public class GenericReader extends MetaData {
     /**
      * Returns  whether the named thread (started via this object) has
      * finished.
+     * @param threadName
+     * @return 
+     * @throws gov.nasa.gsfc.spdf.cdfj.CDFException.ReaderError 
      */
     public final boolean threadFinished(String threadName) throws
         CDFException.ReaderError {
@@ -525,8 +530,10 @@ public class GenericReader extends MetaData {
     }
 
     /**
-     * Returns data extracted by the named thread as ByteBuffer.
-     * After this method returns the ByteBuffer, threadName is forgotten.
+     * Returns data extracted by the named thread as ByteBuffer.After this method returns the ByteBuffer, threadName is forgotten.
+     * @param threadName
+     * @return
+     * @throws java.lang.Throwable
      */ 
     public final ByteBuffer getBuffer(String threadName) throws Throwable {
         if (threadFinished(threadName)) {
@@ -537,7 +544,7 @@ public class GenericReader extends MetaData {
                 try {
                     buffer = container.getBuffer();
                 } catch (Throwable th) {
-                    throw new CDFException.ReaderError(th);
+                    throw new CDFException.ReaderError(th.getMessage());
                 }
                 threadMap.remove(threadName);
                 return buffer;
@@ -551,6 +558,10 @@ public class GenericReader extends MetaData {
     /**
      * Returns data extracted by the named thread as a one dimensional
      * array, organized according to specified row majority..
+     * @param threadName
+     * @param columnMajor
+     * @return 
+     * @throws gov.nasa.gsfc.spdf.cdfj.CDFException.ReaderError 
      */ 
     public final Object getOneDArray(String threadName, boolean columnMajor)
         throws CDFException.ReaderError {
@@ -563,7 +574,7 @@ public class GenericReader extends MetaData {
                 try {
                     array = container.asOneDArray(columnMajor);
                 } catch (Throwable th) {
-                    throw new CDFException.ReaderError(th);
+                    throw new CDFException.ReaderError(th.getMessage());
                 }
                 threadMap.remove(threadName);
                 return array;
@@ -575,16 +586,18 @@ public class GenericReader extends MetaData {
     }
 
     /**
-     * Returns specified data as ByteBuffer of specified type.
-     * Order of the ByteBuffer is 'native'. Data is organized according to
-     * storage model of the variable returned by rowMajority(). A DirectBuffer
-     * is allocated.
+     * Returns specified data as ByteBuffer of specified type.Order of the ByteBuffer is 'native'.Data is organized according to
+ storage model of the variable returned by rowMajority().
+     * A DirectBuffer
+ is allocated.
      * @param    varName   variable name
      * @param    targetType  desired type of extracted data
      * @param    recordRange 
      * @param    preserve    specifies whether the target must preserve
      *                       precision. if false, possible loss of precision
      *                       is deemed acceptable.
+     * @return 
+     * @throws gov.nasa.gsfc.spdf.cdfj.CDFException.ReaderError 
      */
     public final ByteBuffer getBuffer(String varName,  String  targetType,
         int[] recordRange, boolean preserve) throws CDFException.ReaderError {
@@ -592,9 +605,8 @@ public class GenericReader extends MetaData {
     }
 
     /**
-     * Returns specified data as ByteBuffer of specified type.
-     * Order of the ByteBuffer is 'native'. Data is organized according to
-     * storage model of the variable returned by rowMajority().
+     * Returns specified data as ByteBuffer of specified type.Order of the ByteBuffer is 'native'.Data is organized according to
+ storage model of the variable returned by rowMajority().
      * @param    varName   variable name
      * @param    targetType  desired type of extracted data
      * @param    recordRange 
@@ -604,6 +616,8 @@ public class GenericReader extends MetaData {
      * @param    useDirect   specifies whether a DirectBuffer should be used.
      *                       if set to false, an array backed buffer will be
      *                       allocated.
+     * @return 
+     * @throws gov.nasa.gsfc.spdf.cdfj.CDFException.ReaderError 
      */ 
     public final ByteBuffer getBuffer(String varName,  String  targetType,
         int[] recordRange, boolean preserve, boolean useDirect) throws
@@ -612,7 +626,7 @@ public class GenericReader extends MetaData {
         try {
             type = getContainerClass(targetType);
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th);
+            throw new CDFException.ReaderError(th.getMessage());
         }
         if (!isCompatible(varName, type, preserve)) throw
             new CDFException.ReaderError("Requested type " + targetType +
@@ -622,7 +636,7 @@ public class GenericReader extends MetaData {
             container = getContainer(varName, type,
             recordRange, preserve, ByteOrder.nativeOrder());
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th);
+            throw new CDFException.ReaderError(th.getMessage());
         }
         container.setDirect(useDirect);
         container.run();
@@ -641,6 +655,8 @@ public class GenericReader extends MetaData {
      * @param   columnMajor specifies whether the returned array conforms
      * to a columnMajor storage mode, i.e. the first index of a multi
      * dimensional array varies the fastest.
+     * @return 
+     * @throws gov.nasa.gsfc.spdf.cdfj.CDFException.ReaderError 
      */ 
     public final Object getOneDArray(String varName, String targetType,
         int[] recordRange, boolean preserve, boolean columnMajor) throws
@@ -651,7 +667,7 @@ public class GenericReader extends MetaData {
             container = getContainer(varName, type,
             recordRange, preserve, ByteOrder.nativeOrder());
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th);
+            throw new CDFException.ReaderError(th.getMessage());
         }
         container.run();
         return container.asOneDArray(columnMajor);
@@ -700,15 +716,23 @@ public class GenericReader extends MetaData {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public final boolean sourceIsFile() {return thisCDF.getSource().isFile();}
 
     /**
      * Returns the name of the source CDF
+     * @return 
      */
     public final String getSource() {return thisCDF.getSource().getName();}
 
     /**
      * Returns whether a variable is scalar.
+     * @param varName
+     * @return 
+     * @throws gov.nasa.gsfc.spdf.cdfj.CDFException.ReaderError 
      */
     public final boolean isScalar(String varName) throws
         CDFException.ReaderError {
@@ -717,6 +741,9 @@ public class GenericReader extends MetaData {
 
     /**
      * Returns whether a variable is vector.
+     * @param varName
+     * @return 
+     * @throws gov.nasa.gsfc.spdf.cdfj.CDFException.ReaderError 
      */
     public final boolean isVector(String varName) throws
         CDFException.ReaderError {
@@ -733,6 +760,7 @@ public class GenericReader extends MetaData {
      * @return  String   user supplied name, or null if none 
      * @throws   CDFException.ReaderError  if variable does not exist
      */
+    @Override
     public String userTimeVariableName(String varName) throws
         CDFException.ReaderError {
         if (!existsVariable(varName)) throw new CDFException.ReaderError(
@@ -751,22 +779,22 @@ public class GenericReader extends MetaData {
         if (cl == null) throw new Throwable("Invalid type " + type);
         BaseVarContainer container = null;
         Variable var = thisCDF.getVariable(varName);
-        if (type == "float") {
+        if ("float".equals(type)) {
             container = new FloatVarContainer(thisCDF, var, range, preserve);
         }
-        if (type == "double") {
+        if ("double".equals(type)) {
             container = new DoubleVarContainer(thisCDF, var, range, preserve);
         }
-        if (type == "int") {
+        if ("int".equals(type)) {
             container = new IntVarContainer(thisCDF, var, range, preserve);
         }
-        if (type == "short") {
+        if ("short".equals(type)) {
             container = new ShortVarContainer(thisCDF, var, range, preserve);
         }
-        if (type == "byte") {
+        if ("byte".equals(type)) {
             container = new ByteVarContainer(thisCDF, var, range);
         }
-        if (type == "long") {
+        if ("long".equals(type)) {
             container = new LongVarContainer(thisCDF, var, range);
         }
 /*
@@ -796,6 +824,7 @@ public class GenericReader extends MetaData {
      * Returns sampled values of a  numeric variable as one dimensional
      * array of specified type and storage model.
      * @param    varName   variable name
+     * @param range
      * @param    stride    array of length 1 where value specifies stride
      * @param    type  desired type of extracted data - one of
      *                 the following: "long", "double", "float", "int", "short",
@@ -806,6 +835,8 @@ public class GenericReader extends MetaData {
      * @param   columnMajor specifies whether the returned array conforms
      * to a columnMajor storage mode, i.e. the first index of a multi
      * dimensional array varies the fastest.
+     * @return 
+     * @throws gov.nasa.gsfc.spdf.cdfj.CDFException.ReaderError 
      */
     public Object getSampled(String varName, int[] range, 
         int stride, String type, boolean preserve, boolean columnMajor) throws 
@@ -817,22 +848,25 @@ public class GenericReader extends MetaData {
                    new int[] {-1, -stride};
             return container.asOneDArray(columnMajor, new Stride(_stride));
         } catch (Throwable t) {
-            throw new CDFException.ReaderError(t);
+            throw new CDFException.ReaderError(t.getMessage());
         }
     }
     /**
      * Returns sampled values of a  numeric variable as one dimensional
-     * array of specified type.
-     * Data for records is organized according to the storage model of the
-     * variable (as returned by rowMajority()).
+     * array of specified type.Data for records is organized according to the storage model of the
+ variable (as returned by rowMajority()).
      * @param    varName   variable name
+     * @param first
      * @param    stride    array of length 1 where value specifies stride
+     * @param last
      * @param    type  desired type of extracted data - one of
      *                 the following: "long", "double", "float", "int", "short",
      *                 or "byte"
      * @param    preserve    specifies whether the target must preserve
      *                       precision. if false, possible loss of precision
      *                       is deemed acceptable.
+     * @return 
+     * @throws gov.nasa.gsfc.spdf.cdfj.CDFException.ReaderError 
      */
     public Object getSampled(String varName, int first, int last,
         int stride, String type, boolean preserve) throws 
@@ -844,15 +878,15 @@ public class GenericReader extends MetaData {
                    new int[] {-1, -stride};
             return container.asSampledArray(new Stride(_stride));
         } catch (Throwable t) {
-            throw new CDFException.ReaderError(t);
+            throw new CDFException.ReaderError(t.getMessage());
         }
     }
 
-    private static final boolean coreNeeded(Variable var) {
+    private static boolean coreNeeded(Variable var) {
         return var.isMissingRecords();
     }
 
-    private static final boolean coreNeeded(Variable var, int[] range) {
+    private static boolean coreNeeded(Variable var, int[] range) {
         int[] available = var.getRecordRange();
         if (range.length == 1) {
             if (range[0] >= available[0]) {
@@ -893,6 +927,15 @@ public class GenericReader extends MetaData {
         }
         throw new Throwable("Invalid type ");
     }
+
+    /**
+     *
+     * @param varName
+     * @param targetType
+     * @param recordRange
+     * @return
+     * @throws CDFException.ReaderError
+     */
     public final int getBufferCapacity(String varName,  String  targetType,
         int[] recordRange) throws CDFException.ReaderError {
         VDataContainer container = null;
@@ -901,10 +944,21 @@ public class GenericReader extends MetaData {
             container = getContainer(varName, type,
             recordRange, false, ByteOrder.nativeOrder());
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th);
+            throw new CDFException.ReaderError(th.getMessage());
         }
         return container.getCapacity();
     }
+
+    /**
+     *
+     * @param varName
+     * @param targetType
+     * @param recordRange
+     * @param preserve
+     * @param buffer
+     * @return
+     * @throws CDFException.ReaderError
+     */
     public final ByteBuffer getBuffer(String varName,  String  targetType,
         int[] recordRange, boolean preserve, ByteBuffer buffer) throws
         CDFException.ReaderError {
@@ -914,7 +968,7 @@ public class GenericReader extends MetaData {
             container = getContainer(varName, type,
             recordRange, preserve, ByteOrder.nativeOrder());
         } catch (Throwable th) {
-            throw new CDFException.ReaderError(th);
+            throw new CDFException.ReaderError(th.getMessage());
         }
         container.setUserBuffer(buffer);
         container.run();

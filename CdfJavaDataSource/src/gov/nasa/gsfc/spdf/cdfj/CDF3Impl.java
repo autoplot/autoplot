@@ -1,9 +1,6 @@
 package gov.nasa.gsfc.spdf.cdfj;
-
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.nio.channels.FileChannel;
-
+import java.nio.*;
+import java.nio.channels.*;
 final class CDF3Impl extends CDFImpl implements CDF3, java.io.Serializable {
     public long GDROffset;
     FileChannel fc;
@@ -44,12 +41,6 @@ final class CDF3Impl extends CDFImpl implements CDF3, java.io.Serializable {
         zVDRHead = buf.getLong();
         ADRHead = buf.getLong();
         long CDFSize = buf.getLong();
-        if ( buf.capacity()<CDFSize ) {
-            //throw new Throwable("file appears to be truncated, as the header says it should contain " + CDFSize + "bytes." );
-            //TODO: check to see if just the headers were read in.
-            CDFReader.logger.fine("the entire file has not been mapped into memory");
-        }
-        // String.format( "buf.capacity - eof: %d", buf.capacity() - CDFSize ) );
         numberOfRVariables = buf.getInt();
         numberOfAttributes = buf.getInt();
         buf.getInt(); // skip rMaxRec
@@ -81,8 +72,8 @@ final class CDF3Impl extends CDFImpl implements CDF3, java.io.Serializable {
         offset_NEXT_ADR = OFFSET_NEXT_ADR;
         offset_ATTR_NAME = ATTR_OFFSET_NAME;
         offset_SCOPE = OFFSET_SCOPE;
-        offset_AgrEDRHead = AgrEDRHead_OFFSET;
-        offset_AzEDRHead = AzEDRHead_OFFSET;
+        offset_AgrEDRHead = AGR_EDRHEAD_OFFSET;
+        offset_AzEDRHead = AZ_EDRHEAD_OFFSET;
         offset_NEXT_AEDR = OFFSET_NEXT_AEDR;
         offset_ENTRYNUM = OFFSET_ENTRYNUM;
         offset_ATTR_DATATYPE = ATTR_OFFSET_DATATYPE;
@@ -92,10 +83,13 @@ final class CDF3Impl extends CDFImpl implements CDF3, java.io.Serializable {
         offset_VAR_NUM_ELEMENTS = VAR_OFFSET_NUM_ELEMENTS;
         offset_NUM = OFFSET_NUM;
         offset_FLAGS = OFFSET_FLAGS;
-        offset_sRecords = OFFSET_sRecords;
+        offset_sRecords = OFFSET_SRECORDS;
+        offset_CPR_offset = OFFSET_CPR_OFFSET;
+        offset_cType = OFFSET_COMPRESSION_TYPE;
+        offset_cParm = OFFSET_COMPRESSION_PARM;
         offset_BLOCKING_FACTOR = OFFSET_BLOCKING_FACTOR;
         offset_VAR_DATATYPE = VAR_OFFSET_DATATYPE;
-        offset_zNumDims = OFFSET_zNumDims;
+        offset_zNumDims = OFFSET_Z_NUMDIMS;
         offset_FIRST_VXR = OFFSET_FIRST_VXR;
         offset_NEXT_VXR = OFFSET_NEXT_VXR;
         offset_NENTRIES = OFFSET_NENTRIES;
@@ -107,6 +101,7 @@ final class CDF3Impl extends CDFImpl implements CDF3, java.io.Serializable {
         offset_CDATA = OFFSET_CDATA;
     }
 
+    @Override
     public String getString(long offset)  {
         if (fc == null) return getString(offset, MAX_STRING_SIZE);
         ByteBuffer _buf;
@@ -119,28 +114,26 @@ final class CDF3Impl extends CDFImpl implements CDF3, java.io.Serializable {
         return getString(_buf, MAX_STRING_SIZE);
     }
 
+    @Override
     public int lowOrderInt(ByteBuffer buf) {
         return (int)buf.getLong();
     }
 
+    @Override
     public int lowOrderInt(ByteBuffer buf, int offset) {
         return (int)buf.getLong(offset);
     }
 
+    @Override
     protected ByteBuffer getRecord(long offset)  {
         if (fc == null) return super.getRecord(offset);
-        ByteBuffer lenBuf = ByteBuffer.allocate(8);
+        ByteBuffer lenBuf = ByteBuffer.allocate(4);
         synchronized (fc) {
             try {
-                fc.position((long)offset);
+                fc.position((long)offset + 4);
                 fc.read(lenBuf);
-                long size = lenBuf.getLong(0);
-                if ( size>Integer.MAX_VALUE ) {
-                    throw new IllegalArgumentException("blocks longer than 2**32 are not supported.");
-                }
-                return getRecord(offset, (int)size);
-            } catch ( RuntimeException ex ) {
-                throw ex;
+                int size = lenBuf.getInt(0);
+                return getRecord(offset, size);
             } catch (Throwable ex) {
                 ex.printStackTrace();
                 return null;
@@ -160,6 +153,7 @@ final class CDF3Impl extends CDFImpl implements CDF3, java.io.Serializable {
         return bb;
     }
 
+    @Override
     public long longInt(ByteBuffer buf) {
         return buf.getLong();
     }

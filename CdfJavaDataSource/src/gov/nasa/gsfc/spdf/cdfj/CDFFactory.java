@@ -1,25 +1,50 @@
 package gov.nasa.gsfc.spdf.cdfj;
+
 import java.nio.*;
 import java.io.*;
 import java.net.*;
 import java.nio.channels.*;
 import java.util.zip.*;
 import java.util.*;
+
 /**
  * CDFFactory creates an instance of CDFImpl from a CDF source.
  * The source CDF can  be a file, a byte array, or a URL.
  */
 public final class CDFFactory {
+
+    /**
+     *
+     */
     public static final long CDF3_MAGIC =((long)0xcdf3 << 48) +
         ((long)0x0001 << 32) + 0x0000ffff;
+
+    /**
+     *
+     */
     public static final long CDF3_COMPRESSED_MAGIC =((long)0xcdf3 << 48) +
         ((long)0x0001 << 32) + 0x00000000cccc0001l;
+
+    /**
+     *
+     */
     public static final long CDF2_MAGIC =((long)0xcdf2 << 48) +
         ((long)0x0001 << 32) + 0x0000ffff;
+
+    /**
+     *
+     */
     public static final long CDF2_MAGIC_DOT5 = ((long)0x0000ffff << 32) +
          0x0000ffff;
     static Map cdfMap = Collections.synchronizedMap(new WeakHashMap());
     static Long maxMappedMemory;
+
+    public static final long NO_COMPRESSION = 0L;
+    public static final long RLE_COMPRESSION = 1L;
+    public static final long HUFF_COMPRESSION = 2L;
+    public static final long AHUFF_COMPRESSION = 3L;
+    public static final long GZIP_COMPRESSION = 5L;
+ 
 
     private CDFFactory() {
     }
@@ -86,6 +111,9 @@ public final class CDFFactory {
     }
     /**
      * creates  CDFImpl object from a file.
+     * @param fname
+     * @return 
+     * @throws java.lang.Throwable 
      */
     public static CDFImpl getCDF(String fname) throws Throwable {
         return getCDF(fname, false);
@@ -96,14 +124,12 @@ public final class CDFFactory {
         clean();
         File file = new File(fname);
         final String _fname = file.getPath();
-        FileInputStream fis = new FileInputStream(file);
-        FileChannel ch = fis.getChannel();
-        ByteBuffer buf = ch.map(FileChannel.MapMode.READ_ONLY, 0, ch.size());
-        fis.close();
-        CDFImpl cdf = getVersion(buf);
-        if ( cdf==null ) {
-            throw new CDFException.ReaderError("File is not a CDF-format file: "+fname);
+        ByteBuffer buf;
+        try (FileInputStream fis = new FileInputStream(file)) {
+            FileChannel ch = fis.getChannel();
+            buf = ch.map(FileChannel.MapMode.READ_ONLY, 0, ch.size());
         }
+        CDFImpl cdf = getVersion(buf);
         ((CDFImpl)cdf).setOption(new ProcessingOption() {
             public String missingRecordOption() {
                 if (option) return "accept";
@@ -111,7 +137,9 @@ public final class CDFFactory {
             }
         });
         ((CDFImpl)cdf).setSource(new CDFSource() {
+            @Override
             public String getName() {return _fname;};
+            @Override
             public boolean isFile() {return true;};
         });
         cdfMap.put(cdf, _fname);
@@ -133,27 +161,52 @@ public final class CDFFactory {
             remaining -= got;
         }
         CDFImpl cdf = getCDF(ba);
-        if ( cdf==null ) {
-            throw new IllegalArgumentException("File is not a CDF-format file: "+url);
-        }
         cdf.setSource(new CDFSource() {
+            @Override
             public String getName() {return _url;};
+            @Override
             public boolean isFile() {return false;};
         });
         return cdf;
     }
+
+    // Used for file-level compression...
     static ByteBuffer uncompressed(ByteBuffer buf, int version) {
-        //TODO: compression type (gzip,huffman,rle0) should be identified and handled.
-        int DATA_OFFSET = 8 + 20;
-        if (version == 3) DATA_OFFSET = 8 + 32;
+    
         byte[] ba;
         int offset;
-        int len = buf.getInt(8) - 20;
-        if (version == 3) len = (int)(buf.getLong(8) - 32);
-        int ulen = buf.getInt(8 + 12);
-        if (version == 3) ulen = (int)(buf.getLong(8 + 20));
+        // DATA_OFFSET: compressed data location from top of the file (w magic) 
+        // CCRsize: CCR size
+        // len: compressed data size (CCR size - size of fields)
+        // CPRoffset: CPR's offset (w magic number)
+        // ulen: CCR's uSize (uncompressed CDF size W/O magic numbers)
+        int DATA_OFFSET;
+        int len, CCRsize, ulen, CPRoffset;
+        int compression;
+	    if (version == 3) {
+            DATA_OFFSET = 8 + 32;
+            CCRsize = (int) buf.getLong(8);
+            len = CCRsize - 32;
+            ulen = (int)(buf.getLong(8 + 20));
+            CPRoffset = CCRsize + 8;
+            compression = buf.getInt(CPRoffset+12);
+        } else {
+            DATA_OFFSET = 8 + 20;
+            CCRsize = buf.getInt(8);
+            len = CCRsize - 20;
+            ulen = buf.getInt(8 + 12);
+            CPRoffset = CCRsize + 8;
+            compression = buf.getInt(CPRoffset+8);
+        }
         byte [] udata = new byte[ulen + 8];
-        buf.get(udata, 0, 8); // copy the magic words
+	    ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+        if (version == 3)
+            buffer.putLong(CDF3_MAGIC);
+        else
+            buffer.putLong(CDF2_MAGIC);
+        buffer.rewind();
+	// copy the magic words
+        buffer.get(udata, 0, 8);
         if (!buf.hasArray()) { // read data into byte array
             ba = new byte[len];
             buf.position(DATA_OFFSET);
@@ -163,8 +216,9 @@ public final class CDFFactory {
             ba = buf.array();
             offset = DATA_OFFSET;
         }
-        int n = 0;
-        try {
+        if (compression == GZIP_COMPRESSION) {
+          int n = 0;
+          try {
             ByteArrayInputStream bais = 
                 new ByteArrayInputStream(ba, offset, len);
             GZIPInputStream gz = new GZIPInputStream(bais);
@@ -178,24 +232,68 @@ public final class CDFFactory {
             }
         } catch (IOException ex) {
             if ( ex.toString().contains("Not in GZIP") ) {
-                throw new IllegalArgumentException("CDF file is not GZIP compressed, and other compression formats are not supported");
+                throw new IllegalArgumentException("CDF file is not GZIP compressed some mismatch occurred.");
             }
             System.out.println(ex.toString());
             return null;
+          }
+          if (n < 0) return null;
+        } else if (compression == RLE_COMPRESSION) {
+          byte[] uncompressed = new CDFRLE().decompress(ba, ulen);
+          System.arraycopy(uncompressed, 0, udata, 8, ulen);
+        } else if (compression == HUFF_COMPRESSION) {
+          byte[] uncompressed = new CDFHuffman().decompress(ba, ulen);
+          System.arraycopy(uncompressed, 0, udata, 8, ulen);
+        } else if (compression == AHUFF_COMPRESSION) {
+          byte[] uncompressed = new CDFAHuffman().decompress(ba, ulen);
+          System.arraycopy(uncompressed, 0, udata, 8, ulen);
+        } else {
+          System.out.println("**** compression: "+compression+" is not supported...");
+          return null;
         }
-        if (n < 0) return null;
         return ByteBuffer.wrap(udata);
     }
 
+    /**
+     *
+     */
     public static class ProcessingOption {
         String missingRecordsOption() {return "reject";}
     }
 
+    /**
+     *
+     */
     public static class CDFSource {
+
+        /**
+         *
+         * @return
+         */
         public String getName() {return "";};
+
+        /**
+         *
+         * @return
+         */
         public boolean isFile() {return false;};
+
+        /**
+         *
+         * @return
+         */
         public boolean isURL() {return false;};
+
+        /**
+         *
+         * @return
+         */
         public boolean isByteArray() {return false;};
+
+        /**
+         *
+         * @return
+         */
         public boolean isByteBuffer() {return false;};
     }
     private static long mappedMemoryUsed() {
@@ -208,15 +306,24 @@ public final class CDFFactory {
         }
         return size;
     }
+
+    /**
+     *
+     * @param value
+     */
     public static void setMaxMappedMemory(long value) {
         if (maxMappedMemory != null) {
-            if (maxMappedMemory.longValue() > value) return;
+            if (maxMappedMemory > value) return;
         }
-        maxMappedMemory = new Long(value);
+        maxMappedMemory = value;
     }
+
+    /**
+     *
+     */
     public static void clean() {
         if (maxMappedMemory != null) {
-            if (mappedMemoryUsed() > maxMappedMemory.longValue()) {
+            if (mappedMemoryUsed() > maxMappedMemory) {
                 System.gc();
             }
         }

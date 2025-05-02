@@ -1,7 +1,6 @@
 package gov.nasa.gsfc.spdf.cdfj;
 /**
  * Supported CDF data types.
- * @see CDFDataType
  */
 public class SupportedTypes {
      static final CDFDataType[] supportedTypes = 
@@ -29,8 +28,9 @@ public class SupportedTypes {
          supportedTypes[52] = CDFDataType.CHAR;
     }
     /**
-     * Returns CDFDataType object for specified CDF type.
-     * returns null if the type is not supported by this package.
+     * Returns CDFDataType object for specified CDF type.returns null if the type is not supported by this package.
+     * @param type
+     * @return
      */
     public static CDFDataType cdfType(int type) {
         if ((type < 0) || (type > (supportedTypes.length - 1))) return null;

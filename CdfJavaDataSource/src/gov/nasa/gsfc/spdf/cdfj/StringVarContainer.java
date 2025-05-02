@@ -1,21 +1,48 @@
 package gov.nasa.gsfc.spdf.cdfj;
 import java.nio.*;
-import java.util.*;
 import java.lang.reflect.*;
-public final class StringVarContainer extends ByteVarContainer implements VDataContainer.CString {
+
+/**
+ *
+ * @author nand
+ */
+public final class StringVarContainer extends ByteVarContainer implements 
+    VDataContainer.CString {
+
+    /**
+     *
+     * @param cdfi
+     * @param vrbl
+     * @param ints
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     * @throws Throwable
+     */
     public StringVarContainer(CDFImpl thisCDF, Variable var, int[] pt) throws
         IllegalAccessException, InvocationTargetException, Throwable {
         super(thisCDF, var, pt);
     }
+
+    /**
+     *
+     * @param type
+     * @param preserve
+     * @return
+     */
     public static boolean isCompatible(int type, boolean preserve) {
         if  (isCompatible(type, preserve, Byte.TYPE)) {
             boolean stringType = DataTypes.isStringType(type);
-            if (!stringType) return false;
-            return true;
+            return stringType;
         }
         return false;
     }
 
+    /**
+     *
+     * @return
+     * @throws Throwable
+     */
+    @Override
     public Object _asArray() throws Throwable {
         int rank = var.getEffectiveRank();
         if (rank > 2) {
@@ -38,7 +65,7 @@ public final class StringVarContainer extends ByteVarContainer implements VDataC
             return sa;
         case 1:
             int n0 =
-                (((Integer)var.getElementCount().elementAt(0))).intValue();
+                    (((Integer)var.getElementCount().elementAt(0)));
             records = words/(n0*len);
             String[][] sa1 = new String[records][n0];
             for (int r = 0; r < records; r++) {
@@ -61,18 +88,38 @@ public final class StringVarContainer extends ByteVarContainer implements VDataC
                     }
                 }
             }
-            return sa11;
+            return sa11;            
         default:
             throw new Throwable("Internal error");
         }
     }
 
+    @Override
     public byte[] as1DArray() {return (byte[])super.as1DArray();}
+
+    /**
+     *
+     * @return
+     */
+    @Override
     public byte[] asOneDArray() {return (byte[])super.asOneDArray();}
+
+    /**
+     *
+     * @param cmtarget
+     * @return
+     */
+    @Override
     public byte[] asOneDArray(boolean cmtarget) {
         return (byte[])super.asOneDArray(cmtarget);
     }
 
+    /**
+     *
+     * @return
+     * @throws Throwable
+     */
+    @Override
     public AArray asArray() throws Throwable {
         return new StringArray(_asArray());
     }
