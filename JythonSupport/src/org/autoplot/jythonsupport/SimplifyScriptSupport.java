@@ -721,7 +721,12 @@ public class SimplifyScriptSupport {
         } else if ( o instanceof Subscript ) {
             return false;
               
+        } else if ( o instanceof Str ) {
+            return true;
+        } else if ( o instanceof Num ) {
+            return true;
         }
+        
         MyVisitorBase vb = new MyVisitorBase(variableNames);
         try {
             o.traverse(vb);
@@ -911,7 +916,12 @@ public class SimplifyScriptSupport {
                     return false;
                 }
             }
+        } else if ( o instanceof Str ) {
+            return true;
+        } else if ( o instanceof Num ) {
+            return true;
         }
+        
         MyVisitorBase vb = new MyVisitorBase(variableNames);
         try {
             o.traverse(vb);
@@ -1319,7 +1329,7 @@ public class SimplifyScriptSupport {
             logger.log(Level.FINER, "visitCall({0})", node);
             return super.visitCall(node);
         }
-
+        
         @Override
         protected Object unhandled_node(SimpleNode sn) throws Exception {
             return sn;
@@ -1330,6 +1340,10 @@ public class SimplifyScriptSupport {
             logger.log(Level.FINER, "traverse({0})", sn);
             if (sn instanceof Call) {
                 looksOkay = trivialFunctionCall(sn) || trivialConstructorCall(sn);
+                Call c= (Call)sn;
+                for ( exprType t: c.args ) {
+                    traverse(t);
+                }
                 logger.log(Level.FINER, "looksOkay={0}", looksOkay);
             } else if (sn instanceof Assign) {
                 Assign a = ((Assign) sn);
@@ -1347,6 +1361,7 @@ public class SimplifyScriptSupport {
                 if (!names.contains(t)
                         && !okaySet.contains(t)) {
                     looksOkay = false; // TODO: why are there both looksOkay and visitNameFail?
+                    visitNameFail= true; // TODO: I really don't understand this...
                     logger.log(Level.FINER, "looksOkay={0}", looksOkay);
                 }
             } else if (sn instanceof Attribute) {
