@@ -1831,46 +1831,60 @@ public abstract class CDFImpl implements java.io.Serializable {
             return bv;
         }
         int clen = lowOrderInt(bv, offset_CSIZE);
-        byte[] work = new byte[clen];
-        bv.position(offset_CDATA);
-        bv.get(work);
+        byte[] work;
         int ulen = size * number;
-        byte[] udata = null;
+        byte[] udata;
 	int compType = var.getCompressionType();
+        switch ( compType ) {
+            case ((int)CDFFactory.GZIP_COMPRESSION):
+            case ((int)CDFFactory.RLE_COMPRESSION):
+            case ((int)CDFFactory.HUFF_COMPRESSION):
+            case ((int)CDFFactory.AHUFF_COMPRESSION):  
+                work = new byte[clen];
+                bv.position(offset_CDATA);
+                bv.get(work);
+                break;
+            default:
+                // data is not compressed
+                return getValueBuffer(offset);
+        }
+        
         // variable-level compression
-	if (compType == CDFFactory.GZIP_COMPRESSION) {
-          udata = new byte[ulen];
-          int n = 0;
-          try {
-            GZIPInputStream gz
-                    = new GZIPInputStream(new ByteArrayInputStream(work));
-            int toRead = udata.length;
-            int off = 0;
-            while (toRead > 0) {
-                n = gz.read(udata, off, toRead);
-                if (n == -1) {
-                    break;
-                }
-                off += n;
-                toRead -= n;
-            }
-          } catch (IOException ex) {
-            System.out.println(ex.toString() + " at offset " + offset);
-            System.out.println("Trying to get data as uncompressed");
-            return getValueBuffer(offset);
-          }
-          if (n < 0) {
-            return null;
-          }
-	} else if (compType == CDFFactory.RLE_COMPRESSION) {
-	  udata = new CDFRLE().decompress(work, ulen);
-	} else if (compType == CDFFactory.HUFF_COMPRESSION) {
-	  udata = new CDFHuffman().decompress(work, ulen);
-	} else if (compType == CDFFactory.AHUFF_COMPRESSION) {
-	  udata = new CDFAHuffman().decompress(work, ulen);
-	} else  {
-            // data is not compressed
-            return getValueBuffer(offset);
+        switch (compType) {
+            case ((int)CDFFactory.GZIP_COMPRESSION):
+                udata = new byte[ulen];
+                int n = 0;
+                try {
+                    GZIPInputStream gz
+                            = new GZIPInputStream(new ByteArrayInputStream(work));
+                    int toRead = udata.length;
+                    int off = 0;
+                    while (toRead > 0) {
+                        n = gz.read(udata, off, toRead);
+                        if (n == -1) {
+                            break;
+                        }
+                        off += n;
+                        toRead -= n;
+                    }
+                } catch (IOException ex) {
+                    System.out.println(ex.toString() + " at offset " + offset);
+                    System.out.println("Trying to get data as uncompressed");
+                    return getValueBuffer(offset);
+                }     if (n < 0) {
+                    return null;
+                }     break;
+            case ((int)CDFFactory.RLE_COMPRESSION):
+                udata = new CDFRLE().decompress(work, ulen);
+                break;
+            case ((int)CDFFactory.HUFF_COMPRESSION):
+                udata = new CDFHuffman().decompress(work, ulen);
+                break;
+            case ((int)CDFFactory.AHUFF_COMPRESSION):
+                udata = new CDFAHuffman().decompress(work, ulen);
+                break;
+            default:
+                throw new IllegalArgumentException("should not get here");
         }
         return ByteBuffer.wrap(udata);
     }
