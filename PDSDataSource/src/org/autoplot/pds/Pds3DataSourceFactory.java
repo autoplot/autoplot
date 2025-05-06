@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -262,6 +263,10 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
         return null;
     } 
     
+    private static WeakHashMap<String,Document> documents= new WeakHashMap<>();
+    
+    private static WeakHashMap<String,Long> documentBirthMilli= new WeakHashMap<>();
+    
     /**
      * read in the PDS label, resolving STRUCTURES which are loaded with a pointer.  This will look in the current
      * directory, and in the LABEL directory next to the DATA directory.  Note the Pointer must appear 
@@ -277,16 +282,36 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
         
         logger.entering( "Pds3DataSourceFactory", "getDocumentWithImports", labelUrl );
         
+        String slabelUrl= labelUrl.toString();
+        
+        Document doc1= documents.get(labelUrl.toString());
+        
+        if ( doc1!=null ) {
+            synchronized (documents) {
+                doc1= documents.get(labelUrl.toString());
+                if ( doc1!=null ) {
+                    Long birthTime= documentBirthMilli.get(slabelUrl);
+                    if ( birthTime!=null ) {
+                        if ( System.currentTimeMillis()-birthTime < 10000 ) {
+                            return doc1;
+                        }
+                    }                    
+                }
+            }
+        }
+        
         if ( depth>4 ) throw new IllegalArgumentException("something has gone terribly wrong, too many nested structures");
         
         File xmlfile = DataSetURI.getFile( labelUrl,new NullProgressMonitor());
 
+        Document doc;
+        
         PDSLabel label = new PDSLabel(); 
         
         if ( !label.parse( xmlfile.getPath() ) ) {
             throw new IllegalArgumentException("unable to use file "+labelUrl);
         }
-        Document doc;
+        
         doc= label.getDocument();
          
         XPathFactory factory = XPathFactory.newInstance();
@@ -337,6 +362,12 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
                 parent.insertBefore(kid, child);
             }
         }
+        
+        synchronized(documents) {
+            documents.put( slabelUrl, doc );
+            documentBirthMilli.put( slabelUrl, System.currentTimeMillis() );
+        }
+        
         //DocumentUtil.dumpToXML( doc, new File("/tmp/ap/label-with-imports.xml") );
         logger.exiting( "Pds3DataSourceFactory", "getDocumentWithImports" );
         return doc;
