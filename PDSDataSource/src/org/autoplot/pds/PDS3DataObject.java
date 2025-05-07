@@ -52,7 +52,7 @@ public class PDS3DataObject {
     private String dataType;
     private int startByte;
     private int items;
-    private int itemBytes;
+    private int itemBytes; // bytes per item, e.g. four bytes for ints
     private int bytes;
     private String dims; // dimensions for rank 2 or higher data, like "[64,48]" or "[3]"
     private double validMinimum;
@@ -140,7 +140,16 @@ public class PDS3DataObject {
                 }
                 j= toJSONObject(column1);
             } else {
-                itemBytes = bytes;
+                if ( items>-1 ) {
+                    itemBytes= j.optInt("ITEM_BYTES",-1);
+                    if ( itemBytes==-1 ) {
+                        if ( bytes>items ) {
+                            itemBytes= bytes / items; 
+                        }
+                    }
+                } else {
+                    itemBytes = bytes;
+                }
             }
                 
             dataType= j.optString("DATA_TYPE","");
@@ -300,7 +309,7 @@ public class PDS3DataObject {
         } else if ( dataType.equals("LSB_INTEGER" ) ) {
             switch (itemBytes) {
                 case 1: 
-                    args.put("type", "byte");
+                    args.put("type", "ubyte");
                     break;
                 case 2: 
                     args.put("type", "short");
@@ -337,7 +346,7 @@ public class PDS3DataObject {
         } else if ( dataType.equals("MSB_INTEGER") || dataType.equals("INTEGER") ) { // section 3.2 says INTEGER is the same as
             switch (itemBytes) {
                 case 1: 
-                    args.put("type", "byte");
+                    args.put("type", "ubyte");
                     break;                   
                 case 2: 
                     args.put("type", "short");
