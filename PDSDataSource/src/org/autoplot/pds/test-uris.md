@@ -5,6 +5,9 @@ This has the PDS header and data in one file.  Also, a runtime error was attempt
 This shows a couple of problems with the location of pointer file and bytes per field in items>1.
 * https://pds-ppi.igpp.ucla.edu/data/CO-V_E_J_S_SS-RPWS-2-REFDR-WBRFULL-V1.0/DATA/RPWS_WIDEBAND_FULL/T19990XX/T1999003/T1999003_01_10KHZ2_WBRFR.LBL
 
+Item bytes was miscalculated in code, but I think correcting the calculation might break things elsewhere.
+* https://pds-ppi.igpp.ucla.edu/data/VG1-J_S_SS-PWS-1-EDR-WFRM-60MS-V1.0/DATA/WFRM/P9/V1P9_002/C0105058.LBL?WAVEFORM_BYTE
+
 Shows the LABEL in the LABEL directory:
 * https://pds-ppi.igpp.ucla.edu/data/CO-V_E_J_S_SS-RPWS-2-REFDR-WFRFULL-V1.0/DATA/RPWS_WAVEFORM_FULL/T20000XX/T2000037/T2000037_25HZ4_WFRFR.LBL?WFR_SAMPLE
 
@@ -31,4 +34,7 @@ Does not work with the last production release:
 
 Here is the search engine:
 * https://pds.nasa.gov/tools/doi/#/search
+
+VG2-J-PWS-5-DDR-PLASMA-DENSITY-1S-V1.0
+GO-J-PWS-5-DDR-PLASMA-DENSITY-FULL-V1.0
 
