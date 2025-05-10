@@ -31,6 +31,7 @@
                 
         <p>Bugfixes (2025-05-04 r28243):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2703/">2703</a>: Check for empty fields when parsing ASCII files, and insert fill without entering try/catch block.
             <li>Correct handling of PDS3 https://pds-ppi.igpp.ucla.edu/data/VG1-J_S_SS-PWS-1-EDR-WFRM-60MS-V1.0/DATA/WFRM/P9/V1P9_002/C0105058.LBL?WAVEFORM_BYTE, where itemBytes was miscalculated.  
             <li>Read in all PDS3 single-byte integers as unsigned.
             <li><a href="https://github.com/autoplot/cdfj/issues/20">0020</a>: Support for RLE compression showed where byte[] was read out of uncompressed CDF file unnecessarily.
