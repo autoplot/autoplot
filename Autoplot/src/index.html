@@ -31,11 +31,11 @@
                 
         <p>Bugfixes (2025-05-13 r28243):</p>
         <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2703/">2703</a>: Check for empty fields when parsing ASCII files, and insert fill without entering try/catch block.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2703/">2703</a>: Check for empty fields when parsing ASCII files, and insert fill without entering try/catch block.  Thanks, Ivar!
             <li>Correct handling of PDS3 https://pds-ppi.igpp.ucla.edu/data/VG1-J_S_SS-PWS-1-EDR-WFRM-60MS-V1.0/DATA/WFRM/P9/V1P9_002/C0105058.LBL?WAVEFORM_BYTE, where itemBytes was miscalculated.  
             <li>Read in all PDS3 single-byte integers as unsigned.
-            <li><a href="https://github.com/autoplot/cdfj/issues/20">0020</a>: Support for RLE compression showed where byte[] was read out of uncompressed CDF file unnecessarily.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2699/">2699</a>: Nominal data parsed in ASCII files had terrible performance when number of unique items was large.
+            <li><a href="https://github.com/autoplot/cdfj/issues/20">0020</a>: Support for RLE compression showed where byte[] was read out of uncompressed CDF file unnecessarily.  Thanks, Mike!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2699/">2699</a>: Nominal data parsed in ASCII files had terrible performance when number of unique items was large.  Thanks, Ivar!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2701/">2701</a>: Time-varying DEPEND_1 with synchronize.  Thanks, Sadie!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2700/">2700</a>: Add right axis plot works when there are multiple columns.  Thanks, Danil!
             <li>AutoplotServlet supports OpenDAP, where it simply hadn't been included.
