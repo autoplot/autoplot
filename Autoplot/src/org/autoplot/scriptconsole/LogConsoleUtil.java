@@ -72,7 +72,7 @@ public class LogConsoleUtil {
                         rec.setSequenceNumber(Integer.parseInt(data));
                         break;
                     case "thread":
-                        rec.setLongThreadID(Integer.parseInt(data));
+                        rec.setThreadID(Integer.parseInt(data));
                         break;
                     case "message":
                         rec.setMessage(data);
