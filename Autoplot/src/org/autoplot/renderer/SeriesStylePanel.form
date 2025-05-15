@@ -286,6 +286,7 @@
         <Component class="javax.swing.JLabel" name="styleLabel">
           <Properties>
             <Property name="text" type="java.lang.String" value="Style:"/>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
         </Component>
         <Container class="javax.swing.JPanel" name="errorBarStylePanel">

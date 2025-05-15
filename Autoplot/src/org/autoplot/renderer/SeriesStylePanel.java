@@ -182,6 +182,7 @@ public final class SeriesStylePanel extends javax.swing.JPanel implements PlotSt
             errorBarStylePanel.setEnabled(enabled);
             errorBarStyle.getCustomEditor().setEnabled(enabled);
             styleLabel.setEnabled(enabled);
+           // styleLabel.setVisible(enabled);
         }
     };    
 
@@ -290,6 +291,7 @@ public final class SeriesStylePanel extends javax.swing.JPanel implements PlotSt
         });
 
         styleLabel.setText("Style:");
+        styleLabel.setEnabled(false);
 
         errorBarStylePanel.setLayout(new java.awt.BorderLayout());
 
