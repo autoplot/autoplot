@@ -5,12 +5,12 @@
         <blockquote><pre><small>
 wget -N https://autoplot.org/latest/autoplot.jar
 /usr/local/jdk1.8/bin/javac -cp autoplot.jar apextension/Extension.java  # Note newer Javas don't like this jar
-jar tvf APExtension.jar apextension
+jar tvf /tmp/APExtension.jar apextension/Extension.class
         </small></pre></blockquote>
         Then this can be imported into an Autoplot script with:
         <blockquote><pre><small>
 import sys
-sys.path.append("/home/jbf/APExtension.jar")
+sys.path.append("/tmp/APExtension.jar")
 from apextension import Extension
 print Extension.total( 3,4 )
  </small></pre></blockquote>
