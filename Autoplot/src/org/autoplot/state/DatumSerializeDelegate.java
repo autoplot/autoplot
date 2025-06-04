@@ -4,6 +4,7 @@ package org.autoplot.state;
 import java.text.ParseException;
 import org.das2.datum.Datum;
 import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import org.das2.qstream.SerializeDelegate;
 
 /**
@@ -18,7 +19,7 @@ public class DatumSerializeDelegate implements SerializeDelegate {
         Units u= (Units) d.getUnits();
         if ( u==null ) u= Units.dimensionless;
         String svalue= d.getFormatter().format(d, u); // we'll provide units context
-        if ( svalue.contains(" ") ) {
+        if ( svalue.contains(" ") && !UnitsUtil.isTimeLocation(u) ) {
             throw new RuntimeException("formatted value contains string: \""+svalue+"\"" );
         }
         if ( u==Units.dimensionless ) {
