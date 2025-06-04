@@ -19,7 +19,7 @@ public class DatumSerializeDelegate implements SerializeDelegate {
         if ( u==null ) u= Units.dimensionless;
         String svalue= d.getFormatter().format(d, u); // we'll provide units context
         if ( svalue.contains(" ") ) {
-            throw new RuntimeException("formatted value contains string");
+            throw new RuntimeException("formatted value contains string: \""+svalue+"\"" );
         }
         if ( u==Units.dimensionless ) {
             return svalue + " (dimensionless)";
