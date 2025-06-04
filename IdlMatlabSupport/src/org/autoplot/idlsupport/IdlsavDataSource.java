@@ -232,8 +232,8 @@ public class IdlsavDataSource extends AbstractDataSource {
                 if ( u instanceof EnumerationUnits ) { // are the strings found actually ISO8601 times?
                     if ( array.length()>8 ) {
                         String firstRec= array.slice(0).svalue();
-                        String yr4= firstRec.substring(0,4);
                         if ( firstRec.length()>10 ) {
+                            String yr4= firstRec.substring(0,4);
                             int year= Integer.parseUnsignedInt(yr4);
                             if ( year>1600 && year<2900 ) {
                                 if ( TimeUtil.isValidTime(firstRec) ) {
