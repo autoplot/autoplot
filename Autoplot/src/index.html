@@ -15,7 +15,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>More <a href="https://coast.noaa.gov/htdata/CMSP/AISDataHandler/2024/AIS_2024_01_17.zip/AIS_2024_01_17.csv?depend0=LON&column=LAT">ships-at-sea</a> data, this time with on Puget Sound coast overlaid.</small></p>
+        <p><small>Does the rarely-used OpenDAP support work for this <a href="https://nomads.ncep.noaa.gov/dods/gefs/">URL</a>?  Yep, it does!</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -31,6 +31,10 @@
                 
         <p>Bugfixes (2025-05-13 r28243):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2705/">2705</a>: Overzealous check on time datum handing in .vap files prevented Dave from saving .vap with annotation.
+        </ul>
+        <p>Older Bugfixes (2025-05-13 r28243):</p>
+        <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2703/">2703</a>: Check for empty fields when parsing ASCII files, and insert fill without entering try/catch block.  Thanks, Ivar!
             <li>Correct handling of PDS3 https://pds-ppi.igpp.ucla.edu/data/VG1-J_S_SS-PWS-1-EDR-WFRM-60MS-V1.0/DATA/WFRM/P9/V1P9_002/C0105058.LBL?WAVEFORM_BYTE, where itemBytes was miscalculated.  
             <li>Read in all PDS3 single-byte integers as unsigned.
@@ -40,43 +44,14 @@
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2700/">2700</a>: Add right axis plot works when there are multiple columns.  Thanks, Danil!
             <li>AutoplotServlet supports OpenDAP, where it simply hadn't been included.
         </ul>
-        <p>Older Bugfixes (2025-04-22 r28225):</p>
-        <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2695/">2695</a>: Temporarily disable the sanity check on amount of memory available.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2692/">2692</a>: Jython editor "search for examples on github" action opens a new browser.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/1687/">1687</a>: Corrections to labels shown by PDS3, make consistent throughout.
-            <li>Clean-up of PDS3 names, where completions resulted in names being repeated, wasting screen space.
-            <li><a href="https://github.com/das-developers/das2java/issues/132">132</a>: fix log/lin ticks algorithm for ~1e-11
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2692/">2692</a>: improvements to pop-up documentation in Jython editor.
-            <li>Rank 4 flatten added to complete function.
-            <li>rte_0753429255: support non-ASCII column names in xls files.  Thanks, EDY!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2694/">2694</a>: scripts run from tools menu on second Autoplot window would modify the first window.  Thanks, Andrew!
-            <li><a href="https://github.com/das-developers/das2java/issues/130">130</a>: fully support error bars in x.   Thanks, Bill!
-            <li>Do a sanity check on amount of memory available, don't even start if memory is less than 256M.
-            <li>Catch out-of-memory error which can occur when reading bookmarks during startup, returning one empty folder instead with "Out of Memory" title.  Thanks, Matvey!
-            <li><a href="https://github.com/das-developers/das2java/issues/128">128</a>: support XYZ scatter in das2streams.  Thanks, Chris!
-            <li>clarify linear interpolation used in documentation for synchronize, "interpolation" is too vague.  Thanks, Sadie!
-            <li><a href="https://github.com/das-developers/das2java/issues/127">127</a>: double array of complex numbers (ds[m,n,2]) supported.  Thanks, Sadie!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2689/">2689</a>: clarify error message when jyds argument doesn't meet constraints.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2691/">2691</a>: Add support for decimal years.
-            <li><a href="https://github.com/das-developers/das2java/issues/126">0126</a>: Commented test code from review of FFTPower removed.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2688/">2688</a>: clean up getDataSet('URI') when entered into address bar, providing convenient way to test URIs in scripts.
-        </ul>
         <p>Features:</p>
         <ul>
             <li><a href="https://github.com/das-developers/das2java/issues/133/">133</a>: Four-element waveform packets allowed to support TRACERS processing.  Thanks, Chris!
-            <li><a href="https://github.com/autoplot/cdfj/issues/20/">20</a>: Merge in changes to the CDFJ library, to support RLE, Huffman, and other compression types.  Thanks, Mike!
-            <li>Add copy filename to clipboard action in the cache tool.
         </ul>
         <p>Less recent features:</p>
         <ul>
-            <li>Add flatLAF to config/system.properties so that one can always get flatLAF on Linux.
-            <li>DataSetBuilder nextRecord method accepts Color object and inserts Datum with rgbColor units.
-            <li>Jython popup-documentation doesn't try to fold together functions which vary only by arguments, like with fftPower, since this doesn't work consistently.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2397/">2397</a>: don't coalesce functions that differ only by arguments (findgen), update to new conventional Javadoc location at https://cottagesystems.com/~jbf/autoplot/doc2018/
-            <li><a href="https://github.com/das-developers/das2java/issues/127">127</a>: support two-index array of complex numbers in crossProduct and complexConj.
-            <li>fftPower now allows missing timetags, using indgen for tags.
-            <li>filename=T control for aggregation will return the filename for each data point.
+            <li><a href="https://github.com/autoplot/cdfj/issues/20/">20</a>: Merge in changes to the CDFJ library, to support RLE, Huffman, and other compression types.  Thanks, Mike!
+            <li>Add copy filename to clipboard action in the cache tool.
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
