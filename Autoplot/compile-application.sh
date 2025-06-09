@@ -78,8 +78,6 @@ function raiseerror {
    hasErrors=1
 }
 
-#JAVAARGS="-g -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10"
-#JAVAARGS="-g -target 1.7 -source 1.7 -Xlint:unchecked -bootclasspath $JAVA_HOME/jre/lib/rt.jar -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10"
 JAVAARGS="-g -target 1.8 -source 1.8 -bootclasspath $JAVA_HOME/jre/lib/rt.jar -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10"
 
 export timer=`date +%s`
