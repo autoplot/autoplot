@@ -46,15 +46,15 @@ The "src" directory of each of these folders contains the Java source code.  Tog
 
 To use the projects in Netbeans (8.1 or later), do the check out from within Netbeans and it should discover the projects after check out.  Then build Autoplot.
 
-= Building Autoplot Servlet =
+# Building Autoplot Servlet 
 A simple servlet is found in the repository at https://svn.code.sf.net/p/autoplot/code/autoplot/trunk/AutoplotServlet.  This shows how Autoplot can be used to create graphics on the server-side, when used with a J2EE container like Apache Tomcat.
 
 * Check out Autoplot sources as described above.
 * The location of a server's classpath must be specified.  Locate a J2EE instance, such as Tomcat.
 * change directory to the location of the ant build script, build.xml.
 * Use ant to compile the servlet, using (where the classpath is set to your server location):
-~~~~~
-  ant -Dj2ee.platform.classpath=/usr/local/tomcat/apache-tomcat-6.0.16/lib/servlet-api.jar dist
-~~~~~
+```
+ant -Dj2ee.platform.classpath=/usr/local/tomcat/apache-tomcat-6.0.16/lib/servlet-api.jar dist
+```
 * The war file will be found in the "dist" folder.
 
