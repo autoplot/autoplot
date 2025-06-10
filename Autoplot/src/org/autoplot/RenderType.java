@@ -88,12 +88,7 @@ public enum RenderType {
                     return UnitsUtil.isIntervalOrRatioMeasurement(u);
 
                 case 2:
-                    if ( ds.length()==0 ) return true;
-                    if ( SemanticOps.isBundle(ds) ) {
-                        return true;
-                    } else {
-                        return SemanticOps.isRank2Waveform(ds);
-                    }
+                    return true; // we can always slice repeatedly
                 case 3:
                     return true; // we can always slice repeatedly
                 default:
