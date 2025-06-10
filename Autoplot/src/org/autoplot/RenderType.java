@@ -2,7 +2,6 @@ package org.autoplot;
 
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
-import org.das2.graph.RGBImageRenderer;
 import org.das2.qds.DataSetOps;
 import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
@@ -133,13 +132,13 @@ public enum RenderType {
                 }
                 return true;
             case image:
-                return RGBImageRenderer.acceptsData(ds);
+                return org.das2.graph.RGBImageRenderer.acceptsData(ds);
             case pitchAngleDistribution:
                 return org.das2.graph.PitchAngleDistributionRenderer.acceptsData(ds);
             case polar:
                 return org.das2.graph.PolarPlotRenderer.acceptsData(ds);
             case eventsBar:
-                return ds.rank()==2 || ds.rank()==1;
+                return org.das2.graph.EventsRenderer.acceptsData(ds);
             case vectorPlot:
                 return org.das2.graph.VectorPlotRenderer.acceptsData(ds);
             case orbitPlot:
@@ -149,7 +148,7 @@ public enum RenderType {
             case stackedHistogram:
                 return ds.rank()==2;
             case bounds:
-                return  Schemes.isBoundingBox(ds) 
+                return  Schemes.isBoundingBox(ds) // TODO: repeat and inconsistent code
                         || Schemes.isArrayOfBoundingBox(ds) 
                         || ( Schemes.isTrajectory(ds) || ( ds.rank()>1 && ds.length(0)==2 ) )
                         || Schemes.isRank2Bins(ds);
