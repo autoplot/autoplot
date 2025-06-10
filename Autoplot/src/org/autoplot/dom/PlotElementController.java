@@ -1282,7 +1282,11 @@ public class PlotElementController extends DomNodeController {
             return true;
         } else {
             if ( newRenderType==RenderType.eventsBar ) {
-                return false;
+                if ( oldRenderType==RenderType.digital ) {
+                    return true;
+                } else {
+                    return false;
+                }
             } else {
                 if ( oldRenderType==RenderType.spectrogram || oldRenderType==RenderType.nnSpectrogram ) {
                     return true;
