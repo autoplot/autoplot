@@ -8,6 +8,10 @@ import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
 import org.das2.qds.examples.Schemes;
 
+/**
+ * Enumeration of the plot element render types.
+ * @author jbf
+ */
 public enum RenderType {
     spectrogram,
     nnSpectrogram,
