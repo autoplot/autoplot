@@ -401,9 +401,9 @@ public final class EditorContextMenu {
                     String var= getVariableNameContext( editor );
                     logger.log( Level.FINE, "editor.getdoc: {0}", editor.getDocument());
                     if ( var==null || var.length()==0 ) {
-                        insertLine( "filt= getParam( 'filter', 'F', 'filter data', ['T','F'] )\n");
+                        insertLine( "filt= getParam( 'filter', False, 'filter data', [True,False] )\n");
                     } else {
-                        insertLine( var + "= getParam( '"+var+"', 'F', 'filter data', ['T','F'] )\n");
+                        insertLine( var + "= getParam( '"+var+"', False, 'filter data', [True,False] )\n");
                     }
                 }
             };
