@@ -1263,30 +1263,30 @@ public class PlotElementController extends DomNodeController {
         }
     }
 
-//    /**
-//     * return a canonical render type for the given render type.  For example,
-//     * "series" will always have the same dimensions as "scatter" and "colorScatter",
-//     * and "spectrogram" will always have the same as "nnSpectrogram"
-//     * 
-//     * @param t
-//     * @return 
-//     */
-//    private static RenderType canonicalRenderType( RenderType t ) {
-//        switch (t) {
-//            case nnSpectrogram:
-//            case spectrogram:
-//                return RenderType.spectrogram;
-//            case scatter:
-//            case series:
-//            case colorScatter:
-//            case fillToZero:
-//            case stairSteps:
-//            case hugeScatter:
-//                return RenderType.series;
-//            default:
-//                return t;
-//        }
-//    }
+    /**
+     * return a canonical render type for the given render type.  For example,
+     * "series" will always have the same dimensions as "scatter" and "colorScatter",
+     * and "spectrogram" will always have the same as "nnSpectrogram"
+     * 
+     * @param t
+     * @return 
+     */
+    private static RenderType canonicalRenderType( RenderType t ) {
+        switch (t) {
+            case nnSpectrogram:
+            case spectrogram:
+                return RenderType.spectrogram;
+            case scatter:
+            case series:
+            case colorScatter:
+            case fillToZero:
+            case stairSteps:
+            case hugeScatter:
+                return RenderType.series;
+            default:
+                return t;
+        }
+    }
 //
 //    /**
 //     * true indicates that the new renderType makes the axis dimensions change.
@@ -1341,9 +1341,9 @@ public class PlotElementController extends DomNodeController {
             return true;
         } else {
             if ( newRenderType==RenderType.eventsBar ) {
-                if ( oldRenderType==RenderType.digital ) {
-                return true;
-            } else {
+                if ( oldRenderType==RenderType.digital || canonicalRenderType(oldRenderType)==RenderType.series ) {
+                    return true;
+                } else {
                     return false;
                 }
             } else {
