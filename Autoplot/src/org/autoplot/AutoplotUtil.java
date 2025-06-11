@@ -1162,9 +1162,10 @@ public class AutoplotUtil {
      * @see org.autoplot.datasource.DataSourceUtil#guessRenderType(org.das2.qds.QDataSet), which will become the official version.
      * @see https://autoplot.org/developer.guessRenderType
      * @param fillds
-     * @return
+     * @return the render type
      */
     public static RenderType guessRenderType(QDataSet fillds) {
+        
         RenderType spec;
 
         RenderType specPref= RenderType.spectrogram;
@@ -1315,6 +1316,8 @@ public class AutoplotUtil {
             } else {
                 spec= RenderType.eventsBar;
             }
+        } else if ( Schemes.isDatumRange(fillds) ) {
+            spec= RenderType.eventsBar;
         } else {
             if ( useHugeScatter && fillds.length() > SERIES_SIZE_LIMIT) {
                 spec = RenderType.hugeScatter;
