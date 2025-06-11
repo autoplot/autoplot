@@ -67,6 +67,7 @@ import org.autoplot.RenderType;
 import org.autoplot.AutoplotUtil;
 import static org.autoplot.AutoplotUtil.SERIES_SIZE_LIMIT;
 import org.autoplot.ExportDataPanel;
+import static org.autoplot.RenderType.colorScatter;
 import org.autoplot.RenderTypeUtil;
 import org.autoplot.datasource.AnonymousDataSource;
 import org.autoplot.datasource.AutoplotSettings;
@@ -1262,14 +1263,72 @@ public class PlotElementController extends DomNodeController {
         }
     }
 
-    /**
-     * true indicates that the new renderType makes the axis dimensions change.
-     * For example, switching from spectrogram to series (to get a stack of components)
-     * causes the z axis to become the yaxis.
-     * @param oldRenderType
-     * @param newRenderType
-     * @return true if the dimensions change.
-     */
+//    /**
+//     * return a canonical render type for the given render type.  For example,
+//     * "series" will always have the same dimensions as "scatter" and "colorScatter",
+//     * and "spectrogram" will always have the same as "nnSpectrogram"
+//     * 
+//     * @param t
+//     * @return 
+//     */
+//    private static RenderType canonicalRenderType( RenderType t ) {
+//        switch (t) {
+//            case nnSpectrogram:
+//            case spectrogram:
+//                return RenderType.spectrogram;
+//            case scatter:
+//            case series:
+//            case colorScatter:
+//            case fillToZero:
+//            case stairSteps:
+//            case hugeScatter:
+//                return RenderType.series;
+//            default:
+//                return t;
+//        }
+//    }
+//
+//    /**
+//     * true indicates that the new renderType makes the axis dimensions change.
+//     * For example, switching from spectrogram to series (to get a stack of components)
+//     * causes the z axis to become the yaxis.
+//     * @param oldRenderType
+//     * @param newRenderType
+//     * @return true if the dimensions change.
+//     * @see canonicalRenderType
+//     */
+//    public static boolean axisDimensionsChange( RenderType oldRenderType, RenderType newRenderType ) {
+//        oldRenderType= canonicalRenderType(oldRenderType);
+//        newRenderType= canonicalRenderType(newRenderType);
+//        if ( oldRenderType==newRenderType ) return false;
+//        if ( oldRenderType==RenderType.pitchAngleDistribution || newRenderType==RenderType.pitchAngleDistribution ) return true;
+//        if ( newRenderType==RenderType.polar ) return true;
+//        if ( newRenderType==RenderType.spectrogram || newRenderType==RenderType.nnSpectrogram ) {
+//            return true;
+//        } else {
+//            if ( newRenderType==RenderType.eventsBar ) {
+//                return true;
+//            } else {
+//                if ( oldRenderType==RenderType.spectrogram || oldRenderType==RenderType.nnSpectrogram ) {
+//                    return true;
+//                } else {
+//                    if ( oldRenderType==RenderType.series ) {
+//                        return false;
+//                    } else {
+//                        return false;
+//                    }
+//                }
+//            }
+//        }
+//    }    
+//    /**
+//     * true indicates that the new renderType makes the axis dimensions change.
+//     * For example, switching from spectrogram to series (to get a stack of components)
+//     * causes the z axis to become the yaxis.
+//     * @param oldRenderType
+//     * @param newRenderType
+//     * @return true if the dimensions change.
+//     */
     public static boolean axisDimensionsChange( RenderType oldRenderType, RenderType newRenderType ) {
         if ( oldRenderType==newRenderType ) return false;
         if ( newRenderType==RenderType.pitchAngleDistribution ) return true;
@@ -1283,8 +1342,8 @@ public class PlotElementController extends DomNodeController {
         } else {
             if ( newRenderType==RenderType.eventsBar ) {
                 if ( oldRenderType==RenderType.digital ) {
-                    return true;
-                } else {
+                return true;
+            } else {
                     return false;
                 }
             } else {
