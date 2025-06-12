@@ -13,14 +13,22 @@ See https://autoplot.org
 # Building Autoplot 
 
 Autoplot is a git repo at github.com, and uses another repo for the Das2 library
-which has developed along with Autoplot.  First clone Autoplot, and then Autoplot's
-compile scripts are expecting the Das2 library codes to be "under" the Autoplot
-code:
-
+which has developed along with Autoplot.  The dependency library is linked as 
+as git submodule.  To get Autoplot along with it's dependencies in one command
+issue:
+```bash
+git clone --recurse-submodules git@github.com:autoplot/autoplot.git
 ```
-git clone git@github.com:autoplot/autoplot.git
+If you already cloned the project and forgot `--recurse-submodules` then you
+can initialize the submodule using:
+```bash
 cd autoplot
-git clone git@github.com:das-developers/das2java.git
+git submodule update --init
+```
+Autoplot is built using Ant project files in the `Autoplot` subdirectory. To build
+and run Autoplot issue:
+```bash
+cd autoplot
 cd Autoplot
 ant jar
 ant run

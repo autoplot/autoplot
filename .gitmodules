@@ -1,0 +1,4 @@
+[submodule "das2java"]
+	path = das2java
+	url = git@github.com:das-developers/das2java.git
+	branch = main
