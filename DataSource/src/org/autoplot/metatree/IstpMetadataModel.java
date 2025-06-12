@@ -184,7 +184,12 @@ public class IstpMetadataModel extends MetadataModel {
             if ( min<max ) {
                 return DatumRange.newDatumRange(min, max, units);
             } else {
-                logger.log(Level.WARNING, "VALIDMIN and VALIDMAX has min value greater than max value: {0} > {1}", new Object[]{min, max});
+                String n= (String)attrs.get("NAME");
+                if ( n!=null ) {
+                    logger.log(Level.WARNING, "VALIDMIN and VALIDMAX has min value greater than max value: {0} > {1} for {2}", new Object[]{min, max, n});
+                } else {
+                    logger.log(Level.WARNING, "VALIDMIN and VALIDMAX has min value greater than max value: {0} > {1}", new Object[]{min, max});
+                }
                 return null;
             }
         }
