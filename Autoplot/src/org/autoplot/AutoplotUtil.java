@@ -1159,8 +1159,15 @@ public class AutoplotUtil {
     }
 
     /**
+     * Given a dataset, pick a RenderType best suited to display the data.  There will
+     * typically be multiple RenderTypes which could be used, for example "digital" will
+     * almost always display something as well as series, but this will pick a canonical
+     * one which matches the scientist's expectations.  Note some Java Preferences are 
+     * used as well, for example a preference for nnSpectrogram over spectrogram.
+     * 
      * @see org.autoplot.datasource.DataSourceUtil#guessRenderType(org.das2.qds.QDataSet), which will become the official version.
      * @see https://autoplot.org/developer.guessRenderType
+     * @see https://cottagesystems.com/jenkins/job/autoplot-test037/18205/artifact/showAllSchemes.jy
      * @param fillds
      * @return the render type
      */
@@ -1316,7 +1323,7 @@ public class AutoplotUtil {
             } else {
                 spec= RenderType.eventsBar;
             }
-        } else if ( Schemes.isDatumRange(fillds) ) {
+        } else if ( Schemes.isDatumRange(fillds) || Schemes.isCanonicalEvent(fillds) ) {
             spec= RenderType.eventsBar;
         } else {
             if ( useHugeScatter && fillds.length() > SERIES_SIZE_LIMIT) {
