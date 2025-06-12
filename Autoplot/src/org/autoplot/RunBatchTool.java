@@ -671,7 +671,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         });
 
         writeCheckBox.setText("Write:");
-        writeCheckBox.setToolTipText("After each iteration, write the file, where each $x is replaced with the parameter value.  The number \nof $x fields must match the number of parameters controlled.");
+        writeCheckBox.setToolTipText("After each iteration, write the file, where each $x is replaced with the parameter value.  The number \nof $x fields must match the number of parameters controlled.  Note the script name and its arguments\nare embedded within each .vap, and the pngwalk tool can be used to relaunch the script for any run.");
         writeCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 writeCheckBoxActionPerformed(evt);
