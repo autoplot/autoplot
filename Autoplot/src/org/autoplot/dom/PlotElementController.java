@@ -2827,7 +2827,11 @@ public class PlotElementController extends DomNodeController {
                     ydesc= AutoRangeUtil.autoRange( DataSetOps.unbundle(fillDs, fillDs.length(0)-1 ), props, ignoreDsProps ); 
                     Units u= ydesc.range.getUnits();
                     for ( int i=fillDs.length(0)-2; i>=0; i-- ) {
-                        AutoRangeUtil.AutoRangeDescriptor ydesc1= AutoRangeUtil.autoRange( DataSetOps.unbundle(fillDs,i ), props, ignoreDsProps );
+                        QDataSet ds1= DataSetOps.unbundle(fillDs,i);
+                        if ( i==0 && depend0!=null && Ops.equivalent( ds1, depend0 ) ) {
+                            continue;
+                        }
+                        AutoRangeUtil.AutoRangeDescriptor ydesc1= AutoRangeUtil.autoRange( ds1, props, ignoreDsProps );
                         if ( ydesc1.range.getUnits().isConvertibleTo(u) ) { // Bx, By, Bz
                             if ( i==0 && fillDs.length(0)==2 ) {
                                 // special case for T->X,Y where we are plotting X,Y, as in an orbit plot.
