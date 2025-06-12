@@ -1310,6 +1310,8 @@ public class AutoplotUtil {
                     spec = RenderType.bounds;
                 } else if ( fillds.rank()==3 && dims!=null && dims[1]==2 && dims[2]==2 ) {
                     spec = RenderType.bounds;
+                } else if ( Schemes.isBundleDescriptor(fillds) ) {
+                    spec = RenderType.digital;
                 } else {
                     spec = specPref;
                 }
