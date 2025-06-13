@@ -453,7 +453,11 @@ public class IstpMetadataModel extends MetadataModel {
                     // do nothing, assume that they know what they are doing.  
                     // (Steven's NetCDF file, https://sourceforge.net/p/autoplot/feature-requests/724/).
                 } else {
-                    units = Units.cdfEpoch;
+                    if ( units==Units.nanoseconds || units==Units.ns ) {
+                        units = Units.cdfTT2000;
+                    } else {
+                        units = Units.cdfEpoch;
+                    }
                 }
             }
         } else {
