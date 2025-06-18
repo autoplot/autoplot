@@ -66,6 +66,7 @@ import org.jdesktop.beansbinding.Converter;
 import org.python.core.Py;
 import org.python.core.PyFunction;
 import org.autoplot.ApplicationModel.ResizeRequestListener;
+import static org.autoplot.ScriptContext.plot;
 import org.autoplot.datasource.AnonymousDataSource;
 import org.autoplot.dom.DomNode;
 import org.autoplot.dom.DomUtil;
@@ -188,7 +189,7 @@ public class ScriptContext2023 extends PyJavaInstance {
     /**
      * reset the script focus to the default application.
      */
-    public synchronized void setDefaultApplication( ) {
+    public synchronized void setDefaultApplication() {
         setApplication(state.defaultApp);
     }
     
@@ -423,7 +424,7 @@ public class ScriptContext2023 extends PyJavaInstance {
     }
     
     private synchronized void maybeInitView() {
-        maybeInitModel( );
+        maybeInitModel();
         if (state.view == null) {
             Runnable run= new Runnable() {
                 @Override
@@ -536,7 +537,7 @@ public class ScriptContext2023 extends PyJavaInstance {
         if ( surl1.endsWith(".vap") || surl1.contains(".vap?")  ) {
             throw new IllegalArgumentException("cannot load vap here in two-argument plot");
         } else {
-            DataSourceFilter dsf= state.model.getDom().getDataSourceFilters(0);
+            DataSourceFilter dsf= state.dom.getDataSourceFilters(0);
             List<PlotElement> pes= state.dom.getController().getPlotElementsFor(dsf);
             PlotElement pe;
             if ( !pes.isEmpty() ) pe= pes.get(0); else pe=null;
@@ -952,7 +953,7 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
      */
     public MouseModule addMouseModule( Plot plot, String label, final PyFunction listener ) {
         DasPlot p= plot.getController().getDasPlot();
-        BoxSelectorMouseModule mm= new BoxSelectorMouseModule( p, p.getXAxis(), p.getYAxis(), null, new BoxRenderer(p), label );
+        BoxSelectorMouseModule mm= new BoxSelectorMouseModule( p, p.getXAxis(), p.getYAxis(), null, new BoxRenderer(p,true), label );
         BoxSelectionListener bsl= (BoxSelectionEvent e) -> {
             listener.__call__(Py.java2py(e));
         };
@@ -1423,8 +1424,8 @@ addBottomDecoration( dom.canvases[0], paint )
         waitUntilIdle();
 
         DasCanvas c = state.model.getCanvas();
-        int width= state.model.getDocumentModel().getCanvases(0).getWidth();
-        int height= state.model.getDocumentModel().getCanvases(0).getHeight();
+        int width= state.model.getDom().getCanvases(0).getWidth();
+        int height= state.model.getDom().getCanvases(0).getHeight();
 
         BufferedImage image = c.getImage(width,height);
 
@@ -1472,8 +1473,8 @@ addBottomDecoration( dom.canvases[0], paint )
     public void writeToSvg(OutputStream out) throws IOException {
         waitUntilIdle();
 
-        int width= state.model.getDocumentModel().getCanvases(0).getWidth();
-        int height= state.model.getDocumentModel().getCanvases(0).getHeight();
+        int width= state.model.getDom().getCanvases(0).getWidth();
+        int height= state.model.getDom().getCanvases(0).getHeight();
         state.model.getCanvas().setSize( width, height );
         state.model.getCanvas().validate();
         waitUntilIdle();
@@ -1498,8 +1499,8 @@ addBottomDecoration( dom.canvases[0], paint )
         filename= getLocalFilename(filename);
         
         waitUntilIdle();
-        int width= state.model.getDocumentModel().getCanvases(0).getWidth();
-        int height= state.model.getDocumentModel().getCanvases(0).getHeight();
+        int width= state.model.getDom().getCanvases(0).getWidth();
+        int height= state.model.getDom().getCanvases(0).getHeight();
         state.model.getCanvas().setSize( width, height );
         state.model.getCanvas().validate();
         waitUntilIdle();
@@ -2052,7 +2053,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * @throws java.io.IOException
      */
     public void load( String filename ) throws IOException {
-        new PlotCommand(state.dom).__call__(Py.newString(filename));
+        plot(filename);
     }
     
     /**
