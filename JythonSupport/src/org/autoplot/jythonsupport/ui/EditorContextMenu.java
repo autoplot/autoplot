@@ -333,6 +333,10 @@ public final class EditorContextMenu {
         return s;
     }
     
+    /**
+     * create the pop-up menu for the script panel.  This does not add
+     * the scientist's bookmarks, which are added in the Autoplot project.
+     */
     private void maybeCreateMenu() {
         if ( menu==null ) {
             menu= new JPopupMenu();
