@@ -76,6 +76,7 @@ import org.python.util.PythonInterpreter;
 import org.autoplot.GuiSupport;
 import org.autoplot.JythonUtil;
 import org.autoplot.datasource.AutoplotSettings;
+import org.autoplot.dom.Application;
 import org.autoplot.help.Util;
 import org.autoplot.jythonsupport.ui.EditorTextPane;
 import org.autoplot.util.TickleTimer;
@@ -150,7 +151,13 @@ public class LogConsole extends javax.swing.JPanel {
                     maybeInitializeInterpreter();
                     try {
                         PyObject po= interp.eval(s1);
-                        if ( !( po instanceof PyNone ) ) interp.exec("print '" + po.__str__() +"'" ); // JythonRefactory okay
+                        if ( !( po instanceof PyNone ) ) {
+                            try {
+                                interp.exec("print '" + po.__str__() +"'" ); // JythonRefactory okay
+                            } catch ( Exception ex ) {
+                                ex.printStackTrace();
+                            }
+                        }
                     } catch (PyException ex ) {
                         interp.exec(s1);// JythonRefactory okay
                     }
@@ -257,7 +264,7 @@ public class LogConsole extends javax.swing.JPanel {
             String s = commandLineTextPane1.getText();
             int ipos= commandLineTextPane1.getCaretPosition();
             commandLineTextPane1.setText("initializing interpretter...");
-            interp = JythonUtil.createInterpreter(true, false);
+            interp = JythonUtil.createInterpreter(true, false, (Application)scriptContext.get("dom"), null);
             if ( scriptContext!=null ) {
                 for ( Entry<String,Object> e: scriptContext.entrySet() ) {
                     interp.set( e.getKey(), e.getValue() );
