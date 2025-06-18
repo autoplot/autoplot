@@ -8,7 +8,6 @@ import org.python.core.Py;
 import org.python.core.PyInteger;
 import org.python.core.PyObject;
 import org.python.core.PyString;
-import org.autoplot.ScriptContext;
 import org.autoplot.dom.Annotation;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.DomNode;
@@ -36,7 +35,13 @@ import org.python.core.PyList;
  * @author jbf
  */
 public class AnnotationCommand extends PyObject {
-
+    
+    private Application dom;
+    
+    public AnnotationCommand( Application dom ) {
+        this.dom= dom;
+    }
+    
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
     
     public static final PyString __doc__ =
@@ -178,7 +183,7 @@ public class AnnotationCommand extends PyObject {
             index= 0;
         }
         
-        Application dom= ScriptContext.getDocumentModel();
+        Application dom= this.dom;
         
         dom.getController().registerPendingChange( this, this );  
         dom.getController().performingChange(this,this);

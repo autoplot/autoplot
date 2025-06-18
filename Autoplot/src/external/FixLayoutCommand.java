@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import org.autoplot.ScriptContext;
 import org.autoplot.dom.Application;
 import org.autoplot.dom.DomOps;
 import org.python.core.Py;
@@ -20,6 +19,12 @@ import org.python.core.PyString;
  */
 public class FixLayoutCommand extends PyObject  {
         
+    Application dom;
+    
+    public FixLayoutCommand( Application dom ) {
+        this.dom= dom;
+    }
+    
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
     
     public static final PyString __doc__ =
@@ -97,7 +102,7 @@ public class FixLayoutCommand extends PyObject  {
             }
         }
         
-        Application dom= ScriptContext.getDocumentModel();
+        Application dom= this.dom;
         
         DomOps.fixLayout( dom, controls );
 
