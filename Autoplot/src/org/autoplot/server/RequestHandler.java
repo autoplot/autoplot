@@ -56,9 +56,8 @@ public class RequestHandler {
      */
     public String handleRequest( InputStream in, ApplicationModel model, OutputStream out, RequestListener rlistener) {
         try {
-            PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
+            PythonInterpreter interp = JythonUtil.createInterpreter(true, false, model.getDom(), null );
             interp.setOut( out );
-            interp.set("dom", model.getDocumentModel() );
             interp.set("params", new PyDictionary());
             interp.set("resourceURI", Py.None );
             
