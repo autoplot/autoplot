@@ -74,6 +74,7 @@ import org.autoplot.AutoplotUtil;
 import org.autoplot.ColumnColumnConnectorMouseModule;
 import org.autoplot.GuiSupport;
 import org.autoplot.LayoutListener;
+import org.autoplot.ScriptContext2023;
 import org.autoplot.dom.ChangesSupport.DomLock;
 import org.autoplot.layout.LayoutConstants;
 import org.autoplot.renderer.AnnotationEditorPanel;
@@ -3352,6 +3353,27 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
     }
     
+    private ScriptContext2023 scriptContext = null;
+
+    public static final String PROP_SCRIPTCONTEXT = "scriptContext";
+
+    public ScriptContext2023 getScriptContext() {
+        return scriptContext;
+    }
+
+    public void setScriptContext(ScriptContext2023 scriptContext) {
+        ScriptContext2023 oldScriptContext = this.scriptContext;
+        this.scriptContext = scriptContext;
+        this.scriptContextState= new ScriptContext2023.State();
+        das2PeerListenerSupport.firePropertyChange(PROP_SCRIPTCONTEXT, oldScriptContext, scriptContext);
+    }
+    
+    private ScriptContext2023.State scriptContextState;
+
+    public ScriptContext2023.State getScriptContextState() {
+        return scriptContextState;
+    }
+
     /**
      * focus canvas.
      */
