@@ -706,19 +706,29 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 final String fsuri= suri;
                 
                 Runnable run = () -> {
-                    ScriptContext.createGui();
-                    Window apWindow= ScriptContext.getViewWindow();
+                    Window apWindow;
+                    Application dom;
+                    AutoplotUI autoplot;
+                    if ( parent instanceof AutoplotUI ) {
+                        apWindow= parent;
+                        autoplot= ((AutoplotUI)apWindow);
+                        dom= autoplot.getDom();
+                    } else {
+                        ScriptContext.createGui();
+                        apWindow= ScriptContext.getViewWindow();
+                        autoplot= ScriptContext.getApplication();
+                        dom= autoplot.getDom();
+                    }
                     if ( fsuri!=null ) {
                         raiseApWindowSoon(apWindow);
                         if ( fsuri.startsWith("script:") ) {
-                            ScriptContext.getApplication().runScriptTools(fsuri);
+                            autoplot.runScriptTools(fsuri);
                             return;
                         } else {
                             ScriptContext.plot(fsuri);
                         }
                     }
                     // go through and check for the axis autorange flag, and autorange if necessary.
-                    Application dom= ScriptContext.getDocumentModel();
                     for ( int i=0; i<dom.getPlots().length; i++ ) {
                         Plot p= dom.getPlots(i);
                         if ( p.getYaxis().isAutoRange() ) {
@@ -2723,7 +2733,12 @@ public final class PngWalkTool extends javax.swing.JPanel {
             params.put("name",""); //TODO: what should this be?
             params.put("summary",summary);
             try {
-                JythonUtil.invokeScriptSoon(nf.toURI(),null,params,false,false,mon);
+                Application dom= null;
+                if ( parentWindow instanceof AutoplotUI ) {
+                    AutoplotUI parent= (AutoplotUI)parentWindow;
+                    dom = parent.getDom();
+                }
+                JythonUtil.invokeScriptSoon(nf.toURI(),dom,params,false,false,mon);
             } catch (IOException ex) {
                 Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
             }
