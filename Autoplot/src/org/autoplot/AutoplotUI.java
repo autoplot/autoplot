@@ -6682,6 +6682,7 @@ APSplash.checkTime("init 240");
                             final Map<String,Object> env= new HashMap<>();
                             URISplit split= URISplit.parse(cmd);
                             env.put( "PWD", split.path );
+                            env.put( "dom", AutoplotUI.this.getDom() );
                             //ScriptContext.setApplication(AutoplotUI.this);
                             JythonUtil.invokeScriptNow(env, f1);
                         }catch (IOException ex) {
