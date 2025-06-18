@@ -83,6 +83,7 @@ import org.python.util.InteractiveInterpreter;
 import org.autoplot.dom.Application;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
+import org.autoplot.dom.ApplicationController;
 import org.autoplot.jythonsupport.Param;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
 import org.autoplot.jythonsupport.ui.Util;
@@ -1823,16 +1824,16 @@ public class RunBatchTool extends javax.swing.JPanel {
         s= s.replaceAll(" ","_"); 
 
         if ( s.endsWith(".png") ) {
-            BufferedImage bufferedImage = ScriptContext.writeToBufferedImage(); 
+            BufferedImage bufferedImage = dom.getController().getScriptContext().writeToBufferedImage(); 
             Map<String,String> metadata= new LinkedHashMap<>();
             metadata.put( "ScriptURI",uri );
             if ( dom!=null ) {
                 metadata.put( DasPNGConstants.KEYWORD_PLOT_INFO, 
                     dom.getController().getApplicationModel().canvas.getImageMetadata() );
             }
-            ScriptContext.writeToPng(bufferedImage,s,metadata);
+            dom.getController().getScriptContext().writeToPng(bufferedImage,s,metadata);
         } else if ( s.endsWith(".pdf") ) {
-            ScriptContext.writeToPdf(s);
+            dom.getController().getScriptContext().writeToPdf(s);
         } 
         return s;
 
@@ -1999,7 +2000,22 @@ public class RunBatchTool extends javax.swing.JPanel {
         JSONObject runResults= new JSONObject();
 
         try {
-            Application myDom= this.dom;
+            this.dom.getController().getScriptContext();
+            
+            ApplicationModel appmodel = new ApplicationModel();
+            appmodel.addDasPeersToAppAndWait();
+
+            Application myDom= appmodel.getDocumentModel();
+            ScriptContext2023 scriptContext= new ScriptContext2023();
+            myDom.getController().setScriptContext( scriptContext );
+        
+            if ( !scriptContext.isModelInitialized() ) {
+                scriptContext.setApplicationModel(appmodel);
+                scriptContext.setView(null);
+                scriptContext._setDefaultApp(dom.getController().maybeGetApplicatonGUI());
+            }
+            
+            myDom.getController().getScriptContext();
             
             ProgressMonitor myMonitor= new NullProgressMonitor() {
                 @Override
@@ -2110,7 +2126,7 @@ public class RunBatchTool extends javax.swing.JPanel {
     }
         
     /**
-     * experiment to try multi-threaded approach to running 16 processes at once.
+     * experiment to try multi-threaded approach to running multiple processes at once.
      * @param threadCount number of concurrent threads.
      * @throws IOException 
      */
@@ -2179,7 +2195,7 @@ public class RunBatchTool extends javax.swing.JPanel {
             
             Map<String,org.autoplot.jythonsupport.Param> parms= Util.getParams( env, script, splitParams, new NullProgressMonitor() );
 
-            InteractiveInterpreter interp = JythonUtil.createInterpreter( true, false );
+            InteractiveInterpreter interp = JythonUtil.createInterpreter( true, false, this.dom, null );
             interp.exec(JythonRefactory.fixImports("import autoplot2023")); 
             
             ParametersFormPanel pfp= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
@@ -2936,7 +2952,7 @@ public class RunBatchTool extends javax.swing.JPanel {
      */
     private InteractiveInterpreter createInterpretter(
         Map<String,Object> env, File scriptFile, Map<String,String> params, String pwd ) throws IOException {
-        InteractiveInterpreter interp = JythonUtil.createInterpreter( true, false );
+        InteractiveInterpreter interp = JythonUtil.createInterpreter( true, false, this.dom, null );
         interp.exec(JythonRefactory.fixImports("import autoplot2023"));   
 
         ParametersFormPanel pfp= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
