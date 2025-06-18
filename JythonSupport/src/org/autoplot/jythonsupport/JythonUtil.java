@@ -99,7 +99,7 @@ public class JythonUtil {
         org.python.core.PySystemState pySys = new org.python.core.PySystemState();
         //pySys.setdefaultencoding("utf8"); //doesn't work with Jython2.2, try with 2.5
 
-        String[] loadClasses = new String[]{"glob.py", "autoplot2023.py", "autoplotapp.py"}; // these must be in the root of the interpretter search path.
+        String[] loadClasses = new String[]{"glob.py", "autoplot2023.py", "autoplotapp2025.py"}; // these must be in the root of the interpretter search path.
         for (String pysrc : loadClasses) {
             switch (pysrc) {
                 case "glob.py":
@@ -135,6 +135,9 @@ public class JythonUtil {
 //        } catch ( Exception ex ) {
 //            System.err.println("java1-> ok!" );
 //        }
+
+        //interp.get("peekAt"); // not yet
+        
         boolean loadAutoplotStuff = true;
         if (loadAutoplotStuff) {
             maybeLoadAdapters();
@@ -392,7 +395,7 @@ public class JythonUtil {
     private static String getLocalJythonAutoplotLib() throws IOException {
         File ff2 = new File(AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA));
         File ff3 = new File(ff2.toString() + "/jython");
-        File ff4 = new File(ff3, "autoplot2023.py");
+        File ff4 = new File(ff3, "autoplot2025.py");
         String vers = "";
 
         // This is the version that Autoplot would like to find, and should be found within the Java class path.
@@ -428,7 +431,7 @@ public class JythonUtil {
                     }
                 }
             }
-            String[] ss = new String[]{"autoplot2023.py", "autoplotapp2017.py"};
+            String[] ss = new String[]{"autoplot2025.py", "autoplotapp2017.py","autoplotapp2025.py", "autoplotapp2025.py"};
             for (String s : ss) {
                 try (InputStream in = JythonUtil.class.getResourceAsStream("/" + s);
                         FileOutputStream out = new FileOutputStream(new File(ff3, s))) {
