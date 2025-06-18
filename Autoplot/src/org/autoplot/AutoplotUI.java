@@ -115,8 +115,6 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
 import javax.xml.parsers.ParserConfigurationException;
-import static org.autoplot.ScriptContext.writeToPdf;
-import static org.autoplot.ScriptContext.writeToPng;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.autoplot.pngwalk.CreatePngWalk;
 import org.autoplot.pngwalk.PngWalkTool;
@@ -236,7 +234,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
         Runnable run= () -> {
             try ( InputStream ins= AutoplotUI.class.getResourceAsStream("macMenuBar.jy") ) {
                 logger.fine("adding additional actions for mac menu bar.");
-                PythonInterpreter interp= JythonUtil.createInterpreter( true, false );
+                PythonInterpreter interp= JythonUtil.createInterpreter( true, false ); // static okay
                 interp.execfile(ins,"macMenuBar.jy");
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, null, ex);
@@ -461,12 +459,14 @@ public final class AutoplotUI extends javax.swing.JFrame {
         }
 
         applicationModel = model;
-        this.dom= model.getDocumentModel();
+        this.dom= model.getDom();
+        ScriptContext2023 scriptContext= new ScriptContext2023();
+        this.dom.getController().setScriptContext( scriptContext );
         
-        if ( !ScriptContext.isModelInitialized() ) {
-            ScriptContext.setApplicationModel(model);
-            ScriptContext.setView(this);
-            ScriptContext._setDefaultApp(this);
+        if ( !scriptContext.isModelInitialized() ) {
+            scriptContext.setApplicationModel(model);
+            scriptContext.setView(this);
+            scriptContext._setDefaultApp(this);
         }
 
         model.setResizeRequestListener( (int w, int h) -> resizeForCanvasSize(w, h) );
@@ -872,11 +872,11 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 } else {
                     org.das2.util.LoggerManager.logGuiEvent(ev);     
                     
-                    if ( JOptionPane.YES_OPTION==
-                            JOptionPane.showConfirmDialog( AutoplotUI.this, "Scripts can only be run from the main window.  Make this the main window?", 
-                                    "Set Main Window", JOptionPane.YES_NO_OPTION ) ) {
-                        ScriptContext.setApplication(AutoplotUI.this);
-                    }
+//                    if ( JOptionPane.YES_OPTION==
+//                            JOptionPane.showConfirmDialog( AutoplotUI.this, "Scripts can only be run from the main window.  Make this the main window?", 
+//                                    "Set Main Window", JOptionPane.YES_NO_OPTION ) ) {
+//                        ScriptContext.setApplication(AutoplotUI.this);
+//                    }
                     runScript( dataSetSelector.getValue() );
                 }
                 dom.getController().setFocusUri(ApplicationController.VALUE_BLUR_FOCUS);
@@ -915,12 +915,12 @@ public final class AutoplotUI extends javax.swing.JFrame {
                     }
                 } else {
                     org.das2.util.LoggerManager.logGuiEvent(ev);  
-                    if ( JOptionPane.YES_OPTION==
-                            JOptionPane.showConfirmDialog( AutoplotUI.this, "Scripts can only be run from the main window.  Make this the main window?", 
-                                    "Set Main Window", JOptionPane.YES_NO_OPTION ) ) {
-                        ScriptContext.setApplicationModel(AutoplotUI.this.applicationModel);
-                        ScriptContext.setView(AutoplotUI.this);
-                    }
+                    //if ( JOptionPane.YES_OPTION==
+                    //        JOptionPane.showConfirmDialog( AutoplotUI.this, "Scripts can only be run from the main window.  Make this the main window?", 
+                    //                "Set Main Window", JOptionPane.YES_NO_OPTION ) ) {
+                    //    ScriptContext.setApplicationModel(AutoplotUI.this.applicationModel);
+                    //    ScriptContext.setView(AutoplotUI.this);
+                    //}
                     runScript( dataSetSelector.getValue() );
                 }
                 dom.getController().setFocusUri(ApplicationController.VALUE_BLUR_FOCUS);                
@@ -1101,9 +1101,10 @@ public final class AutoplotUI extends javax.swing.JFrame {
         this.addWindowListener( AppManager.getInstance().getWindowListener(this,new AbstractAction("close") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                org.das2.util.LoggerManager.logGuiEvent(e);                                    
-                if ( AutoplotUI.this==ScriptContext.getViewWindow()  ) {
-                    ScriptContext.close();
+                org.das2.util.LoggerManager.logGuiEvent(e);
+                ScriptContext2023 s2c= dom.getController().getScriptContext();
+                if ( AutoplotUI.this== s2c.getViewWindow()  ) {
+                    dom.getController().getScriptContext().close();
                 }
                 //TODO: remove the following prefs.
                 final Preferences prefs= AutoplotSettings.settings().getPreferences(ApplicationModel.class);
@@ -6438,11 +6439,11 @@ APSplash.checkTime("init 240");
         if ( ScriptContext.getViewWindow()==AutoplotUI.this ) {
             runScript( script );
         } else {
-            if ( JOptionPane.YES_OPTION==
-                    JOptionPane.showConfirmDialog( AutoplotUI.this, "Scripts can only be run from the main window.  Make this the main window?", 
-                            "Set Main Window", JOptionPane.YES_NO_OPTION ) ) {
+            //if ( JOptionPane.YES_OPTION==
+            //        JOptionPane.showConfirmDialog( AutoplotUI.this, "Scripts can only be run from the main window.  Make this the main window?", 
+            //                "Set Main Window", JOptionPane.YES_NO_OPTION ) ) {
                 ScriptContext.setApplication(AutoplotUI.this);
-            }
+            //}
             runScript( script );
         }
     }
@@ -6681,7 +6682,7 @@ APSplash.checkTime("init 240");
                             final Map<String,Object> env= new HashMap<>();
                             URISplit split= URISplit.parse(cmd);
                             env.put( "PWD", split.path );
-                            ScriptContext.setApplication(AutoplotUI.this);
+                            //ScriptContext.setApplication(AutoplotUI.this);
                             JythonUtil.invokeScriptNow(env, f1);
                         }catch (IOException ex) {
                             logger.log(Level.SEVERE, null, ex);

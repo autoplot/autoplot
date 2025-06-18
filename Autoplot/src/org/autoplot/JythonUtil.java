@@ -6,6 +6,7 @@ import com.github.difflib.patch.Patch;
 import external.AnnotationCommand;
 import external.PlotCommand;
 import external.FixLayoutCommand;
+import external.SimpleCommand;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -18,6 +19,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -25,10 +28,13 @@ import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BoxLayout;
@@ -59,6 +65,7 @@ import org.autoplot.jythonsupport.ui.EditorTextPane;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
 import org.autoplot.jythonsupport.ui.ScriptPanelSupport;
 import org.das2.util.FileUtil;
+import org.python.core.PyJavaInstance;
 import org.python.core.PySyntaxError;
 
 /**
@@ -90,19 +97,15 @@ public class JythonUtil {
         InteractiveInterpreter interp= org.autoplot.jythonsupport.JythonUtil.createInterpreter(sandbox);
         if ( org.autoplot.jythonsupport.Util.isLegacyImports() ) {
             if ( appContext ) {
-                try ( InputStream in = JythonUtil.class.getResource("/appContextImports2017.py").openStream() ) {
-                    interp.execfile( in, "/appContextImports2017.py" ); // JythonRefactory okay
+                try ( InputStream in = JythonUtil.class.getResource("/appContextImports2025.py").openStream() ) {
+                    interp.execfile( in, "/appContextImports2025.py" ); // JythonRefactory okay
                 }
             }
         }
         interp.set( "monitor", new NullProgressMonitor() );
-        interp.set( "plotx", new PlotCommand() );
-        interp.set( "plot", new PlotCommand() );
         interp.set( "dataset", new DatasetCommand() );
         interp.set( "getDataSet", new GetDataSetCommand() );
         interp.set( "getDataSets", new GetDataSetsCommand() );
-        interp.set( "annotation", new AnnotationCommand() );
-        interp.set( "fixLayout", new FixLayoutCommand() );
         
         return interp;
     }
@@ -119,7 +122,30 @@ public class JythonUtil {
      */
     public static InteractiveInterpreter createInterpreter( boolean appContext, boolean sandbox, Application dom, ProgressMonitor mon ) throws IOException {
         InteractiveInterpreter interp= createInterpreter(appContext, sandbox);
-        if ( dom!=null ) interp.set("dom", dom );
+        // interp.get("peekAt");  // This is how to see if the context 
+        if ( dom!=null ) {
+            interp.set("dom", dom );
+            interp.set("scriptContext", new PyJavaInstance( dom.getController().getScriptContext()) );
+            interp.set( "plotx", new PlotCommand(dom) );
+            interp.set( "plot", new PlotCommand(dom) );    
+            interp.set( "annotation", new AnnotationCommand(dom) );
+            interp.set( "fixLayout", new FixLayoutCommand(dom) );
+            Class c = dom.getController().getScriptContext().getClass();
+            Set<String> exclude=new HashSet<>(Arrays.asList("hashCode"));
+            for ( Method m : c.getDeclaredMethods() ) {
+                if ( m.getName().startsWith("_") || exclude.contains(m.getName()) ) {
+                    continue;
+                }
+                if ( interp.get(m.getName())!=null ) {
+                    continue;
+                }
+                boolean isPublic = Modifier.isPublic(m.getModifiers());
+                if ( !isPublic ) {
+                    continue;
+                }
+                interp.exec(""+m.getName()+"=scriptContext."+m.getName());
+            }
+        }
         if ( mon!=null ) interp.set("monitor", mon ); else interp.set( "monitor", new NullProgressMonitor() );
         return interp;
     }
