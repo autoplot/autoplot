@@ -54,6 +54,7 @@ import org.autoplot.ApplicationModel;
 import org.autoplot.AutoplotUI;
 import org.autoplot.JythonUtil;
 import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.autoplot.dom.ApplicationController;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSetURI;
@@ -398,8 +399,8 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             this.textArea.putClientProperty(JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER, new JythonInterpreterProvider() {
                 @Override
                 public PythonInterpreter createInterpreter() throws java.io.IOException {
-                    PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
-                    interp.set("dom", model.getDocumentModel() );
+                    PythonInterpreter interp = 
+                            JythonUtil.createInterpreter(true, false, model.getDom(), null );
                     interp.set("params", new PyDictionary());
                     interp.set("resourceURI", Py.None );
                     return interp;
@@ -556,8 +557,9 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             }
         }
         System.err.println("== Executing Script ==");
-        ScriptContext.setApplication( app );
-        ScriptContext.setWindow(model);
+        if ( this.context==CONTEXT_APPLICATION ) {
+            model.getDom().getController().getScriptContext().setWindow(model);
+        }
         if ( support.file!=null ) this.setRunningScript(support.file);
         support.executeScript( evt.getModifiers() );
     }//GEN-LAST:event_executeButtonActionPerformed
