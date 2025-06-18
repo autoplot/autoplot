@@ -765,12 +765,10 @@ public class AppScriptPanelSupport {
             }
             InteractiveInterpreter interp = null;
             try {
-                interp= JythonUtil.createInterpreter(true, false);
+                interp= JythonUtil.createInterpreter(true, false, model.getDom(), mon );
 
                 EditorAnnotationsSupport.setExpressionLookup(annotationsSupport.getForInterp(interp));
 
-                interp.set("dom", model.getDocumentModel() );
-                interp.set("monitor", mon );
                 if ( file!=null ) {
                     URISplit split= URISplit.parse(file.toString());
                     interp.set( "PWD", split.path );   
