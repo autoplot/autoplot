@@ -674,6 +674,113 @@ public class CdfDataSourceFormat implements DataSourceFormat {
     }
 
     /**
+     * convert the rank 2 dataset to a native array.
+     * @param ds rank 2 dataset
+     * @param uc units converter to convert the type.
+     * @param type type code, such as CDF_DOUBLE indicating how the data should be converted.
+     * @param mon monitor
+     * @return array of this type.
+     */
+    private static Object doIt2( QDataSet ds, UnitsConverter uc, CDFDataType type, ProgressMonitor mon ) {
+        Object export;
+        QubeDataSetIterator iter = new QubeDataSetIterator(ds);
+        iter.setMonitor(mon);
+        int elements= ds.length()*ds.length(0);
+        if ( type==CDFDataType.DOUBLE || type==CDFDataType.EPOCH ) {
+            double[] dexport= new double[ elements ];
+            int i = 0;
+            while (iter.hasNext()) {
+                iter.next();
+                dexport[i++] = uc.convert(iter.getValue(ds));
+            }
+            export= dexport;
+       } else if ( type==CDFDataType.TT2000 ) {
+            long[] dexport= new long[ elements ];
+            int i = 0;
+            while (iter.hasNext()) {
+                iter.next();
+                dexport[i++] = (long)uc.convert(iter.getValue(ds));
+            }
+            export= dexport;
+            
+        } else if ( type==CDFDataType.FLOAT ) {
+            float[] fexport= new float[ elements ];
+            int i = 0;
+            while (iter.hasNext()) {
+                iter.next();
+                fexport[i++] = (float)uc.convert(iter.getValue(ds));
+            }
+            export= fexport;
+
+        } else if ( type==CDFDataType.INT4 ) {
+            int[] bexport= new int[ elements ];
+            int i = 0;
+            while (iter.hasNext()) {
+                iter.next();
+                bexport[i++] = (int)uc.convert(iter.getValue(ds));
+            }
+            export= bexport;
+
+        } else if ( type==CDFDataType.INT2 ) {
+            short[] bexport= new short[ elements ];
+            int i = 0;
+            while (iter.hasNext()) {
+                iter.next();
+                bexport[i++] = (short)uc.convert(iter.getValue(ds));
+            }
+            export= bexport;
+
+        } else if ( type==CDFDataType.INT1 ) {
+            byte[] bexport= new byte[ elements ];
+            int i = 0;
+            while (iter.hasNext()) {
+                iter.next();
+                bexport[i++] = (byte)uc.convert(iter.getValue(ds));
+            }
+            export= bexport;
+
+        } else if ( type==CDFDataType.CHAR ) {
+            String[] s= new String[ elements ];
+            for ( int i=0; i<ds.length(); i++ ) {
+                s[i]= ds.slice(i).svalue();
+            }
+            export= s;
+        
+        } else if ( type==CDFDataType.UINT1 ) {
+            short[] bexport= new short[ elements ];
+            int i = 0;
+            while (iter.hasNext()) {
+                iter.next();
+                bexport[i++] = (short)uc.convert(iter.getValue(ds));
+            }
+            export= bexport;
+            
+        } else if ( type==CDFDataType.UINT2 ) {
+            int[] bexport= new int[ elements ];
+            int i = 0;
+            while (iter.hasNext()) {
+                iter.next();
+                bexport[i++] = (short)uc.convert(iter.getValue(ds));
+            }
+            export= bexport;
+
+        } else if ( type==CDFDataType.UINT4 ) {
+            long[] bexport= new long[ elements ];
+            int i = 0;
+            while (iter.hasNext()) {
+                iter.next();
+                bexport[i++] = (short)uc.convert(iter.getValue(ds));
+            }
+            export= bexport;
+
+        } else {
+            throw new IllegalArgumentException("not supported: "+type);
+        }
+        return export;
+
+    }
+    
+    /**
      * CDF library needs array in double or triple arrays.  
      * 
      * @param ds the dataset.
@@ -704,37 +811,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             case 1:
                 return doIt1( ds, uc, type );
             case 2:
-                if ( type==CDFDataType.DOUBLE ) {
-                    oexport= new double[ds.length()][];
-                } else if ( type==CDFDataType.TT2000 ) {
-                    oexport= new long[ds.length()][];
-                } else if ( type==CDFDataType.FLOAT ) {
-                    oexport= new float[ds.length()][];
-                } else if ( type==CDFDataType.INT4 ) {
-                    oexport= new int[ds.length()][];
-                } else if ( type==CDFDataType.INT2 ) {
-                    oexport= new short[ds.length()][];
-                } else if ( type==CDFDataType.INT1 ) {
-                    oexport= new byte[ds.length()][];
-                } else if ( type==CDFDataType.CHAR ) {
-                    oexport= new String[ds.length()][];
-                } else if ( type==CDFDataType.UINT4 ) {
-                    oexport= new long[ds.length()][];
-                } else if ( type==CDFDataType.UINT2 ) {
-                    oexport= new int[ds.length()][];
-                } else if ( type==CDFDataType.UINT1 ) {
-                    oexport= new short[ds.length()][];
-                } else {
-                    throw new IllegalArgumentException("type not supported: "+type);
-                }
-                mon.setTaskSize(ds.length());
-                mon.started();
-                for ( int i=0; i<ds.length(); i++ ) {
-                    mon.setTaskProgress(i);
-                    Array.set(oexport, i, CdfDataSourceFormat.datasetToArray( ds.slice(i), uc, type, null ) );
-                }
-                mon.finished();
-                return oexport;
+                return doIt2( ds, uc, type, mon );
             case 3:
                 if ( type==CDFDataType.DOUBLE ) {
                     oexport= new double[ds.length()][][];
