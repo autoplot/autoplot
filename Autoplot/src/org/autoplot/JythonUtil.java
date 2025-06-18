@@ -6,7 +6,6 @@ import com.github.difflib.patch.Patch;
 import external.AnnotationCommand;
 import external.PlotCommand;
 import external.FixLayoutCommand;
-import external.SimpleCommand;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
