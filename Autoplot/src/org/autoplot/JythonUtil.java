@@ -123,7 +123,7 @@ public class JythonUtil {
         InteractiveInterpreter interp= createInterpreter(appContext, sandbox);
         // interp.get("peekAt");  // This is how to see if the context 
         if ( dom!=null ) {
-            interp.set("dom", dom );
+            interp.set( "dom", dom );
             interp.set( "plotx", new PlotCommand(dom) );
             interp.set( "plot", new PlotCommand(dom) );    
             interp.set( "annotation", new AnnotationCommand(dom) );
