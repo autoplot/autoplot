@@ -240,16 +240,16 @@ public class PDS3DataObject {
      */
     public String resolveUri(URL resource) {
         if ( interchangeFormat.equals("ASCII") && fieldNumber>-1 ) {
-            String s= resource.toString();
-            if ( s.contains("NH-P-PEPSSI-4-PLASMA-V1.0") ) {
-                int i= s.lastIndexOf("/");
-                s= s.substring(0,i) + s.substring(i).toLowerCase();
-                try {
-                    resource= new URL(s);
-                } catch (MalformedURLException ex) {
-                    throw new IllegalArgumentException(ex);
-                }
-            }
+//            String s= resource.toString();
+//            if ( s.contains("NH-P-PEPSSI-4-PLASMA-V1.0") ) {
+//                int i= s.lastIndexOf("/");
+//                s= s.substring(0,i) + s.substring(i).toLowerCase();
+//                try {
+//                    resource= new URL(s);
+//                } catch (MalformedURLException ex) {
+//                    throw new IllegalArgumentException(ex);
+//                }
+//            }
             return getAsciiUri(resource);
         } else {
             return getBinaryUri(resource) ;
