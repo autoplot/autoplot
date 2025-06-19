@@ -3365,7 +3365,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         ScriptContext2023 oldScriptContext = this.scriptContext;
         this.scriptContext = scriptContext;
         this.scriptContextState= new ScriptContext2023.State();
-        das2PeerListenerSupport.firePropertyChange(PROP_SCRIPTCONTEXT, oldScriptContext, scriptContext);
+        //das2PeerListenerSupport.firePropertyChange(PROP_SCRIPTCONTEXT, oldScriptContext, scriptContext);
     }
     
     private ScriptContext2023.State scriptContextState;
