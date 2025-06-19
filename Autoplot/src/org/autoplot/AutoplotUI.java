@@ -5382,7 +5382,12 @@ APSplash.checkTime("init 230");
                     boolean scriptExit= alm.getBooleanValue("scriptExit");
                     
                     ScriptContext2023 scriptContext= new ScriptContext2023();
-                    model.dom.getController().setScriptContext( scriptContext );
+                    model.dom.getController().setScriptContext(scriptContext);
+                    if ( !scriptContext.isModelInitialized() ) {
+                        scriptContext.setApplicationModel(model);
+                        scriptContext.setView(app);
+                        scriptContext._setDefaultApp(app);
+                    }
                     
                     Runnable run= getRunScriptRunnable(app, 
                             model, 
