@@ -811,7 +811,37 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             case 1:
                 return doIt1( ds, uc, type );
             case 2:
-                return doIt2( ds, uc, type, mon );
+                if ( type==CDFDataType.DOUBLE ) {
+                    oexport= new double[ds.length()][];
+                } else if ( type==CDFDataType.TT2000 ) {
+                    oexport= new long[ds.length()][];
+                } else if ( type==CDFDataType.FLOAT ) {
+                    oexport= new float[ds.length()][];
+                } else if ( type==CDFDataType.INT4 ) {
+                    oexport= new int[ds.length()][];
+                } else if ( type==CDFDataType.INT2 ) {
+                    oexport= new short[ds.length()][];
+                } else if ( type==CDFDataType.INT1 ) {
+                    oexport= new byte[ds.length()][];
+                } else if ( type==CDFDataType.CHAR ) {
+                    oexport= new String[ds.length()][];
+                } else if ( type==CDFDataType.UINT4 ) {
+                    oexport= new long[ds.length()][];
+                } else if ( type==CDFDataType.UINT2 ) {
+                    oexport= new int[ds.length()][];
+                } else if ( type==CDFDataType.UINT1 ) {
+                    oexport= new short[ds.length()][];
+                } else {
+                    throw new IllegalArgumentException("type not supported: "+type);
+                }
+                mon.setTaskSize(ds.length());
+                mon.started();
+                for ( int i=0; i<ds.length(); i++ ) {
+                    mon.setTaskProgress(i);
+                    Array.set(oexport, i, CdfDataSourceFormat.datasetToArray( ds.slice(i), uc, type, null ) );
+                }
+                mon.finished();
+                return oexport;
             case 3:
                 if ( type==CDFDataType.DOUBLE ) {
                     oexport= new double[ds.length()][][];
