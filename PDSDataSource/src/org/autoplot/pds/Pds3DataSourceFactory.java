@@ -219,6 +219,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
                 DataSetURI.getFile(filePointer.getUrl(),mon );
             } catch ( FileNotFoundException ex ) {
                 // see if the lower case one is there (https://pds-ppi.igpp.ucla.edu/data/NH-J-PEPSSI-2-JUPITER-V1.1/DATA/2007/060_090_MAR/20070303_003527/pep_0035272317_0x691_eng_1.lbl?H1)
+                logger.warning("unable to find the file referenced in the label, looking for lower case filename.");
                 URL urlLower = lowerCaseFile( filePointer.getUrl() );
                 DataSetURI.getFile(urlLower,mon);
                 
