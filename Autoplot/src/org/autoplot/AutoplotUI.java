@@ -4798,7 +4798,6 @@ private void updateFrameTitle() {
             String testPngFilename ) {
         try {
             String pwd= URISplit.parse(script).path;
-            ScriptContext.setApplicationModel(model); // initialize
             JythonUtil.runScript( model, script, scriptArgs.toArray(new String[scriptArgs.size()]), pwd );
 
             if ( testPngFilename!=null && testPngFilename.length()>0 ) {
@@ -5366,6 +5365,7 @@ APSplash.checkTime("init 230");
                                 t.printStackTrace();
                             }
                         } );
+                        
                     }
                     String s= URISplit.makeAbsolute( new File(".").getAbsolutePath(), script );
                     
@@ -5380,6 +5380,10 @@ APSplash.checkTime("init 230");
                         System.exit(-1);
                     }
                     boolean scriptExit= alm.getBooleanValue("scriptExit");
+                    
+                    ScriptContext2023 scriptContext= new ScriptContext2023();
+                    model.dom.getController().setScriptContext( scriptContext );
+                    
                     Runnable run= getRunScriptRunnable(app, 
                             model, 
                             s, 
