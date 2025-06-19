@@ -828,9 +828,10 @@ public class RunBatchTool extends javax.swing.JPanel {
                 String scriptName= dataSetSelector1.getValue();
                 dom.getController().getApplicationModel().addRecent(scriptName);
                 if ( ( evt.getModifiers() & KeyEvent.SHIFT_MASK ) == KeyEvent.SHIFT_MASK ) {
-                    String warning="<html><p>Multi-thread mode is only stable when each process<br>"
-                        + "is independent, use with caution.  For example, if the script plots<br>"
-                        + "data, then running multiple threads will interfere with one another.<br><br>"
+                    String warning="<html><p>Multiple processes can run at the same time, generally"
+                            + "the number of threads should equal the number of CPU cores, beyond that"
+                            + "performance will probably not scale.  Note older versions of "
+                            + "Autoplot, before v2025a_6, did not support this fully.<br><br>"
                         + "Proceed?</p></html>";
                     JPanel p= new JPanel( );
                     p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
