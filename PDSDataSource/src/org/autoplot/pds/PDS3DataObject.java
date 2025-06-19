@@ -2,6 +2,7 @@ package org.autoplot.pds;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -176,6 +177,11 @@ public class PDS3DataObject {
             }
             
             unit= j.optString("UNIT","");
+            if ( unit.trim().equals("") ) {
+                if ( j.optString("NAME","").equals("UTC") ) {
+                    unit= "UTC";
+                }
+            }
             validMaximum= j.optDouble("VALID_MAXIMUM",Double.POSITIVE_INFINITY);
             validMinimum= j.optDouble("VALID_MINIMUM",Double.NEGATIVE_INFINITY);
             missingConstant= j.optDouble("MISSING_CONSTANT",Double.NaN);
@@ -234,6 +240,16 @@ public class PDS3DataObject {
      */
     public String resolveUri(URL resource) {
         if ( interchangeFormat.equals("ASCII") && fieldNumber>-1 ) {
+            String s= resource.toString();
+            if ( s.contains("NH-P-PEPSSI-4-PLASMA-V1.0") ) {
+                int i= s.lastIndexOf("/");
+                s= s.substring(0,i) + s.substring(i).toLowerCase();
+                try {
+                    resource= new URL(s);
+                } catch (MalformedURLException ex) {
+                    throw new IllegalArgumentException(ex);
+                }
+            }
             return getAsciiUri(resource);
         } else {
             return getBinaryUri(resource) ;
