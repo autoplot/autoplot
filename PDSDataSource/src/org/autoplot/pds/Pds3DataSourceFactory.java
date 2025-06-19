@@ -6,6 +6,7 @@ import gov.nasa.pds.ppi.label.PDSLabel;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -177,6 +178,23 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
         
     }
 
+    /**
+     * https://pds-ppi.igpp.ucla.edu/data/NH-J-PEPSSI-2-JUPITER-V1.1/DATA/2007/060_090_MAR/20070303_003527/pep_0035272317_0x691_eng_1.lbl?H1
+     * shows where the label has upper case file, but the file is lower case.
+     * @param url
+     * @return 
+     */
+    public static URL lowerCaseFile( URL url ) {
+        try {
+            String ss= url.toString();
+            int i=ss.lastIndexOf("/");
+            URL newURL= new URL( ss.substring(0,i)+ss.substring(i).toLowerCase());
+            return newURL;
+        } catch (MalformedURLException ex) {
+            return null;
+        }
+    }
+    
     @Override
     public boolean reject(String suri, List<String> problems, ProgressMonitor mon) {
         try {
@@ -197,7 +215,14 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
                 problems.add("uri should point to xml or lblx file");
                 return true;
             }
-            DataSetURI.getFile(filePointer.getUrl(),mon );
+            try {
+                DataSetURI.getFile(filePointer.getUrl(),mon );
+            } catch ( FileNotFoundException ex ) {
+                // see if the lower case one is there (https://pds-ppi.igpp.ucla.edu/data/NH-J-PEPSSI-2-JUPITER-V1.1/DATA/2007/060_090_MAR/20070303_003527/pep_0035272317_0x691_eng_1.lbl?H1)
+                URL urlLower = lowerCaseFile( filePointer.getUrl() );
+                DataSetURI.getFile(urlLower,mon);
+                
+            }
 
             if ( id==null ) {
                 return true;
