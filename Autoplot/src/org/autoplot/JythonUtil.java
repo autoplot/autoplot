@@ -124,29 +124,34 @@ public class JythonUtil {
         // interp.get("peekAt");  // This is how to see if the context 
         if ( dom!=null ) {
             interp.set("dom", dom );
-            if ( dom.getController()==null ) {
-                logger.warning("createInterpreter with dom that does not have a controller, it will not have a scriptContext");
-            } else {
-                interp.set("scriptContext", new PyJavaInstance( dom.getController().getScriptContext()) );
-            }
             interp.set( "plotx", new PlotCommand(dom) );
             interp.set( "plot", new PlotCommand(dom) );    
             interp.set( "annotation", new AnnotationCommand(dom) );
-            interp.set( "fixLayout", new FixLayoutCommand(dom) );
-            Class c = dom.getController().getScriptContext().getClass();
-            Set<String> exclude=new HashSet<>(Arrays.asList("hashCode"));
-            for ( Method m : c.getDeclaredMethods() ) {
-                if ( m.getName().startsWith("_") || exclude.contains(m.getName()) ) {
-                    continue;
+            interp.set( "fixLayout", new FixLayoutCommand(dom) );            
+            if ( dom.getController()==null ) {
+                logger.warning("createInterpreter with dom that does not have a controller, it will not have a scriptContext");
+            } else {
+                ScriptContext2023 scriptContext= dom.getController().getScriptContext();
+                if ( scriptContext==null ) {
+                    logger.warning("createInterpreter with dom that does not have a controller, it will not have a scriptContext");
+                } else {
+                    interp.set("scriptContext", new PyJavaInstance( scriptContext ) );
+                    Class c = dom.getController().getScriptContext().getClass();
+                    Set<String> exclude=new HashSet<>(Arrays.asList("hashCode"));
+                    for ( Method m : c.getDeclaredMethods() ) {
+                        if ( m.getName().startsWith("_") || exclude.contains(m.getName()) ) {
+                            continue;
+                        }
+                        if ( interp.get(m.getName())!=null ) {
+                            continue;
+                        }
+                        boolean isPublic = Modifier.isPublic(m.getModifiers());
+                        if ( !isPublic ) {
+                            continue;
+                        }
+                        interp.exec(""+m.getName()+"=scriptContext."+m.getName());
+                    }
                 }
-                if ( interp.get(m.getName())!=null ) {
-                    continue;
-                }
-                boolean isPublic = Modifier.isPublic(m.getModifiers());
-                if ( !isPublic ) {
-                    continue;
-                }
-                interp.exec(""+m.getName()+"=scriptContext."+m.getName());
             }
         }
         if ( mon!=null ) interp.set("monitor", mon ); else interp.set( "monitor", new NullProgressMonitor() );
