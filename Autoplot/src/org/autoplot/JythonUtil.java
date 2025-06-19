@@ -124,7 +124,11 @@ public class JythonUtil {
         // interp.get("peekAt");  // This is how to see if the context 
         if ( dom!=null ) {
             interp.set("dom", dom );
-            interp.set("scriptContext", new PyJavaInstance( dom.getController().getScriptContext()) );
+            if ( dom.getController()==null ) {
+                logger.warning("createInterpreter with dom that does not have a controller, it will not have a scriptContext");
+            } else {
+                interp.set("scriptContext", new PyJavaInstance( dom.getController().getScriptContext()) );
+            }
             interp.set( "plotx", new PlotCommand(dom) );
             interp.set( "plot", new PlotCommand(dom) );    
             interp.set( "annotation", new AnnotationCommand(dom) );
