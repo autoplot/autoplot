@@ -1498,7 +1498,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
         JTextArea textArea= new JTextArea();
         textArea.setText( FileUtil.readFileToString(ff) );
         
-        JFrame frame = new JFrame(url.getFile());
+        JFrame frame = new JFrame(url.toString());
             
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(800, 600);
