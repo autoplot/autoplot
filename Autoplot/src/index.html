@@ -15,7 +15,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Long-planned <a href="https://sourceforge.net/p/autoplot/feature-requests/849/">correction</a> to Autoplot's scripting allows running batch scripts on multiple threads.</small></p>
+        <p><small>GitHub and soon GitLab will support file listings.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -29,8 +29,9 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-06-19):</p>
+        <p>Bugfixes (2025-06-21):</p>
         <ul>
+            <li>GitHubFileSystems supports file listings on github.com and research-git's abbith/juno using API.
             <li>More kludges for PDS support, where data named "UTC" is now presumed to contain timetags, even if there are no units specified.
             <li>CDF code which when reading in metadata and checking valid ranges assumed time was CDF_Epoch, now checks for data which is TT2000.  Thanks, Ivar!
             <li>Run Batch Tool "Write png" tooltip indicates that the script name and arguments are embedded and the pngwalk tool can be used to rerun the script.  Thanks, Sadie!
@@ -53,6 +54,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>readme.txt entered in the address bar will show the readme.  Also readme.md and README.TXT.  Thanks, Chris!
             <li>GrannyTextEditor allows extentions for psym and images to be edited.  Thanks, Connor!
             <li>add text to "Write" tooltip about how each file contains the script and arguments used to run the image.  Thanks, Sadie!
             <li>use eventsBar for single canonical event.
