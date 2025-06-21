@@ -32,6 +32,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.GraphicsConfiguration;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -105,6 +106,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -186,6 +188,8 @@ import org.das2.components.GrannyTextEditor;
 import org.das2.components.propertyeditor.TickValuesStringSchemeEditor;
 import org.das2.graph.GraphUtil;
 import org.das2.components.propertyeditor.SpecialColorsStringSchemeEditor;
+import org.das2.util.FileUtil;
+import org.das2.util.filesystem.HtmlUtil;
 import org.python.core.PyException;
 import org.python.util.PythonInterpreter;
 import org.w3c.dom.Document;
@@ -755,6 +759,20 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 applicationModel.addRecent(dataSetSelector.getValue());
                 String pngwalk= dataSetSelector.getValue();
                 PngWalkTool.start( pngwalk, AutoplotUI.this);
+            }
+        });
+        
+        dataSetSelector.registerActionTrigger( "(?i).*readme\\.(txt|md)(\\?ref_type=heads)?", new AbstractAction("readme") {
+            @Override
+            public void actionPerformed( ActionEvent ev ) { 
+                org.das2.util.LoggerManager.logGuiEvent(ev);
+                try {
+                    displayContent( AutoplotUI.this, new URL(dataSetSelector.getValue()) );
+                } catch (MalformedURLException ex) {
+                    Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
         
@@ -1457,6 +1475,47 @@ public final class AutoplotUI extends javax.swing.JFrame {
             }
         }
         return result;
+    }
+
+    /**
+     * display the contents of the URL, a text or markdown document, in a window.
+     * There's a small kludge that if the URL ends with "?ref_type=heads" which
+     * is seen with GitLab servers, then it is removed.
+     * @param parentComponent
+     * @param url
+     * @throws IOException
+     * @throws MalformedURLException 
+     */
+    public static void displayContent( Component parentComponent, URL url ) throws IOException, MalformedURLException {
+        
+        if ( url.getFile().endsWith("?ref_type=heads") ) {
+            String surl= url.toString();
+            surl= surl.substring(0,surl.length()-15);
+            url= new URL( surl );
+        }
+        
+        File ff= DataSetURI.downloadResourceAsTempFile( url, new NullProgressMonitor() ); //TODO: monitor?
+        JTextArea textArea= new JTextArea();
+        textArea.setText( FileUtil.readFileToString(ff) );
+        
+        JFrame frame = new JFrame(url.getFile());
+            
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setSize(800, 600);
+
+        textArea.setEditable(false);
+        textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        textArea.setCaretPosition(0);
+
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                
+        frame.add(scrollPane, BorderLayout.CENTER);
+        
+        frame.setLocationRelativeTo(parentComponent);
+        frame.setVisible(true);
+        
     }
 
     /**
