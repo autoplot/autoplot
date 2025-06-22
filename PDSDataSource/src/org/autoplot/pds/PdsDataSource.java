@@ -15,6 +15,7 @@ import java.net.URI;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -412,7 +413,12 @@ public class PdsDataSource extends AbstractDataSource {
         URL fileUrl= PdsDataSourceFactory.getFileResource( split.resourceUri.toURL(), mon );
         DataSetURI.getFile(fileUrl,mon );
                     
-        Label label = Label.open( xmlfile.toURI().toURL() ); 
+        Label label;
+        try {
+            label = Label.open( xmlfile.toURI().toURL() ); 
+        } catch ( java.lang.NoClassDefFoundError ex ) {
+            throw new Exception("Java 8 must be used to read PDS4 files.  Please use dmg, exe, deb, or rpm releases, or the single jar with Java 8.");
+        }
                 
         List<String> names= new ArrayList<>();
         String X= getParam("X","");

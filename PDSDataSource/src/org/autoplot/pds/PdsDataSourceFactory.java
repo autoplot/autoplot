@@ -212,7 +212,11 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
             DataSetURI.getFile(fileUrl,mon );
              
             Map<String,String> result;
-            result = getDataObjectNames(xmlfile.toURI().toURL(), mon);
+            try {
+                result = getDataObjectNames(xmlfile.toURI().toURL(), mon);
+            } catch ( java.lang.NoClassDefFoundError ex ) {
+                result= Collections.singletonMap( "Java 8 needed", "Must run under Java 8, or use dmg, exe, deb or rpm" );
+            }
             
             List<CompletionContext> ccresult= new ArrayList<>();
             ccresult.add( new CompletionContext( 
@@ -241,7 +245,12 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
             String parmname= CompletionContext.get( CompletionContext.CONTEXT_PARAMETER_NAME, cc );
             if ( parmname.equals("id") || parmname.equals("X") || parmname.equals("Y") || parmname.equals("Z") ) {
 
-                Map<String,String> result= getDataObjectNames(cc.resourceURI.toURL(), mon);
+                Map<String,String> result;
+                try {
+                    result = getDataObjectNames(cc.resourceURI.toURL(), mon);
+                } catch ( java.lang.NoClassDefFoundError ex ) {
+                    result= Collections.singletonMap( "Java 8 needed", "Must run under Java 8, or use dmg, exe, deb or rpm" );
+                }
             
                 List<CompletionContext> ccresult= new ArrayList<>();
                 ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "", this, "arg_0", 
