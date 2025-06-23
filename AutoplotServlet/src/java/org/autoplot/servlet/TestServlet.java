@@ -1,10 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.servlet;
 
-import org.autoplot.ScriptContext;
 import org.autoplot.AutoplotUI;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -18,6 +14,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import javax.imageio.ImageIO;
+import org.autoplot.ScriptContext2023;
 import org.das2.qds.QDataSet;
 import org.das2.qds.util.DataSetBuilder;
 
@@ -166,7 +163,7 @@ public class TestServlet {
 
         File dataFile = new File(outputFolder, "timing.qds");
 
-        ScriptContext.formatDataSet(result, dataFile.toString());
+        new ScriptContext2023().formatDataSet(result, dataFile.toString());
 
         AutoplotUI.main(new String[]{dataFile.toString()});
     }

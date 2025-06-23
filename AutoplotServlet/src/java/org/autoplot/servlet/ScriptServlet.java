@@ -2,7 +2,6 @@
 package org.autoplot.servlet;
 
 import org.autoplot.JythonUtil;
-import org.autoplot.ScriptContext;
 import org.autoplot.ApplicationModel;
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,11 +16,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.autoplot.ScriptContext2023;
 import org.autoplot.jythonsupport.JythonRefactory;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.format.TimeDatumFormatter;
 import org.python.util.PythonInterpreter;
 import org.autoplot.scriptconsole.LoggingOutputStream;
+import org.das2.util.monitor.NullProgressMonitor;
 
 /**
  * Allow the clients to run scripts on the server.
@@ -48,7 +49,6 @@ public class ScriptServlet extends HttpServlet {
             appmodel.addDasPeersToAppAndWait();
 
             String script= request.getParameter("script");
-            
             if ( script==null ) {
                 script= "setCanvasSize( 600, 400 )\n"+
                     "setDataSourceURL( 'http://www.sarahandjeremy.net/jeremy/1wire/data/2008/0B000800408DD710.20080117.d2s' )\n"+
@@ -83,12 +83,14 @@ public class ScriptServlet extends HttpServlet {
 
             File hostsallow= new File( home + "allowhosts" );
 
-            if ( !hostsallow.exists() ) {
-                PrintWriter write= new PrintWriter( new FileWriter( hostsallow ) );
-                write.println("# Initially, only clients from the localhost can connect.  List the allowed clients, one per line.");
-                write.println("# Globs like 192.168.0.* may be used.");
-                write.println("localhost");
-                write.close();
+            synchronized ( ScriptServlet.class ) {
+                if ( !hostsallow.exists() ) {
+                    PrintWriter write= new PrintWriter( new FileWriter( hostsallow ) );
+                    write.println("# Initially, only clients from the localhost can connect.  List the allowed clients, one per line.");
+                    write.println("# Globs like 192.168.0.* may be used.");
+                    write.println("localhost");
+                    write.close();
+                }
             }
 
             if ( hostsallow.exists() ) {
@@ -124,13 +126,15 @@ public class ScriptServlet extends HttpServlet {
             w.append(script);
             w.close();
 
-            ScriptContext.getDocumentModel().getOptions().setAutolayout(false);
-
-            PythonInterpreter interp = JythonUtil.createInterpreter( true, true );
+            ScriptContext2023 scriptContext= new ScriptContext2023();
+            
+            PythonInterpreter interp = JythonUtil.createInterpreter( true, true, scriptContext.getDocumentModel(), new NullProgressMonitor() );
             interp.set("java",null);
             interp.set("org",null);
             interp.set("getFile",null);
             interp.set("downloadResourceAsTempFile",null);
+            
+            interp.get("setCanvasSize");
 
             LoggingOutputStream los1= new LoggingOutputStream( Logger.getLogger("autoplot.servlet.scriptservlet"), Level.INFO );
             interp.setOut( los1 );
@@ -139,10 +143,9 @@ public class ScriptServlet extends HttpServlet {
 
             // To support load balancing, insert the actual host that resolved the request
             response.setHeader( "X-Served-By", java.net.InetAddress.getLocalHost().getCanonicalHostName() );
-            
-            //TODO: this limits to one user!
+                        
             LoggingOutputStream los2= new LoggingOutputStream( Logger.getLogger("autoplot.servlet.scriptservlet"), Level.INFO ); 
-            ScriptContext._setOutputStream( los2 ); 
+            scriptContext._setOutputStream( los2 ); 
             
             script= JythonRefactory.fixImports(script);
             interp.exec(script);
