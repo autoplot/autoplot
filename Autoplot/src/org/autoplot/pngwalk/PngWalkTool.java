@@ -33,7 +33,6 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -55,7 +54,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -64,7 +62,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
@@ -100,7 +97,6 @@ import org.das2.components.DasProgressPanel;
 import org.das2.components.DataPointRecorder;
 import org.das2.components.TearoffTabbedPane;
 import org.das2.dataset.DataSetUpdateEvent;
-import org.das2.dataset.DataSetUpdateListener;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -110,7 +106,6 @@ import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.datum.format.TimeDatumFormatter;
 import org.das2.event.DataPointSelectionEvent;
-import org.das2.event.DataPointSelectionListener;
 import org.das2.util.ArgumentList;
 import org.das2.util.FileUtil;
 import org.das2.util.ImageUtil;
@@ -129,7 +124,7 @@ import org.autoplot.AutoplotUI;
 import org.autoplot.AutoplotUtil;
 import org.autoplot.GuiSupport;
 import org.autoplot.JythonUtil;
-import org.autoplot.ScriptContext;
+import org.autoplot.ScriptContext2023;
 import org.autoplot.bookmarks.Bookmark;
 import org.autoplot.bookmarks.BookmarksException;
 import org.autoplot.bookmarks.BookmarksManager;
@@ -697,7 +692,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                         if ( timeRange!=null ) {
                             suri = productFile + "?timeRange=" + timeRange;
                         } else {
-                            JOptionPane.showMessageDialog(ScriptContext.getViewWindow(), "unable to resolve time range from image metadata or filename.");
+                            JOptionPane.showMessageDialog( parent, "unable to resolve time range from image metadata or filename.");
                             return;
                         }
                     }
@@ -709,14 +704,17 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     Window apWindow;
                     Application dom;
                     AutoplotUI autoplot;
+                    ScriptContext2023 scriptContext;
                     if ( parent instanceof AutoplotUI ) {
                         apWindow= parent;
                         autoplot= ((AutoplotUI)apWindow);
                         dom= autoplot.getDom();
+                        scriptContext= dom.getController().getScriptContext();
                     } else {
-                        ScriptContext.createGui();
-                        apWindow= ScriptContext.getViewWindow();
-                        autoplot= ScriptContext.getApplication();
+                        scriptContext= new ScriptContext2023();
+                        scriptContext.createGui();
+                        apWindow= scriptContext.getViewWindow();
+                        autoplot= scriptContext.getApplication();
                         dom= autoplot.getDom();
                     }
                     if ( fsuri!=null ) {
@@ -725,7 +723,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                             autoplot.runScriptTools(fsuri);
                             return;
                         } else {
-                            ScriptContext.plot(fsuri);
+                            scriptContext.plot(fsuri);
                         }
                     }
                     // go through and check for the axis autorange flag, and autorange if necessary.
@@ -1009,8 +1007,9 @@ public final class PngWalkTool extends javax.swing.JPanel {
                    }
                }
                if ( AppManager.getInstance().getApplicationCount()==1 ) {
-                   ScriptContext.createGui();
-                   Window apWindow= ScriptContext.getViewWindow();
+                   ScriptContext2023 scriptContext= new ScriptContext2023();
+                   scriptContext.createGui();
+                   Window apWindow= scriptContext.getViewWindow();
                    raiseApWindowSoon(apWindow);
                }
             }
