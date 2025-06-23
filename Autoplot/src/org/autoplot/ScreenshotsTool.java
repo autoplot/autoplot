@@ -706,21 +706,37 @@ public class ScreenshotsTool extends EventQueue {
     }
     
     /**
+     * @see #getScreenShot(java.awt.Window) 
+     * @return 
+     */
+    public static BufferedImage getScreenShot( ) {
+        throw new IllegalArgumentException("getScreenShot now needs a window");
+    }
+    
+    /**
+     * @see #getScreenShotNoPointer(java.awt.Window) 
+     * @return 
+     */
+    public static BufferedImage getScreenShotNoPointer( ) {
+        throw new IllegalArgumentException("getScreenShotNoPointer now needs a window");
+    }
+    
+    /**
      * get a screenshot of the display Autoplot's main UI is running within.
+     * @param w the window parent of all other windows.
      * @return
      */
-    public static BufferedImage getScreenShot() {
-        Window w= ScriptContext.getViewWindow();
+    public static BufferedImage getScreenShot( Window w ) {
         int active= getActiveDisplay(w);
         return getScreenShot(active,0,true);
     }
 
     /** 
      * get a screenshot of the display Autoplot's main UI is running within, but without the pointer.
+     * @param w the window parent of all other windows.
      * @return
      */
-    public static BufferedImage getScreenShotNoPointer(  ) {
-        Window w= ScriptContext.getViewWindow();
+    public static BufferedImage getScreenShotNoPointer( Window w ) {
         int active= getActiveDisplay(w);
         return getScreenShot(active,0,false);        
     }
