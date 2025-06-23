@@ -1,22 +1,16 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.servlet;
 
-import org.autoplot.ScriptContext;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.autoplot.ScriptContext2023;
 import org.autoplot.datasource.URISplit;
 
 /**
@@ -72,7 +66,8 @@ public class CompletionsServlet extends HttpServlet {
         
         if ( !uri.endsWith("&") ) uri= uri+"&";  //kludge for Dan's server, which doesn't include the final ampersand.  This should probably be removed.
         try {
-            String[] result= ScriptContext.getCompletions(uri);
+            ScriptContext2023 scriptContext= new ScriptContext2023();
+            String[] result= scriptContext.getCompletions(uri);
             for ( String r: result ) {
                 if ( "1".equals(alt) ) {
                     out.println("<a href='thin/zoom/demo.jsp?uri="+r+"'>"+r+"</a><br>\n");
