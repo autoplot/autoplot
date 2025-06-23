@@ -4863,7 +4863,7 @@ private void updateFrameTitle() {
                 logger.log(Level.FINE, "Writing to {0}", testPngFilename);
                 Logger.getLogger("autoplot.scriptcontext.writeToPng").setLevel(Level.FINER);
                 Logger.getLogger("autoplot.scriptcontext.writeToPng").fine("Logging at FINE");
-                ScriptContext.writeToPng(testPngFilename);
+                model.dom.getController().getScriptContext().writeToPng(testPngFilename);
             }
 
             if ( app!=null ) app.setStatus( READY_MESSAGE );

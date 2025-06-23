@@ -420,7 +420,9 @@ public class ScriptContext2023 extends PyJavaInstance {
      */
     protected void _setDefaultApp( AutoplotUI app ) {
         state.defaultApp= app;
-        state.appLookup.put( app.applicationModel, app);
+        if ( app!=null ) {
+            state.appLookup.put( app.applicationModel, app);
+        }
     }
     
     private synchronized void maybeInitView() {
