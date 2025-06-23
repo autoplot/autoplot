@@ -37,8 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.autoplot.ApplicationModel;
 import org.autoplot.JythonUtil;
-import org.autoplot.ScriptContext;
-import static org.autoplot.ScriptContext.waitUntilIdle;
+import org.autoplot.ScriptContext2023;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.URISplit;
@@ -128,7 +127,7 @@ public class ScriptGUIServlet extends HttpServlet {
      * @throws java.io.IOException
      */
     private static void writeToPng( Application dom, String suri, BufferedImage orig, OutputStream out) throws IOException {
-        waitUntilIdle();
+        dom.getController().getScriptContext().waitUntilIdle();
 
         DasCanvas c = dom.getController().getApplicationModel().getCanvas();
         int width= dom.getCanvases(0).getWidth();
@@ -506,7 +505,8 @@ public class ScriptGUIServlet extends HttpServlet {
             
             script= JythonRefactory.fixImports(script);
             
-            ScriptContext.setApplicationModel(model); // why must I do this???
+            ScriptContext2023 scriptContext= dom.getController().getScriptContext();
+            scriptContext.setApplicationModel(model); // why must I do this???
             
             script= "def showMessageDialog(msg): \n    pass\n" + script;
             
@@ -531,7 +531,7 @@ public class ScriptGUIServlet extends HttpServlet {
             long elapsedTime= System.currentTimeMillis()-t0;
             timelogger.log(Level.FINE, "end printScript {0} ({1}ms)", new Object[]{name, elapsedTime });
             
-            waitUntilIdle();
+            scriptContext.waitUntilIdle();
             
             if ( format.equals("svg") ) {
                 Class goClass = Class.forName("org.das2.util.awt.SvgGraphicsOutput");
@@ -597,6 +597,12 @@ public class ScriptGUIServlet extends HttpServlet {
         
         dom.getOptions().setAutolayout(false);
         
+        ScriptContext2023 scriptContext= new ScriptContext2023();
+        dom.getController().setScriptContext( scriptContext );
+        
+        if ( !scriptContext.isModelInitialized() ) {
+            scriptContext.setApplicationModel(model);
+        }
         //PythonInterpreter interp = JythonUtil.createInterpreter( true, true );
         //interp.set("java",null);
         //interp.set("org",null);
@@ -609,7 +615,6 @@ public class ScriptGUIServlet extends HttpServlet {
                         
         script= JythonRefactory.fixImports(script);
         
-        ScriptContext.setApplicationModel(model); // why must I do this???
         
         script= "def showMessageDialog(msg): \n    pass\n" + script;
         
