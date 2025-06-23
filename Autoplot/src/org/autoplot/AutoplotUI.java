@@ -762,6 +762,19 @@ public final class AutoplotUI extends javax.swing.JFrame {
             }
         });
         
+        dataSetSelector.registerActionTrigger( "(?i)(.*readme\\.(txt|md)(\\?ref_type=heads)?|.*errata.txt|.*voldesc.cat)", new AbstractAction("readme2") {
+            @Override
+            public void actionPerformed( ActionEvent ev ) { 
+                org.das2.util.LoggerManager.logGuiEvent(ev);
+                try {
+                    displayContent( AutoplotUI.this, new URL(dataSetSelector.getValue()) );
+                } catch (MalformedURLException ex) {
+                    Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
         dataSetSelector.registerActionTrigger( "(?i).*readme\\.(txt|md)(\\?ref_type=heads)?", new AbstractAction("readme") {
             @Override
             public void actionPerformed( ActionEvent ev ) { 
