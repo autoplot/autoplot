@@ -152,6 +152,7 @@ public class ScriptContext2023 extends PyJavaInstance {
             setUpHeadlessExceptionHandler();
             state.model.addDasPeersToAppAndWait();
             state.dom= state.model.getDom();
+            state.dom.getController().setScriptContext(this);
         }
         if ( state.view!=null ) {
             if ( SwingUtilities.isEventDispatchThread() ) {
