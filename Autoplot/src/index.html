@@ -29,9 +29,10 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-06-23):</p>
+        <p>Bugfixes (2025-06-24):</p>
         <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2715/">2715</a>: Detect when needed Jaxb library is missing when PDS4 is used with Java 11+.
+            <li>PDS3 file references must be case-insensitive.  Thanks, Chris!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2715/">2715</a>: Detect when needed Jaxb library is missing when PDS4 is used with Java 11+.  Thanks, Chris!
             <li>GitHubFileSystems supports file listings on github.com and research-git's abbith/juno using API.
             <li>More kludges for PDS support, where data named "UTC" is now presumed to contain timetags, even if there are no units specified.
             <li>CDF code which when reading in metadata and checking valid ranges assumed time was CDF_Epoch, now checks for data which is TT2000.  Thanks, Ivar!
