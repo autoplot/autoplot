@@ -3,6 +3,8 @@ package org.autoplot.pds;
 
 import gov.nasa.pds.ppi.label.PDSLabel;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
 import org.das2.util.LoggerManager;
+import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.json.JSONArray;
@@ -154,6 +157,23 @@ public class Pds3DataSource extends AbstractDataSource {
                            
     }
     
+    private String toLowerCase( String s ) {
+        int i= s.lastIndexOf("/");
+        if ( i==-1 ) {
+            return s;
+        } else {
+            return s.substring(0,i) + s.substring(i).toLowerCase();
+        }
+    }
+    
+    private String toUpperCase( String s ) {
+        int i= s.lastIndexOf("/");
+        if ( i==-1 ) {
+            return s;
+        } else {
+            return s.substring(0,i) + s.substring(i).toUpperCase();
+        }
+    } 
     
     @Override
     public org.das2.qds.QDataSet getDataSet(ProgressMonitor mon) throws Exception {
@@ -228,8 +248,29 @@ public class Pds3DataSource extends AbstractDataSource {
             name= names.get(i);            
             
             PDS3DataObject obj= Pds3DataSourceFactory.getDataObjectPds3( labelUrl, name );
-                        
+                 
+            File f;
+            try { 
+                f= DataSetURI.getFile( fp.getUrl(), new NullProgressMonitor()  );
+            } catch ( FileNotFoundException ex ) {
+                URL furl= fp.getUrl();
+                String ff=  furl.getFile();
+                if ( Character.isUpperCase(ff.charAt(ff.length()-1) ) ) {
+                    ff= toLowerCase(ff);
+                    URL lowerCaseUrl= new URL( furl.getProtocol(), furl.getHost(), ff );
+                    f= DataSetURI.getFile( lowerCaseUrl, new NullProgressMonitor()  );                    
+                    fp.setUrl( lowerCaseUrl );
+                } else {
+                    ff= toUpperCase( ff );
+                    URL upperCaseURL= new URL( furl.getProtocol(), furl.getHost(), ff ); //TODO: port, etc
+                    f= DataSetURI.getFile( upperCaseURL, new NullProgressMonitor()  );                    
+                    fp.setUrl( upperCaseURL );
+                }
+                
+            }    
+             
             String delegateUri= obj.resolveUri( fp.getUrl() );
+            
             logger.log(Level.FINE, "loading PDS data using delegate URI {0}", delegateUri);
             DataSource delegate= DataSetURI.getDataSource(delegateUri);
             QDataSet ds= delegate.getDataSet( mon.getSubtaskMonitor( "dataset "+ i ) );
