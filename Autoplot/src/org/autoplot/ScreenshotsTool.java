@@ -706,19 +706,21 @@ public class ScreenshotsTool extends EventQueue {
     }
     
     /**
+     * return the screenshot using the default context.
      * @see #getScreenShot(java.awt.Window) 
      * @return 
      */
     public static BufferedImage getScreenShot( ) {
-        throw new IllegalArgumentException("getScreenShot now needs a window");
+        return getScreenShot( ScriptContext.getViewWindow() );
     }
     
     /**
+     * return the screenshot using the default context.
      * @see #getScreenShotNoPointer(java.awt.Window) 
      * @return 
      */
     public static BufferedImage getScreenShotNoPointer( ) {
-        throw new IllegalArgumentException("getScreenShotNoPointer now needs a window");
+        return getScreenShotNoPointer( ScriptContext.getViewWindow() );
     }
     
     /**
