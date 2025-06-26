@@ -447,6 +447,8 @@ public class SimplifyScriptSupport {
         importedNames.put("URL", "java.net");
         importedNames.put("URI", "java.net");
         importedNames.put("TimeParser", "org.das2.datum" );
+        importedNames.put("DataSetBuilder", "org.das2.qds.util" );
+        
         int acceptLine = -1; // first line to accept
         int currentLine = beginLine; // current line we are writing.
         StringBuilder result = new StringBuilder();
