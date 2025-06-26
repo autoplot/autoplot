@@ -1401,6 +1401,34 @@ public class JythonCompletionTask implements CompletionTask {
             argss.add(args);
         }                    
     }
+
+    private static void doPyMethod( String ss, PyMethod pm, List<String> labels, List<String> signatures, List<String> argss ) {
+        
+        if ( pm.im_func instanceof PyReflectedFunction ) {
+            
+            PyReflectedFunction prf= (PyReflectedFunction)pm.im_func;
+            PyReflectedFunctionPeeker peek = new PyReflectedFunctionPeeker(prf);
+            for ( int jj=0; jj<peek.getArgsCount(); jj++ ) {
+                Method method1= peek.getMethod(jj);
+                String signature = methodSignature(method1);
+                String args = methodArgs(method1);
+                int j= signature.indexOf("#");
+                String label= ss + "() JAVA";
+                if ( j>-1 ) {
+                    label= signature.substring(j+1);
+                    label= hideJavaPaths( label );
+                    Class ret= method1.getReturnType();
+                    label= label + "->" + hideJavaPaths( ret.getCanonicalName() );
+                }
+                signatures.add(signature);
+                labels.add(label);
+                argss.add(args);
+            }                   
+        } else {
+            System.err.println("here");
+        }
+      
+    }
     
     private static void doConstructors( Constructor[] constructors, List<String> labels, List<String> signatures, String ss, List<String> argss ) {
         for (Constructor constructor : constructors) {
@@ -1552,6 +1580,9 @@ public class JythonCompletionTask implements CompletionTask {
                 if (po instanceof PyReflectedFunction) {
                     PyReflectedFunction prf = (PyReflectedFunction) po;
                     doPyReflectedFunction( ss, prf, labels, signatures, argss );
+                } else if ( po instanceof PyMethod ) {
+                    PyMethod pm= (PyMethod)po;
+                    doPyMethod( ss, pm, labels, signatures, argss );
                 } else if (po.isCallable()) {
                     label = ss + "() ";
                     if ( po instanceof PyFunction ) {
