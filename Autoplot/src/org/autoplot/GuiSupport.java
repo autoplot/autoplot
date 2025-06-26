@@ -649,6 +649,10 @@ public class GuiSupport {
                 if ( AutoplotUtil.showConfirmDialog2( parent, edp, "Export Data", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
                      try {
                         String name= edp.getFilenameTF().getText();
+                        if ( name.startsWith(" ") || name.startsWith("\\t") ) {
+                            AutoplotUtil.showMessageDialog( parent, "<html>The file name cannot start with space or tab<br>\""+name+"\"", "Bad filename", JOptionPane.WARNING_MESSAGE );
+                            return;
+                        }
                         String ext = edp.getExtension();
                         String file;
                         try {
