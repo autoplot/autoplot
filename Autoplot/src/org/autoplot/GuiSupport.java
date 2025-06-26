@@ -595,6 +595,12 @@ public class GuiSupport {
             @Override
             public void actionPerformed( ActionEvent e ) {
                 org.das2.util.LoggerManager.logGuiEvent(e);
+                
+                if ( dom.getController().getPlotElement()==null ) {
+                    JOptionPane.showMessageDialog( parent, "Click on the plot to focus on a dataset to export.");
+                    return;
+                }
+                
                 final ExportDataPanel edp= new ExportDataPanel();
                 edp.setDataSet(dom);
 

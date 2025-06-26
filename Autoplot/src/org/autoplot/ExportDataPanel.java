@@ -168,7 +168,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
             filenameTF.setText(f);
             originalDataB.setToolTipText( String.format( "<html>%s<br>%s</html>", originalDataB.getToolTipText(), originalDataSet ) );
         }
-
+        
         processedDataSet= model.getController().getPlotElement().getController().getDataSet();
         if ( processedDataSet!=null ) {
             if ( !processedDataSet.equals(originalDataSet ) ) {
