@@ -99,7 +99,7 @@ public class JythonUtil {
         org.python.core.PySystemState pySys = new org.python.core.PySystemState();
         //pySys.setdefaultencoding("utf8"); //doesn't work with Jython2.2, try with 2.5
 
-        String[] loadClasses = new String[]{"glob.py", "autoplot2023.py", "autoplotapp2025.py"}; // these must be in the root of the interpretter search path.
+        String[] loadClasses = new String[]{"glob.py", "autoplot2025.py", "autoplotapp2025.py"}; // these must be in the root of the interpretter search path.
         for (String pysrc : loadClasses) {
             switch (pysrc) {
                 case "glob.py":
@@ -142,17 +142,17 @@ public class JythonUtil {
         if (loadAutoplotStuff) {
             maybeLoadAdapters();
             if (Util.isLegacyImports()) {
-                URL imports = JythonOps.class.getResource("/imports2023.py");
+                URL imports = JythonOps.class.getResource("/imports2025.py");
                 if (imports == null) {
-                    throw new RuntimeException("unable to locate imports2023.py on classpath");
+                    throw new RuntimeException("unable to locate imports2025.py on classpath");
                 } else {
-                    logger.log(Level.FINE, "loading imports2023.py from {0}", imports);
+                    logger.log(Level.FINE, "loading imports2025.py from {0}", imports);
                 }
                 InputStream in = imports.openStream(); // note this stream will load in another stream.
                 byte[] bimports = FileUtil.readBytes(in);
                 //InputStream in = imports.openStream();
                 try {
-                    interp.execfile(new ByteArrayInputStream(bimports), "/imports2023.py");
+                    interp.execfile(new ByteArrayInputStream(bimports), "/imports2025.py");
                 } finally {
                     in.close();
                 }
@@ -185,7 +185,7 @@ public class JythonUtil {
      */
     public static void setupInterp(PythonInterpreter interp, String pwd, String resourceUri, Map<String, String> paramsl, ProgressMonitor mon) {
         interp.set("PWD", pwd);
-        interp.exec("import autoplot2023 as autoplot");
+        interp.exec("import autoplot2025 as autoplot");
         interp.exec("autoplot.params=dict()");
         for (Entry<String, String> e : paramsl.entrySet()) {
             String s = e.getKey();
@@ -204,8 +204,8 @@ public class JythonUtil {
 
         interp.set("monitor", mon);
 
-        try (InputStream in = JythonOps.class.getResource("/autoplot2023.py").openStream()) {
-            interp.execfile(in, "/autoplot2023.py"); // import everything into default namespace.
+        try (InputStream in = JythonOps.class.getResource("/autoplot2025.py").openStream()) {
+            interp.execfile(in, "/autoplot2025.py"); // import everything into default namespace.
         } catch (IOException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
@@ -884,7 +884,7 @@ public class JythonUtil {
      * @param paramsl
      */
     public static void setParams(PythonInterpreter interp, Map<String, String> paramsl) {
-        interp.exec("import autoplot2023 as autoplot");
+        interp.exec("import autoplot2025 as autoplot");
         interp.exec("autoplot.params=dict()");
         for (Entry<String, String> e : paramsl.entrySet()) {
             String s = e.getKey();
@@ -1610,10 +1610,10 @@ public class JythonUtil {
             }
         }
         
-        interp.set("autoplot2023._scriptLabel", "");
-        interp.set("autoplot2023._scriptTitle", "");
-        interp.set("autoplot2023._scriptDescription", "");
-        interp.set("autoplot2023._scriptIcon", "");
+        interp.set("autoplot2025._scriptLabel", "");
+        interp.set("autoplot2025._scriptTitle", "");
+        interp.set("autoplot2025._scriptDescription", "");
+        interp.set("autoplot2025._scriptIcon", "");
 
         if ( params!=null ) {
             setParams(interp, params);
@@ -1626,7 +1626,7 @@ public class JythonUtil {
         }
 
         interp.exec(prog);
-        interp.exec("import autoplot2023 as autoplot\n");
+        interp.exec("import autoplot2025 as autoplot\n");
         PyList sort = (PyList) interp.eval("autoplot._paramSort");
                 
         boolean altWhy = false; // I don't know why things are suddenly showing up in this other space.
@@ -2026,7 +2026,7 @@ public class JythonUtil {
         }
 
         interp.exec(prog);
-        interp.exec("import autoplot2023 as autoplot\n");
+        interp.exec("import autoplot2025 as autoplot\n");
         PyList sort = (PyList) interp.eval("autoplot._paramSort");
 
         boolean altWhy = false; // I don't know why things are suddenly showing up in this other space.
