@@ -510,6 +510,12 @@ public class IstpMetadataModel extends MetadataModel {
             } else {
                 if (!sunits.equals("")) {
                     label= label.trim();
+                    if ( sunits.contains("!A") || sunits.contains("!E") 
+                            || sunits.contains("!B") || sunits.contains("!D") ) {
+                        if ( !sunits.contains("!N") ) {
+                            sunits= sunits + "!N";
+                        }
+                    }
                     label += " (" + sunits + ")";
                 }
             }
