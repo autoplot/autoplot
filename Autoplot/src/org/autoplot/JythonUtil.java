@@ -213,7 +213,7 @@ public class JythonUtil {
             interp.exec("PWD='"+pwd+"'");// JythonRefactory okay
         }
 
-        interp.exec("import autoplot2023 as autoplot");// JythonRefactory okay
+        interp.exec("import autoplot2025 as autoplot");// JythonRefactory okay
         int iargv=1;  // skip the zeroth one, it is the name of the script
         for (String s : argv ) {
             int ieq= s.indexOf('=');
