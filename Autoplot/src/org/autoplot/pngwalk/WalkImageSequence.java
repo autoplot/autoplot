@@ -23,6 +23,7 @@ import org.das2.util.filesystem.FileSystem;
 import org.autoplot.dom.DebugPropertyChangeSupport;
 import org.autoplot.datasource.DataSetURI;
 import org.das2.datum.TimeParser;
+import org.das2.datum.UnitsUtil;
 import org.das2.fsm.FileStorageModel;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
@@ -222,6 +223,17 @@ public class WalkImageSequence implements PropertyChangeListener  {
             if ( TimeParser.isSpec(spec) ) fsm= FileStorageModel.create( fs, spec );        
         }
         
+        boolean isTimeRanges= false;
+        boolean eachIsAllTime= false;
+        if ( uris.size()>0 ) {
+            if ( UnitsUtil.isTimeLocation(datumRanges.get(0).getUnits()) ) {
+                isTimeRanges= true;
+                if ( datumRanges.get(0).width().ge( Units.days.createDatum(2.92e6) ) ) { // year 1000 to 9000
+                    eachIsAllTime= true;
+                }
+            }
+        }
+        
         existingImages = new ArrayList<>();
         for (int i=0; i < uris.size(); i++) {
             existingImages.add(new WalkImage(uris.get(i),haveThumbs400));
@@ -229,9 +241,14 @@ public class WalkImageSequence implements PropertyChangeListener  {
 
             String captionString;
             int splitIndex= WalkUtil.splitIndex( template );
-            if (datumRanges.get(i) != null) {
-                captionString = datumRanges.get(i).toString();//TODO: consider not formatting these until visible.
-                if ( ( template.contains("*") || template.contains("$x") ) && fsm!=null ) {
+            DatumRange range= datumRanges.get(i);
+            if ( range != null) {
+                if ( eachIsAllTime ) {
+                    captionString = "";
+                } else {
+                    captionString = datumRanges.get(i).toString();//TODO: consider not formatting these until visible.
+                }
+                if ( ( template.contains("*") || template.contains("$x") || template.contains("$(x;")) && fsm!=null ) {
                     String cs= uris.get(i).toString();
                     if ( template.startsWith("file:///") && cs.length()>6 && cs.charAt(6)!='/' ) {
                         splitIndex -= 2;
@@ -239,7 +256,8 @@ public class WalkImageSequence implements PropertyChangeListener  {
                     if ( cs.length()>13 && cs.substring(8,13).equals("user@") ) {
                         splitIndex += 5;
                     }
-                    String x1= fsm.getField( "x", cs.substring(splitIndex+1) );
+                    //TODO: file:///tmp/ap/$(x;name=p1)_$(x;name=p2).png should be handled
+                    String x1= fsm.getField( "x", cs.substring(splitIndex+1) );  
                     captionString = captionString + " " + x1;   
                 }
             } else {
