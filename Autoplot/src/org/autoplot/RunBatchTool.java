@@ -2011,7 +2011,7 @@ public class RunBatchTool extends javax.swing.JPanel {
             ApplicationModel appmodel = new ApplicationModel();
             appmodel.addDasPeersToAppAndWait();
 
-            Application myDom= appmodel.getDocumentModel();
+            Application myDom= appmodel.getDom();
             ScriptContext2023 scriptContext= new ScriptContext2023();
             myDom.getController().setScriptContext( scriptContext );
         
@@ -2348,10 +2348,6 @@ public class RunBatchTool extends javax.swing.JPanel {
             doItMultiThreadOneArgument(multiThread);
             return;
         }
-        
-        if ( multiThread<2 ) {
-            doIt();
-        }
     
         final DasProgressPanel monitor= DasProgressPanel.createComponent( "" );
         progressPanel.add( monitor.getComponent() );
@@ -2511,8 +2507,8 @@ public class RunBatchTool extends javax.swing.JPanel {
                             interp.setOut(outbaos);
                             uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
                             interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile),scriptFile.getName()), scriptFile.getName() );
-                            Application myDom= ScriptContext.getDocumentModel();
                             if ( writeCheckBox.isSelected() ) {
+                                Application myDom= (Application)env.get("dom");
                                 runResults.put("writeFile", doWrite(f1.trim(), "", uri, myDom ) );
                             }
                             jobs1.get(i1).setIcon(ICON_OKAY);
@@ -2568,7 +2564,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                                 uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
                                 interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile), scriptFile.getName()), scriptFile.getName() );
                                 if ( writeCheckBox.isSelected() ) {
-                                    Application myDom= ScriptContext.getDocumentModel();
+                                    Application myDom= (Application)env.get("dom");
                                     runResults.put("writeFile", doWrite(f1.trim(),f2.trim(), uri, myDom ) );
                                 }
                                 jobs2.get(i2).setIcon(ICON_OKAY);
@@ -2954,7 +2950,7 @@ public class RunBatchTool extends javax.swing.JPanel {
     /**
      * create the interpretter with the script settings.  This will be further modified 
      * to each state in the list.
-     * @param env the environment, like PWD etc
+     * @param env the environment, like PWD and dom.
      * @param scriptFile the script we are running
      * @param params the constant parameters for the script.
      * @return the interpretter
@@ -2962,7 +2958,10 @@ public class RunBatchTool extends javax.swing.JPanel {
      */
     private InteractiveInterpreter createInterpretter(
         Map<String,Object> env, File scriptFile, Map<String,String> params, String pwd ) throws IOException {
-        InteractiveInterpreter interp = JythonUtil.createInterpreter( true, false, this.dom, null );
+        
+        Application dom= (Application)env.get("dom");
+        
+        InteractiveInterpreter interp = JythonUtil.createInterpreter( true, false, dom, null );
         interp.exec(JythonRefactory.fixImports("import autoplot2023"));   
 
         ParametersFormPanel pfp= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
@@ -2981,8 +2980,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                 return monitor.isCancelled();
             }
         }); // subtask would reset indeterminate.
-
-        interp.set( "dom", this.dom );
+        
         interp.set( "PWD", pwd );
 
         return interp;
