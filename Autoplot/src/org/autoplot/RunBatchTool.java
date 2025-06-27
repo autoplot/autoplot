@@ -827,10 +827,12 @@ public class RunBatchTool extends javax.swing.JPanel {
             try {
                 String scriptName= dataSetSelector1.getValue();
                 dom.getController().getApplicationModel().addRecent(scriptName);
-                if ( ( evt.getModifiers() & KeyEvent.SHIFT_MASK ) == KeyEvent.SHIFT_MASK ) {
-                    String warning="<html><p>Multiple processes can run at the same time, generally"
-                            + "the number of threads should equal the number of CPU cores, beyond that"
-                            + "performance will probably not scale.  Note older versions of "
+                Preferences prefs= Preferences.userNodeForPackage( RunBatchTool.class );
+                int threadCount= prefs.getInt(PREF_THREAD_COUNT,8);
+                if ( true ) {
+                    String warning="<html><p>Multiple processes can run at the same time, generally<br>"
+                            + "the number of threads should equal the number of CPU cores, beyond that<br>"
+                            + "performance will probably not scale.  Note older versions of<br>"
                             + "Autoplot, before v2025a_6, did not support this fully.<br><br>"
                         + "Proceed?</p></html>";
                     JPanel p= new JPanel( );
@@ -842,7 +844,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                     
                     JPanel p2= new JPanel();
                     p2.setLayout( new BoxLayout( p2, BoxLayout.X_AXIS ) );
-                    JTextField tf= new JFormattedTextField( 8 );
+                    JTextField tf= new JFormattedTextField( threadCount );
                     p2.add( new JLabel("Number of threads:") );
                     p2.add( tf );
                     int size= tf.getFont().getSize();
@@ -855,7 +857,9 @@ public class RunBatchTool extends javax.swing.JPanel {
                         
                     if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( param1NameCB, p, 
                         "Multi-Thread warning", JOptionPane.OK_CANCEL_OPTION ) ) {
-                        doIt( Integer.parseInt(tf.getText()) );
+                        threadCount= Integer.parseInt(tf.getText());
+                        prefs.putInt(PREF_THREAD_COUNT, threadCount );
+                        doIt( threadCount );
                     } else {
                         goButton.setEnabled(true);
                     }
@@ -868,6 +872,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         };
         new Thread(run,"runBatch").start();
     }//GEN-LAST:event_goButtonActionPerformed
+    private static final String PREF_THREAD_COUNT = "threadCount";
 
     private void param1ValuesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_param1ValuesMouseClicked
         if ( evt.isPopupTrigger() ) {
@@ -2342,6 +2347,10 @@ public class RunBatchTool extends javax.swing.JPanel {
         if ( pp2.equals("") && multiThread>0 ) {    
             doItMultiThreadOneArgument(multiThread);
             return;
+        }
+        
+        if ( multiThread<2 ) {
+            doIt();
         }
     
         final DasProgressPanel monitor= DasProgressPanel.createComponent( "" );
