@@ -29,8 +29,11 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-06-26):</p>
+        <p>Bugfixes (2025-06-27):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/849/">849</a>: In Run Batch Tool, there was branch (two arguments, single-threaded) where the environment was not correctly initialized.
+            <li>PngWalkTool correctly recognizes $x in a URI, which is used by the Run Batch Tool.
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/849/">849</a>: Corrections to rfe849, where one of the initialization scripts was not loaded properly.  Thanks, Nick!
             <li>PDS3 file references must be case-insensitive.  Thanks, Chris!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2715/">2715</a>: Detect when needed Jaxb library is missing when PDS4 is used with Java 11+.  Thanks, Chris!
             <li>GitHubFileSystems supports file listings on github.com and research-git's abbith/juno using API.
