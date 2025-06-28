@@ -29,8 +29,9 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-06-27):</p>
+        <p>Bugfixes (2025-06-28):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2718/">2718</a>: Back off recent changes which got into production release.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/849/">849</a>: In Run Batch Tool, there was branch (two arguments, single-threaded) where the environment was not correctly initialized.
             <li>PngWalkTool correctly recognizes $x in a URI, which is used by the Run Batch Tool.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/849/">849</a>: Corrections to rfe849, where one of the initialization scripts was not loaded properly.  Thanks, Nick!
@@ -58,7 +59,8 @@
             <li>AutoplotServlet supports OpenDAP, where it simply hadn't been included.
         </ul>
         <p>Features:</p>
-        <ul>
+        <ul>                
+            <li>check for no !N after !A when generating CDF labels, in case the author didn't close the shifted text in a label.  Thanks, Connor!
             <li>readme.txt entered in the address bar will show the readme.  Also readme.md and README.TXT.  Thanks, Chris!
             <li>GrannyTextEditor allows extentions for psym and images to be edited.  Thanks, Connor!
             <li>add text to "Write" tooltip about how each file contains the script and arguments used to run the image.  Thanks, Sadie!
