@@ -226,7 +226,8 @@ public class WalkImageSequence implements PropertyChangeListener  {
         boolean isTimeRanges= false;
         boolean eachIsAllTime= false;
         if ( uris.size()>0 ) {
-            if ( UnitsUtil.isTimeLocation(datumRanges.get(0).getUnits()) ) {
+            // See https://sourceforge.net/p/autoplot/bugs/2718/
+            if ( datumRanges.get(0)!=null && UnitsUtil.isTimeLocation(datumRanges.get(0).getUnits()) ) {
                 isTimeRanges= true;
                 if ( datumRanges.get(0).width().ge( Units.days.createDatum(2.92e6) ) ) { // year 1000 to 9000
                     eachIsAllTime= true;
