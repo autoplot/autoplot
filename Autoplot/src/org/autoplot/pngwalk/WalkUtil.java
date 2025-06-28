@@ -132,6 +132,8 @@ public class WalkUtil {
             ss= fsm.getNamesFor(dr);
         } else {
             //if ( spec.length()>0 && spec.substring(1).contains("/") ) throw new IllegalArgumentException("nested wildcards (*/*) not supported");
+            spec= spec.replaceAll("\\$x", ".*");
+            spec= spec.replaceAll("\\$\\(x\\;?.*\\)", ".*");
             ss= fs.listDirectoryDeep( "/", spec );
             Arrays.sort(ss);
         }
