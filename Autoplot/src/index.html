@@ -15,7 +15,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>The PNG Walk Tool is used to browse the screenshots used this year.  Recent releases <a href="https://sourceforge.net/p/autoplot/bugs/2718/">broke</a> the tool when used this way, and I've backed off the changes.</small></p>
+        <p><small>Multiple Jython servers works now as a side-effect of recent changes to scripting.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -29,8 +29,9 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-06-28):</p>
+        <p>Bugfixes (2025-06-30):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/849/">849</a>: Mistake in Friday fix meant parameters could not be passed into scripts.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2718/">2718</a>: Back off recent changes which got into production release.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/849/">849</a>: In Run Batch Tool, there was branch (two arguments, single-threaded) where the environment was not correctly initialized.
             <li>PngWalkTool correctly recognizes $x in a URI, which is used by the Run Batch Tool.
