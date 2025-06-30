@@ -152,6 +152,7 @@ public class JythonUtil {
                 byte[] bimports = FileUtil.readBytes(in);
                 //InputStream in = imports.openStream();
                 try {
+                    //new String(bimports);
                     interp.execfile(new ByteArrayInputStream(bimports), "/imports2025.py");
                 } finally {
                     in.close();
@@ -399,13 +400,13 @@ public class JythonUtil {
         String vers = "";
 
         // This is the version that Autoplot would like to find, and should be found within the Java class path.
-        double currentVersion = 2.00;  //rfe320 improved getParam support.
+        double currentVersion = 5.10;  //rfe320 improved getParam support.
 
         if (ff4.exists()) {
             try (BufferedReader r = new BufferedReader(new FileReader(ff4))) {
                 String line = r.readLine();
                 if (line != null) {
-                    Pattern versPattern = Pattern.compile("# autoplot2023.py v([\\d\\.]+) .*");  // must be parsable as a double.
+                    Pattern versPattern = Pattern.compile("# autoplot2025.py v([\\d\\.]+) .*");  // must be parsable as a double.
                     Matcher m = versPattern.matcher(line);
                     if (m.matches()) {
                         vers = m.group(1);
@@ -431,7 +432,7 @@ public class JythonUtil {
                     }
                 }
             }
-            String[] ss = new String[]{"autoplot2025.py", "autoplotapp2017.py","autoplotapp2025.py", "autoplotapp2025.py"};
+            String[] ss = new String[]{"autoplot2025.py", "autoplotapp2025.py"};
             for (String s : ss) {
                 try (InputStream in = JythonUtil.class.getResourceAsStream("/" + s);
                         FileOutputStream out = new FileOutputStream(new File(ff3, s))) {
