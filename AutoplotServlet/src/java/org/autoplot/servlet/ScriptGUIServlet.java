@@ -273,7 +273,7 @@ public class ScriptGUIServlet extends HttpServlet {
             File existingImageFile = getKeyFile( key, ".png" );
             if ( existingImageFile.exists() ) {
                 long ageMillis= t0 - existingImageFile.lastModified();
-                if ( ageMillis<3600000 ) {
+                if ( ageMillis<60000 ) {
                     runScript= false;
                 }
             }
@@ -282,7 +282,7 @@ public class ScriptGUIServlet extends HttpServlet {
                 existingImageFile = getKeyFile( key, ".png.t" );
                 if ( existingImageFile.exists() ) {
                     long ageMillis= t0 - existingImageFile.lastModified();
-                    if ( ageMillis<3600000 ) {
+                    if ( ageMillis<60000 ) {
                         runScript= false;
                     }
                 }
