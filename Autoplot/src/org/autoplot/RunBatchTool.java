@@ -1777,7 +1777,7 @@ public class RunBatchTool extends javax.swing.JPanel {
             if ( ss.length==3 ) {
                 packArgments= true;
             } else {
-                throw new IllegalArgumentException("template and number of parameters don't match");
+                throw new IllegalArgumentException("PNG template and number of parameters don't match");
             }
         }
 
