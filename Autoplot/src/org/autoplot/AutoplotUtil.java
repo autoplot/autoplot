@@ -145,6 +145,7 @@ import org.autoplot.dom.BindingModel;
 import org.autoplot.dom.PlotController;
 import org.das2.graph.BoundsRenderer;
 import org.das2.graph.PolarPlotRenderer;
+import org.das2.qds.ops.Ops;
 import org.das2.util.AboutUtil;
 import org.das2.util.FileUtil;
 import org.w3c.dom.Document;
@@ -1283,7 +1284,11 @@ public class AutoplotUtil {
                     } else if ( dep0==null && bundle1.length() == 3 && bundle1.property(QDataSet.DEPENDNAME_0, 2) != null) { // bad kludge
                         spec= RenderType.colorScatter;
                     } else if ( Schemes.isXYZScatter(fillds) && fillds.property(QDataSet.DEPEND_0)==null && !Schemes.isEventsList(fillds) ) { 
-                        spec= RenderType.colorScatter;
+                        if ( Schemes.isNominalAtScatter(fillds) ) {
+                            spec= RenderType.digital;
+                        } else {                        
+                            spec= RenderType.colorScatter;
+                        }
                     } else if ( Schemes.isXYScatter(fillds) && fillds.property(QDataSet.DEPEND_0)==null ) { 
                         spec= RenderType.scatter;
                     } else if ( bundle1.length()==3 || bundle1.length()==4 || bundle1.length()==5 ) {
