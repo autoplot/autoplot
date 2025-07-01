@@ -40,7 +40,7 @@
         },
         {
             "name": "renderType",
-            "description": "explcitly set the render type, to scatter, series, nnSpectrogram, digital, etc"
+            "description": "explcitly set the render type to scatter, series, nnSpectrogram, digital, eventsBar, etc"
         },
         {
             "name": "color",
