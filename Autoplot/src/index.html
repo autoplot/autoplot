@@ -15,7 +15,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Multiple Jython servers works now as a side-effect of recent changes to scripting.</small></p>
+        <p><small>Run Batch is used to run <a href="https://github.com/autoplot/dev/blob/master/rfe/sf/849/allColorbars.jy">script</a> to create rendering with each colorbar in seconds.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -29,8 +29,12 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-06-30):</p>
+        <p>Bugfixes (2025-07-02):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2719/">2719</a>: SubsetDataSet didn't consider that DEPEND_0 might be a bundle, breaking for Schemes.rank1AlongTrajectory.
+            <li>Add eventsBar to the list of renderTypes in plot popup documentation.
+            <li>old code supporting "40" to mean 1940 is no longer supported, since it lead to "2 40 200 2000" to be interpreted as a valid time (1940-07-18T20:00)<li>
+            <li>clarify error message about PNGTemplate not matching the number of parameter in Run Batch Tool.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/849/">849</a>: Mistake in Friday fix meant parameters could not be passed into scripts.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2718/">2718</a>: Back off recent changes which got into production release.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/849/">849</a>: In Run Batch Tool, there was branch (two arguments, single-threaded) where the environment was not correctly initialized.
