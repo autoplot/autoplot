@@ -393,9 +393,6 @@ mv AutoplotStable.jar dist/
 #  rm AutoplotStable.jar
 #fi
 
-echo "copy htaccess.  htaccess must be moved to .htaccess to provide support for .pack.gz."
-cp src/htaccess.txt dist/
-
 # remove this proprietary font so that it isn't accidentally released.
 rm -f temp-volatile-classes/resources/scheme_bk.otf
 
