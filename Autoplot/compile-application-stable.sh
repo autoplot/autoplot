@@ -17,27 +17,12 @@ if [[ $JAVA_HOME != */ ]]; then
     JAVA_HOME=${JAVA_HOME}/
 fi
 
-if [ "" = "$KEYPASS" ]; then
-    echo "KEYPASS NEEDED!"
-    KEYPASS=virbo1
-fi
-
-if [ "" = "$STOREPASS" ]; then
-    echo "STOREPASS NEEDED!"
-    STOREPASS=dolphin
-fi
-
-if [ "" = "$ALIAS" ]; then
-    echo "ALIAS NEEDED!"
-    ALIAS=virbo
-fi
-
 if [ "" = "$CODEBASE" ]; then
     CODEBASE=NEED_CODEBASE_TO_BE_DEFINED_IN_COMPILE_SCRIPT
 fi
 
-if [ "" = "$HUDSON_URL" ]; then
-    HUDSON_URL="http://papco.org:8080/hudson"
+if [ "" = "$JENKINS_URL" ]; then
+    JENKINS_URL="https://cottagesystems.com/jenkins"
 fi
 
 rm -r -f temp-src/
@@ -83,16 +68,10 @@ echo "done copy jar file classes."
 # special handling of the META-INF stuff.
 echo "special handling of META-INF stuff..."
 
-# remove signatures
-rm temp-classes/META-INF/*.RSA
-rm temp-classes/META-INF/*.SF
 
 # add permissions attribute
 rm temp-classes/META-INF/MANIFEST.MF
 printf "Permissions: all-permissions\n" > temp-classes/META-INF/MANIFEST.MF
-
-# remove CDF APPLICATION.JNLP
-rm -r temp-classes/JNLP-INF/
 
 # end, special handling of the META-INF stuff.
 echo "done special handling of META-INF stuff."
@@ -123,28 +102,4 @@ $JAVA_HOME/bin/jar cmf META-INF/MANIFEST.MF ../dist/AutoplotStable.jar *
 cd ..
 echo "done make jumbo jar file..."
 
-#echo "normalize jar file for signing..."
-#$JAVA_HOME/bin/pack200 --repack dist/AutoplotStable.jar
-#echo "sign the jar files..."
-#echo "  use set +x to hide private info"
-#set +x
-#if ! ${JAVA_HOME}/bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS" $JARSIGNER_OPTS dist/AutoplotStable.jar "$ALIAS"; then
-#   echo "Failed to sign resources! (first call)"
-#   exit 1
-#fi
-#
-#echo "repeat normalize/sign (workaround for known bug with large files...)"
-#echo $JAVA_HOME/bin/pack200 --repack dist/AutoplotStable.jar
-#$JAVA_HOME/bin/pack200 --repack dist/AutoplotStable.jar
-#
-#if ! ${JAVA_HOME}/bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS" $JARSIGNER_OPTS dist/AutoplotStable.jar "$ALIAS"; then
-#   echo "Failed to sign resources! (second call)"
-#   exit 1
-#fi
-#set -x
-#
-#echo "pack the jar file..."
-#$JAVA_HOME/bin/pack200 dist/AutoplotStable.jar.pack.gz dist/AutoplotStable.jar
-##echo "done packing."
-#
 echo "Done!"

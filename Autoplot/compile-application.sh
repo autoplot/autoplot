@@ -42,7 +42,7 @@ JAVAC=${JAVA_HOME}/bin/javac
 JAR=${JAVA_HOME}/bin/jar
 
 if [ ! -f $JAVAC ]; then 
-    echo "Java executable does not exist.  Set, for example, \"export JAVA_HOME=/usr/local/jdk1.7.0_80/\""
+    echo "Java executable does not exist.  Set, for example, \"export JAVA_HOME=/usr/local/jdk1.8/\""
     exit -1
 fi
 
@@ -52,22 +52,6 @@ if [ "" = "$AP_KEEP_STABLE" ]; then
 fi
 
 echo "AP_KEEP_STABLE=${AP_KEEP_STABLE}  # if T then keep the stable jars for release"
-
-if [ "" = "$ALIAS" ]; then
-    ALIAS=virbo
-fi
-
-if [ "" = "$KEYPASS" ]; then
-    echo "KEYPASS NEEDED!"
-    KEYPASS=virbo1
-fi
-
-if [ "" = "$STOREPASS" ]; then
-    echo "STOREPASS NEEDED!"
-    set +x
-    STOREPASS=dolphin
-    set -x
-fi
 
 hasErrors=0
 
@@ -103,8 +87,8 @@ if [ "" = "$CODEBASE" ]; then
     CODEBASE=NEED_CODEBASE_TO_BE_DEFINED_IN_COMPILE_SCRIPT
 fi
 
-if [ "" = "$HUDSON_URL" ]; then
-    HUDSON_URL="https://cottagesystems.com/jenkins/"
+if [ "" = "$JENKINS_URL" ]; then
+    JENKINS_URL="https://cottagesystems.com/jenkins/"
 fi
 
 if [ "" = "$WGET" ]; then
@@ -199,11 +183,6 @@ else
 fi
 
 printf "Main-Class: org.autoplot.AutoplotUI\nPermissions: all-permissions\nCodebase: autoplot.org *.physics.uiowa.edu jfaden.net\nApplication-Name: Autoplot\n" > temp-volatile-src/MANIFEST.MF
-
-# remove signatures
-rm -f temp-volatile-classes/META-INF/*.RSA
-rm -f temp-volatile-classes/META-INF/*.DSA
-rm -f temp-volatile-classes/META-INF/*.SF
 
 export TIMESTAMP=`date +%Y%m%d_%H%M%S`
 cat src/META-INF/build.txt | sed "s/build.tag\:/build.tag\: $TAG/" > temp-volatile-classes/META-INF/build.txt
@@ -365,11 +344,6 @@ for i in `cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSour
    compilef $i.java
 done
 
-## NetCDF IOServiceProvider allows Autoplot URIs to be used in ncml files.
-#echo "compile AbstractIOSP and APIOServiceProvider"
-#compilef org/autoplot/netCDF/AbstractIOSP.java
-#compilef org/autoplot/netCDF/APIOServiceProvider.java
-
 compilef-go
 
 cd ..
@@ -387,13 +361,6 @@ else
   echo "justCompile not set to 1, continue on"
 fi
 
-
-#Don't do this, since we modify the jnlp file to make a release.
-#echo "=== make signed jnlp file..."  # http://www.coderanch.com/t/554729/JNLP-Web-Start/java/Signing-JNLP-JNLP-INF-directory
-#mkdir temp-volatile-classes/JNLP-INF
-#cp dist/autoplot.jnlp temp-volatile-classes/JNLP-INF/APPLICATION.JNLP
-
-
 echo "=== make jumbo jar files..."
 mkdir -p dist/
 cd temp-volatile-classes
@@ -405,58 +372,6 @@ cd ..
 
 echo "done make jumbo jar files..."
 
-## See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5078608 "Digital signatures are invalid after unpacking"
-## See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6575373 "Error verifying signatures of pack200 files in some cases"
-## See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6351684 "pack200 doesn't work on/corrupts obfuscated files"
-#echo "=== normalize jar file before signing..."
-#${JAVA_HOME}/bin/pack200 --repack dist/AutoplotVolatile1.jar dist/AutoplotVolatile.jar
-#${JAVA_HOME}/bin/pack200 --repack dist/AutoplotVolatile2.jar dist/AutoplotVolatile1.jar # http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6575373  Note this doesn't appear to have an effect.
-#mv dist/AutoplotVolatile2.jar dist/AutoplotVolatile.jar
-#rm dist/AutoplotVolatile1.jar
-#
-#echo "=== sign and pack the jar file..."
-#
-#if [ "$DO_HIDE" = "true" ]; then 
-#   echo "  use set +x to hide private info"
-#   #echo  ${JAVA_HOME}/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS $JARSIGNER_OPTS dist/AutoplotVolatile.jar "$ALIAS"
-#   set +x
-#fi
-#
-#if ! ${JAVA_HOME}/bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS" $JARSIGNER_OPTS dist/AutoplotVolatile.jar "$ALIAS"; then
-#   echo "Fail to sign resources!"
-#   exit 1
-#fi
-#
-#if [ "$DO_HIDE" = "true" ]; then 
-#   set -x
-#fi
-#
-#echo "=== verify the jar file..."
-#${JAVA_HOME}/bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar | head -10
-
-#echo "=== sign and pack the jar file..."
-#${JAVA_HOME}/bin/pack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile.jar
-#${JAVA_HOME}/bin/unpack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile_pack_gz.jar
-#
-#if ! ${JAVA_HOME}/bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar | head -10; then
-#   echo "jarsigner verify failed on file dist/AutoplotVolatile.jar!"
-#   exit 1
-#fi
-#
-#echo "=== verify signed and unpacked jar file..."
-#if ! ${JAVA_HOME}/bin/jarsigner -verify -verbose dist/AutoplotVolatile_pack_gz.jar | head -10; then
-#   echo "jarsigner verify  failed on pack_gz file dist/AutoplotVolatile_pack_gz.jar!"
-#   exit 1
-#fi
-#rm dist/AutoplotVolatile_pack_gz.jar
-#
-#echo "=== create jnlp file for build..."
-#cp src/autoplot.jnlp dist
-#cp src/autoplot_4GB.jnlp dist
-#cp src/autoplot_1GB.jnlp dist
-#cp src/autoplot_prod_4GB.jnlp dist
-#cp src/autoplot_prod_1GB.jnlp dist
-
 echo "=== copy branding for release, such as png icon images"
 cp src/*.png dist
 cp src/*.gif dist  # mac Java7 has a bug where it can't use pngs for icons, use .gif instead.
@@ -464,13 +379,8 @@ cp src/index.html dist  #TODO: why?
 
 echo "=== modify jar files for this particular release"
 cd temp-volatile-src
-$JAVAC  -target 1.7 -source 1.7 -d ../temp-volatile-classes external/FileSearchReplace.java
+$JAVAC  -target 1.8 -source 1.8 -d ../temp-volatile-classes external/FileSearchReplace.java
 cd ..
-${JAVA_HOME}/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
-${JAVA_HOME}/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_1GB.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
-${JAVA_HOME}/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_4GB.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
-${JAVA_HOME}/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_prod_1GB.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
-${JAVA_HOME}/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_prod_4GB.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
 ${JAVA_HOME}/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/index.html '#{tag}' $TAG '#{codebase}' $CODEBASE
 
 # if these are needed.
