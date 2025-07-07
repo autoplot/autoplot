@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash -xv
 #
 # Purpose: create the volatile jar that goes with the stable jar that is .pack.gz.
 # Stable is code we don't expect to change often,
