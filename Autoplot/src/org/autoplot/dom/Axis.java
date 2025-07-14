@@ -327,6 +327,35 @@ public class Axis extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_TICKVALUES, oldTicks, ticks);
     }
 
+    private String tickFormat = "";
+
+    public static final String PROP_TICKFORMAT = "tickFormat";
+
+    /**
+     * Get the value of tickFormat
+     *
+     * @return the value of tickFormat
+     */
+    public String getTickFormat() {
+        return tickFormat;
+    }
+
+    /**
+     * Set the value of tickFormat, where "" means automatic, $H:$M means
+     * format a time with these components, and %f means format as a float.
+     * The format implies the tick algorithm, where %e will use Log ticks, and
+     * %f implies linear, but otherwise the default algorithms are used.  In
+     * other words %.1f might get 1.2, 1.2, 1.2 for ticks if the step size
+     * if 0.01.
+     *
+     * @param tickFormat new value of tickFormat
+     */
+    public void setTickFormat(String tickFormat) {
+        String oldTickFormat = this.tickFormat;
+        this.tickFormat = tickFormat;
+        propertyChangeSupport.firePropertyChange(PROP_TICKFORMAT, oldTickFormat, tickFormat);
+    }
+
 //    private Color foreground = Color.black;
 //
 //    public static final String PROP_FOREGROUND = "foreground";

@@ -225,7 +225,7 @@ public class AxisController extends DomNodeController {
      */
     public void resetAxisUnits( Units nu ) {
         DatumRange oldRange=dasAxis.getDatumRange();
-        DatumRange newRange= DatumRange.newDatumRange( oldRange.min().doubleValue(nu), oldRange.max().doubleValue(nu), nu );
+        DatumRange newRange= DatumRange.newRange( oldRange.min().doubleValue(nu), oldRange.max().doubleValue(nu), nu );
         dasAxis.resetRange(newRange);
         axis.setRange(newRange);
     }
@@ -288,6 +288,7 @@ public class AxisController extends DomNodeController {
         ac.bind(axis, Axis.PROP_VISIBLE, dasAxis, "visible" );
         ac.bind(axis, Axis.PROP_OPPOSITE, dasAxis, "orientation", getOppositeConverter(axis,dasAxis) );
         ac.bind(axis, Axis.PROP_TICKVALUES, dasAxis, DasAxis.PROP_TICKVALUES );
+        ac.bind(axis, Axis.PROP_TICKFORMAT, dasAxis, DasAxis.PROP_FORMAT );
         ac.bind(axis, Axis.PROP_REFERENCE, dasAxis, DasAxis.PROP_REFERENCE );
         //ac.bind(axis, Axis.PROP_FOREGROUND, dasAxis, "foreground" );
         ac.bind(axis, Axis.PROP_AXISOFFSET, dasAxis, DasAxis.PROP_AXISOFFSET );
@@ -357,7 +358,7 @@ public class AxisController extends DomNodeController {
             if ( !axis.getScale().equals(scale) ) {
                 // when scale is bound, change the range.  When it is not bound, go ahead and just reset the scale
                 List<BindingModel> bms= dom.getController().findBindings( axis, Axis.PROP_SCALE );
-                if ( !rangeWasChanged && bms.size()>0 ) {
+                if ( !rangeWasChanged && !bms.isEmpty() ) {
                     logger.log(Level.FINEST, "{0}: the scale is bound, so adjust the range instead", axis.id);
                     DatumRange dr= axis.getRange();
                     Datum newW= axis.getScale().multiply(npixels);
@@ -400,6 +401,7 @@ public class AxisController extends DomNodeController {
         if ( !exclude.contains( Axis.PROP_AUTORANGEHINTS ) ) axis.setAutoRangeHints(that.getAutoRangeHints());
         if ( !exclude.contains( Axis.PROP_DRAWTICKLABELS ) ) axis.setDrawTickLabels( that.isDrawTickLabels() );
         if ( !exclude.contains( Axis.PROP_TICKVALUES ) ) axis.setTickValues( that.getTickValues() );
+        if ( !exclude.contains( Axis.PROP_TICKFORMAT ) ) axis.setTickFormat( that.getTickFormat() );
         if ( !exclude.contains( Axis.PROP_REFERENCE ) ) axis.setReference( that.getReference() );
         if ( !exclude.contains( Axis.PROP_VISIBLE ) ) axis.setVisible( that.isVisible() );
         //if ( !exclude.contains( Axis.PROP_FOREGROUND ) ) axis.setForeground( that.getForeground() );

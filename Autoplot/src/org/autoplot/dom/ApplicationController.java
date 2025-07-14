@@ -2301,6 +2301,9 @@ public class ApplicationController extends DomNodeController implements RunLater
             p0.getXaxis().setTickValues("");
             p0.getYaxis().setTickValues("");
             p0.getZaxis().setTickValues("");
+            p0.getXaxis().setTickFormat("");
+            p0.getYaxis().setTickFormat("");
+            p0.getZaxis().setTickFormat("");
             //p0.getXaxis().setForeground(application.options.foreground);
             //p0.getYaxis().setForeground(application.options.foreground);
             //p0.getZaxis().setForeground(application.options.foreground);
