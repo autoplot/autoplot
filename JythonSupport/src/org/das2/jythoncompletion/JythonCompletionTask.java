@@ -1589,8 +1589,13 @@ public class JythonCompletionTask implements CompletionTask {
                         label= getPyFunctionSignature((PyFunction)po);
                         args= label.substring(ss.length());
                     }
-                    PyObject doc= interp.eval(ss+".__doc__");
-                    signature= makeInlineSignature( po, doc );
+                    try {
+                        PyObject doc= interp.eval(ss+".__doc__");
+                        signature= makeInlineSignature( po, doc );
+                    } catch ( RuntimeException ex ) {
+                        logger.fine("Callable PyFunction doesn't have __doc__: "+ ss );
+                        continue;
+                    }
                     
                 } else if (po.isNumberType()) {
                     switch (po.getType().getFullName()) {
@@ -1668,7 +1673,7 @@ public class JythonCompletionTask implements CompletionTask {
                             link= getLinkForJavaSignature(signature);  // TODO: inner class like Rectangle.Double is only Double
                         }
                         if ( ss.equals("dom") ) {
-                            link= "http://autoplot.org/developer.scripting#DOM";
+                            link= "https://autoplot.org/developer.scripting#DOM";
                         }
                         logger.log(Level.FINER, "DefaultCompletionItem({0},{1},\n{2}{3},\n{4},\n{5})", new Object[]{ss, cc.completable.length(), ss, argss.get(jj), label, link});
                         result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + argss.get(jj), label, link, JAVAMETHOD_SORT, icon ) );
@@ -1678,7 +1683,7 @@ public class JythonCompletionTask implements CompletionTask {
                     if ( signature!=null && signature.startsWith("inline:") ) {
                         link= signature;
                     } else if ( ss.equals("dom") ) {
-                        link= "http://autoplot.org/developer.scripting#DOM";
+                        link= "https://autoplot.org/developer.scripting#DOM";
                     } else if (signature != null) {
                         link= getLinkForJavaSignature(signature);
                     } else if ( po instanceof PyJavaClass ) {
