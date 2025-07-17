@@ -75,6 +75,20 @@ public class LayoutUtil {
      */
     private static int count=0;
     
+    private static boolean isChildOfMarginColumn( DasColumn marginColumn, DasColumn col ) {
+        return ( col == marginColumn 
+                    || col.getParentDevicePosition() == marginColumn 
+                    || ( col.getParentDevicePosition()!=null 
+                    && col.getParentDevicePosition().getParentDevicePosition() == marginColumn ) );
+    }
+    
+    private static boolean isChildOfMarginRow( DasRow marginRow, DasRow row ) {
+        return ( row == marginRow 
+                    || row.getParentDevicePosition() == marginRow 
+                    || ( row.getParentDevicePosition()!=null 
+                    && row.getParentDevicePosition().getParentDevicePosition() == marginRow ) );
+    }
+    
     /**
      * resets the layout on the canvas so that labels are not clipped (somewhat).
      * Child row and columns are inspected as well, and it's assumed that adjusting
@@ -115,8 +129,7 @@ public class LayoutUtil {
             
             if ( cc instanceof DasAnnotation ) continue; // there's a set of components we want to ignore because it's easy to mess up.
                         
-            if ( cc.isVisible() && ( cc.getColumn() == marginColumn || cc.getColumn().getParentDevicePosition() == marginColumn 
-                    || ( cc.getColumn().getParentDevicePosition()!=null && cc.getColumn().getParentDevicePosition().getParentDevicePosition() == marginColumn ) ) ) {
+            if ( cc.isVisible() && isChildOfMarginColumn( marginColumn, cc.getColumn() ) )  {
                 
                 logger.log(Level.FINER, "here cc= {0}", cc);
                             
@@ -136,8 +149,7 @@ public class LayoutUtil {
                 }
             }
             
-            if ( cc.isVisible() && ( cc.getRow() == marginRow ||  cc.getRow().getParentDevicePosition()==marginRow 
-                    || ( cc.getRow().getParentDevicePosition()!=null && cc.getRow().getParentDevicePosition().getParentDevicePosition() == marginRow ) ) ) {
+            if ( cc.isVisible() && isChildOfMarginRow( marginRow, cc.getRow() ) ) {
                 bounds = cc.getBounds();
                 logger.log(Level.FINER, "considering for y position (count={0}): {1} {2}", new Object[]{count, cc.getDasName(), bounds});
                 if ( bounds.height>0 ) {
