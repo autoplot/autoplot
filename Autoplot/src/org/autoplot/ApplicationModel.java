@@ -1291,6 +1291,8 @@ public final class ApplicationModel {
             state.getCanvases(0).setFitted(dom.getCanvases(0).isFitted());
             state.getCanvases(0).setWidth( dom.getCanvases(0).getWidth());
             state.getCanvases(0).setHeight( dom.getCanvases(0).getHeight());
+        } else {
+            this.setCanvasSize(correctWidth, correctHeight);
         }
         
         ArrayList<String> problems= new ArrayList();
