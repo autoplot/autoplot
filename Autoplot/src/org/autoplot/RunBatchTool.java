@@ -71,7 +71,6 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.autoplot.bookmarks.Bookmark;
-import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.jythonsupport.JythonRefactory;
 import org.das2.components.DasProgressPanel;
