@@ -71,6 +71,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.autoplot.bookmarks.Bookmark;
+import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.jythonsupport.JythonRefactory;
 import org.das2.components.DasProgressPanel;
@@ -133,6 +134,8 @@ public class RunBatchTool extends javax.swing.JPanel {
             
     private ProgressMonitor monitor=null; // non-null when process is going.
         
+    private Preferences prefs;
+    
     /**
      * Creates new form BatchMaster
      * @param dom
@@ -147,7 +150,7 @@ public class RunBatchTool extends javax.swing.JPanel {
             }
         });
         
-        Preferences prefs= Preferences.userNodeForPackage(RunBatchTool.class );
+        prefs= Preferences.userNodeForPackage(RunBatchTool.class );
         String s= prefs.get( "lastTemplate", null );
         if ( s!=null ) {
             writeFilenameCB.setSelectedItem(s);
@@ -220,6 +223,8 @@ public class RunBatchTool extends javax.swing.JPanel {
         param1ScrollPane.getVerticalScrollBar().setUnitIncrement(param1ScrollPane.getFont().getSize());
         param2ScrollPane.getVerticalScrollBar().setUnitIncrement(param2ScrollPane.getFont().getSize());
         
+        timeRangeComboBox.setSelectedItem( prefs.get("lastTimeRange", "2000-Jan" ) );
+        timeFormatComboBox.setSelectedItem( prefs.get("lastTimeFormat", "$Y-$m-$d" ) );
         
     }
     
@@ -827,7 +832,7 @@ public class RunBatchTool extends javax.swing.JPanel {
             try {
                 String scriptName= dataSetSelector1.getValue();
                 dom.getController().getApplicationModel().addRecent(scriptName);
-                Preferences prefs= Preferences.userNodeForPackage( RunBatchTool.class );
+                Preferences prefs= RunBatchTool.this.prefs;
                 int threadCount= prefs.getInt(PREF_THREAD_COUNT,8);
                 if ( true ) {
                     String warning="<html><p>Multiple processes can run at the same time, generally<br>"
@@ -1334,14 +1339,17 @@ public class RunBatchTool extends javax.swing.JPanel {
         if ( pd.type=='T' || ( pd.type=='S' && UnitsUtil.isTimeLocation(((DatumRange)pd.deft).getUnits()) ) ) {
             try {
                 if ( AutoplotUtil.showConfirmDialog( this, timeRangesPanel, "Generate Time Ranges", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+                    String timeRange= timeRangeComboBox.getSelectedItem().toString();
                     String template= timeFormatComboBox.getSelectedItem().toString();
+                    prefs.put("lastTimeRange", timeRange);
+                    prefs.put("lastTimeFormat", template);
                     Pattern p= Pattern.compile("\\$\\(o[,;]id=([a-zA-Z\\-_]+)\\)");
                     Matcher m= p.matcher(template);
                     if ( m.matches() ) {
                         String id= m.group(1);
                         template= "orbit:"+id+":"+template;
                     }
-                    ss= ScriptContext.generateTimeRanges(template, timeRangeComboBox.getSelectedItem().toString() );
+                    ss= ScriptContext.generateTimeRanges(template, timeRange );
                 }
             } catch (ParseException ex) {
                 Logger.getLogger(RunBatchTool.class.getName()).log(Level.SEVERE, null, ex);
