@@ -10,7 +10,6 @@ import java.awt.Component;
 import java.awt.Font;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-import static org.autoplot.GuiSupport.setFont;
 import org.das2.util.Entities;
 import org.das2.util.StringSchemeEditor;
 import org.das2.util.awt.PdfGraphicsOutput;
@@ -127,5 +126,10 @@ public class FontStringSchemeEditor extends javax.swing.JPanel implements String
     @Override
     public void setContext(Object o) {
         
+    }
+
+    @Override
+    public String getLabel() {
+        return "Font Editor";
     }
 }

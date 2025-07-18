@@ -65,4 +65,9 @@ public class DataSetSelectorStringSchemeEditor extends javax.swing.JPanel implem
     public void setContext(Object o) {
         
     }
+
+    @Override
+    public String getLabel() {
+        return "Data Set Selector Editor";
+    }
 }

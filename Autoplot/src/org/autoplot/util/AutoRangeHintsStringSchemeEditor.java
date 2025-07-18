@@ -314,4 +314,9 @@ public class AutoRangeHintsStringSchemeEditor extends javax.swing.JPanel impleme
     private javax.swing.JTextField widthsTextField;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public String getLabel() {
+        return "Autorange Hints Editor";
+    }
 }

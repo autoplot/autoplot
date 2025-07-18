@@ -491,4 +491,9 @@ public class LayoutStringSchemeEditor extends javax.swing.JPanel implements Stri
     private javax.swing.JTextField topLeftPercent;
     private javax.swing.JTextField topLeftPx;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public String getLabel() {
+        return "Layout String Editor";
+    }
 }
