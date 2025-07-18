@@ -30,7 +30,7 @@ public final class JLinkyLabel extends JLabel {
     public JLinkyLabel( URL context, String label ) {
         super(label);
         List<URL> uu= HtmlUtil.getLinks( context, label );
-        if ( uu.size()>0 ) {
+        if ( !uu.isEmpty() ) {
             try {
                 uri= uu.get(0).toURI();
             } catch (URISyntaxException ex) {
@@ -40,10 +40,10 @@ public final class JLinkyLabel extends JLabel {
         } else if ( uu.size()>1 ) {
             uri= null;
         }
-        addMouseListener( myMouseLister() );
+        addMouseListener( myMouseListener() );
     }
 
-    private MouseListener myMouseLister() {
+    private MouseListener myMouseListener() {
         return new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
