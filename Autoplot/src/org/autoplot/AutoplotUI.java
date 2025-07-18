@@ -185,6 +185,7 @@ import org.autoplot.util.FontStringSchemeEditor;
 import org.autoplot.util.LayoutStringSchemeEditor;
 import org.autoplot.util.PlotDataMashupResolver;
 import org.das2.components.GrannyTextEditor;
+import org.das2.components.propertyeditor.AxisFormatStringSchemeEditor;
 import org.das2.components.propertyeditor.TickValuesStringSchemeEditor;
 import org.das2.graph.GraphUtil;
 import org.das2.components.propertyeditor.SpecialColorsStringSchemeEditor;
@@ -1269,6 +1270,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
         SwingUtilities.invokeLater(() -> {
             addTools();
             PropertyEditor.addStringEditor("tickValues", new TickValuesStringSchemeEditor() );
+            PropertyEditor.addStringEditor("tickFormat", new AxisFormatStringSchemeEditor() );
             PropertyEditor.addStringEditor("specialColors", new SpecialColorsStringSchemeEditor() );
             PropertyEditor.addStringEditor("autoRangeHints", new AutoRangeHintsStringSchemeEditor() );
             PropertyEditor.addStringEditor("label", newGrannyTextEditorWithMacros() );
