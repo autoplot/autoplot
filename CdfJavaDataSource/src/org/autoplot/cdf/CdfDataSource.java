@@ -1566,7 +1566,11 @@ public class CdfDataSource extends AbstractDataSource {
                         }
 
                         if ( slice1<0 ) {
-                            result.putProperty("DEPEND_" + idep, depDs);
+                            if ( depDs.rank()==1 && idep<dimensions.length && depDs.length()==dimensions[idep] ) {
+                                // Tracers has file with NRV and no DEPEND_0.
+                                result.putProperty("DEPEND_" + idep, depDs);
+                            }
+                            
                         } else {
                             if ( idep==1 ) {
                                 if ( depDs.rank()==0 ) {
