@@ -1155,6 +1155,9 @@ public class CdfDataSource extends AbstractDataSource {
                 result= false;
             }
         }
+        if ( result==true && !cdf.recordVariance(svariable) ) {
+            result= false;
+        }
         logger.log(Level.FINE, "reformTest for {0}: {1}", new Object[]{svariable, result});
         return result;
     }
