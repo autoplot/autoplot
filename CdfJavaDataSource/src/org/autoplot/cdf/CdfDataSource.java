@@ -1128,16 +1128,15 @@ public class CdfDataSource extends AbstractDataSource {
         if ( thisAttributes.containsKey("DEPEND_0") ) {
             Object o=  thisAttributes.get("DEPEND_0");
             if ( o!=null ) {
-                Object mapo= thisAttributes.get("DEPEND_0");
-                if ( mapo instanceof Map ) {
-                    Map<String,Object> so= (Map)mapo;
+                if ( o instanceof Map ) {
+                    Map<String,Object> so= (Map)o;
                     String dep0= (String) so.get("NAME");
                     int numDep0= cdf.getNumberOfValues(dep0);
                     if ( numDep0==1 ) {
                         result= false;
                     }
-                } else if ( mapo instanceof String ) {
-                    String dep0= (String)mapo;
+                } else if ( o instanceof String ) {
+                    String dep0= (String)o;
                     int numDep0= cdf.getNumberOfValues(dep0);
                     if ( numDep0==1 ) {
                         result= false;
@@ -1155,7 +1154,7 @@ public class CdfDataSource extends AbstractDataSource {
                 result= false;
             }
         }
-        if ( result==true && !cdf.recordVariance(svariable) ) {
+        if ( result==true && !cdf.recordVariance(svariable) && thisAttributes.containsKey("DEPEND_0") ) {
             result= false;
         }
         logger.log(Level.FINE, "reformTest for {0}: {1}", new Object[]{svariable, result});
