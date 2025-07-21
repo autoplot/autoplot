@@ -79,6 +79,7 @@ public class CdfDataSource extends AbstractDataSource {
     protected static final String ATTR_SLICE2= "slice2";
     
     private static final Logger logger= LoggerManager.getLogger("apdss.cdf");
+
     private Map<String, Object> attributes;
 
     public CdfDataSource( URI uri ) {
@@ -1161,6 +1162,155 @@ public class CdfDataSource extends AbstractDataSource {
         logger.log(Level.FINE, "reformTest for {0}: {1}", new Object[]{svariable, result});
         return result;
     }
+
+    private static Units maybeGetUnits(Map<String, Object> thisAttributes, MutablePropertyDataSet result, Units units, final String svariable, final CDFReader cdf) {
+        if (thisAttributes.containsKey("UNITS")) {
+            String sunits= (String) thisAttributes.get("UNITS");
+            Units mu;
+            if ( sunits.equalsIgnoreCase("row number") || sunits.equalsIgnoreCase("column number" ) ) { // kludge for POLAR/VIS
+                mu= Units.dimensionless;
+            } else {
+                mu = Units.lookupUnits(sunits);
+            }
+            Units u = (Units) result.property(QDataSet.UNITS);
+            if (u == null) {
+                result.putProperty(QDataSet.UNITS, mu);
+                units= mu;
+            } else {
+                units= u;
+            }
+        } else if ( thisAttributes.containsKey("UNIT_PTR") ) {
+            String svar= (String) thisAttributes.get("UNIT_PTR");
+            if ( svar!=null ) {
+                logger.log(Level.FINER, "found UNIT_PTR for {0}", svariable);
+                boolean okay= true;
+                QDataSet s=null;
+                try {
+                    if ( hasVariable(cdf, svar) ) {
+                        s= CdfUtil.loadVariable(cdf, svar, 0, 1, 1, -1, new NullProgressMonitor() );
+                        s= s.slice(0);
+                        double s1= s.value(0);
+                        for ( int i=1; i<s.length(); i++ ) {
+                            if ( s.value(i)!=s1 ) {
+                                logger.log( Level.INFO, "units are not all the same, unable to use: {0}", svar );
+                                okay= false;
+                            }
+                        }
+                    } else {
+                        logger.log( Level.INFO, "units variable does not exist: {0}", svar);
+                        okay= false;
+                    }
+                } catch ( Exception ex ) {
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
+                    okay= false;
+                }
+                if ( okay ) {
+                    assert s!=null;
+                    units= Units.lookupUnits( DataSetUtil.getStringValue( s, s.value(0) ) );
+                    result.putProperty(QDataSet.UNITS, units);
+                } else {
+                    units= SemanticOps.getUnits(result); // do what we did before...
+                }
+            } else {
+                units= SemanticOps.getUnits(result); // do what we did before...
+            }
+        } else {
+            units= SemanticOps.getUnits(result); // someone has already figured out TimeLocationUnits...
+        }
+
+        return units;
+    }
+
+    private static void maybeAddValidRange(Map<String, Object> thisAttributes, MutablePropertyDataSet result, Units units, boolean loadDependents) {
+        Object f= thisAttributes.get("FILLVAL");
+        double dv= IstpMetadataModel.doubleValue( f, units, Double.NaN, IstpMetadataModel.VALUE_MIN );
+        if ( !Double.isNaN(dv) ) {
+            result.putProperty(QDataSet.FILL_VALUE, dv );
+        }
+        DatumRange vrange= IstpMetadataModel.getValidRange( thisAttributes, units );
+        if ( vrange!=null ) {
+            if ( vrange.width().value()<=0 ) {
+                logger.fine("ignoring VALID_MIN and VALID_MAX because they are equal or out of order.");
+            } else {
+                QDataSet extentds= Ops.extentSimple( result,null );
+                if ( isFinite( extentds.value(0) ) ) {
+                    DatumRange extent= DataSetUtil.asDatumRange( extentds );
+                    if ( loadDependents || extent.intersects(vrange) ) { // if this data depends on other independent data, or intersects the valid range.
+                        // typical route
+                        if ( UnitsUtil.isTimeLocation( vrange.getUnits() ) ) {
+                            if ( extent.intersects(vrange) ) {
+                                result.putProperty(QDataSet.VALID_MIN, vrange.min().doubleValue(units) );
+                                result.putProperty(QDataSet.VALID_MAX, vrange.max().doubleValue(units) );
+                            }
+                        } else {
+                            result.putProperty(QDataSet.VALID_MIN, vrange.min().doubleValue(units) );
+                            result.putProperty(QDataSet.VALID_MAX, vrange.max().doubleValue(units) );                    
+                        }
+                    } else {
+                        logger.fine("ignoring VALID_MIN and VALID_MAX because no timetags would be considered valid.");
+                    }
+                } else {
+                    logger.fine("using VALID_MIN and VALID_MAX to indictate that all data is invalid.");
+                    result.putProperty(QDataSet.VALID_MIN, vrange.min().doubleValue(units) );
+                    result.putProperty(QDataSet.VALID_MAX, vrange.max().doubleValue(units) );          
+                }
+            }
+        }
+
+    }
+    
+    private static void maybeAddDeltaPlusMinus(boolean loadDependents, Map<String, Object> thisAttributes, final String svariable, final CDFReader cdf, MutablePropertyDataSet result, final String constraints) throws Exception {
+        // CDF uses DELTA_PLUS and DELTA_MINUS on a dependency to represent the BIN boundaries.
+        // vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/po_h0_tim_19960409_v03.cdf?Flux_H has units error.
+        boolean doPlusMinus= loadDependents==false;
+        Object deltaPlus= thisAttributes.get( "DELTA_PLUS_VAR" );
+        Object deltaMinus= thisAttributes.get( "DELTA_MINUS_VAR" );
+        if ( doPlusMinus
+                && ( deltaPlus!=null && deltaPlus instanceof String && !deltaPlus.equals(svariable) )
+                && (  deltaMinus!=null && deltaMinus instanceof String ) && !deltaPlus.equals(svariable) ) {
+            if ( hasVariable( cdf, (String)deltaPlus ) ) {
+                QDataSet delta;
+                try {
+                    delta = getDeltaPlusMinus( cdf, result, (String)deltaPlus, constraints );//TODO: slice1
+                } catch ( NoDataInIntervalException ex ) {  // file:///home/jbf/autoplot/data/u/jonn/20180615/psp_isois-epilo_l2-ic_20100104_v0.0.0.cdf
+                    logger.log(Level.FINE, "DELTA_PLUS_VAR variable has no records {0}: {1}", new Object[] { svariable, deltaPlus } );
+                    delta= null;
+                }
+                if ( delta!=null ) {
+                    String plusAttr= loadDependents==false ? QDataSet.BIN_PLUS : QDataSet.DELTA_PLUS;
+                    String minusAttr= loadDependents==false ? QDataSet.BIN_MINUS : QDataSet.DELTA_MINUS;
+                    Units deltaUnits= SemanticOps.getUnits(delta);
+                    if ( UnitsUtil.isRatioMeasurement(deltaUnits)
+                            && deltaUnits.isConvertibleTo( SemanticOps.getUnits(result).getOffsetUnits() )
+                            && ( delta.rank()==0 || result.length()==delta.length() ) ) {
+                        result.putProperty( plusAttr, delta );
+                        if ( !deltaMinus.equals(deltaPlus) ) {
+                            delta= getDeltaPlusMinus( cdf, result, (String)deltaMinus, constraints );
+                            if ( delta.length()==1 && delta.rank()==1 && delta.length()!=result.length() ) {
+                                delta= delta.slice(0); //vap+cdaweb:ds=C3_PP_CIS&id=T_p_par__C3_PP_CIS&timerange=2005-09-07+through+2005-09-19
+                            }
+                        }
+                        if ( SemanticOps.getUnits(delta).isConvertibleTo( SemanticOps.getUnits(result).getOffsetUnits() ) ) {
+                            result.putProperty( minusAttr, delta );
+                        } else {
+                            result.putProperty( plusAttr, null );
+                            logger.log(Level.FINE, "DELTA_MINUS_VAR units are not convertible: {0}", SemanticOps.getUnits(delta));
+                        }
+                    } else {
+                        if ( !UnitsUtil.isRatioMeasurement(deltaUnits) ) {
+                            logger.log(Level.FINE, "DELTA_PLUS_VAR units are not ratio measurements having a meaningful zero: {0}", new Object[] { deltaUnits } );
+                        } else if ( result.length()!=delta.length() ) {
+                            logger.log(Level.FINE, "DELTA_PLUS_VAR length ({0,number,#})!= data length ({1,number,#})", new Object[] { delta.length(), result.length() } );
+                        } else {
+                            logger.log(Level.FINE, "DELTA_PLUS_VAR units are not convertible: {0}", SemanticOps.getUnits(delta));
+                        }
+                    }
+                }
+            } else {
+                logger.log(Level.FINE, "DELTA_PLUS_VAR variable is not found for {0}: {1}", new Object[] { svariable, deltaPlus } );
+            }
+        }
+    }
     
     /**
      * Read the variable into a QDataSet, possibly recursing to get depend variables.
@@ -1313,99 +1463,12 @@ public class CdfDataSource extends AbstractDataSource {
 
         final boolean doUnits = true;
         Units units=null;
-        if (doUnits) {
-            if (thisAttributes.containsKey("UNITS")) {
-                String sunits= (String) thisAttributes.get("UNITS");
-                Units mu;
-                if ( sunits.equalsIgnoreCase("row number") || sunits.equalsIgnoreCase("column number" ) ) { // kludge for POLAR/VIS
-                    mu= Units.dimensionless;
-                } else {
-                    mu = Units.lookupUnits(sunits);
-                }
-                Units u = (Units) result.property(QDataSet.UNITS);
-                if (u == null) {
-                    result.putProperty(QDataSet.UNITS, mu);
-                    units= mu;
-                } else {
-                    units= u;
-                }
-            } else if ( thisAttributes.containsKey("UNIT_PTR") ) {
-                String svar= (String) thisAttributes.get("UNIT_PTR");
-                if ( svar!=null ) {
-                    logger.log(Level.FINER, "found UNIT_PTR for {0}", svariable);
-                    boolean okay= true;
-                    QDataSet s=null;
-                    try {
-                        if ( hasVariable(cdf, svar) ) {
-                            s= CdfUtil.loadVariable(cdf, svar, 0, 1, 1, -1, new NullProgressMonitor() );
-                            s= s.slice(0);
-                            double s1= s.value(0);
-                            for ( int i=1; i<s.length(); i++ ) {
-                                if ( s.value(i)!=s1 ) {
-                                    logger.log( Level.INFO, "units are not all the same, unable to use: {0}", svar );
-                                    okay= false;
-                                }
-                            }
-                        } else {
-                            logger.log( Level.INFO, "units variable does not exist: {0}", svar);
-                            okay= false;
-                        }
-                    } catch ( Exception ex ) {
-                        logger.log(Level.SEVERE, ex.getMessage(), ex);
-                        okay= false;
-                    }
-                    if ( okay ) {
-                        assert s!=null;
-                        units= Units.lookupUnits( DataSetUtil.getStringValue( s, s.value(0) ) );
-                        result.putProperty(QDataSet.UNITS, units);
-                    } else {
-                        units= SemanticOps.getUnits(result); // do what we did before...
-                    }
-                } else {
-                    units= SemanticOps.getUnits(result); // do what we did before...
-                }
-            } else {
-                units= SemanticOps.getUnits(result); // someone has already figured out TimeLocationUnits...
-            }
-        } else {
-            // doFill must not be true for this branch.
+        if ( doUnits ) {
+            units = maybeGetUnits(thisAttributes, result, units, svariable, cdf);
         }
 
-        Object f= thisAttributes.get("FILLVAL");
-        double dv= IstpMetadataModel.doubleValue( f, units, Double.NaN, IstpMetadataModel.VALUE_MIN );
-        if ( !Double.isNaN(dv) ) {
-            result.putProperty(QDataSet.FILL_VALUE, dv );
-        }
-        DatumRange vrange= IstpMetadataModel.getValidRange( thisAttributes, units );
-        if ( vrange!=null ) {
-            if ( vrange.width().value()<=0 ) {
-                logger.fine("ignoring VALID_MIN and VALID_MAX because they are equal or out of order.");
-            } else {
-                QDataSet extentds= Ops.extentSimple( result,null );
-                if ( isFinite( extentds.value(0) ) ) {
-                    DatumRange extent= DataSetUtil.asDatumRange( extentds );
-                    if ( loadDependents || extent.intersects(vrange) ) { // if this data depends on other independent data, or intersects the valid range.
-                        // typical route
-                        if ( UnitsUtil.isTimeLocation( vrange.getUnits() ) ) {
-                            if ( extent.intersects(vrange) ) {
-                                result.putProperty(QDataSet.VALID_MIN, vrange.min().doubleValue(units) );
-                                result.putProperty(QDataSet.VALID_MAX, vrange.max().doubleValue(units) );
-                            }
-                        } else {
-                            result.putProperty(QDataSet.VALID_MIN, vrange.min().doubleValue(units) );
-                            result.putProperty(QDataSet.VALID_MAX, vrange.max().doubleValue(units) );                    
-                        }
-                    } else {
-                        logger.fine("ignoring VALID_MIN and VALID_MAX because no timetags would be considered valid.");
-                    }
-                } else {
-                    logger.fine("using VALID_MIN and VALID_MAX to indictate that all data is invalid.");
-                    result.putProperty(QDataSet.VALID_MIN, vrange.min().doubleValue(units) );
-                    result.putProperty(QDataSet.VALID_MAX, vrange.max().doubleValue(units) );          
-                }
-            }
-        }
-
+        maybeAddValidRange( thisAttributes, result, units, loadDependents );
+        
         if ( slice && loadDependents ) {
             Map dep0map= (Map) thisAttributes.get( "DEPEND_0" );
             if ( dep0map!=null ) {
@@ -1415,57 +1478,7 @@ public class CdfDataSource extends AbstractDataSource {
             }
         }
 
-        // CDF uses DELTA_PLUS and DELTA_MINUS on a dependency to represent the BIN boundaries.
-        // vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/po_h0_tim_19960409_v03.cdf?Flux_H has units error.
-        boolean doPlusMinus= loadDependents==false;
-        Object deltaPlus= thisAttributes.get( "DELTA_PLUS_VAR" );
-        Object deltaMinus= thisAttributes.get( "DELTA_MINUS_VAR" );
-        if ( doPlusMinus 
-                && ( deltaPlus!=null && deltaPlus instanceof String && !deltaPlus.equals(svariable) ) 
-                && (  deltaMinus!=null && deltaMinus instanceof String ) && !deltaPlus.equals(svariable) ) {
-            if ( hasVariable( cdf, (String)deltaPlus ) ) {
-                QDataSet delta; 
-                try {
-                    delta = getDeltaPlusMinus( cdf, result, (String)deltaPlus, constraints );//TODO: slice1
-                } catch ( NoDataInIntervalException ex ) {  // file:///home/jbf/autoplot/data/u/jonn/20180615/psp_isois-epilo_l2-ic_20100104_v0.0.0.cdf
-                    logger.log(Level.FINE, "DELTA_PLUS_VAR variable has no records {0}: {1}", new Object[] { svariable, deltaPlus } );                    
-                    delta= null;
-                }
-                if ( delta!=null ) {
-                    String plusAttr= loadDependents==false ? QDataSet.BIN_PLUS : QDataSet.DELTA_PLUS;
-                    String minusAttr= loadDependents==false ? QDataSet.BIN_MINUS : QDataSet.DELTA_MINUS;
-                    Units deltaUnits= SemanticOps.getUnits(delta);
-                    if ( UnitsUtil.isRatioMeasurement(deltaUnits)
-                            && deltaUnits.isConvertibleTo( SemanticOps.getUnits(result).getOffsetUnits() )
-                            && ( delta.rank()==0 || result.length()==delta.length() ) ) {
-                        result.putProperty( plusAttr, delta );
-                        if ( !deltaMinus.equals(deltaPlus) ) {
-                            delta= getDeltaPlusMinus( cdf, result, (String)deltaMinus, constraints );
-                            if ( delta.length()==1 && delta.rank()==1 && delta.length()!=result.length() ) {
-                               delta= delta.slice(0); //vap+cdaweb:ds=C3_PP_CIS&id=T_p_par__C3_PP_CIS&timerange=2005-09-07+through+2005-09-19
-                            }
-                        }
-                        if ( SemanticOps.getUnits(delta).isConvertibleTo( SemanticOps.getUnits(result).getOffsetUnits() ) ) {
-                            result.putProperty( minusAttr, delta );
-                        } else {
-                            result.putProperty( plusAttr, null );
-                            logger.log(Level.FINE, "DELTA_MINUS_VAR units are not convertible: {0}", SemanticOps.getUnits(delta));
-                        }
-                    } else {
-                        if ( !UnitsUtil.isRatioMeasurement(deltaUnits) ) {
-                            logger.log(Level.FINE, "DELTA_PLUS_VAR units are not ratio measurements having a meaningful zero: {0}", new Object[] { deltaUnits } );
-                        } else if ( result.length()!=delta.length() ) {
-                            logger.log(Level.FINE, "DELTA_PLUS_VAR length ({0,number,#})!= data length ({1,number,#})", new Object[] { delta.length(), result.length() } );
-                        } else {
-                            logger.log(Level.FINE, "DELTA_PLUS_VAR units are not convertible: {0}", SemanticOps.getUnits(delta));
-                        }
-                    }
-                }
-            } else {
-                logger.log(Level.FINE, "DELTA_PLUS_VAR variable is not found for {0}: {1}", new Object[] { svariable, deltaPlus } );                    
-            }
-        }
-
+        maybeAddDeltaPlusMinus(loadDependents, thisAttributes, svariable, cdf, result, constraints);
 
         int[] qubeDims= DataSetUtil.qubeDims(result);
         if ( loadDependents ) {
