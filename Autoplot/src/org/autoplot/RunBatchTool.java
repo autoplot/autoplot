@@ -1258,7 +1258,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         }
         if ( i>-1 ) {
             File dir= new File( s.substring(0,i) );
-            if ( JOptionPane.showConfirmDialog(this,"<html>Delete files in directory<br>"+dir+"?","Clear directory ",JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION ) {
+            if ( JOptionPane.showConfirmDialog(this,"<html>Delete files and directory<br>"+dir+"?","Delete Directory",JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION ) {
                 if ( !FileUtil.deleteFileTree(dir) ) {
                     JOptionPane.showMessageDialog(this,"Unable to delete directory");
                 }
