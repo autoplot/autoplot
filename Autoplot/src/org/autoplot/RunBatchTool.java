@@ -90,6 +90,7 @@ import org.autoplot.jythonsupport.ui.Util;
 import org.autoplot.pngwalk.PngWalkTool;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
+import org.das2.fsm.FileStorageModel;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
@@ -384,6 +385,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         editParamsButton = new javax.swing.JButton();
         pngWalkToolButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
+        deleteDirectoryButton = new javax.swing.JButton();
 
         jList2.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -731,6 +733,18 @@ public class RunBatchTool extends javax.swing.JPanel {
             }
         });
 
+        deleteDirectoryButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/trashcan.png"))); // NOI18N
+        deleteDirectoryButton.setToolTipText("Delete files in directory");
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, writeCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), deleteDirectoryButton, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
+        deleteDirectoryButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteDirectoryButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -759,6 +773,8 @@ public class RunBatchTool extends javax.swing.JPanel {
                         .addComponent(writeCheckBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(writeFilenameCB, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(deleteDirectoryButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(pngWalkToolButton))
                     .addGroup(layout.createSequentialGroup()
@@ -800,7 +816,8 @@ public class RunBatchTool extends javax.swing.JPanel {
                     .addComponent(writeCheckBox, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(writeFilenameCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(pngWalkToolButton)))
+                        .addComponent(pngWalkToolButton)
+                        .addComponent(deleteDirectoryButton, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(22, 22, 22)
@@ -1230,6 +1247,26 @@ public class RunBatchTool extends javax.swing.JPanel {
     private void writeCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_writeCheckBoxActionPerformed
         checkNumberOfParams();
     }//GEN-LAST:event_writeCheckBoxActionPerformed
+
+    private void deleteDirectoryButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteDirectoryButtonActionPerformed
+        String s= writeFilenameCB.getSelectedItem().toString();
+        int i= FileStorageModel.splitIndex(s);
+        int i2= s.indexOf("%");
+        if ( i2>-1 && ( i==-1 || i2<i ) ) {
+            i2= s.lastIndexOf("/",i2);
+            i=i2;
+        }
+        if ( i>-1 ) {
+            File dir= new File( s.substring(0,i) );
+            if ( JOptionPane.showConfirmDialog(this,"<html>Delete files in directory<br>"+dir+"?","Clear directory ",JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION ) {
+                if ( !FileUtil.deleteFileTree(dir) ) {
+                    JOptionPane.showMessageDialog(this,"Unable to delete directory");
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this,"Unable to find directory (looking for forward slashes)");
+        }
+    }//GEN-LAST:event_deleteDirectoryButtonActionPerformed
 
     private void doLoadFromFile( JTextArea paramValues ) {
         JFileChooser chooser= new JFileChooser();
@@ -2783,6 +2820,7 @@ public class RunBatchTool extends javax.swing.JPanel {
     private javax.swing.JMenuItem copyScriptUri;
     private javax.swing.JMenuItem copyValueMenuItem;
     private org.autoplot.datasource.DataSetSelector dataSetSelector1;
+    private javax.swing.JButton deleteDirectoryButton;
     private javax.swing.JButton editParamsButton;
     private javax.swing.JMenuItem exportResultsMenuItem;
     private javax.swing.JMenu fileMenu;
