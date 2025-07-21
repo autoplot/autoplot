@@ -1482,11 +1482,17 @@ public class CdfDataSource extends AbstractDataSource {
 
         int[] qubeDims= DataSetUtil.qubeDims(result);
         if ( loadDependents ) {
+            int maybeShift= 0;
             for (int idep = 0; idep <= dimensions.length; idep++) {
                 int sidep= idep; // Note slice1 will be implemented towards the end of this loop.
-                Map depAttr = (Map) thisAttributes.get( "DEPEND_" + sidep );
+                Map depAttr = (Map) thisAttributes.get( "DEPEND_" + (sidep+maybeShift) );
+                Object oo= thisAttributes.get("LABL_PTR_" + (sidep+maybeShift));
+                if ( idep==0 && depAttr==null ) {
+                    maybeShift=1;
+                    depAttr = (Map) thisAttributes.get( "DEPEND_" + (sidep+maybeShift) );
+                    oo= thisAttributes.get("LABL_PTR_" + (sidep+maybeShift));
+                }
                 // sometime LABL_PTR_1 is a QDataSet, sometimes it's a string.  Thanks VATesting for catching this.
-                Object oo= thisAttributes.get("LABL_PTR_" + sidep);
                 MutablePropertyDataSet lablDs=null;
                 String labl=null;
                 if ( oo instanceof MutablePropertyDataSet ) {
@@ -1555,7 +1561,7 @@ public class CdfDataSource extends AbstractDataSource {
                         }
                         
                         if ( idep==0 ) { //TODO: check for spareness property.  
-                            if ( cdf.getNumberOfValues(svariable)==1 && depDs.length()>1 ) {
+                            if ( result.length()==1 && cdf.getNumberOfValues(svariable)==1 && depDs.length()>1 ) {
                                 logger.fine("it looks like the variable should repeat to match DEPEND_0");
                                 MutablePropertyDataSet nresult;
                                 if ( result.rank()>1 ) {
@@ -1588,7 +1594,7 @@ public class CdfDataSource extends AbstractDataSource {
                                 if ( depDs.rank()==1 && idep<ndimensions.length && dim0lengthCheck ) {
                                 //    // Tracers has file with NRV and no DEPEND_0.
                                     result.putProperty("DEPEND_" + idep, depDs);
-                                } else if ( depDs.rank()==2 && idep<ndimensions.length && depDsDims[0]==ndimensions[0] ) {
+                                } else if ( depDs.rank()==2 && idep<ndimensions.length && depDsDims[0]==ndimensions[0] && depDsDims[0]!=1 ) {
                                     result.putProperty("DEPEND_" + idep, depDs);
                                 }
                             } else {
