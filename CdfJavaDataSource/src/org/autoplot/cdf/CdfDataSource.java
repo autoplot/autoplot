@@ -1570,7 +1570,7 @@ public class CdfDataSource extends AbstractDataSource {
 
                         if ( slice1<0 ) {
                             int[] depDsDims= DataSetUtil.qubeDims(depDs);
-                            boolean dim0lengthCheck= constraints!=null || ( depDsDims[idep]==ndimensions[idep] );
+                            boolean dim0lengthCheck= constraints!=null || ( depDsDims[0]==ndimensions[idep] );
                             if ( depDs.rank()==1 && idep<ndimensions.length && dim0lengthCheck ) {
                             //    // Tracers has file with NRV and no DEPEND_0.
                                 result.putProperty("DEPEND_" + idep, depDs);
