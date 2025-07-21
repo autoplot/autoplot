@@ -1128,15 +1128,16 @@ public class CdfDataSource extends AbstractDataSource {
         if ( thisAttributes.containsKey("DEPEND_0") ) {
             Object o=  thisAttributes.get("DEPEND_0");
             if ( o!=null ) {
-                if ( o instanceof Map ) {
-                    Map<String,Object> so= (Map)o;
+                Object mapo= thisAttributes.get("DEPEND_0");
+                if ( mapo instanceof Map ) {
+                    Map<String,Object> so= (Map)mapo;
                     String dep0= (String) so.get("NAME");
                     int numDep0= cdf.getNumberOfValues(dep0);
                     if ( numDep0==1 ) {
                         result= false;
                     }
-                } else if ( o instanceof String ) {
-                    String dep0= (String)o;
+                } else if ( mapo instanceof String ) {
+                    String dep0= (String)mapo;
                     int numDep0= cdf.getNumberOfValues(dep0);
                     if ( numDep0==1 ) {
                         result= false;
@@ -1568,9 +1569,12 @@ public class CdfDataSource extends AbstractDataSource {
                         }
 
                         if ( slice1<0 ) {
-                            boolean dim0lengthCheck= constraints!=null || ( depDs.length()==ndimensions[idep] );
+                            int[] depDsDims= DataSetUtil.qubeDims(depDs);
+                            boolean dim0lengthCheck= constraints!=null || ( depDsDims[idep]==ndimensions[idep] );
                             if ( depDs.rank()==1 && idep<ndimensions.length && dim0lengthCheck ) {
-                                // Tracers has file with NRV and no DEPEND_0.
+                            //    // Tracers has file with NRV and no DEPEND_0.
+                                result.putProperty("DEPEND_" + idep, depDs);
+                            } else if ( depDs.rank()==2 && idep<ndimensions.length && depDsDims[0]==ndimensions[0] ) {
                                 result.putProperty("DEPEND_" + idep, depDs);
                             }
                             
