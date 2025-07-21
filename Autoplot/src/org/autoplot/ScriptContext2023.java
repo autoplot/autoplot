@@ -1298,8 +1298,12 @@ addBottomDecoration( dom.canvases[0], paint )
         File parentFile= file.getParentFile();
         if ( parentFile!=null ) { // relative filenames are okay.
             if ( !parentFile.exists() ) {
-                if ( !parentFile.mkdirs() ) {
-                    throw new IOException( "unable to mkdir: "+file.getParentFile() );
+                synchronized ( ScriptContext2023.class ) {
+                    if ( !parentFile.exists() ) {
+                        if ( !parentFile.mkdirs() ) {
+                            throw new IOException( "unable to mkdir: "+file.getParentFile() );
+                        }
+                    }
                 }
             }
         }
