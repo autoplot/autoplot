@@ -31,7 +31,7 @@
                 
         <p>Bugfixes (2025-07-22):</p>
         <ul>
-            <li>detect 0x0 pixel plot which would mess up layout.
+            <li>detect 0 by 0 pixel plot during transitions which would mess up layout.
             <li>ScriptContext's write to png make directory is thread-safe so multiple threads don't step on each other.
             <li>Add string describing how axis tick format dialog is used.
             <li>CDF with NRV variable, and no DEPEND_0 caused runtime error because it was incorrectly handled.  Thanks, Chris!
