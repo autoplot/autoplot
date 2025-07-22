@@ -8,6 +8,9 @@ import org.das2.graph.DasColumn;
 import org.das2.graph.DasDevicePosition;
 import org.das2.graph.DasRow;
 import java.awt.Rectangle;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -122,7 +125,9 @@ public class LayoutUtil {
         count++;
         
         boolean tcaAreComing= false;
-        
+
+        boolean foundZeroAreaPlot= false;
+
         for (DasCanvasComponent cc : canvas.getCanvasComponents()) {
 
             Rectangle bounds;
@@ -160,6 +165,10 @@ public class LayoutUtil {
                 if ( cc instanceof DasAxis && ((DasAxis)cc).isDrawTca() && !((DasAxis)cc).isTcaLoaded() ) {
                     tcaAreComing= true; // anticipate that TCA will be coming.
                 }
+                
+                if ( bounds.height==0 && bounds.width==0 && bounds.x==0 && bounds.y==0 ) {
+                    foundZeroAreaPlot= true;
+                }
             }
         }
 
@@ -183,6 +192,11 @@ public class LayoutUtil {
 
         if ( currentBoundsYMin>canvas.getHeight()/2 ) {
             logger.fine("transitional state where currentBoundsYMin is large.");
+            return;
+        }
+        
+        if ( foundZeroAreaPlot ) {
+            logger.fine("transitional state where plot has no area.");
             return;
         }
         
@@ -229,7 +243,7 @@ public class LayoutUtil {
         changed = changed | maybeSetMaximum(marginColumn, needXmax, 1.0, -needXmax / em - MARGIN_LEFT_RIGHT_EM, 0);
         changed = changed | maybeSetMinimum(marginRow, needYmin, 0, needYmin / em, 0);
         changed = changed | maybeSetMaximum(marginRow, needYmax, 1.0, -needYmax / em, 0);
-        
+
         if ( false && changed ) {
             List<DasRow> rows= new ArrayList<>();
                    
