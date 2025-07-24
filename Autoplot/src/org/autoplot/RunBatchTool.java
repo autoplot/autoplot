@@ -210,7 +210,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         //dataSetSelector1.setRecent( Collections.singletonList() );
         
         List<String> recentUris= new ArrayList<>(20);
-        recentUris.add( "http://autoplot.org/data/script/examples/parameters.jy" );
+        recentUris.add( "https://github.com/autoplot/dev/blob/master/demos/2019/20190726/demoParams.jy" );
         if ( dom.getController()!=null ) { // support testing.
             Pattern p= Pattern.compile(".*\\.jy(\\?.*)?");
             Map<String,String> recentJy= dom.getController().getApplicationModel().getRecent(p,20);
@@ -2200,7 +2200,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         //ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newCachedThreadPool(tf);
         
         String scriptName= dataSetSelector1.getValue();
-
+        
         URISplit split= URISplit.parse(scriptName);
         pwd= split.path;
 
