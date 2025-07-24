@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -913,6 +914,7 @@ public final class ApplicationModel {
                 String[] ss= line.split("\\s+",2);
                 if ( ss.length>1 ) {
                     if ( p.matcher(ss[1]).matches() ) {
+                        result.remove( ss[1] );
                         result.put( ss[1], ss[0] );
                     }
                 }
