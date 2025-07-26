@@ -29,8 +29,10 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-07-22):</p>
+        <p>Bugfixes (2025-07-26):</p>
         <ul>
+            <li>don't assume cadenceExact is valid when histogram mode is used, it would show incorrect horizontal lines.
+            <li>getRecent corrected in Run Batch Tool.
             <li>detect 0 by 0 pixel plot during transitions which would mess up layout.
             <li>ScriptContext's write to png make directory is thread-safe so multiple threads don't step on each other.
             <li>Add string describing how axis tick format dialog is used.
@@ -66,6 +68,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>synchronizeOne allows two datasets with the same length and no timetags (DEPEND_0).
             <li>Run Batch Tool has button to delete the png files directory.
             <li>"String Scheme" editors for URIs, layout, and fonts now have label so they are identified in Tooltips.
             <li>DOM and .vaps have new property "tickFormat".  Work towards allowing mission elapsed time to be shown as well times for axis ticks.  Thanks, Megha!
