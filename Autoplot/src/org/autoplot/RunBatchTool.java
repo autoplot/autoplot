@@ -1376,7 +1376,15 @@ public class RunBatchTool extends javax.swing.JPanel {
             try {
                 if ( pd.constraints.containsKey("format") ) {
                     String format= (String)pd.constraints.get("format");
-                    System.err.println("do something smart with format");
+                    timeFormatComboBox.setSelectedItem(format);
+                }
+                if ( pd.constraints.containsKey("min") && pd.constraints.containsKey("max") ) {
+                    try {
+                        String minMax= Ops.datumRange( pd.constraints.get("min")+"/"+pd.constraints.get("max") ).toString();
+                        timeRangeComboBox.setSelectedItem(minMax);
+                    } catch ( IllegalArgumentException ex ) {
+                        ex.printStackTrace();
+                    }
                 }
                 if ( AutoplotUtil.showConfirmDialog( this, timeRangesPanel, "Generate Time Ranges", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
                     String timeRange= timeRangeComboBox.getSelectedItem().toString();
