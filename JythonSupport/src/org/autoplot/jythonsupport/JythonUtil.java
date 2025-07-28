@@ -2121,6 +2121,10 @@ public class JythonUtil {
                 if ( regex!=null ) {
                     p.constraints.put( "regex", regex.toString() );
                 }
+                PyString format= (PyString)pyDict.get( new PyString("format"), null );
+                if ( format!=null ) {
+                    p.constraints.put( "format", format.toString() );
+                }                
             }
             p.value = params == null ? null : params.get(p.name);
 

@@ -1374,6 +1374,10 @@ public class RunBatchTool extends javax.swing.JPanel {
         String[] ss=null; // will be generated values
         if ( pd.type=='T' || ( pd.type=='S' && UnitsUtil.isTimeLocation(((DatumRange)pd.deft).getUnits()) ) ) {
             try {
+                if ( pd.constraints.containsKey("format") ) {
+                    String format= (String)pd.constraints.get("format");
+                    System.err.println("do something smart with format");
+                }
                 if ( AutoplotUtil.showConfirmDialog( this, timeRangesPanel, "Generate Time Ranges", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
                     String timeRange= timeRangeComboBox.getSelectedItem().toString();
                     String template= timeFormatComboBox.getSelectedItem().toString();
