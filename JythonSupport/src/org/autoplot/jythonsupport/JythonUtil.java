@@ -2076,7 +2076,6 @@ public class JythonUtil {
                 } else {
                     enumsObject = null;
                 }
-                Map<String, Object> constraints = new HashMap<>();
                 if (enumsObject != null && enumsObject instanceof PyList) {
                     PyList enumsList = (PyList) enumsObject;
                     List<Object> enums = new ArrayList(enumsList.size());
@@ -2091,27 +2090,27 @@ public class JythonUtil {
                         for (int j = 0; j < labelsList.size(); j++) {
                             labels.add(j, labelsList.get(j));
                         }
-                        constraints.put("labels", labels);
+                        p.constraints.put("labels", labels);
                     }
                 }
                 PyObject pymin= pyDict.get( new PyString("min"), null );
                 if ( pymin!=null ) {
                     if ( pymin instanceof PyInteger ) {
-                        constraints.put( "min", ((PyInteger)pymin).__tojava__(Integer.class) );
+                        p.constraints.put( "min", ((PyInteger)pymin).__tojava__(Integer.class) );
                     } else if ( p.name.equals("timerange") ) {
-                        constraints.put( "min", pymin.toString() );
+                        p.constraints.put( "min", pymin.toString() );
                     } else {
-                        constraints.put( "min", Double.parseDouble( pymin.__str__().toString() ) );
+                        p.constraints.put( "min", Double.parseDouble( pymin.__str__().toString() ) );
                     }
                 }
                 PyObject pymax= pyDict.get( new PyString("max"), null );
                 if ( pymax!=null ) {
                     if ( pymax instanceof PyInteger ) {
-                        constraints.put( "max", (pymax).__tojava__(Integer.class) );
+                        p.constraints.put( "max", (pymax).__tojava__(Integer.class) );
                     } else if ( p.name.equals("timerange") ) {
-                        constraints.put( "max", pymax.toString() );
+                        p.constraints.put( "max", pymax.toString() );
                     } else {
-                        constraints.put( "max", Double.parseDouble( pymax.__str__().toString() ) );
+                        p.constraints.put( "max", Double.parseDouble( pymax.__str__().toString() ) );
                     }
                 }
                 PyString stringType= (PyString)pyDict.get( new PyString("stringType"), null );
