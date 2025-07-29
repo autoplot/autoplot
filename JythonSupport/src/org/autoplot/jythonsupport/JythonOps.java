@@ -217,7 +217,13 @@ public class JythonOps {
             // In python code, support test like "ds!=None"
             return null;
         } else {
-            throw Py.TypeError("JythonOps is unable to coerce "+arg0+" to QDataSet");
+            String type;
+            if ( arg0 instanceof PyJavaInstance ) {
+                type= ((PyJavaInstance)arg0).__tojava__(Object.class).getClass().getSimpleName();
+            } else {
+                type= "\"" + arg0 + "\"";
+            }
+            throw Py.TypeError("JythonOps is unable to coerce "+type+" to QDataSet");
         }
         
     }
@@ -273,7 +279,13 @@ public class JythonOps {
             // In python code, support test like "ds!=None"
             return null;
         } else {
-            throw Py.TypeError("JythonOps is unable to coerce "+arg0+" to QDataSet");
+            String type;
+            if ( arg0 instanceof PyJavaInstance ) {
+                type= ((PyJavaInstance)arg0).__tojava__(Object.class).getClass().getSimpleName();
+            } else {
+                type= "\"" + arg0 + "\"";
+            }            
+            throw Py.TypeError("JythonOps is unable to coerce "+type+" to QDataSet");
         }
         
     }
