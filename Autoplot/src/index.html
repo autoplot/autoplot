@@ -29,11 +29,12 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-07-26):</p>
+        <p>Bugfixes (2025-07-29):</p>
         <ul>
-            <li>don't assume cadenceExact is valid when histogram mode is used, it would show incorrect horizontal lines.
+            <li>getGetParams didn't properly handle the min and max constraints, dropping them in the generation GUI of run batch 
+            <li>don't assume cadenceExact is valid when histogram mode is used, it would show incorrect horizontal lines.  Thanks, Dave!
             <li>getRecent corrected in Run Batch Tool.
-            <li>detect 0 by 0 pixel plot during transitions which would mess up layout.
+            <li>detect 0 by 0 pixel plot during transitions which would mess up layout, causing noise in tests.
             <li>ScriptContext's write to png make directory is thread-safe so multiple threads don't step on each other.
             <li>Add string describing how axis tick format dialog is used.
             <li>CDF with NRV variable, and no DEPEND_0 caused runtime error because it was incorrectly handled.  Thanks, Chris!
@@ -68,6 +69,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Use "format" constraint when generating timeranges in Run Batch Tool.
+            <li>Use "min" and "max" constraint when generating timeranges in Run Batch Tool.
             <li>synchronizeOne allows two datasets with the same length and no timetags (DEPEND_0).
             <li>Run Batch Tool has button to delete the png files directory.
             <li>"String Scheme" editors for URIs, layout, and fonts now have label so they are identified in Tooltips.
