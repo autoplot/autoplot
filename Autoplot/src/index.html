@@ -15,7 +15,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>TRACERS satellites were launched on Wednesday!  Screenshot from SpaceX feed.</small></p>
+        <p><small>Tempest weather station Illuminance lines up nicely with sunrise and sunset times from HAPI server.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -29,8 +29,13 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-07-29):</p>
+        <p>Bugfixes (2025-08-01):</p>
         <ul>
+            <li>When the fftPower window length is greater than the data window length, automatically flatten the data (a O(1) operation) to provide result.  Thanks, George!
+            <li><a href="https://github.com/das-developers/das2java/issues/139/">139</a>: anchorType plot means follow the plot and use its row and column.
+            <li><a href="https://github.com/das-developers/das2java/issues/139/">139</a>: Annotation with anchorType plot should not clip when anchorPosition is outside of the box.
+            <li>GrannyTextEditor properly replaces an extension when the carot is immediately before an extension.
+            <li><a href="https://github.com/das-developers/das2java/issues/138/">138</a>: Spectrogram flipped flag wasn't considered when comparing to sampleWidths in NN interpolation.
             <li>getGetParams didn't properly handle the min and max constraints, dropping them in the generation GUI of run batch 
             <li>don't assume cadenceExact is valid when histogram mode is used, it would show incorrect horizontal lines.  Thanks, Dave!
             <li>getRecent corrected in Run Batch Tool.
