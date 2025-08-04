@@ -4,6 +4,7 @@ package org.autoplot;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.DataFlavor;
@@ -49,6 +50,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -1450,13 +1452,21 @@ public class RunBatchTool extends javax.swing.JPanel {
             }
         } else if ( pd.type=='F' ) {
             JPanel panel= new JPanel();
+            int h= panel.getFont().getSize()*2;
             panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS ) );
+            panel.setAlignmentX(Component.LEFT_ALIGNMENT);
             String label= pd.label;
             if ( pd.doc!=null ) label= "<html>"+label+", <i>"+pd.doc+"</i>";
             panel.add( new JLabel( label ) );
             JTextField min= new JTextField( "" );
+            min.setAlignmentX(Component.LEFT_ALIGNMENT);
+            min.setMaximumSize( new Dimension(h*10,h));
             JTextField max= new JTextField( "" );
+            max.setAlignmentX(Component.LEFT_ALIGNMENT);
+            max.setMaximumSize( new Dimension(h*10,h));
             JTextField step= new JTextField( "" );
+            step.setAlignmentX(Component.LEFT_ALIGNMENT);
+            step.setMaximumSize( new Dimension(h*10,h));
             boolean isInt;
             min.setText( String.valueOf( pd.deft ) );
             if ( pd.deft instanceof Integer ) {
@@ -1480,6 +1490,7 @@ public class RunBatchTool extends javax.swing.JPanel {
             panel.add( max );
             panel.add( new JLabel( "Step Size: " ) );
             panel.add( step );
+            
             while ( AutoplotUtil.showConfirmDialog( this, panel, "Select range", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
                 List<String> theList= new ArrayList<>();
                 double dmin= Double.parseDouble(min.getText());
