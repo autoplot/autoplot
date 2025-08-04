@@ -884,7 +884,7 @@ public class DataSetURI {
                 } else {
                     //repeated code lurking, line 698
                     if ( split.path.endsWith("/tmp/") ) { // try to download the file directly.
-                        return downloadResourceAsTempFile(url, mon);
+                        return downloadResourceAsTempFile(url, -1, mon);
                     }
                     throw new FileNotFoundException("File not found: "+url );
                 }
@@ -1131,7 +1131,9 @@ public class DataSetURI {
         URISplit split = URISplit.parse( url.toString() ); // get the folder to put the file.
 
         if ( ( "https".equals(split.scheme) || "http".equals(split.scheme) ) 
-                && split.params==null && !split.file.endsWith("/") ) {
+                && split.params==null 
+                && !split.file.endsWith("/") 
+                && !split.path.endsWith("/tmp/") ) { // ending with /tmp/ will cause infinite loop.
             try {
                 File f= getFile(url, mon);
                 return f;
@@ -1371,7 +1373,7 @@ public class DataSetURI {
                 }
                 long contentLength= -1;
                 List<String> contentLengths= headers.get("Content-Length");
-                if ( contentLengths!=null && contentLengths.size()>0 ) {
+                if ( contentLengths!=null && !contentLengths.isEmpty() ) {
                     contentLength= Long.parseLong( contentLengths.get(0) );
                 }
                 
