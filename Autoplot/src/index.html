@@ -29,7 +29,12 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-08-01):</p>
+        <p>Bugfixes (2025-08-04):</p>
+        <ul>
+            <li>clean up generate floats GUI in run batch tool.
+            <li>Missing file from remote directory ending in /tmp/ would cause stack overflow.
+        </ul>
+        <p>Older Bugfixes (2025-08-01):</p>
         <ul>
             <li><a href="https://github.com/das-developers/das2java/issues/140">140</a>: step/scan buttons would always scan to skip an interval for non-time-location xtags.
             <li>When the fftPower window length is greater than the data window length, automatically flatten the data (a O(1) operation) to provide result.  Thanks, George!
@@ -50,30 +55,10 @@
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2272/">2272</a>: clean up release script, removing jnlp stuff and reducing build time.
             <li>URL to example image in GrannyTextEditor is corrected.
         </ul>
-        <p>Older Bugfixes (2025-07-02):</p>
-        <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2719/">2719</a>: SubsetDataSet didn't consider that DEPEND_0 might be a bundle, breaking for Schemes.rank1AlongTrajectory.
-            <li>Add eventsBar to the list of renderTypes in plot popup documentation.
-            <li>old code supporting "40" to mean 1940 is no longer supported, since it lead to "2 40 200 2000" to be interpreted as a valid time (1940-07-18T20:00)
-            <li>clarify error message about PNGTemplate not matching the number of parameter in Run Batch Tool.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/849/">849</a>: Mistake in Friday fix meant parameters could not be passed into scripts.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2718/">2718</a>: Back off recent changes which got into production release.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/849/">849</a>: In Run Batch Tool, there was branch (two arguments, single-threaded) where the environment was not correctly initialized.
-            <li>PngWalkTool correctly recognizes $x in a URI, which is used by the Run Batch Tool.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/849/">849</a>: Corrections to rfe849, where one of the initialization scripts was not loaded properly.  Thanks, Nick!
-            <li>PDS3 file references must be case-insensitive.  Thanks, Chris!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2715/">2715</a>: Detect when needed Jaxb library is missing when PDS4 is used with Java 11+.  Thanks, Chris!
-            <li>GitHubFileSystems supports file listings on github.com and research-git's abbith/juno using API.
-            <li>More kludges for PDS support, where data named "UTC" is now presumed to contain timetags, even if there are no units specified.
-            <li>CDF code which when reading in metadata and checking valid ranges assumed time was CDF_Epoch, now checks for data which is TT2000.  Thanks, Ivar!
-            <li>Run Batch Tool "Write png" tooltip indicates that the script name and arguments are embedded and the pngwalk tool can be used to rerun the script.  Thanks, Sadie!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2708/">2708</a>: Make sure all example schemas have some sort of plot, fix autoranging for some types.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2709/">2709</a>: Insert script code for boolean used True and False, not 'T' and 'F'
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2708/">2708</a>: Series plot element type is enabled for waveform data.  Thanks, Jaya!
-            <li>log and exp functions were missing from operations.  Thanks, Connor!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2705/">2705</a>: Overzealous check on time datum handing in .vap files prevented Dave from saving .vap with annotation.
-        </ul>
         <p>Features:</p>
+        <ul>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>Use "format" constraint when generating timeranges in Run Batch Tool.
             <li>Use "min" and "max" constraint when generating timeranges in Run Batch Tool.
@@ -83,19 +68,6 @@
             <li>DOM and .vaps have new property "tickFormat".  Work towards allowing mission elapsed time to be shown as well times for axis ticks.  Thanks, Megha!
             <li>Annotation Editor shows the anchorBorderType and fontSize.
             <li>Move Annotation mouse action shows anchor position.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>Introduce nominalAtScatter scheme.
-            <li>check for no !N after !A when generating CDF labels, in case the author didn't close the shifted text in a label.  Thanks, Connor!
-            <li>readme.txt entered in the address bar will show the readme.  Also readme.md and README.TXT.  Thanks, Chris!
-            <li>GrannyTextEditor allows extentions for psym and images to be edited.  Thanks, Connor!
-            <li>add text to "Write" tooltip about how each file contains the script and arguments used to run the image.  Thanks, Sadie!
-            <li>use eventsBar for single canonical event.
-            <li>digitalRenderer can render bundleDescriptor
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/849/">849</a>: Run script from multiple windows removes annoying question and allows for multi-threaded batch processing.
-            <li>Autoplot source moved to <a href="https://github.com/autoplot/autoplot">GitHub</a>.
-            <li><a href="https://github.com/das-developers/das2java/issues/133/">133</a>: Four-element waveform packets allowed to support TRACERS processing.  Thanks, Chris!
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
