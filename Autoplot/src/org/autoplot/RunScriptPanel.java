@@ -11,6 +11,7 @@ import java.awt.Window;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -18,6 +19,7 @@ import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JCheckBox;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -123,24 +125,26 @@ public class RunScriptPanel extends javax.swing.JPanel {
      * @throws IOException
      */
     protected void loadFileSoon( final Window window, final String script ) throws IOException {
-        Runnable run= new Runnable() {
-            @Override
-            public void run() {
+        Runnable run= () -> {
+            try {
+                final File ff = DataSetURI.getFile( DataSetURI.getURI(script), DasProgressPanel.createFramed( window,"downloading script"));
+                loadFile(ff);
+            } catch (URISyntaxException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
                 try {
-                    final File ff = DataSetURI.getFile( DataSetURI.getURI(script), DasProgressPanel.createFramed( window,"downloading script"));
-                    loadFile(ff);
-                } catch (URISyntaxException ex) {
                     logger.log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
-                    try {
-                        logger.log(Level.SEVERE, null, ex);
-                        Document d = getTextArea().getDocument();
-                        d.remove( 0, d.getLength() );
-                        d.insertString( 0, "unable to load script", null );
-                        scriptFilename.setText("unable to load script");
-                    } catch (BadLocationException ex1) {
-                        Logger.getLogger(RunScriptPanel.class.getName()).log(Level.SEVERE, null, ex1);
+                    Document d = getTextArea().getDocument();
+                    d.remove( 0, d.getLength() );
+                    d.insertString( 0, "unable to load script", null );
+                    scriptFilename.setText("unable to load script");
+                    if ( ex instanceof FileNotFoundException ) {
+                        JOptionPane.showMessageDialog( window, "<html>Unable to find script<br>"+script);
+                    } else {
+                        JOptionPane.showMessageDialog( window, "<html>I/O exception when trying to load script<br>"+script);
                     }
+                } catch (BadLocationException ex1) {
+                    Logger.getLogger(RunScriptPanel.class.getName()).log(Level.SEVERE, null, ex1);
                 }
             }
         };
