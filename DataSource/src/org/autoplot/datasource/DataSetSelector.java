@@ -1774,7 +1774,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         });
 
         plotItButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/go.png"))); // NOI18N
-        plotItButton.setToolTipText("<html>Play button plots this data location, or URI<br>\nThis may also load a .vap file or run a script, depending on the text entered.<br>\nCtrl modifier: plot the dataset by adding a new plot<br>\nShift modifier: plot the dataset as an overplot<br>\nAlt modifier: inspect this resource.<br>");
+        plotItButton.setToolTipText("<html>Play button plots this data location, or URI<br>\nThis may also load a .vap file or run a script, depending on the text entered.<br>\nCtrl+Play: plot the dataset by adding a new plot<br>\nShift+Play: plot the dataset as an overplot<br>\n");
         plotItButton.setMaximumSize(new java.awt.Dimension(27, 27));
         plotItButton.setMinimumSize(new java.awt.Dimension(27, 27));
         plotItButton.setName("go"); // NOI18N
@@ -1792,13 +1792,13 @@ public class DataSetSelector extends javax.swing.JPanel {
         dataSetSelectorComboBox.setMinimumSize(new java.awt.Dimension(100, 27));
         dataSetSelectorComboBox.setPreferredSize(new java.awt.Dimension(300, 27));
         dataSetSelectorComboBox.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
-            public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {
+            public void popupMenuCanceled(javax.swing.event.PopupMenuEvent evt) {
+                dataSetSelectorComboBoxPopupMenuCanceled(evt);
             }
             public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent evt) {
                 dataSetSelectorComboBoxPopupMenuWillBecomeInvisible(evt);
             }
-            public void popupMenuCanceled(javax.swing.event.PopupMenuEvent evt) {
-                dataSetSelectorComboBoxPopupMenuCanceled(evt);
+            public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {
             }
         });
 
