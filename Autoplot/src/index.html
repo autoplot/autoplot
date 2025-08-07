@@ -15,7 +15,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Tempest weather station Illuminance lines up nicely with sunrise and sunset times from HAPI server.</small></p>
+        <p><small>Fun old screenshot where I was playing with the kernel rebinner for spectrograms, where points are spread out over an area of influence.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -29,8 +29,9 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-08-04):</p>
+        <p>Bugfixes (2025-08-07):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2724/">2724</a>: show "file not found" dialog with bad Jython script name.
             <li>clean up generate floats GUI in run batch tool.
             <li>Missing file from remote directory ending in /tmp/ would cause stack overflow.
         </ul>
@@ -57,6 +58,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>DatumVector is now iterable, to clean up some scripts.  Do some bounds checking.
         </ul>
         <p>Less recent features:</p>
         <ul>
