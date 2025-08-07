@@ -516,7 +516,7 @@ public class IstpMetadataModel extends MetadataModel {
                             sunits= sunits + "!N";
                         }
                     }
-                    label += " (" + sunits + ")";
+                    label += " (%{UNITS})";
                 }
             }
             properties.put(QDataSet.LABEL, label);
