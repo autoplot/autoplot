@@ -482,10 +482,9 @@ public class JythonUtil {
             if ( makeTool ) {
                 assert makeToolPanel!=null;
                 if ( makeToolPanel.isInstall() ) { // the scientist has requested that the script be installed.
-                    Window w= ScriptContext.getViewWindow();
-                    if ( w instanceof AutoplotUI ) {
-                        ((AutoplotUI)w).installTool( file, resourceUri );
-                        ((AutoplotUI)w).reloadTools();
+                    if ( parent instanceof AutoplotUI ) {
+                        ((AutoplotUI)parent).installTool( file, resourceUri );
+                        ((AutoplotUI)parent).reloadTools();
                     } else {
                         throw new RuntimeException("Unable to install"); // and hope the submit the error.
                     }
@@ -758,7 +757,9 @@ public class JythonUtil {
                 return JOptionPane.CANCEL_OPTION;
             }
                          
-            response= showScriptDialog( dom.getController().getDasCanvas(), args, file, fparams, makeTool, uri );
+            Component parent= dom.getController().maybeGetApplicatonGUI();
+            if ( parent==null ) parent = dom.getController().getDasCanvas();
+            response= showScriptDialog( parent, args, file, fparams, makeTool, uri );
             
         } else {
             fd=  pfp.doVariables( env, file, params, null );
