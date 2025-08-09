@@ -228,9 +228,10 @@ public class PlotCommand extends PyObject {
         Column column=null;
         Plot plot=null; // use this plot
         
-        Application dom= this.dom;
+        Application dom;
         ScriptContext2023 scriptContext= this.dom.getController().getScriptContext();
         
+        dom= scriptContext.getDocumentModel();
         String renderType=null;
         for ( int i=0; i<keywords.length; i++  ) {
             if ( keywords[i].equals("renderType" ) ) {
