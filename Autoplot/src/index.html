@@ -29,10 +29,10 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-08-07):</p>
+        <p>Bugfixes (2025-08-09):</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2727/">2727</a>: bug where setApplication() was used to make a slice window, but plot command didn't use the right application for auto ranging.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2725/">2725</a>: don't hard-code units in CDF labels, instead use template.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2725/">2725</a>: don't hard-code units in CDF labels, instead use template %{UNITS}.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2724/">2724</a>: show "file not found" dialog with bad Jython script name.
             <li>Clean up tooltip on "play" button, which incorrectly says Alt+Play did something.
             <li>clean up generate floats GUI in run batch tool.
@@ -61,7 +61,7 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/851/">851</a>tickFormat works property for x-axis time tags.
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/851/">851</a>tickFormat works property for x-axis time tags.  Thanks Megha!
             <li>DatumVector is now iterable, to clean up some scripts.  Do some bounds checking.
         </ul>
         <p>Less recent features:</p>
