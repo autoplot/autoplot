@@ -1773,7 +1773,7 @@ private void guessTimeFormatButtonAP( int row, int first, int last ) {
         }
         String s2= fillValueTextField.getText().trim();
         if ( !s2.equals(MSG_MOMENT) && s2.length()>0 ) {
-            setParam( params, "fill", s );
+            setParam( params, "fill", s2 );
         }
         setParam( params, "validMin", validMinTextField.getText() );
         setParam( params, "validMax", validMaxTextField.getText() );
