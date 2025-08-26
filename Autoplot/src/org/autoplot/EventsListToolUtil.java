@@ -13,6 +13,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
@@ -134,6 +135,10 @@ public class EventsListToolUtil {
             
             final TimeRangeToolEventsList ll= new TimeRangeToolEventsList();
             
+            List<Bookmark> deft= new ArrayList<>();
+            deft.add( new Bookmark.Item("https://autoplot.org/data/event/simpleEvent.txt") );
+            org.autoplot.bookmarks.Util.loadRecent( "eventsRecent", ll.getDataSetSelector(), deft );
+
             ll.addDataRangeSelectionListener( new DataRangeSelectionListener() {
                 @Override
                 public void dataRangeSelected(DataRangeSelectionEvent e) {
