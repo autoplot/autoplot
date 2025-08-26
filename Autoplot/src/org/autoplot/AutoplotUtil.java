@@ -361,15 +361,21 @@ public class AutoplotUtil {
 
            ReplaceFilePanel p= new ReplaceFilePanel();
            p.setCurrentFile(oldf);
+           p.setApplicationModel( dom.getController().getApplicationModel() );
            
            int result= AutoplotUtil.showConfirmDialog( parent,
-            p, "Replace Filename", JOptionPane.OK_CANCEL_OPTION );
+               p, "Replace Filename", JOptionPane.OK_CANCEL_OPTION );
 
            if ( result==JOptionPane.OK_OPTION ) {
-
+                String newf= p.getSelectedFile();
+                dom.getController().getApplicationModel().addRecent(newf);
+                
+                split= URISplit.parse( newf );
+                newf= split.file;
+                
                 for ( DataSourceFilter i: dom2.getDataSourceFilters() ) {
                     String oldf1= i.getUri();
-                    String newf1= oldf1.replace( oldf, p.getSelectedFile() );
+                    String newf1= oldf1.replace( oldf, newf );
                     i.setUri( newf1 );
                 }
                 
