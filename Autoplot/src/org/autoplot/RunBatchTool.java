@@ -958,7 +958,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         DataSetSelector eventsDataSetSelector= new DataSetSelector();
         
         List<Bookmark> deft= new ArrayList<>();
-        deft.add( new Bookmark.Item("http://autoplot.org/autoplot/data/event/simpleEvent.txt") );
+        deft.add( new Bookmark.Item("https://autoplot.org/data/event/simpleEvent.txt") );
         org.autoplot.bookmarks.Util.loadRecent( "eventsRecent", eventsDataSetSelector, deft );
         
         if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog(this, eventsDataSetSelector, "Load Events", JOptionPane.OK_CANCEL_OPTION ) ) {
