@@ -1,6 +1,7 @@
 package org.autoplot.pngwalk;
 
 import java.awt.RenderingHints;
+import java.awt.Window;
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.OutputStream;
@@ -64,6 +65,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import org.autoplot.datasource.DataSetURI;
 import org.autoplot.dom.Options;
 import org.autoplot.dom.PlotElement;
 import org.das2.datum.InconvertibleUnitsException;
@@ -887,11 +889,18 @@ public class CreatePngWalk {
     public static int doIt(Application dom, Params params) throws ParseException, IOException, InterruptedException {
         int status = 0;
 
+        Window w;
+        if ( dom.getController()!=null ) {
+            w= dom.getController().getScriptContext().getViewWindow();
+        } else {
+            w= null;
+        }
+
         if (params == null) {
 
             CreatePngWalkDialog p = new CreatePngWalkDialog();
-
-            if (AutoplotUtil.showConfirmDialog(ScriptContext.getViewWindow(), p, "Create PngWalk Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+            
+            if (AutoplotUtil.showConfirmDialog( w, p, "Create PngWalk Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 
                 p.writeDefaults();
 
@@ -903,17 +912,17 @@ public class CreatePngWalk {
                 }
 
                 ProgressMonitor mon;
-                if (ScriptContext.getViewWindow() == null) {
+                if (w == null) {
                     mon = new NullProgressMonitor();
-                    System.err.println("ScriptContext.getViewWindow is null, running quietly in the background.");
+                    System.err.println("Can't find a GUI window, running quietly in the background.");
                 } else {
-                    mon = DasProgressPanel.createFramed(ScriptContext.getViewWindow(), "running batch");
+                    mon = DasProgressPanel.createFramed( w, "running batch");
                 }
 
                 if (params.timeFormat.length() > 0) {
                     TimeParser tp = TimeParser.create(params.timeFormat);
                     if (!tp.isNested()) {
-                        JOptionPane.showMessageDialog(ScriptContext.getViewWindow(), "<html>Time spec must have fields nested: $Y,$m,$d, etc,<br>not " + params.timeFormat + " .");
+                        JOptionPane.showMessageDialog( w, "<html>Time spec must have fields nested: $Y,$m,$d, etc,<br>not " + params.timeFormat + " .");
                         return -1;
                     }
                 }
@@ -926,7 +935,7 @@ public class CreatePngWalk {
                 if (!mon.isCancelled()) {
                     url = new File(params.outputFolder).toURI().toString();
 
-                    if (ScriptContext.getViewWindow() != null && params.outputFormat.equals("png")) {
+                    if (w != null && params.outputFormat.equals("png")) {
                         logger.log(Level.FINE, "version=\"{0}\"", String.valueOf(params.version));
                         String vers = (params.version == null || params.version.trim().length() == 0) ? "" : "_" + params.version.trim();
                         String st1;
@@ -939,13 +948,13 @@ public class CreatePngWalk {
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                PngWalkTool.start(st, ScriptContext.getViewWindow());
+                                PngWalkTool.start(st, w);
                             }
                         });
-                    } else if (ScriptContext.getViewWindow() != null) {
+                    } else if (w != null) {
                         String vers = (params.version == null || params.version.trim().length() == 0) ? "" : "_" + params.version.trim();
                         final String st = url + params.product + "_" + params.timeFormat + vers + "." + params.outputFormat;
-                        JOptionPane.showMessageDialog(ScriptContext.getViewWindow(), "<html>Files created:<br>" + st);
+                        JOptionPane.showMessageDialog(w, "<html>Files created:<br>" + st);
                     }
                 }
             }
@@ -955,14 +964,14 @@ public class CreatePngWalk {
             String[] times = getListOfTimes(params, new ArrayList());
 
             ProgressMonitor mon;
-            if (ScriptContext.getViewWindow() == null) {
+            if (w == null) {
                 if ("true".equals(System.getProperty("java.awt.headless", "false"))) {
                     mon = new NullProgressMonitor();
                 } else {
                     mon = DasProgressPanel.createFramed("running batch");
                 }
             } else {
-                mon = DasProgressPanel.createFramed(ScriptContext.getViewWindow(), "running batch");
+                mon = DasProgressPanel.createFramed(w, "running batch");
             }
 
             status = doBatch(times, dom, params, mon);
@@ -1168,7 +1177,8 @@ public class CreatePngWalk {
             } else {
                 vap = URISplit.makeAbsolute(new File(".").getAbsolutePath(), vap);
             }
-            dom = (Application) StatePersistence.restoreState(new File(vap));
+            File f= DataSetURI.getFile(vap);
+            dom = (Application) StatePersistence.restoreState(f);
         } else {
             String uri = alm.getValue("uri");
             ScriptContext.setCanvasSize(800, 600);
