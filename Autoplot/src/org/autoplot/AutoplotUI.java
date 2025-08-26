@@ -898,19 +898,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
         dataSetSelector.registerActionTrigger( "(.*)\\.jy(\\?.*)?", new AbstractAction( TAB_SCRIPT) {
             @Override
             public void actionPerformed( ActionEvent ev ) {
-                if ( ScriptContext.getViewWindow()==AutoplotUI.this ) {
-                    org.das2.util.LoggerManager.logGuiEvent(ev);                    
-                    runScript( dataSetSelector.getValue(), !AutoplotUI.this.noAskParams );
-                } else {
-                    org.das2.util.LoggerManager.logGuiEvent(ev);     
-                    
-//                    if ( JOptionPane.YES_OPTION==
-//                            JOptionPane.showConfirmDialog( AutoplotUI.this, "Scripts can only be run from the main window.  Make this the main window?", 
-//                                    "Set Main Window", JOptionPane.YES_NO_OPTION ) ) {
-//                        ScriptContext.setApplication(AutoplotUI.this);
-//                    }
-                    runScript( dataSetSelector.getValue() );
-                }
+                runScript( dataSetSelector.getValue(), !AutoplotUI.this.noAskParams );
                 dom.getController().setFocusUri(ApplicationController.VALUE_BLUR_FOCUS);
             }
         });
@@ -921,39 +909,28 @@ public final class AutoplotUI extends javax.swing.JFrame {
         dataSetSelector.registerBrowseTrigger( "(.*)\\.jy(\\?.*)?", new AbstractAction( TAB_SCRIPT ) {
             @Override
             public void actionPerformed( ActionEvent ev ) {
-                if ( ScriptContext.getViewWindow()==AutoplotUI.this ) {
-                    org.das2.util.LoggerManager.logGuiEvent(ev);                    
-                    String s= dataSetSelector.getValue();
-                    int i= dataSetSelector.getEditor().getCaretPosition();
-                    if ( i==0 || i<s.length() || s.substring(i-1).contains("/") ) {
-                            dataSetSelector.showCompletions();
-                        return;
+                org.das2.util.LoggerManager.logGuiEvent(ev);                    
+                String s= dataSetSelector.getValue();
+                int i= dataSetSelector.getEditor().getCaretPosition();
+                if ( i==0 || i<s.length() || s.substring(i-1).contains("/") ) {
+                        dataSetSelector.showCompletions();
+                    return;
+                }
+                Map<String,String> args;
+                try {
+                    URISplit split= URISplit.parse(s);        //bug 1408--note runScript doesn't account for changes made to the GUI.
+                    args= URISplit.parseParams(split.params);
+                    JythonRunListener runListener= makeJythonRunListener( AutoplotUI.this, split.resourceUri, true );
+                    if ( JOptionPane.OK_OPTION==JythonUtil.invokeScriptSoon( split.resourceUri, dom, 
+                            args, true, true, runListener, new NullProgressMonitor() ) ) {
+                        split.params= URISplit.formatParams(args);
+                        if ( split.params.trim().length()==0 ) split.params=null;
+                        String history= URISplit.format(split);
+                        dataSetSelector.setValue( history );
+                        applicationModel.addRecent( history );
                     }
-                    Map<String,String> args;
-                    try {
-                        URISplit split= URISplit.parse(s);        //bug 1408--note runScript doesn't account for changes made to the GUI.
-                        args= URISplit.parseParams(split.params);
-                        JythonRunListener runListener= makeJythonRunListener( AutoplotUI.this, split.resourceUri, true );
-                        if ( JOptionPane.OK_OPTION==JythonUtil.invokeScriptSoon( split.resourceUri, dom, 
-                                args, true, true, runListener, new NullProgressMonitor() ) ) {
-                            split.params= URISplit.formatParams(args);
-                            if ( split.params.trim().length()==0 ) split.params=null;
-                            String history= URISplit.format(split);
-                            dataSetSelector.setValue( history );
-                            applicationModel.addRecent( history );
-                        }
-                    } catch ( IOException ex ) { 
-                        throw new RuntimeException(ex);
-                    }
-                } else {
-                    org.das2.util.LoggerManager.logGuiEvent(ev);  
-                    //if ( JOptionPane.YES_OPTION==
-                    //        JOptionPane.showConfirmDialog( AutoplotUI.this, "Scripts can only be run from the main window.  Make this the main window?", 
-                    //                "Set Main Window", JOptionPane.YES_NO_OPTION ) ) {
-                    //    ScriptContext.setApplicationModel(AutoplotUI.this.applicationModel);
-                    //    ScriptContext.setView(AutoplotUI.this);
-                    //}
-                    runScript( dataSetSelector.getValue() );
+                } catch ( IOException ex ) { 
+                    throw new RuntimeException(ex);
                 }
                 dom.getController().setFocusUri(ApplicationController.VALUE_BLUR_FOCUS);                
             }
@@ -4699,172 +4676,6 @@ private void updateFrameTitle() {
         return (AutoplotUI)model.application.getMainFrame();
     }
     
-    /**
-     * add a listener to the webstart interface so that there is only one running Autoplot at a time.  This
-     * registers a SingleInstanceListener with webstart, which will prompt the user to add a new plot or to
-     * replace the current one.
-     * @param alm
-     * @param model
-     */
-    private static void addSingleInstanceListener(final ArgumentList alm, final AutoplotUI app ) {
-        javax.jnlp.SingleInstanceService sis;
-        try {
-            sis = (javax.jnlp.SingleInstanceService) javax.jnlp.ServiceManager.lookup( "javax.jnlp.SingleInstanceService" );
-        } catch (javax.jnlp.UnavailableServiceException ex) {
-            sis = null;
-        }
-
-        if ( sis==null ) {
-            logger.fine("not running with webstart");
-            return;
-        }
-
-        final SingleInstanceListener sisL = new SingleInstanceListener() {
-
-            @Override
-            public void newActivation(String[] argv) {
-                if ( logger.isLoggable(Level.FINE) ) {
-                    logger.fine("single instance listener argv:" );
-                    for ( int i=0; i<argv.length; i++ ) {
-                        logger.log(Level.FINE, " argv[{0}]: {1}\n", new Object[]{i, argv[i]});
-                    }
-                }
-
-                for ( int i=0; i<argv.length; i++ ) {  // kludge for java webstart, which uses "-open" not "--open"
-                   if ( argv[i].equals("-print") ) argv[i]="--print";
-                   if ( argv[i].equals("-open") ) argv[i]="--open";
-                }
-
-                if ( !alm.process(argv) ) {
-                    System.exit( alm.getExitCode() );
-                }
-
-                final JFrame frame = (JFrame) ScriptContext.getViewWindow();
-                if ( frame!=null ) {
-                     raiseApplicationWindow(frame);
-                }
-
-                String suri;
-                if (alm.getValue("URI") != null) {
-                    suri = alm.getValue("URI").trim();
-                } else if ( alm.getValue("open") !=null ) {
-                    suri = alm.getValue("open").trim();
-                } else {
-                    suri = null;
-                }
-                
-                if ( suri!=null && suri.length()>1 ) {
-                    logger.log(Level.FINE, "setting initial URI to >>>{0}<<<", suri );
-                }
-
-                String pos= alm.getValue("position");
-                app.handleSingleInstanceURI(suri, pos);
-
-            }
-        };
-        sis.addSingleInstanceListener(sisL);
-    }
-
-    /**
-     * extract the code that handles the single instance so that we can model it for debugging.
-     * @param suri the reentry URI 
-     * @param pos support the --position=3 switch to support servers.
-     */
-    public void handleSingleInstanceURI( String suri, String pos ) {
-        final AutoplotUI app= this; // refactor from static class. TODO: remove this is unnecessary...
-        boolean raise=false;
-        
-        if ( suri!=null && ( suri.startsWith("pngwalk:") || suri.endsWith(".pngwalk") || suri.contains(".pngwalk?") ) ) {
-            //TODO: check other prefixes...
-            PngWalkTool.start( suri, app );
-            app.applicationModel.addRecent(app.dataSetSelector.getValue());
-            return;
-        }
-        
-
-        if ( suri!=null && app.dataSetSelector.hasActionTrigger(suri) ) {
-            app.dataSetSelector.setValue(suri);
-            app.dataSetSelector.maybePlot(false); // allow for completions
-            return;
-        }        
- 
-        if ( suri!=null && suri.length()>1 ) { // check for relative filenames 
-            try {
-                suri= URISplit.makeAbsolute( new File(".").getCanonicalPath(), suri );
-            } catch ( IOException ex ) {
-                throw new RuntimeException(ex);
-            }
-        }
-
-        if ( pos!=null ) {
-            app.applicationModel.setFocus( Integer.parseInt(pos) );
-            if ( suri!=null ) app.dataSetSelector.setValue(suri);
-            app.dataSetSelector.maybePlot(false); // allow for completions
-
-        } else {
-            if (suri == null) {
-                int action = JOptionPane.showConfirmDialog(ScriptContext.getViewWindow(), "<html>Autoplot is already running.<br>Start another window?", "Reenter Autoplot", JOptionPane.YES_NO_OPTION);
-                if (action == JOptionPane.YES_OPTION) {
-                    app.support.newApplication();
-                } else {
-                    raise= true;
-                }
-            } else {
-                String msg;
-                String ssuri= suri;
-                if ( ssuri.length()>80 ) {
-                    ssuri= DataSetURI.abbreviateForHumanComsumption( ssuri, 80 );
-                }
-                if ( app.isExpertMode() ) {
-                        msg= String.format(
-                        "<html>Autoplot is already running. Autoplot can use this address in a new window, <br>"
-                        + "or replace the current plot with the new URI, possibly entering the editor, <br>"
-                        + "or always enter the editor to inspect and insert the plot below.<br>"
-                        + "View in new window, replace, or add plot, using<br>%s?", ssuri );
-                } else {
-                        msg= String.format(
-                        "<html>Autoplot is already running. Autoplot can use this address in a new window, <br>"
-                        + "or replace the current plot with the new URI, possibly entering the editor, <br>"
-                        + "or always enter the editor to inspect before plotting.<br>"
-                        + "View in new window, replace, or add plot, using<br>%s?", ssuri );
-                }
-                String action = (String) JOptionPane.showInputDialog( ScriptContext.getViewWindow(),
-                        msg,
-                        "Incorporate New URI", JOptionPane.QUESTION_MESSAGE, new javax.swing.ImageIcon(getClass().getResource("/resources/logo64.png")),
-                        new String[] { "New Window", "Replace", "Add Plot" }, "Add Plot" );
-                if ( action!=null ) {
-                    switch (action) {
-                        case "Replace":
-                            app.plotUri(suri);
-                            raise= true;
-                            break;
-                        case "Add Plot":
-                            app.dataSetSelector.setValue(suri);
-                            app.dataSetSelector.maybePlot( KeyEvent.ALT_MASK ); // enter the editor
-                            raise= true;
-                            break;
-                        case "New Window":
-                            AutoplotUI ui2= app.newApplication();
-                            ui2.plotUri(suri);
-                            break;
-                        default:
-                            throw new IllegalArgumentException("One of [New Window, Replace,  Add Plot] expected: " + action );
-                    }
-                } else {
-                    raise= true;
-                }
-            }
-        }
-        if ( raise ) {
-            EventQueue.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    raiseApplicationWindow(app);
-                }
-            });
-        }
-
-    }
 
     private static void runScriptImmediately( AutoplotUI app, 
             ApplicationModel model, String script, 
@@ -5296,10 +5107,6 @@ APSplash.checkTime("init -70");
                     //    }
                     //}
 APSplash.checkTime("init 200");
-                    boolean addSingleInstanceListener= true;
-                    if ( addSingleInstanceListener ) {
-                        addSingleInstanceListener( alm, app );
-                    }
                     if ( alm.getBooleanValue("samp") ) {
                         org.autoplot.AddSampListener.addSampListener( app );
                         app.setMessage("SAMP listener started");
@@ -6468,10 +6275,14 @@ APSplash.checkTime("init 240");
                                 logger.log( Level.WARNING, ex.getMessage(), ex );
                             }
                         }
-                        Window w= ScriptContext.getViewWindow();
-                        if ( w instanceof AutoplotUI ) {
-                            ((AutoplotUI)w).reloadTools();
+                        AppManager m= AppManager.getInstance();
+                        for ( int i=0; i<m.getApplicationCount(); i++ ) {
+                            Object w= m.getApplication(i);
+                            if ( w instanceof AutoplotUI ) {
+                                ((AutoplotUI)w).reloadTools();
+                            }
                         }
+
                     } catch ( IOException ex) {
                         logger.log(Level.SEVERE, null, ex);
                     }
