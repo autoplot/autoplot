@@ -368,6 +368,18 @@ public class ScreenshotsTool extends EventQueue {
      * @return
      */
     private static int getActiveDisplay( Window parent ) {
+        Window w= parent;
+        if ( w==null ) {
+            AppManager appm= AppManager.getInstance();
+            for ( int i=0; i<appm.getApplicationCount(); i++ ) {
+                Object o= appm.getApplication(i);
+                if ( o instanceof Window ) {
+                    w= (Window)o;
+                    break;
+                }
+            }
+            parent= w;
+        }
         int active= -1;
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 
