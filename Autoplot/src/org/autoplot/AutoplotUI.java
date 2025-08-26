@@ -4135,6 +4135,7 @@ private void gettingStartedMenuItemActionPerformed(java.awt.event.ActionEvent ev
 private void exceptionReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exceptionReportActionPerformed
     org.das2.util.LoggerManager.logGuiEvent(evt);
     ExceptionHandler eh= applicationModel.getExceptionHandler();
+    ScriptContext.setApplication(this);
     if ( eh==null || !( eh instanceof GuiExceptionHandler ) ) {
         new GuiExceptionHandler().submitFeedback(new RuntimeException("user-generated comment"));
     } else {
@@ -5218,6 +5219,8 @@ APSplash.checkTime("init 230");
                 if ( bookmarks!=null ) {
                     if ( app!=null ) app.initialBookmarksUrl= bookmarks;
                 }
+                
+                ScriptContext.setApplication(app); // support features like screenshot tool.
                 
                 String script_= alm.getValue("script");
                 
