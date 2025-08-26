@@ -15,7 +15,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Tempest irradiance measurement of sun each minute over the past six months forms an image of the backyard.</small></p>
+        <p><small>Run Batch Tool allows %5.1f when formatting PNG filenames.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -29,8 +29,11 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-08-16):</p>
+        <p>Bugfixes (2025-08-26):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2728/">2728</a>: Reduce the number of places where old ScriptContext.getViewWindow is still used.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2731/">2731</a>: Replace File dialog uses DataSetSelector to provide completions and recent entries.  Thanks, Ivar!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2730/">2730</a>: Events list URI bar doesn't remember recent entries.  Thanks, Ivar!
             <li><a href="https://github.com/das-developers/das2java/issues/141">141</a>: properly use credentials using http hostname and realm.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2729/">2729</a>: ASCII editor GUI didn't properly handle "fill" setting.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2727/">2727</a>: bug where setApplication() was used to make a slice window, but plot command didn't use the right application for auto ranging.
