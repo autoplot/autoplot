@@ -1,15 +1,18 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot;
 
-import java.io.File;
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileFilter;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JOptionPane;
+import org.autoplot.datasource.URISplit;
 
 /**
- *
+ * Dialog to swap one filename for another.  This uses the dataSetSelector
+ * with data sources disabled, and only allows replacement with another file
+ * having the same extension.
+ * 
+ * @see https://sourceforge.net/p/autoplot/bugs/2731/
+ * 
  * @author jbf
  */
 public class ReplaceFilePanel extends javax.swing.JPanel {
@@ -19,16 +22,50 @@ public class ReplaceFilePanel extends javax.swing.JPanel {
      */
     public ReplaceFilePanel() {
         initComponents();
+        this.dataSetSelector1.setHidePlayButton(true);
+        this.dataSetSelector1.setSuggestFiles(true);
+        this.dataSetSelector1.setSuggestFsAgg(true);
+        
     }
 
+    /**
+     * copy over recent URIs to the selector.  This must be called after setCurrentFile!
+     * @param appModel 
+     */
+    public void setApplicationModel( ApplicationModel appModel ) {
+        String ext= this.dataSetSelector1.getBrowseTypeExt();
+        
+        List<String> urls= AutoplotUtil.getUrls(appModel.getRecent());
+        List<String> urls1= new ArrayList<String>();
+        for ( String url: urls ) {
+            URISplit split= URISplit.parse( url );
+            if ( ext.equals(split.ext) ) {
+                urls1.add( split.file );
+            }
+        }
+        this.dataSetSelector1.setDisableDataSources(true);
+        this.dataSetSelector1.setRecent(urls1);
+        this.dataSetSelector1.setBrowseTypeExt(ext);
+        this.dataSetSelector1.getValue();
+    }
+    
     public void setCurrentFile( String file ) {
         this.jLabel2.setText(file);
-        this.jTextField1.setText(file);
-        checkLocal();
+        URISplit split= URISplit.parse( file );
+        this.dataSetSelector1.setValue(file);
+        this.dataSetSelector1.setBrowseTypeExt( split.ext );
     }
     
     public String getSelectedFile() {
-        return this.jTextField1.getText();
+        return this.dataSetSelector1.getValue();
+    }
+    
+    public static void main( String[] args ) {
+        ReplaceFilePanel rfp= new ReplaceFilePanel();
+        //rfp.setCurrentFile("vap+cdaweb:ds=MMS1_EDP_SLOW_L2_SCPOT&filter=mms&id=mms1_edp_scpot_slow_l2&timerange=2016-01-04+10:00+to+11:00");
+        rfp.setCurrentFile("https://cdaweb.gsfc.nasa.gov/sp_phys/data/mms/mms1/edp/slow/l2/scpot/2016/01/mms1_edp_slow_l2_scpot_20160104000000_v2.7.0.cdf?mms1_edp_psp_slow_l2");
+        JOptionPane.showMessageDialog( null, rfp );
+        System.err.println(rfp.getSelectedFile());
     }
     
     /**
@@ -43,29 +80,13 @@ public class ReplaceFilePanel extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        dataSetSelector1 = new org.autoplot.datasource.DataSetSelector();
 
         jLabel1.setText("Replace references to the file:");
 
         jLabel2.setText("jLabel2");
 
         jLabel3.setText("With the new file name:");
-
-        jTextField1.setText("jTextField1");
-        jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                jTextField1KeyTyped(evt);
-            }
-        });
-
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/file.png"))); // NOI18N
-        jButton1.setToolTipText("Pick file");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -77,10 +98,7 @@ public class ReplaceFilePanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jTextField1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1)))
+                    .addComponent(dataSetSelector1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -92,72 +110,15 @@ public class ReplaceFilePanel extends javax.swing.JPanel {
                 .addGap(18, 18, 18)
                 .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1))
-                .addGap(0, 174, Short.MAX_VALUE))
+                .addComponent(dataSetSelector1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 169, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        String sfile= this.jLabel2.getText();
-        if ( sfile.startsWith("file://") ) {
-            sfile= sfile.substring(7);
-        } else if ( sfile.startsWith("file:") ) {
-            sfile= sfile.substring(5);
-        }
-        int iext= sfile.lastIndexOf('.');
-        final String ext;
-        if ( iext!=-1 ) {
-            ext= sfile.substring(iext).toLowerCase();
-        } else {
-            ext= null;
-        }
-        
-        File current= new File( sfile );
-        if ( !current.exists() ) {
-            current= current.getParentFile();
-        }
-        JFileChooser choose= new JFileChooser( current );
-        if ( ext!=null ) {
-            choose.addChoosableFileFilter( new FileFilter() {
-                @Override
-                public boolean accept(File f) {
-                    String sf= f.getName();
-                    return sf.toLowerCase().endsWith(ext);
-                }
-
-                @Override
-                public String getDescription() {
-                    return ext + " files";
-                }
-            });
-        }
-        
-        if (choose.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-            this.jTextField1.setText( "file://"+ choose.getSelectedFile().getPath() );
-        }
-        
-    }//GEN-LAST:event_jButton1ActionPerformed
-
-    private void checkLocal() {
-        String s= this.jTextField1.getText();
-        if ( s.startsWith("file:" ) || s.startsWith("/") || s.startsWith("\\") || ( s.length()>2 && s.charAt(1)==':') ) {
-            this.jButton1.setEnabled(true);
-        } else {
-            this.jButton1.setEnabled(false);
-        }
-    }
     
-    private void jTextField1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyTyped
-        checkLocal();
-    }//GEN-LAST:event_jTextField1KeyTyped
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private org.autoplot.datasource.DataSetSelector dataSetSelector1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 }
