@@ -135,7 +135,7 @@ public final class ApplicationModel {
      * @return true if this is running as an application.
      */
     public boolean isApplication() {
-        return ScriptContext.getViewWindow()!=null;
+        return getDom().getController().getScriptContext().getViewWindow()!=null;
     }
     
     /**
