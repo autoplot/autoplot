@@ -65,6 +65,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import org.autoplot.ScriptContext2023;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.dom.Options;
 import org.autoplot.dom.PlotElement;
@@ -891,7 +892,12 @@ public class CreatePngWalk {
 
         Window w;
         if ( dom.getController()!=null ) {
-            w= dom.getController().getScriptContext().getViewWindow();
+            ScriptContext2023 sc= dom.getController().getScriptContext();
+            if ( sc!=null ) {
+                w= sc.getViewWindow();
+            } else {
+                w= null;
+            }
         } else {
             w= null;
         }
