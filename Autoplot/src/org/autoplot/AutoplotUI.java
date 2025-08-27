@@ -5220,7 +5220,11 @@ APSplash.checkTime("init 230");
                     if ( app!=null ) app.initialBookmarksUrl= bookmarks;
                 }
                 
-                ScriptContext.setApplication(app); // support features like screenshot tool.
+                if ( app!=null ) {
+                    ScriptContext.setApplication(app); // support features like screenshot tool.
+                } else {
+                    ScriptContext.setApplicationModel(model);
+                }
                 
                 String script_= alm.getValue("script");
                 
