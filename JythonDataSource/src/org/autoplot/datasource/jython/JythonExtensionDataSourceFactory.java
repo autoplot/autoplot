@@ -13,7 +13,6 @@ import org.autoplot.datasource.DataSetURI;
 import static org.autoplot.datasource.DataSetURI.getFile;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.DataSourceRecognizer;
-import org.autoplot.datasource.DataSourceRegistry;
 import org.autoplot.datasource.URISplit;
 import org.das2.datum.LoggerManager;
 import org.das2.util.monitor.AlertNullProgressMonitor;
