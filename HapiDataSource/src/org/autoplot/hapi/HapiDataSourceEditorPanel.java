@@ -52,6 +52,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
+import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -185,6 +186,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             throw new RuntimeException(ex);
         }
         initComponents();
+        idsList2.setCellRenderer( getCellRenderer() );
         
         hapiServerRecentComboBox.setPreferenceNode("hapi.servers");
         PromptComboBoxEditor editor= new PromptComboBoxEditor("search");
@@ -219,49 +221,46 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         serversComboBox.setModel( new DefaultComboBoxModel<>( HapiServer.getKnownServersArray() ) ); 
         loadKnownServersSoon();
         
-        idsList2.addListSelectionListener( new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if ( !e.getValueIsAdjusting() ) {
-                    String selectedValue= idsList2.getSelectedValue();
-                    if ( selectedValue==null ) {
-                        return;
-                    }
-                    if ( !selectedValue.equals(currentId) ) {
-                        currentParameters= null;
-                    }
-                    if ( currentId!=null && currentId.equals(selectedValue) ) {
-                        return;
-                    }
-                    if ( currentServer!=null ) {
-                        currentId= selectedValue;
-                    } else {
-                        currentId= null;
-                    }
-                    
-                    if ( currentId==null ) {
-                        titleLabel.setText(" ");
-                        return;
-                    }
-                    if ( currentId.startsWith("Error:" ) ) {
-                        return;
-                    }
-                    titleLabel.setText("Retrieving info for "+currentId+"...");
-
-                    parametersPanel.removeAll();
-                    parametersPanel.revalidate();
-                    parametersPanel.repaint();
-                    resetVariableTimer.tickle();
+        idsList2.addListSelectionListener((ListSelectionEvent e) -> {
+            if ( !e.getValueIsAdjusting() ) {
+                JSONObject joid= idsList2.getSelectedValue();
+                String id= joid==null ? null : joid.optString("id","???");
+                
+                if ( id==null ) {
+                    return;
                 }
+                if ( !id.equals(currentId) ) {
+                    currentParameters= null;
+                }
+                if ( currentId!=null && currentId.equals(id) ) {
+                    return;
+                }
+                if ( currentServer!=null ) {
+                    currentId= id;
+                } else {
+                    currentId= null;
+                }
+                
+                if ( currentId==null ) {
+                    titleLabel.setText(" ");
+                    return;
+                }
+                if ( currentId.startsWith("Error:" ) ) {
+                    return;
+                }
+                titleLabel.setText("Retrieving info for "+currentId+"...");
+                
+                parametersPanel.removeAll();
+                parametersPanel.revalidate();
+                parametersPanel.repaint();
+                resetVariableTimer.tickle();
             }
-        } );
+                });
         datasetFilterComboBox.getEditor().getEditorComponent().addKeyListener( new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
-                Runnable run= new Runnable() {
-                    public void run() {
-                        resetServerCatalog( currentServer );                        
-                    }
+                Runnable run= () -> {
+                    resetServerCatalog( currentServer );
                 };
                 SwingUtilities.invokeLater(run);
             }
@@ -269,13 +268,11 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         parameterFilterComboBox.getEditor().getEditorComponent().addKeyListener( new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
-                Runnable run= new Runnable() {
-                    public void run() {
-                        try {
-                            resetIdImmediately( currentId, currentInfo );
-                        } catch ( JSONException ex ) {
-                            ex.printStackTrace();
-                        }
+                Runnable run= () -> {
+                    try {
+                        resetIdImmediately( currentId, currentInfo );
+                    } catch ( JSONException ex ) {
+                        ex.printStackTrace();
                     }
                 };
                 SwingUtilities.invokeLater(run);
@@ -309,6 +306,50 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         }
     });
+    
+    private ListCellRenderer getCellRenderer() {
+        return new ListCellRenderer<Object>() {
+            private final DefaultListCellRenderer defaultRenderer = new DefaultListCellRenderer();
+
+            @Override
+            public Component getListCellRendererComponent(
+                    JList<? extends Object> list, Object value, int index,
+                    boolean isSelected, boolean cellHasFocus) {
+
+                
+                JLabel label = (JLabel) defaultRenderer.getListCellRendererComponent(
+                        list, value, index, isSelected, cellHasFocus);
+
+                JSONObject jovalue= (JSONObject)value;
+                if ( jovalue.has("title") ) {
+                    label.setText( "<html>"+ jovalue.optString("id","???") + ": " +"<em>" + jovalue.optString("title","") + "</em></html>");
+                } else {
+                    label.setText( "<html>"+ jovalue.optString("id","???") + "</html>");
+                }
+                
+
+                return label;
+            }
+        };
+        
+    }
+    
+    /**
+     * return the JSONObject for the id.  It must be in the list of 
+     * JSONObjects for the server.
+     * @param id 
+     */
+    private JSONObject getJsonObjectFor( String id ) {
+        ListModel<JSONObject> jos= idsList2.getModel();
+        JSONObject selection= null;
+        for ( int i=0; i<jos.getSize(); i++ ) {
+            JSONObject jo= jos.getElementAt(i);
+            if ( jo.optString("id","???").equals(id) ) {
+                selection= jo;
+            }
+        }
+        return selection;
+    }
     
     private static String findFavIcon( String hapiString ) {
         try {
@@ -598,6 +639,11 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         jScrollPane2.setMinimumSize(new java.awt.Dimension(100, 22));
 
         idsList2.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        idsList2.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                idsList2ValueChanged(evt);
+            }
+        });
         jScrollPane2.setViewportView(idsList2);
 
         clearButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/hapi/clearTextButton.png"))); // NOI18N
@@ -731,13 +777,24 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private JSONObject createMessageObject( String msg ) {
+        JSONObject jo= new JSONObject();
+        try {
+            jo.put("id", msg);
+        } catch (JSONException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+        return jo;
+    }
+    
     private void serversComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serversComboBoxActionPerformed
         try {
             if ( !initialized ) return;
             final URL url= HapiServer.encodeURL( (String)serversComboBox.getSelectedItem() );
             if ( currentServer==null || !url.toExternalForm().equals(currentServer.toExternalForm()) ) {
                 DefaultListModel m= new DefaultListModel() ;
-                m.add(0,"Reading list of available datasets...");
+                JSONObject jo= createMessageObject("Reading list of available datasets...");
+                m.add(0,jo);
                 idsList2.setModel( m );
             }
             Runnable run= new Runnable() {
@@ -748,7 +805,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                     } catch (IOException | JSONException ex) {
                         logger.log(Level.SEVERE, null, ex);
                         DefaultListModel m= new DefaultListModel() ;
-                        m.add(0,"Error: unable to connect");
+                        m.add(0,createMessageObject("Error: unable to connect"));
                         idsList2.setModel( m );
                     }
                 }
@@ -891,6 +948,10 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         loadKnownServersSoon();
     }//GEN-LAST:event_hapiServerRecentComboBoxActionPerformed
 
+    private void idsList2ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_idsList2ValueChanged
+        System.err.println("here stop ");
+    }//GEN-LAST:event_idsList2ValueChanged
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox binaryCB;
@@ -902,7 +963,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     private javax.swing.JComboBox<String> exampleTimeRangesCB;
     private javax.swing.JButton extraInfoButton;
     private org.autoplot.datasource.RecentComboBox hapiServerRecentComboBox;
-    private javax.swing.JList<String> idsList2;
+    private javax.swing.JList<JSONObject> idsList2;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -1045,7 +1106,12 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         if ( id!=null ) {
             try {
                 id= URLDecoder.decode(id,"UTF-8");
-                idsList2.setSelectedValue( id, true );
+         
+                JSONObject selected= getJsonObjectFor(id);
+                
+                if (selected!=null ) {
+                    idsList2.setSelectedValue( selected, true );
+                }
             } catch (UnsupportedEncodingException ex) {
                 throw new RuntimeException(ex);
             }
@@ -1098,7 +1164,8 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     @Override
     public String getURI() {
         String parameters= getParameters(false);
-        String id= idsList2.getSelectedValue();
+        JSONObject joId= (JSONObject) idsList2.getSelectedValue();
+        String id= joId==null ? null : joId.optString("id","???"); //idsList2.getSelectedValue();
         if ( id==null ) {
             id= "";
         } else {
@@ -1184,11 +1251,11 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                         title= catalogEntry.getString(HapiSpec.TITLE);
                     }
                     if ( p.matcher(id).find() || ( title!=null && p.matcher(title).find() ) ) {
-                        model.addElement( catalogEntry.getString("id") );
+                        model.addElement( catalogEntry );
                         maxCharacters= Math.max( catalogEntry.getString("id").length(), maxCharacters );
                     }
                 } else {
-                    model.addElement( catalogEntry.getString("id") );
+                    model.addElement( catalogEntry );
                     maxCharacters= Math.max( catalogEntry.getString("id").length(), maxCharacters );
                 }
             }
@@ -1204,7 +1271,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 idsList2.ensureIndexIsVisible(0);
             } else {
                 if ( currentId!=null ) {
-                    idsList2.setSelectedValue( currentId, true );
+                    idsList2.setSelectedValue( getJsonObjectFor(currentId), true );
                 } else {
                     int i= idsList2.getSelectedIndex();
                     idsList2.ensureIndexIsVisible( i==-1 ? 0 : i );
