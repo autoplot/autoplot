@@ -47,6 +47,9 @@ public class JythonExtensionDataSourceFactory extends AbstractDataSourceFactory 
             case "vap+spd":
                 script= "https://github.com/autoplot/scripts/blob/master/formats/sps/readTypeSpd.jyds";
                 break;
+            case "vap+npy":
+                script= "https://github.com/autoplot/scripts/blob/master/formats/npy/read_npy.jyds";
+                break;             
             case "vap+wdc":
                 script= "https://raw.githubusercontent.com/autoplot/jyds/master/wdc_kp_ap.jyds";
                 break;
