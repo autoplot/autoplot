@@ -77,6 +77,15 @@ public class DataSetSelectorSupport {
         } catch ( SecurityException ex ) {
             logger.info("unable to set current directory");
         }
+        
+        if ( initialSelection!=null ) {
+            URISplit split= URISplit.parse(initialSelection);
+            if ( ".vap".equals(split.ext) && "file".equals(split.scheme) ) {
+                chooser.setSelectedFile( new File(split.file) );
+                currentFile="";           
+            }
+        }
+        
         if ( currentFile.length()>0 ) {
             try {
                 chooser.setSelectedFile( new File( currentFile ) );
