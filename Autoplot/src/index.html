@@ -31,6 +31,7 @@
                 
         <p>Bugfixes (2025-08-28):</p>
         <ul>
+            <li>Tweaks to the ASCII parser which allow Juno shocks file with colors to be used.  (FF for alpha would cause color parsing to fail, now named colors and 0xFF0000FF can be used.)
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2704/">2704</a>: set the pick vap location appropriately for local .vap files.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2728/">2728</a>: Reduce the number of places where old ScriptContext.getViewWindow is still used.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2731/">2731</a>: Replace File dialog uses DataSetSelector to provide completions and recent entries.  Thanks, Ivar!
