@@ -182,6 +182,8 @@ public class ReadIDLSav {
     public static final int TYPECODE_STRING=7;
     public static final int TYPECODE_STRUCT=8;
     public static final int TYPECODE_COMPLEX_DOUBLE=9;
+    public static final int TYPECODE_UINT16=12;
+    public static final int TYPECODE_UINT32=13;
     public static final int TYPECODE_INT64=14;
     public static final int TYPECODE_UINT64=15;
 
@@ -198,8 +200,14 @@ public class ReadIDLSav {
             case TYPECODE_INT16: {
                 return "short";
             }
+            case TYPECODE_UINT16: {
+                return "int";
+            }
             case TYPECODE_INT32: {
                 return "int";
+            }
+            case TYPECODE_UINT32: {
+                return "long";
             }
             case TYPECODE_INT64: {
                 return "long";
@@ -361,9 +369,15 @@ public class ReadIDLSav {
         @Override
         Object readData( ByteBuffer buf ) {
             switch ( typeCode ) {
+                case TYPECODE_BYTE:
+                    return (short)buf.getInt(offs);
                 case TYPECODE_INT16:
                     return (short)buf.getInt(offs);
+                case TYPECODE_UINT16:
+                    return buf.getInt(offs);
                 case TYPECODE_INT32:
+                    return buf.getInt(offs);
+                case TYPECODE_UINT32:
                     return buf.getInt(offs);
                 case TYPECODE_INT64:
                     return buf.getLong(offs);
@@ -562,6 +576,17 @@ public class ReadIDLSav {
                     }
                     return makeArrayData(result, offsetToFile+ offsToArray, result.length*4 );
                 }
+                case TYPECODE_UINT16: { 
+                    int[] result= new int[arrayDesc.nelements];
+                    for ( int i=0; i<result.length; i++ ) {
+                        int d= buf.getInt(offsToArray+4*i);
+                        if ( d<0 ) { // Note this doesn't happen, since the numbers are zero-padded.
+                            d= d + 65536;
+                        }
+                        result[i]= d;
+                    }
+                    return makeArrayData(result, offsetToFile+ offsToArray, result.length*4 );
+                }
                 case TYPECODE_INT32: {
                     
                     int[] result= new int[arrayDesc.nelements];
@@ -570,6 +595,18 @@ public class ReadIDLSav {
                     }
                     return makeArrayData(result, offsetToFile+ offsToArray, result.length*4 );
                 }
+                case TYPECODE_UINT32: { 
+                    long[] result= new long[arrayDesc.nelements];
+                    for ( int i=0; i<result.length; i++ ) {
+                        long d= buf.getInt(offsToArray+4*i);
+                        if ( d<0 ) {
+                            d= d + 4294967296L;
+                        }
+                        result[i]= d;
+                    }
+                    logger.warning("this is not tested, line 578");
+                    return makeArrayData(result, offsetToFile+ offsToArray, result.length*4 );
+                }                
                 case TYPECODE_INT64: {
                     //TODO: test me
                     long[] result= new long[arrayDesc.nelements];
