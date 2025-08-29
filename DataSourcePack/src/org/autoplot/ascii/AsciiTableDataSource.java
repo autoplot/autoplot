@@ -51,6 +51,7 @@ import org.das2.qds.SparseDataSetBuilder;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.AsciiHeadersParser;
 import org.das2.qds.util.AsciiParser.FieldParser;
+import org.das2.util.ColorUtil;
 
 /**
  * DataSource for reading data in ASCII files, where each record is 
@@ -1084,7 +1085,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                                 if ( field.startsWith("x") ) {
                                     return Integer.decode( "0"+field ); 
                                 } else {
-                                    return Integer.decode( field );
+                                    return ColorUtil.decodeColor(field).getRGB();
                                 }
                             }
                         });
