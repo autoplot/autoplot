@@ -501,7 +501,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
             }
             fire= new DatumRange( fire.min().subtract(1,tu), fire.min().add(1,tu) );
         }
-        if ( rescaleComboBox.getSelectedIndex()>0 ) {
+        if ( rescaleComboBox.getSelectedIndex()>0 || rescaleComboBox.getSelectedIndex()==-1 ) {
             try {
                 fire= DatumRangeUtil.rescale( fire,rescale );
             } catch (ParseException ex) {
