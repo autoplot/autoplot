@@ -29,9 +29,12 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-08-28):</p>
+        <p>Bugfixes (2025-08-29):</p>
         <ul>
+            <li>IDL unsigned longs (32 bit) and unsigned ints (16 bit) are now supported when reading in IDLSave files.  Thanks, Lily!
             <li>Tweaks to the ASCII parser which allow Juno shocks file with colors to be used.  (FF for alpha would cause color parsing to fail, now named colors and 0xFF0000FF can be used.)
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2735/">2735</a>: Runtime errors are routed to Jeremy and Chris' (for Das2Server issues) email again.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2734/">2734</a>: events lists with alpha component load properly again.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2704/">2704</a>: set the pick vap location appropriately for local .vap files.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2728/">2728</a>: Reduce the number of places where old ScriptContext.getViewWindow is still used.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2731/">2731</a>: Replace File dialog uses DataSetSelector to provide completions and recent entries.  Thanks, Ivar!
