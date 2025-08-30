@@ -639,11 +639,6 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         jScrollPane2.setMinimumSize(new java.awt.Dimension(100, 22));
 
         idsList2.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        idsList2.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                idsList2ValueChanged(evt);
-            }
-        });
         jScrollPane2.setViewportView(idsList2);
 
         clearButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/hapi/clearTextButton.png"))); // NOI18N
@@ -947,10 +942,6 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     private void hapiServerRecentComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hapiServerRecentComboBoxActionPerformed
         loadKnownServersSoon();
     }//GEN-LAST:event_hapiServerRecentComboBoxActionPerformed
-
-    private void idsList2ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_idsList2ValueChanged
-        System.err.println("here stop ");
-    }//GEN-LAST:event_idsList2ValueChanged
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
