@@ -1073,11 +1073,14 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 EnumerationUnits eu= EnumerationUnits.create("events");
                 parser.setUnits(icol,eu);
                 parser.setFieldParser(icol,parser.ENUMERATION_PARSER);
+                String[] fieldNames= parser.getFieldNames();
                 if ( icol>2 ) { //get the RGB color as well.
                     String[] fields = new String[parser.getRecordParser().fieldCount()];
                     String s= parser.readFirstParseableRecord(file.toString());
                     parser.getRecordParser().splitRecord(s,fields);
-                    if ( fields[2].startsWith("x") || fields[2].startsWith("0x" ) ) { // RGB color third column starts with x or 0x
+                    if ( fields[2].startsWith("x") 
+                            || fields[2].startsWith("0x" ) 
+                            || fieldNames[2].equalsIgnoreCase("color") ) { // RGB color third column starts with x or 0x
                         parser.setUnits(2,Units.dimensionless);
                         parser.setFieldParser( 2, new FieldParser() {
                             @Override
