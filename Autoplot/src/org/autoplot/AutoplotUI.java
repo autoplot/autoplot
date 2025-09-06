@@ -4774,7 +4774,8 @@ private void updateFrameTitle() {
         
         Util.addFonts();
                 
-        { // read in the file $HOME/autoplot_data/config/logging.properties, if it exists.
+        if ( System.getProperty( "java.util.logging.config.file" )==null ) {
+          // read in the file $HOME/autoplot_data/config/logging.properties, if it exists.
             File f1= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "config" );
             File f2= new File( f1, "logging.properties" );
             if ( f2.exists() ) {
@@ -4850,6 +4851,7 @@ private void updateFrameTitle() {
         alm.addBooleanSwitchArgument( "noAskParams", null, "noAskParams", "don't ask for parameters when running a script");
         alm.addBooleanSwitchArgument( "sandbox", null, "sandbox", "enable sandbox, which limits which disks are used." );
         alm.addBooleanSwitchArgument( "version", null, "version", "print the version" );
+        alm.addBooleanSwitchArgument( "quietLoggers", null, "quietLoggers", "quiet all loggers" );
         
        for ( int i=0; i<args.length; i++ ) {  // kludge for java webstart, which uses "-open" not "--open"
            if ( args[i].equals("-print") ) args[i]="--print";
@@ -4917,6 +4919,12 @@ private void updateFrameTitle() {
             System.setProperty("java.awt.headless","true");
         }
         final boolean headless= "true".equals( System.getProperty("java.awt.headless") ) ;
+        
+        if ( alm.getBooleanValue("quietLoggers") ) {
+            LogManager.getLogManager().reset();
+            Logger rootLogger = Logger.getLogger("");
+            rootLogger.setLevel(Level.OFF);
+        }
         
         AutoplotUtil.maybeLoadSystemProperties();
         AutoplotUtil.maybeInitializeEditorColors();
