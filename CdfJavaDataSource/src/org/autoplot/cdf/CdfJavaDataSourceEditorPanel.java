@@ -806,6 +806,7 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
             Pattern slice1pattern= Pattern.compile("\\[\\:\\,(\\d+)\\]");
             String slice= lparams.remove("slice1"); // legacy
             Pattern slice2pattern= Pattern.compile("\\[\\:\\,\\:\\,(\\d+)\\]");
+            Pattern slice3pattern= Pattern.compile("\\[\\:\\,\\:\\,\\:\\,(\\d+)\\]");
 
             String subset= null;
             if ( param!=null ) {
@@ -823,6 +824,12 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
                         if ( m.matches() ) {
                             slice= m.group(1); 
                             subset= null;
+                        } else {
+                            m= slice3pattern.matcher(subset);
+                            if ( m.matches() ) {
+                                slice= m.group(1); 
+                                subset= null;
+                            }
                         }
                     }
                 }
@@ -990,7 +997,10 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
                 } catch ( ReaderError e ) {
                     e.printStackTrace();
                 }
-                if ( dims==2  ) {
+                if ( dims==3 ) {
+                    int idx= val.indexOf(":");
+                    ps.append(p).append("[:,:,:,").append(val.substring(0,idx).trim()).append("]");                    
+                } else if ( dims==2  ) {
                     int idx= val.indexOf(":");
                     ps.append(p).append("[:,:,").append(val.substring(0,idx).trim()).append("]");                    
                 } else {
@@ -1154,7 +1164,24 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
                 
 
                 int[] dimensions= cdf.getDimensions( varname );
-                boolean doComponents= oattr!=null && ( dimensions.length==1 || dimensions.length==2 ) && dimensions[dimensions.length-1]<=MAX_SLICE1_OFFER;
+                boolean sureIsVector= dimensions.length>0 && ( dimensions[dimensions.length-1]<5 );
+                
+                //TODO: Generalize this code...
+                if ( dimensions.length==3 && oattr==null && sureIsVector ) {
+                    oattr= cdf.getAttribute( varname, "LABL_PTR_3");
+                    lablPtr=null;
+                
+                    if ( oattr!=null && oattr instanceof List ) {
+                        List voattr= (List)oattr;
+                        if ( voattr.size()>0 ) {
+                            lablPtr= (String)((List)oattr).get(0);
+                        } else {
+                            oattr= Collections.emptyList();
+                        }
+                    }
+                } 
+                
+                boolean doComponents= oattr!=null && ( dimensions.length==1 || dimensions.length==2 || sureIsVector ) && dimensions[dimensions.length-1]<=MAX_SLICE1_OFFER;
                 if ( doComponents ) {
                     String s= lablPtr;
                     DefaultMutableTreeNode node= new DefaultMutableTreeNode( varname );
