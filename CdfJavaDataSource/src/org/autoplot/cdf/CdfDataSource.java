@@ -1678,6 +1678,15 @@ public class CdfDataSource extends AbstractDataSource {
                 result= (MutablePropertyDataSet)Ops.copy( Ops.slice2( result, index ) );
             }
         }
+        
+        // kludge for tracers which seems reasonable
+        if ( mc.size()==4 && result.rank()==4 ) {
+            long[] slice3s= mc.get(3);
+            if ( slice3s!=null && ( slice3s[0]!=-1 && slice3s[1]==-1 && slice3s[2]==-1 ) ) {
+                int index= (int)slice3s[0];
+                result= (MutablePropertyDataSet)Ops.copy( Ops.slice3( result, index ) );
+            }
+        }
 
         boolean swapHack = false; // TODO: figure out where this was needed.
 
