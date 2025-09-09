@@ -304,6 +304,7 @@ from org.das2.util.monitor import NullProgressMonitor
 from org.imgscalr import Scalr
 from org.jdesktop.beansbinding import Converter
 from org.json import JSONObject
+from org.json import JSONArray
 from org.netbeans.jemmy import QueueTool
 from org.netbeans.jemmy.operators import DialogOperator
 from org.netbeans.jemmy.operators import JButtonOperator
