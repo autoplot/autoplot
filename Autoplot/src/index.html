@@ -15,7 +15,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small><a href="https://jfaden.net/~jbf/autoplot/data/dat/eventsList2.csv">Events file</a> with named colors is rendered and also used to control the time range.</small></p>
+        <p><small>Revisit the ASCII parser's <a href="https://jfaden.net/~jbf/autoplot/data/dat/pattern/readHangfiles.txt.jyds">pattern</a> control, where a regular expression is used to parse strange file.  <a href="https://regex101.com">Regex101.com</a> is used to verify the regex.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -29,9 +29,11 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-09-06):</p>
+        <p>Bugfixes (2025-09-09):</p>
         <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2739/">2739</a>: add --quietLoggers option to quiet loggers.
+            <li><a href="https://github.com/das-developers/das2java/issues/143">143</a>: AsciiParser's RegexParser would always reset the fields, making it impossible to use external timeFormat.
+            <li>URIs can now have { and } in them, supporting the pattern control of the ASCII data source.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2739/">2739</a>: add --quietLoggers option to quiet loggers.  Thanks, Kristoff!
             <li>Orbits files come directly from https://github.com/das-developers/das2meta/tree/main/orbits, no longer relying on github to redirect the old name.
         </ul>
         <p>Older Bugfixes (2025-09-02):</p>
@@ -56,6 +58,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/855/">855</a>: support ds[t,en,dir,component] datasets, allowing one component to be selected.  Thanks, Chris!
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/854/">854</a>: allow events list with column header "color" to contain named colors.
         </ul>
         <p>Less recent features:</p>
