@@ -242,6 +242,7 @@ public class ScreenshotsTool extends EventQueue {
 
     /**
      * create a new ScreenshotsTool, which will write screenshots to the location.
+     * 
      * @param parent parent to follow.  It and its children are recorded.
      * @param outLocationFolder local file location, folder relative to Autoplot's PWD.
      * @throws IOException 
@@ -258,6 +259,7 @@ public class ScreenshotsTool extends EventQueue {
      * be taken when activity occurs (see start which manages this), or will takePicture
      * is called to manually take screenshots (e.g. from scripts).  When the
      * session is done, requestFinish is called to clean up.
+     * 
      * @param parent parent to follow.  It and its children are recorded.
      * @param outLocationFolder local file location, folder relative to Autoplot's PWD.
      * @param clearFolder if true, clear any files from the output folder.
@@ -289,7 +291,7 @@ public class ScreenshotsTool extends EventQueue {
         active= getActiveDisplay( parent );
         bounds= null;
 
-        tickleTimer= new TickleTimer( 300, new PropertyChangeListener() {
+        tickleTimer= new TickleTimer( 100, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 AWTEvent update= peekEvent(1200);
@@ -303,6 +305,8 @@ public class ScreenshotsTool extends EventQueue {
                         long t1= System.currentTimeMillis();
                         Rectangle r= doTakePicture(filenameFor(t1, 99999), t1);
                         if ( bounds==null ) bounds= r; else bounds= bounds.union(r);
+                    } else {
+                        logger.finer("not canReject");
                     }
                     //System.err.println("update coming anyway");
                 }
