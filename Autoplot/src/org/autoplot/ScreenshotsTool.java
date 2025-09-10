@@ -37,9 +37,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
@@ -685,6 +692,32 @@ public class ScreenshotsTool extends EventQueue {
     public static void trimAll( File dir ) throws IOException {
         trimAll( dir, null, new NullProgressMonitor() );
     }
+    
+    private static class Job implements Callable<File> {
+
+        File f;
+        Rectangle r;
+        Set<File> done;
+        ProgressMonitor monitor;
+        
+        public Job(File f,Rectangle r,Set<File> done, ProgressMonitor monitor) {
+            this.f= f;
+            this.r= r;
+            this.done= done;
+            this.monitor= monitor;
+        }
+        @Override
+        public File call() throws Exception {
+            logger.log(Level.FINER, "trim {0}", f);
+            BufferedImage im= ImageIO.read(f);
+            im= trim( im, r );
+            ImageIO.write( im, "png", f );
+            done.add(f);
+            monitor.setTaskProgress(done.size());
+            return f;
+        }
+        
+    }
 
     /**
      * find the common trim bounding box and trim all the images in the directory.
@@ -706,17 +739,34 @@ public class ScreenshotsTool extends EventQueue {
         monitor.setProgressMessage("trim images");
         monitor.setTaskSize( ff.length );
         int i=0;
+        
+        List<Callable<File>> tasks = new ArrayList<>();
+        Set<File> done= new HashSet<>();
+        
         for ( File f : ff ) {
-            logger.log(Level.FINER, "trim {0}", f);
-            i++;
-            monitor.setTaskProgress( i );
-            if ( f.toString().endsWith(".png") ) {
-                BufferedImage im= ImageIO.read(f);
-                im= trim( im, r );
-                ImageIO.write( im, "png", f );
-            }
+            tasks.add( new Job(f,r,done,monitor));
         }
 
+        int threads = Runtime.getRuntime().availableProcessors();
+        ExecutorService pool = Executors.newFixedThreadPool(threads);
+        
+        try {
+            List<Future<File>> futures = pool.invokeAll(tasks);
+
+            for (Future<File> f : futures) {
+                try { 
+                    logger.finer(f.get().toString()); 
+                } catch (ExecutionException e) { 
+                    e.getCause().printStackTrace(); 
+                }
+            }
+
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ScreenshotsTool.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            pool.shutdown();
+        }
+        
         monitor.finished();
         
     }
