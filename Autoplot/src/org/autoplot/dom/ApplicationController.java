@@ -1137,6 +1137,17 @@ public class ApplicationController extends DomNodeController implements RunLater
         });        
         impl.getDasMouseInputAdapter().addMenuItem(mi);
         
+        final JMenuItem cb2mi= new JMenuItem(new AbstractAction("Copy Annotation") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
+                Annotation second= new Annotation();
+                second.syncTo(annotation);
+                addAnnotation(second);
+            }
+        }); 
+        impl.getDasMouseInputAdapter().addMenuItem(cb2mi);
+        
         final JCheckBoxMenuItem cbmi= new JCheckBoxMenuItem(new AbstractAction("Anchor to Data") {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -1194,7 +1205,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             }
         }); 
         impl.getDasMouseInputAdapter().addMenuItem(cbmi);
-        
+
         bind( annotation, "anchorType", cbmi, "selected", new Converter() {
             @Override
             public Object convertForward(Object s) {
