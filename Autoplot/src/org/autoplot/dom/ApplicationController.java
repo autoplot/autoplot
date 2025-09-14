@@ -1143,6 +1143,15 @@ public class ApplicationController extends DomNodeController implements RunLater
                 org.das2.util.LoggerManager.logGuiEvent(e);
                 Annotation second= new Annotation();
                 second.syncTo(annotation);
+                if ( second.getAnchorOffset().trim().length()==0 ) {
+                    second.setAnchorOffset("1em,1em");
+                } else {
+                    try {
+                        second.setAnchorOffset( DasDevicePosition.addOffset( second.getAnchorOffset(), "1em,1em" ) );
+                    } catch (ParseException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
                 addAnnotation(second);
             }
         }); 
