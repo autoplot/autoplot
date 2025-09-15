@@ -365,6 +365,29 @@ public class Annotation extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_BACKGROUND, oldBackground, background);
     }
 
+    
+    private int rotate = 0;
+
+    public static final String PROP_ROTATE = "rotate";
+
+    /**
+     * get the counter-clockwise rotation in degrees. 
+     * @return the counter-clockwise rotation in degrees. 
+     */
+    public int getRotate() {
+        return rotate;
+    }
+
+    /**
+     * set the counter-clockwise rotation in degrees. 
+     * @param rotate 
+     */
+    public void setRotate(int rotate) {
+        int oldRotate = this.rotate;
+        this.rotate = rotate;
+        propertyChangeSupport.firePropertyChange(PROP_ROTATE, oldRotate, rotate);
+    }
+    
     private String rowId="";
     public static final String PROP_ROWID = "rowId";
 
@@ -398,7 +421,7 @@ public class Annotation extends DomNode {
     @Override
     public void syncTo(DomNode n) {
         super.syncTo(n);
-        syncTo(n,new ArrayList<String>() );
+        syncTo(n,new ArrayList<>() );
     }
 
     @Override
@@ -425,6 +448,7 @@ public class Annotation extends DomNode {
         if ( !exclude.contains( PROP_SHOWARROW ) ) this.setShowArrow( that.isShowArrow() );
         if ( !exclude.contains( PROP_OVERRIDECOLORS ) ) this.setOverrideColors(that.isOverrideColors() );
         if ( !exclude.contains( PROP_TEXTCOLOR ) ) this.setTextColor(that.getTextColor() );
+        if ( !exclude.contains( PROP_ROTATE ) ) this.setRotate(that.getRotate());
         if ( !exclude.contains( PROP_FOREGROUND ) ) this.setForeground(that.getForeground() );
         if ( !exclude.contains( PROP_BACKGROUND ) ) this.setBackground(that.getBackground() );
         if ( !exclude.contains( PROP_GLOW ) ) this.setGlow(that.isGlow() );
@@ -488,6 +512,8 @@ public class Annotation extends DomNode {
         if ( !b ) result.add(new PropertyChangeDiff( PROP_FOREGROUND, that.foreground, this.foreground ) );
         b=  that.background.equals(this.background) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_BACKGROUND, that.background, this.background ) );
+        b=  that.rotate==this.rotate;
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_ROTATE, that.rotate, this.rotate ) );
         b=  that.plotId.equals(this.plotId) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_PLOTID, that.plotId, this.plotId ) );
         b=  that.rowId.equals(this.rowId) ;

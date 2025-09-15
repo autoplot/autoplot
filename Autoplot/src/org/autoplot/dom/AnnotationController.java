@@ -123,6 +123,7 @@ public class AnnotationController extends DomNodeController {
         ac.bind( annotation, "showArrow", dasAnnotation, "showArrow" );
         ac.bind( annotation, "overrideColors", dasAnnotation, "overrideColors" );
         ac.bind( annotation, "textColor", dasAnnotation, "textColor" );
+        ac.bind( annotation, "rotate", dasAnnotation, "rotate" );
         ac.bind( annotation, "foreground", dasAnnotation, "foreground" );
         ac.bind( annotation, "background", dasAnnotation, "background" );
         ac.bind( annotation, "glow", dasAnnotation, "glow" );
