@@ -1515,7 +1515,9 @@ public class DataSetURI {
         surl = surl.replaceAll(" ", "%20"); // drop the spaces are pluses in filenames.
         surl = surl.replaceAll("\\^", "%5E"); 
         surl = surl.replaceAll("\\\\", "%5C");  
+        surl = surl.replaceAll("\\{", "%7B");
         surl = surl.replaceAll("\\|", "%7C");
+        surl = surl.replaceAll("\\}", "%7D");
         //}
         if (split.vapScheme != null) {
             if ( split.vapScheme.contains(" ") ) {
