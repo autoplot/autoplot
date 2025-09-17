@@ -2660,35 +2660,6 @@ public class GuiSupport {
         String math= Entities.decodeEntities("Math Symbols: &sum; &plusmn;");
 
         chooser.setExampleText("Electron Differential Energy Flux\n2001-01-10 12:00\nExtended ASCII: "+sci+"\n"+greek+"\n"+math);
-        chooser.setFontCheck( new JFontChooser.FontCheck() {
-            @Override
-            public String checkFont(Font f) {
-                Object font= PdfGraphicsOutput.ttfFromNameInteractive(f);
-                StringBuilder msg= new StringBuilder();
-                if ( font==PdfGraphicsOutput.READING_FONTS ) {
-                    msg.append("Checking which fonts are embeddable...");
-                } else if ( font!=null ) {
-                    msg.append("PDF okay");
-                } else {                    
-                    msg.append("Cannot be embedded in PDF");
-                }
-                char missingCharacter=0;
-                Font t= chooser.getFont();
-                if ( t!=null ) {
-                    String text= chooser.getExampleText();
-                    for ( int i=0; missingCharacter==0 && i<text.length(); i++ ) {
-                        char c= text.charAt(i);
-                        if ( c!=10 ) {
-                            if ( !t.canDisplay(c) ) {
-                                missingCharacter= c;
-                            }
-                        }
-                    }
-                }
-                if ( missingCharacter!=0 ) msg.append(". Missing ").append(missingCharacter).append(" 0x").append(Integer.toHexString(missingCharacter));
-                return msg.toString();
-            }
-        });
         chooser.setFont(app.getCanvas().getBaseFont());
         chooser.setLocationRelativeTo(parent);
         if (chooser.showDialog() == JFontChooser.OK_OPTION) {
