@@ -1080,7 +1080,9 @@ public class URISplit {
         surl = surl.replaceAll("%5D", "\\]" );
         surl = surl.replaceAll("%5E", "^" );
         surl = surl.replaceAll("%5C", "\\\\" );
+        surl = surl.replaceAll("%7B", "{" );
         surl = surl.replaceAll("%7C", "|" );
+        surl = surl.replaceAll("%7D", "}" );
         return surl;
     }
 
