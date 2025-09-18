@@ -803,7 +803,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         if ( ltm!=null ) {
             switch (tm.getColumnCount()) {
                 case 2:
-                    this.schemeComboBox.setSelectedIndex(3);
+                    this.schemeComboBox.setSelectedIndex(2);
                     break;
                 case 4:
                     this.schemeComboBox.setSelectedIndex(1);
