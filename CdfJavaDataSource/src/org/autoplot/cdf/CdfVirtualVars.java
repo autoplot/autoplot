@@ -367,7 +367,7 @@ public class CdfVirtualVars {
                 "fftpower","fftPower512","fftPower1024","fftpowerdeltatranslation512", 
                 "alternate_view", "calc_p", "region_filt", 
                 "apply_esa_qflag", "apply_qflag",
-                "sum_values", "arr_slice" );
+                "sum_values", "arr_slice", "apply_filter_flag" );
         boolean supported= functions.contains(function.toLowerCase());
         logger.log(Level.FINE, "virtual variable function \"{0}\" is supported: {1}", new Object[]{function, supported});
         return supported;
