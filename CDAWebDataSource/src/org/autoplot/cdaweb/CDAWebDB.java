@@ -474,7 +474,7 @@ public class CDAWebDB {
         }
 
         try {
-            spid= spid.toUpperCase();
+            spid= spid.toUpperCase().trim();
             if ( tmpls.containsKey(spid) ) {
                 return tmpls.get(spid);
             }
