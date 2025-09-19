@@ -15,6 +15,7 @@ import org.das2.qds.DataSetUtil;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.das2.qds.WritableDataSet;
+import org.das2.qds.ops.CoerceUtil;
 import org.das2.qds.ops.Ops;
 
 /**
@@ -229,6 +230,84 @@ public class CdfVirtualVars {
                 }
                 return result;
             }
+        } else if ( function.equalsIgnoreCase("apply_filter_flag") ) {
+            
+            WritableDataSet zdata= Ops.maybeCopy( Ops.copy(args.get(0)) ); // make mutable copy
+            
+            QDataSet filterData= args.get(1);
+            
+            Map<String,Object> m= metadata;
+            if ( m==null ) {
+                throw new IllegalArgumentException("unable to implement because metadata is needed");
+            } else {
+                Object ocompareValue= m.get("COMPARE_VAL");
+                Object ocompareOperator= m.get("COMPARE_OPERATOR");
+                double compareValue = ( ocompareValue==null ) ? 0. : ((Number)ocompareValue).doubleValue();
+                String compareOperator= ( ocompareOperator==null ) ? "eq" : ((String)ocompareValue);
+                
+                QDataSet temp;
+                
+                switch ( compareOperator ) {
+                    case "eq": temp= Ops.where( Ops.ne( filterData, compareValue ) ); break;
+                    case "ne": temp= Ops.where( Ops.eq( filterData, compareValue ) ); break;
+                    case "lt": temp= Ops.where( Ops.ge( filterData, compareValue ) ); break;
+                    case "le": temp= Ops.where( Ops.gt( filterData, compareValue ) ); break;
+                    case "gt": temp= Ops.where( Ops.le( filterData, compareValue ) ); break;
+                    case "ge": temp= Ops.where( Ops.lt( filterData, compareValue ) ); break;
+                    default: throw new IllegalArgumentException("bad compare operator, must be eq ne lt le gt ge: "+compareOperator);
+                }
+
+                double fillValue= (Double)metadata.get("FILLVAL");
+                        
+                // TODO: DataSetOps.applyIndex( diffs, 0, r, false ) remind myself how assignment with index array is done in Java
+                switch ( zdata.rank() ) {
+                    case 1:
+                        for ( int i=0; i<temp.length(); i++ ) zdata.putValue( (int)temp.value(i), fillValue );
+                        break;
+                    case 2: {
+                        int nj= zdata.length(0);
+                        for ( int i=0; i<temp.length(); i++ ) {
+                            int itt= (int)temp.value(i);
+                            for ( int j=0; j<nj; j++ ) zdata.putValue( itt, j, fillValue );
+                        }
+                        break;
+                    }
+                    case 3: {
+                        int nj= zdata.length(0);
+                        int nk= zdata.length(0,0);
+                        for ( int i=0; i<temp.length(); i++ ) {
+                            int itt= (int)temp.value(i);
+                            for ( int j=0; j<nj; j++ ) {
+                                for ( int k=0; k<nk; k++ ) {
+                                    zdata.putValue( itt, j, k, fillValue );
+                                }
+                            }
+                        }
+                        break;
+                    }
+                    case 4:
+                        int nj= zdata.length(0);
+                        int nk= zdata.length(0,0);
+                        int nl= zdata.length(0,0,0);
+                        for ( int i=0; i<temp.length(); i++ ) {
+                            int itt= (int)temp.value(i);
+                            for ( int j=0; j<nj; j++ ) {
+                                for ( int k=0; k<nk; k++ ) {
+                                    for ( int l=0; l<nl; l++ ) {
+                                        zdata.putValue( itt, j, k, l, fillValue );
+                                    }
+                                }
+                            }
+                        }
+                        break;       
+                    default:
+                        throw new IllegalArgumentException("only rank 1,2,3,4 supported in apply_filter_flag");
+                }
+                zdata.makeImmutable();
+                
+                return zdata;
+            }
+            
             
         } else {
             throw new IllegalArgumentException("virtual variable function not implemented: "+function );
