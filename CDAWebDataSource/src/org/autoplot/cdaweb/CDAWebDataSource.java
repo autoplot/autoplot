@@ -514,7 +514,7 @@ public class CDAWebDataSource extends AbstractDataSource {
         List<QDataSet> comps= new ArrayList();
         String function= (String)meta.get( "FUNCTION" );
         if ( function==null ) {
-            function= (String)meta.get( "FUNCT" ); // THA_L2_ESA
+            function= (String)meta.get( "FUNCT" ); // THA_L2_ESA.  Note FUNCT is the correct term, since IDL FUNCTION is reserved word.
         }
         String missingComponentName= null;
         if ( function!=null ) {
