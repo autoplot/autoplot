@@ -148,6 +148,7 @@ import org.xml.sax.SAXException;
 import ZoeloeSoft.projects.JFontChooser.JFontChooser;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import javax.swing.JDialog;
 import org.autoplot.dom.Column;
 import org.autoplot.dom.DomNode;
 import org.autoplot.dom.Row;
@@ -155,6 +156,7 @@ import org.autoplot.renderer.AnnotationEditorPanel;
 import org.das2.components.propertyeditor.EnumerationEditor;
 import org.das2.datum.Datum;
 import org.das2.graph.DasColorBar;
+import org.das2.util.FontChooser;
 
 /**
  * Extra methods to support AutoplotUI.
@@ -2654,16 +2656,21 @@ public class GuiSupport {
      * @return
      */
     public static Font pickFont( Frame parent, ApplicationModel app ) {
-        JFontChooser chooser = new JFontChooser( parent );
+        FontChooser chooser = new FontChooser( );
         String sci= Entities.decodeEntities("2 &times; 10E7  &aacute;");
-        String greek= Entities.decodeEntities("Greek Symbols: &Alpha; &Beta; &Delta; &alpha; &beta; &delta; &pi; &rho; &omega;");
+        String greek= Entities.decodeEntities("Greek Symbols: &Delta; &alpha; &beta; &delta; &pi; &rho; &omega;");
         String math= Entities.decodeEntities("Math Symbols: &sum; &plusmn;");
 
         chooser.setExampleText("Electron Differential Energy Flux\n2001-01-10 12:00\nExtended ASCII: "+sci+"\n"+greek+"\n"+math);
-        chooser.setFont(app.getCanvas().getBaseFont());
-        chooser.setLocationRelativeTo(parent);
-        if (chooser.showDialog() == JFontChooser.OK_OPTION) {
-            return setFont( app, chooser.getFont() );
+        chooser.setCurrentFont(app.getCanvas().getBaseFont());
+        
+        JOptionPane p= new JOptionPane( chooser, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION );
+        JDialog dialog = p.createDialog("Pick Font");
+        dialog.setResizable(true);
+        dialog.setLocationRelativeTo(parent);
+        dialog.setVisible(true);
+        if ( ((Integer)p.getValue()) == JFontChooser.OK_OPTION) {
+            return setFont( app, chooser.getCurrentFont() );
         } else {
             return null;
         }
