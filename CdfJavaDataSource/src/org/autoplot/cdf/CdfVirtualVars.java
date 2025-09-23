@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.qds.ArrayDataSet;
@@ -14,6 +16,7 @@ import org.das2.qds.DataSetOps;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
+import org.das2.qds.SemanticOps;
 import org.das2.qds.WritableDataSet;
 import org.das2.qds.ops.CoerceUtil;
 import org.das2.qds.ops.Ops;
@@ -240,11 +243,17 @@ public class CdfVirtualVars {
             if ( m==null ) {
                 throw new IllegalArgumentException("unable to implement because metadata is needed");
             } else {
-                Object ocompareValue= m.get("COMPARE_VAL");
                 Object ocompareOperator= m.get("COMPARE_OPERATOR");
-                double compareValue = ( ocompareValue==null ) ? 0. : ((Number)ocompareValue).doubleValue();
-                String compareOperator= ( ocompareOperator==null ) ? "eq" : ((String)ocompareValue);
-                
+                String compareOperator= ( ocompareOperator==null ) ? "eq" : ((String)ocompareOperator);
+                Object ocompareValue= m.get("COMPARE_VAL");
+                double compareValue;
+                Units u= SemanticOps.getUnits(filterData);
+                if ( UnitsUtil.isNominalMeasurement( u ) ) {
+                    compareValue= ((EnumerationUnits)u).createDatum(ocompareValue.toString().trim()).doubleValue(u);
+                    filterData= Ops.putProperty( filterData, QDataSet.UNITS, null ); //MSL_RAD_OBS-L1 uses "" for okay
+                } else {
+                    compareValue= ( ocompareValue==null ) ? 0. : ((Number)ocompareValue).doubleValue();
+                }
                 QDataSet temp;
                 
                 switch ( compareOperator ) {
