@@ -31,6 +31,7 @@
                 
         <p>Bugfixes (2025-09-23):</p>
         <ul>
+            <li>bugfix: new, more general, code to do rotations for any angle didn't rotate counter-clockwise, as was the original convention.
             <li>Support MSL_RAD_OBS-L1 vp_moment_SC_gd which uses string data for apply_filter_flag virtual variable.
             <li>vap+inline: with X,Y;X,Y;... wouldn't reenter the editor GUI (to add more points) because of index error.
             <li><a href="https://github.com/das-developers/das2java/issues/146">146</a>: Don't assume the first FFT window has uniform timetags, scan through until one is found.
