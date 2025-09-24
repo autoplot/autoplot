@@ -1217,7 +1217,7 @@ public final class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel imple
                             expand.add( new TreePath( new Object[] { root, node } ) );
                         }
                         
-                    } catch (CDFException.ReaderError | ArrayIndexOutOfBoundsException | IllegalArgumentException ex ) {
+                    } catch (CDFException.ReaderError | ArrayIndexOutOfBoundsException | IllegalArgumentException | NullPointerException ex ) {
                         logger.log(Level.WARNING,"parameter name found: "+s+" referred to by " +varname,ex);
                         root.add( node );
                     }
