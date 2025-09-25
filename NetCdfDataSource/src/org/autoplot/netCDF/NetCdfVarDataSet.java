@@ -272,9 +272,6 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         boolean isCoordinateVariable= false;
         
         for ( int ir=0; ir<a.getRank(); ir++ ) {
-            if ( v.getFullName().contains("Temperature") && ir==1 ) { 
-                System.err.println("Here stop Jeremy");
-            }
             if ( !slice[ir] ) {
                 logger.log(Level.FINER, "v.getDimension({0})", ir);
                 ucar.nc2.Dimension d= v.getDimension(ir);
@@ -543,7 +540,16 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                         result1.read( dv, ncfile, sliceConstraints(constraints,ir), mm, true, new NullProgressMonitor() );
                         QDataSet dependi= result1;
                         
-                        properties.put( "DEPEND_"+(ir-sliceCount(slice,ir)), dependi );
+                        if ( dependi.rank()==0 ) {
+                            
+                        } else {
+                            int dim= (ir-sliceCount(slice,ir));
+                            if ( dependi.length()!=shape[dim] ) {
+                                logger.info("wrong length for dimension");
+                            } else {
+                                properties.put( "DEPEND_"+dim, dependi );
+                            }
+                        }
                     }
                 }
             }
