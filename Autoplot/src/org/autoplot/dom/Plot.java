@@ -343,7 +343,7 @@ public class Plot extends DomNode {
     public static final String PROP_EPHEMERISLINECOUNT = "ephemerisLineCount";
 
     /**
-     * 0 or the number of lines to allocate space for ephemeris.  Note this is set automatically when the ephemeris is
+     * -1 or the number of lines to allocate space for ephemeris.  Note this is set automatically when the ephemeris is
      * loaded.  This was introduced so that fixLayout could be performed without knowing what the TCA dataset contains.
      * @return the line count or -1 if no lines are allocated.
      */
@@ -352,7 +352,7 @@ public class Plot extends DomNode {
     }
 
     /**
-     * 0 or the number of lines to allocate space for ephemeris.  Note this is set automatically when the ephemeris is
+     * -1 or the number of lines to allocate space for ephemeris.  Note this is set automatically when the ephemeris is
      * loaded.
      * @param ephemerisLineCount 
      */
@@ -366,6 +366,13 @@ public class Plot extends DomNode {
 
     public static final String PROP_EPHEMERIS_LABELS = "ephemerisLabels";
 
+    /**
+     * set the ephemeris data labels explicitly, using a semicolon-delimited list of labels.  When there are
+     * too few labels, '???' will be used, and when there are too many, the later labels are ignored.  Note
+     * this does not imply ephemerisLineCount.  An empty string results in the default behavior where the 
+     * loaded data labels are used.
+     * @return 
+     */
     public String getEphemerisLabels() {
         return ephemerisLabels;
     }
