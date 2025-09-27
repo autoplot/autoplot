@@ -1240,7 +1240,10 @@ public class AutoplotUtil {
         QDataSet plane0 = (QDataSet) fillds.property(QDataSet.PLANE_0);
         QDataSet bundle1= (QDataSet) fillds.property(QDataSet.BUNDLE_1);
         QDataSet dep0= (QDataSet) fillds.property(QDataSet.DEPEND_0);
-        
+        final boolean isRank3WaveformXYZ = Schemes.isRank3WaveformXYZ(fillds);
+        if ( isRank3WaveformXYZ ) {
+            bundle1=(QDataSet) fillds.property(QDataSet.BUNDLE_2); 
+        }
         if ( fillds.property( QDataSet.JOIN_0 )!=null ) {
             if ( fillds.length()==0 ) {
                 return RenderType.series;
@@ -1274,7 +1277,16 @@ public class AutoplotUtil {
                 }
             }
             if ( trivialBundle ) {
-                return specPref;
+                if ( isRank3WaveformXYZ ) {
+                    if ( useHugeScatter && fillds.length() > SERIES_SIZE_LIMIT) {
+                        spec = RenderType.hugeScatter;
+                    } else {
+                        spec = RenderType.series;
+                    }
+                    return spec;
+                } else {
+                    return specPref;
+                }
 //            if ( dep1!=null && !isVectorOrBundleIndex(dep1) ) {
 //                spec = specPref; // favor spectrograms when we have a BUNDLE_1 and DEPEND_1.
 //            } else if ( bundle1!=null || (dep1 != null && isVectorOrBundleIndex(dep1) ) ) {
