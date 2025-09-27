@@ -680,34 +680,36 @@ public class PlotElementController extends DomNodeController {
         String label= null;
         c= c.trim();
         if ( c.length()>0 && !c.startsWith("|") ) {  // grab the component, then apply processes after the pipe.
-            if (!plotElement.getComponent().equals("") && fillDs.length() > 0 && fillDs.rank() == 2) {
-                String[] labels = SemanticOps.getComponentNames(fillDs);
-                String comp= plotElement.getComponent();
-                int ip= comp.indexOf('|');
-                if ( ip!=-1 ) {
-                    comp= comp.substring(0,ip);
-                }
-                comp= Ops.saferName(comp);
-                if ( fillDs.property(QDataSet.BUNDLE_1)!=null ) {
-                    fillDs= DataSetOps.unbundle( fillDs,comp ); //TODO: illegal argument exception
-                    label= comp;
-                } else {
-                    boolean found= false;
-                    for (int i = 0; i < labels.length; i++) {
-                        if ( Ops.saferName(labels[i]).equals(comp)) {
-                            fillDs = DataSetOps.slice1(fillDs, i);
-                            label = labels[i];
-                            found= true;
-                            break;
+            if (!plotElement.getComponent().equals("") &&  fillDs.length() > 0 ) {
+                if ( fillDs.rank() == 2 || Schemes.isRank3WaveformXYZ(fillDs) ) {
+                    String[] labels = SemanticOps.getComponentNames(fillDs);
+                    String comp= plotElement.getComponent();
+                    int ip= comp.indexOf('|');
+                    if ( ip!=-1 ) {
+                        comp= comp.substring(0,ip);
+                    }
+                    comp= Ops.saferName(comp);
+                    if ( fillDs.property(QDataSet.BUNDLE_1)!=null || fillDs.property(QDataSet.BUNDLE_2)!=null ) {
+                        fillDs= DataSetOps.unbundle( fillDs,comp ); //TODO: illegal argument exception
+                        label= comp;
+                    } else {
+                        boolean found= false;
+                        for (int i = 0; i < labels.length; i++) {
+                            if ( Ops.saferName(labels[i]).equals(comp)) {
+                                fillDs = DataSetOps.slice1(fillDs, i);
+                                label = labels[i];
+                                found= true;
+                                break;
+                            }
+                        }
+                        if ( !found ) {
+                            throw new IllegalArgumentException("component not found: "+comp );
                         }
                     }
-                    if ( !found ) {
-                        throw new IllegalArgumentException("component not found: "+comp );
+                    if (label == null && !isPendingChanges()) {
+                        RuntimeException ex = new RuntimeException("component not found: " + comp );
+                        throw ex;
                     }
-                }
-                if (label == null && !isPendingChanges()) {
-                    RuntimeException ex = new RuntimeException("component not found: " + comp );
-                    throw ex;
                 }
             }
             int idx= c.indexOf('|');
@@ -1661,7 +1663,7 @@ public class PlotElementController extends DomNodeController {
             //boolean joinOfBundle= fillDs.property(QDataSet.JOIN_0)!=null && lastDimBundle;
             int ndim= Ops.dimensionCount(fillDs);
             boolean isxyz= SemanticOps.isBundle(fillDs) && fillDs.property(QDataSet.DEPEND_0)==null;
-            boolean shouldSlice= ( fillDs.rank()>2 && ndim>3 && plotElement.isAutoComponent() && !isxyz );
+            boolean shouldSlice= ( fillDs.rank()>2 && !Schemes.isRank3WaveformXYZ(fillDs) && ndim>3 && plotElement.isAutoComponent() && !isxyz );
             if ( renderType==RenderType.image && fillDs.rank()==3 ) {
                 shouldSlice= false; //TODO: some how render types should indicate they can handle a slice.
             }
@@ -1693,6 +1695,11 @@ public class PlotElementController extends DomNodeController {
                     || renderType==RenderType.series 
                     || renderType==RenderType.scatter 
                     || renderType==RenderType.stairSteps );
+            
+            boolean isRank3WaveformXYZ=Schemes.isRank3WaveformXYZ(fillDs);
+            if ( isRank3WaveformXYZ ) {
+                shouldHaveChildren= true;
+            }
             //if ( joinOfBundle ) shouldHaveChildren= true;
 
             if ( fillDs.rank()==2 && SemanticOps.isBundle(fillDs) ) { //TODO: LANL has datasets with both BUNDLE_1 and DEPEND_1 set, so the user can pick.
@@ -1783,7 +1790,7 @@ public class PlotElementController extends DomNodeController {
                 return;
             }
 
-            // add additional plotElements when it's a bundle of rank1 datasets.
+            // add additional plotElements when it's a bundle of lower-rank (typically rank 1, but might be rank 2 waveform) datasets.
             if ( weShallAddChildren ) {
 
                 DomLock lock = dom.controller.mutatorLock();
@@ -1793,7 +1800,12 @@ public class PlotElementController extends DomNodeController {
                     Color fc= plotElement.getStyle().getFillColor();
                     Plot domPlot = dom.controller.getPlotFor(plotElement);
 
-                    int count= Math.min(QDataSet.MAX_UNIT_BUNDLE_COUNT, fillDs.length(0));
+                    int count;
+                    if ( !isRank3WaveformXYZ ) {
+                        count= Math.min(QDataSet.MAX_UNIT_BUNDLE_COUNT, fillDs.length(0));
+                    } else {
+                        count= Math.min(QDataSet.MAX_UNIT_BUNDLE_COUNT, fillDs.length(0,0));
+                    }
                     List<PlotElement> cp = new ArrayList<>(count);
                     int nsubsample= 1 + ( count-1 ) / 12; // 1-12 no subsample, 13-24 1 subsample, 25-36 2 subsample, etc.
 
