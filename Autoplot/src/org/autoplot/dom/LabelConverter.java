@@ -25,6 +25,12 @@ import org.das2.qds.ops.Ops;
 /**
  * Class for containing the logic of how macros are implemented.
  * https://sourceforge.net/p/autoplot/feature-requests/426/
+ * https://sourceforge.net/p/autoplot/feature-requests/491/
+ * 
+ * Here are some example labels:
+ * <ul>
+ * <li>%{TIMERANGE,FORMAT=$o} -- This will look at the xaxis and then the plot context for a timerange.
+ * </ul>
  * 
  * This currently supports just the plotElement and plot.  When 
  * multiple plotElements are attached to a plot, then the 
