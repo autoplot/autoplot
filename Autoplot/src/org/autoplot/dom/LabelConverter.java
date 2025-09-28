@@ -177,13 +177,16 @@ public class LabelConverter extends Converter {
             }
 
             if ( title.contains("TIMERANGE") ) {
-                DatumRange tr= PlotElementControllerUtil.getTimeRange( dom, pe );
-                if ( tr==null ) {
-                    if ( plot!=null && UnitsUtil.isTimeLocation( plot.getContext().getUnits() ) ) {
-                        tr= plot.getContext();
-                    } else if ( axis!=null && UnitsUtil.isTimeLocation( axis.getRange().getUnits() ) ) {
+                DatumRange tr=null;
+                if ( plot!=null ) {
+                    if ( axis!=null && UnitsUtil.isTimeLocation( axis.getRange().getUnits() ) ) {
                         tr= axis.getRange();
+                    } else if ( UnitsUtil.isTimeLocation( plot.getContext().getUnits() ) ) {
+                        tr= plot.getContext();
                     }
+                }
+                if ( tr==null ) {
+                    tr= PlotElementControllerUtil.getTimeRange( dom, pe );
                 }
                 
                 Pattern pop= Pattern.compile("(.*)\\%\\{TIMERANGE(.*?)\\}(.*)");
@@ -193,7 +196,7 @@ public class LabelConverter extends Converter {
                     String control= m.group(2).trim();
                     Map<String,String> controls= new HashMap<>();
                     if ( control.length()>0 ) {
-                        char delim= control.charAt(0);
+                        char delim= control.charAt(0); // can be , or ;
                         String[] ss;
                         ss= control.substring(1).split( "\\"+delim );
                         for ( String s: ss ) {

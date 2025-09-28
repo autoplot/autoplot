@@ -168,15 +168,19 @@ public class AnnotationController extends DomNodeController {
                 } else {
                     Plot oldPlot= (Plot) DomUtil.getElementById( dom, (String)evt.getOldValue(), true ); 
                     if ( oldPlot!=null && contextPropertyChangeListener!=null ) {
-                        oldPlot.removePropertyChangeListener( PlotController.PROP_ACTIVEDATASET, contextPropertyChangeListener );
+                        oldPlot.getController().removePropertyChangeListener( PlotController.PROP_ACTIVEDATASET, contextPropertyChangeListener );
+                        oldPlot.removePropertyChangeListener( Plot.PROP_CONTEXT, contextPropertyChangeListener );
+                        oldPlot.getXaxis().removePropertyChangeListener( Axis.PROP_RANGE, contextPropertyChangeListener );
                     }
                     Plot plot= (Plot) DomUtil.getElementById( dom, (String)evt.getNewValue(), true );                
                     if ( plot!=null && plot.getId().length()>0 ) {
-                        LabelConverter lc= new LabelConverter( dom, plot, null, null, annotation );
+                        LabelConverter lc= new LabelConverter( dom, plot, plot.xaxis, null, annotation );
                         contextPropertyChangeListener = (PropertyChangeEvent evt1) -> {
                             dasAnnotation.setText( (String)lc.convertForward(annotation.getText()) );
                         };
                         plot.getController().addPropertyChangeListener( PlotController.PROP_ACTIVEDATASET, contextPropertyChangeListener );
+                        plot.addPropertyChangeListener( Plot.PROP_CONTEXT, contextPropertyChangeListener );
+                        plot.getXaxis().addPropertyChangeListener( Axis.PROP_RANGE, contextPropertyChangeListener );
                         ac.bind( annotation, Annotation.PROP_TEXT, dasAnnotation, DasAnnotation.PROP_TEXT, lc );                        
                     } else {
                         ac.bind( annotation, Annotation.PROP_TEXT, dasAnnotation, "text");
