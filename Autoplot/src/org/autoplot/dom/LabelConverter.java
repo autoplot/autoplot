@@ -426,12 +426,12 @@ public class LabelConverter extends Converter {
      * @return the new string with the value inserted.
      */
     protected static String insertString( String title, String label, String value ) {
-        Pattern p= Pattern.compile("(\\%\\{"+label+"(,.*?)?\\})");
+        Pattern p= Pattern.compile("(\\%\\{"+label+"([,;].*?)?\\})");
         Matcher m= p.matcher(title);
         if ( m.find() ) {
             return title.substring(0,m.start()) + value + title.substring(m.end());
         } else {
-            p= Pattern.compile("(\\$\\("+label+"(,.*?)?\\))");
+            p= Pattern.compile("(\\$\\("+label+"([,;].*?)?\\))");
             m= p.matcher(title);
             if ( m.find() ) {
                 return title.substring(0,m.start()) + value + title.substring(m.end());
