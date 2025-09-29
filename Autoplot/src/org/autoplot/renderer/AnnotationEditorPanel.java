@@ -100,7 +100,6 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         } else if ( anchorType==AnchorType.PLOT ) {
             anchorToPanel.removeAll();
             anchorToPanel.add( plotControlPanel, BorderLayout.CENTER );
-            logger.warning("strange plot anchor type is not supported.");
         } else if ( anchorType==AnchorType.CANVAS ) {
             anchorToPanel.removeAll();
             anchorToPanel.add( canvasControlPanel, BorderLayout.CENTER );
