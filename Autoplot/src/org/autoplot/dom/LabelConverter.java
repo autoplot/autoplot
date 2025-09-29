@@ -451,7 +451,7 @@ public class LabelConverter extends Converter {
     protected static boolean containsString( String title, String label, String value ) {
         String search;
         String[] ss=null;
-        Pattern p= Pattern.compile("(\\%\\{"+label+"(,.*)?\\})");
+        Pattern p= Pattern.compile("(\\%\\{"+label+"([,;].*)?\\})");
         Matcher m= p.matcher(title);
         if ( m.find() ) {
             ss= new String[2];
