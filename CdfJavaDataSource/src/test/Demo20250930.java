@@ -6,7 +6,7 @@ import gov.nasa.gsfc.spdf.cdfj.CDFReader;
 import gov.nasa.gsfc.spdf.cdfj.TimeSeries;
 
 /**
- * Demo the bug where UINT4 could not be read in with the 20150401 release.
+ * Demo where the CDFJ library cannot read files with both rvars and zvars.
  * @author faden@cottagesystems.com
  */
 public class Demo20250930 {
