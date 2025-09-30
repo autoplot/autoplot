@@ -2110,8 +2110,8 @@ public final class PlotController extends DomNodeController {
 
     private void bindTo(DasPlot p) {
         ApplicationController ac= dom.controller;
-        //titleConverter= new LabelConverter( dom, plot, null, null, null );
-        ac.bind( this.plot, Plot.PROP_TITLE, p, DasPlot.PROP_TITLE );
+        titleConverter= new LabelConverter( dom, plot, null, null, null );
+        ac.bind( this.plot, Plot.PROP_TITLE, p, DasPlot.PROP_TITLE, titleConverter );
         Converter plotContextConverter= new Converter() {
             @Override
             public Object convertForward(Object s) {
