@@ -1812,7 +1812,15 @@ public class ApplicationController extends DomNodeController implements RunLater
                     if ( other!=null ) bind( newPlot, Plot.PROP_CONTEXT, other, bm.dstProperty );
                 } else {
                     DomNode other= DomUtil.getElementById( node, bm.srcId );
-                    if ( other!=null ) bind( other, bm.srcProperty, newPlot, Plot.PROP_CONTEXT );
+                    if ( other!=null ) {
+                        if ( other==domPlot.xaxis ) {
+                            bind( newPlot.xaxis, bm.srcProperty, newPlot, Plot.PROP_CONTEXT );
+                        } else if ( other==domPlot.yaxis ) {
+                            bind( newPlot.yaxis, bm.srcProperty, newPlot, Plot.PROP_CONTEXT );
+                        } else {
+                            bind( other, bm.srcProperty, newPlot, Plot.PROP_CONTEXT );
+                        }
+                    }
                 }
             }
             
