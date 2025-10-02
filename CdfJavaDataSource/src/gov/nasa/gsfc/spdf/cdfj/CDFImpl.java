@@ -88,7 +88,7 @@ public abstract class CDFImpl implements java.io.Serializable {
     int numberOfZVariables;
     int[] rDimSizes;
     int lastLeapSecondId;
-
+    int withRZ;
     /**
      * Extracted from CCR
      */
@@ -138,6 +138,17 @@ public abstract class CDFImpl implements java.io.Serializable {
 
     /**
      * returns name to Variable map
+     * ivariableTable, the key-value HashMap, uses the unique variable number
+     * as key and variable object as value pair. For CDFs with only rVariables
+     * or zVariables, the variable numbers are used as is as the key. For CDFs
+     * with both rVariables and zVariables, since some of the variable numbers
+     * will be the same, this HashMap is constructed differently: all
+     * rVariables's numbers are used as is, but each of zVariable's number used
+     * in the hashmap is changed: its value is bumped up by the total number
+     * of rVariables (numberOfRVariables). Once the hashmap is filled, keys
+     * from 0 to (numberOfRVariables-1) are for rVariables and keys from
+     * numberOfRVariable to (numberOfRVriables+numberOfZVariables-1) are for
+     * zVariables.
      */
     protected Hashtable variables() {
         if (variableTable != null) {
@@ -162,7 +173,7 @@ public abstract class CDFImpl implements java.io.Serializable {
                 CDFVariable cdfv = new CDFVariable(offset, vtypes[vtype]);
                 String name = cdfv.getName();
                 v.add(name);
-                ivariableTable.put(cdfv.number, cdfv);
+                ivariableTable.put(cdfv.rzNumber, cdfv);
                 table.put(name, cdfv);
                 if (next == 0) {
                     break;
@@ -421,13 +432,21 @@ public abstract class CDFImpl implements java.io.Serializable {
     /**
      * returns Variable object associated with a given type at a given number
      */
-    Variable getCDFVariable(String vtype, int number) {
-        CDFVariable var = ivariableTable.get(number);
-        if (vtype.equals(var.vtype)) {
+        Variable getCDFVariable(String vtype, int number) {
+        int xNum;
+        if(vtype=="z") xNum = number + numberOfRVariables;
+        else xNum = number;
+        CDFVariable var = ivariableTable.get(xNum);
+//        if (vtype.equals(var.vtype)) {
             return var;
-        } else {
-            throw new IllegalArgumentException("unsupported case, file must contain only zvariables or rvariables");
-        }
+//        } else {
+//            throw new IllegalArgumentException("unsupported case, file must contain only zvariables or rvariables");
+//        }
+    }
+
+    Variable getCDFVariable(String name) {
+        CDFVariable var = (CDFVariable) variableTable.get(name);
+        return var;
     }
 
     /**
@@ -493,6 +512,7 @@ public abstract class CDFImpl implements java.io.Serializable {
             }
             _buf.position(offset_AzEDRHead);
             n = longInt(_buf);
+//if(scope>1) System.out.println("==== CDFAttribute.... name="+name+" scope="+scope+" (z) n="+n+" at offset="+offset_AzEDRHead);
             if (n > 0) {
                 zEntries = getAttributeEntries(n);
                 LOGGER.log(Level.FINEST, "link attr {0} to {1} zEntries", new Object[]{name, zEntries.size()});
@@ -697,6 +717,9 @@ public abstract class CDFImpl implements java.io.Serializable {
         public Vector attributes = new Vector();
         String name;
         public int number;
+        /* rzNumber: another form of var num. For rVar, it is number. */
+        /* For zVar, it is number + numberOfRVariables */ 
+        public int rzNumber;
         String vtype;
         int flags;
         int sRecords;
@@ -724,6 +747,7 @@ public abstract class CDFImpl implements java.io.Serializable {
             numberOfElements = _buf.getInt();
             _buf.position(offset_NUM);
             number = _buf.getInt();
+            rzNumber = number + (withRZ==0?0:(vtype=="r"?0:numberOfRVariables));
             _buf.position(offset_FLAGS);
             flags = _buf.getInt();
             boolean compressed = ((flags & 0x04) != 0);

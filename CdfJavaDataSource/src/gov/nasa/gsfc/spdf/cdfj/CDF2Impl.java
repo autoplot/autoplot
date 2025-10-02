@@ -71,6 +71,10 @@ final class CDF2Impl extends CDFImpl implements CDF2, java.io.Serializable {
             }
         }
         buf.position(0);
+        if (numberOfRVariables > 0 && numberOfZVariables > 0)
+          withRZ = 1;
+        else
+          withRZ = 0;
         variableTable = variables();
         attributeTable = attributes();
     }

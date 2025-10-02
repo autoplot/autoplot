@@ -58,6 +58,10 @@ final class CDF3Impl extends CDFImpl implements CDF3, java.io.Serializable {
             }
         }
         buf.position(0);
+        if (numberOfRVariables > 0 && numberOfZVariables > 0)
+          withRZ = 1;
+        else
+          withRZ = 0;
 //      if (ch == null) {
             variableTable = variables();
             attributeTable = attributes();
