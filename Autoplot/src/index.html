@@ -15,7 +15,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Looking at data from the Space Weather Prediction center, using this <a href="https://github.com/autoplot/dev/blob/master/demos/2025/20250903/readSpaceWeather.jyds">script</a>. </small></p>
+        <p><small>We've been working with ${TIMERANGE} this week.  The macro prpoerty updates in xaxis label, plot title, and annotation text now.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -31,7 +31,8 @@
                 
         <p>Bugfixes (2025-10-02):</p>
         <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2745/">2475</a>: back off DasPlot handles %{TIMERANGE} macro, now we explicitly tell the Converter which node it is working for.
+            <li>Support CDF files containing both zvars and zvars, like vap+cdaweb:ds=AC_OR_SSC&filter=ac_or_&id=XYZ_GSE&timerange=2024.  Thanks for the code, Mike!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2745/">2475</a>: back off DasPlot handles %{TIMERANGE} macro, now we explicitly tell the Converter which node it is working for.  Thanks, Darrelle!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2745/">2475</a>: DasPlot handles %{TIMERANGE} macro, since Plot wouldn't update properly.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/491/">491</a>: review and tweak how the orbit number for the timerange can be displayed in Annotation (using %{TIMERANGE;FORMAT=$o}).
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2746/">2746</a>: drawGrid preference is now saved in .vap files
