@@ -793,7 +793,11 @@ public final class PlotController extends DomNodeController {
                 }
             }
             if ( titleConverter==null ) return;
-            dasPlot.setTitle( (String)titleConverter.convertForward(plot.getTitle()) );
+            if ( plot.getTitle().length()==0 ) {
+                dasPlot.setTitle("");
+            } else {
+                dasPlot.setTitle( (String)titleConverter.convertForward(plot.getTitle()) );
+            }
         }
     };
             
@@ -2110,7 +2114,8 @@ public final class PlotController extends DomNodeController {
 
     private void bindTo(DasPlot p) {
         ApplicationController ac= dom.controller;
-        titleConverter= new LabelConverter( dom, plot, null, null, null );
+        titleConverter= new LabelConverter( dom, plot, plot.xaxis, null, null );
+        titleConverter.setControlledNode( plot );
         ac.bind( this.plot, Plot.PROP_TITLE, p, DasPlot.PROP_TITLE, titleConverter );
         Converter plotContextConverter= new Converter() {
             @Override
@@ -2131,6 +2136,7 @@ public final class PlotController extends DomNodeController {
             }
         };
         this.plot.addPropertyChangeListener(plotListener);
+        this.plot.xaxis.addPropertyChangeListener(plotListener);
         ac.bind( this.plot, Plot.PROP_CONTEXT, p, DasPlot.PROP_CONTEXT, plotContextConverter );
         ac.bind( this.plot, Plot.PROP_BACKGROUND, p, DasPlot.PROP_DRAWBACKGROUND );
         ac.bind(this.plot, Plot.PROP_EPHEMERIS_LABELS, p.getXAxis(), DasAxis.PROP_TCALABELS );
@@ -2172,6 +2178,7 @@ public final class PlotController extends DomNodeController {
         dom.options.removePropertyChangeListener( Options.PROP_DAY_OF_YEAR, dayOfYearListener );
         dom.options.removePropertyChangeListener( Options.PROP_MOUSEMODULE, mouseModuleListener );
         this.plot.removePropertyChangeListener(plotListener);
+        this.plot.xaxis.removePropertyChangeListener(plotListener);
         this.plot.xaxis.controller.removeBindings();
         this.plot.yaxis.controller.removeBindings();
         this.plot.zaxis.controller.removeBindings();
