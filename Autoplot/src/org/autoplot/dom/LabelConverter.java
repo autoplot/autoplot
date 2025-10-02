@@ -47,12 +47,29 @@ public class LabelConverter extends Converter {
     Plot plot=null;
     Annotation annotation=null;
     Axis axis= null;
+    DomNode node= null;
     
     boolean multiplePEWarning= false;
     
     private LabelConverter() {   
     }
     
+    /**
+     * Create the converter which will insert values for macros:
+     * <ul>
+     * <li>CONTEXT - The plot elements's dataset's CONTEXT
+     * <li>PLOT_CONTEXT - the plot's context property
+     * <li>USER_PROPERTIES.xyz - the property xyz of the dataset USER_PROPERTIES map.
+     * <li>METADATA.xyz - the property xyz of the loaded metadata, for example CATDESC of a CDF file.
+     * <li>PROPERTY - dataset property, like ${PROPERTIES.DEPEND_0.UNITS}
+     * <li>TIMERANGE - the time range either from the plot context or the xaxis.
+     * </ul>
+     * @param dom
+     * @param plot plot being controlled
+     * @param axis axis being controlled
+     * @param pe 
+     * @param an 
+     */
     public LabelConverter( Application dom, Plot plot, Axis axis, PlotElement pe, Annotation an ) {
         this();
         this.dom= dom;
@@ -60,6 +77,15 @@ public class LabelConverter extends Converter {
         this.axis= axis;
         this.plotElement= pe;
         this.annotation= an;
+    }
+    
+    /**
+     * It's sometimes ambiguous if the plot is being controlled or if it is the axis.  Disambiguate 
+     * using this method.
+     * @param node 
+     */
+    public void setControlledNode( DomNode node ) {
+        this.node= node;
     }
     
     private PlotElement getFocusPlotElement() {
@@ -293,18 +319,38 @@ public class LabelConverter extends Converter {
         if ( title.length()==0 ) {
             return title;
         }
-        
+         
         String ptitle;
         if ( annotation!=null ) {
             ptitle= annotation.getText();
         } else if ( plotElement!=null ) {
             PlotElement pe= getFocusPlotElement();
             ptitle= pe.getLegendLabel();
-        } else if ( axis!=null ) {
-            ptitle= axis.getLabel();
         } else {
-            ptitle= plot.getTitle();
-        }
+            if ( title.startsWith("xaxis") ) {
+                 System.err.println("here xaxis");
+            }
+            if ( node!=null ) {
+                if ( node==plot ) {
+                    ptitle= plot.getTitle();
+                } else if ( node==axis ) {
+                    ptitle= axis.getLabel();
+                } else if ( node==annotation ) {
+                    ptitle= annotation.getText();
+                } else if ( node==plotElement ) {
+                    PlotElement pe= getFocusPlotElement();
+                    ptitle= pe.getLegendLabel();
+                } else {
+                    ptitle= plot.getTitle();
+                }
+            } else {
+                if ( plot!=null ) {
+                    ptitle= plot.getTitle();
+                } else {
+                    ptitle= axis.getLabel();
+                }
+            }
+        } 
         
         if ( containsString( ptitle, "CONTEXT", title) ) {
             title= ptitle;
@@ -320,6 +366,10 @@ public class LabelConverter extends Converter {
             title= ptitle;
         } else if ( containsString( ptitle, "COMPONENT", title ) ) {
             title= ptitle;
+        }
+        
+        if ( !title.contains("%{") ) { // uh-oh, we lost our macro...
+            System.err.println("here here 344");
         }
         
         if ( multiplePEWarning && !title.equals(value) ) {
