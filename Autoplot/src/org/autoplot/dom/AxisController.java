@@ -107,7 +107,8 @@ public class AxisController extends DomNodeController {
                                 axis.setRange(range);
                                 changesSupport.changePerformed(this, PENDING_RANGE_TWEAK);
                             }
-                        }       break;
+                        }
+                        break;
                     }
                 case Axis.PROP_RANGE:
                     {
@@ -127,7 +128,9 @@ public class AxisController extends DomNodeController {
                                 axis.setRange(range);
                                 changesSupport.changePerformed(this, PENDING_RANGE_TWEAK);
                             }
-                        }       break;
+                        }
+                        dasAxis.setLabel( (String)labelConverter.convertForward( axis.getLabel() ) );
+                        break;
                     }
                 case Axis.PROP_SCALE:
                     if ( dasAxis!=null ) { // the scale has changed, so let's see if we can reset the range to match the scale
@@ -281,6 +284,7 @@ public class AxisController extends DomNodeController {
         ac.bind(axis, Axis.PROP_RANGE, dasAxis, DasAxis.PROPERTY_DATUMRANGE);
         ac.bind(axis, Axis.PROP_LOG, dasAxis, DasAxis.PROP_LOG);
         labelConverter= new LabelConverter( dom, plot, axis, null, null );
+        labelConverter.setControlledNode( axis );
         ac.bind(axis, Axis.PROP_LABEL, dasAxis, DasAxis.PROP_LABEL, labelConverter );
         ac.bind(axis, Axis.PROP_FONTSIZE, dasAxis, DasAxis.PROP_FONTSIZE );
         ac.bind(axis, Axis.PROP_DRAWTICKLABELS, dasAxis, "tickLabelsVisible");
