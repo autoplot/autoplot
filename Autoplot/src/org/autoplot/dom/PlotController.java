@@ -2081,12 +2081,7 @@ public final class PlotController extends DomNodeController {
                 DatumRange dr= plot.getContext();
                 dom.setTimeRange(dr);
             }
-            dom.getController().unbind( plot.getXaxis(), Axis.PROP_RANGE, plot, Plot.PROP_CONTEXT );
             dom.getController().bind( dom, Application.PROP_TIMERANGE, plot, Plot.PROP_CONTEXT );
-        } else {
-            dom.getController().unbind( dom, Application.PROP_TIMERANGE, plot, Plot.PROP_CONTEXT );
-            dom.getController().bind( plot.getXaxis(), Axis.PROP_RANGE, plot, Plot.PROP_CONTEXT );
-            
         }
 
         plot.setAutoBinding(false);
