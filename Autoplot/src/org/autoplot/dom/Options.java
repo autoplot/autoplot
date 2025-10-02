@@ -646,8 +646,6 @@ public final class Options extends DomNode {
         this.syncTo(n,exclude);
         if ( !( n instanceof Options ) ) throw new IllegalArgumentException("node should be a Options");                
         Options that = (Options) n;
-        if ( !exclude.contains(PROP_DRAWGRID) ) this.setDrawGrid( that.isDrawGrid() );
-        if ( !exclude.contains(PROP_DRAWMINORGRID) ) this.setDrawMinorGrid( that.isDrawMinorGrid() );
         if ( !exclude.contains(PROP_MULTILINETEXTALIGNMENT) ) this.setMultiLineTextAlignment( that.getMultiLineTextAlignment() );
         if ( !exclude.contains(PROP_OVERRENDERING) ) this.setOverRendering( that.isOverRendering() );
         if ( !exclude.contains(PROP_TEXTANTIALIAS) ) this.setTextAntiAlias( that.isTextAntiAlias() );
@@ -688,6 +686,8 @@ public final class Options extends DomNode {
         if ( !exclude.contains(PROP_OPPOSITEAXISVISIBLE ) ) this.setOppositeAxisVisible( that.isOppositeAxisVisible() );
         if ( !exclude.contains(PROP_LINE_THICKNESS) ) this.setLineThickness( that.getLineThickness() );
         if ( !exclude.contains(PROP_SCANENABLED) ) this.setScanEnabled( that.isScanEnabled() );
+        if ( !exclude.contains(PROP_DRAWGRID) ) this.setDrawGrid( that.isDrawGrid() );
+        if ( !exclude.contains(PROP_DRAWMINORGRID) ) this.setDrawMinorGrid( that.isDrawMinorGrid() );
     }
 
     @Override
@@ -728,6 +728,11 @@ public final class Options extends DomNode {
         if (!b) result.add(new PropertyChangeDiff(PROP_LINE_THICKNESS, that.getLineThickness(), this.getLineThickness()));
         b = that.isScanEnabled()== this.isScanEnabled();
         if (!b) result.add(new PropertyChangeDiff(PROP_SCANENABLED, that.isScanEnabled(), this.isScanEnabled() ));
+        b = that.isDrawGrid()== this.isDrawGrid();
+        if (!b) result.add(new PropertyChangeDiff(PROP_DRAWGRID, that.isDrawGrid(), this.isDrawGrid() ));
+        b = that.isDrawMinorGrid()== this.isDrawMinorGrid();
+        if (!b) result.add(new PropertyChangeDiff(PROP_DRAWMINORGRID, that.isDrawMinorGrid(), this.isDrawMinorGrid() ));
+        
         return result;
     }
 
@@ -763,6 +768,8 @@ public final class Options extends DomNode {
         that.setOppositeAxisVisible( this.isOppositeAxisVisible() );
         that.setLineThickness( this.getLineThickness() );
         that.setScanEnabled( this.isScanEnabled() );
+        that.setDrawGrid( this.isDrawGrid() );
+        that.setDrawMinorGrid( this.isDrawMinorGrid() );
         return that;
     }
 
