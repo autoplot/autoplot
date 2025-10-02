@@ -367,11 +367,7 @@ public class LabelConverter extends Converter {
         } else if ( containsString( ptitle, "COMPONENT", title ) ) {
             title= ptitle;
         }
-        
-        if ( !title.contains("%{") ) { // uh-oh, we lost our macro...
-            System.err.println("here here 344");
-        }
-        
+                
         if ( multiplePEWarning && !title.equals(value) ) {
             logger.log(Level.FINE, "multiple plot elements found, using first to resolve: {0}", value);              
         }
