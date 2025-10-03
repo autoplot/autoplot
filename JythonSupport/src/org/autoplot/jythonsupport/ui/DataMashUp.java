@@ -811,11 +811,63 @@ public class DataMashUp extends javax.swing.JPanel {
         return ss;
     }
     
+    public static class JythonInlineDescriptor {
+        String timerange;
+        List<String> ids;
+        List<String> uris;
+        boolean synchronize;
+        String expr;
+        
+        public String getAsJythonInline() {
+            StringBuilder b= new StringBuilder("vap+inline:");
+            for ( int i=0; i<this.uris.size(); i++ ) {
+                String uri= this.uris.get(i);
+                if ( uri.trim().length()>0 ) {
+                    String s= this.uris.get(i);
+                    if ( s.contains("'") ) {
+                        logger.info("removing single quotes from URI, hope that doesn't break anything.");
+                        b.append( this.ids.get(i) ).append( "=" ).append( "getDataSet('").append( s.replaceAll("'","") ).append("\')&");
+                    } else {
+                        b.append( this.ids.get(i) ).append( "=" ).append( "getDataSet('").append( s ).append("')&");
+                    }
+                }
+            }
+            
+            if ( synchronize ) {
+            
+                if ( ids.size()>2 ) {
+                    StringBuilder list=new StringBuilder("(");
+                    list.append(ids.get(1));
+                    for ( int i=2; i<ids.size(); i++ ) {
+                        list.append(",").append(ids.get(i));
+                    }
+                    list.append(")");
+                    b.append( list ).append( "=synchronize(").append(ids.get(0)).append(",").append(list).append(")").append("&");
+                } else if ( ids.size()==2 ) {
+                    StringBuilder list=new StringBuilder("");
+                    list.append(ids.get(1));
+                    b.append( list ).append( "=synchronizeOne(").append(ids.get(0)).append(",").append(list).append(")").append("&");
+                }
+            }
+            
+            b.append( expr );
+
+            if ( timerange!=null ) {
+                b.append("&timerange=").append(timerange.trim().replaceAll(" ","+") );
+            }
+            return b.toString();
+            
+        }
+        
+    }
+    
     /**
-     * configure the mashup tool using the "vap+inline" URI.
-     * @param script 
+     * return null or a valid Jython in-line script.
+     * @param script
+     * @return 
      */
-    public void setAsJythonInline( String script ) {
+    public static JythonInlineDescriptor verifyJythonInline( String script ) {
+        JythonInlineDescriptor result= new JythonInlineDescriptor();
         if ( script.startsWith("vap+inline:") ) {
             script= script.substring(11);
         }
@@ -879,32 +931,39 @@ public class DataMashUp extends javax.swing.JPanel {
                     }
                 }
             } else {
-                if ( haveAllIds==false ) {
-                    haveAllIds= true;
-                    setIds(ids);
-                    setUris(uris);
-                }
-                fillTree(s, ids, new ArrayList<>() );
+                result.expr= s;
             }
         }
-        
-        if ( uris.size()==1 ) {
-            synch= true;
+        result.ids= ids;
+        result.uris= uris;
+        if ( explicitTimerange!=null ) {
+            result.timerange= explicitTimerange;
+        } else {
+            result.timerange= timerange;
         }
-        synchronizeCB.setSelected(synch);
+        result.synchronize= synch;
+        return result;
+    }
+    
+    /**
+     * configure the mashup tool using the "vap+inline" URI.
+     * @param script 
+     */
+    public void setAsJythonInline( String script ) {
+        JythonInlineDescriptor desc= verifyJythonInline(script);
         
-        if ( haveAllIds==false ) {
-            setIds(ids);
-            setUris(uris);
-        }
-        if ( timerange==null ) {
+        setIds(desc.ids);
+        setUris(desc.uris);
+        fillTree( desc.expr, desc.ids, new ArrayList<>() );
+        synchronizeCB.setSelected(desc.synchronize);
+        
+        if ( desc.timerange==null ) {
             timeRangeRecentComboBox.setText( "" );
             timeRangeRecentComboBox.setEnabled(false);
             timeRangeLabel.setEnabled(false);
             timeRangeLabel.setToolTipText("In-line code does not support Time Series Browse");
         } else {
-            if ( explicitTimerange!=null ) timerange= explicitTimerange;
-            timeRangeRecentComboBox.setText( timerange.replaceAll("\\+", " " ) );
+            timeRangeRecentComboBox.setText( desc.timerange.replaceAll("\\+", " " ) );
             timeRangeRecentComboBox.setEnabled(true);
             timeRangeLabel.setEnabled(true);
             timeRangeLabel.setToolTipText("Current time range for data requests");
@@ -1048,9 +1107,9 @@ public class DataMashUp extends javax.swing.JPanel {
      */
     public static boolean isDataMashupJythonInline( String jython ) {
         try {
-            DataMashUp dmu= new DataMashUp();
-            dmu.setAsJythonInline(jython);
-            return !"vap+inline:ds".equals(dmu.getAsJythonInline());
+            JythonInlineDescriptor desc= verifyJythonInline(jython);
+            String emptyScript= "vap+inline:ds";
+            return !emptyScript.equals(desc.getAsJythonInline());
         } catch ( Exception ex ) {
             logger.log( Level.FINER, null, ex );
             return false;
