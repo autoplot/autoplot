@@ -245,14 +245,8 @@ public class AsciiTableDataSource extends AbstractDataSource {
         MutablePropertyDataSet vds = null;
         ArrayDataSet dep0 = null;
 
-        if ((column == null) && (timeColumn != -1) ) {
-            column = parser.getFieldNames()[timeColumn];
-        }
-
-        QDataSet bundleDescriptor= (QDataSet) ds.property(QDataSet.BUNDLE_1);
-
-        //auto-detect event lists
-        if ( eventListColumn==null ) { 
+        //auto-detect event lists.  TODO: Again???? https://sourceforge.net/p/autoplot/bugs/1425/
+        if ( eventListColumn==null && column==null ) { 
             if ( ds.length(0)>2 && ds.length(0)<5 ) {
                 Units u0= parser.getUnits(0);
                 Units u1= parser.getUnits(1);
@@ -261,6 +255,13 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 }
             }
         }
+        
+        if ((column == null) && (timeColumn != -1) ) {
+            column = parser.getFieldNames()[timeColumn];
+        }
+
+        QDataSet bundleDescriptor= (QDataSet) ds.property(QDataSet.BUNDLE_1);
+
         
         if ( eventListColumn!=null ) {
             dep0= ArrayDataSet.maybeCopy( DataSetOps.leafTrim( ds, 0, 2) );
@@ -1136,6 +1137,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                     }
                 }
                 // check to see if first two columns look like times, and go ahead and handle these automatically
+                // TODO: a third time??? https://sourceforge.net/p/autoplot/bugs/1425/
                 for ( int icol= 0; icol<fields.length && icol<2; icol++ ) {
                     String field = fields[icol];
                     try {
