@@ -1391,12 +1391,15 @@ public final class PlotController extends DomNodeController {
             dasPlot.setTitle( t );
             AxisController xaxisController= plot.getXaxis().getController();
             AxisController yaxisController= plot.getYaxis().getController();
-            if ( xaxisController==null || yaxisController==null ) return;
-            LabelConverter yaxisLabelConverter= yaxisController.labelConverter;
+            AxisController zaxisController= plot.getZaxis().getController();
+            if ( xaxisController==null || yaxisController==null || zaxisController==null ) return;
             LabelConverter xaxisLabelConverter= xaxisController.labelConverter;
-            if ( xaxisLabelConverter==null || yaxisLabelConverter==null ) return;
+            LabelConverter yaxisLabelConverter= yaxisController.labelConverter;
+            LabelConverter zaxisLabelConverter= zaxisController.labelConverter;
+            if ( xaxisLabelConverter==null || yaxisLabelConverter==null || zaxisLabelConverter==null ) return;
             dasPlot.getYAxis().setLabel( (String)yaxisLabelConverter.convertForward( plot.getYaxis().getLabel() ) );
             dasPlot.getXAxis().setLabel( (String)xaxisLabelConverter.convertForward( plot.getXaxis().getLabel() ) );
+            dasColorBar.setLabel( (String)zaxisLabelConverter.convertForward( plot.getZaxis().getLabel() ) );
             QDataSet pds= plotElement.getController().getDataSet();
             setActiveDataSet( pds );
             logger.log( Level.FINE, "{0} dataSetListener", plot);
