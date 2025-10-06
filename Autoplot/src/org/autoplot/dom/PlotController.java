@@ -772,7 +772,7 @@ public final class PlotController extends DomNodeController {
     private void updateAxisFormatter( DasAxis axis ) {
         logger.fine("updateAxisFormatter()");
         if ( UnitsUtil.isTimeLocation(axis.getUnits()) && 
-                !axis.getLabel().contains("%{RANGE}") &&
+                !axis.getLabel().contains("%{RANGE") &&
                 axis.getFormat().trim().length()==0 ) {
             axis.setUserDatumFormatter(new DateTimeDatumFormatter(  dom.getController().getApplication().getOptions().isDayOfYear() ? DateTimeDatumFormatter.OPT_DOY : 0 ));
         } else {
