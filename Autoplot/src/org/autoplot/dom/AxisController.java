@@ -215,7 +215,10 @@ public class AxisController extends DomNodeController {
      * @param label
      */
     public void setLabelAutomatically( String label ) {
-        if ( axis.getLabel().contains("%{RANGE}") && !label.contains("%{RANGE}") ) {
+        if ( axis.getLabel().contains("%{RANGE}") 
+                && !label.contains("%{RANGE}") 
+                && !axis.getLabel().contains("%{RANGE_NOORBIT}") 
+                && !label.contains("%{RANGE_NOORBIT}") ) {
             return;
         }
         axis.setLabel(label);
