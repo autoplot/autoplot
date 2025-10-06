@@ -716,7 +716,11 @@ public final class PlotController extends DomNodeController {
             String dasAddress= "class:org.autoplot.tca.UriTcaSource:" + plot.getTicksURI();
             dasPlot1.getXAxis().setDataPath(dasAddress);
             dasPlot1.getXAxis().setDrawTca(true);
-            plot.getXaxis().setLabel("%{RANGE}"); //TODO: this is really only necessary for time locations.
+            if ( plot.getXaxis().getLabel().contains("%{RANGE_NOORBIT}") ) {
+                logger.info("wait, someone already set this to RANGE_NOORBIT");
+            } else {
+                plot.getXaxis().setLabel("%{RANGE}"); //TODO: this is really only necessary for time locations.
+            }
         }
 
         this.dasPlot = dasPlot1;
