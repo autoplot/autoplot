@@ -15,7 +15,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>We've been working with ${TIMERANGE} macro this week.  The time range now updates properly in axis labels and plot title now.</small></p>
+        <p><small>Frequency sweeps make a fun graphic.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -29,7 +29,14 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-10-03):</p>
+        <p>Bugfixes (2025-10-08):</p>
+        <ul>
+            <li>|trim(2016-10-04,2016-10-10) now works properly.  Thanks, Sadie!
+            <li>%{RANGE_NOORBIT} kludge needed more attention.  Thanks, Darrelle!
+            <li><a href="https://research-git.uiowa.edu/space-physics/tracers/autoplot/-/issues/3">3</a>: check for orbits which start with /, since I was very confused when local file reference did not work.
+            <li>add verifyJythonInline so that isDataMashupJythonInline can be evaluated without creating a GUI and adding to recent timeranges.
+        </ul>
+        <p>Older Bugfixes (2025-09-02):</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/1425/">1425</a>: Sadie saw where it was impossible to load the start times of an events list, because it ignored the ...?field0.
             <li>isDataMashupJythonInline is now evaluated without running through GUI code and writing to recent timeranges.
@@ -51,27 +58,11 @@
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2739/">2739</a>: add --quietLoggers option to quiet loggers.  Thanks, Kristoff!
             <li>Orbits files come directly from https://github.com/das-developers/das2meta/tree/main/orbits, no longer relying on github to redirect the old name.
         </ul>
-        <p>Older Bugfixes (2025-09-02):</p>
-        <ul>
-            <li><a href="https://github.com/das-developers/das2java/issues/142">0142</a>: Use the correct name at GitHub for the Juno orbits file, to avoid using the alias "meta".  Thanks, Bill!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2736/">2736</a>: IDL unsigned longs (32 bit) and unsigned ints (16 bit) are now supported when reading in IDLSave files.  Thanks, Lily!
-            <li>Tweaks to the ASCII parser which allow Juno shocks file with colors to be used.  (FF for alpha would cause color parsing to fail, now named colors and 0xFF0000FF can be used.)
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2735/">2735</a>: Runtime errors are routed to Jeremy and Chris' (for Das2Server issues) email again.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2734/">2734</a>: events lists with alpha component load properly again.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2704/">2704</a>: set the pick vap location appropriately for local .vap files.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2728/">2728</a>: Reduce the number of places where old ScriptContext.getViewWindow is still used.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2731/">2731</a>: Replace File dialog uses DataSetSelector to provide completions and recent entries.  Thanks, Ivar!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2730/">2730</a>: Events list URI bar doesn't remember recent entries.  Thanks, Ivar!
-            <li><a href="https://github.com/das-developers/das2java/issues/141">141</a>: properly use credentials using http hostname and realm.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2729/">2729</a>: ASCII editor GUI didn't properly handle "fill" setting.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2727/">2727</a>: bug where setApplication() was used to make a slice window, but plot command didn't use the right application for auto ranging.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2725/">2725</a>: don't hard-code units in CDF labels, instead use template %{UNITS}.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2724/">2724</a>: show "file not found" dialog with bad Jython script name.
-            <li>Clean up tooltip on "play" button, which incorrectly says Alt+Play did something.
-            <li>clean up generate floats GUI in run batch tool.
-            <li>Missing file from remote directory ending in /tmp/ would cause stack overflow.
-        </ul>
         <p>Features:</p>
+        <ul> 
+            <li>add median, mode, and mean filters.  Thanks, Cindy!
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>Introduce StringTransmogrifier, which will be used in annotations to transmogify from one format to another using regular expressions.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/855/">855</a>: Support new Rank3WaveformXYZ scheme, wave[timebase,timeoffset,component], used on TRACERS.
@@ -83,13 +74,6 @@
             <li>Screenshots Tool does the final trim operation with multiple threads, greatly speeding up the operation.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/855/">855</a>: support CDF rank 4 ds[t,en,dir,component] datasets, allowing one component to be selected.  Thanks, Chris!
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/854/">854</a>: allow events list with column header "color" to contain named colors.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>HAPI URI editor panel displays the dataset titles if available, so that search is less opaque.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/853/">853</a>: Support for npz and npy files.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/851/">851</a>: tickFormat works property for x-axis time tags.  Thanks Megha!
-            <li>DatumVector is now iterable, to clean up some scripts.  Do some bounds checking.
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
