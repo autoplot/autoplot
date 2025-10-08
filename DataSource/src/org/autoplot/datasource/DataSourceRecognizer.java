@@ -38,8 +38,10 @@ public class DataSourceRecognizer {
      */
     public static String guessDataSourceType( File f ) throws IOException {
         FileChannel channel= new FileInputStream(f).getChannel();
-        ByteBuffer buf= channel.map( FileChannel.MapMode.READ_ONLY, 0, 1024 );
-        ByteBuffer fer= channel.map( FileChannel.MapMode.READ_ONLY, channel.size()-1024, 1024 );
+        long len= f.length();
+        len= Math.min(len,1024);
+        ByteBuffer buf= channel.map( FileChannel.MapMode.READ_ONLY, 0, len );
+        ByteBuffer fer= channel.map( FileChannel.MapMode.READ_ONLY, channel.size()-len, len );
         if ( buf.limit()>5 && 
                 buf.get(0)=='<' && buf.get(1)=='?' && buf.get(2)=='x' && buf.get(3)=='m' && buf.get(4)=='l' ) {
             return guessDataSourceTypeXML(f);
