@@ -1232,8 +1232,9 @@ public class PlotElementController extends DomNodeController {
      */
     private void updateDataSet() throws IllegalArgumentException {
         if ( EventQueue.isDispatchThread() ) {
-            logger.warning("updateDataSet called from event thread.  Stack track follows.");
-            new Exception("updateDataSet called from event thread").printStackTrace();
+            // This never really seems to cause problems...
+            //logger.warning("updateDataSet called from event thread.  Stack track follows.");
+            //new Exception("updateDataSet called from event thread").printStackTrace();
         }
         //if ( getRenderer()!=null ) getRenderer().setDataSet(null); //bug 1073 bug 1065.
         registerPendingChange( this, PENDING_UPDATE_DATASET );
