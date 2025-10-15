@@ -65,7 +65,7 @@ public class Test_039_OperationsCacheReset implements Scenario {
             
             {
 
-                FiltersTreePicker.pickFilter( mainFrame, new String[] { "Filters", "Data Set Operations", "Reduce in Zeroth Dimension" } );
+                FiltersTreePicker.pickFilter( mainFrame, new String[] { "Filters", "Data Set Operations", "Reduce resolution in Zeroth Dimension" } );
             
                 Thread.sleep(1000);
             
@@ -92,7 +92,7 @@ public class Test_039_OperationsCacheReset implements Scenario {
             ScriptContext.waitUntilIdle();
              
             {
-                FiltersTreePicker.pickFilter( mainFrame, new String[] { "Filters", "Data Set Operations", "Reduce in Zeroth Dimension" } );
+                FiltersTreePicker.pickFilter( mainFrame, new String[] { "Filters", "Data Set Operations", "Reduce resolution in Zeroth Dimension" } );
                
                 Thread.sleep(500);
 
