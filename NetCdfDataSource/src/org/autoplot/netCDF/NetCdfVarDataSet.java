@@ -266,7 +266,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
 
         if ( v.getParentStructure()!=null ) { //TODO: this is probably wrong for structure of rank 2 data.
             shape= new int[] { data.length };
-            slice= new boolean[shape.length];
+            slice= new boolean[a.getRank()];
         }
         
         boolean isCoordinateVariable= false;
