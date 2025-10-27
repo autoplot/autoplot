@@ -3243,6 +3243,17 @@ public final class PngWalkTool extends javax.swing.JPanel {
             Runnable run= () -> {
                 try {
                     writeToAnimatedGifImmediately( mon, f, fdelay, r60.isSelected() );
+                    File outf= new File( f.getParentFile(), "pngwalk.mp4" );
+                    String cmd= "ffmpeg -i "
+                            + f.toString() + " "
+                            + "-y " 
+                            + "-movflags faststart "
+                            + "-pix_fmt yuv420p "
+                            + "-vf \"scale=trunc(iw/2)*2:trunc(ih/2)*2\" "
+                            + outf.toString();
+                    System.err.println("Convert to mp4 on Linux:");
+                    System.err.println(cmd);
+                    
                     JPanel panel= new javax.swing.JPanel();
                     panel.setLayout( new BoxLayout(panel,BoxLayout.Y_AXIS ));
                     panel.add( new javax.swing.JLabel("wrote file "+f) );
