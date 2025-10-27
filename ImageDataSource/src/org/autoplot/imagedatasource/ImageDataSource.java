@@ -406,7 +406,12 @@ public class ImageDataSource extends AbstractDataSource {
                 boolean xlog= x.has("type") && x.get("type").equals("log");
                 if ( xlog ) dxmin= Math.log10(dxmin);
                 if ( xlog ) dxmax= Math.log10(dxmax);
-                xx= Ops.subtract( xx, x.getDouble("left") );
+                if ( x.optBoolean("flipped",false) ) {
+                    xx= Ops.subtract( x.getDouble("right"), xx );
+                } else {
+                    xx= Ops.subtract( xx, x.getDouble("left") );
+                }
+                
                 xx= Ops.multiply( xx, ( dxmax-dxmin ) / ( x.getInt("right") -x.getInt("left") ) );
                 xx= Ops.add( xx, dxmin );
                 if ( xlog ) xx= Ops.exp10(xx);
@@ -430,7 +435,11 @@ public class ImageDataSource extends AbstractDataSource {
                 boolean ylog= y.has("type") && y.get("type").equals("log");
                 if ( ylog ) dymin= Math.log10(dymin);
                 if ( ylog ) dymax= Math.log10(dymax);
-                yy= Ops.subtract( yy, y.getDouble("bottom") );
+                if ( y.optBoolean("flipped",false) ) {
+                    yy= Ops.subtract( y.getDouble("top"), yy );
+                } else {
+                    yy= Ops.subtract( yy, y.getDouble("bottom") );
+                }
                 yy= Ops.multiply( yy, ( dymax-dymin ) / ( y.getInt("top") -y.getInt("bottom") ) );
                 yy= Ops.add( yy, dymin );
                 if ( ylog ) yy= Ops.exp10(yy);
@@ -445,7 +454,6 @@ public class ImageDataSource extends AbstractDataSource {
                 yclip= new int[] { height-y.getInt("bottom"), height-y.getInt("top")-1 };
                 
                 result.putProperty( QDataSet.TITLE, plot.opt("title") );
-                
                 
             } else {
                 throw new IllegalArgumentException("png contains no rich metadata.");
@@ -462,7 +470,7 @@ public class ImageDataSource extends AbstractDataSource {
                 result= Ops.maybeCopy( Ops.trim1( result, yclip[0], yclip[1] ) );
             }
         } 
-
+        
         if ( channel!=null ) {
             switch (channel) {
                 case "greyscale":
