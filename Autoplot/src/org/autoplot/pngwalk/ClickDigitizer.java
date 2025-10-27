@@ -140,21 +140,23 @@ public class ClickDigitizer {
      * @return rank 0 dataset containing the point, and labels and scale type.
      */
     private QDataSet invTransform( JSONObject axis, int p, String smaller, String bigger ) throws JSONException, ParseException {
-        boolean log= axis.get("type").equals("log");
+        boolean log= axis.optString("type","lin").equals("log");
         DatumRange range;
 
-        if ( "UTC".equals( axis.getString("units") ) ) {
+        boolean flipped= axis.optString("flipped","false").equals("true");
+        
+        if ( "UTC".equals( axis.optString("units","") ) ) {
             range= DatumRangeUtil.parseISO8601Range( axis.getString("min")+"/"+axis.getString("max") );
 
         } else {
             String sunits;
-            sunits= axis.getString("units"); 
+            sunits= axis.optString("units",""); 
             Units units= Units.lookupUnits(sunits);
             range= new DatumRange(units.parse(axis.getString("min")),
                   units.parse(axis.getString("max")) );
-            
         }
         double nn= ( ( p + 0.5 ) - axis.getInt(smaller) ) / ((double) ( axis.getInt(bigger) - axis.getInt(smaller) ) );
+        if ( flipped ) nn= 1.0-nn;
         
         Datum result;
         if ( log ) {
@@ -165,7 +167,7 @@ public class ClickDigitizer {
             result= rr.min();            
         }
         QDataSet r= DataSetUtil.asDataSet(result);
-        r= Ops.putProperty( r, QDataSet.LABEL, axis.getString("label") );
+        r= Ops.putProperty( r, QDataSet.LABEL, axis.optString("label","") );
         r= Ops.putProperty( r, QDataSet.SCALE_TYPE, log ? "log" : "linear" );
         
         return r;
