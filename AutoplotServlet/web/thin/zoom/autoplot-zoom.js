@@ -291,29 +291,41 @@ function clickshift(subEvent) {
     var found = false;
     for (i = 0; i < plotInfo.plots.length; i++) {
         var p = plotInfo.plots[i];
+        var ymin= p.yaxis.min;
+        var ymax= p.yaxis.max;
+        if ( p.yaxis.flipped ) {
+            ymin= p.yaxis.max;
+            ymax= p.yaxis.min;
+        }
+        var xmin= p.xaxis.min;
+        var xmax= p.xaxis.max;
+        if ( p.xaxis.flipped ) {
+            xmin= p.xaxis.max;
+            xmax= p.xaxis.min;
+        }
         //console.log(p)
         if (p.xaxis.left <= xx && xx < p.xaxis.right && p.yaxis.top <= yy && yy < p.yaxis.bottom) {
             l = p.xaxis.right - p.xaxis.left;
 
             if (p.xaxis.units === 'UTC') {
-                dmin = Date.parse(p.xaxis.min);
-                dmax = Date.parse(p.xaxis.max);
+                dmin = Date.parse(xmin);
+                dmax = Date.parse(xmax);
                 datax = ((xx - p.xaxis.left) * dmax + (p.xaxis.right - xx) * dmin) / l;
                 datax = iso8601Str( dmin, dmax, datax );
             } else {
                 if (p.xaxis.type === 'log') {
                     oo = ((p.xaxis.right - xx) / l);
-                    zz = Math.log(p.xaxis.max / p.xaxis.min);
-                    datax = Math.exp(Math.log(p.xaxis.min) + ((xx - p.xaxis.left) / l) * Math.log(p.xaxis.max / p.xaxis.min));
+                    zz = Math.log(xmax / xmin);
+                    datax = Math.exp(Math.log(xmin) + ((xx - p.xaxis.left) / l) * Math.log(xmax / xmin));
                 } else {
-                    datax = ((xx - p.xaxis.left) * p.xaxis.min + (xx - p.xaxis.left) * p.xaxis.max) / l;
+                    datax = ((xx - p.xaxis.left) * xmin + (xx - p.xaxis.left) * xmax) / l;
                 }
             }
             l = p.yaxis.bottom - p.yaxis.top;
             if (p.yaxis.type === 'log') {
-                datay = Math.exp(Math.log(p.yaxis.min) + ((p.yaxis.bottom - yy) / l) * Math.log(p.yaxis.max / p.yaxis.min));
+                datay = Math.exp(Math.log(ymin) + ((p.yaxis.bottom - yy) / l) * Math.log(ymax / p.yaxis.min));
             } else {
-                datay = ((yy - p.yaxis.top) * p.yaxis.min + (p.yaxis.bottom - yy) * p.yaxis.max) / l;
+                datay = ((yy - p.yaxis.top) * ymin + (p.yaxis.bottom - yy) * ymax) / l;
             }
 
             $("#xclick").val(datax);
