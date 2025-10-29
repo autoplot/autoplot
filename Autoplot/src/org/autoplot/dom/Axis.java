@@ -83,6 +83,12 @@ public class Axis extends DomNode {
     public void setScale(Datum scale) {
         Datum oldScale = this.scale;
         this.scale = scale;
+//        if ( oldScale.getUnits()==scale.getUnits() && scale.value()>0) { // look for trivial change in scale 
+//            double percentDiff= scale.subtract(oldScale).divide(oldScale).abs().value();
+//            if ( percentDiff>0 && percentDiff<0.001 ) {
+//                return;
+//            } // DRW had a case where round-off errors were causing an infinite loop.
+//        }
         propertyChangeSupport.firePropertyChange(PROP_SCALE, oldScale, scale);
     }
 
@@ -239,6 +245,9 @@ public class Axis extends DomNode {
         //        logger.log(Level.FINEST, "{0}.setAutoRange({1})", new Object[]{this.id, autorange});
         //    }
         //}
+        if ( new Exception().getStackTrace().length>100 ) {
+            System.err.println("Here we go...");
+        }
         boolean oldAutorange = this.autoRange;
         this.autoRange = autorange;
         propertyChangeSupport.firePropertyChange(PROP_AUTORANGE, oldAutorange, autorange);
