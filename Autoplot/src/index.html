@@ -29,8 +29,11 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-10-23):</p>
+        <p>Bugfixes (2025-10-30):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2753/">2753</a>: don't reset to time/date ticks if ephemeris data is showing.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2752/">2752</a>: clear the BUNDLE_1 which was common to all ticks.
+            <li>RichPNG supports flipped axis property.  This affects PNG Walk Tool, ImageDataSource, and Servlets.
             <li>Case where TCA Ephemeris labels could not be found resulted in NullPointerException.  Thanks, George!
             <li>rte_1531617043: HDF5 from Personal Space Weather Station showed where slice array was mishandled.  Thanks, Bill E!
             <li>rte_0324293530: code which infers typeness to XML and JSON files assumed files were at least 1024 bytes.
