@@ -72,6 +72,9 @@ public class DataSetSelectorSupport {
         JFileChooser chooser;
         
         chooser= new JFileChooser();
+        
+        WindowManager.getInstance().recallWindowSizePosition(chooser);
+        
         try {
             chooser.setCurrentDirectory( new File( currentDirectory ) );
         } catch ( SecurityException ex ) {
@@ -157,6 +160,7 @@ public class DataSetSelectorSupport {
             int result = chooser.showOpenDialog(w);
             if (result == JFileChooser.APPROVE_OPTION) {
                 prefs.put(AutoplotSettings.PREF_LAST_OPEN_VAP_FOLDER, chooser.getSelectedFile().getParent() );
+                WindowManager.getInstance().recordWindowSizePosition(chooser);
                 if ( b2.isSelected() ) {
                     return chooser.getSelectedFile().toURI().toString() + "?timerange="+ t.getRange().toString().replaceAll("\\s+", "+");
                 } else {
