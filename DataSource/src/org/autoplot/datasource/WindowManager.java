@@ -13,6 +13,9 @@ import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -23,12 +26,14 @@ import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -81,6 +86,104 @@ public class WindowManager {
             }
         }
         return false;
+    }
+    
+    Dimension lastFileChooserDimension= null;
+    int lastFileChooserX= 0;
+    int lastFileChooserY= 0;
+    
+    public void recallWindowSizePosition( JFileChooser window ) {
+        String name= window.getName(); 
+        if (name==null) name="fileChooser";
+        logger.log(Level.FINE, "looking up position for {0}", name);
+        final Preferences prefs= AutoplotSettings.settings().getPreferences(WindowManager.class);
+        int grab= 4 * 12; // pixels so mouse operator has something to grab
+        Dimension screenSize= java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        Pattern p= Pattern.compile("(?<width>\\d+)x(?<height>\\d+)");
+        String s= prefs.get( "window."+name+".screensize", "" );
+        logger.log(Level.FINE, "found for window.{0}.screensize: {1} currentSize: {2}x{3}", new Object[]{name, s, screenSize.width, screenSize.height });
+        Matcher m0= p.matcher(s);
+        if ( m0.matches() && Integer.parseInt( m0.group("width") )==screenSize.width && Integer.parseInt( m0.group("height") )==screenSize.height ) {
+            String wh= prefs.get("window."+name+".size", "" );
+            logger.log(Level.FINER, "window.{0}.size={1}", new Object[]{name, wh});
+            Matcher m= p.matcher(wh);
+            int w= m.matches() ? Integer.parseInt( m.group("width") ) : -9999;
+            int h= m.matches() ? Integer.parseInt( m.group("height") ) : -9999;
+            if ( w>10 && h>10 && w<screenSize.width && h<screenSize.height ) {
+                window.setSize( w, h );
+                window.setPreferredSize( new Dimension( w, h ) );
+            }   
+
+            String xy= prefs.get( "window."+name+".location", "" );
+            logger.log(Level.FINER, "window.{0}.location={1}", new Object[]{name, xy});
+            Pattern p2= Pattern.compile("(?<x>\\d+),(?<y>\\d+)");
+            Matcher m2= p2.matcher(xy);
+            int x= m2.matches() ? Integer.parseInt( m2.group("x") ) : -9999;
+            int y= m2.matches() ? Integer.parseInt( m2.group("y") ) : -9999;
+            if ( x!=0 && y!=0 && x>-9999 && y>-9999 ) {
+                int newx= x;
+                int newy= y;
+                if ( newx<0 ) newx= 0;
+                if ( newy<0 ) newy= 0;
+                if ( newx>screenSize.width-grab ) newx= screenSize.width-grab;
+                if ( newy>screenSize.height-grab ) newy= screenSize.height-h;
+                if ( isOnScreen( new Rectangle(newx,newy,window.getWidth(),window.getWidth()), grab ) ) {
+                    window.setLocation( newx, newy );
+                }
+            }
+        }
+        window.addComponentListener( new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                lastFileChooserDimension= window.getSize();
+            }
+
+            @Override
+            public void componentShown(ComponentEvent e) {
+                lastFileChooserDimension= window.getSize();
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                lastFileChooserX= window.getX();
+                lastFileChooserY= window.getY();
+                System.err.println("x,y="+lastFileChooserX+","+lastFileChooserY);
+            }
+            
+            
+        } );
+        SwingUtilities.invokeLater(() -> {  // Thanks, ChatGPT!
+            Action a = window.getActionMap().get("viewTypeDetails");
+            if (a != null) a.actionPerformed(null);
+        });
+    }
+    
+    public void recordWindowSizePosition( JFileChooser window ) {
+        int x= lastFileChooserX;
+        int y= lastFileChooserY;
+        int w= lastFileChooserDimension.width;
+        int h= lastFileChooserDimension.height;
+        
+        Container c= window.getParent();
+        String name= window.getName(); 
+        if ( name==null ) name="fileChooser";
+        logger.log(Level.FINE, "storing position for {0}", name);
+        if ( name==null ) return;
+        
+        final Preferences prefs= AutoplotSettings.settings().getPreferences(WindowManager.class);
+        logger.log( Level.FINE, "saving last location {0} {1} {2} {3}", new Object[]{x, y, h, w});
+        // so that we know these settings are still valid.
+        Dimension d= java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        prefs.put( "window."+name+".screensize", String.format("%dx%d",d.width,d.height) );
+        if ( c!=null ) {
+            prefs.put( "window."+name+".rlocation", String.format( "%d,%d", x-c.getX(), y-c.getY() ) );
+            prefs.put( "window."+name+".location", String.format( "%d,%d", x, y ) );
+        } else {
+            prefs.put( "window."+name+".rlocation", "0,0" );
+            prefs.put( "window."+name+".location", String.format( "%d,%d", x, y ) );
+        }
+        prefs.put( "window."+name+".size", String.format( "%dx%d", w, h ) );
+     
     }
     
     /**
