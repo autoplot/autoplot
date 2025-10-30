@@ -773,7 +773,8 @@ public final class PlotController extends DomNodeController {
         logger.fine("updateAxisFormatter()");
         if ( UnitsUtil.isTimeLocation(axis.getUnits()) && 
                 !axis.getLabel().contains("%{RANGE") &&
-                axis.getFormat().trim().length()==0 ) {
+                axis.getFormat().trim().length()==0 &&
+                !( axis.isDrawTca() && axis.getTickLines()>1 ) ) {
             axis.setUserDatumFormatter(new DateTimeDatumFormatter(  dom.getController().getApplication().getOptions().isDayOfYear() ? DateTimeDatumFormatter.OPT_DOY : 0 ));
         } else {
             TickVDescriptor.setDayOfYear( dom.getController().getApplication().getOptions().isDayOfYear() );
