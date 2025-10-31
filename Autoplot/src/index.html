@@ -32,8 +32,8 @@
         <p>Bugfixes (2025-10-30):</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2747/">2747</a>: slice-at-datum was disabled, incorrectly.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2753/">2753</a>: don't reset to time/date ticks if ephemeris data is showing.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2752/">2752</a>: clear the BUNDLE_1 which was common to all ticks.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2753/">2753</a>: don't reset to time/date ticks if ephemeris data is showing.  Thanks, Connor!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2752/">2752</a>: clear the BUNDLE_1 which was common to all ticks.  Thanks, Connor!
             <li>RichPNG supports flipped axis property.  This affects PNG Walk Tool, ImageDataSource, and Servlets.
             <li>Case where TCA Ephemeris labels could not be found resulted in NullPointerException.  Thanks, George!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2750/">2750</a>: HDF5 from Personal Space Weather Station showed where slice array was mishandled.  Thanks, Bill E!
@@ -68,6 +68,9 @@
         </ul>
         <p>Features:</p>
         <ul> 
+            <li>Remember FileChooser size.  Thanks, Ivar!
+            <li>FileChooser shows details view initially on some platforms.  Thanks, Ivar and George!
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/858/">858</a>: RichPNG properly limits resolution when formatting.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/858/">858</a>: RichPNG checks for axis flipped property.
             <li>add complexNumber QDataSet scheme.
             <li>add median, mode, and mean filters.  Thanks, Cindy!
