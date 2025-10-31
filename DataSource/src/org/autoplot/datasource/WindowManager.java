@@ -112,6 +112,7 @@ public class WindowManager {
             if ( w>10 && h>10 && w<screenSize.width && h<screenSize.height ) {
                 window.setSize( w, h );
                 window.setPreferredSize( new Dimension( w, h ) );
+                lastFileChooserDimension= window.getSize();
             }   
 
             String xy= prefs.get( "window."+name+".location", "" );
@@ -161,6 +162,9 @@ public class WindowManager {
     public void recordWindowSizePosition( JFileChooser window ) {
         int x= lastFileChooserX;
         int y= lastFileChooserY;
+        
+        if ( lastFileChooserDimension==null ) return;
+        
         int w= lastFileChooserDimension.width;
         int h= lastFileChooserDimension.height;
         
@@ -168,7 +172,6 @@ public class WindowManager {
         String name= window.getName(); 
         if ( name==null ) name="fileChooser";
         logger.log(Level.FINE, "storing position for {0}", name);
-        if ( name==null ) return;
         
         final Preferences prefs= AutoplotSettings.settings().getPreferences(WindowManager.class);
         logger.log( Level.FINE, "saving last location {0} {1} {2} {3}", new Object[]{x, y, h, w});
