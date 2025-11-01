@@ -15,7 +15,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Cassini CAPS Data read from PDS4.</small></p>
+        <p><small><a href="https://github.com/autoplot/dev/blob/master/demos/2025/20251031/halloween2025.csv">Halloween visitors</a> plotted with lines connecting to zero, using a decorator.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -31,6 +31,7 @@
                 
         <p>Bugfixes (2025-10-30):</p>
         <ul>
+            <li>New code which more carefully formats the Rich PNG json showed a bug in DatumUtil.bestFormatter with "Deg F" location units.  Thanks, Jenkins!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2747/">2747</a>: slice-at-datum was disabled, incorrectly.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2753/">2753</a>: don't reset to time/date ticks if ephemeris data is showing.  Thanks, Connor!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2752/">2752</a>: clear the BUNDLE_1 which was common to all ticks.  Thanks, Connor!
