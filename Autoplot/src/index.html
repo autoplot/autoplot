@@ -29,8 +29,9 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-10-31):</p>
+        <p>Bugfixes (2025-11-03):</p>
         <ul>
+            <li>Resolve references like %{UNITS} and %{LABEL} when writing Rich PNGs.
             <li>New code which more carefully formats the Rich PNG json showed a bug in DatumUtil.bestFormatter with "Deg F" location units.  Thanks, Jenkins!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2747/">2747</a>: slice-at-datum was disabled, incorrectly.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2753/">2753</a>: don't reset to time/date ticks if ephemeris data is showing.  Thanks, Connor!
