@@ -1722,16 +1722,13 @@ public class RunBatchTool extends javax.swing.JPanel {
                     f1= f1.substring(1,f1.length()-1);
                 }
                 URI uri;
-                try {
-                    URISplit split= URISplit.parse(f1);
-                    if ( split.path==null ) {
-                        uri= new URI( pwd + f1 );
-                    } else {
-                        uri= new URI(f1);
-                    }
-                } catch ( URISyntaxException ex ) {
-                    throw new IOException(ex);
-                }   interp.set("_apuri", uri );
+                URISplit split= URISplit.parse(f1);
+                if ( split.path==null ) {
+                    uri= DataSetURI.getResourceURI( pwd + f1 );
+                } else {
+                    uri= DataSetURI.getResourceURI(f1);
+                }
+                interp.set("_apuri", uri );
                 interp.exec("autoplot2025.params[\'"+paramName+"\']=_apuri"); // JythonRefactory okay
                 break;
             case 'L': 
