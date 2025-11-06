@@ -280,7 +280,12 @@ public class LabelConverter extends Converter {
                             } else {
                                 TimeParser tp= TimeParser.create(format);
                                 if ( tr!=null ) {
-                                    insert= tp.format(tr);
+                                    try {
+                                        insert= tp.format(tr);
+                                    } catch ( IllegalArgumentException ex ) {
+                                        logger.warning(ex.getMessage());
+                                        insert= tr.toString();
+                                    }
                                 }                        
                             }
                         }
