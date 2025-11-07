@@ -1600,6 +1600,31 @@ public class ApplicationController extends DomNodeController implements RunLater
             domPlot.setRowId( domRow.getId() );
             domPlot.setColumnId( domColumn.getId() );
 
+            if ( LayoutConstants.BELOW.equals(direction) && focus!=null && !focus.xaxis.isDrawTickLabels() ) {
+                domPlot.setDisplayTitle(false);
+                Plot belowPlot= getPlotBelow(domPlot);
+                if ( belowPlot!=null ) {
+                    String bottom = frow.bottom;
+                    double[] dd;
+                    try {
+                        dd = DasDevicePosition.parseLayoutStr(bottom);
+                        if ( dd[1]>=-1.5 ) {
+                           logger.fine("turning off tick labels because they will clash with plot below");
+                            domPlot.xaxis.setDrawTickLabels(false);
+                        }
+                    } catch (ParseException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
+                SwingUtilities.invokeLater( new Runnable() {
+                    @Override
+                    public void run() {
+                        domPlot.getController().getDasPlot().revalidate();
+                    } }
+                );
+            }
+
+           
             List<Plot> plots = new ArrayList<>(Arrays.asList(application.getPlots()));
 
             if (focus != null) {
