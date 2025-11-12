@@ -29,7 +29,7 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-11-06):</p>
+        <p>Bugfixes (2025-11-12):</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2760/">2760</a>: LabelConverter for interval which is not identified
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2759/">2759</a>: Run Batch tool resourceURI parameter didn't like spaces and parens
@@ -71,7 +71,8 @@
             <li>Orbits files come directly from https://github.com/das-developers/das2meta/tree/main/orbits, no longer relying on github to redirect the old name.
         </ul>
         <p>Features:</p>
-        <ul> 
+        <ul>
+            <li>automatically turn off x-axis and title when surrounding plots have this turned off to make a tight stack.
             <li>Remember FileChooser size.  Thanks, Ivar!
             <li>FileChooser shows details view initially on some platforms.  Thanks, Ivar and George!
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/858/">858</a>: RichPNG properly limits resolution when formatting.
