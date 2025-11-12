@@ -25,6 +25,16 @@ can initialize the submodule using:
 cd autoplot
 git submodule update --init
 ```
+
+The above checkout method leaves a DasCore which does not update, so the following 
+should be used instead:
+```
+git clone git@github.com:autoplot/autoplot.git
+cd autoplot
+git clone git@github.com:das-developers/das2java.git
+cd ..
+```
+
 Autoplot is built using Ant project files in the `Autoplot` subdirectory. To build
 and run Autoplot issue:
 ```bash
