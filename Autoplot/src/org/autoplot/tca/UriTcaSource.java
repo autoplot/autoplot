@@ -273,6 +273,7 @@ public class UriTcaSource extends AbstractQFunction {
             if ( read ) {
                 doRead();
                 logger.log( Level.FINER, "loaded dataset: {0} {1} ", new Object[]{ tsb!=null ? tsb.getTimeRange() : "", ds } );
+                //TODO: get extent of dep0 so that we can quickly cull, also check for monotonic
             }
             if ( ds==null ) {
                 BundleDataSet result= new BundleDataSet( errorNoDs );
