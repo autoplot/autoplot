@@ -31,7 +31,7 @@
                 
         <p>Bugfixes (2025-11-14):</p>
         <ul>
-            <li>rte 567726773: script running code assumed there was a non-null message attached to the caught exception, causing NullPointerException and hiding the actual exception.
+            <li>rte 567726773: script running code assumed there was a non-null message attached to the caught exception, causing NullPointerException and hiding the actual exception.  Thanks, Lily!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2762/">2762</a>: FlatLAF now also has control for font, as quick fix for high resolution displays.  Thanks Connor and George!
             <li><a href="https://github.com/das-developers/das2java/issues/151">151</a>: Clipped label containing units with superscript was clipped, because macro was used when calculating bounds.  Thanks, Connor!
             <li><a href="https://github.com/das-developers/das2java/issues/150">150</a>: Label the ephemeris parameter when it is not time.  Thanks, Connor!
@@ -50,7 +50,7 @@
             <li>correction to Schemes.isComplexNumbers.  Add example to Schemes.complexNumbers.
             <li>|trim(2016-10-04,2016-10-10) now works properly.  Thanks, Sadie!
             <li>%{RANGE_NOORBIT} kludge needed more attention.  Thanks, Darrelle!
-            <li><a href="https://research-git.uiowa.edu/space-physics/tracers/autoplot/-/issues/3">3</a>: check for orbits which start with /, since I was very confused when local file reference did not work.
+            <li><a href="https://research-git.uiowa.edu/space-physics/tracers/autoplot/-/issues/3">3</a>: check for orbits which start with /, since it was very confusing when local file reference did not work. Thanks, Jeremy!
             <li>add verifyJythonInline so that isDataMashupJythonInline can be evaluated without creating a GUI and adding to recent timeranges.
         </ul>
         <p>Older Bugfixes (2025-09-02):</p>
