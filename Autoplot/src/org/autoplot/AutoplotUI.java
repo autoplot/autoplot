@@ -5039,6 +5039,11 @@ private void updateFrameTitle() {
                     UIManager.setLookAndFeel( new FlatLightLaf() );
                     UIManager.put( "TabbedPane.selectedBackground", Color.white );
                     UIManager.put( "ScrollBar.showButtons", true );
+                    
+                    String font= System.getProperty("flatLAFFont","");
+                    if ( font.trim().length()>0 ) {
+                        UIManager.put("defaultFont", Font.decode(font.trim()));
+                    }
                         
                 } else {
                                     
@@ -5046,6 +5051,10 @@ private void updateFrameTitle() {
                         UIManager.setLookAndFeel( new FlatLightLaf() );
                         UIManager.put( "TabbedPane.selectedBackground", Color.white );
                         UIManager.put( "ScrollBar.showButtons", true );
+                        String font= System.getProperty("flatLAFFont","");
+                        if ( font.trim().length()>0 ) {
+                            UIManager.put("defaultFont", Font.decode(font.trim()));
+                        }
                     } else if ( nativeLAF ) {
                         logger.fine("nativeLAF");
                         String s= javax.swing.UIManager.getSystemLookAndFeelClassName();

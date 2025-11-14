@@ -689,6 +689,9 @@ public class AutoplotUtil {
                 w.println("# Enable Flat LAF, a consistent Look and Feel which can be run on any platform");
                 w.println("#flatLAF=true");
                 w.println("");
+                w.println("# Set the Flat LAF font and size");
+                w.println("#flatLAFFont=Roboto-24");                
+                w.println("");
                 w.close();
             } catch ( IOException ex ) {
                 logger.log(Level.WARNING, "write initial {0} failed.  {1}", new Object[] { propFile, ex } );
