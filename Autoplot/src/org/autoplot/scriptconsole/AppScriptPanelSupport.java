@@ -967,7 +967,7 @@ public class AppScriptPanelSupport {
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         } catch ( Error ex ) {
-            if ( !ex.getMessage().contains("Python interrupt") ) {
+            if ( ex.getMessage()!=null && !ex.getMessage().contains("Python interrupt") ) {
                 throw ex;
             } else {
                 applicationController.setStatus("script interrupted");
