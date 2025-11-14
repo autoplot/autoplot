@@ -698,13 +698,18 @@ public class AppScriptPanelSupport {
         List<String> errs= new ArrayList();
         try {
             boolean lintWarning;
-            if ( file==null ) {
-                String text = panel.getEditorPanel().getText();
-                try ( LineNumberReader r= new LineNumberReader( new BufferedReader( new StringReader(text) ) ) ) {
-                    lintWarning= org.autoplot.jythonsupport.JythonUtil.pythonLint( r, errs);
+            try {
+                if ( file==null ) {
+                    String text = panel.getEditorPanel().getText();
+                    try ( LineNumberReader r= new LineNumberReader( new BufferedReader( new StringReader(text) ) ) ) {
+                        lintWarning= org.autoplot.jythonsupport.JythonUtil.pythonLint( r, errs);
+                    }
+                } else {
+                    lintWarning= org.autoplot.jythonsupport.JythonUtil.pythonLint( file.toURI(), errs);
                 }
-            } else {
-                lintWarning= org.autoplot.jythonsupport.JythonUtil.pythonLint( file.toURI(), errs);
+            } catch ( java.lang.NoClassDefFoundError ex ) {
+                logger.warning(ex.toString());
+                lintWarning= false;
             }
             
             if ( lintWarning ) {

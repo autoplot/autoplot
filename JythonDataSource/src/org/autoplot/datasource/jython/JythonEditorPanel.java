@@ -380,21 +380,24 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 tearoffTabbedPane1.setSelectedIndex(1);
             }
             
-            List<String> errs= new ArrayList();
-            if ( JythonUtil.pythonLint( f.toURI(), errs) ) {
-                EditorAnnotationsSupport esa= textArea.getEditorAnnotationsSupport();
-                for ( String s: errs ) {
-                    String[] ss= s.split(":",2);
-                    try {
-                        String doc= ss[1];
-                        doc= doc.replaceAll("<", "&lt;");
-                        doc= doc.replaceAll(">", "&gt;");
-                        esa.annotateLine(Integer.parseInt(ss[0]), EditorAnnotationsSupport.ANNO_WARNING, "Variable name is already used before execution: " + doc + "<br>Consider using a different name");
-                    } catch (BadLocationException ex) {
-                        logger.log(Level.SEVERE, ex.getMessage(), ex);
+            try {
+                List<String> errs= new ArrayList();
+                if ( JythonUtil.pythonLint( f.toURI(), errs) ) {
+                    EditorAnnotationsSupport esa= textArea.getEditorAnnotationsSupport();
+                    for ( String s: errs ) {
+                        String[] ss= s.split(":",2);
+                        try {
+                            String doc= ss[1];
+                            doc= doc.replaceAll("<", "&lt;");
+                            doc= doc.replaceAll(">", "&gt;");
+                            esa.annotateLine(Integer.parseInt(ss[0]), EditorAnnotationsSupport.ANNO_WARNING, "Variable name is already used before execution: " + doc + "<br>Consider using a different name");
+                        } catch (BadLocationException ex) {
+                            logger.log(Level.SEVERE, ex.getMessage(), ex);
+                        }
                     }
                 }
-
+            } catch ( java.lang.NoClassDefFoundError ex ) {
+                logger.warning(ex.toString());
             }
 
 
