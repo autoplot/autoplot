@@ -8,7 +8,6 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
@@ -127,7 +126,7 @@ public class AsciiTableTableModel extends AbstractTableModel implements ColSpanT
         }
         BufferedReader reader = null;
         try {
-            reader = new BufferedReader(new FileReader(file));
+            reader = new BufferedReader( AsciiParser.getReader(file));
             if ( recParser!=null ) {
                 String s;
                 for (int i = 0; i < lineNumber; i++) {
@@ -186,7 +185,7 @@ public class AsciiTableTableModel extends AbstractTableModel implements ColSpanT
         RecordParser parser1= this.recParser;
         try {
             int lineCount1 = 0;
-            reader = new BufferedReader(new FileReader(file));
+            reader = new BufferedReader( AsciiParser.getReader(file));
             if ( parser1!=null ) {
                 while ( parser1.readNextRecord(reader)!=null ) {
                     lineCount1++;

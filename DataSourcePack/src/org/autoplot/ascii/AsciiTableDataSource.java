@@ -18,6 +18,8 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel.MapMode;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -1259,9 +1261,9 @@ public class AsciiTableDataSource extends AbstractDataSource {
             int fileLength= (int)file.length();
             mon.setProgressMessage("reading "+file);
             mon.setTaskSize(fileLength-skipBytes);
-            InputStream ins= new FileInputStream(file);
             
             if ( skipBytes>0 ) {
+                InputStream ins= new FileInputStream(file);
                 byte[] bb= new byte[skipBytes];
                 int bytesRead=0;
                 while ( bytesRead<skipBytes ) {
@@ -1269,8 +1271,12 @@ public class AsciiTableDataSource extends AbstractDataSource {
                     if ( n==-1 ) throw new IllegalArgumentException("unable to read skipBytes from file");
                     bytesRead+= n;
                 }
+                ds1 = (DDataSet) parser.readStream( new InputStreamReader(ins), mon ); //DANGER
+            } else {
+                ds1 = (DDataSet) parser.readStream( AsciiParser.getReader(file), mon ); //DANGER
             }
-            ds1 = (DDataSet) parser.readStream( new InputStreamReader(ins), mon ); //DANGER
+            
+            
             
         }
         
