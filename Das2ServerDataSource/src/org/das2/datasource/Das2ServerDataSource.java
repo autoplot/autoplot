@@ -393,8 +393,12 @@ public final class Das2ServerDataSource extends AbstractDataSource {
             int iplane = 0;
             String label = (String) dsdfParams.get("label");
             if ( label==null ) { // do 2.2.2 stuff
-                if ( "1".equals( dsdfParams.get("requiresInterval") ) ) {
+                String requiresInterval= dsdfParams.get("requiresInterval");
+                if ( "1".equals( requiresInterval ) || "true".equals( requiresInterval ) || "on".equals( requiresInterval ) ) {
                     label= dsdfParams.get("item_"+String.format("%02d",iplane) );
+                    if (iplane==0 && label==null ) {
+                        label="item_0";
+                    }
                     while ( label!=null ) {
                         int i= label.indexOf("|");
                         label = i==-1 ? label.trim() : label.substring(0,i).trim();
