@@ -107,8 +107,8 @@
         </Property>
       </Properties>
       <Events>
-        <EventHandler event="popupMenuWillBecomeInvisible" listener="javax.swing.event.PopupMenuListener" parameters="javax.swing.event.PopupMenuEvent" handler="dataSetSelectorComboBoxPopupMenuWillBecomeInvisible"/>
         <EventHandler event="popupMenuCanceled" listener="javax.swing.event.PopupMenuListener" parameters="javax.swing.event.PopupMenuEvent" handler="dataSetSelectorComboBoxPopupMenuCanceled"/>
+        <EventHandler event="popupMenuWillBecomeInvisible" listener="javax.swing.event.PopupMenuListener" parameters="javax.swing.event.PopupMenuEvent" handler="dataSetSelectorComboBoxPopupMenuWillBecomeInvisible"/>
       </Events>
     </Component>
   </SubComponents>

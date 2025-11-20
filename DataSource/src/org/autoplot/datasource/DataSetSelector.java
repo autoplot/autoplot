@@ -143,6 +143,23 @@ public class DataSetSelector extends javax.swing.JPanel {
     /** Creates new form DataSetSelector */
     public DataSetSelector() {
         initComponents(); // of the 58milliseconds it takes to create the GUI, 52 are spent in here.
+        
+        Font f= getFont();
+        if ( f.getSize2D()>20.0 ) {
+            int h= 64;
+            plotItButton.setMinimumSize(new Dimension(h,h));
+            plotItButton.setMaximumSize(new Dimension(h,h));
+            plotItButton.setPreferredSize(new Dimension(h,h));
+            inspectButton.setMinimumSize(new Dimension(h,h));
+            inspectButton.setMaximumSize(new Dimension(h,h));
+            inspectButton.setPreferredSize(new Dimension(h,h));
+            dataSetSelectorComboBox.setMinimumSize(new Dimension(h*10,h));
+            dataSetSelectorComboBox.setMaximumSize(new Dimension(h*100,h));
+            dataSetSelectorComboBox.setPreferredSize(new Dimension(h*30,h));
+            this.setMinimumSize(new Dimension(h*10,h));
+            this.setMaximumSize(new Dimension(h*100,h));
+            this.setPreferredSize(new Dimension(h*30,h));
+        }
         dataSetSelectorComboBox.setEditor( new PromptComboBoxEditor("Enter data location") );
         plotItButton.setActionCommand("doplot");
         inspectButton.setActionCommand("inspect");
@@ -740,7 +757,7 @@ public class DataSetSelector extends javax.swing.JPanel {
      * @param tr
      * @return
      */
-    DatumRange quantizeTimeRange( DatumRange tr ) {
+    private DatumRange quantizeTimeRange( DatumRange tr ) {
         DomainDivider dd= DomainDividerUtil.getDomainDivider(tr.min(),tr.max());
         while ( dd.boundaryCount(tr.min(),tr.max() )<50 ) {
             dd= dd.finerDivider(false);
