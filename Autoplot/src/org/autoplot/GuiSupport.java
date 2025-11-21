@@ -781,7 +781,7 @@ public class GuiSupport {
                 org.das2.util.LoggerManager.logGuiEvent(e);
                 if ( parent.stateSupport.isDirty() ) {
                     String msg= "The application has been modified.  Do you want to save your changes?";
-                    int result= JOptionPane.showConfirmDialog( parent, msg, "Application Modified", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE );
+                    int result= WindowManager.showConfirmDialog( parent, msg, "Application Modified", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE );
                     if ( result==JOptionPane.OK_OPTION ) {
                         result= parent.stateSupport.saveAs();
                         if ( result==JFileChooser.CANCEL_OPTION ) {
@@ -1249,7 +1249,7 @@ public class GuiSupport {
         ImportBookmarksGui gui= new ImportBookmarksGui();
         gui.getBookmarksFilename().setText(bookmarksFile+" ?");
         gui.getRemote().setSelected(true);
-        int r = JOptionPane.showConfirmDialog( parent, gui, "Import bookmarks file", JOptionPane.OK_CANCEL_OPTION );
+        int r = WindowManager.showConfirmDialog( parent, gui, "Import bookmarks file", JOptionPane.OK_CANCEL_OPTION );
         if (r == JOptionPane.OK_OPTION) {
             InputStream in = null;
             try {
@@ -1832,7 +1832,7 @@ public class GuiSupport {
                     cb.setSelectedItem(u);
                     cb.setAlignmentX(0.f);
                     p1.add(cb);
-                    if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( p,
+                    if ( JOptionPane.OK_OPTION==WindowManager.showConfirmDialog( p,
                                 p1,
                                 "Reset axis units", JOptionPane.OK_CANCEL_OPTION ) ) {
                         Units nu= (Units)cb.getSelectedItem();

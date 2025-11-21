@@ -75,6 +75,7 @@ import org.autoplot.dom.Row;
 import org.autoplot.util.CanvasLayoutPanel;
 import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.DataSourceEditorPanelUtil;
+import org.autoplot.datasource.WindowManager;
 import org.autoplot.dom.Annotation;
 import org.autoplot.dom.DomNode;
 import org.das2.graph.DasCanvas;
@@ -337,7 +338,7 @@ public class LayoutPanel extends javax.swing.JPanel {
                 AddPlotsDialog dia= new AddPlotsDialog();
                 dia.getNumberOfColumnsSpinner().setModel( new SpinnerNumberModel(1,1,6,1) );
                 dia.getNumberOfRowsSpinner().setModel( new SpinnerNumberModel(1,1,6,1) );
-                if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog(plotElementListComponent, 
+                if ( JOptionPane.OK_OPTION==WindowManager.showConfirmDialog(plotElementListComponent, 
                         dia, "Add Plots", JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.PLAIN_MESSAGE, 
                         new ImageIcon( AutoplotUtil.getAutoplotIcon() ) ) ) {
@@ -1382,7 +1383,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         org.das2.util.LoggerManager.logGuiEvent(evt);                
         BindToHiddenDialog dia= new BindToHiddenDialog();
 
-        int op= JOptionPane.showConfirmDialog( this, dia, "Add hidden plot for binding", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE );
+        int op= WindowManager.showConfirmDialog( this, dia, "Add hidden plot for binding", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE );
         if ( op==JOptionPane.OK_OPTION ) {
             final String lock = "Add hidden plot";
 

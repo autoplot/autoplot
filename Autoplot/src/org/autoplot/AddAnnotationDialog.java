@@ -11,6 +11,7 @@ import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import org.autoplot.datasource.WindowManager;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.graph.AnchorType;
@@ -205,7 +206,7 @@ public class AddAnnotationDialog extends javax.swing.JPanel {
         GrannyTextEditor edit= AutoplotUI.newGrannyTextEditorWithMacros();
         edit.setValue( jTextField1.getText() );
         if ( JOptionPane.OK_OPTION==
-                JOptionPane.showConfirmDialog( this, edit, GrannyTextEditor.EDITOR_TITLE, JOptionPane.OK_CANCEL_OPTION ) ) {
+                WindowManager.showConfirmDialog( this, edit, GrannyTextEditor.EDITOR_TITLE, JOptionPane.OK_CANCEL_OPTION ) ) {
             jTextField1.setText( edit.getValue() );
         }
     }//GEN-LAST:event_jButton1ActionPerformed

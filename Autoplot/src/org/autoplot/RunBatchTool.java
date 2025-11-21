@@ -85,6 +85,7 @@ import org.python.util.InteractiveInterpreter;
 import org.autoplot.dom.Application;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
+import org.autoplot.datasource.WindowManager;
 import org.autoplot.dom.ApplicationController;
 import org.autoplot.jythonsupport.Param;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
@@ -878,7 +879,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                     
                     p.add( p2 );
                         
-                    if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( param1NameCB, p, 
+                    if ( JOptionPane.OK_OPTION==WindowManager.showConfirmDialog( param1NameCB, p, 
                         "Multi-Thread warning", JOptionPane.OK_CANCEL_OPTION ) ) {
                         threadCount= Integer.parseInt(tf.getText());
                         prefs.putInt(PREF_THREAD_COUNT, threadCount );
@@ -961,7 +962,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         deft.add( new Bookmark.Item("https://autoplot.org/data/event/simpleEvent.txt") );
         org.autoplot.bookmarks.Util.loadRecent( "eventsRecent", eventsDataSetSelector, deft );
         
-        if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog(this, eventsDataSetSelector, "Load Events", JOptionPane.OK_CANCEL_OPTION ) ) {
+        if ( JOptionPane.OK_OPTION==WindowManager.showConfirmDialog(this, eventsDataSetSelector, "Load Events", JOptionPane.OK_CANCEL_OPTION ) ) {
             try {
                 QDataSet ds= org.autoplot.jythonsupport.Util.getDataSet(eventsDataSetSelector.getValue());
                 ds= Ops.createEvents(ds);
@@ -2990,7 +2991,7 @@ public class RunBatchTool extends javax.swing.JPanel {
             paramsCB.add( cb );
         }
         if ( JOptionPane.OK_OPTION==
-            JOptionPane.showConfirmDialog(param1NameCB,p,"Multiple Parameters",JOptionPane.OK_CANCEL_OPTION ) ) {
+            WindowManager.showConfirmDialog(param1NameCB,p,"Multiple Parameters",JOptionPane.OK_CANCEL_OPTION ) ) {
             StringBuilder b= new StringBuilder();
             for ( int i=0; i<paramsCB.size(); i++ ) {
                 if ( paramsCB.get(i).isSelected() ) {

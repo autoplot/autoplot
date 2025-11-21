@@ -4256,7 +4256,7 @@ private void fixLayoutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
     FixLayoutPanel flp= new FixLayoutPanel();
     flp.setPreview(dom);
     if ( JOptionPane.OK_OPTION==
-            JOptionPane.showConfirmDialog( this, flp, "Fix Layout Options",
+            WindowManager.showConfirmDialog( this, flp, "Fix Layout Options",
                     JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE ) ) {
         dom.syncTo(dom0);
         final Map<String,String> options=flp.getOptions();
