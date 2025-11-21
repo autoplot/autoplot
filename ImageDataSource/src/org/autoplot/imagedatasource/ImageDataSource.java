@@ -539,7 +539,7 @@ public class ImageDataSource extends AbstractDataSource {
                     throw new IllegalArgumentException("unable to parse: "+ss[i]);
                 }
             } else {
-                if ( ss[i].toLowerCase().equals("log") ) {
+                if ( ss[i].toLowerCase().equals("log") || ss[i].equals("1") ) {
                     result[i]= Datum.create(1);
                 } else {
                     result[i]= Datum.create(0);
