@@ -63,12 +63,12 @@ public class ImageDataSourceFactory extends AbstractDataSourceFactory implements
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "100", "apply fog with this opacity percent, based on 0,0 color"));
                     break;
                 case "xaxis":
-                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "[valmin,pixmin,valmax,pixmax]", "add labels for each bin"));
-                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "[valmin,pixmin,valmax,pixmax,log]", "add labels for each bin"));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "[<valmin>,<pixmin>,<valmax>,<pixmax>]", "add labels for each bin"));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "[<valmin>,<pixmin>,<valmax>,<pixmax>,log]", "add labels for each bin"));
                     break;
                 case "yaxis":
-                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "[valmin,pixmin,valmax,pixmax]", "add labels for each bin"));
-                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "[valmin,pixmin,valmax,pixmax,log]", "add labels for each bin"));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "[<valmin>,<pixmin>,<valmax>,<pixmax>]", "add labels for each bin"));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "[<valmin>,<pixmin>,<valmax>,<pixmax>,log]", "add labels for each bin"));
                     break;
                 case "plotInfo":
                     File imageFile= DataSetURI.getFile( cc.resourceURI, mon );
