@@ -62,6 +62,19 @@ public class WindowManager {
     }
 
     /**
+     * TODO: this will indicate the message type
+     * @param parent
+     * @param omessage
+     * @param title
+     * @param optionType
+     * @param messageType
+     * @return 
+     */
+    public static int showConfirmDialog( Component parent, Object omessage, String title, int optionType, int messageType ) {
+        return showConfirmDialog( parent, omessage, title, optionType );
+    }
+                
+    /**
      * TODO: this will show the icon.
      * @param parent
      * @param omessage
