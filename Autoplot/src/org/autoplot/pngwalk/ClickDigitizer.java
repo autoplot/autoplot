@@ -253,12 +253,21 @@ public class ClickDigitizer {
         if ( json!=null ) {
             try {
                 JSONObject jo = new JSONObject( json );
+                JSONArray size= jo.optJSONArray("size");
+                if ( size==null ) {
+                    view.seq.setStatus("JSON Object");
+                }
                 JSONArray plots= jo.getJSONArray("plots");
                 JSONObject plot= getPlotContaining( plots, x, y );
                 if ( plot!=null ) {
                     JSONObject xaxis= plot.getJSONObject("xaxis");
                     QDataSet xx= invTransform( xaxis, x, "left", "right" );
                     JSONObject yaxis= plot.getJSONObject("yaxis");
+                    if ( yaxis.has("lower") && size!=null ) {
+                        int h= size.getInt(1);
+                        yaxis.put( "bottom", h-yaxis.getDouble("lower") );
+                        yaxis.put( "top", h-yaxis.getDouble("upper") );
+                    }
                     QDataSet yy= invTransform( yaxis, y, "bottom", "top" );
                     
                     if ( viewer!=null ) {
