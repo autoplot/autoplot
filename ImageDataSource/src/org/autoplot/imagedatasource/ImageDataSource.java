@@ -49,8 +49,11 @@ import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.URISplit;
 import org.das2.qds.ops.Ops;
 import org.autoplot.metatree.MetadataUtil;
+import org.das2.util.FileUtil;
+import org.das2.util.filesystem.FileSystemUtil;
 import org.w3c.dom.Node;
 
 /**
@@ -391,7 +394,14 @@ public class ImageDataSource extends AbstractDataSource {
         
         String plotInfo= getParam( "plotInfo", "" );
         if ( !plotInfo.equals("") ) {
-            String json= ImageUtil.getJSONMetadata(ff);
+            String json;
+            String plotInfoFile= getParam("plotInfoFile","");
+            if ( plotInfoFile.length()>0 ) {
+                plotInfoFile= URISplit.makeAbsolute(ff.getParent(),plotInfoFile);
+                json= FileUtil.readFileToString(new File(plotInfoFile));
+            } else {
+                json= ImageUtil.getJSONMetadata(ff);
+            }
             if ( json!=null ) {
                 JSONObject jo = new JSONObject( json );
                 JSONArray plots= jo.getJSONArray("plots");
@@ -435,12 +445,16 @@ public class ImageDataSource extends AbstractDataSource {
                 boolean ylog= y.has("type") && y.get("type").equals("log");
                 if ( ylog ) dymin= Math.log10(dymin);
                 if ( ylog ) dymax= Math.log10(dymax);
+                double itop= y.optDouble("top",-9999);
+                if ( itop==-9999 ) itop= height-y.getDouble("upper");
+                double ibottom= y.optDouble("bottom",-9999);
+                if ( ibottom==-9999 ) ibottom= height-y.getDouble("lower");
                 if ( y.optBoolean("flipped",false) ) {
-                    yy= Ops.subtract( y.getDouble("top"), yy );
+                    yy= Ops.subtract( itop, yy );
                 } else {
-                    yy= Ops.subtract( yy, y.getDouble("bottom") );
+                    yy= Ops.subtract( yy, ibottom );
                 }
-                yy= Ops.multiply( yy, ( dymax-dymin ) / ( y.getInt("top") -y.getInt("bottom") ) );
+                yy= Ops.multiply( yy, ( dymax-dymin ) / ( itop - ibottom ) );
                 yy= Ops.add( yy, dymin );
                 if ( ylog ) yy= Ops.exp10(yy);
                 MutablePropertyDataSet myy= (MutablePropertyDataSet)yy;
@@ -451,7 +465,7 @@ public class ImageDataSource extends AbstractDataSource {
                 myy.putProperty( QDataSet.LABEL, y.opt("label") ); 
                 
                 result.putProperty( QDataSet.DEPEND_1, yy );
-                yclip= new int[] { height-y.getInt("bottom"), height-y.getInt("top")-1 };
+                yclip= new int[] { height-(int)ibottom, height-(int)itop-1 };
                 
                 result.putProperty( QDataSet.TITLE, plot.opt("title") );
                 
