@@ -258,7 +258,8 @@ public class ClickDigitizer {
                 JSONObject jo = new JSONObject( json );
                 JSONArray size= jo.optJSONArray("size");
                 if ( size==null ) {
-                    view.seq.setStatus("JSON Object");
+                    view.seq.setStatus("RichPNG is missing size.");
+                    return;
                 }
                 JSONArray plots= jo.getJSONArray("plots");
                 JSONObject plot= getPlotContaining( size.getInt(1), plots, x, y );
