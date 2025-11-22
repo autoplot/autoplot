@@ -30,7 +30,7 @@ import org.json.JSONObject;
  * ] }
  *</pre></blockquote>
  *
- * See http://autoplot.org/richPng
+ * See https://autoplot.org/richPng
  *
  * @author faden@cottagesystems.com
  */

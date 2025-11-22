@@ -57,15 +57,18 @@ public class ClickDigitizer {
         this.viewer= viewer;
     }
         
-    private JSONObject getPlotContaining( JSONArray plots, int x, int y ) throws JSONException {
+    private JSONObject getPlotContaining( int height, JSONArray plots, int x, int y ) throws JSONException {
         for ( int i=0; i<plots.length(); i++ ) {
             JSONObject plot= plots.getJSONObject(i);
             JSONObject yaxis= plot.getJSONObject("yaxis");
-            int t1= yaxis.getInt("top");
-            int t2= yaxis.getInt("bottom");
+            double t1= yaxis.optDouble("top",-9999);
+            if ( t1==-9999 ) t1= height - yaxis.optDouble("upper");
+            double t2= yaxis.optDouble("bottom",-9999);
+            if ( t2==-9999 ) t2= height - yaxis.optDouble("lower");
             if ( t1>t2 ) { // swap
-                t2= yaxis.getInt("top"); 
-                t1= yaxis.getInt("bottom");
+                double t= t2;
+                t2= t1;
+                t1= t;
             }
             if ( t1<=y && y<t2 ) {
                 JSONObject xaxis= plot.getJSONObject("xaxis");
@@ -258,7 +261,7 @@ public class ClickDigitizer {
                     view.seq.setStatus("JSON Object");
                 }
                 JSONArray plots= jo.getJSONArray("plots");
-                JSONObject plot= getPlotContaining( plots, x, y );
+                JSONObject plot= getPlotContaining( size.getInt(1), plots, x, y );
                 if ( plot!=null ) {
                     JSONObject xaxis= plot.getJSONObject("xaxis");
                     QDataSet xx= invTransform( xaxis, x, "left", "right" );
@@ -421,7 +424,8 @@ public class ClickDigitizer {
                 JSONArray plots= jo.getJSONArray("plots");
                 JSONObject plot;
                 if ( iplot==-1 ) {
-                    plot= getPlotContaining( plots, x, y );
+                    JSONArray size= jo.getJSONArray("size");
+                    plot= getPlotContaining( size.getInt(1), plots, x, y );
                 } else {
                     plot= plots.getJSONObject( iplot );
                 }
