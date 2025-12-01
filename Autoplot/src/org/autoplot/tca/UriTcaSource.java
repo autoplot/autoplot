@@ -467,7 +467,7 @@ public class UriTcaSource extends AbstractQFunction {
                     }
                     t0= DataSetUtil.asDatum( dep0.slice(0) );
                     tu= t0.getUnits();
-                    label= "???";
+                    label= Ops.guessLabel(dep0);
                 }
             } catch ( Exception ex ) {
                 if ( ex instanceof RuntimeException ) {
@@ -480,7 +480,7 @@ public class UriTcaSource extends AbstractQFunction {
         }
 
         DDataSet inputDescriptor = DDataSet.createRank2(1,0);
-	    inputDescriptor.putProperty(QDataSet.LABEL, 0, label );
+	inputDescriptor.putProperty(QDataSet.LABEL, 0, label );
         inputDescriptor.putProperty(QDataSet.UNITS, 0, tu );
 
         QDataSet q = DataSetUtil.asDataSet(t0);
