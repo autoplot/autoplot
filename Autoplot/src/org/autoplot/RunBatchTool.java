@@ -30,6 +30,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,6 +60,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
@@ -69,6 +71,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -145,6 +148,15 @@ public class RunBatchTool extends javax.swing.JPanel {
      */
     public RunBatchTool( final Application dom ) {
         initComponents();
+        
+        this.registerKeyboardAction((ActionEvent e) -> {
+            org.das2.util.LoggerManager.logGuiEvent(e);
+            JDialog dia= (JDialog) SwingUtilities.getWindowAncestor(cancelButton);
+            if ( cancelButton.isEnabled() ) {
+                dia.setVisible(false);
+                dia.dispose();
+            }
+        }, KeyStroke.getKeyStroke( KeyEvent.VK_ESCAPE, 0 ), JComponent.WHEN_IN_FOCUSED_WINDOW );           
 
         writeFilenameCB.getEditor().getEditorComponent().addKeyListener(new KeyAdapter() {
             @Override
