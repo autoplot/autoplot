@@ -15,7 +15,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small><a href="https://github.com/autoplot/dev/blob/master/demos/2019/20191220/progressMonitorServlet.jy">Slow script</a> used to demonstrate progress monitors.</small></p>
+        <p><small>Blooper when trying to make orbit tool for TRACERS</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -31,6 +31,8 @@
                 
         <p>Bugfixes (2025-11-21):</p>
         <ul>
+            <li><a href="https://github.com/das-developers/das2java/issues/150">150</a>: allow TCA datasets with L as the independent parameter to get the label "L" from the dataset.  Respect " " to mean don't automatically set the label to %{RANGE}.
+            <li>In run batch, don't treat escape as cancel when cancel is not enabled.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2767/">2767</a>: GrannyText editor cannot be resized on Mac, link to documentation.
             <li>GrannyTextRenderer cleanup fixes "glow" property and removes kludgy code which detected URL in text to display image (&lt;img src=""&gt; should be used instead)
             <li>Support UTF-16 encoded character streams for .csv and .dat (ASCII table source now officially supports non-ASCII)
