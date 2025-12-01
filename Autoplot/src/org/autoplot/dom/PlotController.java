@@ -718,6 +718,8 @@ public final class PlotController extends DomNodeController {
             dasPlot1.getXAxis().setDrawTca(true);
             if ( plot.getXaxis().getLabel().contains("%{RANGE_NOORBIT}") ) {
                 logger.info("wait, someone already set this to RANGE_NOORBIT");
+            } else if ( plot.getXaxis().getLabel().equals(" ") ) {
+                logger.info("wait, someone already set this to a single space");
             } else {
                 plot.getXaxis().setLabel("%{RANGE}"); //TODO: this is really only necessary for time locations.
             }
