@@ -2,6 +2,7 @@
 package org.autoplot;
 
 import external.PlotCommand;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.util.logging.Level;
@@ -1136,16 +1137,28 @@ addBottomDecoration( dom.canvases[0], paint )
      * @see #setStatus(java.lang.String) 
      */
     public void showMessageDialog( String message ) {
+        showMessageDialog( state.view, message );
+    }
+
+    /**
+     * show a popup to the scientist, which they must acknowledge before this
+     * returns.  The message is displayed over parent, which could be for example
+     * the editor panel which is undocked.
+     * @param parent, component to focus message over
+     * @param message, possibly containing HTML.
+     * @see #setStatus(java.lang.String) 
+     */
+    public void showMessageDialog( Component parent, String message ) {
+        if ( parent==null ) parent= state.view;
         if ( message.split("\n").length>15 ) {
             JScrollPane pane= new JScrollPane( new JTextArea(message) );
             pane.setPreferredSize( new Dimension(800,600) );
             pane.setMaximumSize( new Dimension(800,600) );
-            JOptionPane.showMessageDialog( state.view, pane );
+            JOptionPane.showMessageDialog( parent, pane );
         } else {
-            JOptionPane.showMessageDialog( state.view, message );
+            JOptionPane.showMessageDialog( parent, message );
         }
-    }
-
+    }    
     
     /**
      * add a tab to the running application.  A new tab will be added with the
