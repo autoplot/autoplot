@@ -144,8 +144,10 @@ public class UriTcaSource extends AbstractQFunction {
                 DDataSet bds1= DDataSet.createRank2(1,0);
                 String name= (String) ds.property(QDataSet.NAME);
                 String label= (String) ds.property(QDataSet.LABEL);
+                Units units= (Units)ds.property(QDataSet.UNITS);
                 bds1.putProperty( QDataSet.NAME, 0, name==null ? "ds0" : name );
                 bds1.putProperty( QDataSet.LABEL, 0, label==null ? ( name==null ? "" : name ) : label );
+                bds1.putProperty( QDataSet.UNITS, 0, units );
                 if ( ds.property(QDataSet.VALID_MIN)!=null ) bds1.putProperty( QDataSet.VALID_MIN, 0, ds.property(QDataSet.VALID_MIN) );
                 if ( ds.property(QDataSet.VALID_MAX)!=null ) bds1.putProperty( QDataSet.VALID_MAX, 0, ds.property(QDataSet.VALID_MAX) );
                 if ( ds.property(QDataSet.FILL_VALUE)!=null ) bds1.putProperty( QDataSet.FILL_VALUE, 0, ds.property(QDataSet.FILL_VALUE) );
@@ -157,8 +159,10 @@ public class UriTcaSource extends AbstractQFunction {
                 for ( int i=0; i<ds.length(0); i++ ) {
                     String name= ( dep1!=null ? u.createDatum(dep1.value(i)).toString() : (String)ds.property(QDataSet.NAME) );
                     String label= (String) ds.property(QDataSet.LABEL);
+                    Units units= (Units)ds.property(QDataSet.UNITS);
                     bds1.putProperty( QDataSet.NAME, i, "ds"+i );
                     bds1.putProperty( QDataSet.LABEL, i, label==null ?  ( name==null ? "" : name ) : label );
+                    bds1.putProperty( QDataSet.UNITS, i, units );
                 }
                 bundleDs= bds1;
             }
