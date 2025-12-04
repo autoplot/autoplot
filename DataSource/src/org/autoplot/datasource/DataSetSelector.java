@@ -15,7 +15,9 @@ import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
+import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.MouseEvent;
 import org.das2.DasApplication;
@@ -24,6 +26,8 @@ import javax.swing.text.BadLocationException;
 import org.das2.util.monitor.ProgressMonitor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.InputEvent;
@@ -1037,7 +1041,9 @@ public class DataSetSelector extends javax.swing.JPanel {
                     pendingChanges.put( PENDING_EDIT, DataSetSelector.this );
 
                     addCancelEscapeKey(dialog);
-
+                    
+                    GuiUtil.ensureAllButtonsVisibleSoon(dialog);
+                    
                     WindowManager.getInstance().showModalDialog(dialog);
 
                     if (!dialog.isCancelled()) {
