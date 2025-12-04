@@ -954,6 +954,9 @@ public final class PlotController extends DomNodeController {
             String s= hints.get("min");
             if ( s!=null ) try {
                 minValue= axis.getRange().getUnits().parse(s);
+                if ( axis.isLog() && minValue.value()<=0. ) {
+                    minValue=null;
+                }
             } catch (ParseException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
@@ -963,6 +966,9 @@ public final class PlotController extends DomNodeController {
             String s= hints.get("max");
             if ( s!=null ) try {
                 maxValue= axis.getRange().getUnits().parse(s);
+                if ( axis.isLog() && maxValue.value()<=0. ) {
+                    maxValue=null;
+                }
             } catch (ParseException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
