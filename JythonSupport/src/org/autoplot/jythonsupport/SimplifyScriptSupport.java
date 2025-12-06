@@ -1067,7 +1067,7 @@ public class SimplifyScriptSupport {
         if ( t instanceof Num ) {
             return String.valueOf(((Num)t).n);
         } else if ( t instanceof Str ) {
-            return "'"+ ((Str)t).toString() + "'";
+            return "'"+ ((Str)t).s + "'";
         } else if ( t instanceof Name ) {
             String n=  ((Name)t).id;
             if ( n.equals("True") || n.equals("False") ) {
