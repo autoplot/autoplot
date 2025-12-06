@@ -163,7 +163,8 @@ public class JythonCompletionTask implements CompletionTask {
     }
 
     /**
-     * perform the completions query.  This is the heart of Jython completions.
+     * perform the completions query.  This is the heart of Jython completions.  Oh funny, I just went here to add
+     * "heart" to the JavaDoc and I added it years ago...
      * @param cc
      * @param resultSet
      * @return the count
@@ -1690,12 +1691,20 @@ public class JythonCompletionTask implements CompletionTask {
                         link= getLinkForJavaSignature( getPyJavaClassSignature( (PyJavaClass)po ) );
                     }
                     if ( po instanceof PyString ) {
+                        String svalue= po.toString();
+                        if ( svalue.length()>50 ) {
+                            if ( svalue.startsWith("http") || svalue.startsWith("file") ) {
+                                svalue= svalue.substring(0,10)+"..."+svalue.substring(svalue.length()-37);
+                            } else {
+                                svalue= svalue.substring(0,37)+"..."+svalue.substring(svalue.length()-10);
+                            }
+                        }
                         if ( ss.equals("PWD") ) {
                             result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link, LOCALVAR_SORT, LOCALVARICON ) );
                         } else if ( !ss.equals("__name__") ) {
-                            result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label+" -> "+po+"", link, LOCALVAR_SORT, LOCALVARICON ) );
+                            result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label+" -> "+svalue+"", link, LOCALVAR_SORT, LOCALVARICON ) );
                         } else {
-                            result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label+" -> "+po+"", link, JAVASTATICFIELD_SORT, null ) );
+                            result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label+" -> "+svalue+"", link, JAVASTATICFIELD_SORT, null ) );
                         }
                     } else {
                         if ( allStatic ) {
