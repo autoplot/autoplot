@@ -1139,6 +1139,9 @@ public class SimplifyScriptSupport {
                 case "linspace":
                 case "fftPower":
                 case "magnitude":
+                case "link":
+                case "dataset":
+                case "unbundle":  // more common things can be detected without full search.
                     return id + JythonCompletionTask.__CLASSTYPE + " = QDataSet    # return type from " + funcName + " (spot line789)\n";
                 case "datumRange":
                     return id + JythonCompletionTask.__CLASSTYPE + " = DatumRange    # return type from " + funcName + " (spot line896)\n";
