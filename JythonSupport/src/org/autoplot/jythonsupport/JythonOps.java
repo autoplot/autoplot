@@ -441,9 +441,29 @@ public class JythonOps {
     }
     
     /**
+     * validate the parameter value against the constraint.This will
+     * raise an exception when the constraint is not met, or returns a modified
+     * value conforming (with format).See https://github.com/autoplot/dev/blob/master/demos/2025/20250108/getParamsValidation.jy
+     * Note this was added when it was realized that the default constraint is ''.
+     * @param name
+     * @param v
+     * @param constraint
+     * @return the value or throw an exception
+     * @see #validateParam(java.lang.String, java.lang.Object, java.util.Map) 
+     * @see https://sourceforge.net/p/autoplot/bugs/2774/
+     */
+    public static Object validateParam( String name, Object v, String constraint ) {
+        return v;
+    }
+    
+    /**
      * validate the parameter value against the constraint.  This will
      * raise an exception when the constraint is not met, or returns a modified
      * value conforming (with format).  See https://github.com/autoplot/dev/blob/master/demos/2025/20250108/getParamsValidation.jy
+     * @param name the parameter name
+     * @param v the value
+     * @param constraint the list of allowed values.
+     * @return the value or throw an exception
      * @see #validateParam(java.lang.String, java.lang.Object, java.util.Map) 
      */
     public static Object validateParam( String name, Object v, List constraint ) {
