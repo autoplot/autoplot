@@ -548,6 +548,7 @@ public class MetadataPanel extends javax.swing.JPanel {
         jPopupMenu1 = new javax.swing.JPopupMenu();
         copyMenuItem = new javax.swing.JMenuItem();
         copyValueMenuItem = new javax.swing.JMenuItem();
+        copyWithPathMenuItem = new javax.swing.JMenuItem();
         jScrollPane1 = new javax.swing.JScrollPane();
         metaDataTree = new javax.swing.JTree();
 
@@ -567,6 +568,14 @@ public class MetadataPanel extends javax.swing.JPanel {
             }
         });
         jPopupMenu1.add(copyValueMenuItem);
+
+        copyWithPathMenuItem.setText("copy path and value");
+        copyWithPathMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                copyWithPathMenuItemActionPerformed(evt);
+            }
+        });
+        jPopupMenu1.add(copyWithPathMenuItem);
 
         jScrollPane1.setViewportView(metaDataTree);
 
@@ -613,9 +622,29 @@ public class MetadataPanel extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_copyValueMenuItemActionPerformed
 
+    private void copyWithPathMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyWithPathMenuItemActionPerformed
+        LoggerManager.logGuiEvent(evt);
+        TreePath tp= metaDataTree.getSelectionPath();
+        if ( tp==null ) return;
+        StringBuilder sb= new StringBuilder("/"); // note two slashes to start, as with xpath.
+        Object[] path= tp.getPath();
+        for ( int i=2; i<path.length; i++ ) {
+            sb.append("/");
+            sb.append(path[i]);
+        }
+        StringSelection stringSelection = new StringSelection( sb.toString() );
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(stringSelection, new ClipboardOwner() {
+            @Override
+            public void lostOwnership(Clipboard clipboard, Transferable contents) {
+            }
+        });
+    }//GEN-LAST:event_copyWithPathMenuItemActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem copyMenuItem;
     private javax.swing.JMenuItem copyValueMenuItem;
+    private javax.swing.JMenuItem copyWithPathMenuItem;
     private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTree metaDataTree;
