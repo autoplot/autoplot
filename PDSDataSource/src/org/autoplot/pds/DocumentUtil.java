@@ -123,25 +123,24 @@ public class DocumentUtil {
             int count = counts.getOrDefault(name, 0) + 1;
             counts.put(name, count);
 
-            if (count == 1) {
-                // first occurrence: keep original
-                result[i] = name;
-            } else {
-                if ( name.equals("#text") ) {
-                    // duplicate: append count
-                    result[i] = name + " (" + count + ")";
-                } else if ( name.equals("Field_Binary") || name.equals("Group_Field_Binary") || name.equals("Field_Character") || name.equals("Group_Field_Character") ) {
+            boolean isFieldOrGroup= name.equals("Field_Binary") 
+                    || name.equals("Group_Field_Binary") 
+                    || name.equals("Field_Character") 
+                    || name.equals("Group_Field_Character") ;
+            
+            if ( isFieldOrGroup ) {
                     String nname= getName(nodes.item(i));
                     if ( nname!=null && nname.length()>0 ) {
                         result[i] = name + " (" + nname + ")";
                     } else {
                         result[i] = name + " (" + count+ ")";
                     }
-                } else {
-                    
-                    result[i] = name + " (" + count + ")";
-                }
-                
+            } else if (count == 1 ) {
+                // first occurrence: keep original
+                result[i] = name;
+            } else {
+                // duplicate: append count
+                result[i] = name + " (" + count + ")";                
                 
             }
         }
