@@ -99,7 +99,22 @@ public class DocumentUtil {
         return node.getChildNodes().getLength() == 1 && node.getFirstChild().getNodeType() == Node.TEXT_NODE;
     }
     
-    private static String[] makeUnique(String[] arr) {
+    private static String getName( Node node ) {
+        NodeList nn= node.getChildNodes();
+        for ( int i=0; i<nn.getLength(); i++ ) {
+            Node item= nn.item(i);
+            if ( item.getNodeName().equals("name") ) {
+                return item.getTextContent();
+            } else if ( item.getNodeName().equals("Field_Binary") ) {
+                return getName( item );
+            } else if ( item.getNodeName().equals("Field_Character") ) {
+                return getName( item );
+            }
+        }
+        return "";
+    }
+    
+    private static String[] makeUnique(String[] arr,NodeList nodes) {
         Map<String, Integer> counts = new HashMap<>();
         String[] result = new String[arr.length];
 
@@ -112,8 +127,22 @@ public class DocumentUtil {
                 // first occurrence: keep original
                 result[i] = name;
             } else {
-                // duplicate: append count
-                result[i] = name + " (" + count + ")";
+                if ( name.equals("#text") ) {
+                    // duplicate: append count
+                    result[i] = name + " (" + count + ")";
+                } else if ( name.equals("Field_Binary") || name.equals("Group_Field_Binary") || name.equals("Field_Character") || name.equals("Group_Field_Character") ) {
+                    String nname= getName(nodes.item(i));
+                    if ( nname!=null && nname.length()>0 ) {
+                        result[i] = name + " (" + nname + ")";
+                    } else {
+                        result[i] = name + " (" + count+ ")";
+                    }
+                } else {
+                    
+                    result[i] = name + " (" + count + ")";
+                }
+                
+                
             }
         }
         return result;
@@ -135,7 +164,7 @@ public class DocumentUtil {
             String key = node.getNodeName();
             nodeNames[i]= key;
         }
-        nodeNames= makeUnique(nodeNames);
+        nodeNames= makeUnique(nodeNames,nodeList);
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node node = nodeList.item(i);
             String key = node.getNodeName();
