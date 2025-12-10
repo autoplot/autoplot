@@ -15,7 +15,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>AVERAGE_TYPE=mod24 in metadata allows SeriesRenderer to insert breaks in the data automatically.</small></p>
+        <p><small>Fun blooper from Juno study.  Have a nice AGU everyone!</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -29,8 +29,11 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-12-04):</p>
+        <p>Bugfixes (2025-12-10):</p>
         <ul>
+            <li><a href="https://github.com/das-developers/das2java/issues/155/">155</a>: restore support for error bars in Das2Streams (see <a href="https://jfaden.net/~jbf/autoplot/data/d2s/">examples</a>).
+            <li>Case where ds[0,0] on rank 2 data had runtime error, I think because 0 and 0 were rank 1 QDataSets.
+            <li>Remove old PDS-PPI DIT/DOS data source, which is no longer operational and PDS3/4 and HAPI support deprecates it.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2774/">2774</a>: setOutputParam without constraints works again.  Jan 2025 validate code didn't consider that the constraint might not be specified.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/1687/">1687</a>: limit length of string shown in completions, so that resourceURI is not obscured.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2768/">2768</a>: Initial GUI size needs to be large enough to show all buttons.
@@ -69,6 +72,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Copy full metadata path to clipboard, since this is often useful when coding.
+            <li>Improvements to Jython completions, such as limiting the length of strings exposed to protect the GUI.
             <li>improve password handling in KeyChain, don't allow extra space which gets in there somehow.
             <li>Add Largest Triangle Three Buckets (LTTB) code written by ChatGPT (which it wrote using QDataSet, worked without any modifications, see <a href="https://chatgpt.com/share/6934a805-be30-800c-aad3-5d717f4a912a">the session</a>)!
             <li>More characters added to list of allowed characters in ASCII file column names (% and #), to support BlueDriver app.
