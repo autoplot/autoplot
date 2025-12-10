@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -97,6 +98,26 @@ public class DocumentUtil {
     public static boolean isLeaf(Node node) {
         return node.getChildNodes().getLength() == 1 && node.getFirstChild().getNodeType() == Node.TEXT_NODE;
     }
+    
+    private static String[] makeUnique(String[] arr) {
+        Map<String, Integer> counts = new HashMap<>();
+        String[] result = new String[arr.length];
+
+        for (int i = 0; i < arr.length; i++) {
+            String name = arr[i];
+            int count = counts.getOrDefault(name, 0) + 1;
+            counts.put(name, count);
+
+            if (count == 1) {
+                // first occurrence: keep original
+                result[i] = name;
+            } else {
+                // duplicate: append count
+                result[i] = name + " (" + count + ")";
+            }
+        }
+        return result;
+    }
 
     /**
      * Create map from the document so that it can be used as metadata.  Note
@@ -106,8 +127,15 @@ public class DocumentUtil {
      * @return a map representing the document.
      */
     public static Map<String, Object> convertDocumentToMap(Node root) {
-        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> resultMap = new LinkedHashMap<>();
         NodeList nodeList = root.getChildNodes();
+        String[] nodeNames= new String[nodeList.getLength()];
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Node node = nodeList.item(i);
+            String key = node.getNodeName();
+            nodeNames[i]= key;
+        }
+        nodeNames= makeUnique(nodeNames);
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node node = nodeList.item(i);
             String key = node.getNodeName();
@@ -116,10 +144,10 @@ public class DocumentUtil {
                 if (key.equalsIgnoreCase("DESCRIPTION")) {
                     value = cleanDescriptionString(value);
                 }
-                resultMap.put(key, value);
+                resultMap.put(nodeNames[i], value);
             } else if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Map<String, Object> subNode = convertDocumentToMap(node);
-                resultMap.put(key, subNode);
+                resultMap.put(nodeNames[i], subNode);
             }
         }
         return resultMap;
