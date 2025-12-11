@@ -1211,6 +1211,49 @@ public class DataSourceController extends DomNodeController {
     }
 
     /**
+     * Suppose there's a rank 2 bundle with [t,B,Bminus,Bplus] but B has the property DELTA_MINUS equal to Bminus.
+     * This will be represented as error bars, so Bminus can be removed from the bundle.
+     * @param ds
+     * @return 
+     */
+    private static MutablePropertyDataSet lookForRedundancies(MutablePropertyDataSet ds) {
+        if ( ds.rank()!=2 ) return ds;
+        
+        List<Integer> rebundle= new ArrayList<>();
+        
+        Map<QDataSet,Integer> foundData= new HashMap<>();
+        
+        for ( int i=0; i<ds.length(0); i++ ) {
+            QDataSet ds1= Ops.unbundle(ds,i);
+            if ( !foundData.containsKey(ds1) ) {
+                rebundle.add(i);
+            }
+            foundData.put(ds1,i);
+            QDataSet dep0= (QDataSet)ds1.property(QDataSet.DEPEND_0);
+            QDataSet d;
+            d = (QDataSet)ds1.property(QDataSet.DELTA_PLUS);
+            if ( d!=null ) foundData.put(d,i);
+            d = (QDataSet)ds1.property(QDataSet.DELTA_MINUS);
+            if ( d!=null ) foundData.put(d,i);
+            d = (QDataSet)ds1.property(QDataSet.BIN_MIN);
+            if ( d!=null ) foundData.put(d,i);
+            d = (QDataSet)ds1.property(QDataSet.BIN_MAX);
+            if ( d!=null ) foundData.put(d,i);
+        }
+        
+        if ( rebundle.size()==ds.length(0) ) { // typical case
+            return ds;
+        } else {
+            int[] reb= new int[rebundle.size()];
+            for ( int i=0; i<rebundle.size(); i++ ) {
+                reb[i]= rebundle.get(i);
+            }
+            return (MutablePropertyDataSet)Ops.rebundle(ds,reb);
+        }
+    }
+    
+    
+    /**
      * Rewrite the dataset so that fill values are set by the valid extent and
      * fill controls. The user can override these values, so make sure the
      * values that came with the dataset are observed as well.
@@ -1419,8 +1462,10 @@ public class DataSourceController extends DomNodeController {
             if (fillDs == ds) { //kludge to force reset renderer, because QDataSet is mutable.
                 this.fillDataSet = null;
             }
-                        
+                    
             fillDs.makeImmutable();
+            
+            fillDs= lookForRedundancies(fillDs);
             
             setFillDataSet(fillDs);
         } finally {
