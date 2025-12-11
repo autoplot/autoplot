@@ -112,7 +112,7 @@ public final class SeriesStylePanel extends javax.swing.JPanel implements PlotSt
         PlotElementStyle style= element.getStyle();
         BindingGroup bc = new BindingGroup();
 
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style,BeanProperty.create( PlotElementStyle.PROP_SYMBOL_SIZE ), symSizeSpinner, BeanProperty.create("value")) );
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_SYMBOL_SIZE ), symSizeSpinner, BeanProperty.create("value")) );
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_PLOT_SYMBOL ), psymEditor,BeanProperty.create( "value")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_LINE_WIDTH ), lineThickSpinner, BeanProperty.create("value")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( PlotElementStyle.PROP_SYMBOL_CONNECTOR ), lineEditor, BeanProperty.create("value")));
@@ -136,6 +136,9 @@ public final class SeriesStylePanel extends javax.swing.JPanel implements PlotSt
         style.addPropertyChangeListener( "drawError", showErrorCheckBoxPCL );
         
         this.plotElement= element;
+        
+        //kludge: TODO: what's the right way to do this?
+        limitsPCL.propertyChange(null);
         
         bc.bind();
         
