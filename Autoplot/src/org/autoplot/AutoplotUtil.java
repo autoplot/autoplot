@@ -1265,6 +1265,11 @@ public class AutoplotUtil {
                 }
             }
         }
+        
+        if ( Schemes.isBundleDescriptor(fillds) ) {
+            spec = RenderType.digital;
+            return spec;
+        }
 
         if (fillds.rank() >= 2) {
             boolean trivialBundle= false; // is the bundle really describing anything?
