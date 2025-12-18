@@ -87,13 +87,13 @@ public class DasProp {
 		if(item instanceof String){ type = Type.STR;    obj = item; return; }
 		if(item instanceof Integer){ 
 			type = Type.LONG;
-			obj = new Long((Integer)item);
+			obj = Long.valueOf((Integer)item);
 			return; 
 		}
 		if(item instanceof Long){   type = Type.LONG;   obj = item; return; }
 		if(item instanceof Float){  
 			type = Type.DOUBLE; 
-			obj = new Double((Float)item); 
+			obj = Double.valueOf((Float)item); 
 			return; 
 		}
 		if(item instanceof Double){ type = Type.DOUBLE; obj = item; return; }
