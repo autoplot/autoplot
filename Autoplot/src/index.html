@@ -15,7 +15,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Fun blooper from Juno study.  Have a nice AGU everyone!</small></p>
+        <p><small>New <a href="https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf">lttb</a> function is used to reduce data while preserving variance.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -29,8 +29,13 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-12-10):</p>
+        <p>Bugfixes (2025-12-19):</p>
         <ul>
+            <li>Remove debug printlns from a number of locations.
+            <li>Show BIN_MAX_NAME, DELTA_PLUS_NAME, etc in properties metadata tab.
+            <li>Das2Stream Datum: and DatumRange: handle time locations in metadata.
+            <li>digital renderer handles BUNDLE_1 (bundle descriptor scheme) dataset.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2775/">2775</a>: get PDS4 metadata for Group_Field_Binary and Group_Field_Character 
             <li><a href="https://github.com/das-developers/das2java/issues/155/">158</a>: properly support bundle of datasets with error bars in Das2Streams.  Thanks, Chris!
             <li><a href="https://github.com/das-developers/das2java/issues/155/">155</a>: restore support for error bars in Das2Streams (see <a href="https://jfaden.net/~jbf/autoplot/data/d2s/">examples</a>).
             <li>Case where ds[0,0] on rank 2 data had runtime error, I think because 0 and 0 were rank 1 QDataSets.
