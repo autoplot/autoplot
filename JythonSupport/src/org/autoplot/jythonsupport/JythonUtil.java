@@ -1071,9 +1071,6 @@ public class JythonUtil {
     }
     
     private static StringBuilder appendToResult(StringBuilder result, String line) {
-        //if ( line.contains("mlt_full") ) {
-        //    System.err.println("here stop");
-        //}
         result.append(line);
         return result;
     }
