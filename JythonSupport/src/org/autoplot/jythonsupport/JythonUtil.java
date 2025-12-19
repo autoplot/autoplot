@@ -682,9 +682,6 @@ public class JythonUtil {
         MyVisitorBase(HashSet names, SimpleNode node ) {
             this.names = names;
             this.node = node; // for reference
-            if ( this.node.toString().contains("id=r_erg") ) {
-                System.err.println("HERE STOP 671");
-            }
         }
 
         @Override
