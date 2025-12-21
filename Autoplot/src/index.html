@@ -29,8 +29,9 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-12-19):</p>
+        <p>Bugfixes (2025-12-21):</p>
         <ul>
+            <li>Make the "Here we go..." deep stack recursion detector less sensitive, since it seems to be misfiring.  Thanks, Ivar!
             <li>Remove debug printlns from a number of locations.
             <li>Show BIN_MAX_NAME, DELTA_PLUS_NAME, etc in properties metadata tab.
             <li>Das2Stream Datum: and DatumRange: handle time locations in metadata.
