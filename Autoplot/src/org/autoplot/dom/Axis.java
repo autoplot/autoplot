@@ -245,7 +245,7 @@ public class Axis extends DomNode {
         //        logger.log(Level.FINEST, "{0}.setAutoRange({1})", new Object[]{this.id, autorange});
         //    }
         //}
-        if ( new Exception().getStackTrace().length>100 ) {
+        if ( new Exception().getStackTrace().length>150 ) {
             System.err.println("Here we go...  Deep stack trace implies infinite loop");
             return;
         }
