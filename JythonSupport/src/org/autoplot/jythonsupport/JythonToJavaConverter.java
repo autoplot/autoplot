@@ -1023,7 +1023,7 @@ public class JythonToJavaConverter {
         }
         
         /**
-         * return "String" or "Object
+         * return "String" or "Object"
          * @param ex
          * @return 
          */
@@ -1127,6 +1127,23 @@ public class JythonToJavaConverter {
         }
 
         /**
+         * return javax.swing.JLabel, for example.
+         * @param attr
+         * @return the attribute as fully-qualified Java name
+         */
+        private static String getConstructorCallExprType( Attribute attr ) {
+            if ( attr.value instanceof Attribute ) {
+                return getConstructorCallExprType((Attribute)attr.value) + "."+ attr.attr;
+            } else {
+                if ( attr.value instanceof Name ) {
+                    return ((Name)attr.value).id + "." + attr.attr;
+                } else {
+                    return "???1136" + attr.value + "." + attr.attr;
+                }
+            }
+        }
+        
+        /**
          * there's an issue here where for iter==Call, this is returning the
          * object which the iterator returns.
          * @param iter
@@ -1173,6 +1190,8 @@ public class JythonToJavaConverter {
                             return TYPE_STRING_ARRAY;
                         } else if ( attr2.attr.equals("tell") ) { // "tell" is pretty unique, right?
                             return TYPE_LONG;
+                        } else if ( Character.isUpperCase(attr2.attr.charAt(0)) && attr.value instanceof Attribute ) { // Assume any capitalized method is a constructor call
+                            return getConstructorCallExprType(attr);
                         }
                     }
                     if ( staticClass.equals("FileUtil") && attr.attr.equals("readFileToString") ) {
