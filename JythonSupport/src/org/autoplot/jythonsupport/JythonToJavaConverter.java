@@ -960,9 +960,13 @@ public class JythonToJavaConverter {
             } else if ( sn instanceof Import ) {
                 Import imp= (Import)sn;
                 builder.append( indent ).append( "import " );
+                boolean first=true;
                 for ( aliasType a: imp.names ) {
+                    if ( !first ) {
+                        builder.append(",");
+                        first= false;
+                    }
                     traverse( builder,"", a, true );
-                    builder.append(",");
                 }
             } else if ( sn instanceof ImportFrom ) {
                 ImportFrom imp= (ImportFrom)sn;
