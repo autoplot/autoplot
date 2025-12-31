@@ -152,13 +152,12 @@ public class GetDataSetsCommand extends PyObject {
                     trimRange= (DatumRange)arg1;
                 }
                 arg1= args[1].__tojava__(String.class);
-                if ( arg1!=Py.NoConversion ) {
+                if ( arg1!=Py.NoConversion && arg1!=null ) {
                     try {
                         trimRange= DatumRangeUtil.parseTimeRange((String)arg1);
                     } catch ( ParseException ex ) {
                         throw Py.JavaError(ex);
                     }
-                    break;
                 }
                 Object arg2= args[2].__tojava__(ProgressMonitor.class);
                 if ( arg2!=Py.NoConversion ) {
