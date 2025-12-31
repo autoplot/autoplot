@@ -1300,6 +1300,27 @@ public class SimplifyScriptSupport {
                         return result.toString();
                     }
                 }
+            } else if ( et instanceof Tuple && a.value instanceof Call ) { // (p,pe=plot)
+                Call c= (Call)a.value;
+                if ( c.func instanceof Name && ((Name)c.func).id.equals("plot")  ) {
+                    Tuple t= (Tuple)et;
+                    if ( t.elts.length==1 && t.elts[0] instanceof Name ) {
+                        String rclzn = "org.autoplot.dom.Plot";
+                        String id= ((Name)t.elts[0]).id;
+                        return "import "+rclzn+"\n" +
+                                ("("+id+ JythonCompletionTask.__CLASSTYPE+")=("+rclzn+")"+"\n");
+                    } else if ( t.elts.length==2 && t.elts[0] instanceof Name && t.elts[1] instanceof Name ) {
+                        String rclzn0 = "org.autoplot.dom.Plot";
+                        String id0= ((Name)t.elts[0]).id;
+                        String rclzn1 = "org.autoplot.dom.PlotElement";
+                        String id1= ((Name)t.elts[1]).id;
+                        return "import "+rclzn0+","+rclzn1+"\n" + 
+                                ("("+id0+ JythonCompletionTask.__CLASSTYPE+","+id1+ JythonCompletionTask.__CLASSTYPE+
+                                ")=("+rclzn0+","+rclzn1+")"+"\n");
+                    }
+
+                }
+                
             }
         }
         return null;
