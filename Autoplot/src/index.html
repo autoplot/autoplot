@@ -15,7 +15,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Return to HAPI server to look at sunrise, sunset, and illuminance in Iowa City.  Here's the <a href='https://github.com/autoplot/dev/blob/master/demos/2025/20251221/sunriseSunset2025.vap'>.vap file</a>.  Happy Holidays!</small></p>
+        <p><small>Events list is used to control the time range.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -23,13 +23,13 @@
            provides a capable programming environment.
         </p> 
 
-        <p>This is the Autoplot v2025a branch.  This is an update to the production version containing bugfixes and minor new features.
+        <p>This is the Autoplot v2026a branch.  This is an update to the production version containing bugfixes and minor new features.
             Java 8 is required.
         </p>
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2025-12-21):</p>
+        <p>Bugfixes (2026-01-05):</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2777/">2777</a>: getDataSets command didn't indicate progress.
             <li>Remove extra comma in import list when converting from Jython to Java.
@@ -81,6 +81,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add git.jfaden.net to list of gitlab filesystems.  Let me know if you have others you would like to add.
+            <li>guessSlice looks for "vperp" and "vpar" dimensions.  Thanks, Connor!
             <li>Jython to Java detects constructor calls and uses this to declare Java type, instead of using Object for everything.
             <li>Copy full metadata path to clipboard, since this is often useful when coding.
             <li>Improvements to Jython completions, such as limiting the length of strings exposed to protect the GUI.
