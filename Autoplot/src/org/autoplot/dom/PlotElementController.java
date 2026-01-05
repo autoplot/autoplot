@@ -1464,7 +1464,7 @@ public class PlotElementController extends DomNodeController {
         String[] depNames= getDimensionNames(fillDs);
         Units[] depUnits= getDimensionUnits(fillDs);
 
-        int lat = -1, lon = -1;
+        int Y = -1, X = -1;
         
         int rank= fillDs.rank();
 
@@ -1482,16 +1482,16 @@ public class PlotElementController extends DomNodeController {
             Units u= depUnits[i];
             if (n.startsWith("lat")) {
                 slicePref.set( i,0 );
-                lat = i;
+                Y = i;
             } else if (n.startsWith("lon")) {
                 slicePref.set( i,0 );
-                lon = i;
+                X = i;
             } else if (n.startsWith("vperp")) {
                 slicePref.set( i,0 );
-                lon = i;
+                X = i;
             } else if (n.startsWith("vpar")) {
                 slicePref.set( i,0 );
-                lat = i;
+                Y = i;
             } else if (n.contains("time") ) {
                 slicePref.set( i,1 );
             } else if (n.contains("epoch") || UnitsUtil.isTimeLocation(u) ) {
@@ -1572,7 +1572,7 @@ public class PlotElementController extends DomNodeController {
             int n= Math.max( 0, qube.get(sliceIndex)/2-1 );
 
             result+= "|slice"+sliceIndex+"("+n+")";
-            if (lat > -1 && lon > -1 && lat < lon) {
+            if (Y > -1 && X > -1 && Y < X) {
                 result+="|transpose()";
                 transpose= true;
             }
