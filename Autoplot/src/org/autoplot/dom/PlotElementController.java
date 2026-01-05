@@ -1486,6 +1486,12 @@ public class PlotElementController extends DomNodeController {
             } else if (n.startsWith("lon")) {
                 slicePref.set( i,0 );
                 lon = i;
+            } else if (n.startsWith("vperp")) {
+                slicePref.set( i,0 );
+                lat = i;
+            } else if (n.startsWith("vpar")) {
+                slicePref.set( i,0 );
+                lon = i;
             } else if (n.contains("time") ) {
                 slicePref.set( i,1 );
             } else if (n.contains("epoch") || UnitsUtil.isTimeLocation(u) ) {
