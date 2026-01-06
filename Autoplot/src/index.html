@@ -29,8 +29,9 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2026-01-05):</p>
+        <p>Bugfixes (2026-01-06):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2779/">2779</a>: improper use of the PDS4-parser library resulted in open FileChannels and files which would fill the /tmp drive.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2777/">2777</a>: getDataSets command didn't indicate progress.
             <li>Remove extra comma in import list when converting from Jython to Java.
             <li>Make the "Here we go..." deep stack recursion detector less sensitive, since it seems to be misfiring.  Thanks, Ivar!
