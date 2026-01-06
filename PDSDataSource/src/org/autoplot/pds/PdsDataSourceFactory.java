@@ -67,21 +67,32 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
         //Label label = Label.open( f ); // this doesn't work.
         Label label = Label.open( url ); // this works
         
-        for ( TableObject t : label.getObjects( TableObject.class) ) {
+        DataObject result=null;
+        
+        try {
+            List<DataObject> objects = label.getObjects();
             
-            for ( FieldDescription fd: t.getFields() ) {
-                if ( name.startsWith( fd.getName() ) ) {
-                    return t;
+            for ( DataObject d : objects ) {
+                if ( d instanceof TableObject ) {
+                    TableObject t=(TableObject)d;
+                    for ( FieldDescription fd: t.getFields() ) {
+                        if ( name.startsWith( fd.getName() ) ) { //TODO: why startsWith?
+                             result= t;
+                        }
+                    }
+                } else if ( d instanceof ArrayObject ) {
+                    ArrayObject a= (ArrayObject)d;
+                    if ( a.getName().equals(name) ) {
+                        result= a;
+                    }
                 }
+                if ( d!=null ) d.closeChannel(); //TODO: not sure why I need to check for null here, but Netbeans says I do.
             }
+        } finally {
+            label.close();
         }
         
-        for ( ArrayObject a: label.getObjects(ArrayObject.class) ) {
-            if ( a.getName().equals(name) ) {
-                return a;
-            }
-        }
-        return null;
+        return result;
     }
             
     @Override
@@ -139,33 +150,51 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
         
         Label label = Label.open( xmlfile.toURI().toURL() ); // this works
 
-        for ( TableObject t : label.getObjects( TableObject.class) ) {
-            //TODO: can there be more than one table?
-            for ( FieldDescription fd: t.getFields() ) {
-                result.put( fd.getName(), fd.getName() + " of a table" );
+        try {
+            
+            List<DataObject> objects=  label.getObjects();
+            
+            for ( DataObject d : objects ) {
+                if ( d instanceof TableObject ) {
+                    TableObject t= (TableObject)d;
+                    //TODO: can there be more than one table?
+                    for ( FieldDescription fd: t.getFields() ) {
+                        result.put( fd.getName(), fd.getName() + " of a table" );
+                    }
+                }
             }
-        }
 
-        DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
-        domFactory.setNamespaceAware(false);
-        DocumentBuilder builder = domFactory.newDocumentBuilder();
-        Document doc = builder.parse(xmlfile);
+            DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
+            domFactory.setNamespaceAware(false);
+            DocumentBuilder builder = domFactory.newDocumentBuilder();
+            Document doc = builder.parse(xmlfile);
 
-        for ( ArrayObject a: label.getObjects(ArrayObject.class) ) {
-            //result.put( a.getName(), a.getDescription() ); //TODO: update PDS4 library
-            String n= a.getName();
-            XPathExpression xp= XPathFactory.newInstance().newXPath().compile(
-                "//Product_Observational/File_Area_Observational/Array[name='"+n+"']");
-            org.w3c.dom.Node n1= (org.w3c.dom.Node)xp.evaluate(doc,XPathConstants.NODE);
-            XPathExpression xp2= XPathFactory.newInstance().newXPath().compile(
-                "Axis_Array/axis_name/text()");
+            for ( DataObject d: objects ) {
+                if ( d instanceof ArrayObject ) {
+                    ArrayObject a= (ArrayObject)d;
+                    //result.put( a.getName(), a.getDescription() ); //TODO: update PDS4 library
+                    String n= a.getName();
+                    XPathExpression xp= XPathFactory.newInstance().newXPath().compile(
+                        "//Product_Observational/File_Area_Observational/Array[name='"+n+"']");
+                    org.w3c.dom.Node n1= (org.w3c.dom.Node)xp.evaluate(doc,XPathConstants.NODE);
+                    XPathExpression xp2= XPathFactory.newInstance().newXPath().compile(
+                        "Axis_Array/axis_name/text()");
 
-            org.w3c.dom.NodeList nn= (org.w3c.dom.NodeList)xp2.evaluate(n1,XPathConstants.NODESET);
-            String[] ss= new String[nn.getLength()];
-            for ( int i=0; i<ss.length; i++ ) {
-                ss[i]= nn.item(i).getTextContent();
+                    org.w3c.dom.NodeList nn= (org.w3c.dom.NodeList)xp2.evaluate(n1,XPathConstants.NODESET);
+                    String[] ss= new String[nn.getLength()];
+                    for ( int i=0; i<ss.length; i++ ) {
+                        ss[i]= nn.item(i).getTextContent();
+                    }
+                    result.put( a.getName(), a.getName() + " ("+ String.join(",", ss)+")");
+                }
             }
-            result.put( a.getName(), a.getName() + " ("+ String.join(",", ss)+")");
+            
+            for ( DataObject d : objects ) {
+                if ( d!=null ) d.closeChannel();
+            }
+            
+        } finally {
+            label.close();
         }
 
         return result;
