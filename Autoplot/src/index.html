@@ -29,9 +29,10 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2026-01-06):</p>
+        <p>Bugfixes (2026-01-07):</p>
         <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2779/">2779</a>: improper use of the PDS4-parser library resulted in open FileChannels and files which would fill the /tmp drive.
+            <li>Run Batch Tool re-enables "go" button after run and then editing.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2779/">2779</a>: improper use of the PDS4-parser library resulted in open FileChannels and files which would fill the /tmp drive.  Thanks, Larry!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2777/">2777</a>: getDataSets command didn't indicate progress.
             <li>Remove extra comma in import list when converting from Jython to Java.
             <li>Make the "Here we go..." deep stack recursion detector less sensitive, since it seems to be misfiring.  Thanks, Ivar!
@@ -82,6 +83,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Run Batch Tool has "active focus" checkbox which will scroll the list to what is being worked on.
             <li>add git.jfaden.net to list of gitlab filesystems.  Let me know if you have others you would like to add.
             <li>guessSlice looks for "vperp" and "vpar" dimensions.  Thanks, Connor!
             <li>Jython to Java detects constructor calls and uses this to declare Java type, instead of using Object for everything.
