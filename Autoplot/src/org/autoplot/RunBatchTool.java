@@ -2362,7 +2362,9 @@ public class RunBatchTool extends javax.swing.JPanel {
                 ja.put(i1,frunResults);  // note runResults must be mutable
                                 
                 Runnable runOne= () -> {
+                    if ( monitor.isCancelled() ) return;
                     JSONObject runResults= doOneJob( jobLabel, scriptFile, parms, final_params, final_param1, final_f1, monitor.getSubtaskMonitor(final_f1) );
+                    if ( runResults==null ) return; // Cancel pressed
                     Iterator i= runResults.keys();
                     while ( i.hasNext() ) {
                         String k= (String) i.next();
@@ -2389,6 +2391,9 @@ public class RunBatchTool extends javax.swing.JPanel {
                 if ( executor.getActiveCount()==0 && I1.intValue()==ff1.length ) {
                     break;
                 }
+                if ( monitor.isCancelled() ) {
+                    break;
+                }
                 if ( resultsFile!=null && ( ( System.currentTimeMillis()-lastWrite )>10000 ) ) { // write to pending file every ten seconds.
                     if ( resultsFile.getName().endsWith(".json") ) {
                         
@@ -2407,6 +2412,8 @@ public class RunBatchTool extends javax.swing.JPanel {
                 JSONObject pendingResults= new JSONObject( jo.toString() );
                 pendingResults.put( "results", new JSONArray( ja.toString() ) );
             }
+            
+            if ( monitor.isCancelled() ) executor.shutdownNow();
                 
             jo.put( "results", ja );
             results= jo;
