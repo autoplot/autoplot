@@ -1171,6 +1171,7 @@ public class RunBatchTool extends javax.swing.JPanel {
     private void editParamsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editParamsButtonActionPerformed
         switchToEditableList();
         editParamsButton.setEnabled(false);
+        goButton.setEnabled(true);
     }//GEN-LAST:event_editParamsButtonActionPerformed
 
     private void pngWalkToolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pngWalkToolButtonActionPerformed
@@ -2130,8 +2131,12 @@ public class RunBatchTool extends javax.swing.JPanel {
             if ( activeFocusCB.isSelected() ) {
                 SwingUtilities.invokeLater(() -> {
                     JViewport vp = (JViewport) SwingUtilities.getAncestorOfClass(JViewport.class, jobLabel);
-                    Rectangle r = SwingUtilities.convertRectangle(jobLabel.getParent(), jobLabel.getBounds(), vp);
-                    vp.scrollRectToVisible(r);
+                    try {
+                        Rectangle r = SwingUtilities.convertRectangle(jobLabel.getParent(), jobLabel.getBounds(), vp);
+                        vp.scrollRectToVisible(r);
+                    } catch ( java.lang.Error e ) {
+                        // this can be ignored.
+                    }
                 });
             }
             
@@ -2589,9 +2594,13 @@ public class RunBatchTool extends javax.swing.JPanel {
                     
                     if ( activeFocusCB.isSelected() ) {
                         SwingUtilities.invokeLater(() -> {
-                            JViewport vp = (JViewport) SwingUtilities.getAncestorOfClass(JViewport.class, jobLabel);
-                            Rectangle r = SwingUtilities.convertRectangle(jobLabel.getParent(), jobLabel.getBounds(), vp);
-                            vp.scrollRectToVisible(r);
+                            try {
+                                JViewport vp = (JViewport) SwingUtilities.getAncestorOfClass(JViewport.class, jobLabel);
+                                Rectangle r = SwingUtilities.convertRectangle(jobLabel.getParent(), jobLabel.getBounds(), vp);
+                                vp.scrollRectToVisible(r);    
+                            } catch ( java.lang.Error e ) {
+                                // this can be ignored.
+                            }
                         });
                     }
                     
