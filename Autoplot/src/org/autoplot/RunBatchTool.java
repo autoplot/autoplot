@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.DataFlavor;
@@ -71,6 +72,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -401,6 +403,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         pngWalkToolButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
         deleteDirectoryButton = new javax.swing.JButton();
+        activeFocusCB = new javax.swing.JCheckBox();
 
         jList2.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -760,6 +763,9 @@ public class RunBatchTool extends javax.swing.JPanel {
             }
         });
 
+        activeFocusCB.setText("Active focus");
+        activeFocusCB.setEnabled(false);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -784,7 +790,8 @@ public class RunBatchTool extends javax.swing.JPanel {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(generateButton2))))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(activeFocusCB)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(writeCheckBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(writeFilenameCB, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -827,12 +834,13 @@ public class RunBatchTool extends javax.swing.JPanel {
                     .addComponent(param1ScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
                     .addComponent(param2ScrollPane))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(writeCheckBox, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(writeCheckBox)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(writeFilenameCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(pngWalkToolButton)
-                        .addComponent(deleteDirectoryButton, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(deleteDirectoryButton, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(activeFocusCB))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(22, 22, 22)
@@ -858,6 +866,7 @@ public class RunBatchTool extends javax.swing.JPanel {
             return;
         }
         goButton.setEnabled(false);
+        activeFocusCB.setEnabled(true);
         messageLabel.setText("Setting up to run jobs...");
         Runnable run= () -> {
             try {
@@ -2117,6 +2126,15 @@ public class RunBatchTool extends javax.swing.JPanel {
             }
 
             jobLabel.setIcon(ICON_WORKING);
+            
+            if ( activeFocusCB.isSelected() ) {
+                SwingUtilities.invokeLater(() -> {
+                    JViewport vp = (JViewport) SwingUtilities.getAncestorOfClass(JViewport.class, jobLabel);
+                    Rectangle r = SwingUtilities.convertRectangle(jobLabel.getParent(), jobLabel.getBounds(), vp);
+                    vp.scrollRectToVisible(r);
+                });
+            }
+            
             interp.set( "PWD", split.path );
             String[] paramNames= maybeSplitMultiParam( paramName );
 
@@ -2566,7 +2584,16 @@ public class RunBatchTool extends javax.swing.JPanel {
                         continue;
                     }
 
-                    jobs1.get(i1).setIcon(ICON_WORKING);
+                    JLabel jobLabel= jobs1.get(i1);
+                    jobLabel.setIcon(ICON_WORKING);
+                    
+                    if ( activeFocusCB.isSelected() ) {
+                        SwingUtilities.invokeLater(() -> {
+                            JViewport vp = (JViewport) SwingUtilities.getAncestorOfClass(JViewport.class, jobLabel);
+                            Rectangle r = SwingUtilities.convertRectangle(jobLabel.getParent(), jobLabel.getBounds(), vp);
+                            vp.scrollRectToVisible(r);
+                        });
+                    }
                     
                     String uri=null;
                     
@@ -2848,6 +2875,7 @@ public class RunBatchTool extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem OpenMenuItem;
     private javax.swing.JMenuItem SaveAsMenuItem;
+    private javax.swing.JCheckBox activeFocusCB;
     private javax.swing.JButton cancelButton;
     private javax.swing.JButton closeButton;
     private javax.swing.JMenuItem copyScriptUri;
