@@ -1798,6 +1798,14 @@ public class JythonUtil {
                         if (p.value != null) {
                             p.value = Double.parseDouble(p.value.toString());
                         }
+                        if ( p.enums!=null ) {
+                            for ( int j=0; j<p.enums.size(); j++ ) {
+                                Object o= p.enums.get(j);
+                                if ( o instanceof Integer ) {
+                                    p.enums.set(j,Double.valueOf((Integer)o) );
+                                }
+                            }
+                        }
                     } else if (p.deft instanceof PyJavaInstance) {
                         Object pp = ((PyJavaInstance) p.deft).__tojava__(URI.class);
                         if (pp == Py.NoConversion) {
