@@ -660,7 +660,7 @@ public class ParametersFormPanel {
                             } else {
                                 val= String.valueOf( parm.deft );
                                 params.put( vname, val );
-                            }       
+                            }
                             if ( values!=null && !values.isEmpty() ) {
                                 if ( isBool ) {
                                     JCheckBox jcb= new JCheckBox( label );
