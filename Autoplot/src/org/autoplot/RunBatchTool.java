@@ -2356,10 +2356,11 @@ public class RunBatchTool extends javax.swing.JPanel {
             monitor.started();
             monitor.setTaskProgress(0);
             
-            int icount=0;
             int i1=0;
             int exportResultsWritten=0;
             final AtomicInteger I1= new AtomicInteger(0);
+
+            boolean showEta= "true".equals( System.getProperty("RunBatchTool.eta","false") );            
             
             for ( String f1 : ff1 ) {
                 final String final_f1= f1;
@@ -2373,7 +2374,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                     if ( monitor.isCancelled() ) return;
                     long t0= System.currentTimeMillis();
                     JSONObject runResults= doOneJob( jobLabel, scriptFile, parms, final_params, final_param1, final_f1, monitor.getSubtaskMonitor(final_f1) );
-                    durationsMillis.addLast(System.currentTimeMillis()-t0);
+                    if ( showEta ) durationsMillis.addLast(System.currentTimeMillis()-t0);
                     if ( runResults==null ) return; // Cancel pressed
                     Iterator i= runResults.keys();
                     while ( i.hasNext() ) {
@@ -2422,7 +2423,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                     lastWrite= t;
                 }
                 
-                if ( ( t - lastReport ) > 3000 ) {
+                if ( showEta && ( t - lastReport ) > 3000 ) {
                     String report;
                     while ( durationsMillis.size()>12 ) {
                         long removed = durationsMillis.removeFirst();
@@ -2441,10 +2442,10 @@ public class RunBatchTool extends javax.swing.JPanel {
                             Datum eta= Units.milliseconds.createDatum( 
                                     jobsRemaining * timeFor12Jobs / 12.0 / executor.getCorePoolSize() );
                             eta= DatumUtil.asOrderOneUnits(eta);
-                            String seta= String.format("%.1f%s", eta.value(), eta.getUnits() );
+                            String seta= String.format("%.2f%s", eta.value(), eta.getUnits() );
                             Datum avgDuration= Units.milliseconds.createDatum( timeFor12Jobs / 12.0 );
                             avgDuration= DatumUtil.asOrderOneUnits(avgDuration);
-                            String savgDuration= String.format("%.1f%s", avgDuration.value(), avgDuration.getUnits() );
+                            String savgDuration= String.format("%.2f%s", avgDuration.value(), avgDuration.getUnits() );
                             
                             report= String.format( "%d remaining, avg %s, eta %s", jobsRemaining, savgDuration, seta );
                         } else {
