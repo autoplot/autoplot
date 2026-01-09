@@ -467,6 +467,26 @@ public class JythonOps {
      * @see #validateParam(java.lang.String, java.lang.Object, java.util.Map) 
      */
     public static Object validateParam( String name, Object v, List constraint ) {
+        if ( v instanceof Double ) {
+            for ( int i=0; i<constraint.size(); i++ ) {
+                Object o= constraint.get(i);
+                if ( o instanceof Integer ) {
+                    constraint.set(i, ((Integer)o).doubleValue() );
+                } else if ( o instanceof String ) {
+                    constraint.set(i, Double.parseDouble((String)o) );
+                }
+            }
+        }
+        if ( v instanceof Integer ) {
+            for ( int i=0; i<constraint.size(); i++ ) {
+                Object o= constraint.get(i);
+                if ( o instanceof Double ) {
+                    constraint.set(i, ((Double)o).intValue() );
+                } else if ( o instanceof String ) {
+                    constraint.set(i, Integer.parseInt((String)o) );
+                }
+            }
+        }
         if ( !constraint.contains(v) ) {
             String sconstraint= constraint.toString();
             if ( sconstraint.length()<40 ) {
