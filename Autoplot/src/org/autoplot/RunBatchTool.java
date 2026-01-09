@@ -33,14 +33,17 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.text.ParseException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -96,6 +99,8 @@ import org.autoplot.jythonsupport.Param;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
 import org.autoplot.jythonsupport.ui.Util;
 import org.autoplot.pngwalk.PngWalkTool;
+import org.das2.datum.Datum;
+import org.das2.datum.DatumUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.fsm.FileStorageModel;
@@ -1970,9 +1975,10 @@ public class RunBatchTool extends javax.swing.JPanel {
         scrollp.setPreferredSize( new Dimension(640,640));
         scrollp.setMaximumSize( new Dimension(640,640));
             
-        messageLabel.setText("Running jobs, mouse over to view tooltip containing standard output.");
+        messageLabel.setText(RUNNING_LABEL_MOUSEOVER);
         return p;
     }
+    private static final String RUNNING_LABEL_MOUSEOVER = "Running jobs, mouse over to view tooltip containing standard output.";
     
     /**
      * make an HTML rendering of the text, possibly truncating it to 50 lines.
@@ -2252,6 +2258,8 @@ public class RunBatchTool extends javax.swing.JPanel {
         
         ThreadFactory tf= (Runnable r) -> new Thread( r, "run-batch-"+threadCounter.incrementAndGet());
         ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(threadCount,tf);
+        Deque<Long> durationsMillis= new ArrayDeque<>(); 
+                
         //ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
         //ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newCachedThreadPool(tf);
         
@@ -2363,7 +2371,9 @@ public class RunBatchTool extends javax.swing.JPanel {
                                 
                 Runnable runOne= () -> {
                     if ( monitor.isCancelled() ) return;
+                    long t0= System.currentTimeMillis();
                     JSONObject runResults= doOneJob( jobLabel, scriptFile, parms, final_params, final_param1, final_f1, monitor.getSubtaskMonitor(final_f1) );
+                    durationsMillis.addLast(System.currentTimeMillis()-t0);
                     if ( runResults==null ) return; // Cancel pressed
                     Iterator i= runResults.keys();
                     while ( i.hasNext() ) {
@@ -2386,6 +2396,8 @@ public class RunBatchTool extends javax.swing.JPanel {
             }
             
             long lastWrite= System.currentTimeMillis();
+            long lastReport= System.currentTimeMillis();
+            long messageNumber= 0; // toggle between messages
             
             while ( true ) {
                 if ( executor.getActiveCount()==0 && I1.intValue()==ff1.length ) {
@@ -2394,7 +2406,8 @@ public class RunBatchTool extends javax.swing.JPanel {
                 if ( monitor.isCancelled() ) {
                     break;
                 }
-                if ( resultsFile!=null && ( ( System.currentTimeMillis()-lastWrite )>10000 ) ) { // write to pending file every ten seconds.
+                long t=  System.currentTimeMillis();
+                if ( resultsFile!=null && ( ( t-lastWrite )>10000 ) ) { // write to pending file every ten seconds.
                     if ( resultsFile.getName().endsWith(".json") ) {
                         
                     } else {
@@ -2406,7 +2419,42 @@ public class RunBatchTool extends javax.swing.JPanel {
                         messageLabel.setText( "wrote records "+exportResultsWritten+"-"+completed + " to " + resultsFile.getAbsolutePath()+".pending");
                         exportResultsWritten= completed;
                     }
-                    lastWrite= System.currentTimeMillis();
+                    lastWrite= t;
+                }
+                
+                if ( ( t - lastReport ) > 3000 ) {
+                    String report;
+                    while ( durationsMillis.size()>12 ) {
+                        long removed = durationsMillis.removeFirst();
+                    }
+                    long timeFor12Jobs=0;
+                    if ( durationsMillis.size()>=12 ) {
+                        Iterator<Long> it= durationsMillis.descendingIterator();
+                        for ( int i=0; i<12; i++ ) {
+                            timeFor12Jobs+= it.next();
+                        }
+                    }
+                    messageNumber++;
+                    if ( ( messageNumber % 4 )>0 ) {
+                        long jobsRemaining= executor.getTaskCount() - executor.getCompletedTaskCount();
+                        if ( timeFor12Jobs>0 ) {
+                            Datum eta= Units.milliseconds.createDatum( 
+                                    jobsRemaining * timeFor12Jobs / 12.0 / executor.getCorePoolSize() );
+                            eta= DatumUtil.asOrderOneUnits(eta);
+                            String seta= String.format("%.1f%s", eta.value(), eta.getUnits() );
+                            Datum avgDuration= Units.milliseconds.createDatum( timeFor12Jobs / 12.0 );
+                            avgDuration= DatumUtil.asOrderOneUnits(avgDuration);
+                            String savgDuration= String.format("%.1f%s", avgDuration.value(), avgDuration.getUnits() );
+                            
+                            report= String.format( "%d remaining, avg %s, eta %s", jobsRemaining, savgDuration, seta );
+                        } else {
+                            report= String.format( "%d jobs, %d remaining", ff1.length, jobsRemaining );
+                        }
+                    } else {
+                        report= RUNNING_LABEL_MOUSEOVER;
+                    }
+                    messageLabel.setText( report );
+                    lastReport= t;
                 }
                 
                 JSONObject pendingResults= new JSONObject( jo.toString() );
