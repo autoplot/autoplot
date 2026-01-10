@@ -185,7 +185,8 @@ public class Test019 {
         testTimeParser1( "$Y-$j",         "2012-017", "2012-01-17T00:00 to 2012-01-18T00:00");
         testTimeParser1( "$(j;Y=2012)",   "017",      "2012-01-17T00:00 to 2012-01-18T00:00");
         testTimeParser1( "ace_mag_$Y_$j_to_$(Y;end)_$j.cdf",   "ace_mag_2005_001_to_2005_003.cdf",      "2005-001T00:00 to 2005-003T00:00");
-
+        testTimeParser1( "$-1m/$d/$Y $H:$M $p", "1/10/2026 12:40 AM", "2026-01-10T00:40:00.000Z to 2026-01-10T00:41:00.000Z" );
+        
         // speed tests
         long t0;
         String test;
