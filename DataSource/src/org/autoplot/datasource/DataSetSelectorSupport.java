@@ -2,11 +2,14 @@
 package org.autoplot.datasource;
 
 import java.awt.Dimension;
+import java.awt.FileDialog;
+import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,6 +53,57 @@ public class DataSetSelectorSupport {
     }
     
     /**
+     * Use a native browser to pick a file.  Use the system property fileChooserNative=true
+     * @param parent parent component for focus.  If a dataSetSelector is
+     * used then its timerange is used for the initial timerange.
+     * This will now allow a non-local vap to be browsed as well.
+     * @param initialSelection if non-null, then the initial selection.
+     * @return the URI for the vap file, or null if cancel was pressed.
+     * @return 
+     */
+    public static String browseLocalVapNative( java.awt.Component parent, String initialSelection) {
+        Preferences prefs = AutoplotSettings.settings().getPreferences( AutoplotSettings.class);
+
+        String currentDirectory = prefs.get( AutoplotSettings.PREF_LAST_OPEN_VAP_FOLDER, prefs.get(AutoplotSettings.PREF_LAST_OPEN_FOLDER, userHome().toString() ) );
+        String currentFile=  prefs.get( AutoplotSettings.PREF_LAST_OPEN_VAP_FILE, "" );
+
+        boolean isRemote= initialSelection!=null && ( initialSelection.startsWith("https:/") 
+                || initialSelection.startsWith("http:/")
+                || initialSelection.startsWith("ftp:/") 
+                || initialSelection.startsWith("sftp:/") );
+        boolean isLocal= initialSelection==null || initialSelection.isEmpty() || !isRemote;
+        
+        FileDialog chooser=
+                new java.awt.FileDialog( (Frame)(SwingUtilities.getWindowAncestor(parent)), 
+                        "Open .vap file", java.awt.FileDialog.LOAD );
+        chooser.setName("openVapNative");
+        chooser.setDirectory(currentDirectory);
+        chooser.setFile(currentFile);
+        WindowManager.getInstance().recallWindowSizePosition(chooser);
+        FileFilter ff;
+        ff = new FileNameExtensionFilter( ".vap files", "vap" );
+
+        chooser.setFilenameFilter((File dir, String name) -> ff.accept( new File( dir, name ) ));
+        chooser.setVisible(true);
+
+        String result=null;
+
+        chooser.dispose();
+        String file = chooser.getFile();
+        if ( file!=null ) {
+            String dir = chooser.getDirectory();
+            prefs.put(AutoplotSettings.PREF_LAST_OPEN_VAP_FOLDER, dir );
+            try {
+                result= new File( dir, file ).getCanonicalPath();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+        return result;
+
+    }
+
+    /**
      * Show a file chooser component, and return the name of a .vap file.
      * @param parent parent component for focus.  If a dataSetSelector is
      * used then its timerange is used for the initial timerange.
@@ -70,17 +124,17 @@ public class DataSetSelectorSupport {
         boolean isLocal= initialSelection==null || initialSelection.isEmpty() || !isRemote;
         
         JFileChooser chooser;
-        
+
         chooser= new JFileChooser();
-        
+
         WindowManager.getInstance().recallWindowSizePosition(chooser);
-        
+
         try {
             chooser.setCurrentDirectory( new File( currentDirectory ) );
         } catch ( SecurityException ex ) {
             logger.info("unable to set current directory");
         }
-        
+
         if ( initialSelection!=null ) {
             URISplit split= URISplit.parse(initialSelection);
             if ( ".vap".equals(split.ext) && "file".equals(split.scheme) ) {
@@ -88,7 +142,7 @@ public class DataSetSelectorSupport {
                 currentFile="";           
             }
         }
-        
+
         if ( currentFile.length()>0 ) {
             try {
                 chooser.setSelectedFile( new File( currentFile ) );
@@ -102,7 +156,7 @@ public class DataSetSelectorSupport {
                 chooser.setSelectedFile( new File( split.file ));
             }
         }
-        
+
         JPanel trPanel= new JPanel();
         trPanel.setLayout( new BoxLayout(trPanel, BoxLayout.Y_AXIS ));
         trPanel.setMaximumSize( new Dimension(230,9999) );
@@ -120,20 +174,20 @@ public class DataSetSelectorSupport {
         final JCheckBox b2= new JCheckBox("Reset the .vap timerange:");
         bg.add(b2);
         //b2.setAlignmentX(Component.LEFT_ALIGNMENT);
-        
+
         boolean notimerange= ( initialSelection==null || !initialSelection.contains("?timerange=") );
         b1.setSelected( notimerange );
         b2.setSelected( !notimerange );
-        
+
         b1.setAlignmentX( 0.f );
         b2.setAlignmentX( 0.f );
         t.setAlignmentX( 0.f );
-        
+
         trPanel.add(b1);
         trPanel.add( Box.createVerticalStrut(14) );
         trPanel.add(b2);
         trPanel.add(t);
-        
+
         ActionListener enableTR= new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -142,14 +196,14 @@ public class DataSetSelectorSupport {
         };
         b1.addActionListener(enableTR);
         b2.addActionListener(enableTR);
-        
+
         t.setEnabled(b2.isSelected());
-        
+
         trPanel.add( Box.createVerticalGlue() );
-        
+
         if ( chooser!=null ) {
             chooser.setAccessory(trPanel);
-        
+
             FileFilter ff;
             ff = new FileNameExtensionFilter( ".vap files", "vap" );
 
@@ -189,7 +243,7 @@ public class DataSetSelectorSupport {
             }
             
         }
-
+        
     }
 
     /**
@@ -313,7 +367,17 @@ public class DataSetSelectorSupport {
             @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);
-                String result= browseLocalVap(ui, ui.getValue() );
+                Preferences prefs = AutoplotSettings.settings().getPreferences( AutoplotSettings.class);
+                String result;
+                boolean useNative= System.getProperty("fileChooserNative","").equals("true");
+                if ( ( e.getModifiers() & KeyEvent.SHIFT_MASK )==KeyEvent.SHIFT_MASK ) {
+                    useNative= !useNative;
+                }
+                if ( useNative ) {
+                    result = browseLocalVapNative(ui, ui.getValue() );
+                } else {
+                    result = browseLocalVap(ui, ui.getValue() );
+                }
 
                 if (result != null ) {
                     ui.setValue(result);
