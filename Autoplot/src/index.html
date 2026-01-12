@@ -15,7 +15,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Events list is used to control the time range.</small></p>
+        <p><small>Experiments exploring data reduction to create low-res maps.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,6 +30,9 @@
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
         <p>Bugfixes (2026-01-07):</p>
+        <ul>
+        </ul>
+        <p>Older Bugfixes (2025-01-07):</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2778/">2778</a>: check for integers in float parameter values.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2780/">2780</a>: Run Batch Tool cancel press is handled properly.
@@ -58,32 +61,12 @@
             <li>GrannyTextRenderer cleanup fixes "glow" property and removes kludgy code which detected URL in text to display image (&lt;img src=""&gt; should be used instead)
             <li>Support UTF-16 encoded character streams for .csv and .dat (ASCII table source now officially supports non-ASCII)
         </ul>
-        <p>Older Bugfixes (2025-11-14):</p>
-        <ul>
-            <li>DataPointRecorder resolution limit increased to 100 nanoseconds, was 100 microseconds.  Improve feedback when a bunch of points are received.  Thanks, Sadie and Lily!
-            <li>rte 567726773: script running code assumed there was a non-null message attached to the caught exception, causing NullPointerException and hiding the actual exception.  Thanks, Lily!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2762/">2762</a>: FlatLAF now also has control for font, as quick fix for high resolution displays.  Thanks Connor and George!
-            <li><a href="https://github.com/das-developers/das2java/issues/151">151</a>: Clipped label containing units with superscript was clipped, because macro was used when calculating bounds.  Thanks, Connor!
-            <li><a href="https://github.com/das-developers/das2java/issues/150">150</a>: Label the ephemeris parameter when it is not time.  Thanks, Connor!
-            <li>Insert plot looks at adjacent plots to detect when x-axis and title should be turned off.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2760/">2760</a>: LabelConverter for interval which is not identified
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2759/">2759</a>: Run Batch tool resourceURI parameter didn't like spaces and parens
-            <li>Resolve references like %{UNITS} and %{LABEL} when writing Rich PNGs.
-            <li>New code which more carefully formats the Rich PNG json showed a bug in DatumUtil.bestFormatter with "Deg F" location units.  Thanks, Jenkins!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2747/">2747</a>: slice-at-datum was disabled, incorrectly.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2753/">2753</a>: don't reset to time/date ticks if ephemeris data is showing.  Thanks, Connor!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2752/">2752</a>: clear the BUNDLE_1 which was common to all ticks.  Thanks, Connor!
-            <li>RichPNG supports flipped axis property.  This affects PNG Walk Tool, ImageDataSource, and Servlets.
-            <li>Case where TCA Ephemeris labels could not be found resulted in NullPointerException.  Thanks, George!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2750/">2750</a>: HDF5 from Personal Space Weather Station showed where slice array was mishandled.  Thanks, Bill E!
-            <li>rte_0324293530: code which infers typeness to XML and JSON files assumed files were at least 1024 bytes.
-            <li>correction to Schemes.isComplexNumbers.  Add example to Schemes.complexNumbers.
-            <li>|trim(2016-10-04,2016-10-10) now works properly.  Thanks, Sadie!
-            <li>%{RANGE_NOORBIT} kludge needed more attention.  Thanks, Darrelle!
-            <li><a href="https://research-git.uiowa.edu/space-physics/tracers/autoplot/-/issues/3">3</a>: check for orbits which start with /, since it was very confusing when local file reference did not work. Thanks, Jeremy!
-            <li>add verifyJythonInline so that isDataMashupJythonInline can be evaluated without creating a GUI and adding to recent timeranges.
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/864/">864</a>: Add option for native file dialog to pick .vap files.
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/863/">863</a>: Run Batch ETA calculation is shown by default.
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>Run Batch Tool has "active focus" checkbox which will scroll the list to what is being worked on.
             <li>add git.jfaden.net to list of gitlab filesystems.  Let me know if you have others you would like to add.
@@ -97,16 +80,6 @@
             <li>Introduce "upper" and "lower" keywords for RichPNG, so that plots can be located relative to page bottom.
             <li>Introduce plotInfoFile switch for ImageDataSource, so that third-party images can be decorated.
             <li>Series connector looks at AVERAGE_TYPE for ...MOD24, ...MOD360 etc.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>automatically turn off x-axis and title when surrounding plots have this turned off to make a tight stack.
-            <li>Remember FileChooser size.  Thanks, Ivar!
-            <li>FileChooser shows details view initially on some platforms.  Thanks, Ivar and George!
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/858/">858</a>: RichPNG properly limits resolution when formatting.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/858/">858</a>: RichPNG checks for axis flipped property.
-            <li>add complexNumber QDataSet scheme.
-            <li>add median, mode, and mean filters.  Thanks, Cindy!
         </ul>
 
         <b>Feedback on the function and quality of this release is greatly appreciated!</b>
