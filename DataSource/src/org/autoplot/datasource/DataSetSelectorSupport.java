@@ -369,7 +369,7 @@ public class DataSetSelectorSupport {
                 org.das2.util.LoggerManager.logGuiEvent(e);
                 Preferences prefs = AutoplotSettings.settings().getPreferences( AutoplotSettings.class);
                 String result;
-                boolean useNative= System.getProperty("fileChooserNative","").equals("true");
+                boolean useNative= System.getProperty("fileDialogNative","").equals("true");
                 if ( ( e.getModifiers() & KeyEvent.SHIFT_MASK )==KeyEvent.SHIFT_MASK ) {
                     useNative= !useNative;
                 }
