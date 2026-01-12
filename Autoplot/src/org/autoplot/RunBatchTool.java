@@ -2360,7 +2360,7 @@ public class RunBatchTool extends javax.swing.JPanel {
             int exportResultsWritten=0;
             final AtomicInteger I1= new AtomicInteger(0);
 
-            boolean showEta= "true".equals( System.getProperty("RunBatchTool.eta","false") );            
+            boolean showEta= "true".equals( System.getProperty("RunBatchTool.eta","true") );            
             
             for ( String f1 : ff1 ) {
                 final String final_f1= f1;
