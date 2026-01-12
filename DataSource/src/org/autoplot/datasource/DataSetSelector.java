@@ -54,6 +54,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
@@ -847,7 +848,12 @@ public class DataSetSelector extends javax.swing.JPanel {
                 if ( !".vap".equals(split.ext) ) { 
                     edit= new CompletionsDataSourceEditor();
                 } else {
-                    String result= DataSetSelectorSupport.browseLocalVap(this, surl);
+                    String result;
+                    if ( System.getProperty("fileDialogNative","").equals("true") ) {
+                        result= DataSetSelectorSupport.browseLocalVapNative(this,surl);
+                    } else {
+                        result= DataSetSelectorSupport.browseLocalVap(this, surl);
+                    }
                     if (result != null ) {
                         this.setValue(result);
                         this.maybePlot(false);
