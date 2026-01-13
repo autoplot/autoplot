@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot.datasource.ui;
 
@@ -18,8 +14,20 @@ public class PromptComboBoxEditor extends BasicComboBoxEditor {
         editor= new PromptTextField(prompt);
     }
     
+    /**
+     * set the tooltip
+     * @param text
+     */
     public void setTooltipText( String text ) {
         this.editor.setToolTipText(text);
+    }
+    
+    /**
+     * set the grey italicized text when the text field is empty.
+     * @param prompt 
+     */
+    public void setPromptText( String prompt ) {
+        ((PromptTextField)this.editor).setPromptText(prompt);
     }
     
 }
