@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -68,40 +69,103 @@ public class HapiServer {
     public static final Charset UTF8= Charset.forName("UTF-8");
     
     /**
-     * get known servers.  
+     * contains "about" information for each server
+     */
+    public static final Map<String,JSONObject> serverInfo= new HashMap<>();
+    
+    /**
+     * get known servers. These are now listed in abouts.json and abouts-dev.json
+     * at https://github.com/hapi-server/servers project.
      * @return known servers
      */
     public static List<String> getKnownServers() {
         ArrayList<String> result= new ArrayList<>();
-        try {
-            URL url= new URL("https://raw.githubusercontent.com/hapi-server/servers/master/server_list.txt");
-            try {
-                String s= readFromURL(url,"");
-                String[] ss= s.split("\n");
-                result.addAll(Arrays.asList(ss));
-            } catch ( IOException ex ) {
-                url= new URL("https://raw.githubusercontent.com/hapi-server/servers/master/all.txt");
-                String s= readFromURL(url,"");
-                String[] ss= s.split("\n");
-                result.addAll(Arrays.asList(ss));
-            }
-            if ( "true".equals(System.getProperty("hapiDeveloper","false")) ) {
-                result.add("http://tsds.org/get/IMAGE/PT1M/hapi");
-                result.add("https://cdaweb.gsfc.nasa.gov/registry/hdp/hapi");
-                result.add("http://jfaden.net/HapiServerDemo/hapi");
-            }
-        } catch (IOException  ex) {
-            Logger.getLogger(HapiServer.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        result.remove("http://datashop.elasticbeanstalk.com/hapi");
-        result.add("http://datashop.elasticbeanstalk.com/hapi");
+        HashSet<String> urls= new HashSet<>();
         
-        ArrayList<String> uniq= new ArrayList<>();
-        for ( String s: result ) {
-            if ( !uniq.contains(s) ) uniq.add(s);
+        URL url=null;
+        String s;
+        JSONArray ja;
+        
+        try {
+            url = new URL( "https://raw.githubusercontent.com/hapi-server/servers/refs/heads/master/abouts.json" );
+            s= readFromURL(url,"json");
+            ja= new JSONArray(s);
+        
+            for ( int i=0; i<ja.length(); i++ ) {
+                JSONObject jo= ja.getJSONObject(i);
+                String surl= jo.getString("x_url");
+                if ( surl.startsWith("http://") && urls.contains("https://"+surl.substring(7) ) ) {
+                    continue;
+                }
+                if ( surl.startsWith("https://") && urls.contains("http://"+surl.substring(8) ) ) {
+                    urls.remove( "http://"+surl.substring(8) );
+                }                
+                if ( !urls.contains(surl) ) {
+                    urls.add(surl);
+                    result.add(surl);
+                    serverInfo.put( surl, jo );
+                }
+            }
+        } catch ( MalformedURLException ex ) {
+            logger.log(Level.WARNING, "Unable to read from malformed URL: {0}", url);
+        } catch ( JSONException ex) {
+            logger.log(Level.WARNING, "JSON exception when reading file: {0}", url);
+        } catch ( IOException ex) {
+            logger.log(Level.WARNING, "IO exception when reading file: {0}", url);
+        }
+        
+        try {
+            url = new URL( "https://raw.githubusercontent.com/hapi-server/servers/refs/heads/master/abouts-dev.json" );
+            s= readFromURL(url,"json");
+            ja= new JSONArray(s);
+
+            for ( int i=0; i<ja.length(); i++ ) {
+                JSONObject jo= ja.getJSONObject(i);
+                String surl= jo.getString("x_url");
+                if ( surl.startsWith("http://") && urls.contains("https://"+surl.substring(7) ) ) {
+                    continue;
+                }
+                if ( surl.startsWith("https://") && urls.contains("http://"+surl.substring(8) ) ) {
+                    urls.remove( "http://"+surl.substring(8) );
+                }
+                if ( !urls.contains(surl) ) {
+                    urls.add(surl);
+                    result.add(surl);
+                    serverInfo.put( surl, jo );
+                }
+            }
+        } catch ( MalformedURLException ex ) {
+            logger.log(Level.WARNING, "Unable to read from malformed URL: {0}", url);
+        } catch ( JSONException ex) {
+            logger.log(Level.WARNING, "JSON exception when reading file: {0}", url);
+        } catch ( IOException ex) {
+            logger.log(Level.WARNING, "IO exception when reading file: {0}", url);
+        }
+        
+        if ( "true".equals(System.getProperty("hapiDeveloper","false")) ) {
+            // add any secret servers here, I guess
         }
 
-        return uniq;
+        return result;
+    }
+    
+    /**
+     * returns a JSONObject which is the about response of the server.Note
+     * the about responses are cached regularly (nightly?) at 
+     * https://github.com/hapi-server/servers.
+     * @param surl the HAPI server URL as a string.
+     * @return null or the about response for the server.  
+     * @see #getAbout(url) which queries the server directly.
+     */
+    public static JSONObject getServerInfo( String surl ) {
+        JSONObject jo= serverInfo.get( surl );
+        if ( jo==null ) return null;
+        try {
+            return new JSONObject( jo.toString(0) );
+        } catch (JSONException ex) {
+            logger.log(Level.SEVERE, null, ex);
+            return null;
+        }
     }
     
     /**
@@ -228,6 +292,36 @@ public class HapiServer {
         JSONObject o= new JSONObject(s);
         JSONArray catalog= o.getJSONArray( HapiSpec.CATALOG );
         return catalog;
+    }
+    
+    /**
+     * return the list of datasets available at the server.  
+     * This should not be called from the event thread.  Old servers, before
+     * version 3.0, did not have an about response and a trivial about
+     * is returned.
+     * @param server the root of the server, which should should contain "catalog"
+     * @return list of catalog entries, which have "id" and "title" tags.
+     * @throws java.io.IOException
+     * @throws org.json.JSONException
+     */
+    public static JSONObject getAbout( URL server ) throws IOException, JSONException {
+        if ( EventQueue.isDispatchThread() ) {
+            logger.warning("HAPI network call on event thread");
+        }        
+        URL url;
+        url= HapiServer.createURL( server, HapiSpec.ABOUT_URL  );
+        try {
+            String s= readFromURL(url, "json");
+            JSONObject o= new JSONObject(s);
+            return o;
+        } catch ( IOException ex ) {
+            JSONObject o= new JSONObject();
+            o.put("id", server.toString() );
+            o.put("title", server.toString() );
+            o.put("contact","Contact HAPI team about this old server.");
+            return o;
+        }
+        
     }
     
     /**
@@ -413,7 +507,8 @@ public class HapiServer {
     }
     
     /**
-     * read data from the URL.  
+     * read data from the URL.  Note the URL must be a downloadable URL,
+     * and not the name of a file in a GitHub filesystem.
      * @param url the URL to read from
      * @param type the extension to use for the cache file (JSON).
      * @return non-empty string

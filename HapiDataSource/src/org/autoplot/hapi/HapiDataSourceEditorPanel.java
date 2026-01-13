@@ -38,6 +38,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.swing.BoxLayout;
+import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
@@ -56,6 +57,7 @@ import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.autoplot.datasource.DataSetURI;
@@ -170,6 +172,8 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
      */
     private String providedTimeRange= null;
     
+    PromptComboBoxEditor serverSearch=null;
+            
     /**
      * Creates new form HapiDataSourceEditorPanel
      */
@@ -186,7 +190,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             throw new RuntimeException(ex);
         }
         initComponents();
-        idsList2.setCellRenderer( getCellRenderer() );
+        idsList2.setCellRenderer( getIdsCellRenderer() );
         
         hapiServerRecentComboBox.setPreferenceNode("hapi.servers");
         PromptComboBoxEditor editor= new PromptComboBoxEditor("search");
@@ -203,6 +207,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         ((JTextField)editor.getEditorComponent()).setColumns(10);
         datasetFilterComboBox.invalidate();
         datasetFilterComboBox.revalidate();
+        serverSearch= editor;
         
         parameterFilterComboBox.setPreferenceNode("hapi.filters");
         editor= new PromptComboBoxEditor("search");
@@ -219,6 +224,8 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         serversComboBox.setEnabled(false);
         serversComboBox.setModel( new DefaultComboBoxModel<>( HapiServer.getKnownServersArray() ) ); 
+        serversComboBox.setRenderer( new ServersListCellRenderer() );
+        
         loadKnownServersSoon();
         
         idsList2.addListSelectionListener((ListSelectionEvent e) -> {
@@ -279,7 +286,29 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         } );
     }
-
+    
+    private class ServersListCellRenderer implements ListCellRenderer {
+        DefaultListCellRenderer r= new DefaultListCellRenderer();
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            String serverUrl= (String)value;
+            JSONObject jo= HapiServer.getServerInfo(serverUrl);
+            Component c= r.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            Icon icon= iconFor( value, false );
+            String text;
+            if ( jo!=null ) {
+                text= jo.optString("title",serverUrl);
+            } else {
+                text= serverUrl;
+            }
+            ((DefaultListCellRenderer)c).setText(text);
+            ((DefaultListCellRenderer)c).setIcon(icon);
+            return c;
+        }
+        
+    }
+    
+    
     TickleTimer resetVariableTimer= new TickleTimer( 100, new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
@@ -307,7 +336,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
     });
     
-    private ListCellRenderer getCellRenderer() {
+    private ListCellRenderer getIdsCellRenderer() {
         return new ListCellRenderer<Object>() {
             private final DefaultListCellRenderer defaultRenderer = new DefaultListCellRenderer();
 
@@ -446,7 +475,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             @Override
             public void run() {
                 serversComboBox.setModel( new DefaultComboBoxModel<>( servers ));
-                serversComboBox.setRenderer( new IconCellRenderer() );
+                serversComboBox.setRenderer( new ServersListCellRenderer() );
                 try {
                     defaultServer= new URL(servers[0]); //TODO: sometimes server is URL sometimes a string.  How annoying...
                 } catch (MalformedURLException ex) {
@@ -1091,6 +1120,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         } catch ( MalformedURLException ex ) {
             serversComboBox.setSelectedItem( split.file ); // do what we did before.
         }
+        
         Map<String,String> params= URISplit.parseParams( split.params );
         
         String id= params.get("id");
@@ -1284,6 +1314,12 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
      * @throws JSONException 
      */
     private void resetServer( final URL server ) throws IOException, JSONException {
+        JSONObject jo= HapiServer.getServerInfo(server.toString());
+        if ( jo!=null ) {
+            serverSearch.setPromptText("search within "+jo.getString("title"));
+        } else {
+            serverSearch.setPromptText("search regex");
+        }
         idsJSON= HapiServer.getCatalog(server);
         loadServerCapabilities(server);
         Runnable run= new Runnable() {

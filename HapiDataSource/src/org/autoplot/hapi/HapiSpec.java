@@ -10,6 +10,12 @@ package org.autoplot.hapi;
 public final class HapiSpec {
 
     private HapiSpec() {}
+   
+    /**
+     * the text to append to a HAPI server to request the about information.
+     * @see https://github.com/hapi-server/data-specification#about
+     */
+    protected static final String ABOUT_URL= "about";
     
     /**
      * the text to append to a HAPI server to request the catalog.
@@ -19,7 +25,7 @@ public final class HapiSpec {
 
     /**
      * the text to append to a HAPI server to request parameter info.
-     * @see https://github.com/hapi-server/data-specification#catalog
+     * @see https://github.com/hapi-server/data-specification#info
      */
     protected static final String INFO_URL = "info";
 
