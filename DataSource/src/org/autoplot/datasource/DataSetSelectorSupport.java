@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import org.das2.dasml.PersistentStateSupport;
 import org.das2.datum.DatumRange;
 
 /**
@@ -245,17 +246,55 @@ public class DataSetSelectorSupport {
         }
         
     }
-
+    
+    /**
+     * return true if native dialogs should be used, or if shift is pressed, flipping the logic.
+     * @param e null or the ActionEvent, so that when shift it pressed...
+     * @return 
+     */
+    public static boolean shouldUseNativeFileDialog( ActionEvent e ) {
+        boolean result= System.getProperty("fileDialogNative","false").equals("true");
+        if ( e!=null && ( ( e.getModifiers()&KeyEvent.SHIFT_MASK)==KeyEvent.SHIFT_MASK ) ) {
+            result= !result;
+        }
+        return result;
+    }
+    
+    /**
+     * show a native file browser
+     * @param parent     
+     * @return null or the URI for the vap file.
+     */
+    public static String browseLocalNative( java.awt.Component parent ) {
+        Preferences prefs = AutoplotSettings.settings().getPreferences(DataSetSelectorSupport.class);
+        
+        String currentDirectory = prefs.get(AutoplotSettings.PREF_LAST_OPEN_FOLDER, userHome().toString());
+        FileDialog chooser= new FileDialog( (Frame) SwingUtilities.getWindowAncestor(parent), "Open File", FileDialog.LOAD );
+        
+        chooser.setDirectory( currentDirectory );
+        chooser.setVisible(true);
+        if ( chooser.getFile()!=null ) {
+            prefs.put(AutoplotSettings.PREF_LAST_OPEN_FOLDER, chooser.getDirectory() );
+            return new File( chooser.getDirectory(), chooser.getFile() ).toString();
+        } else {
+            return null;
+        }
+    }
+    
     /**
      * Show a file chooser component, and return the name of a data or .vap file.
      * @param parent parent component for focus.
-     * @return the URI for the vap file.
+     * @return null or the URI for the vap file.
      */
     public static String browseLocal( java.awt.Component parent ) {
         Preferences prefs = AutoplotSettings.settings().getPreferences(DataSetSelectorSupport.class);
 
         String currentDirectory = prefs.get(AutoplotSettings.PREF_LAST_OPEN_FOLDER, userHome().toString());
         final HashMap<String,Object> exts = DataSourceRegistry.getInstance().dataSourcesByExt;
+        
+        if ( DataSetSelectorSupport.shouldUseNativeFileDialog(null) ) {
+            return browseLocalNative(parent);
+        }
         
         JFileChooser chooser = new JFileChooser();
         try {

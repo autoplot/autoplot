@@ -9,7 +9,11 @@ import org.das2.dasml.SerializeUtil;
 import org.das2.dasml.DOMBuilder;
 import org.das2.graph.DasCanvas;
 import java.awt.Component;
+import java.awt.Dialog;
+import java.awt.FileDialog;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -30,6 +34,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -177,6 +182,19 @@ public class PersistentStateSupport {
     }
     
     /**
+     * return true if native dialogs should be used, or if shift is pressed, flipping the logic.
+     * @param e
+     * @return 
+     */
+    public static boolean shouldUseNativeFileDialog( ActionEvent e ) {
+        boolean result= System.getProperty("fileDialogNative","false").equals("true");
+        if (( e.getModifiers()&KeyEvent.SHIFT_MASK)==KeyEvent.SHIFT_MASK ) {
+            result= !result;
+        }
+        return result;
+    }
+    
+    /**
      * Create an action which will trigger the save as dialog.  This is
      * used to create a "save as" button.
      * @return the action
@@ -185,11 +203,49 @@ public class PersistentStateSupport {
         return new AbstractAction("Save As...") {
             @Override
             public void actionPerformed( ActionEvent e ) {
-                saveAs();
+                if ( shouldUseNativeFileDialog(e) ) {
+                    saveAsNative();
+                } else {
+                    saveAs();
+                }
             }
         };
     }
 
+    /**
+     * Save the state to the file selected by the native
+     * FileChooser.
+     * @return same as jFileChooser.showSaveDialog(), for example:
+     *    JFileChooser.CANCEL_OPTION   means the option was canceled.
+     *    JFileChooser.APPROVE_OPTION  means the file was saved.
+     *    Note this is not the same as  JOptionPane.CANCEL_OPTION!
+     */
+    public int saveAsNative() {
+        FileDialog chooser= new FileDialog((Frame) SwingUtilities.getWindowAncestor(component),"Save .vap",FileDialog.SAVE);
+        if ( getDirectory()!=null && getDirectory().length()>0 ) chooser.setDirectory( getDirectory() );
+        if ( getCurrentFile()!=null ) {
+            try {
+                File child= new File( getCurrentFile() );
+                File parent= FileSystem.settings().getLocalCacheDir();
+                if ( child.getCanonicalPath().startsWith(parent.getCanonicalPath())) {
+                    child= new File( getDirectory(), child.getName() );
+                }
+                chooser.setFile(child.getName());
+            } catch (IOException ex) {
+                Logger.getLogger(PersistentStateSupport.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }  
+        chooser.setVisible(true);
+        if ( chooser.getFile()!=null ) {
+            setCurrentFile( new File( chooser.getDirectory(), chooser.getFile() ).toString() );
+            setCurrentFileOpened(true);                
+            addToRecent(getCurrentFile());
+            save(new File( getCurrentFile()), "", Collections.emptyMap() );                    
+            return JFileChooser.APPROVE_OPTION;
+        }
+        return JFileChooser.CANCEL_OPTION;
+    }
+    
     /**
      * Save the state to the file selected by a JFileChooser.
      * @return same as jFileChooser.showSaveDialog(), for example:
@@ -365,7 +421,11 @@ public class PersistentStateSupport {
             @Override
             public void actionPerformed( ActionEvent e ) {
                 if ( getCurrentFile()==null ) {
-                    saveAs();
+                    if ( shouldUseNativeFileDialog(e) ) {
+                        saveAsNative();
+                    } else {
+                        saveAs();
+                    }
                 } else {
                     try {
                         File child = new File(getCurrentFile());
@@ -373,7 +433,11 @@ public class PersistentStateSupport {
                         if (child.getCanonicalPath().startsWith(parent.getCanonicalPath())) {
                             child = new File(getDirectory(), child.getName());
                             setCurrentFile(child.toString());
-                            saveAs();
+                            if ( shouldUseNativeFileDialog(e) ) {
+                                saveAsNative();
+                            } else {
+                                saveAs();
+                            }
                         } else {
                             save(new File(getCurrentFile()),"", Collections.emptyMap());
                         }

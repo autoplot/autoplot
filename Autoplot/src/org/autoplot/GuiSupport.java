@@ -783,7 +783,11 @@ public class GuiSupport {
                     String msg= "The application has been modified.  Do you want to save your changes?";
                     int result= JOptionPane.showConfirmDialog( parent, msg, "Application Modified", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE );
                     if ( result==JOptionPane.OK_OPTION ) {
-                        result= parent.stateSupport.saveAs();
+                        if ( PersistentStateSupport.shouldUseNativeFileDialog(e) ) {
+                            result= parent.stateSupport.saveAsNative();
+                        } else {
+                            result= parent.stateSupport.saveAs();
+                        }
                         if ( result==JFileChooser.CANCEL_OPTION ) {
                             return;
                         }
