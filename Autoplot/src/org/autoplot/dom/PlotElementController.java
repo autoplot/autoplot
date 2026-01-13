@@ -1474,6 +1474,9 @@ public class PlotElementController extends DomNodeController {
             }
         }
                         
+        /**
+         * higher the number the more likely to slice on this dimension.
+         */
         List<Integer> slicePref = new ArrayList( rank );
         for ( int i=0; i<fillDs.rank(); i++ ) slicePref.add(2);
                 
@@ -1490,6 +1493,12 @@ public class PlotElementController extends DomNodeController {
                 slicePref.set( i,0 );
                 X = i;
             } else if (n.startsWith("vpar")) {
+                slicePref.set( i,0 );
+                Y = i;
+            } else if (n.startsWith("v_perp")) {
+                slicePref.set( i,0 );
+                X = i;
+            } else if (n.startsWith("v_par")) {
                 slicePref.set( i,0 );
                 Y = i;
             } else if (n.contains("time") ) {
