@@ -297,7 +297,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             Icon icon= iconFor( value, false );
             String text;
             if ( jo!=null ) {
-                text= jo.optString("title",serverUrl);
+                text= serverUrl + ": " +jo.optString("title","");
             } else {
                 text= serverUrl;
             }
