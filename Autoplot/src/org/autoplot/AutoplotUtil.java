@@ -692,6 +692,9 @@ public class AutoplotUtil {
                 w.println("# Set the Flat LAF font and size");
                 w.println("#flatLAFFont=Roboto-24");                
                 w.println("");
+                w.println("# Use native file choosers, loosing some control over save and load options, but allows native search");
+                w.println("#fileDialogNative=true");
+                w.println("");
                 w.close();
             } catch ( IOException ex ) {
                 logger.log(Level.WARNING, "write initial {0} failed.  {1}", new Object[] { propFile, ex } );
