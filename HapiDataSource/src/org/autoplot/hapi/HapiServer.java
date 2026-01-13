@@ -199,6 +199,9 @@ public class HapiServer {
         }        
         List<String> d2ss1= new ArrayList( );
         d2ss1.addAll( getKnownServers() );
+        
+        HashSet<String> urls= new HashSet<>();
+        urls.addAll(d2ss1);
 
         File home = new File(AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA));
         File book = new File(home, "bookmarks");
@@ -220,8 +223,18 @@ public class HapiServer {
                         int i= s.indexOf("?");
                         if ( i==-1 ) i= s.length();
                         String key= s.substring(ttaglen+4+seek.length(),i);
+                        boolean skip= false;
+                        if ( !( key.startsWith("http://") || key.startsWith("https://") ) ) {
+                            skip=true;
+                        }
+                        if ( key.contains("vap+hapi") ) skip= true;
                         if ( dss.contains(key) ) dss.remove( key ); // move to the end
-                        dss.add( key );
+                        if ( key.startsWith("http://") && dss.contains("https://"+key.substring(7) ) ) {
+                            skip= true;
+                        }
+                        if ( !skip ) {
+                            dss.add( key );
+                        }
                     }
                     s = r.readLine();
                 }
