@@ -19,6 +19,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -155,7 +157,8 @@ public class RunBatchTool extends javax.swing.JPanel {
      */
     public RunBatchTool( final Application dom ) {
         initComponents();
-        
+        messageLabel.setPreferredSize( new Dimension(messageLabel.getFont().getSize()*50,messageLabel.getFont().getSize()) );
+        messageLabel.setMaximumSize( messageLabel.getPreferredSize() );        
         this.registerKeyboardAction((ActionEvent e) -> {
             org.das2.util.LoggerManager.logGuiEvent(e);
             JDialog dia= (JDialog) SwingUtilities.getWindowAncestor(cancelButton);
@@ -1137,7 +1140,11 @@ public class RunBatchTool extends javax.swing.JPanel {
                 }
                 messageLabel.setText(message0);
             };
-            messageLabel.setText("writing to "+ff + "...");
+            String msg= "writing to "+ff + "...";
+            //if ( msg.length()>70 ) {
+            //    msg= msg.substring(0,50)+"..."+msg.substring(msg.length()-17,msg.length());
+            //}
+            messageLabel.setText("<html>"+msg+"<html>");
             new Thread(run).start();
         }
     }//GEN-LAST:event_exportResultsMenuItemActionPerformed
@@ -2417,7 +2424,12 @@ public class RunBatchTool extends javax.swing.JPanel {
                         int count= completed - exportResultsWritten;
                         
                         appendResultsPendingCSV( pendingResultsFile, jo, ja, exportResultsWritten, count);
-                        messageLabel.setText( "wrote records "+exportResultsWritten+"-"+completed + " to " + resultsFile.getAbsolutePath()+".pending");
+                        String msg= "wrote records "+exportResultsWritten+"-"+completed + " to " + resultsFile.getAbsolutePath()+".pending";
+                        messageLabel.setToolTipText(msg);
+                        //if ( msg.length()>70 ) {
+                        //    msg= msg.substring(0,50) + "..." + msg.substring(msg.length()-17,msg.length());
+                        //}
+                        messageLabel.setText( "<html>"+msg+"</html>" );
                         exportResultsWritten= completed;
                     }
                     lastWrite= t;
