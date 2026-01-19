@@ -29,8 +29,10 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2026-01-17):</p>
+        <p>Bugfixes (2026-01-19):</p>
         <ul>
+            <li>Minor corrections to command line arguments, including "Welcome to Autoplot" is not printed with --quietLoggers
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2781/">2781</a>: change hadn't been pushed for build.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2781/">2781</a>: check bounds when switching dimensions with slice GUI.  Thanks, Connor!
         </ul>
         <p>Older Bugfixes (2025-01-07):</p>
@@ -64,6 +66,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>-q is added to mean --quietLoggers.
             <li>Look for "v_perp" and "v_par" as well when deciding how to automatically slice a rank 3 qube.  Thanks, Connor!
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/865/">865</a>: HAPI client uses abouts.json.  Thanks, HAPI team!
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/864/">864</a>: Add option for native file dialog to pick .vap files.  Thanks, Allison!
