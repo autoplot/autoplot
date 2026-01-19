@@ -300,6 +300,7 @@ from org.das2.util import Expect
 from org.das2.util import FileUtil
 from org.das2.util import GrannyTextRenderer
 from org.das2.util import LoggerManager
+from org.das2.util import StringTransmogrifier
 from org.das2.util.monitor import NullProgressMonitor
 from org.imgscalr import Scalr
 from org.jdesktop.beansbinding import Converter
