@@ -4832,7 +4832,7 @@ private void updateFrameTitle() {
         alm.addBooleanSwitchArgument( "scriptExit",null,"scriptExit","force exit after running the script, setting exit status to non-zero for exception");
         alm.addOptionalSwitchArgument("testPngFilename", null, "testPngFilename", "", "write canvas to this png file after script is run" );
         alm.addOptionalSwitchArgument("outputFile", null, "outputFile", "", "Write canvas to png or pdf output file" );
-        alm.addOptionalSwitchArgument("runBatch", "", "runBatch", "", "Run the Run Batch Tool .batch and exit.");
+        alm.addOptionalSwitchArgument("runBatch", null, "runBatch", "", "Run the Run Batch Tool .batch and exit.");
         
         alm.addOptionalSwitchArgument("autoLayout",null,"autoLayout",ArgumentList.TRUE,"turn on/off initial autolayout setting");
         alm.addOptionalSwitchArgument("mode","m","mode","expert","start in basic (browse,reduced) mode or expert mode" );
@@ -4845,7 +4845,7 @@ private void updateFrameTitle() {
         alm.addBooleanSwitchArgument( "noAskParams", null, "noAskParams", "don't ask for parameters when running a script");
         alm.addBooleanSwitchArgument( "sandbox", null, "sandbox", "enable sandbox, which limits which disks are used." );
         alm.addBooleanSwitchArgument( "version", null, "version", "print the version" );
-        alm.addBooleanSwitchArgument( "quietLoggers", null, "quietLoggers", "quiet all loggers" );
+        alm.addBooleanSwitchArgument( "quietLoggers", "q", "quietLoggers", "quiet all loggers" );
         
        for ( int i=0; i<args.length; i++ ) {  // kludge for java webstart, which uses "-open" not "--open"
            if ( args[i].equals("-print") ) args[i]="--print";
@@ -4933,7 +4933,10 @@ private void updateFrameTitle() {
         }
         System.setProperty("http.agent", "Autoplot-"+tag );
 
-        System.err.println(welcome);
+        if ( !alm.getBooleanValue("quietLoggers") ) {
+            System.err.println(welcome);
+        }
+        
         logger.info(welcome);
         final ApplicationModel model = new ApplicationModel();
         
