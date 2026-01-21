@@ -62,7 +62,6 @@ import org.python.util.PythonInterpreter;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
-import org.das2.qds.ops.Ops;
 import org.python.core.PyTuple;
 import org.python.parser.ast.BinOp;
 import org.python.parser.ast.TryExcept;
@@ -505,7 +504,7 @@ public class JythonUtil {
         }
         
         
-        return errs.size() > 0;
+        return !errs.isEmpty();
 
     }
 
@@ -677,11 +676,9 @@ public class JythonUtil {
         boolean visitNameFail = false;
 
         HashSet names = new HashSet();
-        SimpleNode node;
 
         MyVisitorBase(HashSet names, SimpleNode node ) {
             this.names = names;
-            this.node = node; // for reference
         }
 
         @Override
@@ -1439,7 +1436,7 @@ public class JythonUtil {
      * @throws PySyntaxError
      */
     public static List<Param> getGetParams(Reader reader) throws IOException, PySyntaxError {
-        return getGetParams(null, readScript(reader), new HashMap<String, String>());
+        return getGetParams(null, readScript(reader), new HashMap<>());
     }
 
     /**
@@ -1628,7 +1625,7 @@ public class JythonUtil {
         if (sort.isEmpty()) {
             try {
                 sort = (PyList) interp.eval("_paramSort");
-                if (sort.size() > 0) {
+                if (!sort.isEmpty()) {
                     logger.warning("things are suddenly in the wrong space.  This is because things are incorrectly imported.");
                     altWhy = true;
                 }
@@ -1908,11 +1905,11 @@ public class JythonUtil {
      * <p>
      * scrape through the script looking for getParam calls. These are executed,
      * and we get labels and infer types from the defaults. For example,<br>
-     * <tt>getParam( 'foo', 3.0 )</tt> will always return a real and<br>
-     * <tt>getParam( 'foo', 3 )</tt> will always return an integer.<br>
+     * <code>getParam( 'foo', 3.0 )</code> will always return a real and<br>
+     * <code>getParam( 'foo', 3 )</code> will always return an integer.<br>
      *
      * Other examples include:<br>
-     * <tt>getParam( 'foo', 'A', '', [ 'A', 'B' ] )</tt> constrains the values
+     * <code>getParam( 'foo', 'A', '', [ 'A', 'B' ] )</code> constrains the values
      * to A or B<br>
      * </p>
      * <p>
@@ -1921,11 +1918,11 @@ public class JythonUtil {
      * parameters to specify ranges. And last it would be nice to specify when a
      * parameter is ignored by the script (dA is not used is mode B is active).
      * <br>
-     * <tt>getParam( 'foo', 3, '', { 'min':0, 'max':10 } )</tt> might (Not
+     * <code>getParam( 'foo', 3, '', { 'min':0, 'max':10 } )</code> might (Not
      * implemented) constrain ranges<br>
-     * <tt>getParam( 'sc', 'A', '', [ 'A', 'B' ], { 'A':'big one', 'B':'little
-     * one' } )</tt> might (Not implemented) allow labels<br>
-     * <tt>getParam( 'foo', 'dA', '', [], { '_ignoreIf':'sc==B' } )</tt> might
+     * <code>getParam( 'sc', 'A', '', [ 'A', 'B' ], { 'A':'big one', 'B':'little
+     * one' } )</code> might (Not implemented) allow labels<br>
+     * <code>getParam( 'foo', 'dA', '', [], { '_ignoreIf':'sc==B' } )</code> might
      * (Not implemented) allow groups to be disabled when not active<br>
      * </p>
      * <p>
@@ -1944,7 +1941,7 @@ public class JythonUtil {
      * @throws PyException
      */
     public static List<Param> getGetParams(String script) throws PyException {
-        return getGetParams(null,script, new HashMap<String, String>());
+        return getGetParams(null,script, new HashMap<>());
 
     }
 
@@ -2036,7 +2033,7 @@ public class JythonUtil {
         if (sort.isEmpty()) {
             try {
                 sort = (PyList) interp.eval("_paramSort");
-                if (sort.size() > 0) {
+                if (!sort.isEmpty()) {
                     logger.warning("things are suddenly in the wrong space.  This is because things are incorrectly imported.");
                     altWhy = true;
                 }
