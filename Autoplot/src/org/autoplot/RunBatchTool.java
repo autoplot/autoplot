@@ -38,6 +38,7 @@ import java.text.ParseException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -143,13 +144,13 @@ public class RunBatchTool extends javax.swing.JPanel {
      */
     private org.autoplot.jythonsupport.Param[] parameterDescriptions;
     
-    private Map<JLabel,String> jobs= new HashMap<>();
+    private final Map<JLabel,String> jobs= new HashMap<>();
     
     public static final int HTML_LINE_LIMIT = 50;
             
     private ProgressMonitor monitor=null; // non-null when process is going.
         
-    private Preferences prefs;
+    private final Preferences prefs;
     
     /**
      * Creates new form BatchMaster
@@ -1211,6 +1212,8 @@ public class RunBatchTool extends javax.swing.JPanel {
         } else {
             messageLabel.setText("Unable to find script URI.");
             System.err.println("internal error...");
+            StringSelection stringSelection= new StringSelection( "Internal error..." );
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents( stringSelection, null );
         }
         
     }//GEN-LAST:event_copyScriptUriActionPerformed
@@ -2376,7 +2379,9 @@ public class RunBatchTool extends javax.swing.JPanel {
                 final JLabel jobLabel= jobs1.get(i1);
                 final JSONObject frunResults= new JSONObject();
                 ja.put(i1,frunResults);  // note runResults must be mutable
-                                
+                String uri= 
+                        URISplit.format( "script", split.resourceUri.toString(), Collections.singletonMap(final_param1, final_f1) );
+                jobs.put( jobLabel, uri);
                 Runnable runOne= () -> {
                     if ( monitor.isCancelled() ) return;
                     long t0= System.currentTimeMillis();
@@ -2687,6 +2692,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                             param1ScrollPane.scrollRectToVisible( jobs1.get(i1).getBounds() );
                             interp.setOut(outbaos);
                             uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
+                            jobs.put( jobs1.get(i1), uri );                            
                             interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile),scriptFile.getName()), scriptFile.getName() );
                             if ( writeCheckBox.isSelected() ) {
                                 Application myDom= (Application)env.get("dom");
@@ -2739,10 +2745,12 @@ public class RunBatchTool extends javax.swing.JPanel {
                             ByteArrayOutputStream outbaos= new ByteArrayOutputStream();                            
                             try {                                
                                 doSetParameter( param2NameCB, f2, parms, interp, pwd, runResults, scriptParams );
-                                
+                            
                                 jobs2.get(i2).setIcon( ICON_WORKING );
                                 interp.setOut(outbaos);
                                 uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
+                                jobs.put( jobs1.get(i1), uri );
+                                jobs.put( jobs2.get(i2), uri );                                    
                                 interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile), scriptFile.getName()), scriptFile.getName() );
                                 if ( writeCheckBox.isSelected() ) {
                                     Application myDom= (Application)env.get("dom");
@@ -2884,8 +2892,12 @@ public class RunBatchTool extends javax.swing.JPanel {
                         JSONArray ja= jo.getJSONArray("results");
                         for ( int j=0; j<ja.length(); j++ ) {
                             JSONObject jo1= ja.getJSONObject(j);
-                            if ( jo1.getString(param1).equals(s) ) {
-                                thisRow.add( jo1 );
+                            try {
+                                if ( jo1.getString(param1).equals(s) ) {
+                                    thisRow.add( jo1 );
+                                }
+                            } catch ( JSONException ex ) {
+                                logger.warning(ex.getMessage());
                             }
                         }
                         if ( jobs2.size()==thisRow.size() ) {
