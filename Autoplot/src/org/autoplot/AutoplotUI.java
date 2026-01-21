@@ -5390,10 +5390,16 @@ APSplash.checkTime("init 240");
      * @throws IOException 
      */
     private static void printScriptUsage( String[] args, String s, List<String> scriptArgs, PrintStream out) throws IOException {
+        URISplit split= URISplit.parse(s);
+        
         File f= DataSetURI.getFile(s,new NullProgressMonitor());
         String script= org.autoplot.jythonsupport.JythonUtil.readScript( new FileReader(f) );
         //List<org.autoplot.jythonsupport.JythonUtil.Param> parms= org.autoplot.jythonsupport.JythonUtil.getGetParams( script );
-        org.autoplot.jythonsupport.JythonUtil.ScriptDescriptor sd= org.autoplot.jythonsupport.JythonUtil.describeScript(script,null);
+        
+        Map<String,Object> env= new HashMap<>();
+        env.put( "PWD", split.path );
+        
+        org.autoplot.jythonsupport.JythonUtil.ScriptDescriptor sd= org.autoplot.jythonsupport.JythonUtil.describeScript(env,script,null);
         
         String label= sd.getLabel();
         if ( label.length()==0 ) {
