@@ -4,7 +4,6 @@ package org.autoplot;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.Window;
@@ -19,8 +18,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -32,8 +29,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
 import java.text.ParseException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -46,7 +41,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Queue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -58,7 +52,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -97,7 +90,6 @@ import org.autoplot.dom.Application;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.WindowManager;
-import org.autoplot.dom.ApplicationController;
 import org.autoplot.jythonsupport.Param;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
 import org.autoplot.jythonsupport.ui.Util;
@@ -2196,8 +2188,8 @@ public class RunBatchTool extends javax.swing.JPanel {
 
             if ( param2NameCB.getSelectedItem().toString().trim().length()==0 ) {
                 long t0= System.currentTimeMillis();
-                ByteArrayOutputStream outbaos= new ByteArrayOutputStream();
-                try {
+                String stdout="";
+                try (ByteArrayOutputStream outbaos = new ByteArrayOutputStream()) {
                     param1ScrollPane.scrollRectToVisible( jobLabel.getBounds() );
                     interp.setOut(outbaos);
                     interp.execfile( JythonRefactory.fixImports( new FileInputStream(scriptFile),scriptFile.getName()), scriptFile.getName() );
@@ -2207,22 +2199,23 @@ public class RunBatchTool extends javax.swing.JPanel {
                     }
                     jobLabel.setIcon(ICON_OKAY);
                     jobs.put( jobLabel, uri );
+                    stdout= new String(outbaos.toByteArray(),"US-ASCII");
                 } catch ( IOException | JSONException | RuntimeException ex ) {
-                    String msg= ex.toString();
+                    String msg= ex.toString().intern();
                     runResults.put("result",msg);
                     jobLabel.setIcon(ICON_PROB);
                 } finally {
-                    outbaos.close();
-                    runResults.put("stdout", new String(outbaos.toByteArray(),"US-ASCII") );
+                    runResults.put("stdout", stdout );
                     runResults.put("executionTime", System.currentTimeMillis()-t0);                            
                     System.out.println(runResults.getString("stdout"));
                 }
-                if ( jobLabel.getIcon()==ICON_OKAY ) {
-                    jobLabel.setToolTipText( htmlize(runResults.getString("stdout")) );
-                } else {
-                    jobLabel.setToolTipText( htmlize(runResults.getString("stdout"),runResults.getString("result")));
+                if ( false ) {
+                    if ( jobLabel.getIcon()==ICON_OKAY ) {
+                        jobLabel.setToolTipText( htmlize(runResults.getString("stdout")) );
+                    } else {
+                        jobLabel.setToolTipText( htmlize(runResults.getString("stdout"),runResults.getString("result")));
+                    }
                 }
-
 
                 JSONObject copy = new JSONObject(runResults, JSONObject.getNames(runResults));
 
