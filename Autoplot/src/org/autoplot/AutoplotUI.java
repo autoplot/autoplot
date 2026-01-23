@@ -4993,13 +4993,7 @@ private void updateFrameTitle() {
                 throw new IllegalArgumentException("outputFile must end with .png or .pdf");
             }
         }
-        
-        final String runBatch=alm.getValue("runBatch");
-        if ( !runBatch.equals("") ) {
-            System.err.println("runBatch is not supported.  Run the GUI and"
-                    + " use the Run Batch GUI.");
-        }
-        
+                
         final String finitialURL= initialURL;
         
         bookmarks= alm.getValue("bookmarks");
@@ -5310,6 +5304,22 @@ APSplash.checkTime("init 240");
                     if ( app!=null ) app.setStatus( READY_MESSAGE );
                 }
                 
+                final String runBatch=alm.getValue("runBatch");
+                if ( !runBatch.equals("") ) {
+                    Runnable run= new Runnable() {
+                        public void run() {
+                            try {
+                                System.err.println("Running batch job...");
+                                new org.autoplot.batch.BatchProcessor().runBatchScript( model.getDom(), runBatch, "", 8, new NullProgressMonitor() );
+                                System.err.println("Done!");
+                            } catch (IOException ex) {
+                                logger.log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    };
+                    new Thread(run,"runBatchThread").start();
+                }
+
                 if ( app!=null ) {
                     checkStatusLoop(app);
                 }
