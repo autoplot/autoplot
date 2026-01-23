@@ -75,7 +75,7 @@ public class Util {
     /**
      * get the parameters for the script.
      * @param env null, or a script context that can contain values such as dom and PWD.
-     * @param src the script, all in one string.
+     * @param src the script, all in one string.  NOT the URI for the script!
      * @param params null or default values for the parameters.
      * @param mon
      * @return list of parameters.
@@ -84,6 +84,10 @@ public class Util {
      */
     public static Map<String, Param> getParams( Map<String,Object> env, String src, Map<String,String> params, ProgressMonitor mon ) throws IOException {
         logger.finer("enter getParams");
+        
+        if ( src.startsWith("https://") || src.startsWith("http://") || src.startsWith("file://") ) {
+            throw new IllegalArgumentException("the script is expected, not the address of the script.");
+        }
         List<Param> r2= JythonUtil.getGetParams( env, src, params );
 
         Map<String, Param> result= new LinkedHashMap();
