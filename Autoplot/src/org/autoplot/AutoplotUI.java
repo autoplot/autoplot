@@ -5312,6 +5312,7 @@ APSplash.checkTime("init 240");
                                 System.err.println("Running batch job...");
                                 new org.autoplot.batch.BatchProcessor().runBatchScript( model.getDom(), runBatch, "", 8, new NullProgressMonitor() );
                                 System.err.println("Done!");
+                                AppManager.getInstance().quit();
                             } catch (IOException ex) {
                                 logger.log(Level.SEVERE, null, ex);
                             }
