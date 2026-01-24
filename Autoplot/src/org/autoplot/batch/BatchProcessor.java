@@ -2,6 +2,8 @@
 package org.autoplot.batch;
 
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -14,6 +16,7 @@ import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -204,9 +207,7 @@ public class BatchProcessor {
 
         Object[] args= new Object[argList.size()];
         for ( int i=0; i<argList.size(); i++ ) {
-            if ( i>ss.length ) {
-                System.err.println("Do somethng here");
-            }
+
             String spec;
             if ( packArgments ) {
                 spec= "x";
@@ -447,19 +448,73 @@ public class BatchProcessor {
 
     }
     
+    private int threads = 8;
+
+    public static final String PROP_THREADS = "threads";
+
+    public int getThreads() {
+        return threads;
+    }
+
+    public void setThreads(int threads) {
+        int oldThreads = this.threads;
+        this.threads = threads;
+        propertyChangeSupport.firePropertyChange(PROP_THREADS, oldThreads, threads);
+    }
+
+    private String writePngTemplate = "";
+
+    public static final String PROP_WRITEPNGTEMPLATE = "writePngTemplate";
+
+    public String getWritePngTemplate() {
+        return writePngTemplate;
+    }
+
+    public void setWritePngTemplate(String writePngTemplate) {
+        String oldWritePngTemplate = this.writePngTemplate;
+        this.writePngTemplate = writePngTemplate;
+        propertyChangeSupport.firePropertyChange(PROP_WRITEPNGTEMPLATE, oldWritePngTemplate, writePngTemplate);
+    }
+
+    private String statusMessage = "";
+
+    public static final String PROP_STATUSMESSAGE = "statusMessage";
+
     /**
-     * run the batch script at the location.
+     * get the last issues status message.
+     * @return 
+     */
+    public String getStatusMessage() {
+        return statusMessage;
+    }
+
+    public void setStatusMessage(String statusMessage) {
+        this.statusMessage = statusMessage;
+        propertyChangeSupport.firePropertyChange(PROP_STATUSMESSAGE, null, statusMessage);
+    }
+    
+    private transient final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
+    /**
+     * run the batch script at the location.  This will block until all jobs
+     * are completed or the monitor is cancelled.
      * @param dom the original dom.
      * @param batchFile the batch file specification
-     * @param writePngTemplate empty string (or null) or the template to write images
-     * @param threads the number of threads to use
      * @param monitor monitor for the process.
      * @throws java.io.IOException 
      * @throws IllegalArgumentException if the batchFile cannot be parsed.
      */
-    public void runBatchScript( Application dom, String batchFile, String writePngTemplate, int threads, ProgressMonitor monitor ) throws IOException {
+    public void runBatchScript( Application dom, String batchFile, ProgressMonitor monitor ) throws IOException {
 
-        int initialThreadCount= threads<1 ? 8 : threads;
+        int initialThreadCount= threads;
         
         try {
             
@@ -634,21 +689,27 @@ public class BatchProcessor {
                         long removed = durationsMillis.removeFirst();
                     }
                     long timeFor12Jobs=0;
+                    double jobCount=0.0;
                     if ( durationsMillis.size()>=12 ) {
-                        Iterator<Long> it= durationsMillis.descendingIterator();
-                        for ( int i=0; i<12; i++ ) {
-                            timeFor12Jobs+= it.next();
+                        try {
+                            Iterator<Long> it= durationsMillis.descendingIterator();
+                            for ( int i=0; i<12; i++ ) {
+                                timeFor12Jobs+= it.next();
+                                jobCount++;
+                            }
+                        } catch ( ConcurrentModificationException ex ) {
+                            
                         }
                     }
                     messageNumber++;
                     if ( ( messageNumber % 4 )>0 ) {
                         long jobsRemaining= executor.getTaskCount() - executor.getCompletedTaskCount();
-                        if ( timeFor12Jobs>0 ) {
+                        if ( jobCount>0 ) {
                             Datum eta= Units.milliseconds.createDatum( 
-                                    jobsRemaining * timeFor12Jobs / 12.0 / executor.getCorePoolSize() );
+                                    jobsRemaining * timeFor12Jobs / jobCount / executor.getCorePoolSize() );
                             eta= DatumUtil.asOrderOneUnits(eta);
                             String seta= String.format("%.2f%s", eta.value(), eta.getUnits() );
-                            Datum avgDuration= Units.milliseconds.createDatum( timeFor12Jobs / 12.0 );
+                            Datum avgDuration= Units.milliseconds.createDatum( timeFor12Jobs / jobCount );
                             avgDuration= DatumUtil.asOrderOneUnits(avgDuration);
                             String savgDuration= String.format("%.2f%s", avgDuration.value(), avgDuration.getUnits() );
                             
@@ -659,6 +720,7 @@ public class BatchProcessor {
                     } else {
                         report= "Running jobs...";
                     }
+                    setStatusMessage(report);
                     lastReport= t;
                 }
                 
@@ -684,6 +746,9 @@ public class BatchProcessor {
         Application dom= new ScriptContext2023().getDocumentModel();
         String batchFile= "https://github.com/autoplot/dev/blob/master/demos/2019/20190726/runBatch.batch"; 
         ProgressMonitor monitor= DasProgressPanel.createFramed("Run Batch");
-        new BatchProcessor().runBatchScript(dom, batchFile, "/tmp/ap/mypng_%08.1f.png", 8, monitor);
+        BatchProcessor processor= new BatchProcessor();
+        processor.setWritePngTemplate("/tmp/ap/mypng_%08.1f.png");
+        processor.setThreads(6);
+        new BatchProcessor().runBatchScript(dom, batchFile, monitor);
     }
 }
