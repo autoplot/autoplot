@@ -430,8 +430,7 @@ public class BatchProcessor {
             } finally {
                 outbaos.close();
                 runResults.put("stdout", new String(outbaos.toByteArray(),"US-ASCII") );
-                runResults.put("executionTime", System.currentTimeMillis()-t0);                            
-                System.out.println(runResults.getString("stdout"));
+                runResults.put("executionTime", System.currentTimeMillis()-t0);
             }
 
             JSONObject copy = new JSONObject(runResults, JSONObject.getNames(runResults));
