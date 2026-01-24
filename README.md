@@ -17,7 +17,7 @@ which has developed along with Autoplot.  The dependency library is linked as
 as git submodule.  To get Autoplot along with it's dependencies in one command
 issue:
 ```bash
-git clone --recurse-submodules git@github.com:autoplot/autoplot.git
+git clone --recurse-submodules https://github.com/autoplot/autoplot.git
 ```
 If you already cloned the project and forgot `--recurse-submodules` then you
 can initialize the submodule using:
@@ -28,9 +28,9 @@ git submodule update --init
 
 The above checkout method leaves a DasCore which does not update, so the following should be used instead:
 ```
-git clone git@github.com:autoplot/autoplot.git
+git clone https://github.com/autoplot/autoplot.git
 cd autoplot
-git clone git@github.com:das-developers/das2java.git
+git clone https://github.com/das-developers/das2java.git
 cd ..
 ```
 
