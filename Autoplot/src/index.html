@@ -29,8 +29,9 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2026-01-23):</p>
+        <p>Bugfixes (2026-01-24):</p>
         <ul>
+            <li><a href="https://github.com/das-developers/das2java/issues/161">161</a>: New code in DataPointRecorder caused runtime error with some existing scripts.  Thanks, Andrew!
             <li>Run batch tool sets "copy script URI" mouse action before attempting run.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2783/">2783</a>: --script --help when PWD is used now works properly.
             <li>Minor corrections to command line arguments, including "Welcome to Autoplot" is not printed with --quietLoggers
@@ -68,7 +69,7 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li><a href="https://github.com/das-developers/das2java/issues/160">160</a>: show both 100% confidence and 68% confidence intervals. (This may change.)
+            <li><a href="https://github.com/das-developers/das2java/issues/160">160</a>: show both 100% confidence and 68% confidence intervals when metadata is available. (This may change.)
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2670/">2670</a>: beginnings of run batch from command line.  1-parameter batch jobs are supported now.
             <li><a href="https://github.com/das-developers/das2java/issues/159/">159</a>: allow orbits files to be more lax, allowing csv files and comments.
             <li>-q is added to mean --quietLoggers.
