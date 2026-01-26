@@ -2267,12 +2267,11 @@ public class RunBatchTool extends javax.swing.JPanel {
                     runResults.put("executionTime", System.currentTimeMillis()-t0);                            
                     System.out.println(runResults.getString("stdout"));
                 }
-                if ( false ) {
-                    if ( jobLabel.getIcon()==ICON_OKAY ) {
-                        jobLabel.setToolTipText( htmlize(runResults.getString("stdout")) );
-                    } else {
-                        jobLabel.setToolTipText( htmlize(runResults.getString("stdout"),runResults.getString("result")));
-                    }
+                
+                if ( jobLabel.getIcon()==ICON_OKAY ) {
+                    jobLabel.setToolTipText( htmlize(runResults.getString("stdout")) );
+                } else {
+                    jobLabel.setToolTipText( htmlize(runResults.getString("stdout"),runResults.getString("result")));
                 }
 
                 JSONObject copy = new JSONObject(runResults, JSONObject.getNames(runResults));
