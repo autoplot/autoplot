@@ -2,6 +2,7 @@
 package org.autoplot.batch;
 
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.ByteArrayInputStream;
@@ -265,6 +266,94 @@ public class BatchProcessor {
 
     }
     
+    /**
+     * write stats for results to file.
+     * @param pendingFile
+     * @param results
+     * @param resultsArray
+     * @param recordsWrittenAlready
+     * @param count
+     * @throws FileNotFoundException
+     * @throws IOException 
+     */
+    private static void appendResultsPendingCSV( 
+            File pendingFile, 
+            JSONObject results, 
+            JSONArray resultsArray, 
+            int recordsWrittenAlready, 
+            int count ) throws FileNotFoundException, IOException {
+        
+        boolean header= recordsWrittenAlready==0;
+        
+        synchronized (RunBatchTool.class) {
+            
+            try (PrintWriter out = new PrintWriter( new FileWriter( pendingFile, true ) ) ) {
+
+                if ( resultsArray.length()==0 ) {
+                    logger.warning("no records in results");
+                    return;
+                }
+
+                JSONObject jo= resultsArray.getJSONObject(0);
+                boolean hasOutputFile= jo.has("writeFile");
+                JSONArray params= results.getJSONArray("params");
+
+                StringBuilder record;
+
+                if ( header ) {
+                    record= new StringBuilder();
+                    record.append("jobNumber");
+
+                    for ( int j=0; j<params.length(); j++ ) {
+                        record.append(",");
+                        record.append(params.get(j));
+                    }
+                    record.append(",").append("executionTime(ms)");
+                    if ( hasOutputFile ) {
+                        record.append(",").append("writeFile");
+                    }
+                    record.append(",").append("exception");
+
+                    out.println(record.toString());
+
+                }
+
+                int stop= recordsWrittenAlready + count;
+                for ( int i=recordsWrittenAlready; i<stop; i++ ) {
+                    Object o= resultsArray.opt(i);
+                    if ( o==null ) {
+                        continue;
+                    }
+                    if ( !( o instanceof JSONObject ) ) {
+                        continue;
+                    }
+                    jo= (JSONObject)o;
+                    record= new StringBuilder();
+                    record.append(i);
+                    for ( int j=0; j<params.length(); j++ ) {
+                        record.append(",");
+                        record.append( jo.get(params.getString(j)) );
+                    }
+                    record.append(",").append(jo.get("executionTime"));
+                    if ( hasOutputFile ) {
+                        record.append(",").append(jo.get("writeFile"));
+                    }
+                    String resultString= jo.optString("result","");
+                    int inl= resultString.indexOf("\n");
+                    if ( inl>=0 ) inl= resultString.indexOf("\n",inl+1);
+                    if ( inl>=0 ) inl= resultString.indexOf("\n",inl+1);
+                    if ( inl>=0 ) resultString= resultString.substring(0,inl).replaceAll("\n"," ").replaceAll(",","");
+                    record.append(",").append(resultString);
+                    out.println( record.toString() );
+                }
+                out.flush();
+
+            } catch (JSONException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
     
     /**
      * Run the job.  If an exception occurs during the run, the exception
@@ -278,7 +367,6 @@ public class BatchProcessor {
      * @param param1Value the value of the first parameter (or semicolon-delimited values)
      * @param param2Name the name of the second parameter (or semicolon-delimited parameters)
      * @param param2Value the value of the second parameter (or semicolon-delimited values)
-     * @param doWriteTemplate if non-empty, then write to this file
      * @param monitor monitor for the job
      * @return a JSONObject representing the run results.
      */
@@ -292,7 +380,6 @@ public class BatchProcessor {
         String param1Value, 
         String param2Name,
         String param2Value,
-        String doWriteTemplate,
         final ProgressMonitor monitor ) throws RuntimeException {
         
         URISplit split= URISplit.parse(scriptUri);
@@ -419,6 +506,7 @@ public class BatchProcessor {
                 interp.setOut(outbaos);
                 interp.execfile( new ByteArrayInputStream(script.getBytes("US-ASCII")), name );
                 String uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
+                String doWriteTemplate= this.writePngTemplate;
                 if ( doWriteTemplate.length()>0 ) {
                     runResults.put("writeFile", doWrite( doWriteTemplate, param1Value, "", uri, myDom ) );
                 }
@@ -492,6 +580,50 @@ public class BatchProcessor {
         propertyChangeSupport.firePropertyChange(PROP_STATUSMESSAGE, null, statusMessage);
     }
     
+    private File resultsFile = null;
+
+    public static final String PROP_RESULTSFILE = "resultsFile";
+
+    public File getResultsFile() {
+        return resultsFile;
+    }
+
+    /**
+     * set the file where results will be written.  This must have a .csv
+     * or .json extention.
+     * @param resultsFile 
+     */
+    public void setResultsFile(File resultsFile) {
+        if ( !( resultsFile.getName().endsWith(".csv") || resultsFile.getName().endsWith(".json") ) ) {
+            throw new IllegalArgumentException("results file must end with .json or .csv");
+        }
+        File oldResultsFile = this.resultsFile;
+        this.resultsFile = resultsFile;
+        propertyChangeSupport.firePropertyChange(PROP_RESULTSFILE, oldResultsFile, resultsFile);
+    }
+    
+
+    private File batchDirectory = null;
+
+    public static final String PROP_BATCHDIRECTORY = "batchDirectory";
+
+    public File getBatchDirectory() {
+        return batchDirectory;
+    }
+
+    /**
+     * set the location where job files will be created in "jobs"
+     * moved to "pending" as the job is in progress, and to "complete"
+     * as each job is completed.
+     * @param batchDirectory 
+     */
+    public void setBatchDirectory(File batchDirectory) {
+        File oldBatchDirectory = this.batchDirectory;
+        this.batchDirectory = batchDirectory;
+        propertyChangeSupport.firePropertyChange(PROP_BATCHDIRECTORY, oldBatchDirectory, batchDirectory);
+    }
+
+
     private transient final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -501,6 +633,14 @@ public class BatchProcessor {
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
+    
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(propertyName,listener);
+    }
+
+    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(propertyName,listener);
+    }    
 
     /**
      * run the batch script at the location.  This will block until all jobs
@@ -598,7 +738,20 @@ public class BatchProcessor {
            
             int numberOfJobs;
             
-            if ( param2Values==null ) {
+            JSONObject batchResults= new JSONObject();
+            JSONArray resultsStats= new JSONArray();
+            
+            batchResults.put( "results", resultsStats );
+            
+            JSONArray paramsJson= new JSONArray();
+            paramsJson.put(0,jo.getString("param1"));
+            if ( jo.getString("param2").length()>0 ) {
+                paramsJson.put(1,jo.getString("param2"));
+            }
+            
+            batchResults.put("params", paramsJson );
+            
+            if ( param2Values==null || param2Values.length==0 ) {
                 numberOfJobs= param1Values.length;
                 monitor.setTaskSize(numberOfJobs);
                 monitor.started();
@@ -620,9 +773,14 @@ public class BatchProcessor {
                                         fparam1Value, 
                                         null,
                                         null,
-                                        writePngTemplate,
                                         monitor.getSubtaskMonitor(fparam1) );
-                        if ( showEta ) durationsMillis.addLast(System.currentTimeMillis()-t0);
+                        if ( showEta ) {
+                            try{
+                                durationsMillis.addLast(System.currentTimeMillis()-t0);
+                            } catch ( Exception ex ) {
+                                logger.warning("Exception...");
+                            }
+                        }
                         if ( runResults==null ) return; // Cancel pressed
                         Iterator keyIterator= runResults.keys();
                         while ( keyIterator.hasNext() ) {
@@ -633,6 +791,16 @@ public class BatchProcessor {
                                 logger.log(Level.SEVERE, null, ex);
                             }
                         }
+                        
+                        int icount= I1.get();
+
+                        try {
+                            resultsStats.put( icount, runResults );
+                        } catch (JSONException ex) {
+                            logger.log(Level.SEVERE, null, ex);
+                        }
+                        icount++; 
+                        
                         if ( monitor.isFinished() ) {
                             logger.fine("monitor reports being finished though it shouldn't have been.");
                         } else {
@@ -651,7 +819,6 @@ public class BatchProcessor {
             long lastReport= System.currentTimeMillis();
             long messageNumber= 0; // toggle between messages
             
-            File resultsFile=null;
             int exportResultsWritten= 0;
             
             while ( true ) {
@@ -662,7 +829,7 @@ public class BatchProcessor {
                     break;
                 }
                 long t= System.currentTimeMillis();
-                if ( resultsFile!=null && ( ( t-lastWrite )>10000 ) ) { // write to pending file every ten seconds.
+                if ( resultsFile!=null && ( ( t-lastWrite )>1000 ) ) { // write to pending file every ten seconds.
                     if ( resultsFile.getName().endsWith(".json") ) {
                         
                     } else {
@@ -670,13 +837,9 @@ public class BatchProcessor {
                         int completed= I1.intValue();
                         int count= completed - exportResultsWritten;
                         
-                        //appendResultsPendingCSV( pendingResultsFile, jo, ja, exportResultsWritten, count);
-                        //String msg= "wrote records "+exportResultsWritten+"-"+completed + " to " + resultsFile.getAbsolutePath()+".pending";
-                        //messageLabel.setToolTipText(msg);
-                        //if ( msg.length()>70 ) {
-                        //    msg= msg.substring(0,50) + "..." + msg.substring(msg.length()-17,msg.length());
-                        //}
-                        //messageLabel.setText( "<html>"+msg+"</html>" );
+                        appendResultsPendingCSV( pendingResultsFile, batchResults, resultsStats, exportResultsWritten, count);
+                        String msg= "wrote records "+exportResultsWritten+"-"+completed + " to " + resultsFile.getAbsolutePath()+".pending";
+                        setStatusMessage(msg);
                         exportResultsWritten= completed;
                     }
                     lastWrite= t;
@@ -727,6 +890,23 @@ public class BatchProcessor {
                 //pendingResults.put( "results", new JSONArray( ja.toString() ) );
             }
             
+            if ( resultsFile!=null ) { // write to pending file every ten seconds.
+                if ( resultsFile.getName().endsWith(".json") ) {
+
+                } else {
+                    File pendingResultsFile= new File( resultsFile.getAbsolutePath()+".pending" );
+                    int completed= I1.intValue();
+                    int count= completed - exportResultsWritten;
+
+                    appendResultsPendingCSV( pendingResultsFile, batchResults, resultsStats, exportResultsWritten, count);
+                    String msg= "wrote records "+exportResultsWritten+"-"+completed + " to " + resultsFile.getAbsolutePath()+".pending";
+                    setStatusMessage(msg);
+                    pendingResultsFile.renameTo( resultsFile );
+                    
+                }
+            }
+                
+            
             if ( monitor.isCancelled() ) executor.shutdownNow();
 
             
@@ -743,11 +923,20 @@ public class BatchProcessor {
     
     public static void main( String[] args ) throws IOException {
         Application dom= new ScriptContext2023().getDocumentModel();
-        String batchFile= "https://github.com/autoplot/dev/blob/master/demos/2019/20190726/runBatch.batch"; 
+        String batchFile= "https://github.com/autoplot/dev/blob/master/demos/2019/20190726/runBatch2.batch"; 
         ProgressMonitor monitor= DasProgressPanel.createFramed("Run Batch");
         BatchProcessor processor= new BatchProcessor();
-        processor.setWritePngTemplate("/tmp/ap/mypng_%08.1f.png");
+        processor.setWritePngTemplate("/tmp/ap/mypng_%08.3f.png");
+        processor.setResultsFile( new File("/tmp/ap/results.csv"));
         processor.setThreads(6);
-        new BatchProcessor().runBatchScript(dom, batchFile, monitor);
+        processor.runBatchScript(dom, batchFile, monitor);
+        processor.addPropertyChangeListener( BatchProcessor.PROP_STATUSMESSAGE, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                System.err.println(evt.getNewValue());
+            }
+        });
+        System.err.println("Done!");
+        System.exit(0);
     }
 }
