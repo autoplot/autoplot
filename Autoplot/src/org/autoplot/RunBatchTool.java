@@ -1368,11 +1368,41 @@ public class RunBatchTool extends javax.swing.JPanel {
         } catch (InterruptedException | InvocationTargetException ex) {
             logger.log(Level.SEVERE, null, ex);
         } 
-        
+
         params.put( "param1", jo.getString("param1"));
-        params.put( "param2", jo.getString("param2"));
-        params.put( "param1Values", jo.getString("param1Values"));
-        params.put( "param2Values", jo.getString("param2Values"));                
+        params.put( "param2", jo.getString("param2"));                
+        
+        Object o= jo.get("param1Values");
+        if ( o instanceof String ) {
+            params.put( "param1Values", (String)o );
+        } else if ( o instanceof JSONArray ) {
+            JSONArray ja= (JSONArray)o;
+            StringBuilder sb= new StringBuilder();
+            for ( int i=0; i<ja.length(); i++ ) {
+                if ( i>0 ) sb.append("\n");
+                sb.append(ja.getString(i));
+            }
+            params.put( "param1Values", sb.toString() );
+        } else {
+            throw new IllegalArgumentException("bad format in file "+f);
+        }
+        
+        o= jo.get("param2Values");
+        if ( o instanceof String ) {
+            params.put( "param2Values", (String)o );
+        } else if ( o instanceof JSONArray ) {
+            JSONArray ja= (JSONArray)o;
+            StringBuilder sb= new StringBuilder();
+            for ( int i=0; i<ja.length(); i++ ) {
+                if ( i>0 ) sb.append("\n");
+                sb.append(ja.getString(i));
+            }
+            params.put( "param2Values", sb.toString() );
+        } else {
+            throw new IllegalArgumentException("bad format in file "+f);
+        }
+        
+        
         run= () -> {
             RunBatchTool.this.param1NameCB.setSelectedItem(params.get("param1"));
             RunBatchTool.this.param2NameCB.setSelectedItem(params.get("param2"));
@@ -1387,12 +1417,40 @@ public class RunBatchTool extends javax.swing.JPanel {
     }
     
     private void saveFile( File f ) throws IOException, JSONException {
+        boolean newBatchFormat= System.getProperty("newBatchFileFormat","false").equals("true");
+        
         JSONObject jo= new JSONObject();
         jo.put( "script", this.dataSetSelector1.getValue() );
         jo.put( "param1", this.param1NameCB.getSelectedItem().toString() );
         jo.put( "param2", this.param2NameCB.getSelectedItem().toString() );
-        jo.put( "param1Values", this.param1Values.getText() );
-        jo.put( "param2Values", this.param2Values.getText() );
+        String s1= this.param1Values.getText().trim();
+        if ( newBatchFormat ) {
+            JSONArray ja= new JSONArray();
+            if ( s1.length()>0 ) {
+                String[] ss= s1.split("\n",-2);
+                for ( int i=0; i<ss.length; i++ ) {
+                    ja.put( i, ss[i] );
+                }
+            }
+            jo.put( "param1Values", ja );
+        } else {
+            jo.put( "param1Values", s1 );
+        }
+        
+        String s2= this.param2Values.getText().trim();
+        if ( newBatchFormat ) {
+            JSONArray ja= new JSONArray();
+            if ( s2.length()>0 ) {
+                String[] ss= s2.split("\n",-2);
+                for ( int i=0; i<ss.length; i++ ) {
+                    ja.put( i, ss[i] );
+                }
+            }
+            jo.put( "param2Values", ja );
+        } else {
+            jo.put( "param2Values", s2 );
+        }
+        
         String src= jo.toString(4);
         FileUtil.writeStringToFile(f,src);
     }

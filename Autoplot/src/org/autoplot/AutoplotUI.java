@@ -117,6 +117,7 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
 import javax.xml.parsers.ParserConfigurationException;
+import org.autoplot.batch.BatchProcessor;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.autoplot.pngwalk.CreatePngWalk;
 import org.autoplot.pngwalk.PngWalkTool;
@@ -4993,13 +4994,7 @@ private void updateFrameTitle() {
                 throw new IllegalArgumentException("outputFile must end with .png or .pdf");
             }
         }
-        
-        final String runBatch=alm.getValue("runBatch");
-        if ( !runBatch.equals("") ) {
-            System.err.println("runBatch is not supported.  Run the GUI and"
-                    + " use the Run Batch GUI.");
-        }
-        
+                
         final String finitialURL= initialURL;
         
         bookmarks= alm.getValue("bookmarks");
@@ -5310,6 +5305,26 @@ APSplash.checkTime("init 240");
                     if ( app!=null ) app.setStatus( READY_MESSAGE );
                 }
                 
+                final String runBatchPngTemplate=alm.getValue("testPngFilename"); // this may change
+                final String runBatch=alm.getValue("runBatch");
+                if ( !runBatch.equals("") ) {
+                    Runnable run= new Runnable() {
+                        public void run() {
+                            try {
+                                System.err.println("Running batch job...");
+                                BatchProcessor processor= new org.autoplot.batch.BatchProcessor();
+                                processor.setWritePngTemplate(runBatchPngTemplate);
+                                processor.runBatchScript( model.getDom(), runBatch, new NullProgressMonitor() );
+                                System.err.println("Done!");
+                                if ( headless ) AppManager.getInstance().quit();
+                            } catch (IOException ex) {
+                                logger.log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    };
+                    new Thread(run,"runBatchThread").start();
+                }
+
                 if ( app!=null ) {
                     checkStatusLoop(app);
                 }
