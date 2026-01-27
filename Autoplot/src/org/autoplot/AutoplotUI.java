@@ -4834,7 +4834,8 @@ private void updateFrameTitle() {
         alm.addOptionalSwitchArgument("testPngFilename", null, "testPngFilename", "", "write canvas to this png file after script is run" );
         alm.addOptionalSwitchArgument("outputFile", null, "outputFile", "", "Write canvas to png or pdf output file" );
         alm.addOptionalSwitchArgument("runBatch", null, "runBatch", "", "Run the Run Batch Tool .batch and exit.");
-        
+        alm.addOptionalSwitchArgument("runBatchDirectory", null, "runBatchDirectory", "", "The batch will be controlled using this directory.");
+
         alm.addOptionalSwitchArgument("autoLayout",null,"autoLayout",ArgumentList.TRUE,"turn on/off initial autolayout setting");
         alm.addOptionalSwitchArgument("mode","m","mode","expert","start in basic (browse,reduced) mode or expert mode" );
         //alm.addOptionalSwitchArgument("exit", null, "exit", "0", "exit after running script" );
@@ -5308,12 +5309,15 @@ APSplash.checkTime("init 240");
                 final String runBatchPngTemplate=alm.getValue("testPngFilename"); // this may change
                 final String runBatch=alm.getValue("runBatch");
                 if ( !runBatch.equals("") ) {
+                    final String batchDirectory= alm.getValue("runBatchDirectory");
+                    final BatchProcessor processor= new org.autoplot.batch.BatchProcessor();
+                    processor.setWritePngTemplate(runBatchPngTemplate);
+                    if ( batchDirectory.length()>0 ) processor.setBatchDirectory(new File(batchDirectory));
                     Runnable run= new Runnable() {
                         public void run() {
                             try {
                                 System.err.println("Running batch job...");
-                                BatchProcessor processor= new org.autoplot.batch.BatchProcessor();
-                                processor.setWritePngTemplate(runBatchPngTemplate);
+                                
                                 processor.runBatchScript( model.getDom(), runBatch, new NullProgressMonitor() );
                                 System.err.println("Done!");
                                 if ( headless ) AppManager.getInstance().quit();

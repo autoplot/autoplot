@@ -10,8 +10,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URI;
 import java.text.ParseException;
@@ -32,6 +34,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.swing.SwingUtilities;
+import org.apache.commons.io.output.TeeOutputStream;
 import org.autoplot.ApplicationModel;
 import org.autoplot.JythonUtil;
 import org.autoplot.RunBatchTool;
@@ -358,6 +361,7 @@ public class BatchProcessor {
     /**
      * Run the job.  If an exception occurs during the run, the exception
      * text will appear in the result.
+     * @param jobNumber unique id for the job.
      * @param pwd the working directory of the script.
      * @param scriptUri the name of the script, possibly https://...jy
      * @param script the script to run
@@ -371,6 +375,7 @@ public class BatchProcessor {
      * @return a JSONObject representing the run results.
      */
     private JSONObject doOneJob(
+        int jobNumber,
         String pwd,
         String scriptUri,
         String script,
@@ -501,9 +506,24 @@ public class BatchProcessor {
             }
 
             long t0= System.currentTimeMillis();
-            ByteArrayOutputStream outbaos= new ByteArrayOutputStream();
+            
+            OutputStream outs;
+            ByteArrayOutputStream outbaos;
+            if ( batchDirectory!=null ) {
+                File outf= new File( new File( batchDirectory, "stdout" ), String.format("%06d",jobNumber) );
+                if ( !outf.getParentFile().exists() ) {
+                    outf.getParentFile().mkdirs();
+                } 
+                outbaos= new ByteArrayOutputStream();
+                outs= new TeeOutputStream( new FileOutputStream( outf ), outbaos );
+            } else {
+                outbaos= new ByteArrayOutputStream();
+                outs= outbaos;
+            }
+            
+            //ByteArrayOutputStream outbaos= 
             try {
-                interp.setOut(outbaos);
+                interp.setOut(outs);
                 interp.execfile( new ByteArrayInputStream(script.getBytes("US-ASCII")), name );
                 String uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
                 String doWriteTemplate= this.writePngTemplate;
@@ -756,6 +776,7 @@ public class BatchProcessor {
                 monitor.setTaskSize(numberOfJobs);
                 monitor.started();
                 for ( int i=0; i<param1Values.length; i++ ) {
+                    final int fi= i;
                     final String fparam1= jo.getString("param1");
                     final String fparam1Value= param1Values[i];
                     final Map<String,String> fscriptParams= scriptParams;
@@ -764,7 +785,7 @@ public class BatchProcessor {
                         if ( monitor.isCancelled() ) return;
                         long t0= System.currentTimeMillis();
                         JSONObject runResults= 
-                                doOneJob( pwd,
+                                doOneJob( fi, pwd,
                                         fscriptUri,
                                         script, 
                                         fparameterDescriptions, 
