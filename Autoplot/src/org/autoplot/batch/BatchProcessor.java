@@ -690,6 +690,9 @@ public class BatchProcessor {
             
             final Map<String,String> params= new HashMap();
             String scriptUri= jo.getString("script");
+            if ( scriptUri.startsWith("script:") ) { // kludge where "script:" prefix gets into .batch file
+                scriptUri= scriptUri.substring(7);
+            }
             scriptUri= scriptUri.replaceAll("\\%\\{PWD\\}",pwd );
             
             final String fscriptUri= scriptUri;
