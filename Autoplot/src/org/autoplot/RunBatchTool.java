@@ -1420,7 +1420,12 @@ public class RunBatchTool extends javax.swing.JPanel {
         boolean newBatchFormat= System.getProperty("newBatchFileFormat","false").equals("true");
         
         JSONObject jo= new JSONObject();
-        jo.put( "script", this.dataSetSelector1.getValue() );
+        
+        String script= this.dataSetSelector1.getValue();
+        if ( script.startsWith("script:") ) {
+            script= script.substring(7);
+        }
+        jo.put( "script", script );
         jo.put( "param1", this.param1NameCB.getSelectedItem().toString() );
         jo.put( "param2", this.param2NameCB.getSelectedItem().toString() );
         String s1= this.param1Values.getText().trim();
