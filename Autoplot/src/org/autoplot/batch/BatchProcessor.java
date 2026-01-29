@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -36,6 +37,7 @@ import java.util.prefs.Preferences;
 import javax.swing.SwingUtilities;
 import org.apache.commons.io.output.TeeOutputStream;
 import org.autoplot.ApplicationModel;
+import org.autoplot.AutoplotUtil;
 import org.autoplot.JythonUtil;
 import org.autoplot.RunBatchTool;
 import org.autoplot.ScriptContext2023;
@@ -622,11 +624,20 @@ public class BatchProcessor {
         propertyChangeSupport.firePropertyChange(PROP_RESULTSFILE, oldResultsFile, resultsFile);
     }
     
-
+    /**
+     * null or the root of the batch directory used to coordinate the jobs.
+     */
     private File batchDirectory = null;
 
+    /**
+     * property name of the batchDirectory, where the batch is coordinated.
+     */    
     public static final String PROP_BATCHDIRECTORY = "batchDirectory";
 
+    /**
+     * null or the root of the batch directory used to coordinate the jobs.
+     * @return null or the root of the batch directory used to coordinate the jobs.
+     */    
     public File getBatchDirectory() {
         return batchDirectory;
     }
@@ -635,7 +646,7 @@ public class BatchProcessor {
      * set the location where job files will be created in "jobs"
      * moved to "pending" as the job is in progress, and to "complete"
      * as each job is completed.
-     * @param batchDirectory 
+     * @param batchDirectory null or the directory.
      */
     public void setBatchDirectory(File batchDirectory) {
         File oldBatchDirectory = this.batchDirectory;
@@ -747,7 +758,7 @@ public class BatchProcessor {
             ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(initialThreadCount,tf);
             Deque<Long> durationsMillis= new ArrayDeque<>(); 
             
-            final AtomicInteger I1= new AtomicInteger(0);
+            final AtomicInteger jobNumber= new AtomicInteger(0);
             
             boolean showEta= "true".equals( System.getProperty("RunBatchTool.eta","true") ); 
             
@@ -760,6 +771,48 @@ public class BatchProcessor {
             final Map<String,Param> fparameterDescriptions=Util.getParams( env, script, params, new NullProgressMonitor() );
            
             int numberOfJobs;
+            
+            File lbatchQueueDirectory= null;
+            File lbatchPendingDirectory= null;
+            File lbatchCompleteDirectory= null;
+            File lbatchStdoutDirectory= null;
+            
+            if ( batchDirectory!=null ) {
+                if ( !batchDirectory.exists() ) {
+                    if ( !batchDirectory.mkdirs() ) {
+                        throw new IllegalArgumentException("Unable to make directory: "+batchDirectory);
+                    }
+                }
+                lbatchQueueDirectory= new File( batchDirectory, "jobs" );
+                if ( !lbatchQueueDirectory.exists() ) {
+                    if ( !lbatchQueueDirectory.mkdirs() ) {
+                        throw new IllegalArgumentException("Unable to make directory: "+lbatchQueueDirectory);
+                    }
+                }
+                lbatchPendingDirectory= new File( batchDirectory, "pending" );
+                if ( !lbatchPendingDirectory.exists() ) {
+                    if ( !lbatchPendingDirectory.mkdirs() ) {
+                        throw new IllegalArgumentException("Unable to make directory: "+lbatchPendingDirectory);
+                    }
+                }
+                lbatchCompleteDirectory= new File( batchDirectory, "complete" );
+                if ( !lbatchCompleteDirectory.exists() ) {
+                    if ( !lbatchCompleteDirectory.mkdirs() ) {
+                        throw new IllegalArgumentException("Unable to make directory: "+lbatchCompleteDirectory);
+                    }
+                }
+                lbatchStdoutDirectory= new File( batchDirectory, "stdout" );
+                if ( !lbatchStdoutDirectory.exists() ) {
+                    if ( !lbatchStdoutDirectory.mkdirs() ) {
+                        throw new IllegalArgumentException("Unable to make directory: "+lbatchStdoutDirectory);
+                    }
+                }                
+            }
+            
+            final File batchQueueDirectory= lbatchQueueDirectory;
+            final File batchPendingDirectory= lbatchPendingDirectory;
+            final File batchCompleteDirectory= lbatchCompleteDirectory;
+            final File batchStdoutDirectory= lbatchStdoutDirectory;
             
             JSONObject batchResults= new JSONObject();
             JSONArray resultsStats= new JSONArray();
@@ -784,52 +837,89 @@ public class BatchProcessor {
                     final String fparam1Value= param1Values[i];
                     final Map<String,String> fscriptParams= scriptParams;
                     final JSONObject frunResults= new JSONObject();
+                    
+                    if ( batchPendingDirectory!=null ) {
+                        File file= new File( batchQueueDirectory,String.format("%06d",fi) );
+                        try ( PrintWriter write= new PrintWriter( file) ) {
+                            write.println( AutoplotUtil.getProcessId("XXX") );
+                        }
+                    }
+                    
                     Runnable runOne= () -> {
                         if ( monitor.isCancelled() ) return;
-                        long t0= System.currentTimeMillis();
-                        JSONObject runResults= 
-                                doOneJob( fi, pwd,
-                                        fscriptUri,
-                                        script, 
-                                        fparameterDescriptions, 
-                                        fscriptParams,
-                                        fparam1, 
-                                        fparam1Value, 
-                                        null,
-                                        null,
-                                        monitor.getSubtaskMonitor(fparam1) );
-                        if ( showEta ) {
-                            try{
-                                durationsMillis.addLast(System.currentTimeMillis()-t0);
-                            } catch ( Exception ex ) {
-                                logger.warning("Exception...");
+                        
+                        try {
+                            if ( batchQueueDirectory!=null ) {
+                                synchronized (BatchProcessor.this) {
+                                    // Note even though this is synchronized, 
+                                    // the idea is that other machines might also 
+                                    // be working on this.
+                                    File file= new File( batchQueueDirectory,String.format("%06d",fi) );
+                                    if ( !file.exists() ) {
+                                        return; // someone else grabbed the task
+                                    }
+                                    File pendingFile= new File( batchPendingDirectory,String.format("%06d",fi) );
+                                    if ( !file.renameTo(pendingFile) ) {
+                                        return; // someone else grabbed the task
+                                    }
+                                }
                             }
-                        }
-                        if ( runResults==null ) return; // Cancel pressed
-                        Iterator keyIterator= runResults.keys();
-                        while ( keyIterator.hasNext() ) {
-                            String k= (String) keyIterator.next();
+                            
+                            long t0= System.currentTimeMillis();
+                            JSONObject runResults= 
+                                    doOneJob( fi, pwd,
+                                            fscriptUri,
+                                            script, 
+                                            fparameterDescriptions, 
+                                            fscriptParams,
+                                            fparam1, 
+                                            fparam1Value, 
+                                            null,
+                                            null,
+                                            monitor.getSubtaskMonitor(fparam1) );
+                            if ( showEta ) {
+                                try{
+                                    durationsMillis.addLast(System.currentTimeMillis()-t0);
+                                } catch ( Exception ex ) {
+                                    logger.warning("Exception...");
+                                }
+                            }
+                            
+                            if ( batchQueueDirectory!=null ) {
+                                File completedFile= new File( batchCompleteDirectory,String.format("%06d",fi) );
+                                File pendingFile= new File( batchPendingDirectory,String.format("%06d",fi) );
+                                if ( !pendingFile.renameTo(completedFile) ) {
+                                    throw new IllegalArgumentException("couldn't rename "+pendingFile);
+                                }
+                            }
+                            if ( runResults==null ) return; // Cancel pressed
+                            Iterator keyIterator= runResults.keys();
+                            while ( keyIterator.hasNext() ) {
+                                String k= (String) keyIterator.next();
+                                try {
+                                    frunResults.put( k, runResults.get(k) );
+                                } catch (JSONException ex) {
+                                    logger.log(Level.SEVERE, null, ex);
+                                }
+                            }
+
+                            int icount= jobNumber.get();
+
                             try {
-                                frunResults.put( k, runResults.get(k) );
+                                resultsStats.put( icount, runResults );
                             } catch (JSONException ex) {
                                 logger.log(Level.SEVERE, null, ex);
                             }
-                        }
-                        
-                        int icount= I1.get();
-
-                        try {
-                            resultsStats.put( icount, runResults );
-                        } catch (JSONException ex) {
-                            logger.log(Level.SEVERE, null, ex);
-                        }
-                        icount++; 
-                        
-                        if ( monitor.isFinished() ) {
-                            logger.fine("monitor reports being finished though it shouldn't have been.");
-                        } else {
-                            monitor.setTaskProgress(I1.incrementAndGet());
                             
+                        } catch ( RuntimeException ex ) {
+                            ex.printStackTrace(); //TODO: do something with this.
+                        } finally {
+                            if ( monitor.isFinished() ) {
+                                logger.fine("monitor reports being finished though it shouldn't have been.");
+                            } else {
+                                monitor.setTaskProgress(jobNumber.incrementAndGet());
+
+                            }
                         }
                     };
                     executor.execute(runOne);
@@ -846,7 +936,7 @@ public class BatchProcessor {
             int exportResultsWritten= 0;
             
             while ( true ) {
-                if ( executor.getActiveCount()==0 && I1.intValue()==numberOfJobs ) {
+                if ( executor.getActiveCount()==0 && jobNumber.intValue()==numberOfJobs ) {
                     break;
                 }
                 if ( monitor.isCancelled() ) {
@@ -858,7 +948,7 @@ public class BatchProcessor {
                         
                     } else {
                         File pendingResultsFile= new File( resultsFile.getAbsolutePath()+".pending" );
-                        int completed= I1.intValue();
+                        int completed= jobNumber.intValue();
                         int count= completed - exportResultsWritten;
                         
                         appendResultsPendingCSV( pendingResultsFile, batchResults, resultsStats, exportResultsWritten, count);
@@ -919,7 +1009,7 @@ public class BatchProcessor {
 
                 } else {
                     File pendingResultsFile= new File( resultsFile.getAbsolutePath()+".pending" );
-                    int completed= I1.intValue();
+                    int completed= jobNumber.intValue();
                     int count= completed - exportResultsWritten;
 
                     appendResultsPendingCSV( pendingResultsFile, batchResults, resultsStats, exportResultsWritten, count);
