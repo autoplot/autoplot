@@ -5,11 +5,9 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -811,7 +809,7 @@ public class BatchProcessor {
             
             final File batchQueueDirectory= lbatchQueueDirectory;
             final File batchPendingDirectory= lbatchPendingDirectory;
-            final File batchCompleteDirectory= lbatchCompleteDirectory;
+            final File batchCompletedDirectory= lbatchCompleteDirectory;
             final File batchStdoutDirectory= lbatchStdoutDirectory;
             
             JSONObject batchResults= new JSONObject();
@@ -827,6 +825,34 @@ public class BatchProcessor {
             
             batchResults.put("params", paramsJson );
             
+            // If using a batchDirectory, then queue up all the jobs.
+            if ( batchPendingDirectory!=null ) {
+                if ( param2Values==null || param2Values.length==0 ) {
+                    URISplit split1= URISplit.parse(fscriptUri);
+                    Map<String,String> scriptParams1= URISplit.parseParams(split1.params);
+                    String param1s= jo.getString("param1");
+                    scriptParams1.remove(param1s);
+                    String baseScriptUriMyName1= URISplit.format( "script", split1.file, (Map) scriptParams1 );
+                    for ( int i=0; i<param1Values.length; i++ ) {
+                        final int fi= i;
+                        File file= new File( batchQueueDirectory,String.format("%06d",fi) );
+                        try ( PrintWriter write= new PrintWriter( file) ) {
+                            write.println( AutoplotUtil.getProcessId("XXX") );
+                            String scriptURI;
+                            if ( baseScriptUriMyName1.endsWith("?") ) {
+                                scriptURI= baseScriptUriMyName1 + param1s + "=" + param1Values[i];
+                            } else{
+                                scriptURI= baseScriptUriMyName1 + "&"+ param1s + "=" + param1Values[i];
+                            }
+                            write.println( scriptURI );
+                        }
+                    }
+                } else {
+                    throw new IllegalArgumentException("second parameter not supported");
+                    //TODO: second parameter
+                }
+            }
+            
             if ( param2Values==null || param2Values.length==0 ) {
                 numberOfJobs= param1Values.length;
                 monitor.setTaskSize(numberOfJobs);
@@ -838,13 +864,6 @@ public class BatchProcessor {
                     final Map<String,String> fscriptParams= scriptParams;
                     final JSONObject frunResults= new JSONObject();
                     
-                    if ( batchPendingDirectory!=null ) {
-                        File file= new File( batchQueueDirectory,String.format("%06d",fi) );
-                        try ( PrintWriter write= new PrintWriter( file) ) {
-                            write.println( AutoplotUtil.getProcessId("XXX") );
-                        }
-                    }
-                    
                     Runnable runOne= () -> {
                         if ( monitor.isCancelled() ) return;
                         
@@ -854,13 +873,18 @@ public class BatchProcessor {
                                     // Note even though this is synchronized, 
                                     // the idea is that other machines might also 
                                     // be working on this.
-                                    File file= new File( batchQueueDirectory,String.format("%06d",fi) );
-                                    if ( !file.exists() ) {
+                                    File queueFile= new File( batchQueueDirectory,String.format("%06d",fi) );
+                                    if ( !queueFile.exists() ) {
                                         return; // someone else grabbed the task
                                     }
                                     File pendingFile= new File( batchPendingDirectory,String.format("%06d",fi) );
-                                    if ( !file.renameTo(pendingFile) ) {
-                                        return; // someone else grabbed the task
+                                    if ( !queueFile.renameTo(pendingFile) ) {
+                                        if ( queueFile.exists() ) {
+                                            System.err.println("there was an issue when moving "+queueFile);
+                                        } else {
+                                            System.err.println("someone else grabbed "+queueFile);
+                                            return; // someone else grabbed the task
+                                        }
                                     }
                                 }
                             }
@@ -886,8 +910,8 @@ public class BatchProcessor {
                             }
                             
                             if ( batchQueueDirectory!=null ) {
-                                File completedFile= new File( batchCompleteDirectory,String.format("%06d",fi) );
                                 File pendingFile= new File( batchPendingDirectory,String.format("%06d",fi) );
+                                File completedFile= new File( batchCompletedDirectory,String.format("%06d",fi) );
                                 if ( !pendingFile.renameTo(completedFile) ) {
                                     throw new IllegalArgumentException("couldn't rename "+pendingFile);
                                 }
