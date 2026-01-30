@@ -842,10 +842,8 @@ public class BatchProcessor {
                 File specificationFile = new File( batchDirectory, "main.batch" );
                 
                 if ( specificationFile.exists() ) {
-                    try (DirectoryStream<Path> stream = Files.newDirectoryStream(lbatchQueueDirectory.toPath())) {
-                        if ( !stream.iterator().hasNext() ) {
-                            specificationFile.delete();
-                        }
+                    if ( isDirectoryEmpty(lbatchQueueDirectory) ) {
+                        specificationFile.delete();
                     }
                 }
                 if ( specificationFile.exists() ) {
@@ -1039,7 +1037,9 @@ public class BatchProcessor {
             
             while ( true ) {
                 if ( executor.getActiveCount()==0 && jobNumber.intValue()==numberOfJobs ) {
-                    break;
+                    if ( isDirectoryEmpty(batchPendingDirectory) ) {
+                        break;
+                    }
                 }
                 if ( monitor.isCancelled() ) {
                     break;
@@ -1134,6 +1134,18 @@ public class BatchProcessor {
             
         }
         
+    }
+
+    /**
+     * return true if the directory is empty
+     * @param lbatchQueueDirectory
+     * @return
+     * @throws IOException 
+     */
+    private boolean isDirectoryEmpty(File lbatchQueueDirectory) throws IOException {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(lbatchQueueDirectory.toPath())) {
+            return !stream.iterator().hasNext();
+        }
     }
     
     public static void main( String[] args ) throws IOException {
