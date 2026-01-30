@@ -976,7 +976,7 @@ public class BatchProcessor {
                                     durationsMillis.addLast(timeToComplete);
                                 } catch ( Exception ex ) {
                                     logger.warning("Exception...");
-                                }
+                                }                                
                             }
                             
                             if ( batchQueueDirectory!=null ) {
@@ -1079,26 +1079,25 @@ public class BatchProcessor {
                             
                         }
                     }
-                    messageNumber++;
-                    if ( ( messageNumber % 4 )>0 ) {
-                        long jobsRemaining= executor.getTaskCount() - executor.getCompletedTaskCount();
-                        if ( jobCount>0 ) {
-                            Datum eta= Units.milliseconds.createDatum( 
-                                    jobsRemaining * timeFor12Jobs / jobCount / executor.getCorePoolSize() );
-                            eta= DatumUtil.asOrderOneUnits(eta);
-                            String seta= String.format("%.2f%s", eta.value(), eta.getUnits() );
-                            Datum avgDuration= Units.milliseconds.createDatum( timeFor12Jobs / jobCount );
-                            avgDuration= DatumUtil.asOrderOneUnits(avgDuration);
-                            String savgDuration= String.format("%.2f%s", avgDuration.value(), avgDuration.getUnits() );
+
+                    long jobsRemaining= executor.getTaskCount() - executor.getCompletedTaskCount();
+                    if ( jobCount>0 ) {
+                        Datum eta= Units.milliseconds.createDatum( 
+                            jobsRemaining * timeFor12Jobs / jobCount / executor.getCorePoolSize() );
+                        eta= DatumUtil.asOrderOneUnits(eta);
+                        String seta= String.format("%.2f%s", eta.value(), eta.getUnits() );
+                        Datum avgDuration= Units.milliseconds.createDatum( timeFor12Jobs / jobCount );
+                        avgDuration= DatumUtil.asOrderOneUnits(avgDuration);
+                        String savgDuration= String.format("%.2f%s", avgDuration.value(), avgDuration.getUnits() );
                             
-                            report= String.format( "%d remaining, avg %s, eta %s", jobsRemaining, savgDuration, seta );
-                        } else {
-                            report= String.format( "%d jobs, %d remaining", numberOfJobs, jobsRemaining );
-                        }
+                        report= String.format( "%d remaining, avg %s, eta %s", jobsRemaining, savgDuration, seta );
                     } else {
-                        report= "Running jobs...";
+                        report= String.format( "%d remaining", jobsRemaining );
                     }
+                    
+                    logger.fine(report);
                     setStatusMessage(report);
+                    
                     lastReport= t;
                 }
                 
