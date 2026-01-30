@@ -1188,6 +1188,9 @@ public class AutoplotUtil {
         
         RenderType spec;
 
+        /**
+         * preference between nearest neighbor and smooth spectrograms
+         */
         RenderType specPref= RenderType.spectrogram;
         Options o= new Options();
         Preferences prefs= AutoplotSettings.settings().getPreferences( o.getClass() );  //TODO: because this is static?
@@ -1288,7 +1291,7 @@ public class AutoplotUtil {
                 }
             }
             if ( trivialBundle ) {
-                if ( isRank3WaveformXYZ ) {
+                if ( isRank3WaveformXYZ || fillds.length(0)<4 ) {
                     if ( useHugeScatter && fillds.length() > SERIES_SIZE_LIMIT) {
                         spec = RenderType.hugeScatter;
                     } else {
