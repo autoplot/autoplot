@@ -867,7 +867,6 @@ public class BatchProcessor {
             final File batchQueueDirectory= lbatchQueueDirectory;
             final File batchPendingDirectory= lbatchPendingDirectory;
             final File batchCompletedDirectory= lbatchCompleteDirectory;
-            final File batchStdoutDirectory= lbatchStdoutDirectory;
             
             JSONObject batchResults= new JSONObject();
             JSONArray resultsStats= new JSONArray();
@@ -934,14 +933,15 @@ public class BatchProcessor {
                                     // be working on this.
                                     File queueFile= new File( batchQueueDirectory,String.format("%06d",fi) );
                                     if ( !queueFile.exists() ) {
+                                        logger.log(Level.FINE, "someone else grabbed {0}", queueFile);
                                         return; // someone else grabbed the task
                                     }
                                     File pendingFile= new File( batchPendingDirectory,String.format("%06d",fi) );
                                     if ( !queueFile.renameTo(pendingFile) ) {
                                         if ( queueFile.exists() ) {
-                                            System.err.println("there was an issue when moving "+queueFile);
+                                            logger.log(Level.WARNING, "there was an issue when moving {0}", queueFile);
                                         } else {
-                                            System.err.println("someone else grabbed "+queueFile);
+                                            logger.log(Level.FINE, "someone else grabbed {0}", queueFile);
                                             return; // someone else grabbed the task
                                         }
                                     }
