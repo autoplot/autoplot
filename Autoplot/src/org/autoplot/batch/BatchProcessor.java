@@ -838,7 +838,16 @@ public class BatchProcessor {
                         throw new IllegalArgumentException("Unable to make directory: "+lbatchStdoutDirectory);
                     }
                 }
+                
                 File specificationFile = new File( batchDirectory, "main.batch" );
+                
+                if ( specificationFile.exists() ) {
+                    try (DirectoryStream<Path> stream = Files.newDirectoryStream(lbatchQueueDirectory.toPath())) {
+                        if ( !stream.iterator().hasNext() ) {
+                            specificationFile.delete();
+                        }
+                    }
+                }
                 if ( specificationFile.exists() ) {
                     batchWorker= true;
                     logger.info("Running batch as worker");
@@ -978,7 +987,8 @@ public class BatchProcessor {
                                 }
                                 try {
                                     Path path= completedFile.toPath();
-                                    String text= "durationMs: " + timeToComplete + "\n";
+                                    String exception= runResults.optString("result","").replaceAll("\n"," ");
+                                    String text= "runTimeMs: " + timeToComplete + "\n" + "exception: "+exception;
                                     Files.write(path, text.getBytes(), StandardOpenOption.APPEND );
                                 } catch (IOException ex) {
                                     logger.log(Level.SEVERE, null, ex);
