@@ -14,6 +14,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.DirectoryStream;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayDeque;
@@ -670,6 +675,21 @@ public class BatchProcessor {
     public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(propertyName,listener);
     }    
+    
+    /**
+     * delete all files in the directory.
+     * @param directory
+     * @throws IOException 
+     */
+    private static void emptyDirectory( File directory ) throws IOException {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory.toPath())) {
+            for (Path entry : stream) {
+                if (Files.isRegularFile(entry)) {
+                    Files.delete(entry);
+                }
+            }
+        }
+    }
 
     /**
      * run the batch script at the location.  This will block until all jobs
@@ -775,6 +795,8 @@ public class BatchProcessor {
             File lbatchCompleteDirectory= null;
             File lbatchStdoutDirectory= null;
             
+            boolean batchWorker= false; // a batchWorker is a machine which works on a batch but does not set it up.
+            
             if ( batchDirectory!=null ) {
                 if ( !batchDirectory.exists() ) {
                     if ( !batchDirectory.mkdirs() ) {
@@ -805,6 +827,21 @@ public class BatchProcessor {
                         throw new IllegalArgumentException("Unable to make directory: "+lbatchStdoutDirectory);
                     }
                 }
+                File specificationFile = new File( batchDirectory, "main.batch" );
+                if ( specificationFile.exists() ) {
+                    batchWorker= true;
+                    logger.info("Running batch as worker");
+                } else {
+                    try ( PrintWriter write= new PrintWriter( specificationFile ) ) {
+                        write.append(batchFileJson);
+                    }
+                    emptyDirectory(lbatchQueueDirectory);
+                    emptyDirectory(lbatchPendingDirectory);
+                    emptyDirectory(lbatchCompleteDirectory);
+                    emptyDirectory(lbatchStdoutDirectory);
+                    logger.info("Running batch as manager");
+                }
+                
             }
             
             final File batchQueueDirectory= lbatchQueueDirectory;
@@ -825,26 +862,28 @@ public class BatchProcessor {
             
             batchResults.put("params", paramsJson );
             
-            // If using a batchDirectory, then queue up all the jobs.
-            if ( batchPendingDirectory!=null ) {
+            // If using a batchDirectory and we are the manager, then queue up all the jobs.
+            if ( batchPendingDirectory!=null && !batchWorker ) {
                 if ( param2Values==null || param2Values.length==0 ) {
                     URISplit split1= URISplit.parse(fscriptUri);
                     Map<String,String> scriptParams1= URISplit.parseParams(split1.params);
                     String param1s= jo.getString("param1");
                     scriptParams1.remove(param1s);
-                    String baseScriptUriMyName1= URISplit.format( "script", split1.file, (Map) scriptParams1 );
+                    String baseScriptUriMyName1= URISplit.format( null, split1.file, (Map) scriptParams1 );
+                    final String hostAndPid= "managerPid: " +AutoplotUtil.getProcessId("XXX") +"\n" 
+                            + "managerHost: " + InetAddress.getLocalHost().getHostName();
                     for ( int i=0; i<param1Values.length; i++ ) {
                         final int fi= i;
                         File file= new File( batchQueueDirectory,String.format("%06d",fi) );
                         try ( PrintWriter write= new PrintWriter( file) ) {
-                            write.println( AutoplotUtil.getProcessId("XXX") );
                             String scriptURI;
                             if ( baseScriptUriMyName1.endsWith("?") ) {
                                 scriptURI= baseScriptUriMyName1 + param1s + "=" + param1Values[i];
                             } else{
                                 scriptURI= baseScriptUriMyName1 + "&"+ param1s + "=" + param1Values[i];
                             }
-                            write.println( scriptURI );
+                            write.println( "script: " + scriptURI );
+                            write.println( hostAndPid );
                         }
                     }
                 } else {
@@ -886,6 +925,16 @@ public class BatchProcessor {
                                             return; // someone else grabbed the task
                                         }
                                     }
+                                    try {
+                                        Path path= Path.of( pendingFile.toURI() );
+                                        String text= "workerHost: " + InetAddress.getLocalHost().getHostName() + "\n" + 
+                                            "workerPid: " + AutoplotUtil.getProcessId("XXX") +"\n" +
+                                            "workerThread: " + Thread.currentThread().getName() + "\n";
+                                        Files.writeString(path, text, StandardOpenOption.APPEND );
+                                    } catch (IOException ex) {
+                                        logger.log(Level.SEVERE, null, ex);
+                                    }
+                                    
                                 }
                             }
                             
@@ -901,9 +950,10 @@ public class BatchProcessor {
                                             null,
                                             null,
                                             monitor.getSubtaskMonitor(fparam1) );
+                            long timeToComplete= System.currentTimeMillis()-t0;
                             if ( showEta ) {
                                 try{
-                                    durationsMillis.addLast(System.currentTimeMillis()-t0);
+                                    durationsMillis.addLast(timeToComplete);
                                 } catch ( Exception ex ) {
                                     logger.warning("Exception...");
                                 }
@@ -914,6 +964,13 @@ public class BatchProcessor {
                                 File completedFile= new File( batchCompletedDirectory,String.format("%06d",fi) );
                                 if ( !pendingFile.renameTo(completedFile) ) {
                                     throw new IllegalArgumentException("couldn't rename "+pendingFile);
+                                }
+                                try {
+                                    Path path= Path.of( completedFile.toURI() );
+                                    String text= "durationMs: " + timeToComplete + "\n";
+                                    Files.writeString(path, text, StandardOpenOption.APPEND );
+                                } catch (IOException ex) {
+                                    logger.log(Level.SEVERE, null, ex);
                                 }
                             }
                             if ( runResults==null ) return; // Cancel pressed
