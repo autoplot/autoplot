@@ -5319,9 +5319,11 @@ APSplash.checkTime("init 240");
                         public void run() {
                             try {
                                 System.err.println("Running batch job...");
-                                
+                                long t0= System.currentTimeMillis();
                                 processor.runBatchScript( model.getDom(), runBatch, new NullProgressMonitor() );
-                                System.err.println("Done!");
+                                long dtms= System.currentTimeMillis() - t0;
+                                Datum dt= Units.milliseconds.createDatum((double)dtms); // will print in order-one units.
+                                System.err.println( String.format( "Done in %s, results in %s.", dt.toString(), batchDirectory) );
                                 if ( headless ) AppManager.getInstance().quit();
                             } catch (IOException ex) {
                                 logger.log(Level.SEVERE, null, ex);
