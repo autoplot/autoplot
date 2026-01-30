@@ -937,11 +937,11 @@ public class BatchProcessor {
                                         }
                                     }
                                     try {
-                                        Path path= Path.of( pendingFile.toURI() );
+                                        Path path= pendingFile.toPath();
                                         String text= "workerHost: " + InetAddress.getLocalHost().getHostName() + "\n" + 
                                             "workerPid: " + AutoplotUtil.getProcessId("XXX") +"\n" +
                                             "workerThread: " + Thread.currentThread().getName() + "\n";
-                                        Files.writeString(path, text, StandardOpenOption.APPEND );
+                                        Files.write(path, text.getBytes(), StandardOpenOption.APPEND );
                                     } catch (IOException ex) {
                                         logger.log(Level.SEVERE, null, ex);
                                     }
@@ -977,9 +977,9 @@ public class BatchProcessor {
                                     throw new IllegalArgumentException("couldn't rename "+pendingFile);
                                 }
                                 try {
-                                    Path path= Path.of( completedFile.toURI() );
+                                    Path path= completedFile.toPath();
                                     String text= "durationMs: " + timeToComplete + "\n";
-                                    Files.writeString(path, text, StandardOpenOption.APPEND );
+                                    Files.write(path, text.getBytes(), StandardOpenOption.APPEND );
                                 } catch (IOException ex) {
                                     logger.log(Level.SEVERE, null, ex);
                                 }
