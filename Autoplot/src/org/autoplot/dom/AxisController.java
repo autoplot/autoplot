@@ -80,7 +80,7 @@ public class AxisController extends DomNodeController {
         }
 
         @Override
-        public void propertyChange(PropertyChangeEvent evt) {
+        public void propertyChange(PropertyChangeEvent evt) { 
             LoggerManager.logPropertyChangeEvent(evt);  
             // ensure that log doesn't make axis invalid, or min trivially close to zero.
             if ( dom.controller.isValueAdjusting() || valueIsAdjusting() ) return;
