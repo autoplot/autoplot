@@ -75,6 +75,17 @@ import org.python.util.InteractiveInterpreter;
  * <li>multi-computer processing
  * <li>improved batch file formatting (they are very hard to read and create from other programs)
  * </ul>
+ * 
+ * The property "batchDirectory" is used to coordinate multiple machines.  There
+ * will be one "host" machine and multiple "worker" machines.  The host will
+ * set up the batchDirectory to contain the subdirectories:
+ * <ul>
+ * <li>jobs - jobs to be run
+ * <li>pending - job claimed by workers
+ * <li>complete - job completed by workers
+ * </ul>
+ * A job is moved from one directory to the next as each job is performed.  Note
+ * this is a guess at how this should work, and may change.
  * @author jbf
  */
 
