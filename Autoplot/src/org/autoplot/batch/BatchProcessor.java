@@ -804,7 +804,7 @@ public class BatchProcessor {
                     if ( !lbatchStdoutDirectory.mkdirs() ) {
                         throw new IllegalArgumentException("Unable to make directory: "+lbatchStdoutDirectory);
                     }
-                }                
+                }
             }
             
             final File batchQueueDirectory= lbatchQueueDirectory;
