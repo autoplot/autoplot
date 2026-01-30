@@ -689,6 +689,17 @@ public class PdsDataSource extends AbstractDataSource {
                 if ( d!=null ) d.closeChannel();
             }
             
+            // check for missing data and throw useful error.
+            ArrayList<String> missing= new ArrayList();
+            for ( int i=0; i<results.length; i++ ) {
+                if ( results[i]==null ) {
+                    missing.add(names.get(i));                    
+                }
+            }
+            if ( !missing.isEmpty() ) {
+                throw new IllegalArgumentException("Unable to locate data for names: "+ String.join(",", missing));
+            }
+            
             if ( result==null ) {
                 switch (results.length) {
                     case 1:
