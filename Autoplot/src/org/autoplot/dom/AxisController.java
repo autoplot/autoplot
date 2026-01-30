@@ -80,7 +80,7 @@ public class AxisController extends DomNodeController {
         }
 
         @Override
-        public synchronized void propertyChange(PropertyChangeEvent evt) {
+        public void propertyChange(PropertyChangeEvent evt) {
             LoggerManager.logPropertyChangeEvent(evt);  
             // ensure that log doesn't make axis invalid, or min trivially close to zero.
             if ( dom.controller.isValueAdjusting() || valueIsAdjusting() ) return;
@@ -282,7 +282,7 @@ public class AxisController extends DomNodeController {
     
     protected LabelConverter labelConverter;
     
-    public final synchronized void bindTo() {
+    public final void bindTo() {
         ApplicationController ac = dom.controller;
         ac.bind(axis, Axis.PROP_RANGE, dasAxis, DasAxis.PROPERTY_DATUMRANGE);
         ac.bind(axis, Axis.PROP_LOG, dasAxis, DasAxis.PROP_LOG);
@@ -311,7 +311,7 @@ public class AxisController extends DomNodeController {
         axis.addPropertyChangeListener( Axis.PROP_LOG, scaleListener );
     }
 
-    public final synchronized void removeBindings() {
+    public final void removeBindings() {
         //System.err.println("removeBindings for "+axis + " " +scaleListener );//bug2053
         axis.removePropertyChangeListener( Axis.PROP_RANGE, scaleListener );
         axis.removePropertyChangeListener( Axis.PROP_LOG, scaleListener );
@@ -332,7 +332,7 @@ public class AxisController extends DomNodeController {
     /**
      * remove any references this object has before as it is deleted.
      */
-    public final synchronized void removeReferences() {
+    public final void removeReferences() {
         labelConverter= null;
         //this.dom= null;
         //this.axis= null;
