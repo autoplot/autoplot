@@ -9,7 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static org.autoplot.hapi.HapiDataSource.getHapiCache;
-import static org.autoplot.hapi.HapiDataSource.logger;
 import org.das2.datum.DatumRange;
 import org.das2.fsm.FileStorageModel;
 import org.das2.util.LoggerManager;
@@ -36,6 +35,7 @@ public final class HapiUtil {
     public static final String KEY_LENGTH= "length";
     public static final String KEY_SIZE= "size";
     public static final String KEY_LABEL= "label";
+    public static final String KEY_X_LABEL= "x_label";
     public static final String KEY_FILL = "fill";
     public static final String KEY_UNITS = "units";
     public static final String KEY_TYPE = "type";
