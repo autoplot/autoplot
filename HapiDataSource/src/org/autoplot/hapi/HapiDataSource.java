@@ -1619,6 +1619,19 @@ public final class HapiDataSource extends AbstractDataSource {
                         }
                     }
                     if ( pds[i].label==null ) pds[i].label= name;
+                } else if ( jsonObjecti.has(HapiUtil.KEY_X_LABEL) ) {
+                    Object olabel= jsonObjecti.get( HapiUtil.KEY_X_LABEL );
+                    if ( olabel instanceof String ) {
+                        pds[i].label= (String)olabel;
+                        pds[i].labels= null;
+                    } else if ( olabel instanceof JSONArray ) {
+                        JSONArray array= (JSONArray)olabel;
+                        pds[i].labels= new String[array.length()];
+                        for ( int j=0; j<array.length(); j++ ) {
+                            pds[i].labels[j]= array.getString(j);
+                        }
+                    }
+                    if ( pds[i].label==null ) pds[i].label= name;
                 } else {
                     pds[i].label= name;
                 }
