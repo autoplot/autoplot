@@ -20,6 +20,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.DirectoryStream;
 import java.net.URI;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -544,7 +545,12 @@ public class BatchProcessor {
                 String uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
                 String doWriteTemplate= this.writePngTemplate;
                 if ( doWriteTemplate.length()>0 ) {
-                    runResults.put("writeFile", doWrite( doWriteTemplate, param1Value, "", uri, myDom ) );
+                    String image= doWrite( doWriteTemplate, param1Value, "", uri, myDom );
+                    File outf= new File( new File( batchDirectory, "images" ), String.format("%06d.png",jobNumber) );
+                    Path target = Paths.get(image);
+                    Path link   = outf.toPath();
+                    Files.createSymbolicLink(link, target);
+                    runResults.put("writeFile", image );
                 }
 
             } catch ( IOException | JSONException | RuntimeException ex ) {
@@ -805,6 +811,7 @@ public class BatchProcessor {
             File lbatchPendingDirectory= null;
             File lbatchCompleteDirectory= null;
             File lbatchStdoutDirectory= null;
+            File lbatchImagesDirectory= null;
             
             boolean batchGuest= false; // a batchWorker is a machine which works on a batch but does not set it up.
             
@@ -838,6 +845,13 @@ public class BatchProcessor {
                         throw new IllegalArgumentException("Unable to make directory: "+lbatchStdoutDirectory);
                     }
                 }
+
+                lbatchImagesDirectory= new File( batchDirectory, "images" );
+                if ( !lbatchImagesDirectory.exists() ) {
+                    if ( !lbatchImagesDirectory.mkdirs() ) {
+                        throw new IllegalArgumentException("Unable to make directory: "+lbatchImagesDirectory);
+                    }
+                }
                 
                 File specificationFile = new File( batchDirectory, "main.batch" );
                 
@@ -857,6 +871,7 @@ public class BatchProcessor {
                     emptyDirectory(lbatchPendingDirectory);
                     emptyDirectory(lbatchCompleteDirectory);
                     emptyDirectory(lbatchStdoutDirectory);
+                    emptyDirectory(lbatchImagesDirectory);
                     logger.info("Running batch as host");
                 }
                 
