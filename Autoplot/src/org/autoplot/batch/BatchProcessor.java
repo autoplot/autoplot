@@ -806,7 +806,7 @@ public class BatchProcessor {
             File lbatchCompleteDirectory= null;
             File lbatchStdoutDirectory= null;
             
-            boolean batchWorker= false; // a batchWorker is a machine which works on a batch but does not set it up.
+            boolean batchGuest= false; // a batchWorker is a machine which works on a batch but does not set it up.
             
             if ( batchDirectory!=null ) {
                 if ( !batchDirectory.exists() ) {
@@ -847,8 +847,8 @@ public class BatchProcessor {
                     }
                 }
                 if ( specificationFile.exists() ) {
-                    batchWorker= true;
-                    logger.info("Running batch as worker");
+                    batchGuest= true;
+                    logger.info("Running batch as guest");
                 } else {
                     try ( PrintWriter write= new PrintWriter( specificationFile ) ) {
                         write.append(batchFileJson);
@@ -857,7 +857,7 @@ public class BatchProcessor {
                     emptyDirectory(lbatchPendingDirectory);
                     emptyDirectory(lbatchCompleteDirectory);
                     emptyDirectory(lbatchStdoutDirectory);
-                    logger.info("Running batch as manager");
+                    logger.info("Running batch as host");
                 }
                 
             }
@@ -880,7 +880,7 @@ public class BatchProcessor {
             batchResults.put("params", paramsJson );
             
             // If using a batchDirectory and we are the manager, then queue up all the jobs.
-            if ( batchPendingDirectory!=null && !batchWorker ) {
+            if ( batchPendingDirectory!=null && !batchGuest ) {
                 if ( param2Values==null || param2Values.length==0 ) {
                     URISplit split1= URISplit.parse(fscriptUri);
                     Map<String,String> scriptParams1= URISplit.parseParams(split1.params);
