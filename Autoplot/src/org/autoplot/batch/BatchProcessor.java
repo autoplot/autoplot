@@ -171,9 +171,9 @@ public class BatchProcessor {
     
     /**
      * write the current canvas to a file.
-     * @param f1
-     * @param f2
-     * @param uri
+     * @param f1 the parameter value of null.
+     * @param f2 the parameter value or null.
+     * @param uri the script URI which is embedded in the PNG (for the PNGWalkTool to use).
      * @param dom if non-null, use this application for the image.
      * @return the name of the file used.
      * @throws IOException 
@@ -446,7 +446,7 @@ public class BatchProcessor {
             interp.set( "PWD", split.path );
             String[] paramNames1= maybeSplitMultiParam( param1Name );
 
-            if ( paramNames1!=null ) {
+            if ( paramNames1!=null ) { // v1;v2;v3 form used
                 char splitc= param1Name.charAt(paramNames1[0].length());
                 String[] paramValues= param1Value.trim().split("\\"+splitc);
                 for ( int j= 0; j<paramNames1.length; j++ ) {
@@ -485,7 +485,7 @@ public class BatchProcessor {
             if ( param2Name!=null && param2Name.length()>0 ) {
                 String[] paramNames2= maybeSplitMultiParam( param2Name );
 
-                if ( paramNames2!=null ) {
+                if ( paramNames2!=null ) { // v1;v2;v3 form used
                     char splitc= param2Name.charAt(paramNames2[0].length());
                     String[] paramValues= param2Value.trim().split("\\"+splitc);
                     for ( int j= 0; j<paramNames2.length; j++ ) {
@@ -541,18 +541,26 @@ public class BatchProcessor {
             //ByteArrayOutputStream outbaos= 
             try {
                 interp.setOut(outs);
+                
                 interp.execfile( new ByteArrayInputStream(script.getBytes("US-ASCII")), name );
+                
                 String uri= URISplit.format( "script", split.resourceUri.toString(), scriptParams );
                 String doWriteTemplate= this.writePngTemplate;
                 if ( doWriteTemplate.length()>0 ) {
-                    String image= doWrite( doWriteTemplate, param1Value, "", uri, myDom );
+                    String image;
+                    image= doWrite( doWriteTemplate, param1Value, param2Value, uri, myDom );
+
                     File outf= new File( new File( batchDirectory, "images" ), String.format("%06d.png",jobNumber) );
                     Path target = Paths.get(image);
                     Path link   = outf.toPath();
                     Files.createSymbolicLink(link, target);
                     runResults.put("writeFile", image );
                 }
-
+            } catch ( NumberFormatException ex ) {
+                ex.printStackTrace(); // TODO: need to get the word out.  This is a bug in the run batch tool, not the script.
+                String msg= ex.toString();
+                runResults.put("result",msg);
+                
             } catch ( IOException | JSONException | RuntimeException ex ) {
                 String msg= ex.toString();
                 runResults.put("result",msg);
@@ -758,6 +766,7 @@ public class BatchProcessor {
             String[] param1Values;
             String[] param2Values;
             
+            String param1Name= jo.getString("param1");
             Object oparam1Values= jo.get("param1Values");
             if ( oparam1Values instanceof String ) {
                 param1Values= ((String)oparam1Values).split("\n");
@@ -771,6 +780,7 @@ public class BatchProcessor {
                 throw new IllegalArgumentException("param1Values must be a string or string array");
             }
             
+            String param2Name= jo.getString("param2");
             Object oparam2Values= jo.get("param2Values");
             if ( oparam2Values instanceof String ) {
                 param2Values= ((String)oparam2Values).split("\n");
@@ -797,8 +807,6 @@ public class BatchProcessor {
             
             boolean showEta= "true".equals( System.getProperty("RunBatchTool.eta","true") ); 
             
-            int i1=0;
-            
             Map<String,Object> env= new HashMap<>();
             env.put("dom",dom);
             env.put("PWD",pwd);
@@ -810,10 +818,10 @@ public class BatchProcessor {
             File lbatchQueueDirectory= null;
             File lbatchPendingDirectory= null;
             File lbatchCompleteDirectory= null;
-            File lbatchStdoutDirectory= null;
-            File lbatchImagesDirectory= null;
+            File lbatchStdoutDirectory;
+            File lbatchImagesDirectory;
             
-            boolean batchGuest= false; // a batchWorker is a machine which works on a batch but does not set it up.
+            boolean batchGuest= false; // a batchGuest is a machine which works on a batch but does not set it up.
             
             if ( batchDirectory!=null ) {
                 if ( !batchDirectory.exists() ) {
@@ -919,129 +927,76 @@ public class BatchProcessor {
                         }
                     }
                 } else {
-                    throw new IllegalArgumentException("second parameter not supported");
-                    //TODO: second parameter
+                    URISplit split1= URISplit.parse(fscriptUri);
+                    Map<String,String> scriptParams1= URISplit.parseParams(split1.params);
+                    scriptParams1.remove(param1Name);
+                    scriptParams1.remove(param2Name);
+                    String baseScriptUriMyName1= URISplit.format( null, split1.file, (Map) scriptParams1 );
+                    final String hostAndPid= "managerPid: " +AutoplotUtil.getProcessId("XXX") +"\n" 
+                            + "managerHost: " + InetAddress.getLocalHost().getHostName();
+                    int i=0;
+
+                    for ( int i1=0; i1<param1Values.length; i1++ ) {
+                        final int fi1= i1;
+                        for ( int i2=0; i2<param2Values.length; i2++ ) {
+                            final int fi2= i2;
+                            File file= new File( batchQueueDirectory,String.format("%06d",i) );
+                            try ( PrintWriter write= new PrintWriter( file) ) {
+                                String scriptURI;
+                                if ( baseScriptUriMyName1.endsWith("?") ) {
+                                    scriptURI= baseScriptUriMyName1 + param1Name + "=" + param1Values[i1] + "&"+ param2Name + "=" + param2Values[i2];
+                                } else{
+                                    scriptURI= baseScriptUriMyName1 + "&"+ param1Name + "=" + param1Values[i1] + "&"+ param2Name + "=" + param2Values[i2];
+                                }
+                                write.println( "script: " + scriptURI );
+                                write.println( hostAndPid );
+                            }
+                            i=i+1;
+                        }
+                    }
                 }
             }
             
+            Settings s= new Settings();
+            s.batchQueueDirectory= batchQueueDirectory;
+            s.batchPendingDirectory= batchPendingDirectory;
+            s.batchCompletedDirectory= batchCompletedDirectory;
+            s.pwd= pwd;
+            s.fscriptUri= fscriptUri;
+            s.script= script;
+            s.fparameterDescriptions= fparameterDescriptions;
+            s.showEta= showEta;
+            s.durationsMillis= durationsMillis;
+            s.jobNumber= jobNumber;
+            s.resultsStats= resultsStats;
+
             if ( param2Values==null || param2Values.length==0 ) {
                 numberOfJobs= param1Values.length;
                 monitor.setTaskSize(numberOfJobs);
                 monitor.started();
+                
+                int ijob=0;
+                                       
                 for ( int i=0; i<param1Values.length; i++ ) {
-                    final int fi= i;
-                    final String fparam1= jo.getString("param1");
-                    final String fparam1Value= param1Values[i];
-                    final Map<String,String> fscriptParams= scriptParams;
-                    final JSONObject frunResults= new JSONObject();
-                    
-                    Runnable runOne= () -> {
-                        if ( monitor.isCancelled() ) return;
-                        
-                        try {
-                            if ( batchQueueDirectory!=null ) {
-                                synchronized (BatchProcessor.this) {
-                                    // Note even though this is synchronized, 
-                                    // the idea is that other machines might also 
-                                    // be working on this.
-                                    File queueFile= new File( batchQueueDirectory,String.format("%06d",fi) );
-                                    if ( !queueFile.exists() ) {
-                                        logger.log(Level.FINE, "someone else grabbed {0}", queueFile);
-                                        return; // someone else grabbed the task
-                                    }
-                                    File pendingFile= new File( batchPendingDirectory,String.format("%06d",fi) );
-                                    if ( !queueFile.renameTo(pendingFile) ) {
-                                        if ( queueFile.exists() ) {
-                                            logger.log(Level.WARNING, "there was an issue when moving {0}", queueFile);
-                                        } else {
-                                            logger.log(Level.FINE, "someone else grabbed {0}", queueFile);
-                                            return; // someone else grabbed the task
-                                        }
-                                    }
-                                    try {
-                                        Path path= pendingFile.toPath();
-                                        String text= "workerHost: " + InetAddress.getLocalHost().getHostName() + "\n" + 
-                                            "workerPid: " + AutoplotUtil.getProcessId("XXX") +"\n" +
-                                            "workerThread: " + Thread.currentThread().getName() + "\n";
-                                        Files.write(path, text.getBytes(), StandardOpenOption.APPEND );
-                                    } catch (IOException ex) {
-                                        logger.log(Level.SEVERE, null, ex);
-                                    }
-                                    
-                                }
-                            }
-                            
-                            long t0= System.currentTimeMillis();
-                            JSONObject runResults= 
-                                    doOneJob( fi, pwd,
-                                            fscriptUri,
-                                            script, 
-                                            fparameterDescriptions, 
-                                            fscriptParams,
-                                            fparam1, 
-                                            fparam1Value, 
-                                            null,
-                                            null,
-                                            monitor.getSubtaskMonitor(fparam1) );
-                            long timeToComplete= System.currentTimeMillis()-t0;
-                            if ( showEta ) {
-                                try{
-                                    durationsMillis.addLast(timeToComplete);
-                                } catch ( Exception ex ) {
-                                    logger.warning("Exception...");
-                                }                                
-                            }
-                            
-                            if ( batchQueueDirectory!=null ) {
-                                File pendingFile= new File( batchPendingDirectory,String.format("%06d",fi) );
-                                File completedFile= new File( batchCompletedDirectory,String.format("%06d",fi) );
-                                if ( !pendingFile.renameTo(completedFile) ) {
-                                    throw new IllegalArgumentException("couldn't rename "+pendingFile);
-                                }
-                                try {
-                                    Path path= completedFile.toPath();
-                                    String exception= runResults.optString("result","").replaceAll("\n"," ");
-                                    String text= "runTimeMs: " + timeToComplete + "\n" + "exception: "+exception;
-                                    Files.write(path, text.getBytes(), StandardOpenOption.APPEND );
-                                } catch (IOException ex) {
-                                    logger.log(Level.SEVERE, null, ex);
-                                }
-                            }
-                            if ( runResults==null ) return; // Cancel pressed
-                            Iterator keyIterator= runResults.keys();
-                            while ( keyIterator.hasNext() ) {
-                                String k= (String) keyIterator.next();
-                                try {
-                                    frunResults.put( k, runResults.get(k) );
-                                } catch (JSONException ex) {
-                                    logger.log(Level.SEVERE, null, ex);
-                                }
-                            }
-
-                            int icount= jobNumber.get();
-
-                            try {
-                                resultsStats.put( icount, runResults );
-                            } catch (JSONException ex) {
-                                logger.log(Level.SEVERE, null, ex);
-                            }
-                            
-                        } catch ( RuntimeException ex ) {
-                            ex.printStackTrace(); //TODO: do something with this.
-                        } finally {
-                            if ( monitor.isFinished() ) {
-                                logger.fine("monitor reports being finished though it shouldn't have been.");
-                            } else {
-                                monitor.setTaskProgress(jobNumber.incrementAndGet());
-
-                            }
-                        }
-                    };
+                    Runnable runOne= setUpOneRun(ijob, param1Name, param1Values[i], null, null, scriptParams, monitor, s);
                     executor.execute(runOne);
-                    i1=i1+1;                    
+                    ijob=ijob+1;                    
                 }
             } else {
-                throw new IllegalArgumentException("second parameter not supported");
+                numberOfJobs= param1Values.length * param2Values.length;
+                monitor.setTaskSize(numberOfJobs);
+                monitor.started();
+                
+                int ijob=0;
+                                       
+                for ( int i1=0; i1<param1Values.length; i1++ ) {
+                    for ( int i2=0; i2<param2Values.length; i2++ ) {
+                        Runnable runOne= 
+                            setUpOneRun(ijob, param1Name, param1Values[i1], param2Name, param2Values[i2], scriptParams, monitor, s);
+                        executor.execute(runOne);
+                        ijob=ijob+1;
+                    }
+                }
             }
             
             long lastWrite= System.currentTimeMillis();
@@ -1149,6 +1104,135 @@ public class BatchProcessor {
             
         }
         
+    }
+
+    private static class Settings {
+        File batchQueueDirectory;
+        File batchPendingDirectory;
+        String pwd;
+        String fscriptUri;
+        String script;
+        Map<String, Param> fparameterDescriptions;
+        boolean showEta;
+        Deque<Long> durationsMillis;
+        File batchCompletedDirectory;
+        AtomicInteger jobNumber;
+        JSONArray resultsStats;
+    }
+    
+    private Runnable setUpOneRun(int ijob, 
+            String param1Name, String param1Value, 
+            String param2Name, String param2Value,
+            Map<String, String> scriptParams, ProgressMonitor monitor,
+            Settings s ) throws JSONException {
+        final int fijob= ijob;
+        final String fparam1Name= param1Name;
+        final String fparam2Name= param2Name;
+        final String fparam1Value= param1Value;
+        final String fparam2Value= param2Value;
+        final Map<String,String> fscriptParams= scriptParams;
+        final JSONObject frunResults= new JSONObject();
+        Runnable runOne= () -> {
+            if ( monitor.isCancelled() ) return;
+            
+            try {
+                if ( s.batchQueueDirectory!=null ) {
+                    synchronized (BatchProcessor.this) {
+                        // Note even though this is synchronized,
+                        // the idea is that other machines might also
+                        // be working on this.
+                        File queueFile= new File( s.batchQueueDirectory,String.format("%06d",fijob) );
+                        if ( !queueFile.exists() ) {
+                            logger.log(Level.FINE, "someone else grabbed {0}", queueFile);
+                            return; // someone else grabbed the task
+                        }
+                        File pendingFile= new File( s.batchPendingDirectory,String.format("%06d",fijob) );
+                        if ( !queueFile.renameTo(pendingFile) ) {
+                            if ( queueFile.exists() ) {
+                                logger.log(Level.WARNING, "there was an issue when moving {0}", queueFile);
+                            } else {
+                                logger.log(Level.FINE, "someone else grabbed {0}", queueFile);
+                                return; // someone else grabbed the task
+                            }
+                        }
+                        try {
+                            Path path= pendingFile.toPath();
+                            String text= "workerHost: " + InetAddress.getLocalHost().getHostName() + "\n" +
+                                    "workerPid: " + AutoplotUtil.getProcessId("XXX") +"\n" +
+                                    "workerThread: " + Thread.currentThread().getName() + "\n";
+                            Files.write(path, text.getBytes(), StandardOpenOption.APPEND );
+                        } catch (IOException ex) {
+                            logger.log(Level.SEVERE, null, ex);
+                        }
+                        
+                    }
+                }
+                
+                long t0= System.currentTimeMillis();
+                JSONObject runResults=
+                        doOneJob( fijob, s.pwd,
+                                s.fscriptUri,
+                                s.script,
+                                s.fparameterDescriptions,
+                                fscriptParams,
+                                fparam1Name,
+                                fparam1Value,
+                                fparam2Name,
+                                fparam2Value,
+                                monitor.getSubtaskMonitor(fparam1Name) );
+                long timeToComplete= System.currentTimeMillis()-t0;
+                if ( s.showEta ) {
+                    try{
+                        s.durationsMillis.addLast(timeToComplete);
+                    } catch ( Exception ex ) {
+                        logger.warning("Exception...");
+                    }
+                }
+                
+                if ( s.batchQueueDirectory!=null ) {
+                    File pendingFile= new File( s.batchPendingDirectory,String.format("%06d",fijob) );
+                    File completedFile= new File( s.batchCompletedDirectory,String.format("%06d",fijob) );
+                    if ( !pendingFile.renameTo(completedFile) ) {
+                        throw new IllegalArgumentException("couldn't rename "+pendingFile);
+                    }
+                    try {
+                        Path path= completedFile.toPath();
+                        String exception= runResults.optString("result","").replaceAll("\n"," ");
+                        String text= "runTimeMs: " + timeToComplete + "\n" + "exception: "+exception;
+                        Files.write(path, text.getBytes(), StandardOpenOption.APPEND );
+                    } catch (IOException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
+                if ( runResults==null ) return; // Cancel pressed
+                Iterator keyIterator= runResults.keys();
+                while ( keyIterator.hasNext() ) {
+                    String k= (String) keyIterator.next();
+                    try {
+                        frunResults.put( k, runResults.get(k) );
+                    } catch (JSONException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
+                
+                try {
+                    s.resultsStats.put( fijob, runResults );
+                } catch (JSONException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
+                
+            } catch ( RuntimeException ex ) {
+                ex.printStackTrace(); //TODO: do something with this.
+            } finally {
+                if ( monitor.isFinished() ) {
+                    logger.fine("monitor reports being finished though it shouldn't have been.");
+                } else {
+                    monitor.setTaskProgress(s.jobNumber.incrementAndGet());
+                    
+                }
+            }
+        };
+        return runOne;
     }
 
     /**
