@@ -4972,7 +4972,7 @@ private void updateFrameTitle() {
                 boolean isAbsolute= initialURL.startsWith("/") || initialURL.startsWith("\\") || ( initialURL.length()>2 && initialURL.charAt(1)==':' );
                 if ( !isAbsolute ) {
                     try {
-                        String pwd= new File(".").getCanonicalPath();
+                        String pwd= new File(".").getCanonicalPath(); // TODO: see runBatch parameter
                         if ( pwd.length()>2 ) {
                             if ( "Windows".equals(System.getProperty("os.family")) ) {
                                 pwd= pwd + "\\";
@@ -5307,10 +5307,12 @@ APSplash.checkTime("init 240");
                     if ( app!=null ) app.setStatus( READY_MESSAGE );
                 }
                 
+                URI pwd= new File(".").getAbsoluteFile().toURI();
+                    
                 final String runBatchPngTemplate=alm.getValue("testPngFilename"); // this may change
-                final String runBatch=alm.getValue("runBatch");
+                final String runBatch= FileUtil.maybeMakeAbsolute( alm.getValue("runBatch"), pwd, false );
                 if ( !runBatch.equals("") ) {
-                    final String batchDirectory= alm.getValue("runBatchDirectory");
+                    final String batchDirectory= FileUtil.maybeMakeAbsolute( alm.getValue("runBatchDirectory"), pwd, true );
                     final BatchProcessor processor= new org.autoplot.batch.BatchProcessor();
                     processor.setThreads( Integer.parseInt(alm.getValue("runBatchThreads") ) );
                     processor.setWritePngTemplate(runBatchPngTemplate);
@@ -5320,6 +5322,7 @@ APSplash.checkTime("init 240");
                             try {
                                 System.err.println("Running batch job...");
                                 long t0= System.currentTimeMillis();
+                                
                                 processor.runBatchScript( model.getDom(), runBatch, new NullProgressMonitor() );
                                 long dtms= System.currentTimeMillis() - t0;
                                 Datum dt= Units.milliseconds.createDatum((double)dtms); // will print in order-one units.
