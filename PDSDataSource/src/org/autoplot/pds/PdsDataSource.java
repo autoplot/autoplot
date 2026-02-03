@@ -8,6 +8,7 @@ import gov.nasa.pds.label.object.FieldDescription;
 import gov.nasa.pds.label.object.FieldType;
 import gov.nasa.pds.label.object.TableObject;
 import gov.nasa.pds.label.object.TableRecord;
+import gov.nasa.pds.objectAccess.array.ElementType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -607,6 +608,7 @@ public class PdsDataSource extends AbstractDataSource {
                                         int[] qube= new int[] { dd.length };
                                         DDataSet ddresult= DDataSet.wrap( dd, qube );
                                         boolean isCDF= fileUrl.getFile().toLowerCase().endsWith(".cdf");
+                                        //TODO: maybe check for SignedMSB8
                                         if ( isCDF && ( name.equalsIgnoreCase("Epoch") || name.equalsIgnoreCase("tt2000") ) ) { 
                                             logger.fine("Epoch kludge results in CDF_TT2000 units");
                                             units= Units.cdfTT2000;
