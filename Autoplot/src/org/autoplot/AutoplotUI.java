@@ -192,6 +192,7 @@ import org.das2.graph.GraphUtil;
 import org.das2.components.propertyeditor.SpecialColorsStringSchemeEditor;
 import org.das2.util.FileUtil;
 import org.das2.util.filesystem.HtmlUtil;
+import org.json.JSONException;
 import org.python.core.PyException;
 import org.python.util.PythonInterpreter;
 import org.w3c.dom.Document;
@@ -1038,6 +1039,25 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 //}
                 setCursor( Cursor.getDefaultCursor() );
                 if ( blurFocus ) dom.getController().setFocusUri(ApplicationController.VALUE_BLUR_FOCUS);
+            }
+        });
+        
+        dataSetSelector.registerBrowseTrigger( "(.+)\\.batch", new AbstractAction( "batchfile") {
+            @Override
+            public void actionPerformed( ActionEvent ev ) {
+                org.das2.util.LoggerManager.logGuiEvent(ev);                    
+                String batchFile= dataSetSelector.getValue();
+                openRunBatchFile(batchFile);
+            }
+
+        });
+        dataSetSelector.registerActionTrigger( "(.+)\\.batch", new AbstractAction( "batchfile") {
+            @Override
+            public void actionPerformed( ActionEvent ev ) { // TODO: underimplemented
+                org.das2.util.LoggerManager.logGuiEvent(ev);
+                org.das2.util.LoggerManager.logGuiEvent(ev);                    
+                String batchFile= dataSetSelector.getValue();
+                openRunBatchFile(batchFile);
             }
         });
 
@@ -4480,6 +4500,28 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
         dia.setVisible(true);
     }//GEN-LAST:event_runBatchMenuItemActionPerformed
 
+    /**
+     * open the batch file in the RunBatchTool.
+     * @param batchFile 
+     */
+    private void openRunBatchFile(String batchFile) {
+        RunBatchTool mmm= new RunBatchTool(dom);
+        final JDialog dia= new JDialog( AutoplotUI.this, "Run Batch Tool" );
+        dia.setJMenuBar( mmm.getMenuBar() );
+        dia.setContentPane(mmm);
+        dia.pack();
+        dia.setLocationRelativeTo(AutoplotUI.this);
+        RequestProcessor.invokeLater(() -> {
+            try {
+                mmm.loadBatchFile( DataSetURI.getFile(batchFile) );
+            } catch (JSONException|IOException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        });
+        dia.setVisible(true);
+                
+    }
+
     private void resetAppSizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetAppSizeActionPerformed
         ScriptContext.setCanvasSize( 724, 656 ); // this is the arbitrary size of the app when its size is now saved.
     }//GEN-LAST:event_resetAppSizeActionPerformed
@@ -5310,12 +5352,15 @@ APSplash.checkTime("init 240");
                 URI pwd= new File(".").getAbsoluteFile().toURI();
                     
                 final String runBatchPngTemplate=alm.getValue("testPngFilename"); // this may change
-                final String runBatch= FileUtil.maybeMakeAbsolute( alm.getValue("runBatch"), pwd, false );
+                String runBatch= alm.getValue("runBatch");
                 if ( !runBatch.equals("") ) {
-                    String _batchDirectory= FileUtil.maybeMakeAbsolute( alm.getValue("runBatchDirectory"), pwd, true );
+                    runBatch= FileUtil.maybeMakeAbsolute( runBatch, pwd, false );
+                    String _batchDirectory= alm.getValue("runBatchDirectory");
+                    if ( !_batchDirectory.equals("") ) _batchDirectory= FileUtil.maybeMakeAbsolute( _batchDirectory, pwd, true );
                     if ( !_batchDirectory.startsWith("file:") ) {
                         throw new IllegalArgumentException("runBatchDirectory must be a local file");
                     }
+                    final String frunBatch= runBatch;
                     final String batchDirectory= _batchDirectory.substring(5);
                     
                     final BatchProcessor processor= new org.autoplot.batch.BatchProcessor();
@@ -5328,7 +5373,7 @@ APSplash.checkTime("init 240");
                                 System.err.println("Running batch job...");
                                 long t0= System.currentTimeMillis();
                                 
-                                processor.runBatchScript( model.getDom(), runBatch, new NullProgressMonitor() );
+                                processor.runBatchScript( model.getDom(), frunBatch, new NullProgressMonitor() );
                                 long dtms= System.currentTimeMillis() - t0;
                                 Datum dt= Units.milliseconds.createDatum((double)dtms); // will print in order-one units.
                                 System.err.println( String.format( "Done in %s, results in %s.", dt.toString(), batchDirectory) );

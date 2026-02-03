@@ -1349,7 +1349,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         }
     }
     
-    private void loadBatchFile( File f ) throws IOException, JSONException {
+    public void loadBatchFile( File f ) throws IOException, JSONException {
         if ( SwingUtilities.isEventDispatchThread() ) throw new IllegalArgumentException("don't call from event thread");
         String src= FileUtil.readFileToString(f);
         JSONObject jo= new JSONObject(src);
