@@ -21,6 +21,7 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.DirectoryStream;
 import java.net.URI;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.text.ParseException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -812,7 +813,7 @@ public class BatchProcessor {
            
             int numberOfJobs;
             
-            File lbatchQueueDirectory= null;
+            File lbatchJobsDirectory= null;
             File lbatchPendingDirectory= null;
             File lbatchCompleteDirectory= null;
             File lbatchStdoutDirectory;
@@ -826,10 +827,10 @@ public class BatchProcessor {
                         throw new IllegalArgumentException("Unable to make directory: "+batchDirectory);
                     }
                 }
-                lbatchQueueDirectory= new File( batchDirectory, "jobs" );
-                if ( !lbatchQueueDirectory.exists() ) {
-                    if ( !lbatchQueueDirectory.mkdirs() ) {
-                        throw new IllegalArgumentException("Unable to make directory: "+lbatchQueueDirectory);
+                lbatchJobsDirectory= new File( batchDirectory, "jobs" );
+                if ( !lbatchJobsDirectory.exists() ) {
+                    if ( !lbatchJobsDirectory.mkdirs() ) {
+                        throw new IllegalArgumentException("Unable to make directory: "+lbatchJobsDirectory);
                     }
                 }
                 lbatchPendingDirectory= new File( batchDirectory, "pending" );
@@ -861,7 +862,7 @@ public class BatchProcessor {
                 File specificationFile = new File( batchDirectory, "main.batch" );
                 
                 if ( specificationFile.exists() ) {
-                    if ( isDirectoryEmpty(lbatchQueueDirectory) ) {
+                    if ( isDirectoryEmpty(lbatchJobsDirectory) ) {
                         specificationFile.delete();
                     }
                 }
@@ -872,7 +873,7 @@ public class BatchProcessor {
                     try ( PrintWriter write= new PrintWriter( specificationFile ) ) {
                         write.append(batchFileJson);
                     }
-                    emptyDirectory(lbatchQueueDirectory);
+                    emptyDirectory(lbatchJobsDirectory);
                     emptyDirectory(lbatchPendingDirectory);
                     emptyDirectory(lbatchCompleteDirectory);
                     emptyDirectory(lbatchStdoutDirectory);
@@ -882,7 +883,7 @@ public class BatchProcessor {
                 
             }
             
-            final File batchQueueDirectory= lbatchQueueDirectory;
+            final File batchJobsDirectory= lbatchJobsDirectory;
             final File batchPendingDirectory= lbatchPendingDirectory;
             final File batchCompletedDirectory= lbatchCompleteDirectory;
             
@@ -899,7 +900,7 @@ public class BatchProcessor {
             
             batchResults.put("params", paramsJson );
             
-            // If using a batchDirectory and we are the manager, then queue up all the jobs.
+            // If using a batchDirectory and we are the "host", then queue up all the jobs.
             if ( batchPendingDirectory!=null && !batchGuest ) {
                 if ( param2Values==null || param2Values.length==0 ) {
                     URISplit split1= URISplit.parse(fscriptUri);
@@ -911,7 +912,7 @@ public class BatchProcessor {
                             + "managerHost: " + InetAddress.getLocalHost().getHostName();
                     for ( int i=0; i<param1Values.length; i++ ) {
                         final int fi= i;
-                        File file= new File( batchQueueDirectory,String.format("%06d",fi) );
+                        File file= new File( batchJobsDirectory,String.format("%06d",fi) );
                         try ( PrintWriter write= new PrintWriter( file) ) {
                             String scriptURI;
                             if ( baseScriptUriMyName1.endsWith("?") ) {
@@ -935,7 +936,7 @@ public class BatchProcessor {
 
                     for (String param1Value : param1Values) {
                         for (String param2Value : param2Values) {
-                            File file= new File( batchQueueDirectory,String.format("%06d",i) );
+                            File file= new File( batchJobsDirectory,String.format("%06d",i) );
                             try (PrintWriter write = new PrintWriter( file)) {
                                 String scriptURI;
                                 if (baseScriptUriMyName1.endsWith("?")) {
@@ -953,7 +954,7 @@ public class BatchProcessor {
             }
             
             Settings s= new Settings();
-            s.batchQueueDirectory= batchQueueDirectory;
+            s.batchJobsDirectory= batchJobsDirectory;
             s.batchPendingDirectory= batchPendingDirectory;
             s.batchCompletedDirectory= batchCompletedDirectory;
             s.pwd= pwd;
@@ -1100,7 +1101,7 @@ public class BatchProcessor {
     }
 
     private static class Settings {
-        File batchQueueDirectory;
+        File batchJobsDirectory;
         File batchPendingDirectory;
         String pwd;
         String fscriptUri;
@@ -1129,25 +1130,28 @@ public class BatchProcessor {
             if ( monitor.isCancelled() ) return;
             
             try {
-                if ( s.batchQueueDirectory!=null ) {
+                if ( s.batchJobsDirectory!=null ) {
                     synchronized (BatchProcessor.this) {
                         // Note even though this is synchronized,
                         // the idea is that other machines might also
                         // be working on this.
-                        File queueFile= new File( s.batchQueueDirectory,String.format("%06d",fijob) );
-                        if ( !queueFile.exists() ) {
-                            logger.log(Level.FINE, "someone else grabbed {0}", queueFile);
+                        File jobFile= new File( s.batchJobsDirectory,String.format("%06d",fijob) );
+                        if ( !jobFile.exists() ) {
+                            logger.log(Level.FINE, "someone else grabbed {0}", jobFile);
                             return; // someone else grabbed the task
                         }
                         File pendingFile= new File( s.batchPendingDirectory,String.format("%06d",fijob) );
-                        if ( !queueFile.renameTo(pendingFile) ) {
-                            if ( queueFile.exists() ) {
-                                logger.log(Level.WARNING, "there was an issue when moving {0}", queueFile);
+                        try {
+                            Files.move( jobFile.toPath(), pendingFile.toPath(), StandardCopyOption.ATOMIC_MOVE );
+                        } catch ( IOException ex ) {
+                            if ( jobFile.exists() ) {
+                                logger.log(Level.WARNING, "there was an issue when moving {0}", jobFile);
                             } else {
-                                logger.log(Level.FINE, "someone else grabbed {0}", queueFile);
+                                logger.log(Level.FINE, "someone else grabbed {0}", jobFile);
                                 return; // someone else grabbed the task
-                            }
+                            }                            
                         }
+                        
                         try {
                             Path path= pendingFile.toPath();
                             String text= "workerHost: " + InetAddress.getLocalHost().getHostName() + "\n" +
@@ -1182,7 +1186,7 @@ public class BatchProcessor {
                     }
                 }
                 
-                if ( s.batchQueueDirectory!=null ) {
+                if ( s.batchJobsDirectory!=null ) {
                     File pendingFile= new File( s.batchPendingDirectory,String.format("%06d",fijob) );
                     File completedFile= new File( s.batchCompletedDirectory,String.format("%06d",fijob) );
                     if ( !pendingFile.renameTo(completedFile) ) {

@@ -5312,7 +5312,12 @@ APSplash.checkTime("init 240");
                 final String runBatchPngTemplate=alm.getValue("testPngFilename"); // this may change
                 final String runBatch= FileUtil.maybeMakeAbsolute( alm.getValue("runBatch"), pwd, false );
                 if ( !runBatch.equals("") ) {
-                    final String batchDirectory= FileUtil.maybeMakeAbsolute( alm.getValue("runBatchDirectory"), pwd, true );
+                    String _batchDirectory= FileUtil.maybeMakeAbsolute( alm.getValue("runBatchDirectory"), pwd, true );
+                    if ( !_batchDirectory.startsWith("file:") ) {
+                        throw new IllegalArgumentException("runBatchDirectory must be a local file");
+                    }
+                    final String batchDirectory= _batchDirectory.substring(5);
+                    
                     final BatchProcessor processor= new org.autoplot.batch.BatchProcessor();
                     processor.setThreads( Integer.parseInt(alm.getValue("runBatchThreads") ) );
                     processor.setWritePngTemplate(runBatchPngTemplate);
