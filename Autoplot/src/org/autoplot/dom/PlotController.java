@@ -1416,7 +1416,7 @@ public final class PlotController extends DomNodeController {
             QDataSet pds= plotElement.getController().getDataSet();
             setActiveDataSet( pds );
             logger.log( Level.FINE, "{0} dataSetListener", plot);
-            if ( pds!=null && UnitsUtil.isIntervalOrRatioMeasurement(SemanticOps.getUnits(pds)) ) {
+            if ( !dom.controller.isHeadless() && pds!=null && UnitsUtil.isIntervalOrRatioMeasurement(SemanticOps.getUnits(pds)) ) {
                 updateNextPrevious( plot.getXaxis().getRange(), pds );
             }
         }
