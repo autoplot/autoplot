@@ -523,7 +523,7 @@ public final class PlotController extends DomNodeController {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 LoggerManager.logPropertyChangeEvent(evt,"xaxis datumrange");  
-                if ( dom.getOptions().isScanEnabled() ) {
+                if ( dom.getOptions().isScanEnabled() && !dom.controller.isHeadless() ) {
                     nextPrevTickleTimer.tickle();
                 }
             }
