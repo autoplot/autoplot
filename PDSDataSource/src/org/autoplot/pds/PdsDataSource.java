@@ -607,7 +607,7 @@ public class PdsDataSource extends AbstractDataSource {
                                         int[] qube= new int[] { dd.length };
                                         DDataSet ddresult= DDataSet.wrap( dd, qube );
                                         if ( name.equalsIgnoreCase("Epoch") || name.equalsIgnoreCase("tt2000") ) { 
-                                            logger.info("Epoch kludge results in CDF_TT2000 units");
+                                            logger.fine("Epoch kludge results in CDF_TT2000 units");
                                             units= Units.cdfTT2000;
                                             ddresult.putProperty( QDataSet.UNITS, units );
                                         }       
