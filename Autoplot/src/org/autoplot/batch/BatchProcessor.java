@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.Deque;
 import java.util.HashMap;
@@ -195,9 +196,7 @@ public class BatchProcessor {
         List<String> argList= new ArrayList<>();
         if ( f1.contains(";") ) {
             String[] ss= f1.split("\\;",-2);
-            for ( String s: ss ) {
-                argList.add(s);
-            }
+            argList.addAll(Arrays.asList(ss));
         } else {
             if ( f1.trim().length()>0 ) {
                 argList.add(f1);
@@ -205,9 +204,7 @@ public class BatchProcessor {
         }
         if ( f2.contains(";") ) {
             String[] ss= f2.split("\\;",-2);
-            for ( String s: ss ) {
-                argList.add(s);
-            }
+            argList.addAll(Arrays.asList(ss));
         } else {
             if ( f2.trim().length()>0 ) {
                 argList.add(f2);
@@ -250,11 +247,11 @@ public class BatchProcessor {
             } else {
                 switch (letter) {
                     case 'd':
-                        args[i]= Integer.parseInt(argList.get(i));
+                        args[i]= Integer.valueOf(argList.get(i));
                         break;
                     case 'f':
                     case 'e':
-                        args[i]= Double.parseDouble(argList.get(i));
+                        args[i]= Double.valueOf(argList.get(i));
                         break;
                     default:
                         args[i]= argList.get(i);
@@ -936,17 +933,15 @@ public class BatchProcessor {
                             + "managerHost: " + InetAddress.getLocalHost().getHostName();
                     int i=0;
 
-                    for ( int i1=0; i1<param1Values.length; i1++ ) {
-                        final int fi1= i1;
-                        for ( int i2=0; i2<param2Values.length; i2++ ) {
-                            final int fi2= i2;
+                    for (String param1Value : param1Values) {
+                        for (String param2Value : param2Values) {
                             File file= new File( batchQueueDirectory,String.format("%06d",i) );
-                            try ( PrintWriter write= new PrintWriter( file) ) {
+                            try (PrintWriter write = new PrintWriter( file)) {
                                 String scriptURI;
-                                if ( baseScriptUriMyName1.endsWith("?") ) {
-                                    scriptURI= baseScriptUriMyName1 + param1Name + "=" + param1Values[i1] + "&"+ param2Name + "=" + param2Values[i2];
-                                } else{
-                                    scriptURI= baseScriptUriMyName1 + "&"+ param1Name + "=" + param1Values[i1] + "&"+ param2Name + "=" + param2Values[i2];
+                                if (baseScriptUriMyName1.endsWith("?")) {
+                                    scriptURI = baseScriptUriMyName1 + param1Name + "=" + param1Value + "&" + param2Name + "=" + param2Value;
+                                } else {
+                                    scriptURI = baseScriptUriMyName1 + "&"+ param1Name + "=" + param1Value + "&" + param2Name + "=" + param2Value;
                                 }
                                 write.println( "script: " + scriptURI );
                                 write.println( hostAndPid );
@@ -977,8 +972,8 @@ public class BatchProcessor {
                 
                 int ijob=0;
                                        
-                for ( int i=0; i<param1Values.length; i++ ) {
-                    Runnable runOne= setUpOneRun(ijob, param1Name, param1Values[i], null, null, scriptParams, monitor, s);
+                for (String param1Value : param1Values) {
+                    Runnable runOne = setUpOneRun(ijob, param1Name, param1Value, null, null, scriptParams, monitor, s);
                     executor.execute(runOne);
                     ijob=ijob+1;                    
                 }
@@ -989,10 +984,9 @@ public class BatchProcessor {
                 
                 int ijob=0;
                                        
-                for ( int i1=0; i1<param1Values.length; i1++ ) {
-                    for ( int i2=0; i2<param2Values.length; i2++ ) {
-                        Runnable runOne= 
-                            setUpOneRun(ijob, param1Name, param1Values[i1], param2Name, param2Values[i2], scriptParams, monitor, s);
+                for (String param1Value : param1Values) {
+                    for (String param2Value : param2Values) {
+                        Runnable runOne = setUpOneRun(ijob, param1Name, param1Value, param2Name, param2Value, scriptParams, monitor, s);
                         executor.execute(runOne);
                         ijob=ijob+1;
                     }
@@ -1001,7 +995,6 @@ public class BatchProcessor {
             
             long lastWrite= System.currentTimeMillis();
             long lastReport= System.currentTimeMillis();
-            long messageNumber= 0; // toggle between messages
             
             int exportResultsWritten= 0;
             
@@ -1034,7 +1027,7 @@ public class BatchProcessor {
                 if ( showEta && ( t - lastReport ) > 3000 ) {
                     String report;
                     while ( durationsMillis.size()>12 ) {
-                        long removed = durationsMillis.removeFirst();
+                        durationsMillis.removeFirst();
                     }
                     long timeFor12Jobs=0;
                     double jobCount=0.0;
@@ -1256,11 +1249,8 @@ public class BatchProcessor {
         processor.setResultsFile( new File("/tmp/ap/results.csv"));
         processor.setThreads(6);
         processor.runBatchScript(dom, batchFile, monitor);
-        processor.addPropertyChangeListener( BatchProcessor.PROP_STATUSMESSAGE, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                System.err.println(evt.getNewValue());
-            }
+        processor.addPropertyChangeListener(BatchProcessor.PROP_STATUSMESSAGE, (PropertyChangeEvent evt) -> {
+            System.err.println(evt.getNewValue());
         });
         System.err.println("Done!");
         System.exit(0);
