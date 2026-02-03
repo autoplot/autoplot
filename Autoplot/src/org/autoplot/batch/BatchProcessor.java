@@ -1216,6 +1216,8 @@ public class BatchProcessor {
                     s.resultsStats.put( fijob, runResults );
                 } catch (JSONException ex) {
                     logger.log(Level.SEVERE, null, ex);
+                } catch ( ArrayIndexOutOfBoundsException ex ) {
+                    logger.log(Level.SEVERE, null, ex);
                 }
                 
             } catch ( RuntimeException ex ) {
