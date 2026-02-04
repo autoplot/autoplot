@@ -508,10 +508,12 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     
                     if ( isTca ) {
                         intervalOrResolutionLabel.setText("Sampling Interval (sec):");
-                        intervalOrResolutionLabel.setToolTipText("Explicitly request function to be evaluated at this cadence.");
+                        intervalOrResolutionLabel.setToolTipText("<html>Interval (in seconds) to use for TCA (ephemeris) data.<br> Leave blank for most datasets.<br> </html>");
+                        intervalOrResolutionTextField.setToolTipText("<html>Interval (in seconds) to use for TCA (ephemeris) data.<br> Leave blank for most datasets.<br> </html>");
                     } else {
                         intervalOrResolutionLabel.setText("Resolution Limit (sec):");
-                        intervalOrResolutionLabel.setToolTipText("Limit data requests to this resolution.");
+                        intervalOrResolutionLabel.setToolTipText("Limit data requests to this resolution (in seconds).");
+                        intervalOrResolutionTextField.setToolTipText("Limit data requests to this resolution (in seconds).");
                     }
                     
                     String selectedItem= tcaItem.get( url.toString() ); 
