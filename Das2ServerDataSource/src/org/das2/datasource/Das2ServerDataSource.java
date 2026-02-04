@@ -22,11 +22,9 @@ import java.net.URLEncoder;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
-import java.util.Formatter;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
@@ -63,7 +61,6 @@ import org.das2.qds.ops.Ops;
 import org.das2.qstream.QDataSetStreamHandler;
 import org.das2.stream.PacketDescriptor;
 import org.das2.util.CredentialsManager;
-import org.das2.util.monitor.AbstractProgressMonitor;
 
 /**
  * DataSource for communicating with Das2servers.
@@ -148,6 +145,10 @@ public final class Das2ServerDataSource extends AbstractDataSource {
             resolution = Units.seconds.parse(params2.get("resolution"));
             minResolution= resolution;
         }
+        
+        if ( params2.get("resolutionLimit")!=null ) {
+            minResolution= Units.seconds.parse(params2.get("resolutionLimit"));
+        }
 
     }
 
@@ -155,6 +156,10 @@ public final class Das2ServerDataSource extends AbstractDataSource {
 
     DatumRange timeRange;
     Datum resolution;
+    
+    /**
+     * minResolution (resolutionLimit in the URI) is the finest resolution allowed.
+     */
     Datum minResolution;
     String interval;
     String dsParams;
@@ -253,6 +258,8 @@ public final class Das2ServerDataSource extends AbstractDataSource {
         mon.started();
 
         Map<String, String> params2 = new LinkedHashMap();
+        
+        // otherParams are the parameters to be interpretted by the dataset reader.
         Map<String, String> otherParams = new LinkedHashMap(params);
         otherParams.remove("start_time");
         otherParams.remove("end_time");
@@ -264,6 +271,7 @@ public final class Das2ServerDataSource extends AbstractDataSource {
         otherParams.remove("intrinsic"); // =true means use native resolution
         otherParams.remove("useOldD2sParser");
         otherParams.remove("qubeSubset");
+        otherParams.remove("resolutionLimit");
         
         String item = (String) otherParams.remove("item");
         interval = (String) otherParams.remove("interval");

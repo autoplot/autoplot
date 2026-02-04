@@ -64,9 +64,9 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="intrinsicCb" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
-                              <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
+                              <Component id="intervalOrResolutionLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="tcaTextField" min="-2" pref="70" max="-2" attributes="0"/>
+                              <Component id="intervalOrResolutionTextField" min="-2" pref="70" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
                               <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
@@ -121,8 +121,8 @@
                       <Component id="jScrollPane2" min="-2" pref="53" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="tcaTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="intervalOrResolutionLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="intervalOrResolutionTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="intrinsicCb" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="itemsComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -205,13 +205,13 @@
         </Component>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JLabel" name="jLabel5">
+    <Component class="javax.swing.JLabel" name="intervalOrResolutionLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="Sampling Interval (sec):"/>
         <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt; Interval (in seconds) to use for arbitrary resolution data.&lt;br&gt;Typically used for spacecraft positions or models, leave blank for most datasets.&lt;br&gt; &lt;/html&gt; "/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="tcaTextField">
+    <Component class="javax.swing.JTextField" name="intervalOrResolutionTextField">
       <Properties>
         <Property name="text" type="java.lang.String" value=" "/>
         <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt; Interval (in seconds) to use for TCA (ephemeris) data.&lt;br&gt; Leave blank for most datasets.&lt;br&gt; &lt;/html&gt; "/>

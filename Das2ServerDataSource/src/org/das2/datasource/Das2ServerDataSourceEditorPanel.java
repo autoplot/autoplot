@@ -109,6 +109,11 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
     private final String DEFAULT_TIMERANGE="2001-01-01";
     private String dsdfContent;
+    
+    /**
+     * the data is a TCA and would have the interval specified, not the resolution.
+     */
+    private boolean isTca=false;
 
     /** Creates new form Das2ServerDataSourceEditorPanel */
     public Das2ServerDataSourceEditorPanel() {
@@ -139,8 +144,8 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         jLabel4 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         readerParamsTextArea = new javax.swing.JTextArea();
-        jLabel5 = new javax.swing.JLabel();
-        tcaTextField = new javax.swing.JTextField();
+        intervalOrResolutionLabel = new javax.swing.JLabel();
+        intervalOrResolutionTextField = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         viewDsdfButton = new javax.swing.JButton();
         validRangeLabel = new javax.swing.JLabel();
@@ -186,11 +191,11 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         readerParamsTextArea.setRows(5);
         jScrollPane2.setViewportView(readerParamsTextArea);
 
-        jLabel5.setText("Sampling Interval (sec):");
-        jLabel5.setToolTipText("<html> Interval (in seconds) to use for arbitrary resolution data.<br>Typically used for spacecraft positions or models, leave blank for most datasets.<br> </html> ");
+        intervalOrResolutionLabel.setText("Sampling Interval (sec):");
+        intervalOrResolutionLabel.setToolTipText("<html> Interval (in seconds) to use for arbitrary resolution data.<br>Typically used for spacecraft positions or models, leave blank for most datasets.<br> </html> ");
 
-        tcaTextField.setText(" ");
-        tcaTextField.setToolTipText("<html> Interval (in seconds) to use for TCA (ephemeris) data.<br> Leave blank for most datasets.<br> </html> ");
+        intervalOrResolutionTextField.setText(" ");
+        intervalOrResolutionTextField.setToolTipText("<html> Interval (in seconds) to use for TCA (ephemeris) data.<br> Leave blank for most datasets.<br> </html> ");
 
         jLabel6.setText("TCA Item:");
         jLabel6.setToolTipText("The optional item number for TCAs.");
@@ -302,9 +307,9 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                             .add(layout.createSequentialGroup()
                                 .add(intrinsicCb)
                                 .add(28, 28, 28)
-                                .add(jLabel5)
+                                .add(intervalOrResolutionLabel)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(tcaTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 70, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .add(intervalOrResolutionTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 70, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 .add(26, 26, 26)
                                 .add(jLabel6)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -348,8 +353,8 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                         .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 53, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                            .add(jLabel5)
-                            .add(tcaTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(intervalOrResolutionLabel)
+                            .add(intervalOrResolutionTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .add(jLabel6)
                             .add(intrinsicCb)
                             .add(itemsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
@@ -467,6 +472,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     //String exampleParams= null;
                     Map<String,String> items= new HashMap<>();
                     Pattern itemPattern= Pattern.compile("item_(\\d\\d)");
+                    
                     for ( int i=0; i<exs.getLength(); i++ ) {
                         Node ex= exs.item(i);
                         String name= ex.getNodeName();
@@ -498,6 +504,14 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                                 items.put( name, s );
                             }
                         }
+                    }
+                    
+                    if ( isTca ) {
+                        intervalOrResolutionLabel.setText("Sampling Interval (sec):");
+                        intervalOrResolutionLabel.setToolTipText("Explicitly request function to be evaluated at this cadence.");
+                    } else {
+                        intervalOrResolutionLabel.setText("Resolution Limit (sec):");
+                        intervalOrResolutionLabel.setToolTipText("Limit data requests to this resolution.");
                     }
                     
                     String selectedItem= tcaItem.get( url.toString() ); 
@@ -605,11 +619,17 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     } else {
                         Das2ServerDataSourceEditorPanel.this.validRangeLabel.setText("<html><i>no valid range for dataset provided</i></html>");
                     }
-                    if ( isTca ) {
-                        tcaTextField.setText("60");
-                    } else {
-                        tcaTextField.setText("");
+                    
+                    boolean isTcaChange= Das2ServerDataSourceEditorPanel.this.isTca!=isTca;
+                    if ( isTcaChange ) {
+                        if ( isTca ) {
+                            intervalOrResolutionTextField.setText("60");
+                        } else {
+                            intervalOrResolutionTextField.setText("");
+                        }
                     }
+                    Das2ServerDataSourceEditorPanel.this.isTca= isTca;
+
                     } catch ( XPathExpressionException ex ) {
                         logger.log(Level.SEVERE, ex.getMessage(), ex);
                     }
@@ -1113,13 +1133,14 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     public javax.swing.JCheckBox discoveryCb;
     public javax.swing.JButton editParamsButton;
     public javax.swing.JComboBox examplesComboBox;
+    public javax.swing.JLabel intervalOrResolutionLabel;
+    public javax.swing.JTextField intervalOrResolutionTextField;
     public javax.swing.JCheckBox intrinsicCb;
     public javax.swing.JComboBox<String> itemsComboBox;
     public javax.swing.JLabel jLabel1;
     public javax.swing.JLabel jLabel2;
     public javax.swing.JLabel jLabel3;
     public javax.swing.JLabel jLabel4;
-    public javax.swing.JLabel jLabel5;
     public javax.swing.JLabel jLabel6;
     public javax.swing.JLabel jLabel7;
     public javax.swing.JScrollPane jScrollPane1;
@@ -1127,7 +1148,6 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     public javax.swing.JTree jTree1;
     public javax.swing.JTextArea readerParamsTextArea;
     public org.autoplot.datasource.RecentComboBox recentComboBox1;
-    public javax.swing.JTextField tcaTextField;
     public javax.swing.JButton timeRangeTool;
     public javax.swing.JLabel validRangeLabel;
     public javax.swing.JButton viewDsdfButton;
@@ -1247,10 +1267,12 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         String intrinsic = params.remove("intrinsic");
         intrinsicCb.setSelected("true".equals(intrinsic));
 		  
-        String interval= params.remove("interval");
-        if ( interval!=null ) {
-            tcaTextField.setText(interval);
+        String intervalOrResolution= params.remove("interval");
+        if ( intervalOrResolution==null ) intervalOrResolution= params.remove("resolutionLimit");
+        if ( intervalOrResolution!=null ) {
+            intervalOrResolutionTextField.setText(intervalOrResolution);
         }
+        
         String item= params.remove("item");
         if ( item!=null ) {
             itemsComboBox.setSelectedItem(item);
@@ -1455,10 +1477,15 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 		  
         if(intrinsicCb.isSelected()) result.append("&intrinsic=true");
 		  
-        String tcaInterval= tcaTextField.getText().trim();
-        if ( !tcaInterval.equals("") ) {
-            result.append("&interval=").append(tcaInterval);
+        String intervalOrResolution= intervalOrResolutionTextField.getText().trim();
+        if ( !intervalOrResolution.equals("") ) {
+            if ( isTca ) {   //intervalOrResolutionLabel.getText().startsWith("Sampling"))
+                result.append("&interval=").append(intervalOrResolution);
+            } else {
+                result.append("&resolutionLimit=").append(intervalOrResolution);
+            }
         }
+        
         String s= itemsComboBox.getSelectedItem().toString().trim();
         if ( !s.equals("") ) {
             if ( s.startsWith("0 (") ) {
