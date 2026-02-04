@@ -15,7 +15,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Quick and dirty BatchProcessor is now available, which can run a Jython script with many different parameter values simultaneously on multiple threads on multiple machines.</small></p>
+        <p><small>Das2Server source now has resolution limit control.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -29,8 +29,9 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2026-01-31):</p>
+        <p>Bugfixes (2026-02-04):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2787/">2787</a>: add explicit resolution limit for Das2Server, clean up GUI.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2786/">2786</a>: reject when where(...) is used in ASCII URI, should be where=...
             <li><a href="https://github.com/das-developers/das2java/issues/162">162</a>: bug fixed in DataPointRecorder when third column is time column and last is nominal.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2785/">2785</a>: Strange deadlock observed resolved by removing (probably) unnecessary synchronized blocks.  Thanks, Connor!
