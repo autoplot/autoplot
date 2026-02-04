@@ -11,6 +11,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -131,6 +132,9 @@ public class RunBatchTool extends javax.swing.JPanel {
     
     private JLabel[] param1JLabels= null;
     
+    private JLabel lastActiveLabel= null;
+    
+    
     /**
      * 1, 2, or more than 2 params.
      */
@@ -244,6 +248,20 @@ public class RunBatchTool extends javax.swing.JPanel {
         timeRangeComboBox.setSelectedItem( prefs.get("lastTimeRange", "2000-Jan" ) );
         timeFormatComboBox.setSelectedItem( prefs.get("lastTimeFormat", "$Y-$m-$d" ) );
         
+        activeFocusCB.addActionListener((ActionEvent ae) -> {
+            if ( activeFocusCB.isSelected() ) {
+                if ( lastActiveLabel!=null ) {
+                    JLabel jobLabel= lastActiveLabel;
+                    JViewport vp = (JViewport) SwingUtilities.getAncestorOfClass(JViewport.class, jobLabel);
+                    try {
+                        Rectangle r = SwingUtilities.convertRectangle(jobLabel.getParent(), jobLabel.getBounds(), vp);
+                        vp.scrollRectToVisible(r);
+                    } catch ( java.lang.Error e ) {
+                        // this can be ignored.
+                    }
+                }
+            }
+        });
     }
     
     /**
@@ -280,6 +298,7 @@ public class RunBatchTool extends javax.swing.JPanel {
      * do the stuff to do when the play button is pressed.
      */
     private void doPlayButton() {
+        lastActiveLabel= null;
         state= STATE_LOADING;                  
         try {
             String scriptName= dataSetSelector1.getValue();
@@ -2198,7 +2217,8 @@ public class RunBatchTool extends javax.swing.JPanel {
             }
 
             jobLabel.setIcon(ICON_WORKING);
-            
+            lastActiveLabel= jobLabel;
+                    
             if ( activeFocusCB.isSelected() ) {
                 SwingUtilities.invokeLater(() -> {
                     JViewport vp = (JViewport) SwingUtilities.getAncestorOfClass(JViewport.class, jobLabel);
