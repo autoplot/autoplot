@@ -257,9 +257,14 @@ public class AsciiTableDataSourceFactory extends AbstractDataSourceFactory imple
             String arg_0= params.get("arg_0");
             if ( arg_0!=null ) {
                 if ( arg_0.equals("rank2") || arg_0.equals("bundle") ) return false;
+                if ( arg_0.startsWith("where(") ) {
+                    problems.add("'where=' not 'where('");
+                    return true;
+                }
             }
 
             if ( split.resourceUri==null ) {
+                problems.add("missing resource uri");
                 return true;
             }
             
@@ -280,13 +285,14 @@ public class AsciiTableDataSourceFactory extends AbstractDataSourceFactory imple
                             return false;
                         }
                     }
-                    if ( cc.size()>0 && cc.size()<7 ) {  // kludge where the last completion will be for eventListColumn when this could be done automatically. // bug1900.
+                    if ( !cc.isEmpty() && cc.size()<7 ) {  // kludge where the last completion will be for eventListColumn when this could be done automatically. // bug1900.
                         CompletionContext lastCC= cc.get(cc.size()-1);
                         if ( lastCC.context==CompletionContext.CONTEXT_PARAMETER_NAME 
                                 && lastCC.completable.equals("eventListColumn") ) {
                             return false;
                         }
                     }
+                    problems.add("unable to identify column");
                     return true;
                 }
             }
