@@ -263,6 +263,14 @@ public class AsciiTableDataSourceFactory extends AbstractDataSourceFactory imple
                 }
             }
 
+            String arg_1= params.get("arg_1");
+            if ( arg_1!=null ) {
+                if ( arg_1.startsWith("where(") ) {
+                    problems.add("'where=' not 'where('");
+                    return true;
+                }
+            }
+
             if ( split.resourceUri==null ) {
                 problems.add("missing resource uri");
                 return true;
