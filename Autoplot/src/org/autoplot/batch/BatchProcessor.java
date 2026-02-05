@@ -823,8 +823,12 @@ public class BatchProcessor {
             File lbatchJobsDirectory= null;
             File lbatchPendingDirectory= null;
             File lbatchCompleteDirectory= null;
+            File lbatchExceptionsDirectory= null;
             File lbatchStdoutDirectory;
             File lbatchImagesDirectory;
+            
+            File specificationFile = new File( batchDirectory, "main.batch" );
+            File specificationPendingFile = new File( batchDirectory, "main.batch.pending" );
             
             boolean batchGuest= false; // a batchGuest is a machine which works on a batch but does not set it up.
             
@@ -852,6 +856,12 @@ public class BatchProcessor {
                         throw new IllegalArgumentException("Unable to make directory: "+lbatchCompleteDirectory);
                     }
                 }
+                lbatchExceptionsDirectory= new File( batchDirectory, "exceptions" );
+                if ( !lbatchExceptionsDirectory.exists() ) {
+                    if ( !lbatchExceptionsDirectory.mkdirs() ) {
+                        throw new IllegalArgumentException("Unable to make directory: "+lbatchExceptionsDirectory);
+                    }
+                }
                 lbatchStdoutDirectory= new File( batchDirectory, "stdout" );
                 if ( !lbatchStdoutDirectory.exists() ) {
                     if ( !lbatchStdoutDirectory.mkdirs() ) {
@@ -865,8 +875,6 @@ public class BatchProcessor {
                         throw new IllegalArgumentException("Unable to make directory: "+lbatchImagesDirectory);
                     }
                 }
-                
-                File specificationFile = new File( batchDirectory, "main.batch" );
                 
                 if ( specificationFile.exists() ) {
                     if ( isDirectoryEmpty(lbatchJobsDirectory) ) {
@@ -886,12 +894,14 @@ public class BatchProcessor {
                     batchGuest= true;
                     logger.log(Level.INFO, "Running batch as GUEST, pid is {0}", pid);
                 } else {
+                    Files.createFile( specificationPendingFile.toPath() );
                     try ( PrintWriter write= new PrintWriter( specificationFile ) ) {
                         write.append(batchFileJson);
                     }
                     emptyDirectory(lbatchJobsDirectory);
                     emptyDirectory(lbatchPendingDirectory);
                     emptyDirectory(lbatchCompleteDirectory);
+                    emptyDirectory(lbatchExceptionsDirectory);
                     emptyDirectory(lbatchStdoutDirectory);
                     emptyDirectory(lbatchImagesDirectory);
                     logger.log(Level.INFO, "Running batch as HOST, pid is {0}", pid);
@@ -902,6 +912,7 @@ public class BatchProcessor {
             final File batchJobsDirectory= lbatchJobsDirectory;
             final File batchPendingDirectory= lbatchPendingDirectory;
             final File batchCompletedDirectory= lbatchCompleteDirectory;
+            final File batchExceptionsDirectory= lbatchExceptionsDirectory;
             
             JSONObject batchResults= new JSONObject();
             JSONArray resultsStats= new JSONArray();
@@ -967,12 +978,14 @@ public class BatchProcessor {
                         }
                     }
                 }
+                Files.delete( specificationPendingFile.toPath() );
             }
             
             Settings s= new Settings();
             s.batchJobsDirectory= batchJobsDirectory;
             s.batchPendingDirectory= batchPendingDirectory;
             s.batchCompletedDirectory= batchCompletedDirectory;
+            s.batchExceptionsDirectory= batchExceptionsDirectory;
             s.pwd= pwd;
             s.fscriptUri= fscriptUri;
             s.script= script;
@@ -1169,13 +1182,14 @@ public class BatchProcessor {
     private static class Settings {
         File batchJobsDirectory;
         File batchPendingDirectory;
+        File batchCompletedDirectory;
+        File batchExceptionsDirectory;
         String pwd;
         String fscriptUri;
         String script;
         Map<String, Param> fparameterDescriptions;
         boolean showEta;
         Deque<Long> durationsMillis;
-        File batchCompletedDirectory;
         AtomicInteger jobNumber;
         JSONArray resultsStats;
     }
@@ -1253,14 +1267,19 @@ public class BatchProcessor {
                 }
                 
                 if ( s.batchJobsDirectory!=null ) {
+                    String exception= runResults.optString("result","").replaceAll("\n"," ").trim();
                     File pendingFile= new File( s.batchPendingDirectory,String.format("%06d",fijob) );
-                    File completedFile= new File( s.batchCompletedDirectory,String.format("%06d",fijob) );
-                    if ( !pendingFile.renameTo(completedFile) ) {
+                    File completeOrExceptionFile;
+                    if ( exception.length()>0 ) {
+                        completeOrExceptionFile= new File( s.batchExceptionsDirectory,String.format("%06d",fijob) );
+                    } else {
+                        completeOrExceptionFile= new File( s.batchCompletedDirectory,String.format("%06d",fijob) );
+                    }
+                    if ( !pendingFile.renameTo(completeOrExceptionFile) ) {
                         throw new IllegalArgumentException("couldn't rename "+pendingFile);
                     }
                     try {
-                        Path path= completedFile.toPath();
-                        String exception= runResults.optString("result","").replaceAll("\n"," ");
+                        Path path= completeOrExceptionFile.toPath();
                         String text= "runTimeMs: " + timeToComplete + "\n" + "exception: "+exception;
                         Files.write(path, text.getBytes(), StandardOpenOption.APPEND );
                     } catch (IOException ex) {
