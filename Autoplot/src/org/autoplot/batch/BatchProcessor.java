@@ -34,6 +34,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -799,7 +800,7 @@ public class BatchProcessor {
         
             ThreadFactory tf= (Runnable r) -> new Thread( r, "run-batch-"+threadCounter.incrementAndGet());
             ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(initialThreadCount,tf);
-            Deque<Long> durationsMillis= new ArrayDeque<>(); 
+            Deque<Long> durationsMillis= new LinkedBlockingDeque<>(); 
             
             final AtomicInteger jobNumber= new AtomicInteger(0);
             
