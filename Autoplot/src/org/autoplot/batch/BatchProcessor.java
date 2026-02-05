@@ -530,22 +530,29 @@ public class BatchProcessor {
             long t0= System.currentTimeMillis();
             
             OutputStream outs;
+            OutputStream errs;
+            
             ByteArrayOutputStream outbaos;
             if ( batchDirectory!=null ) {
-                File outf= new File( new File( batchDirectory, "stdout" ), String.format("%06d",jobNumber) );
-                if ( !outf.getParentFile().exists() ) {
-                    outf.getParentFile().mkdirs();
-                } 
                 outbaos= new ByteArrayOutputStream();
+
+                File outf= new File( new File( batchDirectory, "stdout" ), String.format("%06d",jobNumber) );
                 outs= new TeeOutputStream( new FileOutputStream( outf ), outbaos );
+                
+                //File errf= new File( new File( batchDirectory, "stderr" ), String.format("%06d",jobNumber) );
+                //errs= new TeeOutputStream( new FileOutputStream( errf ), outbaos );
+                errs= outs;  //TODO: the above lines don't seem to catch the err channel.
+                
             } else {
                 outbaos= new ByteArrayOutputStream();
                 outs= outbaos;
+                errs= outbaos;
             }
             
             //ByteArrayOutputStream outbaos= 
             try {
                 interp.setOut(outs);
+                interp.setErr(errs);
                 
                 interp.execfile( new ByteArrayInputStream(script.getBytes("US-ASCII")), name );
                 
@@ -712,6 +719,7 @@ public class BatchProcessor {
      * @throws IOException 
      */
     private static void emptyDirectory( File directory ) throws IOException {
+        if ( !directory.exists() ) return;
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory.toPath())) {
             for (Path entry : stream) {
                 if (Files.isRegularFile(entry)) {
@@ -825,6 +833,7 @@ public class BatchProcessor {
             File lbatchCompleteDirectory= null;
             File lbatchExceptionsDirectory= null;
             File lbatchStdoutDirectory;
+            File lbatchStderrDirectory;
             File lbatchImagesDirectory;
             
             File specificationFile = new File( batchDirectory, "main.batch" );
@@ -869,6 +878,13 @@ public class BatchProcessor {
                     }
                 }
 
+                lbatchStderrDirectory= new File( batchDirectory, "stderr" );
+                //if ( !lbatchStderrDirectory.exists() ) {
+                //    if ( !lbatchStderrDirectory.mkdirs() ) {
+                //        throw new IllegalArgumentException("Unable to make directory: "+lbatchStderrDirectory);
+                //    }
+                //}
+
                 lbatchImagesDirectory= new File( batchDirectory, "images" );
                 if ( !lbatchImagesDirectory.exists() ) {
                     if ( !lbatchImagesDirectory.mkdirs() ) {
@@ -903,6 +919,7 @@ public class BatchProcessor {
                     emptyDirectory(lbatchCompleteDirectory);
                     emptyDirectory(lbatchExceptionsDirectory);
                     emptyDirectory(lbatchStdoutDirectory);
+                    emptyDirectory(lbatchStderrDirectory);
                     emptyDirectory(lbatchImagesDirectory);
                     logger.log(Level.INFO, "Running batch as HOST, pid is {0}", pid);
                 }
