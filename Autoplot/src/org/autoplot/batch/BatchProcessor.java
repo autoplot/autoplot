@@ -873,9 +873,18 @@ public class BatchProcessor {
                         specificationFile.delete();
                     }
                 }
+                
+                String pid= AutoplotUtil.getProcessId("???");
                 if ( specificationFile.exists() ) {
+                    //makr sure the JSON files are identical.
+                    String hostBatchFileJson= FileUtil.readFileToString(specificationFile);
+                    JSONObject hostJson= new JSONObject(hostBatchFileJson); 
+                    String diff= batchTasksDifferent(jo,hostJson);
+                    if ( diff!=null ) {
+                        throw new IllegalArgumentException("Guest runBatch JSON doesn't match host runBatch JSON in "+specificationFile+", "+diff);
+                    }
                     batchGuest= true;
-                    logger.info("Running batch as guest");
+                    logger.log(Level.INFO, "Running batch as GUEST, pid is {0}", pid);
                 } else {
                     try ( PrintWriter write= new PrintWriter( specificationFile ) ) {
                         write.append(batchFileJson);
@@ -885,7 +894,7 @@ public class BatchProcessor {
                     emptyDirectory(lbatchCompleteDirectory);
                     emptyDirectory(lbatchStdoutDirectory);
                     emptyDirectory(lbatchImagesDirectory);
-                    logger.info("Running batch as host");
+                    logger.log(Level.INFO, "Running batch as HOST, pid is {0}", pid);
                 }
                 
             }
@@ -1105,6 +1114,56 @@ public class BatchProcessor {
             
         }
         
+    }
+
+    private String batchParamsIdentical(Object p1,Object p2,String which) throws JSONException {
+        String[] pp1;
+        String[] pp2;
+        if ( p1 instanceof String ) {
+            pp1= ((String)p1).split("\n");
+        } else {
+            JSONArray ja= (JSONArray)p1;
+            pp1= new String[ja.length()];
+            for ( int i=0; i<ja.length(); i++ ) {
+                pp1[i]= ja.getString(i);
+            }
+        }
+        if ( p2 instanceof String ) {
+            pp2= ((String)p2).split("\n");
+        } else {
+            JSONArray ja= (JSONArray)p2;
+            pp2= new String[ja.length()];
+            for ( int i=0; i<ja.length(); i++ ) {
+                pp2[i]= ja.getString(i);
+            }
+        }
+        if ( pp1.length!=pp2.length ) return which + " are different lengths";
+        for ( int i=0; i<pp1.length; i++ ) {
+            if ( !pp1[i].equals(pp2[i]) ) return which + " are different at index "+i;
+        }
+        return null;
+    }
+    
+    /**
+     * return a string indicating a different part of the JSON batch file, or null if they are the same.
+     * @param jo
+     * @param hostJson
+     * @return
+     * @throws JSONException 
+     */
+    private String batchTasksDifferent(JSONObject jo, JSONObject hostJson) throws JSONException {
+        if ( !jo.getString("param1").equals(hostJson.getString("param1") ) ) return "param1 is different";
+        if ( !jo.getString("param2").equals(hostJson.getString("param2") ) ) return "param2 is different";
+        if ( !jo.getString("script").equals(hostJson.getString("script") ) ) return "script is different";
+        Object p1= jo.get("param1Values");
+        Object p2= hostJson.get("param1Values");
+        String s= batchParamsIdentical(p1,p2,"param1Values");
+        if ( s!=null ) return s;
+        p1= jo.get("param2Values");
+        p2= hostJson.get("param2Values");
+        s= batchParamsIdentical(p1,p2,"param2Values");
+        if ( s!=null ) return s;
+        return null;
     }
 
     private static class Settings {
