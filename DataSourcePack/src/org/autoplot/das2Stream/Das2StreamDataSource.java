@@ -93,7 +93,7 @@ public class Das2StreamDataSource extends AbstractDataSource {
 
         String ext= split.vapScheme;
         
-        boolean useOldD2sParser= "T".equals( getParam( "useOldD2sParser", "T") );
+        boolean useOldD2sParser= "T".equals( getParam( "useOldD2sParser", "F") );
         
         if ( ext.equals("vap+qds") || ext.equals("vap+qdst") ) {
             try {
@@ -178,6 +178,9 @@ public class Das2StreamDataSource extends AbstractDataSource {
 
                 QDataSet r= handler.getDataSet();
                 Map<String,Object> userProps= new HashMap<>();
+                if ( r.property(QDataSet.USER_PROPERTIES)!=null ) {
+                    userProps.putAll( (Map<String,Object>)r.property(QDataSet.USER_PROPERTIES) );
+                }
                 userProps.put( "file", uri );
                 r= Ops.putProperty( r, QDataSet.USER_PROPERTIES, userProps );
                 return r;
