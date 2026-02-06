@@ -96,6 +96,9 @@ import org.python.util.InteractiveInterpreter;
  * If setWritePngTemplate is a non-empty string, then image files are written to this location, and a link from the images
  * directory to this image will be created.
  * 
+ * Scripts are run without verifying them against known approved scripts, so only run this against scripts from
+ * trusted sources.
+ * 
  * @author jbf
  */
 
