@@ -1288,6 +1288,7 @@ public class BatchProcessor {
                 
                 if ( s.batchJobsDirectory!=null ) {
                     String exception= runResults.optString("result","").replaceAll("\n"," ").trim();
+                    if ( exception.length()>240 ) exception= exception.substring(0,237)+"...";
                     File pendingFile= new File( s.batchPendingDirectory,String.format("%06d",fijob) );
                     File completeOrExceptionFile;
                     if ( exception.length()>0 ) {
@@ -1300,7 +1301,7 @@ public class BatchProcessor {
                     }
                     try {
                         Path path= completeOrExceptionFile.toPath();
-                        String text= "runTimeMs: " + timeToComplete + "\n" + "exception: "+exception;
+                        String text= "runTimeMs: " + timeToComplete + "\n" + "exception: "+exception + "\n";
                         Files.write(path, text.getBytes(), StandardOpenOption.APPEND );
                     } catch (IOException ex) {
                         logger.log(Level.SEVERE, null, ex);
