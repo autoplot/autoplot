@@ -81,12 +81,12 @@ import org.python.util.InteractiveInterpreter;
  * </ul>
  * 
  * The property "batchDirectory" is used to coordinate multiple machines.  There
- * will be one "host" machine and multiple "worker" machines.  The host will
+ * will be one "host" machine and multiple "guest" machines.  The host will
  * set up the batchDirectory to contain the subdirectories:
  * <ul>
  * <li>jobs - jobs to be run
- * <li>pending - job claimed by workers
- * <li>complete - job completed by workers
+ * <li>pending - job claimed by guests
+ * <li>complete - job completed by guests
  * </ul>
  * A job is moved from one directory to the next as each job is performed.  Note
  * this is a guess at how this should work, and may change.
@@ -1251,9 +1251,9 @@ public class BatchProcessor {
                         
                         try {
                             Path path= pendingFile.toPath();
-                            String text= "workerHost: " + InetAddress.getLocalHost().getHostName() + "\n" +
-                                    "workerPid: " + AutoplotUtil.getProcessId("XXX") +"\n" +
-                                    "workerThread: " + Thread.currentThread().getName() + "\n";
+                            String text= "guestHost: " + InetAddress.getLocalHost().getHostName() + "\n" +
+                                    "guestPid: " + AutoplotUtil.getProcessId("XXX") +"\n" +
+                                    "guestThread: " + Thread.currentThread().getName() + "\n";
                             Files.write(path, text.getBytes(), StandardOpenOption.APPEND );
                         } catch (IOException ex) {
                             logger.log(Level.SEVERE, null, ex);
