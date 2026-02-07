@@ -72,7 +72,10 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "timerange=", "time range"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "intrinsic=true", "do not reduce on server"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "interval=", "cadence in seconds for TCAs"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, 
+                    "resolutionLimit=", "limit the resolution requests to no finer than this many seconds"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "item=", "item number for TCAs"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "useOldD2sParser=", "use old das2stream parser"));
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
             String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
             if (paramName.equals("dataset")) {
@@ -131,6 +134,9 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
                         System.err.println("SAX Exception: "+surl );
                     }
                 }
+            } else if ( paramName.equals("useOldD2sParser") ) {
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "T" ) );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "F" ) );
             }
         }
 
