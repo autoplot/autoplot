@@ -1656,6 +1656,10 @@ public class DomUtil {
         List<PlotElement> pes= getPlotElementsFor(dom, p);
         for ( PlotElement pe: pes ) {
             DataSourceFilter dsf= (DataSourceFilter)getElementById( dom, pe.getDataSourceFilterId() );
+            if ( dsf==null ) {
+                logger.log(Level.WARNING, "unable to find DataSource {0}", pe.dataSourceFilterId);
+                continue;
+            }
             dsfs.add( dsf );
             if ( dsf.getUri().startsWith("vap+internal:") ) {
                 dsfs.addAll( getParentsFor(dom, dsf.getUri() ) );
