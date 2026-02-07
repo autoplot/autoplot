@@ -285,6 +285,10 @@ public class AxisPanel extends javax.swing.JPanel {
         List<PlotElement> pes= dom.getController().getPlotElementsFor(p);
         for ( PlotElement pe: pes ) {
             DataSourceFilter dsf= pe.getController().getDataSourceFilter();
+            if ( dsf==null ) {
+                logger.log(Level.WARNING, "unable to find DataSource for {0}", pe);
+                continue;
+            }
             DataSourceController dsfc= dsf.getController();
             if ( dsfc==null ) return false;
             TimeSeriesBrowseController tsbc= dsfc.getTimeSeriesBrowseController();
