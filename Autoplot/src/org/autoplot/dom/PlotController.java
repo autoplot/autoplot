@@ -383,6 +383,15 @@ public final class PlotController extends DomNodeController {
      */
     private void updateNextPrevious( final DatumRange dr0, QDataSet ds ) {
 
+        List<PlotElement> pes= DomUtil.getPlotElementsFor( dom, plot );
+        
+        boolean multipleDataSources= pes.size()>1;
+        if ( multipleDataSources ) {
+            if ( DomUtil.oneFamily(pes) ) {
+                multipleDataSources= false;
+            }
+        }
+        
         logger.log(Level.FINE, "updateNextPrevious: {0}", dr0);
         if ( ds!=null && SemanticOps.isBundle(ds) ) {
             logger.log(Level.FINE, "unbundling: {0}", ds);
@@ -401,8 +410,14 @@ public final class PlotController extends DomNodeController {
             scanNextRange= dr0.next();
             
         } else {
-            scanPrevRange= DataSetUtil.getPreviousInterval(ds, dr0);
-            scanNextRange= DataSetUtil.getNextInterval(ds, dr0);
+            if ( multipleDataSources ) {
+                logger.fine("simple next and previous used because there are multiple plot elements");
+                scanPrevRange= dr0.previous();
+                scanNextRange= dr0.next();                
+            } else {
+                scanPrevRange= DataSetUtil.getPreviousInterval(ds, dr0);
+                scanNextRange= DataSetUtil.getNextInterval(ds, dr0);
+            }
         }
         
         double rescaleFactor; // note rescaleFactor is always 1.0 now.
