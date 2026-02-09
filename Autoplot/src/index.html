@@ -29,8 +29,9 @@
 
         <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
                 
-        <p>Bugfixes (2026-02-07):</p>
+        <p>Bugfixes (2026-02-09):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2788/">2788</a>: Don't use "scan" when multiple plot elements, not from one family (Bx,By,Bz), are used.  Thanks, Ivar!
             <li><a href="https://github.com/das-developers/das2java/issues/164">164</a>: HugeScatter shows limits as well as Series.  WARN is drawn after NOMINAL, not before.  In the case where they overlap, WARN implies NOMINAL.
             <li><a href="https://github.com/das-developers/das2java/issues/164">164</a>: Das2Stream yWarn and yNominal are supported.  New Das2Stream to QDataSet parser is used by default.  Thanks, Chris!
             <li><a href="https://github.com/das-developers/das2java/issues/164">164</a>: Das2Stream to QDataSet parser preserves more metadata in USER_PROPERTIES.
