@@ -372,9 +372,8 @@ public final class Das2ServerDataSource extends AbstractDataSource {
                 ReadableByteChannel channel = Channels.newChannel(in);
 
                 final Map map = new LinkedHashMap();
-
                 
-                DataSetStreamHandler handler = new DataSetStreamHandler(new HashMap(), mon) {
+                DataSetStreamHandler handler = new DataSetStreamHandler(new HashMap(), mon) {//this is just to get the DSDF
                     @Override
                     public void streamDescriptor(StreamDescriptor sd) throws StreamException {
                         super.streamDescriptor(sd);
