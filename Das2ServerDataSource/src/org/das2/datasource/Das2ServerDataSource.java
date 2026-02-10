@@ -211,10 +211,13 @@ public final class Das2ServerDataSource extends AbstractDataSource {
                 mpin.setEnableProgressPosition(false);
             } else {
                 this.monitorXTags= true;
-                if ( timeRange.width().gt( Units.days.createDatum(480) ) ) {
+                Datum w= timeRange.width();
+                if ( w.gt( Units.days.createDatum(480) ) ) {
                     this.units= Units.days;
-                } else if ( timeRange.width().gt( Units.hours.createDatum(48) ) ) {
+                } else if ( w.gt( Units.hours.createDatum(48) ) ) {
                     this.units= Units.hours;
+                } else if ( w.gt( Units.hours.createDatum(1.5) ) ) {
+                    this.units= Units.minutes;
                 }
                 mon.setTaskSize( (long)(timeRange.width().doubleValue(units)) );
                 mon.setAdditionalInfo( this.units.toString() );
@@ -576,7 +579,7 @@ public final class Das2ServerDataSource extends AbstractDataSource {
         } else {
             
             org.das2.client.QDataSetStreamHandler handler;
-            if ( System.getProperty("timetagMonitoringDas2StreamHandler","false").startsWith("t") ) {
+            if ( System.getProperty("timetagMonitoringDas2StreamHandler","true").startsWith("t") ) {
                 handler = new MonitoringDataSetStreamHandler( mpin, mon, timeRange );
             } else {
                 handler= new org.das2.client.QDataSetStreamHandler() {
