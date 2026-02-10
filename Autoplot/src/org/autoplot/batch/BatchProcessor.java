@@ -1057,6 +1057,11 @@ public class BatchProcessor {
                 if ( monitor.isCancelled() ) {
                     break;
                 }
+                if ( new File( batchDirectory, "shutdown.txt" ).exists() ) {
+                    logger.info("shutting down after seeing shutdown.txt");
+                    break;
+                }
+                
                 long t= System.currentTimeMillis();
                 if ( resultsFile!=null && ( ( t-lastWrite )>1000 ) ) { // write to pending file every ten seconds.
                     if ( resultsFile.getName().endsWith(".json") ) {
