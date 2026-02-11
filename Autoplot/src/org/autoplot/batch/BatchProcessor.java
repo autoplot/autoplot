@@ -903,7 +903,7 @@ public class BatchProcessor {
                 
                 String pid= AutoplotUtil.getProcessId("???");
                 if ( specificationFile.exists() ) {
-                    //makr sure the JSON files are identical.
+                    //make sure the JSON files are identical.
                     String hostBatchFileJson= FileUtil.readFileToString(specificationFile);
                     JSONObject hostJson= new JSONObject(hostBatchFileJson); 
                     String diff= batchTasksDifferent(jo,hostJson);
