@@ -79,7 +79,7 @@ public final class CsvFileLogHandler extends Handler implements Closeable, Flush
             try {
                 if (writeHeader && !headerWritten) {
                     writeRow(new String[] {
-                            "timestamp_iso", "epoch_millis", "level", "logger", "thread",
+                            "timestamp_iso", "epoch_millis", "level", "thread", "logger", 
                             "source_class", "source_method", "message", "thrown"
                     });
                     headerWritten = true;
@@ -88,7 +88,7 @@ public final class CsvFileLogHandler extends Handler implements Closeable, Flush
                 long millis= r.getMillis();
                 String timestampIso = Units.ms1970.createDatum(millis).toString();
                 String epochMillis = Long.toString(millis);
-                String level = safe(r.getLevel());
+                String level = Integer.toString(r.getLevel().intValue());
                 String logger = safe(r.getLoggerName());
                 String thread = Integer.toString(r.getThreadID());
                 String sourceClass = safe(r.getSourceClassName());
@@ -97,7 +97,7 @@ public final class CsvFileLogHandler extends Handler implements Closeable, Flush
                 String thrown = throwableToString(r.getThrown());
 
                 writeRow(new String[] {
-                        timestampIso, epochMillis, level, logger, thread,
+                        timestampIso, epochMillis, level, thread, logger, 
                         sourceClass, sourceMethod, message, thrown
                 });
 
