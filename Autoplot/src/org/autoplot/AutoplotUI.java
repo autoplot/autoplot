@@ -1574,7 +1574,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
         tabs.insertTab("metadata", null, fmetadataPane,
                 String.format(  TAB_TOOLTIP_METADATA, TABS_TOOLTIP), tabs.getTabCount() );
 
-        invokeLater( 2230, true, new Runnable() { 
+        invokeLater( 1230, true, new Runnable() { 
             @Override
             public String toString() { return "addLayout"; }
             @Override            
@@ -1596,7 +1596,7 @@ APSplash.checkTime("init 250");
                 }
             }
         } );
-        invokeLater( 2350, true, new Runnable() {
+        invokeLater( 1350, true, new Runnable() {
             @Override
             public String toString() { return "addDataPanel"; }
             @Override
@@ -1616,7 +1616,7 @@ APSplash.checkTime("init 260");
                 }
             }
         } );
-        invokeLater( 2470, true, new Runnable() { 
+        invokeLater( 1470, true, new Runnable() { 
             @Override
             public String toString() { return "addMetadataPanel"; }
             @Override
@@ -1640,7 +1640,7 @@ APSplash.checkTime("init 270");
             jythonScriptPanel.setPreferredSize(new Dimension(640,480));
             tabs.addTab( TAB_SCRIPT, null, jythonScriptPanel,
                   String.format(  TAB_TOOLTIP_SCRIPT, TABS_TOOLTIP )  );
-            invokeLater( 4000, true, new Runnable() {
+            invokeLater( 2000, true, new Runnable() {
                 @Override
                 public String toString() { return "addScriptPanel"; }
                 @Override
@@ -1662,7 +1662,7 @@ APSplash.checkTime("init 270");
 
             tabs.addTab( TAB_CONSOLE, null, logConsolePanel,
                 String.format(  TAB_TOOLTIP_LOGCONSOLE, TABS_TOOLTIP) );
-            invokeLater( 4020, true, new Runnable() {
+            invokeLater( 2020, true, new Runnable() {
                 @Override
                 public String toString() { return "addLogConsole"; }
                 @Override
