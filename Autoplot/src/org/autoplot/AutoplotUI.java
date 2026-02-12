@@ -181,6 +181,7 @@ import org.autoplot.jythonsupport.ui.EditorTextPane;
 import org.autoplot.layout.LayoutConstants;
 import org.autoplot.state.StatePersistence;
 import org.autoplot.util.AutoRangeHintsStringSchemeEditor;
+import org.autoplot.util.CsvFileLogHandler;
 import org.autoplot.util.DataSetSelectorStringSchemeEditor;
 import org.autoplot.util.FontStringSchemeEditor;
 import org.autoplot.util.LayoutStringSchemeEditor;
@@ -190,6 +191,7 @@ import org.das2.components.propertyeditor.AxisFormatStringSchemeEditor;
 import org.das2.components.propertyeditor.TickValuesStringSchemeEditor;
 import org.das2.graph.GraphUtil;
 import org.das2.components.propertyeditor.SpecialColorsStringSchemeEditor;
+import org.das2.system.DasLogger;
 import org.das2.util.FileUtil;
 import org.das2.util.filesystem.HtmlUtil;
 import org.json.JSONException;
@@ -4848,6 +4850,16 @@ private void updateFrameTitle() {
             }
         }        
         
+//        try {
+//            CsvFileLogHandler h= new CsvFileLogHandler();
+//            h.setLevel(Level.ALL);
+//            logger.addHandler( h );
+//            logger.setLevel(Level.ALL);
+//            DasLogger.getLogger(DasLogger.GRAPHICS_LOG).addHandler(h);
+//            DasLogger.getLogger(DasLogger.GRAPHICS_LOG).setLevel(Level.FINE);
+//        } catch ( IOException ex ) {
+//            System.err.println("fail when making CsvFileLogHandler");
+//        }
         
         if ( logger.isLoggable( Level.FINE ) ) {
             logger.fine("==arguments==");
