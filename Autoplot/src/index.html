@@ -11,7 +11,7 @@
         <br>Built with <a href='https://www.ej-technologies.com/products/install4j/overview.html'>Install4J</a> multi-platform installer builder and 
         <a href="https://cottagesystems.com/~jbf/autoplot/build/autoplot-dev_linux_#{tag}.deb">deb</a> and 
         <a href="https://cottagesystems.com/~jbf/autoplot/build/autoplot-dev_linux_#{tag}.rpm">rpm</a> are available as well.  Thanks, Install4J!
-        
+        <br>On 32-bit systems, use the single-jar release and a 32-bit version of Java.  These systems will be limited to 1GB of memory.
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
@@ -27,14 +27,14 @@
             Java 8 is required.
         </p>
 
-        <p>To run on 32-bit systems, use the single-jar release and a 32-bit version of Java.</p>
+        <p>Autoplot's development is guided by feedback from those using it.  Thanks for your feedback!</p>
                 
         <p>Bugfixes (2026-02-13):</p>
         <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2792/">2792</a>: Correct window position code when two monitors are used, total size wasn't accounted for.
-            <li><a href="https://github.com/das-developers/das2java/issues/164">164</a>: Das2Stream slice of peaks and averages should be conveyed as a bundle of peaks and average, not using BIN_MAX, to match old parser.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2792/">2792</a>: Correct window position code when two monitors are used, total size wasn't accounted for.  Thanks, Chris!
+            <li><a href="https://github.com/das-developers/das2java/issues/164">164</a>: Das2Stream slice of peaks and averages should be conveyed as a bundle of peaks and average, not using BIN_MAX, to match old parser.  Thanks, Chris!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2788/">2788</a>: Don't use "scan" when multiple plot elements, not from one family (Bx,By,Bz), are used.  Thanks, Ivar!                
-            <li><a href="https://github.com/das-developers/das2java/issues/164">164</a>: HugeScatter shows limits as well as Series.  WARN is drawn after NOMINAL, not before.  In the case where they overlap, WARN implies NOMINAL.
+            <li><a href="https://github.com/das-developers/das2java/issues/164">164</a>: HugeScatter shows limits as well as Series.  WARN is drawn after NOMINAL, not before.  In the case where they overlap, WARN implies NOMINAL.  Thanks, Chris!
             <li><a href="https://github.com/das-developers/das2java/issues/164">164</a>: Das2Stream yWarn and yNominal are supported.  New Das2Stream to QDataSet parser is used by default.  Thanks, Chris!
             <li><a href="https://github.com/das-developers/das2java/issues/164">164</a>: Das2Stream to QDataSet parser preserves more metadata in USER_PROPERTIES.
             <li><a href="https://github.com/das-developers/das2java/issues/155">155</a>: new Das2Stream parser properly handles data.min, data.max, etc.  Thanks, Chris!
@@ -118,18 +118,17 @@
             <li>Series connector looks at AVERAGE_TYPE for ...MOD24, ...MOD360 etc.
         </ul>
 
-        <b>Feedback on the function and quality of this release is greatly appreciated!</b>
-
         <p>Data is input from:</p>
         <ul>
             <li>ASCII files (.dat,.txt)</li>
             <li>CSV files (.csv)</li>
             <li>Binary files (.bin)</li>
             <li>CDF files(.cdf)</li>
+            <li>OpenDAP servers (.dds, .dods)</li>
             <li>PDS4 files (.lblx)</li>
             <li>PDS3 files (.lbl)</li>
             <li>Excel spread sheets (.xls)</li>
-            <li>das2Streams (.d2s or .das2Stream)</li>
+            <li>das2Streams (.d2s, .d2t, or .das2Stream)</li>
             <li>HAPI Servers (vap+hapi:)</li>
             <li>CDAWeb data server (vap+cdaweb:)</li>
             <li>das2servers (vap+das2server:)</li>
@@ -143,6 +142,12 @@
             <li>Images (.jpg, .png, .gif)</li>
             <li>Wav audio files (.wav)</li>
             <li>ODL files (.sts)</li>
+            <li>IDL Savesets (.sav)</li>
+            <li>Matlab .mat files</li>
+            <li>NumPy .npy files</li>
+            <li>JSON lines file (.jsonl)</li>
+            <li>RadioJove .sps and .spd files</li>
+            <li>ESA TFCat files (.tfcat)</li>
         </ul>
 
         <p><a href="https://autoplot.org">autoplot.org</a> is the website containing
