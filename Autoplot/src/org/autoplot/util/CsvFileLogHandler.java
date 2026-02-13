@@ -6,13 +6,11 @@ import java.io.File;
 import java.io.Flushable;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -21,7 +19,6 @@ import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 
 /**
