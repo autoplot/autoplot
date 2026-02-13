@@ -101,6 +101,23 @@ public class WindowManager {
         return false;
     }
     
+    /**
+     * returns the size of the screen when all the monitors are 
+     * considered one large virtual display.
+     * @return 
+     */
+    private Rectangle getVirtualScreenSize() {
+        Rectangle all = new Rectangle();
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+
+        for (GraphicsDevice gd : ge.getScreenDevices()) {
+            Rectangle b = gd.getDefaultConfiguration().getBounds();
+            all = all.union(b);
+        }
+
+        return all;        
+    }
+    
     Dimension lastFileChooserDimension= null;
     int lastFileChooserX= 0;
     int lastFileChooserY= 0;
@@ -111,7 +128,7 @@ public class WindowManager {
         logger.log(Level.FINE, "looking up position for {0}", name);
         final Preferences prefs= AutoplotSettings.settings().getPreferences(WindowManager.class);
         int grab= 4 * 12; // pixels so mouse operator has something to grab
-        Dimension screenSize= java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        Rectangle screenSize= getVirtualScreenSize();
         Pattern p= Pattern.compile("(?<width>\\d+)x(?<height>\\d+)");
         String s= prefs.get( "window."+name+".screensize", "" );
         logger.log(Level.FINE, "found for window.{0}.screensize: {1} currentSize: {2}x{3}", new Object[]{name, s, screenSize.width, screenSize.height });
@@ -189,7 +206,7 @@ public class WindowManager {
         final Preferences prefs= AutoplotSettings.settings().getPreferences(WindowManager.class);
         logger.log( Level.FINE, "saving last location {0} {1} {2} {3}", new Object[]{x, y, h, w});
         // so that we know these settings are still valid.
-        Dimension d= java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        Rectangle d= getVirtualScreenSize();
         prefs.put( "window."+name+".screensize", String.format("%dx%d",d.width,d.height) );
         if ( c!=null ) {
             prefs.put( "window."+name+".rlocation", String.format( "%d,%d", x-c.getX(), y-c.getY() ) );
@@ -213,7 +230,7 @@ public class WindowManager {
         if ( name==null ) return;
         final Preferences prefs= AutoplotSettings.settings().getPreferences(WindowManager.class);
         int grab= 4 * window.getFont().getSize(); // pixels so mouse operator has something to grab
-        Dimension screenSize= java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        Rectangle screenSize= getVirtualScreenSize();
         Pattern p= Pattern.compile("(?<width>\\d+)x(?<height>\\d+)");
         String s= prefs.get( "window."+name+".screensize", "" );
         logger.log(Level.FINE, "found for window.{0}.screensize: {1} currentSize: {2}x{3}", new Object[]{name, s, screenSize.width, screenSize.height });
@@ -230,7 +247,7 @@ public class WindowManager {
             if ( parent!=null ) {
                 String rxy= prefs.get( "window."+name+".rlocation", "" );
                 logger.log(Level.FINER, "window.{0}.rlocation={1}", new Object[]{name, rxy});
-                Pattern p2= Pattern.compile("(?<x>\\d+),(?<y>\\d+)");
+                Pattern p2= Pattern.compile("(?<x>\\-?\\d+),(?<y>\\-?\\d+)");
                 Matcher m2= p2.matcher(rxy);
                 int x= m2.matches() ? Integer.parseInt( m2.group("x") ) : -9999;
                 int y= m2.matches() ? Integer.parseInt( m2.group("y") ) : -9999;
@@ -248,7 +265,7 @@ public class WindowManager {
             } else {
                 String xy= prefs.get( "window."+name+".location", "" );
                 logger.log(Level.FINER, "window.{0}.location={1}", new Object[]{name, xy});
-                Pattern p2= Pattern.compile("(?<x>\\d+),(?<y>\\d+)");
+                Pattern p2= Pattern.compile("(?<x>\\-?\\d+),(?<y>\\-?\\d+)");
                 Matcher m2= p2.matcher(xy);
                 int x= m2.matches() ? Integer.parseInt( m2.group("x") ) : -9999;
                 int y= m2.matches() ? Integer.parseInt( m2.group("y") ) : -9999;
@@ -287,7 +304,7 @@ public class WindowManager {
         final Preferences prefs= AutoplotSettings.settings().getPreferences(WindowManager.class);
         logger.log( Level.FINE, "saving last location {0} {1} {2} {3}", new Object[]{x, y, h, w});
         // so that we know these settings are still valid.
-        Dimension d= java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        Rectangle d= getVirtualScreenSize();
         prefs.put( "window."+name+".screensize", String.format("%dx%d",d.width,d.height) );
         if ( c!=null ) {
             prefs.put( "window."+name+".rlocation", String.format( "%d,%d", x-c.getX(), y-c.getY() ) );
