@@ -15,7 +15,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>A Cartesian to Spherical operation was added to the Data Post Processing area.</small></p>
+        <p><small>Final version of Cartesian to Spherical filter has angles in degrees.  Note &amp;Theta; used for symbol.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -29,8 +29,9 @@
 
         <p>Autoplot's development is guided by feedback from those using it.  Thanks for your feedback!</p>
                 
-        <p>Bugfixes (2026-02-13):</p>
+        <p>Bugfixes (2026-02-14):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2793/">2793</a>: Remove "log console initialized" message because it is self-evident and now breaks Jemmy testing.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2792/">2792</a>: Correct window position code when two monitors are used, total size wasn't accounted for.  Thanks, Chris!
             <li><a href="https://github.com/das-developers/das2java/issues/164">164</a>: Das2Stream slice of peaks and averages should be conveyed as a bundle of peaks and average, not using BIN_MAX, to match old parser.  Thanks, Chris!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2788/">2788</a>: Don't use "scan" when multiple plot elements, not from one family (Bx,By,Bz), are used.  Thanks, Ivar!                
@@ -80,7 +81,7 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>script and console tabs initialize sooner, after verifying this did not affect launch time.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2793/">2793</a>: script and console tabs initialize sooner, after verifying this did not affect launch time.
             <li>add diffMod, mod, and modp filters to operations on data tab.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/645/">645</a>: Das2Server uses timetags to indicate progress by default now.
             <li>Das2Stream to QDataSet picks up yWarnMin, yWarnMax etc and puts them in METADATA as with CDF source.
