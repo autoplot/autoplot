@@ -327,7 +327,7 @@ compilef 'org/das2/util/Expect.java'
 compilef 'external/AuralizationHandler.java'
 compilef 'org/das2/util/filesystem/GitCommand.java'
 compilef 'org/das2/graph/util/GraphicalLogHandler.java'
-compilef 'org/das2/graph/util/CsvFileLogHandler.java'
+compilef 'org/autoplot/util/CsvFileLogHandler.java'
 
 cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceFactory.extensions | cut -d' ' -f1
 for i in `cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
