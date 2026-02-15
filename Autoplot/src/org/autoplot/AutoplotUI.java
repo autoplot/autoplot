@@ -2342,7 +2342,6 @@ APSplash.checkTime("init 52.9");
 
         Logger.getLogger("").addHandler(h);
         
-        setMessage("log console added");
        // tabs.addTab("console", null, logConsole,
        //         String.format(  TAB_TOOLTIP_LOGCONSOLE, TABS_TOOLTIP) );
         applicationModel.getDocumentModel().getOptions().setLogConsoleVisible(true);
