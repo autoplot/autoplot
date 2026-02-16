@@ -13,6 +13,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.logging.ErrorManager;
 import java.util.logging.Formatter;
@@ -24,12 +27,22 @@ import org.das2.datum.Units;
 /**
  * java.util.logging Handler that writes each LogRecord as a CSV row.
  *
- * Default columns:
- *   timestamp_iso, epoch_millis, level, logger, thread, source_class, source_method, message, thrown
+ * Default columns:<ul>
+ * <li> timestamp_iso - The UTC time
+ * <li> elapsed_seconds - seconds since the log file was started
+ * <li> level - integer code for serverity (900=WARNING 800=INFO 500=FINE 300=FINEST)
+ * <li> logger - logger name
+ * <li> thread - thread number, and threads existing at initialization are printed at the top (for example 34=AWT-EventQueue)
+ * <li> source_class - name of the source class
+ * <li> source_method - name of the source method
+ * <li> message - formatted log message
+ * <li> thrown - any thrown exception
+ * </ul>
  */
 public final class CsvFileLogHandler extends Handler implements Closeable, Flushable {
 
     private final BufferedWriter out;
+    private long startTime;
     private final boolean writeHeader;
     private boolean headerWritten = false;
 
@@ -56,7 +69,6 @@ public final class CsvFileLogHandler extends Handler implements Closeable, Flush
         this.out = new BufferedWriter(new OutputStreamWriter(
                 Files.newOutputStream(file,
                         StandardOpenOption.CREATE,
-                        StandardOpenOption.APPEND,
                         StandardOpenOption.WRITE),
                 charset
         ));
@@ -75,8 +87,21 @@ public final class CsvFileLogHandler extends Handler implements Closeable, Flush
         synchronized (this) {
             try {
                 if (writeHeader && !headerWritten) {
+                    startTime= r.getMillis();
+                    
+                    List<Thread> threads = new ArrayList<>(Thread.getAllStackTraces().keySet());
+                    threads.sort(Comparator.comparingLong(Thread::getId));
+                    
+                    // output useful headers
+                    for (Thread t : threads) {
+                        out.write("thread."+t.getId()+"="+t.getName()+"\n" );
+                    }
+                    out.write("level."+Level.WARNING.intValue()+"="+Level.WARNING.getName()+"\n");
+                    out.write("level."+Level.INFO.intValue()+"="+Level.INFO.getName()+"\n");
+                    out.write("level."+Level.FINE.intValue()+"="+Level.FINE.getName()+"\n");                    
+                    out.write("level."+Level.FINEST.intValue()+"="+Level.FINEST.getName()+"\n");
                     writeRow(new String[] {
-                            "timestamp_iso", "epoch_millis", "level", "thread", "logger", 
+                            "timestamp_iso", "elapsed_seconds", "level", "thread", "logger", 
                             "source_class", "source_method", "message", "thrown"
                     });
                     headerWritten = true;
@@ -84,7 +109,7 @@ public final class CsvFileLogHandler extends Handler implements Closeable, Flush
 
                 long millis= r.getMillis();
                 String timestampIso = Units.ms1970.createDatum(millis).toString();
-                String epochMillis = Long.toString(millis);
+                String elapsedSeconds = String.format("%.3f",(millis-startTime)/1000.);
                 String level = Integer.toString(r.getLevel().intValue());
                 String logger = safe(r.getLoggerName());
                 String thread = Integer.toString(r.getThreadID());
@@ -94,9 +119,11 @@ public final class CsvFileLogHandler extends Handler implements Closeable, Flush
                 String thrown = throwableToString(r.getThrown());
 
                 writeRow(new String[] {
-                        timestampIso, epochMillis, level, thread, logger, 
+                        timestampIso, elapsedSeconds, level, thread, logger, 
                         sourceClass, sourceMethod, message, thrown
                 });
+                
+                out.flush();
 
             } catch (IOException e) {
                 reportError("CSV log write failed", e, ErrorManager.WRITE_FAILURE);
