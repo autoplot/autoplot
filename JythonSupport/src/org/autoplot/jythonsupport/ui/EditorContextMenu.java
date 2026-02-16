@@ -351,7 +351,7 @@ public final class EditorContextMenu {
                     LoggerManager.logGuiEvent(e);                
                     ScriptDocumentationPanel p= new ScriptDocumentationPanel();
                     p.initialize(editor.getText());
-                    if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( menu, p, "Set Script Description", JOptionPane.OK_CANCEL_OPTION ) ) {
+                    if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( editor, p, "Set Script Description", JOptionPane.OK_CANCEL_OPTION ) ) {
                         String src= p.implement( editor.getText() );
                         editor.setText(src);
                     }
@@ -865,7 +865,7 @@ public final class EditorContextMenu {
                                 }
                             }
                         });
-                        if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( (Component)e.getSource(), p, "Editor Colors", JOptionPane.OK_CANCEL_OPTION ) ) {
+                        if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( editor, p, "Editor Colors", JOptionPane.OK_CANCEL_OPTION ) ) {
                             String s= editor.getText();
                             bean.writeToConfig(configFile);
                             editor.setEditorKit(null);
