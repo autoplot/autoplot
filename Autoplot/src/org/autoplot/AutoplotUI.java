@@ -189,6 +189,8 @@ import org.das2.components.propertyeditor.AxisFormatStringSchemeEditor;
 import org.das2.components.propertyeditor.TickValuesStringSchemeEditor;
 import org.das2.graph.GraphUtil;
 import org.das2.components.propertyeditor.SpecialColorsStringSchemeEditor;
+import org.das2.system.DasLogger;
+import org.das2.util.CsvFileLogHandler;
 import org.das2.util.FileUtil;
 import org.json.JSONException;
 import org.python.core.PyException;
@@ -4848,10 +4850,8 @@ private void updateFrameTitle() {
 //        try {
 //            CsvFileLogHandler h= new CsvFileLogHandler();
 //            h.setLevel(Level.ALL);
-//            logger.addHandler( h );
-//            logger.setLevel(Level.ALL);
-//            DasLogger.getLogger(DasLogger.GRAPHICS_LOG).addHandler(h);
-//            DasLogger.getLogger(DasLogger.GRAPHICS_LOG).setLevel(Level.FINE);
+//            LoggerManager.getLogger("").addHandler( h );
+//            
 //        } catch ( IOException ex ) {
 //            System.err.println("fail when making CsvFileLogHandler");
 //        }
