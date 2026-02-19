@@ -31,6 +31,9 @@
                 
         <p>Bugfixes (2026-02-16):</p>
         <ul>
+        </ul>
+        <p>Older Bugfixes (2026-02-16):</p>
+        <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2795/">2795</a>: ScriptPanelSupport brought back in because one of the GIT scripts is using the deprecated class.
             <li>"Set script title" dialog should appear above the script.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2793/">2793</a>: Remove "log console initialized" message because it is self-evident and now breaks Jemmy testing.
@@ -52,36 +55,11 @@
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2781/">2781</a>: change hadn't been pushed for build.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2781/">2781</a>: check bounds when switching dimensions with slice GUI.  Thanks, Connor!
         </ul>
-        <p>Older Bugfixes (2025-01-07):</p>
-        <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2778/">2778</a>: check for integers in float parameter values.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2780/">2780</a>: Run Batch Tool cancel press is handled properly.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2780/">2780</a>: Run Batch Tool re-enables "go" button after run and then editing.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2779/">2779</a>: improper use of the PDS4-parser library resulted in open FileChannels and files which would fill the /tmp drive.  Thanks, Larry!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2777/">2777</a>: getDataSets command didn't indicate progress.
-            <li>Remove extra comma in import list when converting from Jython to Java.
-            <li>Make the "Here we go..." deep stack recursion detector less sensitive, since it seems to be misfiring.  Thanks, Ivar!
-            <li>Remove debug printlns from a number of locations.
-            <li>Show BIN_MAX_NAME, DELTA_PLUS_NAME, etc in properties metadata tab.
-            <li>Das2Stream Datum: and DatumRange: handle time locations in metadata.
-            <li>digital renderer handles BUNDLE_1 (bundle descriptor scheme) dataset.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2775/">2775</a>: get PDS4 metadata for Group_Field_Binary and Group_Field_Character 
-            <li><a href="https://github.com/das-developers/das2java/issues/155/">158</a>: properly support bundle of datasets with error bars in Das2Streams.  Thanks, Chris!
-            <li><a href="https://github.com/das-developers/das2java/issues/155/">155</a>: restore support for error bars in Das2Streams (see <a href="https://jfaden.net/~jbf/autoplot/data/d2s/">examples</a>).
-            <li>Case where ds[0,0] on rank 2 data had runtime error, I think because 0 and 0 were rank 1 QDataSets.
-            <li>Remove old PDS-PPI DIT/DOS data source, which is no longer operational and PDS3/4 and HAPI support deprecates it.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2774/">2774</a>: setOutputParam without constraints works again.  Jan 2025 validate code didn't consider that the constraint might not be specified.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/1687/">1687</a>: limit length of string shown in completions, so that resourceURI is not obscured.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2768/">2768</a>: Initial GUI size needs to be large enough to show all buttons.
-            <li><a href="https://github.com/das-developers/das2java/issues/154">154</a>: don't drop units in TCA datasets since CDF labels often contain %{UNITS} macro.  Thanks, Connor!
-            <li>Git pull and commit actions now show dialogs over undocked editor, not the Autoplot canvas.
-            <li><a href="https://github.com/das-developers/das2java/issues/150">150</a>: allow TCA datasets with L as the independent parameter to get the label "L" from the dataset.  Respect " " to mean don't automatically set the label to %{RANGE}.  Thanks, Connor!
-            <li>In run batch, don't treat escape as cancel when cancel is not enabled.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2767/">2767</a>: GrannyText editor cannot be resized on Mac, link to documentation.
-            <li>GrannyTextRenderer cleanup fixes "glow" property and removes kludgy code which detected URL in text to display image (&lt;img src=""&gt; should be used instead)
-            <li>Support UTF-16 encoded character streams for .csv and .dat (ASCII table source now officially supports non-ASCII)
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li>New logging handler logs to CSV file it can be studied later.
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2793/">2793</a>: script and console tabs initialize sooner, after verifying this did not affect launch time.
             <li>add diffMod, mod, and modp filters to operations on data tab.
@@ -104,21 +82,6 @@
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/865/">865</a>: HAPI client uses abouts.json.  Thanks, HAPI team!
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/864/">864</a>: Add option for native file dialog to pick .vap files.  Thanks, Allison!
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/863/">863</a>: Run Batch ETA calculation is shown by default.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>Run Batch Tool has "active focus" checkbox which will scroll the list to what is being worked on.
-            <li>add git.jfaden.net to list of gitlab filesystems.  Let me know if you have others you would like to add.
-            <li>guessSlice looks for "vperp" and "vpar" dimensions.  Thanks, Connor!
-            <li>Jython to Java detects constructor calls and uses this to declare Java type, instead of using Object for everything.
-            <li>Copy full metadata path to clipboard, since this is often useful when coding.
-            <li>Improvements to Jython completions, such as limiting the length of strings exposed to protect the GUI.
-            <li>improve password handling in KeyChain, don't allow extra space which gets in there somehow.
-            <li>Add Largest Triangle Three Buckets (LTTB) code written by ChatGPT (which it wrote using QDataSet, worked without any modifications, see <a href="https://chatgpt.com/share/6934a805-be30-800c-aad3-5d717f4a912a">the session</a>)!
-            <li>More characters added to list of allowed characters in ASCII file column names (% and #), to support BlueDriver app.
-            <li>Introduce "upper" and "lower" keywords for RichPNG, so that plots can be located relative to page bottom.
-            <li>Introduce plotInfoFile switch for ImageDataSource, so that third-party images can be decorated.
-            <li>Series connector looks at AVERAGE_TYPE for ...MOD24, ...MOD360 etc.
         </ul>
 
         <p>Data is input from:</p>
