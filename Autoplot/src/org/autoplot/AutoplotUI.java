@@ -89,7 +89,6 @@ import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.help.CSH;
-import javax.jnlp.SingleInstanceListener;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
