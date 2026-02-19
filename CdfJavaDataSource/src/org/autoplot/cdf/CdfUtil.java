@@ -620,10 +620,11 @@ public class CdfUtil {
     public static synchronized MutablePropertyDataSet loadVariable(
             CDFReader cdf, String svariable, long recStart, long recCount, long recInterval, int slice1, ProgressMonitor mon) throws Exception {        
 
+        logger.entering( "CdfUtil", "loadVariable");
         if ( recCount==0 ) throw new IllegalArgumentException("recCount must be greater than 0 or -1");
         if ( recCount<-1 ) throw new IllegalArgumentException("recCount must be greater than -1");
         
-        logger.log(Level.FINE, "loadVariable {0}[{1}:{2}:{3}] slice1={4}", new Object[] { svariable, String.valueOf(recStart), // no commas in {1}
+        logger.log(Level.FINER, "loadVariable {0}[{1}:{2}:{3}] slice1={4}", new Object[] { svariable, String.valueOf(recStart), // no commas in {1}
                  ""+(recCount+recStart), recInterval, slice1 } );
         
         //MutablePropertyDataSet cresult= maybeGetCached( cdf, svariable, recStart, recCount, recInterval );
@@ -632,7 +633,7 @@ public class CdfUtil {
         long varType = cdf.getType(svariable);
         
         if ( varType==32 ) {
-            logger.fine("disabling slice1 because epoch16");
+            logger.finer("disabling slice1 because epoch16");
             slice1= -1;
         }
         
@@ -718,7 +719,7 @@ public class CdfUtil {
         }
         
         logger.exiting("gov.nasa.gsfc.spdf.cdfj.CDFReader", "getBuffer" );
-        logger.log(Level.FINE, "read variable {0} in (ms): {1}", new Object[]{svariable, System.currentTimeMillis()-t0});
+        logger.log(Level.FINER, "read variable {0} in (ms): {1}", new Object[]{svariable, System.currentTimeMillis()-t0});
 
         Object bbType= byteBufferType( cdf.getType(svariable) );
         
@@ -857,7 +858,7 @@ public class CdfUtil {
                 CdfDataSource.dsCachePut( uri, result );
             }
         }
-                
+        logger.exiting("CdfUtil", "loadVariable" );
         return result;
         
     }
