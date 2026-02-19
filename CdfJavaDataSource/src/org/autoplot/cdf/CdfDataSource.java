@@ -1332,6 +1332,7 @@ public class CdfDataSource extends AbstractDataSource {
         final CDFReader cdf, final String svariable, final String constraints, boolean reform, boolean loadDependents, 
         Map<String,Object> thisAttributes, int slice1, int expectRec, ProgressMonitor mon) throws Exception, ParseException {
         
+        logger.entering("CdfDataSource","loadVariableAndDependents");
         logger.log(Level.FINE, "loadVariableAndDependents {0} constraints={1} dependVar={2} slice1={3} reform={4}", new Object[] { svariable, constraints, loadDependents, slice1, reform } );
         if ( !hasVariable(cdf, svariable) ) {
             throw new IllegalArgumentException( "No such variable: "+svariable );
@@ -1756,7 +1757,7 @@ public class CdfDataSource extends AbstractDataSource {
                 result.putProperty("DEPEND_"+idep,depDs);
             }
         }      
-
+        logger.exiting("CdfDataSource","loadVariableAndDependents");
         return result;
     }
 
