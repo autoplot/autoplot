@@ -417,6 +417,10 @@ public class LogConsole extends javax.swing.JPanel {
                         recMsg= null;
                     }
                     
+                    if ( recMsg.startsWith("RETURN") && rec.getSourceMethodName().startsWith("writeToImage") ) {
+                        System.err.println("here stop");
+                    }
+                    
                     if ( parms!=null && parms.length>0 ) {
                         try {
                             recMsg = MessageFormat.format( recMsg, parms );
@@ -610,7 +614,9 @@ public class LogConsole extends javax.swing.JPanel {
             recMsg="null";  //  I see this when profiling.
         }
         if ( recMsg.startsWith("ENTRY ") ) {
-            entryTimes.put(recMsg.substring(6),rec.getMillis());
+            int i= recMsg.indexOf(' ',6);
+            if ( i==-1 ) i= recMsg.length();
+            entryTimes.put(recMsg.substring(6,i),rec.getMillis());
         } else if ( recMsg.startsWith("RETURN ") ) {
             Long t1= entryTimes.remove( recMsg.substring(7) );
             if ( t1!=null ) {
