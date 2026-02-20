@@ -416,11 +416,7 @@ public class LogConsole extends javax.swing.JPanel {
                     } else {
                         recMsg= null;
                     }
-                    
-                    if ( recMsg.startsWith("RETURN") && rec.getSourceMethodName().startsWith("writeToImage") ) {
-                        System.err.println("here stop");
-                    }
-                    
+                                        
                     if ( parms!=null && parms.length>0 ) {
                         try {
                             recMsg = MessageFormat.format( recMsg, parms );
