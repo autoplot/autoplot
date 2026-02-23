@@ -1048,6 +1048,9 @@ public class BatchProcessor {
             
             int exportResultsWritten= 0;
             
+            // is shutdownFile exists, then exit the batch job gracefully.
+            File shutdownFile= new File( batchDirectory, "shutdown.txt" );
+                    
             while ( true ) {
                 if ( executor.getActiveCount()==0 && jobNumber.intValue()==numberOfJobs ) {
                     if ( isDirectoryEmpty(batchPendingDirectory) ) {
@@ -1057,8 +1060,9 @@ public class BatchProcessor {
                 if ( monitor.isCancelled() ) {
                     break;
                 }
-                if ( new File( batchDirectory, "shutdown.txt" ).exists() ) {
+                if ( shutdownFile.exists() ) {
                     logger.info("shutting down after seeing shutdown.txt");
+                    
                     break;
                 }
                 
@@ -1140,7 +1144,9 @@ public class BatchProcessor {
             }
                 
             
-            if ( monitor.isCancelled() ) executor.shutdownNow();
+            if ( monitor.isCancelled() || shutdownFile.exists() ) {
+                executor.shutdownNow();
+            }
 
             
             
