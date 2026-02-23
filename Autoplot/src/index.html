@@ -15,7 +15,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Final version of Cartesian to Spherical filter has angles in degrees.  Note &amp;Theta; is used for legend label.</small></p>
+        <p><small>Events lists at CDAWeb in https://spdf.gsfc.nasa.gov/pub/event_lists/ are easily used in Autoplot by prefixing with vap+dat:.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -29,8 +29,11 @@
 
         <p>Autoplot's development is guided by feedback from those using it.  Thanks for your feedback!</p>
                 
-        <p>Bugfixes (2026-02-16):</p>
+        <p>Bugfixes (2026-02-23):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2799/">2799</a>: putValues where fill is not specified and histogram2d where units differ are handled properly.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2798/">2798</a>: Be more aggressive about keeping invalid datum ranges out of the DOM.
+            <li>LogConsole mishandled log message entering(source,method,arg1,arg2)
         </ul>
         <p>Older Bugfixes (2026-02-16):</p>
         <ul>
@@ -57,7 +60,7 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>New logging handler logs to CSV file it can be studied later.
+            <li>New logging handler logs to CSV file, so it can be studied later.
         </ul>
         <p>Less recent features:</p>
         <ul>
