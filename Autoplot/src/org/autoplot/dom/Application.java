@@ -173,6 +173,14 @@ public class Application extends DomNode {
         if ( timeRange.width().value()==0 ) {
             throw new IllegalArgumentException("timeRange.width().value()==0");
         }
+        if ( timeRange.min().isFill() ) {
+            logger.log( Level.WARNING, "range min is fill");
+            return;
+        }
+        if ( timeRange.max().isFill() ) {
+            logger.log( Level.WARNING, "range max is fill");
+            return;
+        }        
         DatumRange oldTimeRange = this.timeRange;
         this.timeRange = timeRange;
 //        if ( timeRange.width().value()>0 && timeRange.getUnits()==oldTimeRange.getUnits() && !timeRange.equals(oldTimeRange) ) {

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.logging.Level;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
+import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 
 /**
@@ -41,6 +42,14 @@ public class Axis extends DomNode {
         }
         if ( range.width().value()==0 ) {
             logger.log( Level.WARNING, "range set to zero-width datum range!");
+            return;
+        }
+        if ( range.min().isFill() ) {
+            logger.log( Level.WARNING, "range min is fill");
+            return;
+        }
+        if ( range.max().isFill() ) {
+            logger.log( Level.WARNING, "range max is fill");
             return;
         }
 //        System.err.println("range="+range);
