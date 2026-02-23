@@ -327,7 +327,7 @@ compilef 'org/das2/util/Expect.java'
 compilef 'external/AuralizationHandler.java'
 compilef 'org/das2/util/filesystem/GitCommand.java'
 compilef 'org/das2/graph/util/GraphicalLogHandler.java'
-compilef 'org/autoplot/util/CsvFileLogHandler.java'
+compilef 'org/das2/util/CsvFileLogHandler.java'
 compilef 'org/autoplot/scriptconsole/ScriptPanelSupport.java' # some git scripts are still using this.
 
 cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceFactory.extensions | cut -d' ' -f1
