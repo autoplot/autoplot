@@ -1330,7 +1330,9 @@ public class BatchProcessor {
                 }
                 
                 try {
-                    s.resultsStats.put( fijob, runResults );
+                    synchronized ( BatchProcessor.this ) {
+                        s.resultsStats.put( fijob, runResults );
+                    }
                 } catch (JSONException ex) {
                     logger.log(Level.SEVERE, null, ex);
                 } catch ( ArrayIndexOutOfBoundsException ex ) {
