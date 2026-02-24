@@ -132,6 +132,7 @@ public class RunBatchTool extends javax.swing.JPanel {
     
     /**
      * Creates new form RunBatchTool
+     * @param dom
      */
     public RunBatchTool( final Application dom ) {
         initComponents();
@@ -244,6 +245,52 @@ public class RunBatchTool extends javax.swing.JPanel {
             }
         });
         
+    }
+    
+    /**
+     * set up the GUI to monitor the batch directory
+     * @param d the directory containing main.batch file.
+     * @throws JSONException
+     * @throws IOException 
+     */
+    public void setBatchDirectory( File d ) throws JSONException, IOException {
+        
+        File f;
+        if ( d.isFile() ) {
+            f= d;
+        } else {
+            f= new File( d, "main.batch");
+        }
+        
+        String batchFileJson= FileUtil.readFileToString(f);
+        JSONObject jo= new JSONObject(batchFileJson);       
+        
+        final List<JLabel> jobs1= new ArrayList<>();
+        final List<JLabel> jobs2= new ArrayList<>();
+        
+        JSONArray a;
+        a = jo.getJSONArray("param1Values");
+        String[] ff1= new String[a.length()];
+        for ( int i=0; i<a.length(); i++ ) {
+            ff1[i]= a.getString(i);
+        }
+        JPanel p= switchListToIconLabels(jobs1, ff1);
+        param1ScrollPane.getViewport().setView(p);
+        
+        a = jo.getJSONArray("param2Values");
+        String[] ff2= new String[a.length()];
+        for ( int i=0; i<a.length(); i++ ) {
+            ff2[i]= a.getString(i);
+        }
+        p= switchListToIconLabels(jobs2, ff2);
+        param2ScrollPane.getViewport().setView(p);
+        
+        param1NameCB.setSelectedItem( jo.getString("param1") );
+        param2NameCB.setSelectedItem( jo.getString("param2") );
+        
+        dataSetSelector1.setValue( jo.getString("script") );
+        
+        this.revalidate();
     }
     
     /**
