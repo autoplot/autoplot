@@ -452,6 +452,15 @@ public class BatchProcessor {
             }
             
             interp.set( "PWD", split.path );
+            
+            // set all the defaults
+            for ( Map.Entry<String,String> e: params.entrySet() ) {
+                String pname= e.getKey();
+                if ( parameterDescriptions.get(pname)!=null ) { //TODO: When does this happen?  See file:/Users/jbf/Desktop/git/dev/demos/2025/20250130/brokenParamDescription.jy?resourceURI='https://pds-ppi.igpp.ucla.edu/data/JNO-J_SW-JAD-5-CALIBRATED-V1.0/DATA/2018/2018091/ELECTRONS/JAD_L50_HRS_ELC_TWO_DEF_2018091_V01.LBL'&doplot=False
+                    setParam( interp, pwd, parameterDescriptions.get(pname), pname, e.getValue() );
+                }
+            }                
+            
             String[] paramNames1= maybeSplitMultiParam( param1Name );
 
             if ( paramNames1!=null ) { // v1;v2;v3 form used
@@ -472,22 +481,18 @@ public class BatchProcessor {
                     scriptParams.put( p, v );
                 }
             } else {
-                if ( !parameterDescriptions.containsKey(param1Name) ) {
-                    if ( param1Name.length()==0 ) {
+                String p= param1Name;
+                String v= param1Value;
+                if ( !parameterDescriptions.containsKey(p) ) {
+                    if ( p.length()==0 ) {
                         throw new IllegalArgumentException("param1Name not set");
+                    } else {
+                        throw new IllegalArgumentException("param not found: " + p );
                     }
                 }
-                // set all the default values, and values set for all runs
-                for ( Map.Entry<String,String> e: params.entrySet() ) {
-                    String pname= e.getKey();
-                    if ( parameterDescriptions.get(pname)!=null ) { //TODO: When does this happen?  See file:/Users/jbf/Desktop/git/dev/demos/2025/20250130/brokenParamDescription.jy?resourceURI='https://pds-ppi.igpp.ucla.edu/data/JNO-J_SW-JAD-5-CALIBRATED-V1.0/DATA/2018/2018091/ELECTRONS/JAD_L50_HRS_ELC_TWO_DEF_2018091_V01.LBL'&doplot=False
-                        setParam( interp, pwd, parameterDescriptions.get(pname), pname, e.getValue() );
-                    }
-                }
-                setParam( interp, pwd, parameterDescriptions.get(param1Name), param1Name, param1Value );
-                runResults.put(param1Name,param1Value);
-                scriptParams.put(param1Name,param1Value);                
-                
+                setParam( interp, pwd, parameterDescriptions.get(p), p, v );
+                runResults.put( p, v );
+                scriptParams.put( p, v );
             }
             
             if ( param2Name!=null && param2Name.length()>0 ) {
@@ -511,22 +516,18 @@ public class BatchProcessor {
                         scriptParams.put( p, v );
                     }
                 } else {
-                    if ( !parameterDescriptions.containsKey(param2Name) ) {
-                        if ( param2Name.length()==0 ) {
-                            throw new IllegalArgumentException("param1Name not set");
+                    String p= param2Name;
+                    String v= param2Value;
+                    if ( !parameterDescriptions.containsKey(p) ) {
+                        if ( p.trim().length()==0 ) {
+                            throw new IllegalArgumentException("param2Name not set");
+                        } else {
+                            throw new IllegalArgumentException("param not found: " + p );
                         }
                     }
-                    // set all the default values, and values set for all runs
-                    for ( Map.Entry<String,String> e: params.entrySet() ) {
-                        String pname= e.getKey();
-                        if ( parameterDescriptions.get(pname)!=null ) { //TODO: When does this happen?  See file:/Users/jbf/Desktop/git/dev/demos/2025/20250130/brokenParamDescription.jy?resourceURI='https://pds-ppi.igpp.ucla.edu/data/JNO-J_SW-JAD-5-CALIBRATED-V1.0/DATA/2018/2018091/ELECTRONS/JAD_L50_HRS_ELC_TWO_DEF_2018091_V01.LBL'&doplot=False
-                            setParam( interp, pwd, parameterDescriptions.get(pname), pname, e.getValue() );
-                        }
-                    }
-                    setParam( interp, pwd, parameterDescriptions.get(param2Name), param2Name, param2Value );
-                    runResults.put(param2Name,param2Value);
-                    scriptParams.put(param2Name,param2Value);                
-
+                    setParam( interp, pwd, parameterDescriptions.get(p), p, v );
+                    runResults.put( p, v );
+                    scriptParams.put( p, v );
                 }                
             }
 
