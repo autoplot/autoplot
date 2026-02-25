@@ -36,6 +36,7 @@ import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -111,6 +112,8 @@ public class RunBatchTool extends javax.swing.JPanel {
     
     private JLabel[] param1JLabels= null;
     private JLabel[] param2JLabels= null;
+    
+    private int selectedIndex1;
     
     private JSONObject mainBatchJSONObject= null;
     private File mainBatchFile= null;
@@ -296,8 +299,9 @@ public class RunBatchTool extends javax.swing.JPanel {
         p= switchListToIconLabels(2, ff2);
         param2ScrollPane.getViewport().setView(p);
 
-        updateListIcons(0, 2, f);
-        updateListIcons(0, 1, f);
+        selectedIndex1=0;
+        updateListIcons(2);
+        updateListIcons(1);
         
         param1NameCB.setSelectedItem( jo.getString("param1") );
         param2NameCB.setSelectedItem( jo.getString("param2") );
@@ -305,6 +309,11 @@ public class RunBatchTool extends javax.swing.JPanel {
         dataSetSelector1.setValue( jo.getString("script") );
         
         this.revalidate();
+    }
+    
+    public void update() {
+        updateListIcons(2);
+        updateListIcons(1);
     }
     
     /**
@@ -1723,7 +1732,7 @@ public class RunBatchTool extends javax.swing.JPanel {
         param2ScrollPane.getViewport().setView(param2Values);
     }
     
-    private void updateListIcons( int param1Index, int paramNumber, File mainBatch) {
+    private void updateListIcons( int paramNumber) {
             
         JLabel[] jobs;
         if ( paramNumber==1 ) {
@@ -1734,6 +1743,8 @@ public class RunBatchTool extends javax.swing.JPanel {
 
         int numParam2= RunBatchTool.this.param2JLabels.length;
 
+        File mainBatch = this.mainBatchFile;
+        
         File[] ff;
 
         ff = new File( mainBatch.getParentFile(), "complete" ).listFiles();
@@ -1744,7 +1755,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                 if ( paramNumber==1 ) {
                     jobs[num1].setIcon(ICON_OKAY);
                 } else {
-                    if ( num1==param1Index ) {
+                    if ( num1==selectedIndex1 ) {
                         int num2= Math.floorMod( num, numParam2 );
                         jobs[num2].setIcon(ICON_OKAY);
                     }
@@ -1760,7 +1771,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                 if ( paramNumber==1 ) {
                     jobs[num1].setIcon(ICON_QUEUED);
                 } else {
-                    if ( num1==param1Index ) {
+                    if ( num1==selectedIndex1 ) {
                         int num2= Math.floorMod( num, numParam2 );
                         jobs[num2].setIcon(ICON_QUEUED);
                     }
@@ -1776,7 +1787,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                 if ( paramNumber==1 ) {
                     jobs[num1].setIcon(ICON_WORKING);
                 } else {
-                    if ( num1==param1Index ) {
+                    if ( num1==selectedIndex1 ) {
                         int num2= Math.floorMod( num, numParam2 );
                         jobs[num2].setIcon(ICON_WORKING);
                     }
@@ -1792,7 +1803,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                 if ( paramNumber==1 ) {
                     jobs[num1].setIcon(ICON_PROB);
                 } else {
-                    if ( num1==param1Index ) {
+                    if ( num1==selectedIndex1 ) {
                         int num2= Math.floorMod( num, numParam2 );
                         jobs[num2].setIcon(ICON_PROB);
                     }
@@ -1831,7 +1842,10 @@ public class RunBatchTool extends javax.swing.JPanel {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     if ( paramNumber==1 ) {
-                        updateListIcons(findex, 2, RunBatchTool.this.mainBatchFile);
+                        param1JLabels[selectedIndex1].setBorder( null );
+                        selectedIndex1= findex;
+                        updateListIcons(2);
+                        param1JLabels[selectedIndex1].setBorder( BorderFactory.createLineBorder(Color.black) );
                     }
                 }
             });
