@@ -351,20 +351,32 @@ public class AsciiTableDataSourceFactory extends AbstractDataSourceFactory imple
             int i= parser.getFieldIndex(params.get("eventListColumn"));
             if ( i!=-1 ) parser.setUnits( i, new EnumerationUnits("events") );
         }
+        
+        AsciiParser.RecordParser recordParser;
+                
+        if ( params.containsKey("pattern") ) {
+            recordParser= new AsciiParser.RegexParser(parser,params.get("pattern"));
+            parser.setRecordParser(recordParser);
+        } else {
+            recordParser= null;
+        }
+        
         String line= parser.readFirstParseableRecord(file.toString());
         if ( line==null ) {
             //dp= parser.guessSkipAndDelimParser(file.toString());
             throw new IllegalArgumentException("unable to find parseable record");
         }
         
-        DelimParser dp= parser.guessSkipAndDelimParser(file.toString());
+        if ( recordParser==null ) {
+            recordParser= parser.guessSkipAndDelimParser(file.toString());
+        }
         
-        if ( dp==null ) {
+        if ( recordParser==null ) {
             throw new IllegalArgumentException("unable to find delimited columns");
         }
         
-        String[] fields= new String[ dp.fieldCount() ];
-        dp.splitRecord( line, fields );
+        String[] fields= new String[ recordParser.fieldCount() ];
+        recordParser.splitRecord( line, fields );
 
         String[] columns = parser.getFieldNames();
         List<CompletionContext> result = new ArrayList<>();
