@@ -16,6 +16,8 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -108,7 +110,11 @@ public class RunBatchTool extends javax.swing.JPanel {
     private File resultsFile=null;
     
     private JLabel[] param1JLabels= null;
+    private JLabel[] param2JLabels= null;
     
+    private JSONObject mainBatchJSONObject= null;
+    private File mainBatchFile= null;
+            
     private JLabel lastActiveLabel= null;
     
     
@@ -248,7 +254,8 @@ public class RunBatchTool extends javax.swing.JPanel {
     }
     
     /**
-     * set up the GUI to monitor the batch directory
+     * set up the GUI to monitor the batch directory.  The GUI will show
+     * all the jobs and their current status.
      * @param d the directory containing main.batch file.
      * @throws JSONException
      * @throws IOException 
@@ -264,17 +271,21 @@ public class RunBatchTool extends javax.swing.JPanel {
         
         String batchFileJson= FileUtil.readFileToString(f);
         JSONObject jo= new JSONObject(batchFileJson);       
+        this.mainBatchJSONObject= jo;
+        this.mainBatchFile= f;
         
         final List<JLabel> jobs1= new ArrayList<>();
         final List<JLabel> jobs2= new ArrayList<>();
-        
+
         JSONArray a;
+        JPanel p;
+
         a = jo.getJSONArray("param1Values");
         String[] ff1= new String[a.length()];
         for ( int i=0; i<a.length(); i++ ) {
             ff1[i]= a.getString(i);
         }
-        JPanel p= switchListToIconLabels(jobs1, ff1);
+        p = switchListToIconLabels(1, ff1);
         param1ScrollPane.getViewport().setView(p);
         
         a = jo.getJSONArray("param2Values");
@@ -282,8 +293,11 @@ public class RunBatchTool extends javax.swing.JPanel {
         for ( int i=0; i<a.length(); i++ ) {
             ff2[i]= a.getString(i);
         }
-        p= switchListToIconLabels(jobs2, ff2);
+        p= switchListToIconLabels(2, ff2);
         param2ScrollPane.getViewport().setView(p);
+
+        updateListIcons(0, 2, f);
+        updateListIcons(0, 1, f);
         
         param1NameCB.setSelectedItem( jo.getString("param1") );
         param2NameCB.setSelectedItem( jo.getString("param2") );
@@ -1709,15 +1723,119 @@ public class RunBatchTool extends javax.swing.JPanel {
         param2ScrollPane.getViewport().setView(param2Values);
     }
     
-    private JPanel switchListToIconLabels( List<JLabel> jobs1, String[] ff1 ) {
+    private void updateListIcons( int param1Index, int paramNumber, File mainBatch) {
+            
+        JLabel[] jobs;
+        if ( paramNumber==1 ) {
+            jobs= this.param1JLabels;
+        } else {
+            jobs= this.param2JLabels;
+        }
+
+        int numParam2= RunBatchTool.this.param2JLabels.length;
+
+        File[] ff;
+
+        ff = new File( mainBatch.getParentFile(), "complete" ).listFiles();
+        if ( ff!=null ) {
+            for ( File f: ff ) {
+                int num= Integer.parseInt( f.getName() );
+                int num1= Math.floorDiv( num, numParam2 );
+                if ( paramNumber==1 ) {
+                    jobs[num1].setIcon(ICON_OKAY);
+                } else {
+                    if ( num1==param1Index ) {
+                        int num2= Math.floorMod( num, numParam2 );
+                        jobs[num2].setIcon(ICON_OKAY);
+                    }
+                }
+            }
+        }
+
+        ff = new File( mainBatch.getParentFile(), "jobs" ).listFiles();
+        if ( ff!=null ) {
+            for ( File f: ff ) {
+                int num= Integer.parseInt( f.getName() );
+                int num1= Math.floorDiv( num, numParam2 );
+                if ( paramNumber==1 ) {
+                    jobs[num1].setIcon(ICON_QUEUED);
+                } else {
+                    if ( num1==param1Index ) {
+                        int num2= Math.floorMod( num, numParam2 );
+                        jobs[num2].setIcon(ICON_QUEUED);
+                    }
+                }
+            }
+        }
+
+        ff = new File( mainBatch.getParentFile(), "pending" ).listFiles();
+        if ( ff!=null ) {
+            for ( File f: ff ) {
+                int num= Integer.parseInt( f.getName() );
+                int num1= Math.floorDiv( num, numParam2 );
+                if ( paramNumber==1 ) {
+                    jobs[num1].setIcon(ICON_WORKING);
+                } else {
+                    if ( num1==param1Index ) {
+                        int num2= Math.floorMod( num, numParam2 );
+                        jobs[num2].setIcon(ICON_WORKING);
+                    }
+                }
+            }
+        }
+
+        ff = new File( mainBatch.getParentFile(), "exceptions" ).listFiles();
+        if ( ff!=null ) {
+            for ( File f: ff ) {
+                int num= Integer.parseInt( f.getName() );
+                int num1= Math.floorDiv( num, numParam2 );
+                if ( paramNumber==1 ) {
+                    jobs[num1].setIcon(ICON_PROB);
+                } else {
+                    if ( num1==param1Index ) {
+                        int num2= Math.floorMod( num, numParam2 );
+                        jobs[num2].setIcon(ICON_PROB);
+                    }
+                }
+            }
+        }        
+
+    }
+            
+    /**
+     * 
+     * @param jobs1 list to put the JLabels into.
+     * @param paramNumber 1 for the left param, 2 for the right
+     * @param ff1
+     * @return 
+     */
+    private JPanel switchListToIconLabels( final int paramNumber, String[] ff1 ) {
         JPanel p= new JPanel();
             
+        JLabel[] jobs1= new JLabel[ff1.length];
+        if ( paramNumber==1 ) {
+            this.param1JLabels= jobs1;
+        } else {
+            this.param2JLabels= jobs1;
+        }
+        
         p.setLayout( new BoxLayout(p,BoxLayout.Y_AXIS) );
+        int index=0;
         for ( String f: ff1 ) {
+            final int findex= index;
             JLabel l= new JLabel(f);
             l.setIcon(ICON_QUEUED);
             p.add( l );
-            jobs1.add(l);
+            jobs1[index]=l;
+            l.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if ( paramNumber==1 ) {
+                        updateListIcons(findex, 2, RunBatchTool.this.mainBatchFile);
+                    }
+                }
+            });
+            index++;
         }
 
         JScrollPane scrollp= new JScrollPane(p);
