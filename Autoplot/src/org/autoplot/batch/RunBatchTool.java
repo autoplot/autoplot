@@ -347,29 +347,6 @@ public class RunBatchTool extends javax.swing.JPanel {
     }    
 
     /**
-     * read the script into a string
-     * @param f
-     * @return
-     * @throws FileNotFoundException
-     * @throws IOException 
-     */
-    private String readScript( File f ) throws FileNotFoundException, IOException {
-        StringBuilder build= new StringBuilder();
-        BufferedReader r;
-        r = new BufferedReader( new FileReader(f) );
-        try {    
-            String line= r.readLine();
-            while ( line!=null ) {
-                build.append(line).append("\n");
-                line= r.readLine();
-            }
-        } finally {
-            r.close();
-        }        
-        return build.toString();
-    }
-    
-    /**
      * do the stuff to do when the play button is pressed.
      */
     private void doPlayButton() {
@@ -390,7 +367,7 @@ public class RunBatchTool extends javax.swing.JPanel {
 
             DasProgressPanel monitor= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(org.autoplot.batch.RunBatchTool.this), "download script");
             File scriptFile= DataSetURI.getFile( split.file, monitor );
-            String script= readScript( scriptFile );
+            String script= FileUtil.readFileToString(scriptFile);
 
             env.put( "dom", dom );
             env.put( "PWD", split.path );
@@ -1495,7 +1472,7 @@ public class RunBatchTool extends javax.swing.JPanel {
 
         //DasProgressPanel monitor= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(BatchMaster.this), "download script");
         File scriptFile= DataSetURI.getFile( split.file, new NullProgressMonitor() );
-        String script= readScript( scriptFile );
+        String script= FileUtil.readFileToString(scriptFile);
         
         env.put("dom",this.dom);
         env.put("PWD",pwd);
@@ -1943,7 +1920,7 @@ public class RunBatchTool extends javax.swing.JPanel {
 
         try {
             final File scriptFile= DataSetURI.getFile( split.file, new AlertNullProgressMonitor() );
-            String script= readScript( scriptFile );
+            String script= FileUtil.readFileToString(scriptFile);
             Map<String,String> params= URISplit.parseParams( split.params );
             Map<String,org.autoplot.jythonsupport.Param> parms= Util.getParams( env, script, params, new NullProgressMonitor() );
             Runnable run= () -> {
