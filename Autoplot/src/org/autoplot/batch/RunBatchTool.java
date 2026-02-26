@@ -312,8 +312,10 @@ public class RunBatchTool extends javax.swing.JPanel {
     }
     
     public void update() {
+        long t0= System.currentTimeMillis();
         updateListIcons(2);
         updateListIcons(1);
+        logger.log(Level.INFO, "update jobs status in {0} millis", System.currentTimeMillis()-t0);
     }
     
     /**
@@ -1719,6 +1721,9 @@ public class RunBatchTool extends javax.swing.JPanel {
         }
 
         int numParam2= RunBatchTool.this.param2JLabels.length;
+        if ( paramNumber==2 && numParam2==0 ) return;
+        
+        if ( numParam2==0 ) numParam2=1;
 
         File mainBatch = this.mainBatchFile;
         
