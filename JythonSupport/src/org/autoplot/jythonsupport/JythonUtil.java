@@ -1592,6 +1592,8 @@ public class JythonUtil {
                 } else if (ent.getValue() == null) {
                     if (ent.getKey().equals("dom")) {
                         logger.log(Level.FINE, "parameter \"dom\" value was set to null");  // Some scripts don't use dom.
+                    } else if (ent.getKey().equals("PWD")) {
+                        logger.log(Level.FINE, "parameter \"PWD\" value is not set");  // Some scripts exist only in memory and don't have PWD.
                     } else {
                         logger.log(Level.WARNING, "parameter value was null");
                     }
