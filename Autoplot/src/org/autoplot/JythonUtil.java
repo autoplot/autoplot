@@ -215,44 +215,47 @@ public class JythonUtil {
         
         interp.exec("import autoplot2025 as autoplot");// JythonRefactory okay
         
-        long t0= System.currentTimeMillis();
-        // load params structure with the values to use, so that they are all in one compact place.
-        Map<String,Object> env= new HashMap<>();
-        env.put("PWD",pwd);
-        env.put("dom",dom);
-        Map<String,String> params= new HashMap<>();
-        int iargv=1;  // skip the zeroth one, it is the name of the script
-        for (String s : argv ) {
-            int ieq= s.indexOf('=');
-            if ( ieq>0 ) {
-                String snam= s.substring(0,ieq).trim();
-                if ( DataSourceUtil.isJavaIdentifier(snam) ) {
-                    String sval= s.substring(ieq+1).trim();
-                    params.put(snam, sval);
-                } else {
-                    if ( snam.startsWith("-") ) {
-                        System.err.println("\n!!! Script arguments should not start with -, they should be name=value");
+        if ( name!=null ) {
+            long t0= System.currentTimeMillis();
+            // load params structure with the values to use, so that they are all in one compact place.
+            Map<String,Object> env= new HashMap<>();
+            env.put("PWD",pwd);
+            env.put("dom",dom);
+            Map<String,String> params= new HashMap<>();
+            int iargv=1;  // skip the zeroth one, it is the name of the script
+            for (String s : argv ) {
+                int ieq= s.indexOf('=');
+                if ( ieq>0 ) {
+                    String snam= s.substring(0,ieq).trim();
+                    if ( DataSourceUtil.isJavaIdentifier(snam) ) {
+                        String sval= s.substring(ieq+1).trim();
+                        params.put(snam, sval);
+                    } else {
+                        if ( snam.startsWith("-") ) {
+                            System.err.println("\n!!! Script arguments should not start with -, they should be name=value");
+                        }
+                        System.err.println("bad parameter: "+ snam);
                     }
-                    System.err.println("bad parameter: "+ snam);
+                } else {
+                    params.put( "arg_"+iargv, s);                
+                    iargv++;
                 }
-            } else {
-                interp.exec("autoplot.params['arg_" + iargv + "']='" + s +"'" );// JythonRefactory okay
-                iargv++;
             }
+
+            File scriptFile= DataSetURI.getFile( name );
+            String src= FileUtil.readFileToString(scriptFile);
+            logger.log(Level.INFO, "read script to get param defaults in {0} millis", System.currentTimeMillis()-t0);
+
+            Map<String,org.autoplot.jythonsupport.Param> allParams= org.autoplot.jythonsupport.ui.Util.getParams(env, src, params, new NullProgressMonitor() );
+            for ( org.autoplot.jythonsupport.Param p: allParams.values() ) {
+                String snam= p.name;
+                String sval= p.deft.toString();
+                interp.exec("autoplot.params['" + snam + "']='" + sval+"'");
+            }  
+            logger.log(Level.INFO, "set param defaults in {0} millis", System.currentTimeMillis()-t0);
         }
         
-        File scriptFile= DataSetURI.getFile( name );
-        String src= FileUtil.readFileToString(scriptFile);
-        
-        Map<String,org.autoplot.jythonsupport.Param> allParams= org.autoplot.jythonsupport.ui.Util.getParams(env, src, params, new NullProgressMonitor() );
-        for ( org.autoplot.jythonsupport.Param p: allParams.values() ) {
-            String snam= p.name;
-            String sval= p.deft.toString();
-            interp.exec("autoplot.params['" + snam + "']='" + sval+"'");
-        }  
-        logger.log(Level.FINE, "set param defaults in {0} millis", System.currentTimeMillis()-t0);
-        
-        iargv=1;  // skip the zeroth one, it is the name of the script
+        int iargv=1;  // skip the zeroth one, it is the name of the script
         for (String s : argv ) {
             int ieq= s.indexOf('=');
             if ( ieq>0 ) {
