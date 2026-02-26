@@ -107,6 +107,11 @@ public class LayoutUtil {
      */
     public static void autolayout(DasCanvas canvas, DasRow marginRow, DasColumn marginColumn) {
         
+        if ( canvas.isValueAdjusting() ) {
+            logger.info("canvas is adjusting, don't autolayout");
+            return;
+        }
+        
         logger.fine( "enter autolayout" );
         
         double em = marginColumn.getEmSize();
