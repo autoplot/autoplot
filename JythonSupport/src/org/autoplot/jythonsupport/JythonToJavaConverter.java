@@ -364,8 +364,8 @@ public class JythonToJavaConverter {
         Pattern assignPattern= Pattern.compile("([a-zA-Z.]*[A-Z]\\S+)(\\s+)(\\S+)(\\s*=.*)");
         Pattern importPattern1= Pattern.compile("import ([a-z\\.]*)\\.([A-Za-z\\*]*)");
         Pattern newPattern= Pattern.compile("(.*)([=\\s]*)?new\\s*([a-zA-Z\\.]+)(.*)");
-        int indentLevel= 0;
-        int nextIndentLevel= 0;
+        int indentLevel= -1;
+        int nextIndentLevel= -1;
         String indent="";
         boolean withinComment= false;
         
@@ -376,32 +376,36 @@ public class JythonToJavaConverter {
             logger.log(Level.FINER, "line {0}: {1}", new Object[]{lineNumber, s});
             lineNumber++;
             
+            String line= s;
+            
             String strim= s.trim();
             int javaIndent= strim.length()>1 ? s.indexOf(strim.substring(0,1)) : 0;
             s= strim;
-            if ( lineNumber==1 ) {
+            if ( indentLevel==-1 && strim.length()>0 ) {
                 indentLevel= javaIndent;
+                nextIndentLevel= indentLevel;
             }
             
-            if ( indentLevel!=indent.length()) {
-                indent= "                                                                       ".substring(0,indentLevel);
-            }
-
             if ( s.endsWith(";") ) s= s.substring(0,s.length()-1);
             // check for indent/unindedent
-            
-            s= s.replaceAll("//","#");
-            
+
             int icomment= s.indexOf("//");
-            if ( icomment==-1 ) icomment=s.length();
-            
-            if ( s.substring(0,icomment).trim().endsWith("{") ) {
-                nextIndentLevel=indentLevel+4;
-            } else if ( strim.startsWith("}") ) {
-                nextIndentLevel=indentLevel-4;
-                if ( nextIndentLevel<0 ) nextIndentLevel= 0;
+            if ( icomment==-1 ) icomment=s.length();            
+
+            String sNoComment= line.substring(0,icomment).trim();
+            if ( strim.startsWith("}") ) {
+                indentLevel-=4;
+                if ( indentLevel<0 ) indentLevel= 0;
             }
             
+            if ( indentLevel==-1 ) {
+                indent= "";
+            } else if ( indentLevel!=indent.length()) {
+                indent= "                                                                       ".substring(0,indentLevel);
+            }
+            
+            s= s.replaceAll("//","#");
+                        
             if ( s.startsWith("/*") ) withinComment= true;
             Matcher m= newPattern.matcher(s);
             if ( m.matches() ) {
@@ -452,10 +456,6 @@ public class JythonToJavaConverter {
                 }
             }
             
-            if ( s.contains("reformatIsoTime")) {
-                System.err.println("Stop here jeremy");
-            }
-            
             if ( s.contains("{") ) {
                 s= s.replace("{",":");
             } 
@@ -481,7 +481,10 @@ public class JythonToJavaConverter {
                 s= "def " + s;
             }
             b.append(s).append("\n");
-            indentLevel= nextIndentLevel;
+            
+            if ( sNoComment.endsWith("{") ) {
+                indentLevel=indentLevel+4;
+            }
             
             logger.log(Level.FINER, "out  {0}: {1}", new Object[]{lineNumber, s});
                         
