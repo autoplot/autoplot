@@ -480,7 +480,7 @@ public class StatePersistence {
         Application state = (Application) StatePersistence.restoreState(in);
         
         List<String> problems= DomUtil.checkUniqueIdsAndReferences( state, new ArrayList<>() );
-        if ( problems.size()>0 ) {
+        if ( !problems.isEmpty() ) {
             for ( String s: problems ) {
                 logger.warning(s);
             }
@@ -495,6 +495,11 @@ public class StatePersistence {
                 logger.log(Level.FINEST, "applying to vap {0}={1}", new Object[]{e.getKey(), e.getValue()});
                 String node = e.getKey();
                 String sval = e.getValue();
+                
+                if ( node.contains("%{") || sval.contains("%{") ) {
+                    logger.info("ignoring macro which contains '%{' in the name or the value");
+                    continue;
+                }
 
 //                BeanProperty prop = BeanProperty.create(node);
 //                if (!prop.isWriteable(state)) {

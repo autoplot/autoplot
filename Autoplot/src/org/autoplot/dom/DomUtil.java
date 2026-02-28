@@ -1423,13 +1423,25 @@ public class DomUtil {
     }
     
     /**
-     * Look through the state property values for references to ${PWD}
-     * and replace them with sval.
+     * Look through the state property values for macro references like %{PWD}
+     * and replace them with sval.  Controller nodes are skipped.  The macro
+     * value (sval) cannot itself contain other macros.
      * @param state the domNode, typically starting from the Application root.
-     * @param node %{PWD}
-     * @param sval /tmp
+     * @param node the node to find in string values, like %{PWD} or %{my_date}
+     * @param sval the text to replace it with, like "/tmp" or "2026-02-28"
      */
     public static void applyMacro( DomNode state, String node, String sval) {
+        
+        if ( !( node.startsWith("%{") && node.endsWith("}") ) ) {
+            throw new IllegalArgumentException("node must start with %{ and end with }.");
+        } 
+        
+        if ( sval.contains("%{") && sval.contains("}") ) {
+            throw new IllegalArgumentException("macro replacement cannot contain macros.");
+        }
+        
+        String nodeRegex= "%\\{"+ node.substring(2,node.length()-1)+"\\}";
+        
         String[] props = BeansUtil.getPropertyNames(state.getClass());
         PropertyDescriptor[] pds = BeansUtil.getPropertyDescriptors(state.getClass());
 
@@ -1445,10 +1457,9 @@ public class DomUtil {
                             if ( val1 instanceof DomNode  ) {
                                 applyMacro( (DomNode)val1, node, sval );
                             } else if ( val1 instanceof String ) {
-                                System.err.println( val1 );
                                 String sval1= (String)val1;
                                 if ( sval1.contains( node ) ) {
-                                    sval1= sval1.replaceAll( node, sval );
+                                    sval1= sval1.replaceAll( nodeRegex, sval );
                                     pds[i].getWriteMethod().invoke( state, sval1 );
                                 }
                             }
@@ -1463,7 +1474,7 @@ public class DomUtil {
                         } else if ( val1 instanceof String ) {
                             String sval1= (String)val1;
                             if ( sval1.contains( node ) ) { 
-                                sval1= sval1.replace( node, sval );  //TODO: convert %{} to regex.
+                                sval1= sval1.replaceAll( nodeRegex, sval );  //TODO: convert %{} to regex.
                                 pds[i].getWriteMethod().invoke( state, sval1 );
                             }
                         }
