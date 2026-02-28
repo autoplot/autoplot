@@ -365,6 +365,7 @@ public class JythonToJavaConverter {
         Pattern importPattern1= Pattern.compile("import ([a-z\\.]*)\\.([A-Za-z\\*]*)");
         Pattern newPattern= Pattern.compile("(.*)([=\\s]*)?new\\s*([a-zA-Z\\.]+)(.*)");
         int indentLevel= 0;
+        int nextIndentLevel= 0;
         String indent="";
         boolean withinComment= false;
         
@@ -378,13 +379,29 @@ public class JythonToJavaConverter {
             String strim= s.trim();
             int javaIndent= strim.length()>1 ? s.indexOf(strim.substring(0,1)) : 0;
             s= strim;
-            indentLevel= javaIndent;
+            if ( lineNumber==1 ) {
+                indentLevel= javaIndent;
+            }
+            
             if ( indentLevel!=indent.length()) {
                 indent= "                                                                       ".substring(0,indentLevel);
             }
 
             if ( s.endsWith(";") ) s= s.substring(0,s.length()-1);
+            // check for indent/unindedent
+            
             s= s.replaceAll("//","#");
+            
+            int icomment= s.indexOf("//");
+            if ( icomment==-1 ) icomment=s.length();
+            
+            if ( s.substring(0,icomment).trim().endsWith("{") ) {
+                nextIndentLevel=indentLevel+4;
+            } else if ( strim.startsWith("}") ) {
+                nextIndentLevel=indentLevel-4;
+                if ( nextIndentLevel<0 ) nextIndentLevel= 0;
+            }
+            
             if ( s.startsWith("/*") ) withinComment= true;
             Matcher m= newPattern.matcher(s);
             if ( m.matches() ) {
@@ -417,10 +434,13 @@ public class JythonToJavaConverter {
             s= s.replaceAll("public static ([a-zA-Z0-9_]+)","# returns $1\n"+indent+"def");
             s= s.replaceAll("private static ([a-zA-Z0-9_]+)","# returns $1\n"+indent+"def");
             s= s.replaceAll("for\\s+\\(\\s*int\\s+([a-z]+)\\s*=\\s*(\\d+)\\s*\\; \\s*\\1\\s*\\<\\s*(\\d+)\\;\\s*\\1\\+\\+\\s*\\)", "for $1 in xrange($2,$3)");
+            s= s.replaceAll("for\\s+\\(\\s*[a-zA-Z]+\\s+([a-z]+)\\s*:\\s*([a-zA-Z\\.]+)\\s*\\)", "for $1 in $2");
             s= s.replaceAll("\\.substring\\(([a-z\\+\\-\\.0-9]+\\s*)(,\\s*([a-z\\+\\-\\.0-9]+)\\s*)?\\)","[$1:$3]" );
             s= s.replaceAll("\\.substring\\(([a-z\\+\\-\\.0-9\\(\\)]+\\s*)(,\\s*([a-z\\+\\-\\.0-9]+)\\s*)?\\)","[$1:$3]" );
             s= s.replaceAll(".charAt\\(([a-z\\+\\-\\.0-9\\(\\)]+\\s*)\\)","[$1]" );
             s= s.replaceAll("([a-zA-Z0-9_]+).length\\(\\)","len($1)" );
+            s= s.replaceAll("System.err.println\\((.*)\\)","print($1)" );
+            s= s.replaceAll("System.out.println\\((.*)\\)","print($1)" );
             
             m= assignPattern.matcher(s);
             if ( m.matches() ) {
@@ -461,6 +481,8 @@ public class JythonToJavaConverter {
                 s= "def " + s;
             }
             b.append(s).append("\n");
+            indentLevel= nextIndentLevel;
+            
             logger.log(Level.FINER, "out  {0}: {1}", new Object[]{lineNumber, s});
                         
         }
