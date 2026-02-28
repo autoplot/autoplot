@@ -439,8 +439,8 @@ public class JythonToJavaConverter {
             s= s.replaceAll("\\.substring\\(([a-z\\+\\-\\.0-9\\(\\)]+\\s*)(,\\s*([a-z\\+\\-\\.0-9]+)\\s*)?\\)","[$1:$3]" );
             s= s.replaceAll(".charAt\\(([a-z\\+\\-\\.0-9\\(\\)]+\\s*)\\)","[$1]" );
             s= s.replaceAll("([a-zA-Z0-9_]+).length\\(\\)","len($1)" );
-            s= s.replaceAll("System.err.println\\((.*)\\)","print($1)" );
             s= s.replaceAll("System.out.println\\((.*)\\)","print($1)" );
+            s= s.replaceAll("System.err.println\\((.*)\\)","sys.stderr.write(str($1)+'\n')" );
             
             m= assignPattern.matcher(s);
             if ( m.matches() ) {
