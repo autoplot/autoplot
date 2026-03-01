@@ -41,7 +41,7 @@ public class LayoutUtil {
     private static boolean maybeSetMaximum(DasDevicePosition c, double need, double norm, double em, int pt) {
         em = Math.floor(em);
         double excess = -1 * (c.getEmMaximum() - em);
-        if (ALLOW_EXCESS_SPACE && c.getMaximum() == norm && excess >= 0 && excess < 4) return false;
+        if (ALLOW_EXCESS_SPACE && c.getMaximum() == norm && excess >= 0 && excess < 5) return false;
         if (Math.abs(c.getEmMaximum() - em) < 0.1 && Math.abs(norm - c.getMaximum()) < 0.001) return false;
         if ( Math.abs(em)>100 ) {
             logger.log(Level.SEVERE, "autolayout failure: {0}em", em);
@@ -132,7 +132,7 @@ public class LayoutUtil {
         boolean tcaAreComing= false;
 
         boolean foundZeroAreaPlot= false;
-
+        
         for (DasCanvasComponent cc : canvas.getCanvasComponents()) {
 
             Rectangle bounds;
@@ -238,7 +238,7 @@ public class LayoutUtil {
         }
         
         logger.log( Level.FINE, "needYmin: {0} needYmax: {1}", new Object[]{needYmin, needYmax});
-       
+
         if ( needYmin<-700 ) {
             logger.fine("needYmin is less than -700, returning.");
             return;
