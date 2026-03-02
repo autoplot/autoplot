@@ -19,6 +19,7 @@ import java.util.List;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.datasource.DataSetURI.CompletionResult;
+import org.das2.util.StringTools;
 
 /**
  *
@@ -30,8 +31,7 @@ public class DataSetURLDemo {
         String context;
         int carotPos;
 
-        String spaces = "                                                         ";
-        spaces = spaces + spaces + spaces + spaces;
+        String spaces = StringTools.spaces(57*4);
 
         int test = 4;
 

@@ -14,6 +14,7 @@ import java.net.URL;
 import org.das2.components.DasProgressPanel;
 import java.util.List;
 import org.autoplot.datasource.DataSetURI;
+import org.das2.util.StringTools;
 
 /**
  *
@@ -25,8 +26,7 @@ public class DataSetURLDemo {
         String context;
         int carotPos;
         
-        String spaces= "                                                         ";
-        spaces= spaces+spaces+spaces+spaces;
+        String spaces= StringTools.spaces(57*4);
         
         int test=4;
         
