@@ -23,6 +23,7 @@ import javax.swing.text.Document;
 import org.autoplot.datasource.DataSetURI;
 import org.das2.jythoncompletion.JavadocLookup;
 import org.das2.util.LoggerManager;
+import org.das2.util.StringTools;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.python.core.PyFloat;
 import org.python.core.PyInteger;
@@ -365,7 +366,6 @@ public class JythonToJavaConverter {
         Pattern importPattern1= Pattern.compile("import ([a-z\\.]*)\\.([A-Za-z\\*]*)");
         Pattern newPattern= Pattern.compile("(.*)([=\\s]*)?new\\s*([a-zA-Z\\.]+)(.*)");
         int indentLevel= -1;
-        int nextIndentLevel= -1;
         String indent="";
         boolean withinComment= false;
         
@@ -383,7 +383,6 @@ public class JythonToJavaConverter {
             s= strim;
             if ( indentLevel==-1 && strim.length()>0 ) {
                 indentLevel= javaIndent;
-                nextIndentLevel= indentLevel;
             }
             
             if ( s.endsWith(";") ) s= s.substring(0,s.length()-1);
@@ -401,7 +400,7 @@ public class JythonToJavaConverter {
             if ( indentLevel==-1 ) {
                 indent= "";
             } else if ( indentLevel!=indent.length()) {
-                indent= "                                                                       ".substring(0,indentLevel);
+                indent= StringTools.spaces(indentLevel);
             }
             
             s= s.replaceAll("//","#");
