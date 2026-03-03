@@ -19,7 +19,7 @@ import org.das2.qds.util.AsciiParser.RecordParser;
 
 /**
  * You will need to:
- * <tt>
+ * <pre>{@code
  * model.setParser(parser);
  * this.jTable1.setModel(model);
  * model.setFile(file);
@@ -29,7 +29,7 @@ import org.das2.qds.util.AsciiParser.RecordParser;
  *    p = parser.setDelimParser(f, AsciiParser.DELIM_COMMA);
  *    model.setRecParser(p);
  * }
- * </tt>
+ * }</pre>
  * @author jbf
  */
 public class AsciiTableTableModel extends AbstractTableModel implements ColSpanTableCellRenderer.ColSpanTableModel {
