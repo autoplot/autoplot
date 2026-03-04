@@ -216,6 +216,11 @@ public class CreatePngWalk {
         public boolean autorangeFlags = true;
 
         /**
+         * enable/disable autolayout when creating pngwalk.
+         */
+        public boolean autolayout = true;
+        
+        /**
          * clone the dom and run on the copy, so the original Autoplot is free.
          */
         public boolean runOnCopy = true;
@@ -405,9 +410,8 @@ public class CreatePngWalk {
 
             TimeParser tp = TimeParser.create(params.timeFormat);
             Application dom = (Application) readOnlyDom.copy();
-            dom.getOptions().setAutolayout(false);
+            dom.getOptions().setAutolayout( params.autolayout );
             dom.getOptions().syncToAll(readOnlyDom.getOptions(), new ArrayList());
-            dom.getOptions().setAutolayout(false);
             
             if (!times.hasNext()) {
                 throw new IllegalArgumentException("there must be at least one time");
@@ -445,7 +449,7 @@ public class CreatePngWalk {
 
                 mon.setProgressMessage("synchronize to this application");
 
-                dom2.getOptions().setAutolayout(false);
+                dom2.getOptions().setAutolayout( params.autolayout );
                 dom2.getCanvases(0).setHeight(dom.getCanvases(0).getHeight());
                 dom2.getCanvases(0).setWidth(dom.getCanvases(0).getWidth());
                 w0 = dom2.getCanvases(0).getWidth();
@@ -1102,6 +1106,7 @@ public class CreatePngWalk {
         alm.addOptionalSwitchArgument("version", null, "version", null, "additional version string to add to each filename, like v1.0");
         alm.addBooleanSwitchArgument("autorange", null, "autorange", "rerange dependent dimensions Y and Z");
         alm.addBooleanSwitchArgument("autorangeFlags", null, "autorangeFlags", "only autorange axes with autorange=true");
+        alm.addBooleanSwitchArgument("autolayout", null, "autolayout", "allow autolayout code");
         alm.addBooleanSwitchArgument("update", null, "update", "only calculate missing images");
         alm.addBooleanSwitchArgument("removeNoData", null, "removeNoData", "don't produce images which have no visible data.");
         alm.addBooleanSwitchArgument("testException", null, "testException", "throw a runtime exception to test exit code");
@@ -1176,6 +1181,7 @@ public class CreatePngWalk {
             params.batchUriName = alm.getValue("batchUriName");
         }
         params.outputFormat = alm.getValue("outputFormat");
+        params.autolayout= alm.getBooleanValue("autolayout");
 
         Application dom;
 
