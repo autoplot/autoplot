@@ -405,8 +405,10 @@ public class CreatePngWalk {
 
             TimeParser tp = TimeParser.create(params.timeFormat);
             Application dom = (Application) readOnlyDom.copy();
+            dom.getOptions().setAutolayout(false);
             dom.getOptions().syncToAll(readOnlyDom.getOptions(), new ArrayList());
-
+            dom.getOptions().setAutolayout(false);
+            
             if (!times.hasNext()) {
                 throw new IllegalArgumentException("there must be at least one time");
             }
@@ -443,6 +445,7 @@ public class CreatePngWalk {
 
                 mon.setProgressMessage("synchronize to this application");
 
+                dom2.getOptions().setAutolayout(false);
                 dom2.getCanvases(0).setHeight(dom.getCanvases(0).getHeight());
                 dom2.getCanvases(0).setWidth(dom.getCanvases(0).getWidth());
                 w0 = dom2.getCanvases(0).getWidth();
