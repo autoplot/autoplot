@@ -1,7 +1,10 @@
 
 package org.autoplot;
 
+import com.formdev.flatlaf.FlatLightLaf;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,6 +43,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import org.das2.DasApplication;
 import org.das2.util.awt.PdfGraphicsOutput;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -66,6 +71,7 @@ import org.python.core.Py;
 import org.python.core.PyFunction;
 import org.autoplot.ApplicationModel.ResizeRequestListener;
 import org.autoplot.datasource.AnonymousDataSource;
+import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.dom.DomNode;
 import org.autoplot.dom.DomUtil;
 import org.autoplot.dom.Plot;
@@ -426,6 +432,21 @@ public class ScriptContext extends PyJavaInstance {
             Runnable run= new Runnable() {
                 @Override
                 public void run() {
+                    AutoplotUtil.maybeLoadSystemProperties();
+                    if ( System.getProperty("flatLAF","false").equals("true") ) {
+                        try {
+                            UIManager.setLookAndFeel( new FlatLightLaf() );
+                            UIManager.put( "TabbedPane.selectedBackground", Color.white );
+                            UIManager.put( "ScrollBar.showButtons", true );
+                            
+                            String font= System.getProperty("flatLAFFont","");
+                            if ( font.trim().length()>0 ) {
+                                UIManager.put("defaultFont", Font.decode(font.trim()));
+                            }
+                        } catch (UnsupportedLookAndFeelException ex) {
+                            logger.log(Level.SEVERE, null, ex);
+                        }
+                    }
                     view = new AutoplotUI(model);
                     view.setVisible(true);
                     defaultApp= view;
