@@ -107,6 +107,8 @@ import org.das2.util.filesystem.FileSystem;
  ScriptContext.writeToPdf('/tmp/foo.pdf')
  *}</small></pre></blockquote>
  * 
+ * ScriptContext2023 should be used now, which supports multiple contexts under one Java process.  This
+ * is still used for Jemmy testing (VATesting).
  * @author jbf
  */
 public class ScriptContext extends PyJavaInstance {
