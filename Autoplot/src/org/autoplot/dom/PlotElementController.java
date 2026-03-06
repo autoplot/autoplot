@@ -149,6 +149,7 @@ public class PlotElementController extends DomNodeController {
         plotElement.addPropertyChangeListener(PlotElement.PROP_COMPONENT, plotElementListener);
         plotElement.addPropertyChangeListener(PlotElement.PROP_PARENT, parentElementListener );
         plotElement.getStyle().addPropertyChangeListener(styleListener);
+        dom.getOptions().addPropertyChangeListener(colorbarListener);
     }
 
     /**
@@ -160,6 +161,7 @@ public class PlotElementController extends DomNodeController {
         plotElement.removePropertyChangeListener(PlotElement.PROP_COMPONENT, plotElementListener);
         plotElement.removePropertyChangeListener(PlotElement.PROP_PARENT, plotElementListener);
         plotElement.getStyle().removePropertyChangeListener(styleListener);
+        dom.getOptions().removePropertyChangeListener(colorbarListener);
         PlotElement parent= getParentPlotElement();
         if ( parent!=null ) {
             parent.removePropertyChangeListener( getParentComponentLister() );
@@ -592,6 +594,16 @@ public class PlotElementController extends DomNodeController {
 //                plotElement.setAutoRenderType( false );
 //            } else if ( evt.getPropertyName().equals( PlotElementStyle.PROP_PLOT_SYMBOL ) ) {
 //                plotElement.setAutoRenderType( false );
+            }
+        }
+    };
+    
+    PropertyChangeListener colorbarListener= new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt,"colorbarListener");            
+            if ( evt.getPropertyName().equals(Options.PROP_COLORTABLE) ) {
+                plotElement.style.setColortable(dom.getOptions().getColortable());
             }
         }
     };
