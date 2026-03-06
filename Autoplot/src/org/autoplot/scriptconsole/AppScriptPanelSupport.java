@@ -46,6 +46,7 @@ import java.nio.file.WatchService;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -104,6 +105,7 @@ import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
 import org.das2.util.ColorUtil;
 import org.das2.util.filesystem.GitCommand;
+import org.python.core.PyDictionary;
 import org.python.parser.Node;
 import org.python.parser.ast.Expr;
 import org.python.parser.ast.Str;
@@ -732,6 +734,26 @@ public class AppScriptPanelSupport {
     }
 
     /**
+     * @param interp
+     * @param s the script source code
+     */
+    private void setParametersStruct( InteractiveInterpreter interp, String s ) throws IOException {
+        Map<String,org.autoplot.jythonsupport.Param> allParams=null;
+        Map<String,Object> env= new HashMap<>();
+                            
+        s= JythonRefactory.fixImports(s);
+        allParams= org.autoplot.jythonsupport.ui.Util.getParams(env, 
+            s, Collections.emptyMap(), new NullProgressMonitor() );
+        PyDictionary d= (PyDictionary)interp.get("params");
+        
+        for ( Entry<String,org.autoplot.jythonsupport.Param> e: allParams.entrySet() ) {
+            d.__setitem__( org.python.core.Py.java2py(e.getKey()), org.python.core.Py.java2py( e.getValue().deft ) );
+        }
+        
+        //interp.set("params",d);
+    }
+    
+    /**
      * Execute the script in the current thread.  For context data source, 
      * this means putting the URI in the data set selector and telling it to 
      * plot.  "mode" controls how the script is run, for example by bringing up 
@@ -846,7 +868,9 @@ public class AppScriptPanelSupport {
 
                             logger.finest("add Netbeans breakpoint here to debug jython code line-by-line without GDB");
 
-                            interp.exec(JythonRefactory.fixImports(s));
+                            setParametersStruct(interp, script);
+                            
+                            interp.exec(s);
                         } catch (PyException ex) {
                             throw ex;
                         }
@@ -916,7 +940,7 @@ public class AppScriptPanelSupport {
                             (final String expr) -> dc.setEval(expr) //return dc.getEval();
                         );
                     }
-                    String code= panel.getEditorPanel().getText();
+                    String code= JythonRefactory.fixImports(panel.getEditorPanel().getText());
                     if ( file!=null ) {
                         char[] cc= code.toCharArray();
                         boolean warning= false;
@@ -932,6 +956,9 @@ public class AppScriptPanelSupport {
                         if ( warning ) {
                             System.err.println("code contains data that will not be represented properly!");
                         }
+                        
+                        setParametersStruct(interp, code);
+                        
                         //experiment with writing to a temporary file and executing it.
                         if ( experiment ) {
                             String fixedCode= JythonRefactory.fixImports( code );
@@ -949,7 +976,9 @@ public class AppScriptPanelSupport {
                             }
                         }
                     } else {
-                        interp.exec(JythonRefactory.fixImports(code));
+                        
+                        setParametersStruct(interp, code);
+                        interp.exec(code);
                     }
                 }
                 setInterruptible( null );
