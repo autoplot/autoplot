@@ -62,6 +62,7 @@ import org.python.util.PythonInterpreter;
 import org.autoplot.datasource.AutoplotSettings;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
+import org.das2.util.StringTools;
 import org.python.core.PyTuple;
 import org.python.parser.ast.BinOp;
 import org.python.parser.ast.TryExcept;
@@ -1112,9 +1113,8 @@ public class JythonUtil {
      * @see SimplifyScriptSupport#simplifyScriptToGetCompletions(java.lang.String[], org.python.parser.ast.stmtType[], java.util.HashSet, int, int, int) 
      */
     public static String simplifyScriptToGetParams(String[] ss, stmtType[] stmts, HashSet variableNames, int beginLine, int lastLine, int depth) {
-        String spaces= "                              "
-                + "                              "
-                + "                              ";
+        String spaces= StringTools.spaces(90);
+        
         if ( lastLine>=ss.length ) {
             throw new IllegalArgumentException("lastLine is >= number of lines");
         }
@@ -1166,7 +1166,7 @@ public class JythonUtil {
                 boolean includeBlock;
                 if (simplifyScriptToGetParamsCanResolve(iff.test, variableNames)) {
                     for (int i = beginLine; i < iff.body[0].beginLine; i++) {
-                        result.append(ss[i]).append("\n");
+                        appendToResult(result,ss[i]).append("\n");
                     } // write out the 'if' part
                     includeBlock = true;
                 } else {
