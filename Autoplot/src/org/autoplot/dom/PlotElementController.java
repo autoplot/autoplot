@@ -149,7 +149,7 @@ public class PlotElementController extends DomNodeController {
         plotElement.addPropertyChangeListener(PlotElement.PROP_COMPONENT, plotElementListener);
         plotElement.addPropertyChangeListener(PlotElement.PROP_PARENT, parentElementListener );
         plotElement.getStyle().addPropertyChangeListener(styleListener);
-        dom.getOptions().addPropertyChangeListener(colorbarListener);
+        dom.getOptions().addPropertyChangeListener(optionsListener);
     }
 
     /**
@@ -161,7 +161,7 @@ public class PlotElementController extends DomNodeController {
         plotElement.removePropertyChangeListener(PlotElement.PROP_COMPONENT, plotElementListener);
         plotElement.removePropertyChangeListener(PlotElement.PROP_PARENT, plotElementListener);
         plotElement.getStyle().removePropertyChangeListener(styleListener);
-        dom.getOptions().removePropertyChangeListener(colorbarListener);
+        dom.getOptions().removePropertyChangeListener(optionsListener);
         PlotElement parent= getParentPlotElement();
         if ( parent!=null ) {
             parent.removePropertyChangeListener( getParentComponentLister() );
@@ -598,12 +598,18 @@ public class PlotElementController extends DomNodeController {
         }
     };
     
-    PropertyChangeListener colorbarListener= new PropertyChangeListener() {
+    PropertyChangeListener optionsListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             LoggerManager.logPropertyChangeEvent(evt,"colorbarListener");            
             if ( evt.getPropertyName().equals(Options.PROP_COLORTABLE) ) {
                 plotElement.style.setColortable(dom.getOptions().getColortable());
+            } else if ( evt.getPropertyName().equals(Options.PROP_NEARESTNEIGHBOR) ) {
+                if ( evt.getNewValue().equals(Boolean.TRUE) ) {
+                    plotElement.style.setRebinMethod(SpectrogramRenderer.RebinnerEnum.nearestNeighbor);
+                } else {
+                    plotElement.style.setRebinMethod(SpectrogramRenderer.RebinnerEnum.binAverage);
+                }
             }
         }
     };
