@@ -1200,7 +1200,13 @@ public class CreatePngWalk {
             ScriptContext.plot(uri);
             dom = ScriptContext.getDocumentModel();
         }
-
+        
+        if ( params.batchUri.trim().length()>0 ) {
+            params.batchUri= URISplit.makeAbsolute( new File(".").getAbsolutePath(), params.batchUri );
+        }
+        
+        params.outputFolder= new File(params.outputFolder).getAbsolutePath();
+        
         if (vap != null && vap.contains(params.outputFolder)) {
             params.writeVap = false;
         }
