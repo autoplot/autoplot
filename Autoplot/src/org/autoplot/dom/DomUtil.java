@@ -40,6 +40,7 @@ import org.jdesktop.beansbinding.Converter;
 import org.autoplot.dom.ChangesSupport.DomLock;
 import org.autoplot.state.StatePersistence;
 import org.das2.components.propertyeditor.Displayable;
+import org.das2.graph.AnchorType;
 import org.das2.graph.DasColumn;
 import org.das2.graph.DasDevicePosition;
 import org.das2.qds.QDataSet;
@@ -1957,7 +1958,7 @@ public class DomUtil {
             } else {
                 ids.put( a.id, a );
             }
-            if ( a.getPlotId().length()>0 && ids.get(a.getPlotId())==null ) {
+            if ( a.getAnchorType()!=AnchorType.CANVAS && a.getPlotId().length()>0 && ids.get(a.getPlotId())==null ) {
                 problems.add( "Annotation refers to plot '"+a.getPlotId() +"' which is not found: "+a );
             }
             if ( a.getColumnId().trim().length()>0 && ids.get(a.getColumnId())==null ) {
