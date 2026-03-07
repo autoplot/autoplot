@@ -109,7 +109,7 @@ public class LayoutUtil {
     public static void autolayout(DasCanvas canvas, DasRow marginRow, DasColumn marginColumn) {
         
         if ( canvas.isValueAdjusting() ) {
-            logger.info("canvas is adjusting, don't autolayout");
+            logger.fine("exit autolayout because canvas is adjusting");
             return;
         }
         
