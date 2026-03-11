@@ -74,7 +74,7 @@ public class PlotCommand extends PyObject {
     
     public static final PyString __doc__ =
         new PyString("<html><H2>plot([index],x,y,z,[named parameters])</H2>"
-            + "plot (or plotx) plots the data or URI for data on the canvas.\n"
+            + "plot plots the data or URI for data on the canvas.\n"
             + "See https://autoplot.org/help.plotCommand<br>\n"
             + "<br><b>named parameters:</b>\n"
             + "<table>"
@@ -82,7 +82,7 @@ public class PlotCommand extends PyObject {
             + " <tr><td> [xyz]title </td><td>set the label for the axis.</td></tr>\n"
             + " <tr><td> index       </td><td>plot index\n</td></tr>"
             + " <tr><td> title       </td><td>title for the plot\n</td></tr>"
-            + " <tr><td> renderType  </td><td> explcitly set the render type, to scatter, series, nnSpectrogram, digital, etc\n</td></tr>"
+            + " <tr><td> renderType  </td><td> explicitly set the render type, to scatter, series, nnSpectrogram, digital, eventsBar, fillToZero, pitchAngleDistribution, contour, etc. See https://cottagesystems.com/~jbf/autoplot/doc/org/autoplot/RenderType.html\n</td></tr>"
             + " <tr><td> color      </td><td> the line colors.\n</td></tr>"
             + " <tr><td> fillColor   </td><td>the color when filling volumes.\n</td></tr>"
             + " <tr><td> colorTable  </td><td>the color table to use, like white_blue_black or black_red.\n</td></tr>"

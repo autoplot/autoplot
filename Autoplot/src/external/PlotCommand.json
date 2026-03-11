@@ -40,7 +40,7 @@
         },
         {
             "name": "renderType",
-            "description": "explcitly set the render type to scatter, series, nnSpectrogram, digital, eventsBar, etc"
+            "description": "explicitly set the render type, to scatter, series, nnSpectrogram, digital, eventsBar, fillToZero, pitchAngleDistribution, contour, etc. See https://cottagesystems.com/~jbf/autoplot/doc/org/autoplot/RenderType.html"
         },
         {
             "name": "color",
