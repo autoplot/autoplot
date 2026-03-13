@@ -92,7 +92,8 @@ public class Util {
      * return the build time an an ISO8601 time, or "????" if it is unknown.
      * Note question marks are used intentionally so sloppy codes can assume
      * that ???? means the current version of the code built in a debugger.
-     * @return ISO8601 time or "????"
+     * @return ISO8601 time in $Y-$m-$dT$H:$MZ or "????"
+     * @see org.autoplot.jythonsupport.Util#requireAutoplotScriptingVersion()
      */
     public static String getBuildTime() {
         String buildTime = "????";
