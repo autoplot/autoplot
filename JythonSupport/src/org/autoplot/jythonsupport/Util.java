@@ -109,6 +109,8 @@ public class Util {
      * reason versions should always be vNNN.NN.
      * @param v 
      * @throws IllegalArgumentException 
+     * @see org.das2.util.AboutUtil#getReleaseTag() 
+     * @see org.autoplot.Util#getBuildTime()
      */
     public static void requireAutoplotScriptingVersion(String v) {
         Pattern p= Pattern.compile("v(\\d+)\\.(\\d\\d)");
