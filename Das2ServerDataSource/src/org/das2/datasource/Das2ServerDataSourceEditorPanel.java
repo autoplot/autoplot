@@ -1116,7 +1116,8 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     }//GEN-LAST:event_editParamsButtonActionPerformed
 
     /**
-     * use an editor based on the DSDF content.
+     * use an editor based on the DSDF content.  See 
+     * https://github.com/das-developers/das2docs/wiki/Structured-Sub%E2%80%90values-for-Params
      */
     public void editDsdfContent() {
         Das2ServerGUI x = new Das2ServerGUI();
