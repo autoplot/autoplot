@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.util.LoggerManager;
+import org.das2.util.OsUtil;
 
 /**
  * Class for containing the elemental parts of a URI, and utility
@@ -153,7 +154,7 @@ public class URISplit {
 
     /**
      * ensure that the reference, which may be relative, is absolute.
-     * NOTE this is only implemented for unix filenames. TODO: Windows.
+     * Windows filenames with backslashes are rewritten as forward slashes.
      * For example:<ul>
      * <li>/tmp/,foo.dat &rarr; /home/t/foo.dat
      * <li>/tmp/,/home/jbf/foo.dat &rarr; /home/jbf/foo.dat
@@ -164,6 +165,10 @@ public class URISplit {
      */
     public static String makeAbsolute( String path, String suri ) {
         int i= suri.indexOf(':');
+        if ( OsUtil.isWindows() ) {
+            suri= suri.replaceAll("\\\\", "/");
+            path= path.replaceAll("\\\\", "/");
+        }
         if ( i==-1 ) { // it's a file.
             boolean isAbsolute= suri.startsWith("/");
             if ( !isAbsolute ) {
