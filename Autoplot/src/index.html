@@ -31,6 +31,7 @@
                 
         <p>Bugfixes (2026-03-16):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2808/">2808</a>: URISplit.makeAbsolute should support Windows
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2809/">2809</a>: old code looking get getParam('timerange',...) to detect time series browse capability in Jython scripts didn't like constraints like {"format":"$Y-$m-$d"}.
             <li><a href="https://github.com/das-developers/das2java/issues/8">8</a>: improve support for Das2Server DSDF parameters like sensor=@ as with <a href="https://planet.physics.uiowa.edu/das/das2Server?server=dsdf&dataset=Van_Allen_Probes/A/EMFISIS/L2/WFR_waveform-continuous-burst_psd">this DSDF</a>, and support <a href="https://planet.physics.uiowa.edu/das/das2Server?server=dsdf&dataset=Voyager/2/PWS/SpecAnalyzer-4s-Efield">three-argument boolean switches</a>.
             <li><a href="https://github.com/das-developers/das2java/issues/168">168</a>: Quiet warning message about "strange bug where update event didn't clear dirty flags, reposting" which can be ignored.  Thanks, Darrelle!
