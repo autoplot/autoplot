@@ -1371,11 +1371,11 @@ public class CdfUtil {
                 if ( ( xMaxRec>0 || !isMaster ) && xMaxRec==maxRec ) { // small kludge for CDAWeb, where we expect masters to be empty.
                     htmlDescription+= "=" + (xMaxRec);
                 }
-                if ( dep1desc.dep != null) {
+                if ( dep1desc.dep != null && dims.length>0 ) {
                     htmlDescription += "," + maybeShorten( svar, dep1desc.dep ) + "=" + dims[0] + ( dep1desc.rank2 ? "*": "" );
-                    if ( dep2desc.dep != null) {
+                    if ( dep2desc.dep != null && dims.length>1 ) {
                         htmlDescription += "," + maybeShorten( svar, dep2desc.dep ) + "=" + dims[1] + ( dep2desc.rank2 ? "*": "" );
-                        if (dep3desc.dep != null) {
+                        if (dep3desc.dep != null && dims.length>2 ) {
                             htmlDescription += "," + maybeShorten( svar, dep3desc.dep ) + "=" + dims[2] + ( dep3desc.rank2 ? "*": "" );
                         }
                     }
@@ -1468,11 +1468,11 @@ public class CdfUtil {
                 if ( ( xMaxRec>0 || !isMaster ) && xMaxRec==maxRec ) { // small kludge for CDAWeb, where we expect masters to be empty.
                     desc+= "=" + (xMaxRec);
                 }
-                if ( dep1desc.dep != null) {
+                if ( dep1desc.dep != null && dims.length>0 ) {
                     desc += "," + maybeShorten( svar, dep1desc.dep ) + "=" + dims[0] + ( dep1desc.rank2 ? "*": "" );
-                    if ( dep2desc.dep != null) {
+                    if ( dep2desc.dep != null && dims.length>1 ) {
                         desc += "," + maybeShorten( svar, dep2desc.dep ) + "=" + dims[1] + ( dep2desc.rank2 ? "*": "" );
-                        if (dep3desc.dep != null) {
+                        if (dep3desc.dep != null && dims.length>2 ) {
                             desc += "," + maybeShorten( svar, dep3desc.dep ) + "=" + dims[2] + ( dep3desc.rank2 ? "*": "" );
                         }
                     }
@@ -1725,11 +1725,11 @@ public class CdfUtil {
                 if ( ( xMaxRec>0 || !isMaster ) && xMaxRec==maxRec ) { // small kludge for CDAWeb, where we expect masters to be empty.
                     desc+= "=" + (xMaxRec);
                 }
-                if ( dep1desc.dep != null) {
+                if ( dep1desc.dep != null && dims.length>0 ) {
                     desc += "," + maybeShorten( svar, dep1desc.dep ) + "=" + dims[0] + ( dep1desc.rank2 ? "*": "" );
-                    if ( dep2desc.dep != null) {
+                    if ( dep2desc.dep != null && dims.length>1 ) {
                         desc += "," + maybeShorten( svar, dep2desc.dep ) + "=" + dims[1] + ( dep2desc.rank2 ? "*": "" );
-                        if (dep3desc.dep != null) {
+                        if (dep3desc.dep != null && dims.length>2 ) {
                             desc += "," + maybeShorten( svar, dep3desc.dep ) + "=" + dims[2] + ( dep3desc.rank2 ? "*": "" );
                         } else if ( rank>3 ) {
                             desc += "," + DataSourceUtil.strjoin( Arrays.copyOfRange(dims,2,dims.length),"," );
