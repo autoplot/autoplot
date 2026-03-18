@@ -29,17 +29,18 @@
 
         <p>Autoplot's development is guided by feedback from those using it.  Thanks for your feedback!</p>
                 
-        <p>Bugfixes (2026-03-16):</p>
+        <p>Bugfixes (2026-03-18):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2811/">2811</a>: Runtime error with CDF with incorrect dependencies now communicates problem to the scientist.  Thanks, Connor!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2808/">2808</a>: URISplit.makeAbsolute should support Windows
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2809/">2809</a>: old code looking get getParam('timerange',...) to detect time series browse capability in Jython scripts didn't like constraints like {"format":"$Y-$m-$d"}.
-            <li><a href="https://github.com/das-developers/das2java/issues/8">8</a>: improve support for Das2Server DSDF parameters like sensor=@ as with <a href="https://planet.physics.uiowa.edu/das/das2Server?server=dsdf&dataset=Van_Allen_Probes/A/EMFISIS/L2/WFR_waveform-continuous-burst_psd">this DSDF</a>, and support <a href="https://planet.physics.uiowa.edu/das/das2Server?server=dsdf&dataset=Voyager/2/PWS/SpecAnalyzer-4s-Efield">three-argument boolean switches</a>.
+            <li><a href="https://github.com/das-developers/das2java/issues/8">8</a>: improve support for Das2Server DSDF parameters like sensor=@ as with <a href="https://planet.physics.uiowa.edu/das/das2Server?server=dsdf&dataset=Van_Allen_Probes/A/EMFISIS/L2/WFR_waveform-continuous-burst_psd">this DSDF</a>, and support <a href="https://planet.physics.uiowa.edu/das/das2Server?server=dsdf&dataset=Voyager/2/PWS/SpecAnalyzer-4s-Efield">three-argument boolean switches</a>.  Thanks, Chris!
             <li><a href="https://github.com/das-developers/das2java/issues/168">168</a>: Quiet warning message about "strange bug where update event didn't clear dirty flags, reposting" which can be ignored.  Thanks, Darrelle!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2803/">2803</a>: Disable autolayout by default when running createPngWalk.  Thanks, Darrelle!
             <li>new RunBatchTool which can monitor a multi-machine batch run is compiled into the release.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2805/">2805</a>: Autolayout needs rewrite
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2789/">2789</a>: don't allow new code to accept "123" as column name, where data is used as a column name.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2804/">2804</a>: vap macro feature is barely described.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2804/">2804</a>: vap macro feature is barely described.  Thanks, Darrelle!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2803/">2803</a>: Disable autoLayout for the immediate interval where the DasCanvas is resetting.  Thanks, Darrelle!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2802/">2802</a>: Script parameter with default value is still included in "params" dictionary.  Thanks, Kristoff!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2801/">2801</a>: ASCII files read with regex parameter support aggregation.
@@ -74,8 +75,8 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>Introduce three- and four-argument append to make scripts more ledgible.
-            <li>Various improvements to Auralizor, including more precise location report.
+            <li>Introduce three- and four-argument append to make scripts more legible.
+            <li>Various improvements to Auralizor, including more precise location report.  Thanks, Erika!
             <li>Plot TopDecorator is drawn independently from the cache image to allow feedback without redo expensive rebuild of cache image.
             <li>Regression testing moved to new server, finally!
             <li>Add StringTools.spaces to use until Java 11 is the platform.
