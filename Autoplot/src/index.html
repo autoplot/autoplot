@@ -31,6 +31,7 @@
                 
         <p>Bugfixes (2026-03-18):</p>
         <ul>
+            <li>URISplit.makeAbsolute would assume colon in dust2025-01-28T22:35:12.420densZ.txt was a fully-qualified protocol (file:/...).  Verify protocol does not end in two digits.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2811/">2811</a>: Runtime error with CDF with incorrect dependencies now communicates problem to the scientist.  Thanks, Connor!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2808/">2808</a>: URISplit.makeAbsolute should support Windows
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2809/">2809</a>: old code looking get getParam('timerange',...) to detect time series browse capability in Jython scripts didn't like constraints like {"format":"$Y-$m-$d"}.
