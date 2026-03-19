@@ -721,6 +721,9 @@ public class JythonUtil {
                 traverse(((BinOp) sn).left);
                 traverse(((BinOp) sn).right);
 
+            } else if ( sn instanceof Subscript ) {
+                traverse(((Subscript) sn).value);
+                traverse(((Subscript) sn).slice);
             }
         }
 
@@ -1092,7 +1095,94 @@ public class JythonUtil {
         System.arraycopy( ss1, 0, ss, headerOffset, ss1.length );
         return ss;
     }
-
+    
+    /**
+     * Extracts the parts of the program that get parameters or take a trivial
+     * amount of time to execute.  This may call itself recursively when if
+     * blocks are encountered.  
+     * 
+     * This scans through, where acceptLine is the first line we'll accept
+     * to the currentLine, copying over script from acceptLine to currentLine.
+     * 
+     * See test038 (https://jfaden.net/jenkins/job/autoplot-test038/)
+     *
+     * @param stmts statements being processed.
+     * @param variableNames variable/procedure names that have been resolved.
+     * @param beginStatement the first statement being processed
+     * @param lastStatement INCLUSIVE last line of the script being processed.
+     * @param depth recursion depth, for debugging.
+     * @return
+     * @see SimplifyScriptSupport#simplifyScriptToGetCompletions(java.lang.String[], org.python.parser.ast.stmtType[], java.util.HashSet, int, int, int) 
+     */     
+    public static stmtType[] simplifyScriptToGetInterface( stmtType[] stmts, HashSet variableNames, 
+        int beginStatement, int lastStatement, int depth) {
+        List<stmtType> acceptedStatements= new ArrayList<>();
+        for (int istatement = beginStatement; istatement <= lastStatement; istatement++) {
+            stmtType o = stmts[istatement];
+            variableNames.contains("stopYYYYMMDD");
+            if ( o instanceof TryExcept ) {
+                //System.err.println("here try except");
+                continue;
+            } else if (o instanceof org.python.parser.ast.If) {
+                If iff = (If) o;
+                if (simplifyScriptToGetParamsCanResolve(iff.test, variableNames)) {
+                    stmtType[] body= simplifyScriptToGetInterface(iff.body,variableNames,0,iff.body.length,depth+1);
+                    iff.body= body;
+                }
+                if (iff.orelse != null && iff.orelse.length > 0) {
+                    stmtType[] orelse= simplifyScriptToGetInterface(iff.orelse,variableNames,0,iff.orelse.length,depth+1);     
+                    iff.orelse= orelse;
+                }
+            } else {
+                if (simplifyScriptToGetParamsOkay(o, variableNames)) {
+                    acceptedStatements.add(o);
+                } else if (isSetScriptCall(o, variableNames)) {
+                    acceptedStatements.add(o);
+                }
+            }
+        }
+        if ( acceptedStatements.isEmpty() ) {
+            return new stmtType[] { new org.python.parser.ast.Pass() };
+        } else {
+            return acceptedStatements.toArray( new stmtType[] {} );
+        }
+    }
+    
+    /**
+     * new refactor based on ChatGPT formatter.
+     * @param script
+     * @return 
+     */
+    public static String simplifyScriptToGetInterface( String script ) {
+        HashSet variableNames = new HashSet();
+        variableNames.add("getParam");  // this is what allows the getParam calls to be included.
+        variableNames.add("map");
+        variableNames.add("str");  // include casts.
+        variableNames.add("int");
+        variableNames.add("long");
+        variableNames.add("float");
+        variableNames.add("datum");
+        variableNames.add("datumRange");
+        variableNames.add("URI");
+        variableNames.add("URL");
+        variableNames.add("True");
+        variableNames.add("False");
+        variableNames.add("range");
+        variableNames.add("xrange");
+        variableNames.add("list");
+        variableNames.add("len");
+        variableNames.add("map");
+        variableNames.add("dict");
+        variableNames.add("zip");
+        variableNames.add("PWD");
+        variableNames.add("dom");
+        
+        Module n = (Module) org.python.core.parser.parse(script, "exec");
+        stmtType[] ss= simplifyScriptToGetInterface( n.body, variableNames, 0, n.body.length-1, 1 );
+        n.body= ss;
+        return new JythonSourceEmitter().toSource(n);
+    }
+    
     /**
      * Extracts the parts of the program that get parameters or take a trivial
      * amount of time to execute.  This may call itself recursively when if
