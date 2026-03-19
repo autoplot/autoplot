@@ -4,17 +4,8 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import static org.autoplot.jythonsupport.JythonToJavaConverter.TYPE_MAP;
-import static org.autoplot.jythonsupport.JythonToJavaConverter.TYPE_STRING;
 import org.python.parser.ast.Assign;
-import org.python.parser.ast.Index;
-import org.python.parser.ast.Name;
-import org.python.parser.ast.Slice;
-import org.python.parser.ast.Str;
-import org.python.parser.ast.Subscript;
 import org.python.parser.ast.exprType;
-import org.python.parser.ast.sliceType;
 
 /**
  * Best-effort source emitter for Jython 2.2 org.python.parser.ast trees.
