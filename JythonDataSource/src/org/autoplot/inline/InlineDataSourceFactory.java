@@ -215,6 +215,12 @@ public class InlineDataSourceFactory extends AbstractDataSourceFactory {
             if ( checkRejectGetDataSet( surl, problems, mon.getSubtaskMonitor("getDataSet calls") ) ) {
                 return true;
             }
+            int i= surl.indexOf("&timerange=");
+            if ( i>-1 && !surl.substring(i+1).contains("&") ) {
+                if ( i==11 ) { //vap+inline:&timerange=2025-01-28
+                    return true;
+                }
+            }
             return super.reject(surl, problems, mon.getSubtaskMonitor("super.reject") ); //To change body of generated methods, choose Tools | Templates.
         } finally {
             mon.finished();
