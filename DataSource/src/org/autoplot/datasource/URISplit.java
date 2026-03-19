@@ -158,22 +158,32 @@ public class URISplit {
      * For example:<ul>
      * <li>/tmp/,foo.dat &rarr; /tmp/foo.dat
      * <li>/tmp/,/home/jbf/foo.dat &rarr; /home/jbf/foo.dat
-     * <li>/tmp/,dust2025-01-28T22:35:12.420densZ.txt &rarr; /tmo/dust2025-01-28T22:35:12.420densZ.txt
+     * <li>/tmp/,dust2025-01-28T22:35:12.420densZ.txt &rarr; /tmp/dust2025-01-28T22:35:12.420densZ.txt
+     * <li>/tmp/,vap+hdf5:/home/jbf/foo.h5 &rarr; vap+hdf5:/home/jbf/foo.h5
      * </ul>
      * @param path the absolute directory.
      * @param suri the URI, which may be relative to path.
      * @return the absolute path
      */
     public static String makeAbsolute( String path, String suri ) {
-        int i= suri.indexOf(':');
         if ( OsUtil.isWindows() ) {
             suri= suri.replaceAll("\\\\", "/");
             path= path.replaceAll("\\\\", "/");
         }
+        int i= suri.indexOf(':');
         if ( i!=-1 ) {
             String proto= suri.substring(0,i);
-            if ( i==0 || Character.isDigit( proto.charAt(proto.length()-1) ) ) {
-                logger.fine("No protocol can end in digit.  Expect that this is actually a time.");
+            if ( i==1 ) {
+                if ( ! Character.isDigit( proto.charAt(0) ) ) {
+                    // Windows c:
+                    suri= "/"+suri;
+                } else {
+                    i=-1;
+                }
+            } else if ( i==0 ) {
+                i=-1; //don't know what it is but it isn't a proto like "vap+cdf:" or "https:"
+            } else if ( Character.isDigit( proto.charAt(proto.length()-2) ) && Character.isDigit( proto.charAt(proto.length()-1 ) ) ) {
+                logger.fine("No protocol can end in two digits.  Expect that this is actually a time."); // vap+hdf5:
                 i=-1;
             }
         }
@@ -183,7 +193,7 @@ public class URISplit {
                 String pwd= path;
                 if ( pwd.endsWith("/.") ) pwd= pwd.substring(0,pwd.length()-2);
                 if ( !pwd.endsWith("/")) {
-                    pwd= pwd + "/"; //TODO: Windows...
+                    pwd= pwd + "/"; 
                 }
                 suri= pwd + suri;
             }
