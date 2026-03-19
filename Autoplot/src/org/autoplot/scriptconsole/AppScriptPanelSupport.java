@@ -100,11 +100,14 @@ import org.autoplot.datasource.FileSystemUtil;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.jython.JythonDataSource;
 import org.autoplot.datasource.jython.JythonDataSourceFactory;
+import org.autoplot.dom.Application;
 import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
 import org.das2.util.ColorUtil;
 import org.das2.util.filesystem.GitCommand;
 import org.python.core.PyDictionary;
+import org.python.core.PyJavaInstance;
+import org.python.core.PyString;
 import org.python.parser.ast.Expr;
 import org.python.parser.ast.Str;
 import org.python.parser.ast.TryExcept;
@@ -738,6 +741,16 @@ public class AppScriptPanelSupport {
     private void setParametersStruct( InteractiveInterpreter interp, String s ) throws IOException {
         Map<String,org.autoplot.jythonsupport.Param> allParams=null;
         Map<String,Object> env= new HashMap<>();
+        
+        PyString pwd=(PyString)interp.get("PWD");
+        if ( pwd!=null ) {
+            env.put( "PWD", pwd.toString() );
+        }
+        
+        PyJavaInstance pydom= (PyJavaInstance)interp.get("dom");
+        if ( pydom!=null ) {
+            env.put( "dom", pydom.__tojava__(Application.class) );
+        }
                             
         s= JythonRefactory.fixImports(s);
         allParams= org.autoplot.jythonsupport.ui.Util.getParams(env, 
