@@ -156,8 +156,9 @@ public class URISplit {
      * ensure that the reference, which may be relative, is absolute.
      * Windows filenames with backslashes are rewritten as forward slashes.
      * For example:<ul>
-     * <li>/tmp/,foo.dat &rarr; /home/t/foo.dat
+     * <li>/tmp/,foo.dat &rarr; /tmp/foo.dat
      * <li>/tmp/,/home/jbf/foo.dat &rarr; /home/jbf/foo.dat
+     * <li>/tmp/,dust2025-01-28T22:35:12.420densZ.txt &rarr; /tmo/dust2025-01-28T22:35:12.420densZ.txt
      * </ul>
      * @param path the absolute directory.
      * @param suri the URI, which may be relative to path.
@@ -168,6 +169,13 @@ public class URISplit {
         if ( OsUtil.isWindows() ) {
             suri= suri.replaceAll("\\\\", "/");
             path= path.replaceAll("\\\\", "/");
+        }
+        if ( i!=-1 ) {
+            String proto= suri.substring(0,i);
+            if ( i==0 || Character.isDigit( proto.charAt(proto.length()-1) ) ) {
+                logger.fine("No protocol can end in digit.  Expect that this is actually a time.");
+                i=-1;
+            }
         }
         if ( i==-1 ) { // it's a file.
             boolean isAbsolute= suri.startsWith("/");
