@@ -724,6 +724,11 @@ public class JythonUtil {
             } else if ( sn instanceof Subscript ) {
                 traverse(((Subscript) sn).value);
                 traverse(((Subscript) sn).slice);
+            } else if ( sn instanceof Name ) {
+                if ( !simplifyScriptToGetParamsCanResolve( sn, names ) ) {
+                    visitNameFail= true;
+                    looksOkay = false;
+                }
             }
         }
 
