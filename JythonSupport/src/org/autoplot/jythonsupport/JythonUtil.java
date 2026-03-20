@@ -1833,6 +1833,11 @@ public class JythonUtil {
                     constraints.put("regex", regex);
                 }
                 
+                PyString glob= (PyString)getConstraintP( pyDict, new PyString("glob"), new PyString("") );
+                if ( glob.__len__()>0 ) {
+                    constraints.put("glob", glob);
+                }
+                
                 PyString stringType= (PyString)getConstraintP( pyDict, new PyString("stringType"), new PyString("") );
                 if ( stringType.__len__()>0 ) {
                     constraints.put("stringType", stringType);
