@@ -797,13 +797,13 @@ public final class AutoplotUI extends javax.swing.JFrame {
             public void actionPerformed( final ActionEvent ev ) { 
                 org.das2.util.LoggerManager.logGuiEvent(ev);                
                 final String value= dataSetSelector.getValue();
-                Pattern p= Pattern.compile("(http.*/hapi)(/?)(info\\?id=(.*))?");
+                Pattern p= Pattern.compile("(http.*/hapi)(/?)(info\\?(id|dataset)=(.*))?");
                 Matcher m= p.matcher(value);
                 final String newValue;
                 if ( m.matches() ) {
-                    String id= m.group(4);
+                    String id= m.group(5);
                     if ( id!=null ) {
-                        newValue= "vap+hapi:" + m.group(1) + m.group(2)+"?id="+ id;
+                        newValue= "vap+hapi:" + m.group(1) + "/" + m.group(3);
                     } else {
                         newValue= "vap+hapi:" + m.group(1);
                     }
