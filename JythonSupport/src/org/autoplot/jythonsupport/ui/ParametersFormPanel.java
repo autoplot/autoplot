@@ -757,18 +757,39 @@ public class ParametersFormPanel {
                                         @Override
                                         public String getDescription() {
                                             if ( stringType.equals("file") ) {
-                                                return "Files matching "+regex;
+                                                return "Files matching regex "+regex;
                                             } else {
-                                                return "Directories matching "+regex;
+                                                return "Directories matching regex "+regex;
                                             }
                                         }
-                                    };   
+                                    }; 
+                                } else if ( c.containsKey("glob") ) {
+                                    String glob= c.get("glob").toString();
+                                    String regex= org.das2.util.filesystem.Glob.globToRegex(glob);
+                                    Pattern p= Pattern.compile(regex);
+                                    filt= new FileFilter() {
+                                        @Override
+                                        public boolean accept(File f) {
+                                            return p.matcher(f.getPath()).matches();
+                                        }
+                                        @Override
+                                        public String getDescription() {
+                                            if ( stringType.equals("file") ) {
+                                                return "Files matching "+glob;
+                                            } else {
+                                                return "Directories matching "+glob;
+                                            }
+                                        }
+                                    }; 
                                 } else {
                                     filt=null;
                                 }
                                 b.addActionListener((ActionEvent e) -> {
                                     JFileChooser c1 = new JFileChooser();
-                                    if ( filt!=null ) c1.addChoosableFileFilter( filt );
+                                    if ( filt!=null ) {
+                                        c1.addChoosableFileFilter( filt );
+                                        c1.setFileFilter(filt);
+                                    }
                                     if ( stringType.equals("directory") ) {
                                         c1.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                                     }
