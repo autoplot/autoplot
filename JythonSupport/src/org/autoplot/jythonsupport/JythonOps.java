@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -18,6 +19,7 @@ import org.autoplot.datasource.FileSystemUtil;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
+import org.das2.util.filesystem.Glob;
 import org.python.core.Py;
 import org.python.core.PyArray;
 import org.python.core.PyDictionary;
@@ -37,14 +39,9 @@ import org.das2.qds.DataSetUtil;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.URISplit;
-import org.das2.datum.InconvertibleUnitsException;
 import org.das2.datum.TimeParser;
-import org.das2.datum.UnitsConverter;
-import org.das2.datum.UnitsUtil;
 import org.das2.jythoncompletion.JavadocLookup;
 import org.das2.qds.LDataSet;
-import org.das2.qds.LongWriteAccess;
-import org.das2.qds.SemanticOps;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.DataSetBuilder;
 import org.das2.util.JsonUtil;
@@ -506,9 +503,10 @@ public class JythonOps {
      * 
      * Constraints include:
      * <ul>
-     * <li>regex -- regular expression which must be matched.
-     * <li>min -- minimum value allowed, and for timerange parameter this is interpretted as time range.
-     * <li>max -- maximum value allowed, and for timerange parameter this is interpretted as time range.
+     * <li>regex -- regular expression (*\.cdf) which must be matched.
+     * <li>glob -- glob pattern (*.cdf) which much be matched.
+     * <li>min -- minimum value allowed, and for timerange parameter this is interpreted as time range.
+     * <li>max -- maximum value allowed, and for timerange parameter this is interpreted as time range.
      * <li>format -- if URI template with $Y etc, then reformat with this, if starts with % then reformat double.
      * <li>values -- list/array of allowed values
      * </ul>
@@ -521,28 +519,40 @@ public class JythonOps {
      */
     public static Object validateParam( String name, Object v, Map<String,Object> constraint ) {
         if ( name==null ) name="";
-        if ( constraint.containsKey("regex") ) {
-            if ( !Pattern.matches( (String)constraint.get("regex"), v.toString() ) ) {
-                throw new IllegalArgumentException(String.format("value does not match regular expression: %s %s",name,v));
+        String regex= (String)constraint.getOrDefault( "regex", "" );
+        if ( regex.length()>0 ) {
+            if ( !Pattern.matches( regex, v.toString() ) ) {
+                throw new IllegalArgumentException(String.format("value for %s does not match regex %s: %s",name,regex,v));
+            }
+        }
+        String glob= (String)constraint.getOrDefault( "glob", "" );
+        if ( glob.length()>0 ) {
+            regex= Glob.getRegex(glob);
+            if ( !Pattern.matches( regex, v.toString() ) ) {
+                throw new IllegalArgumentException(String.format("value for %s does not match glob %s: %s",name,glob,v));
             }
         }
         if ( name.equals("timerange") ) {
-            if ( constraint.containsKey("min") ) {
-                if ( Ops.datumRange(v).min().lt( Ops.datumRange(constraint.get("min")).min() ) ) {
-                    throw new IllegalArgumentException(String.format("value is less than minimum: %s %s",name,v));
+            String min= (String)constraint.getOrDefault("min", "" );
+            if ( min.length()>0 ) {
+                if ( Ops.datumRange(v).min().lt( Ops.datumRange(min).min() ) ) {
+                    throw new IllegalArgumentException(String.format("value for %s is less than min %s: %s",name,min,v));
                 }
             }
-            if ( constraint.containsKey("max") ) {
+            String max= (String)constraint.getOrDefault("max", "" );
+            if ( max.length()>0 ) {
                 if ( Ops.datumRange(v).max().gt( Ops.datumRange(constraint.get("max")).max() ) ) {
-                    throw new IllegalArgumentException(String.format("value is greater than maximum: %s %s",name,v));
+                    throw new IllegalArgumentException(String.format("value for %s is greater than max %s: %s",name,max,v));
                 }
             }
         } else {
-            if ( constraint.containsKey("min") && Ops.datum(v).lt( Ops.datum(constraint.get("min"))) ) {
-                throw new IllegalArgumentException(String.format("value is less than minimum: %s %s",name,v));
+            String min= (String)constraint.getOrDefault("min", "" );
+            if ( min.length()>0 && Ops.datum(v).lt( Ops.datum(min)) ) {
+                throw new IllegalArgumentException(String.format("value for %s is less than minimum %s: %s",name,min,v));
             }
-            if ( constraint.containsKey("max") && Ops.datum(v).gt( Ops.datum(constraint.get("max"))) ) {
-                throw new IllegalArgumentException(String.format("value is greater than maximum: %s %s",name,v));
+            String max= (String)constraint.getOrDefault("max", "" );
+            if ( constraint.containsKey("max") && Ops.datum(v).gt( Ops.datum(min)) ) {
+                throw new IllegalArgumentException(String.format("value for %s is greater than maximum %s: %s",name,max,v));
             }
         }
         if ( constraint.containsKey("format") ) {
