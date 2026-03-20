@@ -803,7 +803,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 if ( m.matches() ) {
                     String id= m.group(5);
                     if ( id!=null ) {
-                        newValue= "vap+hapi:" + m.group(1) + "/" + m.group(3);
+                        newValue= "vap+hapi:" + m.group(1) + "?id=" + m.group(5);
                     } else {
                         newValue= "vap+hapi:" + m.group(1);
                     }
