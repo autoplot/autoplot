@@ -450,7 +450,11 @@ public class JythonOps {
      * @see https://sourceforge.net/p/autoplot/bugs/2774/
      */
     public static Object validateParam( String name, Object v, String constraint ) {
-        return v;
+        if ( constraint.trim().length()==0 ) {
+            return v;
+        } else {
+            throw new IllegalArgumentException("constraint must be a list or a dictionary/Map");
+        }
     }
     
     /**
