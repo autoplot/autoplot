@@ -15,7 +15,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Continued fun with Taylor Swift wav example, now controls are visible.  Note using the same link lets push new functionality to you, using <a href="https://github.com/autoplot/dev/blob/master/demos/2026/20260309/sonify.jy">the same script</a>.</small></p>
+        <p><small>Autoplot quickly digitizes data in an image, using the crosshair digitizer and "C" keypress to copy the coordinates to the mouse paste buffer into a "vap+inline:" URI.  Happy Spring!</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -29,8 +29,10 @@
 
         <p>Autoplot's development is guided by feedback from those using it.  Thanks for your feedback!</p>
                 
-        <p>Bugfixes (2026-03-18):</p>
+        <p>Bugfixes (2026-03-20):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2817/">2817</a>: Improve support for HAPI 3.0, using new dataset parameter, and code will try "id" if "dataset" fails.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2815/">2815</a>: "symbol color and background are same warning" when color scatter
             <li>URISplit.makeAbsolute would assume colon in dust2025-01-28T22:35:12.420densZ.txt was a fully-qualified protocol (file:/...).  Verify protocol does not end in two digits.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2811/">2811</a>: Runtime error with CDF with incorrect dependencies now communicates problem to the scientist.  Thanks, Connor!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2808/">2808</a>: URISplit.makeAbsolute should support Windows
@@ -76,6 +78,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>HAPI server checks both dataset and id parameters with 3.x servers.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2814/">2814</a>: getParam constraints now have glob (like *.{cdf,CDF}) as well as regex.  GlobToRegex code rewritten by ChatGPT.
             <li>Introduce three- and four-argument append to make scripts more legible.
             <li>Various improvements to Auralizor, including more precise location report.  Thanks, Erika!
             <li>Plot TopDecorator is drawn independently from the cache image to allow feedback without redo expensive rebuild of cache image.
