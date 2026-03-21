@@ -42,12 +42,19 @@ public final class HapiSpec {
     protected static final String DATA_URL = "data";
     
     /**
-     * ID parameter of a URL, used in the info and data requests.
+     * ID parameter of a URL, used in the info and data requests, used 
      * @see https://github.com/hapi-server/data-specification#info
      * @see https://github.com/hapi-server/data-specification#data
      */
     protected static final String URL_PARAM_ID = "id";
 
+    /**
+     * The dataset parameter of a URL, used in the info and data requests for version 3 and newer servers.
+     * @see https://github.com/hapi-server/data-specification#info
+     * @see https://github.com/hapi-server/data-specification#data
+     */
+    protected static final String URL_PARAM_DATASET = "dataset";
+    
     /**
      * start time parameter of a URL, used in the data requests.
      * @see https://github.com/hapi-server/data-specification#data

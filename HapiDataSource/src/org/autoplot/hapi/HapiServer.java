@@ -351,6 +351,14 @@ public class HapiServer {
     private static Map<String,String> versions= new HashMap<>();
     private static Map<String,Long> versionFresh= new HashMap<>();
     
+    /**
+     * return the version reported by the HAPI server.  This will do a capabilities request and 
+     * keep the version cached for 600 seconds.  The server version is a semantic version.
+     * @param server the HAPI server
+     * @return the server version.
+     * @throws JSONException
+     * @throws IOException 
+     */
     public static String getHapiServerVersion( URL server ) throws JSONException, IOException {
         String sserver= server.toString();
         Long fresh= versionFresh.get(sserver);
@@ -376,7 +384,6 @@ public class HapiServer {
     public static URL getDataURL( URL server, String id, DatumRange tr, String parameters ) {
         TimeParser tp= TimeParser.create("$Y-$m-$dT$H:$M:$S.$(subsec;places=3)Z");
         HashMap<String,String> map= new LinkedHashMap();
-        map.put(HapiSpec.URL_PARAM_ID, id );
         String version;
         try {
             version= getHapiServerVersion(server);
@@ -386,9 +393,11 @@ public class HapiServer {
         if ( version.startsWith("2.") || version.startsWith("1.")) {
             map.put(HapiSpec.URL_PARAM_TIMEMIN, tp.format(tr.min()) );
             map.put(HapiSpec.URL_PARAM_TIMEMAX, tp.format(tr.max()) );
+            map.put(HapiSpec.URL_PARAM_ID, id );
         } else {
             map.put(HapiSpec.URL_PARAM_START, tp.format(tr.min()) );
             map.put(HapiSpec.URL_PARAM_STOP, tp.format(tr.max()) );            
+            map.put(HapiSpec.URL_PARAM_DATASET, id );        
         }
         if ( parameters.length()>0 ) {
             map.put(HapiSpec.URL_PARAM_PARAMETERS, parameters );
@@ -426,28 +435,62 @@ public class HapiServer {
         }
     }
 
-    public static JSONArray getParameters(URL server, String id) throws IOException, JSONException {
-        JSONObject o= getInfo( server, id );
+    /**
+     * return just the parameters for the server and dataset.
+     * @param server
+     * @param dataset
+     * @return JSONArray of parameters
+     * @throws IOException
+     * @throws JSONException 
+     */
+    public static JSONArray getParameters(URL server, String dataset) throws IOException, JSONException {
+        JSONObject o= getInfo( server, dataset );
         JSONArray catalog= o.getJSONArray(HapiSpec.PARAMETERS);
         return catalog;
+    }
+    
+    private static URL setQuery( URL url, String newQuery ) {
+        URL newUrl;
+        try {
+            newUrl = new URL(
+                    url.getProtocol(),
+                    url.getHost(),
+                    url.getPort(),
+                    url.getPath() + "?" + newQuery );
+        } catch (MalformedURLException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+        return newUrl;
     }
     
     /**
      * return the info as a JSONObject.
      * This should not be called from the event thread.
      * @param server HAPI server.
-     * @param id the parameter id.
+     * @param dataset the parameter id.
      * @return JSONObject containing information.
      * @throws IOException
      * @throws JSONException 
      */
-    public static JSONObject getInfo( URL server, String id) throws IOException, JSONException {
+    public static JSONObject getInfo( URL server, String dataset ) throws IOException, JSONException {
         if ( EventQueue.isDispatchThread() ) {
             logger.warning("HAPI network call on event thread");
         }
+        
+        String serverVersion;
+        try {
+            serverVersion = getHapiServerVersion(server);
+        } catch ( JSONException | IOException ex ) {
+            throw new RuntimeException(ex);
+        }
+        
         URL url;
         Map<String,String> params= new HashMap<>();
-        params.put( HapiSpec.URL_PARAM_ID, id );
+        if ( serverVersion.startsWith("1.") || serverVersion.startsWith("2.") ) {
+            params.put( HapiSpec.URL_PARAM_ID, dataset );
+        } else {
+            params.put( HapiSpec.URL_PARAM_DATASET, dataset );
+        }
         
         //// https://sourceforge.net/p/autoplot/feature-requests/696/
         //if ( server.toString().contains("http://hapi-server.org/servers/TestDataRef/hapi") ) {
@@ -458,6 +501,23 @@ public class HapiServer {
         logger.log(Level.FINE, "getInfo {0}", url.toString());
         String s= readFromURL(url, "json");
         JSONObject o= new JSONObject(s);
+        
+        if ( o.getJSONObject("status").getInt("code")!=1200 && serverVersion.startsWith("3.") ) { 
+            logger.log(Level.INFO, "Version 3 server fails to respond, trying alternate of dataset instead of id: {0}", url);
+            if ( url.getQuery().startsWith("id=") ) {
+                url= setQuery( url, "dataset="+url.getQuery().substring(3) );
+                s= readFromURL(url, "json");
+                try {
+                    JSONObject altO= new JSONObject(s);
+                    if ( altO.getJSONObject("status").getInt("code")==1200 ) {
+                        o= altO;
+                    }
+                } catch ( JSONException ex ) {
+                    logger.log(Level.INFO, "Version 3 server then fails to respond to: {0}", url);
+                }
+            }
+        }
+        
         return o;
     }
     
@@ -592,6 +652,29 @@ public class HapiServer {
         } else {
             s= s.append("/").append( append );
         }
+        
+        if ( append.equals("info") ) {
+            // Version 4 HAPI servers will not support id, and will use dataset instead.  Migrate the
+            // URL to the server version.
+            String serverVersion;
+            try {
+                serverVersion = getHapiServerVersion(server);
+            } catch ( JSONException | IOException ex ) {
+                throw new RuntimeException(ex);
+            }
+            if ( serverVersion.startsWith("1.") || serverVersion.startsWith("2.") ) {
+                if ( singletonMap.containsKey("dataset") ) {
+                    singletonMap= Collections.singletonMap( "id", singletonMap.get("dataset") );
+                }
+            } else if ( serverVersion.startsWith("3.") ) {
+            
+            } else {
+                if ( singletonMap.containsKey("id") ) {
+                    singletonMap= Collections.singletonMap( "dataset", singletonMap.get("id") );
+                }
+            }
+        }
+        
         if ( singletonMap!=null && !singletonMap.isEmpty() ) {
             boolean firstArg= true;
             for ( Entry<String,String> entry: singletonMap.entrySet() ) {
