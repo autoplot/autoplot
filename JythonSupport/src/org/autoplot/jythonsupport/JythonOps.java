@@ -527,31 +527,31 @@ public class JythonOps {
         }
         String glob= (String)constraint.getOrDefault( "glob", "" );
         if ( glob.length()>0 ) {
-            regex= Glob.getRegex(glob);
+            regex= Glob.globToRegex(glob);
             if ( !Pattern.matches( regex, v.toString() ) ) {
                 throw new IllegalArgumentException(String.format("value for %s does not match glob %s: %s",name,glob,v));
             }
         }
         if ( name.equals("timerange") ) {
-            String min= (String)constraint.getOrDefault("min", "" );
+            String min= constraint.getOrDefault("min", "" ).toString();
             if ( min.length()>0 ) {
                 if ( Ops.datumRange(v).min().lt( Ops.datumRange(min).min() ) ) {
                     throw new IllegalArgumentException(String.format("value for %s is less than min %s: %s",name,min,v));
                 }
             }
-            String max= (String)constraint.getOrDefault("max", "" );
+            String max= constraint.getOrDefault("max", "" ).toString();
             if ( max.length()>0 ) {
-                if ( Ops.datumRange(v).max().gt( Ops.datumRange(constraint.get("max")).max() ) ) {
+                if ( Ops.datumRange(v).max().gt( Ops.datumRange(max).max() ) ) {
                     throw new IllegalArgumentException(String.format("value for %s is greater than max %s: %s",name,max,v));
                 }
             }
         } else {
-            String min= (String)constraint.getOrDefault("min", "" );
+            String min= constraint.getOrDefault("min", "" ).toString();
             if ( min.length()>0 && Ops.datum(v).lt( Ops.datum(min)) ) {
                 throw new IllegalArgumentException(String.format("value for %s is less than minimum %s: %s",name,min,v));
             }
-            String max= (String)constraint.getOrDefault("max", "" );
-            if ( constraint.containsKey("max") && Ops.datum(v).gt( Ops.datum(min)) ) {
+            String max= constraint.getOrDefault("max", "" ).toString();
+            if ( constraint.containsKey("max") && Ops.datum(v).gt( Ops.datum(max)) ) {
                 throw new IllegalArgumentException(String.format("value for %s is greater than maximum %s: %s",name,max,v));
             }
         }
