@@ -300,9 +300,9 @@ public final class Das2ServerDataSource extends AbstractDataSource {
 
         if (sresolution != null) {
             if (sresolution.trim().length() == 0 || sresolution.equals("0")) {
-                minResolution = null;
+                resolution = null;
             } else {
-                minResolution = Units.seconds.parse(sresolution);
+                resolution = Units.seconds.parse(sresolution);
             }
         }
 
@@ -992,7 +992,8 @@ public final class Das2ServerDataSource extends AbstractDataSource {
 	}
  
     /**
-     * TODO: why are there two of these???
+     * There are two of these because one is used to form requests in the DataSourceFactory, and this 
+     * one is to handle times and resolutions once data is loaded.
      * @return TimeSeriesBrowse
      */
     public final TimeSeriesBrowse getTimeSeriesBrowse() {
