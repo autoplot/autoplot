@@ -74,6 +74,8 @@ public final class Das2ServerDataSource extends AbstractDataSource {
     private Exception offlineException= null;
     
     private Logger loggerUrl= org.das2.util.LoggerManager.getLogger( "das2.url" );
+
+    private static final Logger logger = LoggerManager.getLogger("apdss.das2server");
     
     public Das2ServerDataSource(URI uri) throws ParseException {
         super(uri);
@@ -151,8 +153,6 @@ public final class Das2ServerDataSource extends AbstractDataSource {
         }
 
     }
-
-    private static final Logger logger = LoggerManager.getLogger("apdss.das2server");
 
     DatumRange timeRange;
     
@@ -355,7 +355,7 @@ public final class Das2ServerDataSource extends AbstractDataSource {
                 d2sParams.put("params", URLEncoder.encode(dsParams, "US-ASCII"));
             }
         }
-        URL url2 = new URL("" + this.resourceURI + "?" + URISplit.formatParams(d2sParams));
+        URL dataResquestURL = new URL("" + this.resourceURI + "?" + URISplit.formatParams(d2sParams));
 
         //if ( interval!=null && tcaDesc==null ) {
         if (true) {
@@ -433,16 +433,16 @@ public final class Das2ServerDataSource extends AbstractDataSource {
                         Key key2 = authenticator.authenticate();
                         if (key2 != null) {
                             d2sParams.put("key", key2.toString());
-                            url2 = new URL("" + this.resourceURI + "?" + URISplit.formatParams(d2sParams));
+                            dataResquestURL = new URL("" + this.resourceURI + "?" + URISplit.formatParams(d2sParams));
                             keys.put(k, key2.toString());
                         }
                     } else {
                         d2sParams.put("key", t);
-                        url2 = new URL("" + this.resourceURI + "?" + URISplit.formatParams(d2sParams));
+                        dataResquestURL = new URL("" + this.resourceURI + "?" + URISplit.formatParams(d2sParams));
                     }
                 } else {
                     d2sParams.put("key", key1);
-                    url2 = new URL("" + this.resourceURI + "?" + URISplit.formatParams(d2sParams));
+                    dataResquestURL = new URL("" + this.resourceURI + "?" + URISplit.formatParams(d2sParams));
                 }
             }
 
@@ -450,7 +450,7 @@ public final class Das2ServerDataSource extends AbstractDataSource {
 
         boolean qds = "1".equals(dsdfParams.get("qstream"));
 
-        logger.log(Level.FINE, "opening {0} {1}", new Object[]{qds ? "as qstream" : "as das2stream", url2});
+        logger.log(Level.FINE, "opening {0} {1}", new Object[]{qds ? "as qstream" : "as das2stream", dataResquestURL});
 
         // Allow response bodies that are Das2 streams or QStreams to be processed
         // normally even when the HTTP Status code indicates an error.  This is to handle
@@ -460,7 +460,7 @@ public final class Das2ServerDataSource extends AbstractDataSource {
             if ( offlineException!=null  ) {
                 throw offlineException;
             }
-            in = getInputStream(url2, dataset);
+            in = getInputStream(dataResquestURL, dataset);
         } catch ( AccessDeniedException ex ) {
             offlineException= ex;
             throw offlineException;
@@ -512,7 +512,7 @@ public final class Das2ServerDataSource extends AbstractDataSource {
                 } else if (ex.getMessage().contains("No data found")) {
                     throw new org.das2.dataset.NoDataInIntervalException(ex.getMessage());
                 } else {
-                    throw new StreamException(ex.getMessage() + "\ndataset request was\n" + url2 + techContact);
+                    throw new StreamException(ex.getMessage() + "\ndataset request was\n" + dataResquestURL + techContact);
                 }
             }
         } else if ( useOldDas2SteamParser ) {
@@ -545,7 +545,7 @@ public final class Das2ServerDataSource extends AbstractDataSource {
                 } else if (ex.getMessage().contains("No data found")) {
                     throw new org.das2.dataset.NoDataInIntervalException(ex.getMessage());
                 } else {
-                    ex = new StreamException(ex.getMessage() + "\ndataset request was \n" + url2 + " " + techContact);
+                    ex = new StreamException(ex.getMessage() + "\ndataset request was \n" + dataResquestURL + " " + techContact);
                     logger.log(Level.INFO, ex.getMessage(), ex);
                     throw ex;
                 }
@@ -607,7 +607,7 @@ public final class Das2ServerDataSource extends AbstractDataSource {
                 } else if (ex.getMessage().contains("No data found")) {
                     throw new org.das2.dataset.NoDataInIntervalException(ex.getMessage());
                 } else {
-                    ex = new StreamException(ex.getMessage() + "\ndataset request was \n" + url2 + " " + techContact);
+                    ex = new StreamException(ex.getMessage() + "\ndataset request was \n" + dataResquestURL + " " + techContact);
                     logger.log(Level.INFO, ex.getMessage(), ex);
                     throw ex;
                 }
@@ -695,6 +695,8 @@ public final class Das2ServerDataSource extends AbstractDataSource {
                 MutablePropertyDataSet result2 = DataSetOps.makePropertiesMutable(result1);
                 result2.putProperty(prop, dep2);
                 return result2;
+            } else {
+                this.resolution= ct.getResolution();
             }
         } catch (IllegalArgumentException ex) {
             logger.log(Level.WARNING, ex.getMessage(), ex);
@@ -1032,7 +1034,9 @@ public final class Das2ServerDataSource extends AbstractDataSource {
                 }
                 String sparams = URISplit.formatParams(c);
                 //if ( dsParams!=null && dsParams.trim().length()>0 )  sparams+= "&" + dsParams; //TODO: Double-load was caused by extra & at the end.  It's silly to have it so sensitive.
-                return "vap+das2server:" + resourceURI + "?" + sparams;
+                String uri= "vap+das2server:" + resourceURI + "?" + sparams;
+                logger.log(Level.FINE, "tsb.getURI returns {0}", uri);
+                return uri;
             }
 
             @Override
