@@ -384,7 +384,11 @@ public class TimeSeriesBrowseController {
             QDataSet ds = this.dataSourceController.getDataSet();
             QDataSet dep0 = ds == null ? null : (QDataSet) ds.property(QDataSet.DEPEND_0);
             Object join0 = ds == null ? null : ds.property(QDataSet.JOIN_0);
-            CacheTag tag = dep0 == null ? null : (CacheTag) dep0.property(QDataSet.CACHE_TAG);
+            CacheTag tag= ds == null ? null : (CacheTag)ds.property(QDataSet.CACHE_TAG);
+            if ( tag==null && dep0!=null ) {
+                tag = (CacheTag) dep0.property(QDataSet.CACHE_TAG);
+            }
+            
             if ( tag==null && join0!=null )  {
                 if ( join0 instanceof QDataSet ) {
                     QDataSet qdsj= (QDataSet)join0;
