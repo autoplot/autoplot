@@ -155,6 +155,11 @@ public final class Das2ServerDataSource extends AbstractDataSource {
     private static final Logger logger = LoggerManager.getLogger("apdss.das2server");
 
     DatumRange timeRange;
+    
+    /**
+     * Resolution is the current requested resolution, based on the screen pixels.  It is not what the
+     * scientist has requested.
+     */
     Datum resolution;
     
     /**
@@ -260,7 +265,10 @@ public final class Das2ServerDataSource extends AbstractDataSource {
         //&ascii=1'
         mon.started();
 
-        Map<String, String> params2 = new LinkedHashMap();
+        /**
+         * parameters to be sent to the server
+         */
+        Map<String, String> d2sParams = new LinkedHashMap();
         
         // otherParams are the parameters to be interpretted by the dataset reader.
         Map<String, String> otherParams = new LinkedHashMap(params);
@@ -282,14 +290,14 @@ public final class Das2ServerDataSource extends AbstractDataSource {
 
         dsParams = (String) URISplit.formatParams(otherParams);
 
-        params2.put("server", "dataset");
+        d2sParams.put("server", "dataset");
         if (timeRange != null) {
             int[] timemin= TimeUtil.fromDatum( timeRange.min() );
             timemin[6]= (int)( Math.floor( timemin[6] / 1000000. ) ) * 1000000;
             int[] timemax= TimeUtil.fromDatum( timeRange.max() );
             timemax[6]= (int)( Math.ceil( timemax[6] / 1000000. ) ) * 1000000;
-            params2.put("start_time", URLEncoder.encode( TimeUtil.toDatum(timemin).toString(), "US-ASCII"));
-            params2.put("end_time", URLEncoder.encode(  TimeUtil.toDatum(timemax).toString(), "US-ASCII"));
+            d2sParams.put("start_time", URLEncoder.encode( TimeUtil.toDatum(timemin).toString(), "US-ASCII"));
+            d2sParams.put("end_time", URLEncoder.encode(  TimeUtil.toDatum(timemax).toString(), "US-ASCII"));
         } else {
             throw new IllegalArgumentException("timeRange is null");
         }
@@ -297,23 +305,23 @@ public final class Das2ServerDataSource extends AbstractDataSource {
         // optional explicit resolution
         String sresolution = params.get("_res");
         if (sresolution != null) {
-            params2.remove("_res");
+            d2sParams.remove("_res");
         }
         if ("true".equals(params.get("intrinsic"))) {
             sresolution = "0";
-            params2.remove("intrinsic");
+            d2sParams.remove("intrinsic");
         }
 
         if (sresolution != null) {
             if (sresolution.trim().length() == 0 || sresolution.equals("0")) {
-                resolution = null;
+                minResolution = null;
             } else {
-                resolution = Units.seconds.parse(sresolution);
+                minResolution = Units.seconds.parse(sresolution);
             }
         }
 
         if (resolution != null) {
-            params2.put("resolution", "" + resolution.doubleValue(Units.seconds));
+            d2sParams.put("resolution", "" + resolution.doubleValue(Units.seconds));
         } else {
             logger.fine("resolution is not available, loading at intrinsic resolution");
         }
@@ -347,21 +355,21 @@ public final class Das2ServerDataSource extends AbstractDataSource {
             String ifmt= String.format( "%d.%d", iinterval10 / 10, iinterval10 % 10 );
             String sinterval= URLEncoder.encode( ifmt, "US-ASCII");
             
-            params2.put("interval",sinterval);
-            params2.remove("resolution");
+            d2sParams.put("interval",sinterval);
+            d2sParams.remove("resolution");
         } else {
             logger.finer("dataset is not a TCA, interval parameter is null");
         }
 
-        params2.put("dataset", URLEncoder.encode(dataset, "US-ASCII"));
+        d2sParams.put("dataset", URLEncoder.encode(dataset, "US-ASCII"));
         if (dsParams.length() > 0) {
             if (dsParams.contains("+-") && !dsParams.startsWith("+")) {
-                params2.put("params", dsParams); // somebody already encoded it.
+                d2sParams.put("params", dsParams); // somebody already encoded it.
             } else {
-                params2.put("params", URLEncoder.encode(dsParams, "US-ASCII"));
+                d2sParams.put("params", URLEncoder.encode(dsParams, "US-ASCII"));
             }
         }
-        URL url2 = new URL("" + this.resourceURI + "?" + URISplit.formatParams(params2));
+        URL url2 = new URL("" + this.resourceURI + "?" + URISplit.formatParams(d2sParams));
 
         //if ( interval!=null && tcaDesc==null ) {
         if (true) {
@@ -438,17 +446,17 @@ public final class Das2ServerDataSource extends AbstractDataSource {
                         authenticator = new Authenticator(DasServer.create(this.resourceURI.toURL()), groupAccess);
                         Key key2 = authenticator.authenticate();
                         if (key2 != null) {
-                            params2.put("key", key2.toString());
-                            url2 = new URL("" + this.resourceURI + "?" + URISplit.formatParams(params2));
+                            d2sParams.put("key", key2.toString());
+                            url2 = new URL("" + this.resourceURI + "?" + URISplit.formatParams(d2sParams));
                             keys.put(k, key2.toString());
                         }
                     } else {
-                        params2.put("key", t);
-                        url2 = new URL("" + this.resourceURI + "?" + URISplit.formatParams(params2));
+                        d2sParams.put("key", t);
+                        url2 = new URL("" + this.resourceURI + "?" + URISplit.formatParams(d2sParams));
                     }
                 } else {
-                    params2.put("key", key1);
-                    url2 = new URL("" + this.resourceURI + "?" + URISplit.formatParams(params2));
+                    d2sParams.put("key", key1);
+                    url2 = new URL("" + this.resourceURI + "?" + URISplit.formatParams(d2sParams));
                 }
             }
 
@@ -686,8 +694,9 @@ public final class Das2ServerDataSource extends AbstractDataSource {
                     dep = (QDataSet) o;
                 }
             }
-            if (dep != null && dep.property(QDataSet.CACHE_TAG) == null) {
-                CacheTag ct;
+            CacheTag ct= (CacheTag) result1.property(QDataSet.CACHE_TAG);
+            if ( ct == null ) ct= (CacheTag) dep.property(QDataSet.CACHE_TAG);
+            if ( ct == null) {
                 if (SemanticOps.isBundle(result1)) {
                     QDataSet bounds = SemanticOps.bounds(dep);
                     ct = new CacheTag(DataSetUtil.asDatumRange(bounds.slice(1), true), resolution);
