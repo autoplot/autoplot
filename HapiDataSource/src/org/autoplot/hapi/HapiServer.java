@@ -499,14 +499,33 @@ public class HapiServer {
         
         url= HapiServer.createURL(server, HapiSpec.INFO_URL, params );
         logger.log(Level.FINE, "getInfo {0}", url.toString());
-        String s= readFromURL(url, "json");
-        JSONObject o= new JSONObject(s);
         
-        if ( o.getJSONObject("status").getInt("code")!=1200 && serverVersion.startsWith("3.") ) { 
+        JSONObject o=null;
+        IOException exKeep=null;
+        try {
+            String s= readFromURL(url, "json");
+            o = new JSONObject(s);
+        } catch ( IOException ex ) { // Old https://jfaden.net/HapiServerDemo/hapi fails to look for dataset.
+            exKeep= ex;
+            
+        }
+        
+        if ( o==null || o.getJSONObject("status").getInt("code")!=1200 && serverVersion.startsWith("3.") ) { 
             logger.log(Level.INFO, "Version 3 server fails to respond, trying alternate of dataset instead of id: {0}", url);
             if ( url.getQuery().startsWith("id=") ) {
                 url= setQuery( url, "dataset="+url.getQuery().substring(3) );
-                s= readFromURL(url, "json");
+                String s= readFromURL(url, "json");
+                try {
+                    JSONObject altO= new JSONObject(s);
+                    if ( altO.getJSONObject("status").getInt("code")==1200 ) {
+                        o= altO;
+                    }
+                } catch ( JSONException ex ) {
+                    logger.log(Level.INFO, "Version 3 server then fails to respond to: {0}", url);
+                }
+            } else if ( url.getQuery().startsWith("dataset=") ) {
+                url= setQuery( url, "id="+url.getQuery().substring(8) );
+                String s= readFromURL(url, "json");
                 try {
                     JSONObject altO= new JSONObject(s);
                     if ( altO.getJSONObject("status").getInt("code")==1200 ) {
@@ -516,6 +535,10 @@ public class HapiServer {
                     logger.log(Level.INFO, "Version 3 server then fails to respond to: {0}", url);
                 }
             }
+        }
+        
+        if ( o==null && exKeep!=null ) {
+            throw exKeep;
         }
         
         return o;
