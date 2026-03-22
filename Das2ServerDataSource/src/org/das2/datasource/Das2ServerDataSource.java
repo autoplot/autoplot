@@ -171,20 +171,6 @@ public final class Das2ServerDataSource extends AbstractDataSource {
     List<String> tcaDesc;
     Map<String,String> dsdfParams = null;
 
-    /**
-     * attempt to unbundle the name, return null if the data set is not found.
-     * @param ds
-     * @param item
-     * @return 
-     */
-    private static QDataSet tryUnbundle( QDataSet ds, String item ) {
-        try {
-            QDataSet ds1= Ops.unbundle( ds, item );
-            return ds1;
-        } catch ( IllegalArgumentException ex ) {
-            return null;
-        }
-    }
     
     /**
      * detects if the stream is sending progress information, and uses timetags to
@@ -782,6 +768,12 @@ public final class Das2ServerDataSource extends AbstractDataSource {
         return result;
     }
 
+    /**
+     * attempt to unbundle the name, return null if the data set is not found.
+     * @param ds
+     * @param item
+     * @return null or the item.
+     */
     private static QDataSet unbundleOrNull( QDataSet ds, String item ) {
         try {
             return Ops.unbundle( ds, item );        
