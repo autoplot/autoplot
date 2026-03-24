@@ -1449,7 +1449,7 @@ public class RunBatchTool extends javax.swing.JPanel {
     }
     
     private void saveFile( File f ) throws IOException, JSONException {
-        boolean newBatchFormat= System.getProperty("newBatchFileFormat","false").equals("true");
+        boolean newBatchFormat= System.getProperty("newBatchFileFormat","true").equals("true");
         
         JSONObject jo= new JSONObject();
         
