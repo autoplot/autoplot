@@ -888,6 +888,11 @@ public class RunBatchTool extends javax.swing.JPanel {
         goButton.setEnabled(false);
         activeFocusCB.setEnabled(true);
         messageLabel.setText("Setting up to run jobs...");
+        
+        String pp2= param2NameCB.getSelectedItem()!=null ?
+                    param2NameCB.getSelectedItem().toString().trim() :
+                    "";
+                
         Runnable run= () -> {
             try {
                 String scriptName= dataSetSelector1.getValue();
@@ -895,8 +900,9 @@ public class RunBatchTool extends javax.swing.JPanel {
                 Preferences prefs= RunBatchTool.this.prefs;
                 int threadCount= prefs.getInt(PREF_THREAD_COUNT,8);
                 if ( true ) {
-                    String warning="<html><p>Multiple processes can run at the same time, generally<br>"
-                            + "the number of threads should equal the number of CPU cores, beyond that<br>"
+                    String warning="<html><p>"
+                            + "Multiple processes can run at the same time, generally the<br>"
+                            + "number of threads should equal the number of CPU cores, beyond that<br>"
                             + "performance will probably not scale.  Note older versions of<br>"
                             + "Autoplot, before v2025a_6, did not support this fully.<br><br>"
                         + "Proceed?</p></html>";
@@ -909,15 +915,22 @@ public class RunBatchTool extends javax.swing.JPanel {
                     
                     JPanel p2= new JPanel();
                     p2.setLayout( new BoxLayout( p2, BoxLayout.X_AXIS ) );
-                    JTextField tf= new JFormattedTextField( threadCount );
-                    p2.add( new JLabel("Number of threads:") );
-                    p2.add( tf );
-                    int size= tf.getFont().getSize();
-                    tf.setMaximumSize( new Dimension( size*5, size*2 ) );
-                    tf.setPreferredSize( new Dimension( size*5, size*2 ) );
 
-                    p2.setAlignmentX( JPanel.LEFT_ALIGNMENT  );
+                    JTextField tf= new JFormattedTextField( threadCount );
+                        
+                    if ( pp2.trim().length()>0 ) {
+                        p2.add( new JLabel("Multi-parameter script can only be run with one thread.") );
+                        tf.setText("1");
+                        
+                    } else {
+                        p2.add( new JLabel("Number of threads:") );
+                        p2.add( tf );
+                        int size= tf.getFont().getSize();
+                        tf.setMaximumSize( new Dimension( size*5, size*2 ) );
+                        tf.setPreferredSize( new Dimension( size*5, size*2 ) );
+                    }
                     
+                    p2.setAlignmentX( JPanel.LEFT_ALIGNMENT  );
                     p.add( p2 );
                         
                     if ( JOptionPane.OK_OPTION==WindowManager.showConfirmDialog( param1NameCB, p, 
