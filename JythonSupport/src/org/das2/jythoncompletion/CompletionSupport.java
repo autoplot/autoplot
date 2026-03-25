@@ -112,7 +112,8 @@ public class CompletionSupport {
         Pattern pimport= Pattern.compile("\\s*from\\s+("+pp+")\\s+import\\s"+vvs+"\\s*");
         String code= editor.getText( 0, pos );
         String[] ss= code.split("\\n+");
-        for ( String s: ss ) {
+        for ( int iline=0; iline<ss.length; iline++ ) {
+            String s= ss[iline];               
             m= pimport.matcher(s);
             if ( m.matches() ) {
                 String pkg= m.group(1);
