@@ -365,7 +365,7 @@ public class UriTcaSource extends AbstractQFunction {
                         result= result1;
                         ((MutablePropertyDataSet)result).putProperty( QDataSet.UNITS, nonValueDs.property(QDataSet.UNITS) );
                     } else {
-                        if ( tsb.getTimeRange().contains(DataSetUtil.asDatum(d0)) ) {
+                        if ( DatumRangeUtil.sloppyContains( tsb.getTimeRange(), DataSetUtil.asDatum(d0)) ) {
                             BundleDataSet result1= new BundleDataSet( nonValueDs );
                             for ( int i=1; i<ds.length(0); i++ ) {
                                 result1.bundle(nonValueDs);
