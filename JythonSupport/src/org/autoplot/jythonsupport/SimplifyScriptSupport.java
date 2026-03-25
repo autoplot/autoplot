@@ -1103,7 +1103,7 @@ public class SimplifyScriptSupport {
                             + id + JythonCompletionTask.__CLASSTYPE + " = DataSource\n";
                 case "addMouseModule":
                     return "import org.das2.event.MouseModule\n" 
-                            + id + JythonCompletionTask.__CLASSTYPE + " = org.das2.event.MouseModule    # return type from " + funcName + " (spot line898)\n";
+                            + id + JythonCompletionTask.__CLASSTYPE + " = org.das2.event.BoxSelectorMouseModule    # return type from " + funcName + " (spot line898)\n";
                 case "createDataPointRecorder":
                     return "import org.das2.components.DataPointRecorder\n" 
                             + id + JythonCompletionTask.__CLASSTYPE + " = org.das2.components.DataPointRecorder    # return type from " + funcName + " (spot line898)\n";
