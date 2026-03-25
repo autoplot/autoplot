@@ -31,6 +31,7 @@
                 
         <p>Bugfixes (2026-03-20):</p>
         <ul>
+            <li>rte_2038937185: slice0, slice1, slice2, and slice3 didn't handle slice-at-datum properly when datum was past the end.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2818/">2818</a>: Correctly check if loaded data from Das2Server was sufficient resolution to satisfy request.  Thanks, Bill!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2817/">2817</a>: Improve support for HAPI 3.0, using new dataset parameter, and code will try "id" if "dataset" fails.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2815/">2815</a>: Don't show "symbol color and background are same warning" when color scatter is used.
@@ -79,6 +80,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li><a href="https://github.com/das-developers/das2java/issues/171">171</a>: improvements to mouse modules and drag renderers, see <a href="https://github.com/autoplot/dev/tree/master/demos/tools/slice">the demos</a>.
             <li>HAPI server checks both dataset and id parameters with 3.x servers.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2814/">2814</a>: getParam constraints now have glob (like *.{cdf,CDF}) as well as regex.  GlobToRegex code rewritten by ChatGPT.
             <li>Introduce three- and four-argument append to make scripts more legible.
