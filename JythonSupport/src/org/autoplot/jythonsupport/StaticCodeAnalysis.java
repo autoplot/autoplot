@@ -65,6 +65,7 @@ public class StaticCodeAnalysis {
             definedNamesApp.put("int",null);
             definedNamesApp.put("float",null);
             definedNamesApp.put("Exception",null);
+            definedNamesApp.put("isinstance",null);
             
             //TODO: more are needed, this is still experimental!
             InteractiveInterpreter interp= JythonUtil.createInterpreter(true);
