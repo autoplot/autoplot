@@ -77,7 +77,7 @@ public class CompletionSupport {
         
         // Note variables must be [a-zA-Z0-9_]+
         String vv= "[a-zA-Z0-9_]+";
-        String vvs= "([a-zA-Z0-9_]+)(,[a-zA-Z0-9_]+)*";
+        String vvs= "(([a-zA-Z0-9_]+)(,[a-zA-Z0-9_]+)*)";
         String pp= "[a-zA-Z0-9_\\.]+";
         
         String var; // this will be the variable name.
@@ -116,8 +116,10 @@ public class CompletionSupport {
             m= pimport.matcher(s);
             if ( m.matches() ) {
                 String pkg= m.group(1);
-                for ( int i=2; i<=m.groupCount(); i++ ) {
-                    importssss.put( m.group(i), pkg );
+                String symbols= m.group(2);
+                String[] syms= symbols.split(",",-2);
+                for (String sym : syms) {
+                    importssss.put(sym, pkg);
                 }
             }            
             m= passert.matcher(s);
