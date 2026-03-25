@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -73,21 +74,79 @@ public class CompletionSupport {
      * @throws javax.swing.text.BadLocationException
      */
     public static CompletionContext checkJavaSubClass( JTextComponent editor ) throws BadLocationException {
+        
+        // Note variables must be [a-zA-Z0-9_]+
+        String vv= "[a-zA-Z0-9_]+";
+        String vvs= "([a-zA-Z0-9_]+)(,[a-zA-Z0-9_]+)*";
+        String pp= "[a-zA-Z0-9_\\.]+";
+        
+        String var; // this will be the variable name.
+        String stuff; // what we are assigning to it.
+        
         // get the AST, check that we are in a routine which is a subclass (e.g. Painter), and get the Java types from it.
         int pos= editor.getCaretPosition();
         int i0= Utilities.getRowStart( editor, pos );
         //int i2= Utilities.getRowEnd( editor, pos );
         
         String line= editor.getText( i0, pos-i0 );
-        Pattern p= Pattern.compile("\\s*(g)\\.([a-zA-Z]*)");
+        Pattern p= Pattern.compile("\\s*("+vv+")\\.([a-zA-Z]*)");
         Matcher m= p.matcher(line);
         if ( m.matches() ) {
-            CompletionContext result= new CompletionContext( CompletionContext.CLASS_METHOD_NAME, m.group(1), m.group(2) );
-            result.setContextObjectClass( Graphics2D.class );
-            return result;
+            var= m.group(1);
+            stuff= m.group(2);
+            if ( var.equals("g") ) { // the biggest kludge in all completions!
+                CompletionContext result= new CompletionContext( CompletionContext.CLASS_METHOD_NAME, var, stuff );
+                result.setContextObjectClass( Graphics2D.class );
+                return result;
+            }
+        } else {
+            return null;
         }
         
+        // now let's look for assert isinstance..
+        Map<String,String> classTypes= new LinkedHashMap<>();
+        Map<String,String> importssss= new LinkedHashMap<>();
+
+        Pattern passert= Pattern.compile("\\s*assert\\s+isinstance\\(\\s*("+vv+")\\s*,\\s*("+pp+")\\s*\\)\\s*");
+        Pattern passign= Pattern.compile("\\s*("+vv+")\\s*=(.*)");
+        Pattern pimport= Pattern.compile("\\s*from\\s+("+pp+")\\s+import\\s"+vvs+"\\s*");
+        String code= editor.getText( 0, pos );
+        String[] ss= code.split("\\n+");
+        for ( String s: ss ) {
+            m= pimport.matcher(s);
+            if ( m.matches() ) {
+                String pkg= m.group(1);
+                for ( int i=2; i<=m.groupCount(); i++ ) {
+                    importssss.put( m.group(i), pkg );
+                }
+            }            
+            m= passert.matcher(s);
+            if ( m.matches() ) {
+                if ( importssss.containsKey(m.group(2)) ) {
+                    String path= importssss.get(m.group(2));
+                    classTypes.put( m.group(1), path + "." + m.group(2) );
+                }
+            }
+            m= passign.matcher(s);
+            if ( m.matches() ) {
+                classTypes.remove( m.group(1) ); // we don't know the type now that it's been reassigned.
+            }
+        }
+        
+        String clas= classTypes.get(var);
+        
+        if ( clas!=null ) {
+            CompletionContext result= new CompletionContext( CompletionContext.CLASS_METHOD_NAME, var, stuff );
+            try {
+                Class c= Class.forName(clas);
+                result.setContextObjectClass( c );
+                return result;
+            } catch ( ClassNotFoundException ex ) {
+                return null;
+            }
+        }
         return null;
+        
     }
     
     /**
