@@ -49,6 +49,7 @@ public class Annotation extends DomNode {
     }
 
     public void setUrl(String url) {
+        url= url.strip();
         String oldUrl = this.url;
         this.url = url;
         propertyChangeSupport.firePropertyChange(PROP_URL, oldUrl, url);
@@ -82,6 +83,7 @@ public class Annotation extends DomNode {
     }
 
     public void setFontSize(String fontSize) {
+        fontSize= fontSize.strip();
         String oldFontSize = this.fontSize;
         this.fontSize = fontSize;
         propertyChangeSupport.firePropertyChange(PROP_FONTSIZE, oldFontSize, fontSize);
@@ -185,6 +187,7 @@ public class Annotation extends DomNode {
     }
 
     public void setPointAtOffset(String pointAtOffset) {
+        pointAtOffset= pointAtOffset.strip();
         String oldPointAtOffset = this.pointAtOffset;
         this.pointAtOffset = pointAtOffset;
         propertyChangeSupport.firePropertyChange(PROP_POINTATOFFSET, oldPointAtOffset, pointAtOffset);
@@ -255,6 +258,7 @@ public class Annotation extends DomNode {
     }
 
     public void setAnchorOffset(String anchorOffset) {
+        anchorOffset= anchorOffset.strip();
         String oldAnchorOffset = this.anchorOffset;
         this.anchorOffset = anchorOffset;
         propertyChangeSupport.firePropertyChange(PROP_ANCHOROFFSET, oldAnchorOffset, anchorOffset);
@@ -396,6 +400,7 @@ public class Annotation extends DomNode {
     }
 
     public void setRowId(String rowId) {
+        rowId= rowId.strip();
         String oldRowId = this.rowId;
         this.rowId = rowId;
         propertyChangeSupport.firePropertyChange(PROP_ROWID, oldRowId, rowId);
@@ -409,6 +414,7 @@ public class Annotation extends DomNode {
     }
 
     public void setColumnId(String columnId) {
+        columnId= columnId.strip();
         String oldColumnId = this.columnId;
         this.columnId = columnId;
         propertyChangeSupport.firePropertyChange(PROP_COLUMNID, oldColumnId, columnId);
