@@ -29,8 +29,10 @@
 
         <p>Autoplot's development is guided by feedback from those using it.  Thanks for your feedback!</p>
                 
-        <p>Bugfixes (2026-03-20):</p>
+        <p>Bugfixes (2026-03-25):</p>
         <ul>
+            <li>Annotation string properties where "" means off now call strip to allow " " to be used carelessly.
+            <li>Run Batch Tool .batch files use new format by default.  This output will not be handled by Autoplots older than v2026a_2.
             <li>rte_2038937185: slice0, slice1, slice2, and slice3 didn't handle slice-at-datum properly when datum was past the end.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2818/">2818</a>: Correctly check if loaded data from Das2Server was sufficient resolution to satisfy request.  Thanks, Bill!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2817/">2817</a>: Improve support for HAPI 3.0, using new dataset parameter, and code will try "id" if "dataset" fails.
