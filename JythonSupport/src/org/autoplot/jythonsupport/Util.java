@@ -54,7 +54,11 @@ import org.autoplot.datasource.DataSourceFactory;
 import org.autoplot.datasource.DataSourceUtil;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
+import org.das2.datum.TimeUtil;
+import static org.das2.datum.TimeUtil.parseTime;
+import static org.das2.datum.TimeUtil.toDatum;
 import org.das2.qds.ops.Ops;
+import org.das2.util.AboutUtil;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystemUtil;
 import org.das2.util.monitor.AlertNullProgressMonitor;
@@ -140,7 +144,26 @@ public class Util {
         }
     }
 
-    
+    /**
+     * Ensure that this Autoplot was built as of a certain time, which is often simpler than 
+     * using versions.
+     * @param isotime time string, for example "2026-03-25T00:00Z"
+     * @throws java.text.ParseException if the time cannot be parsed
+     */
+    public static void requireAutoplotBuildTime(String isotime) throws ParseException {
+        String buildTime= AboutUtil.getBuildTime();
+        if ( "???".equals(buildTime) ) {
+            logger.fine("build time cannot be established, assuming build on the HEAD code.");
+        } else {
+            TimeUtil.TimeStruct ts= parseTime(isotime);
+            String requiredBuildTime= TimeParser.create("$Y-$m-$dT$H:$MZ").format( toDatum(ts) );
+            if ( buildTime.compareTo(requiredBuildTime)<0 ) {
+                String msg= 
+                    String.format( "Autoplot build time (%s) is before required build time (%s).", buildTime, requiredBuildTime );
+                throw new IllegalArgumentException(msg);
+            }
+        }
+    }
     /**
      * load the data specified by URI into Autoplot's internal data model.  This will
      * block until the load is complete, and a ProgressMonitor object can be used to
