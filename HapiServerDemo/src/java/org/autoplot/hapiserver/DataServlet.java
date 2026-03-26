@@ -122,9 +122,9 @@ public class DataServlet extends HttpServlet {
         Util.setHapiHome( new File( HAPI_SERVER_HOME ) );
             
         Map<String,String[]> params= new HashMap<>( request.getParameterMap() );
-        String dataset= getParam( params,"id",null,"The identifier for the resource.", null );
-        if ( dataset==null ) {
-            dataset= getParam( params,"dataset",null,"The identifier for the resource.", null );
+        String dataset= getParam( params,"dataset","","The identifier for the resource.", null );
+        if ( dataset.length()==0 ) {
+            dataset= getParam( params,"id",null,"The identifier for the resource.", null );
         }
         String timeMin= getParam( params, "time.min", "", "The earliest value of time to include in the response.", null );
         String timeMax= 
