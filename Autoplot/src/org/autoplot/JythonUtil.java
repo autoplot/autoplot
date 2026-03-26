@@ -199,6 +199,12 @@ public class JythonUtil {
      */
     public static void runScript( Application dom, InputStream in, String name, String[] argv, String pwd ) throws IOException {    
         
+        if ( name!=null ) {
+            URISplit split= URISplit.parse(name);
+            if ( split.params!=null ) {
+                throw new IllegalArgumentException("name cannot contain params");
+            }
+        }
         if ( argv==null ) argv= new String[] {};
         
         String[] pyInitArgv= new String[ argv.length+1 ];
