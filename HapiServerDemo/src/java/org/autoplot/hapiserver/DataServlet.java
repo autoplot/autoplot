@@ -122,7 +122,10 @@ public class DataServlet extends HttpServlet {
         Util.setHapiHome( new File( HAPI_SERVER_HOME ) );
             
         Map<String,String[]> params= new HashMap<>( request.getParameterMap() );
-        String id= getParam( params,"id",null,"The identifier for the resource.", null );
+        String dataset= getParam( params,"id",null,"The identifier for the resource.", null );
+        if ( dataset==null ) {
+            dataset= getParam( params,"dataset",null,"The identifier for the resource.", null );
+        }
         String timeMin= getParam( params, "time.min", "", "The earliest value of time to include in the response.", null );
         String timeMax= 
             getParam( params, "time.max", "", "Include values of time up to but not including this time in the response.", null );
@@ -142,19 +145,19 @@ public class DataServlet extends HttpServlet {
             throw new ServletException("unrecognized parameters: "+params);
         }
         
-        logger.log(Level.FINE, "data request for {0} {1}/{2}", new Object[]{id, timeMin, timeMax});
+        logger.log(Level.FINE, "data request for {0} {1}/{2}", new Object[]{dataset, timeMin, timeMax});
         
         DataFormatter dataFormatter;
         if ( format.equals("binary") ) {
             response.setContentType("application/binary");
             dataFormatter= new BinaryDataFormatter();
             response.setHeader("Content-disposition", "attachment; filename="
-                + Ops.safeName(id) + "_"+timeMin+ "_"+timeMax + ".bin" );
+                + Ops.safeName(dataset) + "_"+timeMin+ "_"+timeMax + ".bin" );
         } else {
             response.setContentType("text/csv;charset=UTF-8");  
             dataFormatter= new CsvDataFormatter();
             response.setHeader("Content-disposition", "attachment; filename=" 
-                + Ops.safeName(id) + "_"+timeMin+ "_"+timeMax + ".csv" ); 
+                + Ops.safeName(dataset) + "_"+timeMin+ "_"+timeMax + ".csv" ); 
         }
         
         
@@ -173,8 +176,8 @@ public class DataServlet extends HttpServlet {
 
         RecordIterator dsiter;
         
-        if ( !( HapiServerSupport.getCatalogIds().contains(id) ) ) {
-            Util.raiseBadId(id, response, response.getWriter() );
+        if ( !( HapiServerSupport.getCatalogIds().contains(dataset) ) ) {
+            Util.raiseBadId(dataset, response, response.getWriter() );
             return;
         }
         
@@ -196,7 +199,7 @@ public class DataServlet extends HttpServlet {
         boolean allowCache= false; //dataFormatter instanceof CsvDataFormatter;
         if ( allowCache ) {
             File dataFileHome= new File( Util.getHapiHome(), "cache" );
-            dataFileHome= new File( dataFileHome, Util.fileSystemSafeName(id) );
+            dataFileHome= new File( dataFileHome, Util.fileSystemSafeName(dataset) );
             if ( dataFileHome.exists() ) {
                 FileStorageModel fsm= FileStorageModel.create( FileSystem.create(dataFileHome.toURI()), "$Y/$m/$Y$m$d.csv.gz" );
                 File[] files= fsm.getFilesFor(dr); 
@@ -221,20 +224,20 @@ public class DataServlet extends HttpServlet {
         if ( dataFiles==null ) {
             try {
                 logger.log(Level.FINER, "data files is null at {0} ms.", System.currentTimeMillis()-t0);
-                dsiter= checkAutoplotSource( id, dr, allowStream );
+                dsiter= checkAutoplotSource( dataset, dr, allowStream );
                 logger.log(Level.FINER, "done checkAutoplotSource at {0} ms.", System.currentTimeMillis()-t0);
                 if ( dsiter==null ) {
                     File dataFileHome= new File( Util.getHapiHome(), "data" );
-                    File dataFile= new File( dataFileHome, Util.fileSystemSafeName(id)+".csv" );
+                    File dataFile= new File( dataFileHome, Util.fileSystemSafeName(dataset)+".csv" );
                     if ( dataFile.exists() ) {
                         dataFiles= new File[] { dataFile };
                     } else {
-                        if ( id.equals("0B000800408DD710.noStream") ) {
+                        if ( dataset.equals("0B000800408DD710.noStream") ) {
                             logger.log(Level.FINER, "noStream demo shows without streaming" );
                             dsiter= new RecordIterator( // allow Autoplot to select
                                 "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/0B000800408DD710.$Y$m$d.d2s", dr, false ); 
                         } else {
-                            throw new IllegalArgumentException("bad id: "+id+", data file does not exist: "+dataFile );
+                            throw new IllegalArgumentException("bad id: "+dataset+", data file does not exist: "+dataFile );
                         }
                     }
                 } else {
@@ -287,7 +290,7 @@ public class DataServlet extends HttpServlet {
         
         try {
 
-            jo0= InfoServlet.getInfo( id );
+            jo0= InfoServlet.getInfo( dataset );
             int[] indexMap=null;
             
             if ( !parameters.equals("") ) {
@@ -345,7 +348,7 @@ public class DataServlet extends HttpServlet {
             boolean proceed= true;
             
             File dataFileHome= new File( Util.getHapiHome(), "cache" );
-            dataFileHome= new File( dataFileHome, id );
+            dataFileHome= new File( dataFileHome, dataset );
             if ( !dataFileHome.exists() ) {
                 if ( !dataFileHome.mkdirs() ) {
                     logger.log(Level.FINE, "unable to mkdir {0}", dataFileHome);
