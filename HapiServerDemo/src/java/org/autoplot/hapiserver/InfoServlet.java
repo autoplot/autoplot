@@ -106,7 +106,7 @@ public class InfoServlet extends HttpServlet {
         status.put( "message", "OK request successful");
                 
         o.put( "status", status );
-        o.put( "x_infoVersion__", "20210715.1" );
+        o.put( "x_infoVersion__", "20260325.1" );
         return o;
 
     }
@@ -126,11 +126,16 @@ public class InfoServlet extends HttpServlet {
         String HAPI_SERVER_HOME= getServletContext().getInitParameter("HAPI_SERVER_HOME");
         Util.setHapiHome( new File( HAPI_SERVER_HOME ) );
             
-        String id= request.getParameter("id");
+        String dataset= request.getParameter("dataset");
         
-        logger.log(Level.FINE, "info request for {0}", id);
+        if ( dataset==null ) {
+            dataset= request.getParameter("id");
+        }
         
-        if ( id==null ) throw new ServletException("required parameter 'id' is missing from request");
+        
+        logger.log(Level.FINE, "info request for {0}", dataset);
+        
+        if ( dataset==null ) throw new ServletException("required parameter 'dataset' is missing from request");
         
         response.setContentType("application/json;charset=UTF-8");        
         
@@ -140,7 +145,7 @@ public class InfoServlet extends HttpServlet {
         
         try (PrintWriter out = response.getWriter()) {
            try {
-               JSONObject jo= getInfo( id );
+               JSONObject jo= getInfo( dataset );
                String parameters= request.getParameter("parameters");
                if ( parameters!=null) {
                    jo= Util.subsetParams(jo,parameters);
@@ -148,9 +153,9 @@ public class InfoServlet extends HttpServlet {
                String s= jo.toString(4);
                out.write(s);
            } catch ( IllegalArgumentException ex ) {
-               Util.raiseBadId(id, response, out);
+               Util.raiseBadId(dataset, response, out);
            } catch ( FileNotFoundException ex ) {
-               Util.raiseMisconfiguration( id, ex, response, out );
+               Util.raiseMisconfiguration( dataset, ex, response, out );
            }
         } catch ( JSONException ex ) {
             throw new ServletException(ex);
