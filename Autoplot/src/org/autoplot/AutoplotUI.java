@@ -5297,7 +5297,39 @@ APSplash.checkTime("init 230");
                         }
                     }
                 }
-
+                
+                if ( script_.length()>0 ) {
+                    // Any parameters in the script URI are interpretted as script argv params.
+                    URISplit split= URISplit.parse(script_);
+                    if ( split.params!=null ) {
+                        Map<String,String> sa= URISplit.parseParams(split.params);
+                        int iarg=0;
+                        for ( int i=0; i<scriptArgs.size(); i++ ) {
+                            String sa1= scriptArgs.get(i);
+                            int ieq= sa1.indexOf("=");
+                            if ( ieq==-1 ) {
+                                sa.put(sa1.substring(0,ieq), sa1.substring(ieq+1));
+                            } else {
+                                sa.put("arg_"+iarg, sa1);
+                                iarg++;
+                            }
+                        }
+                        if ( !scriptArgs.isEmpty() ) {
+                            throw new IllegalArgumentException("script URI contains parameter values, so there can be no more script arguments after");
+                        }
+                        iarg=0;
+                        for ( Entry<String,String> e: sa.entrySet() ) {
+                            if ( e.getKey().equals("arg_"+iarg) ) {
+                                scriptArgs.add(iarg, e.getValue());
+                                iarg++;
+                            } else {
+                                scriptArgs.add(iarg, e.getKey()+"="+e.getValue());
+                            }
+                        }
+                        script_= split.file;
+                    }
+                }
+                
                 final String script= script_;
                 
                 if ( !script.equals("") ) {
