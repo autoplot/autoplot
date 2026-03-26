@@ -194,6 +194,7 @@ public class HapiServerSupport {
         try {
             File catalogFile= new File( Util.getHapiHome(), "catalog.json" );
             JSONObject catalog= readJSON(catalogFile);
+            catalog.put("HAPI",Util.hapiVersion());
             return catalog;
         } catch ( IllegalArgumentException ex ) {
             throw new IllegalArgumentException("Util.HAPI_HOME is not set, which might be because the root (hapi/index.jsp) was never loaded.");

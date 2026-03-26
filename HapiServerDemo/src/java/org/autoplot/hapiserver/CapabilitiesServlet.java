@@ -70,16 +70,6 @@ public class CapabilitiesServlet extends HttpServlet {
         response.setHeader("Access-Control-Allow-Methods","GET" );
         response.setHeader("Access-Control-Allow-Headers","Content-Type" );
         
-        File capFile= new File( Util.getHapiHome(), "capabilities.json" );
-        if ( capFile.exists() ) {
-            String s= FileUtil.readFileToString(capFile);
-            if ( !Util.validateJSON(s) ) {
-                throw new ServletException("Internal error, JSON file for capabilities does not parse.");
-            }
-            logger.log(Level.FINE, "using cached capabilities file {0}", capFile);
-            Util.transfer( new FileInputStream(capFile), response.getOutputStream() );
-            return;
-        }
         try (PrintWriter out = response.getWriter()) {
             JSONObject jo= new JSONObject();
             jo.put("HAPI",Util.hapiVersion());

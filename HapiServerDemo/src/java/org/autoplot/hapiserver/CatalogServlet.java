@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +27,13 @@ public class CatalogServlet extends HttpServlet {
     private static final Logger logger= Logger.getLogger("hapi");    
     
     private static final String deployedAt= TimeParser.create( TimeParser.TIMEFORMAT_Z ).format( TimeUtil.now() );
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        Util.maybeInitialize(config.getServletContext());
+    }
+    
+    
     /**
      * return the JSONObject for the catalog.
      * @return
@@ -57,20 +65,17 @@ public class CatalogServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
         response.setContentType("application/json;charset=UTF-8");
                 
         response.setHeader("Access-Control-Allow-Origin", "* " );
         response.setHeader("Access-Control-Allow-Methods","GET" );
         response.setHeader("Access-Control-Allow-Headers","Content-Type" );
         
-        File catalogFile= new File( Util.getHapiHome(), "catalog.json" );
-        if ( catalogFile.exists() ) {
-            logger.log(Level.FINE, "using cached catalog file {0}", catalogFile);
-            Util.transfer( new FileInputStream(catalogFile), response.getOutputStream() );
-            return;
-        }
         try (PrintWriter out = response.getWriter()) {
             JSONObject jo= getCatalog();
+            jo.put("HAPI", Util.hapiVersion() );
+                    
             out.write( jo.toString(4) );
             
         } catch ( JSONException ex ) {
