@@ -106,7 +106,7 @@ public class Util {
      * @return the HAPI protocol version.
      */
     public static final String hapiVersion() {
-        return "3.0";
+        return "3.2";
     }
     
     /**
@@ -114,7 +114,7 @@ public class Util {
      * @return the server implementation version. 
      */
     public static final String serverVersion() {
-        return "20220212.1011";
+        return "2026.03.25";
     }
     
     /**
