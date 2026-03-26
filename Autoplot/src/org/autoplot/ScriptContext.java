@@ -975,7 +975,7 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
      * @see org.das2.event.BoxSelectionEvent for the methods of the event.
      * 
      */
-    public static MouseModule addMouseModule( Plot plot, String label, final PyFunction listener ) {
+    public static BoxSelectorMouseModule addMouseModule( Plot plot, String label, final PyFunction listener ) {
         
         DasPlot p= plot.getController().getDasPlot();
         BoxSelectorMouseModule mm= new BoxSelectorMouseModule( p, p.getXAxis(), p.getYAxis(), null, new BoxRenderer(p,true), label );
