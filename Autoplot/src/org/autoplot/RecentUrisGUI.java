@@ -245,7 +245,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
             if ( filt!=null && filt.length()==0 ) filt=null;
             if ( filt!=null ) filt= filt.toLowerCase();
             if ( filt!=null ) { // make into regex
-                filt= "(?i)"+ Glob.getRegex(filt);
+                filt= "(?i)"+ Glob.globToRegex(filt);
                 filtPattern= Pattern.compile(filt);
             }
             long tzOffsetMs= Calendar.getInstance().getTimeZone().getRawOffset();
