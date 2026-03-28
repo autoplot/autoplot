@@ -15,7 +15,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Playing with <a href="https://github.com/autoplot/dev/blob/master/demos/2026/20260324/lavaLamp.jyds">Lava Lamp script</a> written by ChatGPT.</small></p>
+        <p><small>Studying resolution of camera vs scanner, getting ready to scan family albums.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,6 +30,10 @@
         <p>Autoplot's development is guided by feedback from those using it.  Thanks for your feedback!</p>
                 
         <p>Bugfixes (2026-03-25):</p>
+        <ul>
+            <li>New code for glob to regex added ^ and $ constraints, which the old implementation did not.
+        </ul>
+        <p>Older Bugfixes (2026-02-16):</p>
         <ul>
             <li>Allow arguments in script command line like --script=multiParamGraphic.jy?ncenter=5&amp;radius=1
             <li>Annotation string properties where "" means off now call strip to allow " " to be used carelessly.
@@ -58,30 +62,10 @@
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2798/">2798</a>: Be more aggressive about keeping invalid datum ranges out of the DOM.
             <li>LogConsole mishandled log message entering(source,method,arg1,arg2)
         </ul>
-        <p>Older Bugfixes (2026-02-16):</p>
-        <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2795/">2795</a>: ScriptPanelSupport brought back in because one of the GIT scripts is using the deprecated class.
-            <li>"Set script title" dialog should appear above the script.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2793/">2793</a>: Remove "log console initialized" message because it is self-evident and now breaks Jemmy testing.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2792/">2792</a>: Correct window position code when two monitors are used, total size wasn't accounted for.  Thanks, Chris!
-            <li><a href="https://github.com/das-developers/das2java/issues/164">164</a>: Das2Stream slice of peaks and averages should be conveyed as a bundle of peaks and average, not using BIN_MAX, to match old parser.  Thanks, Chris!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2788/">2788</a>: Don't use "scan" when multiple plot elements, not from one family (Bx,By,Bz), are used.  Thanks, Ivar!                
-            <li><a href="https://github.com/das-developers/das2java/issues/164">164</a>: HugeScatter shows limits as well as Series.  WARN is drawn after NOMINAL, not before.  In the case where they overlap, WARN implies NOMINAL.  Thanks, Chris!
-            <li><a href="https://github.com/das-developers/das2java/issues/164">164</a>: Das2Stream yWarn and yNominal are supported.  New Das2Stream to QDataSet parser is used by default.  Thanks, Chris!
-            <li><a href="https://github.com/das-developers/das2java/issues/164">164</a>: Das2Stream to QDataSet parser preserves more metadata in USER_PROPERTIES.
-            <li><a href="https://github.com/das-developers/das2java/issues/155">155</a>: new Das2Stream parser properly handles data.min, data.max, etc.  Thanks, Chris!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2787/">2787</a>: add explicit resolution limit for Das2Server, clean up GUI.  Thanks, Chris!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2786/">2786</a>: reject when where(...) is used in ASCII URI, should be where=... Thanks, Sadie!
-            <li><a href="https://github.com/das-developers/das2java/issues/162">162</a>: bug fixed in DataPointRecorder when third column is time column and last is nominal.  
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2785/">2785</a>: Strange deadlock observed resolved by removing unnecessary synchronized blocks.  Thanks, Connor!
-            <li><a href="https://github.com/das-developers/das2java/issues/161">161</a>: New code in DataPointRecorder caused runtime error with some existing scripts.  Thanks, Andrew!
-            <li>Run batch tool sets "copy script URI" mouse action before attempting run.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2783/">2783</a>: --script --help when PWD is used now works properly.
-            <li>Minor corrections to command line arguments, including "Welcome to Autoplot" is not printed with --quietLoggers.  Thanks, Kristoff!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2781/">2781</a>: change hadn't been pushed for build.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2781/">2781</a>: check bounds when switching dimensions with slice GUI.  Thanks, Connor!
-        </ul>
         <p>Features:</p>
+        <ul>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li><a href="https://github.com/das-developers/das2java/issues/171">171</a>: improvements to mouse modules and drag renderers, see <a href="https://github.com/autoplot/dev/tree/master/demos/tools/slice">the demos</a>.
             <li>HAPI server checks both dataset and id parameters with 3.x servers.
@@ -92,30 +76,6 @@
             <li>Regression testing moved to new server, finally!
             <li>Add StringTools.spaces to use until Java 11 is the platform.
             <li>New logging handler logs to CSV file, so it can be studied later.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2793/">2793</a>: script and console tabs initialize sooner, after verifying this did not affect launch time.
-            <li>add diffMod, mod, and modp filters to operations on data tab.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/645/">645</a>: Das2Server uses timetags to indicate progress by default now.
-            <li>Das2Stream to QDataSet picks up yWarnMin, yWarnMax etc and puts them in METADATA as with CDF source.
-            <li>Das2Stream directly to QDataSet is always used.
-            <li>StringTransmogrifer interface throws exception or returns alternate text, and has new find to replace strings found anywhere in text.
-            <li>add cartesianToPolar function and filter to match polarToCartesian.  add cartesianToSpherical.  Thanks, Scott!
-            <li>TimeParser supports $Z, three-character time zone codes.  
-            <li>Be a bit more cautious about assuming PDS4 data type is CDF_TT2000.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2670/">2670</a>: .batch file can be entered in the address bar to enter the Run Batch GUI with the settings.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2670/">2670</a>: Run batch supports multiple machines. 
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2670/">2670</a>: Run batch can finally be used from the command line.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/866/">866</a>: Run batch tool file format new format is handled, still write old format unless setenv newBatchFileFormat to true.
-            <li><a href="https://github.com/das-developers/das2java/issues/160">160</a>: show both 100% confidence and 68% confidence intervals when metadata is available. (This may change.)
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2670/">2670</a>: beginnings of run batch from command line.  1-parameter batch jobs are supported now.
-            <li><a href="https://github.com/das-developers/das2java/issues/159/">159</a>: allow orbits files to be more lax, allowing csv files and comments.  Thanks, Darrelle!
-            <li>-q is added to mean --quietLoggers.  Thanks, Kristoff!
-            <li>Look for "v_perp" and "v_par" as well when deciding how to automatically slice a rank 3 qube.  Thanks, Connor!
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/865/">865</a>: HAPI client uses abouts.json.  Thanks, HAPI team!
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/864/">864</a>: Add option for native file dialog to pick .vap files.  Thanks, Allison!
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/863/">863</a>: Run Batch ETA calculation is shown by default.
         </ul>
 
         <p>Data is input from:</p>
