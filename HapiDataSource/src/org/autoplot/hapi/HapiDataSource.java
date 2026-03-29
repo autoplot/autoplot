@@ -1464,20 +1464,48 @@ public final class HapiDataSource extends AbstractDataSource {
     }
     
     /**
-     * TODO: commas within quotes.  remove extra whitespace.
-     * @param line
-     * @return 
+     * split the line using a state machine, keeping track of quotes.  Note newlines are not allowed
+     * in the quoted string.  Quotes are removed.  Thanks, ChatGPT!
+     * @param line the line
+     * @return the line fields.
      */
-    private static String[] lineSplit( String line ) {
-        String[] ss= line.split(",",-2);
-        for ( int i=0; i<ss.length; i++ ) {
-            String s= ss[i].trim();
-            if ( s.startsWith("\"") && s.endsWith("\"") ) {
-                s= s.substring(1,s.length()-1);
-            }
-            ss[i]= s;
+    private static String[] lineSplit(String line) {
+        if (line == null) {
+            return new String[0];
         }
-        return ss;
+
+        ArrayList<String> result = new ArrayList<>();
+        StringBuilder field = new StringBuilder();
+        boolean inQuotes = false;
+        int len = line.length();
+
+        for (int i = 0; i < len; i++) {
+            char c = line.charAt(i);
+
+            if (c == '"') {
+                if (inQuotes) {
+                    if (i + 1 < len && line.charAt(i + 1) == '"') {
+                        field.append('"');
+                        i++;
+                    } else {
+                        inQuotes = false;
+                    }
+                } else {
+                    inQuotes = true;
+                }
+            } else if (c == ',' && !inQuotes) {
+                String s= field.toString();
+                result.add(s);
+                field.setLength(0);
+            } else {
+                if ( inQuotes || !Character.isWhitespace(c) ) {
+                    field.append(c);
+                }
+            }
+        }
+        result.add(field.toString());
+        return result.toArray(new String[0]);
+
     }
             
     protected static Datum parseTime( String stopDate ) throws ParseException {
