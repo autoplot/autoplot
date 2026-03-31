@@ -29,8 +29,10 @@
 
         <p>Autoplot's development is guided by feedback from those using it.  Thanks for your feedback!</p>
                 
-        <p>Bugfixes (2026-03-29):</p>
+        <p>Bugfixes (2026-03-31):</p>
         <ul>
+            <li>Add kludge to support public GitLab filesystems on research-git.uiowa.edu.
+            <li>TimeParser properly supports $(x;name=band) where the extra map will contain "band"
             <li>Properly handle commas in HAPI CSV quoted strings, as with https://cottagesystems.com/server/esac/hapi/data?start=2001-01-01T00:00:00.000Z&stop=2008-07-01T00:00:00.000Z&dataset=C4_CQ_ASP_CAVEATS
             <li>New code for glob to regex added ^ and $ constraints, which the old implementation did not.
         </ul>
