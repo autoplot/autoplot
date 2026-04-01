@@ -330,6 +330,7 @@ compilef 'org/das2/graph/util/GraphicalLogHandler.java'
 compilef 'org/das2/util/CsvFileLogHandler.java'
 compilef 'org/autoplot/scriptconsole/ScriptPanelSupport.java' # some git scripts are still using this.
 compilef 'org/autoplot/batch/RunBatchTool.java'
+compilef 'org/das2/event/NullDragRenderer.java'
 
 cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceFactory.extensions | cut -d' ' -f1
 for i in `cat ../temp-volatile-classes/META-INF/org.autoplot.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
