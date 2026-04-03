@@ -2130,7 +2130,19 @@ public class JythonUtil {
         interp.exec(prog);
         interp.exec("import autoplot2025 as autoplot\n");
         PyList sort = (PyList) interp.eval("autoplot._paramSort");
-
+        
+        HashSet<String> names= new HashSet<>();
+        for ( int i=0; i<sort.size(); i++ ) {
+            String k= sort.__getitem__(i).toString();
+            if ( names.contains(k) ) {
+                throw new IllegalArgumentException("script has multiple parameters with the same name, so default would be ambiguous");
+            } else {
+                names.add(k);
+            }
+        } 
+        
+        
+      
         boolean altWhy = false; // I don't know why things are suddenly showing up in this other space.
         if (sort.isEmpty()) {
             try {
