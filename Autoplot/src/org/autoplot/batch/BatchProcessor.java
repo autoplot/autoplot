@@ -815,6 +815,8 @@ public class BatchProcessor {
             }
             
             final AtomicInteger threadCounter= new AtomicInteger(0);
+
+            final String pid= AutoplotUtil.getProcessId("???");
         
             ThreadFactory tf= (Runnable r) -> new Thread( r, "run-batch-"+threadCounter.incrementAndGet());
             ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(initialThreadCount,tf);
@@ -898,11 +900,29 @@ public class BatchProcessor {
                 
                 if ( specificationFile.exists() ) {
                     if ( isDirectoryEmpty(lbatchJobsDirectory) ) {
-                        specificationFile.delete();
+                        if ( specificationFile.delete() ) {
+                            logger.fine("Cleared specification file for old run, because the jobs directory is empty.");
+                        } else {
+                            logger.info("Saw the specification file, but someone else must have deleted it.");
+                        }
                     }
                 }
                 
-                String pid= AutoplotUtil.getProcessId("???");
+                while ( specificationPendingFile.exists() ) {
+                    long t0= System.currentTimeMillis();
+                    while ( specificationPendingFile.exists() && System.currentTimeMillis()-t0 < 60000 ) { // we'll wait for the file to go away for 1 minute.
+                        logger.warning("Another thread or workstation appears to be setting up the run, sleeping for 10 seconds.");
+                        try {
+                            Thread.sleep(10000);
+                        } catch (InterruptedException ex) {
+                            logger.log(Level.SEVERE, null, ex);
+                        }
+                    }
+                    if ( specificationPendingFile.exists() ) {
+                        throw new IllegalArgumentException("The other thread is still working on the setup, check on its status and run this again later.");
+                    }
+                }
+                
                 if ( specificationFile.exists() ) {
                     //make sure the JSON files are identical.
                     String hostBatchFileJson= FileUtil.readFileToString(specificationFile);
