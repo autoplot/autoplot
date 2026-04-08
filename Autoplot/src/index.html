@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Round of bugfixes with the HAPI client and development version of CSA HAPI server.</small></p>
+        <p><small>BinaryDataSource is used to reverse-engineer a TIFF file reader, presumably a GeoTIFF file.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -32,6 +32,7 @@
                 
         <p>Bugfixes (2026-04-04):</p>
         <ul>
+            <li>Starting up a bunch of CPUs with run batch could trigger race condition where one would fail. Now the guests wait for the host to finish setting up.
             <li>Add kludge to support public GitLab filesystems on research-git.uiowa.edu.  Rewrite much of GitLab support to work properly.
             <li>Detect when two script parameters have the same name, instead of strange and inconsistent behavior.            
             <li>TimeParser properly supports $(x;name=band) where the extra map will contain "band"
@@ -69,6 +70,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>DataPointRecorder indicates number of points and number selected.
+            <li>GitHub and GitLab filesystems use API to access files, and soon tokens will allow access to restricted sites.
             <li>Add NullDragRenderer and SimpleCrossHairRenderer to serve as base class for Mouse Modules.  Example scripts <a href="https://github.com/autoplot/dev/tree/master/demos/tools/slice">here</a>.
         </ul>
         <p>Less recent features:</p>
