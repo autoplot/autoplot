@@ -32,6 +32,7 @@
                 
         <p>Bugfixes (2026-04-04):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2824/">2824</a>: don't print the Jython exception extra times.
             <li>Starting up a bunch of CPUs with run batch could trigger race condition where one would fail. Now the guests wait for the host to finish setting up.
             <li>Add kludge to support public GitLab filesystems on research-git.uiowa.edu.  Rewrite much of GitLab support to work properly.
             <li>Detect when two script parameters have the same name, instead of strange and inconsistent behavior.            
