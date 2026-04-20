@@ -348,7 +348,6 @@ public final class JythonDataSource extends AbstractDataSource implements Cachin
                     } else if ( javaClass instanceof org.das2.util.monitor.CancelledOperationException ) { //TODO: why are there two?
                         throw (Exception)javaClass;
                     }
-                    logger.warning( ex.toString() );
                     if (listener != null) {
                         listener.exceptionThrown(ex);
                     }
