@@ -1811,13 +1811,26 @@ public final class HapiDataSource extends AbstractDataSource {
         
         if ( ds.rank()==2 ) {
             QDataSet bds= (QDataSet)ds.property(QDataSet.BUNDLE_1);
+            int testIdxStopTime=1;
+            int middleMessage=-1;
+            for ( int i=1; i<pds.length; i++ ) { // look for fileListing scheme
+                ParamDescription pd= pds[i];
+                if (pd.name.equals("stopDate") ) {
+                    testIdxStopTime= i;
+                } else if ( pd.name.equals("fileURI") ) {
+                    middleMessage= i;
+                }
+            }
             if ( bds!=null && bds.length()>1 ) {
                 Units u1= (Units)bds.property(QDataSet.UNITS,0);
-                Units u2= (Units)bds.property(QDataSet.UNITS,1);
+                Units u2= (Units)bds.property(QDataSet.UNITS,testIdxStopTime);
                 if ( u1!=null && u2!=null && UnitsUtil.isTimeLocation( u1 ) && UnitsUtil.isTimeLocation( u2 ) ) {
                     QDataSet start= Ops.slice1( ds,0 );
-                    QDataSet stop= Ops.slice1( ds,1 );
-                
+                    QDataSet stop= Ops.slice1( ds,testIdxStopTime );
+                    if ( middleMessage>-1 && pds.length==3 ) {
+                        QDataSet message= Ops.slice1( ds, middleMessage );
+                        return Ops.createEvents( Ops.bundle( start, stop, message ));
+                    }
                     // It's an events dataset, but we better check that all stops are greater than starts!
                     if ( Ops.reduceMax( Ops.lt( stop, start ),0 ).value()==0 ) {
                         return Ops.createEvents(ds);
