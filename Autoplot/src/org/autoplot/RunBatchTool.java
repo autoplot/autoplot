@@ -1923,6 +1923,25 @@ public class RunBatchTool extends javax.swing.JPanel {
             return null;
         }
                 
+        String s= calculateWritePngFilename(f1, f2);
+
+        if ( s.endsWith(".png") ) {
+            BufferedImage bufferedImage = dom.getController().getScriptContext().writeToBufferedImage(); 
+            Map<String,String> metadata= new LinkedHashMap<>();
+            metadata.put( "ScriptURI",uri );
+            if ( dom!=null ) {
+                metadata.put( DasPNGConstants.KEYWORD_PLOT_INFO, 
+                    dom.getController().getApplicationModel().canvas.getImageMetadata() );
+            }
+            dom.getController().getScriptContext().writeToPng(bufferedImage,s,metadata);
+        } else if ( s.endsWith(".pdf") ) {
+            dom.getController().getScriptContext().writeToPdf(s);
+        } 
+        return s;
+
+    }
+
+    private String calculateWritePngFilename(String f1, String f2) throws IllegalArgumentException {
         String template= writeFilenameCB.getSelectedItem().toString();
         Preferences prefs= Preferences.userNodeForPackage( RunBatchTool.class );
         prefs.put( "lastTemplate", template );
@@ -2017,19 +2036,6 @@ public class RunBatchTool extends javax.swing.JPanel {
         }
         
         s= s.replaceAll(" ","_"); 
-
-        if ( s.endsWith(".png") ) {
-            BufferedImage bufferedImage = dom.getController().getScriptContext().writeToBufferedImage(); 
-            Map<String,String> metadata= new LinkedHashMap<>();
-            metadata.put( "ScriptURI",uri );
-            if ( dom!=null ) {
-                metadata.put( DasPNGConstants.KEYWORD_PLOT_INFO, 
-                    dom.getController().getApplicationModel().canvas.getImageMetadata() );
-            }
-            dom.getController().getScriptContext().writeToPng(bufferedImage,s,metadata);
-        } else if ( s.endsWith(".pdf") ) {
-            dom.getController().getScriptContext().writeToPdf(s);
-        } 
         return s;
 
     }
