@@ -261,6 +261,8 @@ public class DataSetURI {
         if (ipercy == -1) ipercy = surl.lastIndexOf("$v");
         if (ipercy == -1) ipercy = surl.lastIndexOf("$(v");
         if (ipercy == -1) ipercy = surl.lastIndexOf("$x");
+        if (ipercy == -1) ipercy = surl.lastIndexOf("$s");
+        if (ipercy == -1) ipercy = surl.lastIndexOf("$(s");
         if (ipercy == -1) ipercy = surl.lastIndexOf('*');
         
         return ipercy != -1;
