@@ -624,6 +624,8 @@ public class AppScriptPanelSupport {
             //String filename= String.valueOf( (ex.value.__getitem__(1).__getitem__(3)) );
             //int col = ((PyInteger) ex.value.__getitem__(1).__getitem__(2)).getValue();
             annotationsSupport.annotateLine(lineno, EditorAnnotationsSupport.ANNO_MAYBE_ERROR, ex.toString(),interp);
+            //TODO: scroll to syntax error!  Also, why is it <string> anyway???
+            //TODO: also,  ~/uploads/rte_0875073804_20260430_135558_jbf.xml is similar
         } 
         //else {
         //logger.log(Level.SEVERE, ex.getMessage(), ex);
