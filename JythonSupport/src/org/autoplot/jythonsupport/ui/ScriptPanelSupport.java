@@ -200,49 +200,52 @@ public class ScriptPanelSupport {
         int scrollToOffset= -1;
         
         for ( AbstractDelta<String> d : patch.getDeltas() ) {
-            
-            List<Integer> ll = d.getSource().getChangePosition();
-            if ( ll==null ) {
-                ll= new ArrayList<>(d.getSource().size());
-                for ( int i=0; i<d.getSource().size(); i++ ) {
-                    ll.add( d.getSource().getPosition()+1+i );
+            try {
+                List<Integer> ll = d.getSource().getChangePosition();
+                if ( ll==null ) {
+                    ll= new ArrayList<>(d.getSource().size());
+                    for ( int i=0; i<d.getSource().size(); i++ ) {
+                        ll.add( d.getSource().getPosition()+1+i );
+                    }
                 }
+                List<Integer> ss = d.getTarget().getChangePosition();
+                if ( ss==null ) {
+                    ss= new ArrayList<>(d.getTarget().size());
+                    for ( int i=0; i<d.getTarget().size(); i++ ) {
+                        ss.add( d.getTarget().getPosition()+1+i );
+                    }
+                }
+                int[] lp0,lp1;
+
+                String sourceText = String.join( "<br>", d.getSource().getLines() );
+
+                if ( d instanceof ChangeDelta ) {
+                    sourceText= "<html><i>Text has been changed:</i><br>"+sourceText;
+                    for ( int i : ss ) {
+                        lp0 = annotationsSupport.getLinePosition(i);    
+                        lp1 = annotationsSupport.getLinePosition(i); 
+                        annotationsSupport.annotateChars(lp0[0],lp1[1],EditorAnnotationsSupport.ANNO_CHANGE,sourceText,null);
+                        if ( scrollToOffset==-1 ) scrollToOffset= lp0[0];
+                    }
+                } else if ( d instanceof DeleteDelta ) {
+                    sourceText= "<html><i>Text has been deleted:</i><br>"+sourceText;
+                    for ( int i : ll ) {
+                        lp0 = annotationsSupport.getLinePosition(i);    
+                        lp1 = annotationsSupport.getLinePosition(i); 
+                        annotationsSupport.annotateChars(lp0[0],lp1[1],EditorAnnotationsSupport.ANNO_DELETE,sourceText,null);
+                        if ( scrollToOffset==-1 ) scrollToOffset= lp0[0];
+                    }
+                } else if ( d instanceof InsertDelta ) {
+                    for ( int i : ss ) {
+                        lp0 = annotationsSupport.getLinePosition(i);    
+                        lp1 = annotationsSupport.getLinePosition(i);    
+                        annotationsSupport.annotateChars(lp0[0],lp1[1],EditorAnnotationsSupport.ANNO_INSERT,"<html><i>Text has been inserted.</i>",null);
+                        if ( scrollToOffset==-1 ) scrollToOffset= lp0[0];
+                    }
+                }        
+            } catch ( IllegalArgumentException ex ) {
+                logger.info("Errot when trying to identify the editor line location of annotation");
             }
-            List<Integer> ss = d.getTarget().getChangePosition();
-            if ( ss==null ) {
-                ss= new ArrayList<>(d.getTarget().size());
-                for ( int i=0; i<d.getTarget().size(); i++ ) {
-                    ss.add( d.getTarget().getPosition()+1+i );
-                }
-            }
-            int[] lp0,lp1;
-            
-            String sourceText = String.join( "<br>", d.getSource().getLines() );
-            
-            if ( d instanceof ChangeDelta ) {
-                sourceText= "<html><i>Text has been changed:</i><br>"+sourceText;
-                for ( int i : ss ) {
-                    lp0 = annotationsSupport.getLinePosition(i);    
-                    lp1 = annotationsSupport.getLinePosition(i); 
-                    annotationsSupport.annotateChars(lp0[0],lp1[1],EditorAnnotationsSupport.ANNO_CHANGE,sourceText,null);
-                    if ( scrollToOffset==-1 ) scrollToOffset= lp0[0];
-                }
-            } else if ( d instanceof DeleteDelta ) {
-                sourceText= "<html><i>Text has been deleted:</i><br>"+sourceText;
-                for ( int i : ll ) {
-                    lp0 = annotationsSupport.getLinePosition(i);    
-                    lp1 = annotationsSupport.getLinePosition(i); 
-                    annotationsSupport.annotateChars(lp0[0],lp1[1],EditorAnnotationsSupport.ANNO_DELETE,sourceText,null);
-                    if ( scrollToOffset==-1 ) scrollToOffset= lp0[0];
-                }
-            } else if ( d instanceof InsertDelta ) {
-                for ( int i : ss ) {
-                    lp0 = annotationsSupport.getLinePosition(i);    
-                    lp1 = annotationsSupport.getLinePosition(i);    
-                    annotationsSupport.annotateChars(lp0[0],lp1[1],EditorAnnotationsSupport.ANNO_INSERT,"<html><i>Text has been inserted.</i>",null);
-                    if ( scrollToOffset==-1 ) scrollToOffset= lp0[0];
-                }
-            }        
         }
         
         if ( scrollToOffset>-1 ) {
