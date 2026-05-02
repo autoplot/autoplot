@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>New <a href="https://github.com/autoplot/dev/blob/master/demos/2026/20260406/readGeoTiffChatGPT.20260421.jyds">script</a> to read uncompressed GeoTIFF files.  Happy Earth Day!</small></p>
+        <p><small>Jython code wraps Jupiter image in Lon,Lat to make polar image.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,7 +30,11 @@
 
         <p>Autoplot's development is guided by feedback from those using it.  Thanks for your feedback!</p>
                 
-        <p>Bugfixes (2026-04-22):</p>
+        <p>Bugfixes (2026-05-01):</p>
+        <ul>
+            <li>rte_0875073804: catch runtime error when trying to identify Jython line.
+        </ul>
+        <p>Older Bugfixes (2026-04-22):</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2825/">2825</a>: remove strange code which unnecessarily flipped Jupiter image. (Allow the xtags to be monotonic decreasing.)  Thanks, Masafumi!
             <li>Jython errors were printed twice to the console.
@@ -42,56 +46,18 @@
             <li>Properly handle commas in HAPI CSV quoted strings, as with https://cottagesystems.com/server/esac/hapi/data?start=2001-01-01T00:00:00.000Z&stop=2008-07-01T00:00:00.000Z&dataset=C4_CQ_ASP_CAVEATS
             <li>New code for glob to regex added ^ and $ constraints, which the old implementation did not.
         </ul>
-        <p>Older Bugfixes (2026-02-16):</p>
-        <ul>
-            <li>Allow arguments in script command line like --script=multiParamGraphic.jy?ncenter=5&amp;radius=1
-            <li>Annotation string properties where "" means off now call strip to allow " " to be used carelessly.
-            <li>Run Batch Tool .batch files use new format by default.  This output will not be handled by Autoplots older than v2026a_2.
-            <li>rte_2038937185: slice0, slice1, slice2, and slice3 didn't handle slice-at-datum properly when datum was past the end.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2818/">2818</a>: Correctly check if loaded data from Das2Server was sufficient resolution to satisfy request.  Thanks, Bill!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2817/">2817</a>: Improve support for HAPI 3.0, using new dataset parameter, and code will try "id" if "dataset" fails.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2815/">2815</a>: Don't show "symbol color and background are same warning" when color scatter is used.
-            <li>URISplit.makeAbsolute would assume colon in dust2025-01-28T22:35:12.420densZ.txt was a fully-qualified protocol (file:/...).  Verify protocol does not end in two digits.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2811/">2811</a>: Runtime error with CDF with incorrect dependencies now communicates problem to the scientist.  Thanks, Connor!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2808/">2808</a>: URISplit.makeAbsolute should support Windows
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2809/">2809</a>: old code looking get getParam('timerange',...) to detect time series browse capability in Jython scripts didn't like constraints like {"format":"$Y-$m-$d"}.
-            <li><a href="https://github.com/das-developers/das2java/issues/8">8</a>: improve support for Das2Server DSDF parameters like sensor=@ as with <a href="https://planet.physics.uiowa.edu/das/das2Server?server=dsdf&dataset=Van_Allen_Probes/A/EMFISIS/L2/WFR_waveform-continuous-burst_psd">this DSDF</a>, and support <a href="https://planet.physics.uiowa.edu/das/das2Server?server=dsdf&dataset=Voyager/2/PWS/SpecAnalyzer-4s-Efield">three-argument boolean switches</a>.  Thanks, Chris!
-            <li><a href="https://github.com/das-developers/das2java/issues/168">168</a>: Quiet warning message about "strange bug where update event didn't clear dirty flags, reposting" which can be ignored.  Thanks, Darrelle!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2803/">2803</a>: Disable autolayout by default when running createPngWalk.  Thanks, Darrelle!
-            <li>new RunBatchTool which can monitor a multi-machine batch run is compiled into the release.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2805/">2805</a>: Autolayout needs rewrite
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2789/">2789</a>: don't allow new code to accept "123" as column name, where data is used as a column name.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2804/">2804</a>: vap macro feature is barely described.  Thanks, Darrelle!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2803/">2803</a>: Disable autoLayout for the immediate interval where the DasCanvas is resetting.  Thanks, Darrelle!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2802/">2802</a>: Script parameter with default value is still included in "params" dictionary.  Thanks, Kristoff!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2801/">2801</a>: ASCII files read with regex parameter support aggregation.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2789/">2789</a>: Be more aggressive about creating column names, including / and * characters.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2670/">2670</a>: bug corrected where first parameter was reset when running two-parameter batch.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2799/">2799</a>: putValues where fill is not specified and histogram2d where units differ are handled properly.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2798/">2798</a>: Be more aggressive about keeping invalid datum ranges out of the DOM.
-            <li>LogConsole mishandled log message entering(source,method,arg1,arg2)
-        </ul>
         <p>Features:</p>
         <ul>
             <li>Support $s (integer number of seconds since 1970-01-01T00:00Z), an extension of URI time templates.
+        </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>catch when RGBA image is used for RGBImageRenderer, which is not supported.
             <li>Add TRACERS orbit files ts1-roi-list, rs2-roi-list, and ts-tandem-rois
             <li>Look for HAPI File Listing scheme.
             <li>DataPointRecorder indicates number of points and number selected.
             <li>GitHub and GitLab filesystems use API to access files, and soon tokens will allow access to restricted sites.
             <li>Add NullDragRenderer and SimpleCrossHairRenderer to serve as base class for Mouse Modules.  Example scripts <a href="https://github.com/autoplot/dev/tree/master/demos/tools/slice">here</a>.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li><a href="https://github.com/das-developers/das2java/issues/171">171</a>: improvements to mouse modules and drag renderers, see <a href="https://github.com/autoplot/dev/tree/master/demos/tools/slice">the demos</a>.
-            <li>HAPI server checks both dataset and id parameters with 3.x servers.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2814/">2814</a>: getParam constraints now have glob (like *.{cdf,CDF}) as well as regex.  GlobToRegex code rewritten by ChatGPT.
-            <li>Introduce three- and four-argument append to make scripts more legible.
-            <li>Various improvements to Auralizor, including more precise location report.  Thanks, Erika!
-            <li>Plot TopDecorator is drawn independently from the cache image to allow feedback without redo expensive rebuild of cache image.
-            <li>Regression testing moved to new server, finally!
-            <li>Add StringTools.spaces to use until Java 11 is the platform.
-            <li>New logging handler logs to CSV file, so it can be studied later.
         </ul>
 
         <p>Data is input from:</p>
