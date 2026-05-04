@@ -2379,8 +2379,9 @@ public class DataSetURI {
             String suri;
             if ( hasResourceUri ) {
                 suri= CompletionContext.get(CompletionContext.CONTEXT_FILE, cc);
-                if ( suri==null ) {
+                if ( suri==null || factory instanceof AggregatingDataSourceFactory ) {
                     suri= cc.surl;
+                    if ( suri.endsWith("?") ) suri= suri.substring(0,suri.length()-1);
                 }
             } else {
                 suri= surl1;
