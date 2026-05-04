@@ -813,6 +813,17 @@ public class AppScriptPanelSupport {
                     URISplit split= URISplit.parse(file.toString());
                     interp.set( "PWD", split.path );   
                 }
+                
+                JPanel p= new JPanel(); // note we may not use p.
+                p.setLayout( new BorderLayout() );
+                
+                Map<String,String> vars= new HashMap();
+                ParametersFormPanel pfp= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
+                Map<String,Object> env= new HashMap();
+                env.put("dom",interp.get("dom") );
+                env.put("PWD",interp.get("PWD") );
+                ParametersFormPanel.FormData fd=  pfp.doVariables( env, panel.getEditorPanel().getText(), vars, p );
+
                 setInterruptible( interp );
                 ts= Py.getThreadState();
                 boolean dirty0 = panel.isDirty();
@@ -904,15 +915,9 @@ public class AppScriptPanelSupport {
                         
                     }
                     clearAnnotations();
-                } else if ( ( ( mode & Event.SHIFT_MASK ) == Event.SHIFT_MASK ) || ( ( mode & Event.ALT_MASK ) == Event.ALT_MASK ) ) {
-                    JPanel p= new JPanel();
-                    p.setLayout( new BorderLayout() );
-                    Map<String,String> vars= new HashMap();
-                    ParametersFormPanel pfp= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
-                    Map<String,Object> env= new HashMap();
-                    env.put("dom",interp.get("dom") );
-                    env.put("PWD",interp.get("PWD") );
-                    ParametersFormPanel.FormData fd=  pfp.doVariables( env, panel.getEditorPanel().getText(), vars, p );
+                } else if ( fd.count>0 
+                        || ( ( mode & Event.SHIFT_MASK ) == Event.SHIFT_MASK ) 
+                        || ( ( mode & Event.ALT_MASK ) == Event.ALT_MASK ) ) {
                     if ( true ) {
                         JScrollPane pane= new JScrollPane(p);
 
@@ -1036,6 +1041,7 @@ public class AppScriptPanelSupport {
      * <li>8 parameters GUI (ALT is pressed)
      * </ul>
      * @param mode =0 normal.  =2=CTRL_MASK= trace.  ALT_MASK or SHIFT_MASK brings up parameters GUI.
+     * Note, since v2026a_5 we always bring up the parameters GUI, when there are parameters.
      */
     protected void executeScript(final int mode) {
 
