@@ -494,8 +494,8 @@ public class ApplicationController extends DomNodeController implements RunLater
                     } else {
                         dstPlot.setDisplayTitle(false);                            
                     }
-                    dstPlot.getXaxis().setLog(false);
-                    bind( dstPlot.getXaxis(), Axis.PROP_RANGE, dom, Application.PROP_TIMERANGE );
+                    dstPlot.getXaxis().setLog(false);    
+                    bind( dom, Application.PROP_TIMERANGE, dstPlot.getXaxis(), Axis.PROP_RANGE );
                     
                     // we have to find some x-axis to listen to.
                     DataSourceFilter dsf= getDataSourceFilterFor(pele);
