@@ -824,6 +824,8 @@ public class AppScriptPanelSupport {
                 env.put("PWD",interp.get("PWD") );
                 ParametersFormPanel.FormData fd=  pfp.doVariables( env, panel.getEditorPanel().getText(), vars, p );
 
+                boolean doShowParams= false;
+                
                 setInterruptible( interp );
                 ts= Py.getThreadState();
                 boolean dirty0 = panel.isDirty();
@@ -915,7 +917,7 @@ public class AppScriptPanelSupport {
                         
                     }
                     clearAnnotations();
-                } else if ( fd.count>0 
+                } else if ( ( doShowParams && fd.count>0 )
                         || ( ( mode & Event.SHIFT_MASK ) == Event.SHIFT_MASK ) 
                         || ( ( mode & Event.ALT_MASK ) == Event.ALT_MASK ) ) {
                     if ( true ) {
