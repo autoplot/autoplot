@@ -200,9 +200,13 @@ public class EditorAnnotationsSupport {
         if ( r.y + r.height > h ) {
             r.y= h - r.height;
         }
-        SwingUtilities.invokeLater(() -> {
+        if ( SwingUtilities.isEventDispatchThread() ) {
             editorPanel.scrollRectToVisible(r);
-        });
+        } else {
+            SwingUtilities.invokeLater(() -> {
+                editorPanel.scrollRectToVisible(r);
+            });
+        }
         
     }
 
@@ -383,6 +387,10 @@ public class EditorAnnotationsSupport {
      * @param interp the interpreter or null, to allow for further queries by resetting the interpreter.
      */
     public void annotateChars( final int i0, final int i1, final String name, final String text, final PythonInterpreter interp ) {
+        if ( name.equals(ANNO_MAYBE_ERROR) ) {
+            System.err.println("stop here");
+        }
+        
         SwingUtilities.invokeLater(() -> {
             boolean lightBackground= ( (
                     editorPanel.getBackground().getRed() +
