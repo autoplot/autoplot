@@ -870,6 +870,11 @@ public class AppScriptPanelSupport {
                             }
                         }
                         
+                        if ( stmt instanceof Expr ) {
+                            Expr expr= (Expr)stmt;
+                            l0 = Math.min( l0, expr.value.beginLine );
+                        }
+                        
                         for ( int i= lineOffset; i<l0-1; i++ ) {
                             offset= offset + sscript[i].length() + 1;
                         }
