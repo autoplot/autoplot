@@ -96,6 +96,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -2201,6 +2202,9 @@ APSplash.checkTime("init 52.7");
         mi.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ));
         fileMenu.add(mi);
 
+        mi= new JMenuItem(createOpenJyScriptAction());
+        fileMenu.add(mi);
+        
         fileMenu.addSeparator();
 APSplash.checkTime("init 52.8");
         
@@ -6814,4 +6818,33 @@ APSplash.checkTime("init 240");
 //                        
 //        return JythonUtil.invokeScriptSoon( uri, file, dom, params, askParams, makeTool, runListener, mon1 );
 //    }    
+    
+    /**
+     * return the open .jy action, which can use a native or swing filechooser, depending on the 
+     * "fileDialogNative" option.
+     * @return 
+     */
+    private Action createOpenJyScriptAction() {
+        return new AbstractAction("Open Local .jy Script...") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
+                Preferences prefs = AutoplotSettings.settings().getPreferences( AutoplotSettings.class);
+                String result;
+                boolean useNative= System.getProperty("fileDialogNative","").equals("true");
+                if ( ( e.getModifiers() & KeyEvent.SHIFT_MASK )==KeyEvent.SHIFT_MASK ) {
+                    useNative= !useNative;
+                }
+                if ( useNative ) {
+                    result = Util.browseLocalJyNative( AutoplotUI.this, null );
+                } else {
+                    result=  Util.browseLocalJy( AutoplotUI.this, null );
+                }
+                
+                if ( result!=null ) {
+                    AutoplotUI.this.plotUri(result);
+                }
+            }
+        };
+    }
 }

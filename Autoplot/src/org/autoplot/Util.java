@@ -4,9 +4,15 @@
  */
 package org.autoplot;
 
+import java.awt.Dimension;
+import java.awt.FileDialog;
 import java.awt.Font;
 import java.awt.FontFormatException;
+import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,10 +34,28 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import org.autoplot.datasource.AutoplotSettings;
+import org.autoplot.datasource.DataSetSelector;
 import org.das2.util.AboutUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.datasource.DataSourceUtil;
+import org.autoplot.datasource.TimeRangeEditor;
+import org.autoplot.datasource.URISplit;
+import org.autoplot.datasource.WindowManager;
+import org.autoplot.scriptconsole.AppScriptPanelSupport;
+import org.das2.datum.DatumRange;
 
 /**
  *
@@ -382,4 +406,126 @@ public class Util {
             }
         }
     }
+    
+    
+    /**
+     * Use a native browser to pick a file.  Use the system property fileChooserNative=true
+     * @param parent parent component for focus.  If a dataSetSelector is
+     * used then its timerange is used for the initial timerange.
+     * This will now allow a non-local vap to be browsed as well.
+     * @param initialSelection if non-null, then the initial selection.
+     * @return the URI for the vap file, or null if cancel was pressed.
+     * @return 
+     */
+    public static String browseLocalJyNative( java.awt.Component parent, String initialSelection) {
+        Preferences prefs = AutoplotSettings.settings().getPreferences(AppScriptPanelSupport.class);
+        String PREFERENCE_OPEN_FILE = "openFile";
+        
+        String currentFile=  prefs.get( PREFERENCE_OPEN_FILE, "" );
+        String currentDirectory = null;
+        if ( !currentFile.equals("") ) {
+            currentDirectory= new File(currentFile).getParentFile().getAbsolutePath();
+        }
+        
+        FileDialog chooser=
+                new java.awt.FileDialog( (Frame)(SwingUtilities.getWindowAncestor(parent)), 
+                        "Open .vap file", java.awt.FileDialog.LOAD );
+        chooser.setName("openVapNative");
+        chooser.setDirectory(currentDirectory);
+        chooser.setFile(currentFile);
+        //WindowManager.getInstance().recallWindowSizePosition(chooser);
+        FileFilter ff;
+        ff = new FileNameExtensionFilter( ".jy files", "jy" );
+
+        chooser.setFilenameFilter((File dir, String name) -> ff.accept( new File( dir, name ) ));
+        chooser.setVisible(true);
+
+        String result=null;
+
+        chooser.dispose();
+        String file = chooser.getFile();
+        if ( file!=null ) {
+            String dir = chooser.getDirectory();
+            prefs.put(AutoplotSettings.PREF_LAST_OPEN_VAP_FOLDER, dir );
+            try {
+                result= new File( dir, file ).getCanonicalPath();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+        return result;
+
+    }
+
+    /**
+     * Show a file chooser component, and return the name of a .vap file.
+     * @param parent parent component for focus.  If a dataSetSelector is
+     * used then its timerange is used for the initial timerange.
+     * This will now allow a non-local vap to be browsed as well.
+     * @param initialSelection if non-null, then the initial selection.
+     * @return the URI for the vap file, or null if cancel was pressed.
+     */
+    public static String browseLocalJy( java.awt.Component parent, String initialSelection) {
+        Preferences prefs = AutoplotSettings.settings().getPreferences(AppScriptPanelSupport.class);
+        File userHome= new File(System.getProperty("user.home"));
+        String PREFERENCE_OPEN_FILE = "openFile";
+        String openFile= prefs.get(PREFERENCE_OPEN_FILE, "");
+                
+        String currentDirectory = null;
+        if ( !openFile.equals("") ) {
+            currentDirectory= new File(openFile).getParentFile().getAbsolutePath();
+        }
+        String currentFile=  prefs.get( PREFERENCE_OPEN_FILE, "" );
+
+        boolean isRemote= initialSelection!=null && ( initialSelection.startsWith("https:/") 
+                || initialSelection.startsWith("http:/")
+                || initialSelection.startsWith("ftp:/") 
+                || initialSelection.startsWith("sftp:/") );
+        boolean isLocal= initialSelection==null || initialSelection.isEmpty() || !isRemote;
+        
+        JFileChooser chooser;
+
+        chooser= new JFileChooser();
+
+        WindowManager.getInstance().recallWindowSizePosition(chooser);
+
+        try {
+            if ( currentDirectory!=null ) {
+                chooser.setCurrentDirectory( new File( currentDirectory ) );
+            }
+        } catch ( SecurityException ex ) {
+            logger.info("unable to set current directory");
+        }
+
+        if ( currentFile.length()>0 ) {
+            try {
+                chooser.setSelectedFile( new File( currentFile ) );
+            } catch ( SecurityException ex ) {
+                logger.info("unable to set current file");
+            }
+        }
+        if ( initialSelection!=null && isLocal ) {
+            URISplit split= URISplit.parse(initialSelection);
+            if ( split.file!=null && "jy".equals(split.ext) ) {
+                chooser.setSelectedFile( new File( split.file ));
+            }
+        }
+        
+        FileFilter ff;
+        ff = new FileNameExtensionFilter( ".jy files", "jy" );
+
+        chooser.addChoosableFileFilter(ff);
+        chooser.setFileFilter(ff);
+
+        Window w= parent==null ? null : SwingUtilities.getWindowAncestor( parent);
+        int result = chooser.showOpenDialog(w);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            prefs.put(AutoplotSettings.PREF_LAST_OPEN_VAP_FOLDER, chooser.getSelectedFile().getParent() );
+            WindowManager.getInstance().recordWindowSizePosition(chooser);
+            return chooser.getSelectedFile().toURI().toString();
+        } else {
+            return null;
+        }
+        
+    }    
 }
