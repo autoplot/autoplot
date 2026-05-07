@@ -277,6 +277,29 @@ public class LabelConverter extends Converter {
                                 } else {
                                     insert= "???";
                                 }
+                            } else if ( format.equals("$(o") && controls.containsKey("id") ) { // mis-parse of %{TIMERANGE;format=$(o;id=ts2-roi-list)}
+                                String id= controls.get("id");
+                                if ( id.endsWith(")") ) {
+                                    id= id.substring(0,id.length()-1);
+                                }
+                                Orbits o= Orbits.getOrbitsFor(id);
+                                String orbit= o.getOrbit(tr.middle());
+                                if ( orbit==null ) {
+                                    insert="???";
+                                } else {
+                                    try {
+                                        DatumRange dr= o.getDatumRange(orbit);
+                                        if ( Math.abs( DatumRangeUtil.normalize(dr,tr.min()) )<0.1 
+                                                && Math.abs( DatumRangeUtil.normalize(dr,tr.max()) - 1.0 )<0.1 ) { // within 10%
+                                            insert= orbit;
+                                        } else {
+                                            insert= tr.toString(); // TODO: Maybe this should be ???
+                                        }
+                                    } catch ( ParseException ex ) {
+                                        insert= tr.toString(); // TODO: Maybe this should be ???
+                                    }
+                                }
+                                        
                             } else {
                                 TimeParser tp= TimeParser.create(format);
                                 if ( tr!=null ) {
