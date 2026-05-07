@@ -277,7 +277,7 @@ public class LabelConverter extends Converter {
                                 } else {
                                     insert= "???";
                                 }
-                            } else if ( format.equals("$(o") && controls.containsKey("id") ) { // mis-parse of %{TIMERANGE;format=$(o;id=ts2-roi-list)}
+                            } else if ( format.equals("$(o") && controls.containsKey("id") && tr!=null ) { // mis-parse of %{TIMERANGE;FORMAT=$(o;id=ts2-roi-list)}
                                 String id= controls.get("id");
                                 if ( id.endsWith(")") ) {
                                     id= id.substring(0,id.length()-1);
