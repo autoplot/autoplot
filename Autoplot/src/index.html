@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small><a href="https://github.com/autoplot/dev/blob/master/bugs/sf/2825/drawJupiterPole.jy">Jython code</a> wraps Jupiter image in Lon,Lat to make polar image.</small></p>
+        <p><small>Bug where "no renderers" message is repeated excessively is fixed.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,10 @@
 
         <p>Autoplot's development is guided by feedback from those using it.  Thanks for your feedback!</p>
                 
-        <p>Bugfixes (2026-05-04):</p>
+        <p>Bugfixes (2026-05-07):</p>
         <ul>
+            <li><a href="https://github.com/das-developers/das2java/issues/175">175</a>: property "VALID_MIN" should be type "Number" log messages quieted from WARNING to FINE.
+            <li>vap+dat:file:///tmp/foo/autoplot_access_log.$s?avail=T is handled properly, where the $s was handled as it if were an extention, not using vap+dat:.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2830/">2830</a>: multiple "no renderers" warnings were drawn because code was moved to support always redrawing the top decorator.
             <li>TimeParser supports 'autoplot_access_log.$(s;span=86400)'
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2829/">2829</a>: always bind from timerange to target, to preserve the intended timerange.  Thanks, Dave!
@@ -51,7 +53,7 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>Support $s (integer number of seconds since 1970-01-01T00:00Z), an extension of URI time templates.
+            <li>Support $s (integer number of seconds since 1970-01-01T00:00Z) in aggregations.
         </ul>
         <p>Less recent features:</p>
         <ul>
