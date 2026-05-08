@@ -1347,7 +1347,10 @@ public final class AutoplotUI extends javax.swing.JFrame {
                     final JComponent c= new AxisPanel(applicationModel);
                     SwingUtilities.invokeLater( new Runnable() {
                         @Override
-                        public void run( ) { sp.setViewportView(c); }
+                        public void run( ) { 
+                            tabs.remove(sp);
+                            tabs.insertTab("axes", null, c,
+                            String.format(  TAB_TOOLTIP_AXES, TABS_TOOLTIP), 1); }
                     } );
                     APSplash.checkTime("addAxes1 out");
                 }

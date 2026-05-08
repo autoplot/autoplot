@@ -447,6 +447,7 @@ public class AxisPanel extends javax.swing.JPanel {
 
         xAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("X Axis [?]"));
         xAxisPanel.setToolTipText("click title for help");
+        xAxisPanel.setMaximumSize(new java.awt.Dimension(1000, 1000));
 
         xLog.setText("Log");
         xLog.setToolTipText("X axis logarithmic scale");
@@ -526,6 +527,7 @@ public class AxisPanel extends javax.swing.JPanel {
 
         zAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Colorbar [?]"));
         zAxisPanel.setToolTipText("click title for help");
+        zAxisPanel.setMaximumSize(new java.awt.Dimension(1000, 1000));
 
         zLog.setText("Log");
         zLog.setToolTipText("colorbar logarithmic scale");
@@ -604,6 +606,7 @@ public class AxisPanel extends javax.swing.JPanel {
 
         yAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Y Axis [?]"));
         yAxisPanel.setToolTipText("click title for help");
+        yAxisPanel.setMaximumSize(new java.awt.Dimension(1000, 1000));
 
         yAxisRangePanel.setLayout(new java.awt.BorderLayout());
 
@@ -681,9 +684,10 @@ public class AxisPanel extends javax.swing.JPanel {
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Plot [?]"));
         jPanel1.setToolTipText("click title for help");
+        jPanel1.setMaximumSize(new java.awt.Dimension(1000, 1000));
 
         titleTextField.setText("title will go here");
-        titleTextField.setMaximumSize(new java.awt.Dimension(700, 2147483647));
+        titleTextField.setMaximumSize(new java.awt.Dimension(700, 25));
         titleTextField.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 titleMouseAction(evt);
