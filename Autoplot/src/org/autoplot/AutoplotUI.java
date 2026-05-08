@@ -1346,12 +1346,9 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 public void run() {
                     APSplash.checkTime("addAxes1 in");
                     final JComponent c= new AxisPanel(applicationModel);
-                    SwingUtilities.invokeLater( new Runnable() {
-                        @Override
-                        public void run( ) {
-                            p.add(c,BorderLayout.CENTER);
-                        }
-                    } );
+                    SwingUtilities.invokeLater(() -> {
+                        p.add(c,BorderLayout.CENTER);
+                    });
                     APSplash.checkTime("addAxes1 out");
                 }
             });
