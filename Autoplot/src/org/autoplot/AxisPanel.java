@@ -448,6 +448,7 @@ public class AxisPanel extends javax.swing.JPanel {
         xAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("X Axis [?]"));
         xAxisPanel.setToolTipText("click title for help");
         xAxisPanel.setMaximumSize(new java.awt.Dimension(1000, 1000));
+        xAxisPanel.setMinimumSize(new java.awt.Dimension(200, 300));
 
         xLog.setText("Log");
         xLog.setToolTipText("X axis logarithmic scale");
@@ -500,7 +501,7 @@ public class AxisPanel extends javax.swing.JPanel {
                         .add(xLog)
                         .add(18, 18, 18)
                         .add(showXAxisLabelsCB)
-                        .add(0, 9, Short.MAX_VALUE))
+                        .add(0, 125, Short.MAX_VALUE))
                     .add(xAxisPanelLayout.createSequentialGroup()
                         .add(jLabel1)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -522,12 +523,13 @@ public class AxisPanel extends javax.swing.JPanel {
                 .add(xAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(xLog)
                     .add(showXAxisLabelsCB))
-                .addContainerGap(12, Short.MAX_VALUE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         zAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Colorbar [?]"));
         zAxisPanel.setToolTipText("click title for help");
         zAxisPanel.setMaximumSize(new java.awt.Dimension(1000, 1000));
+        zAxisPanel.setMinimumSize(new java.awt.Dimension(300, 300));
 
         zLog.setText("Log");
         zLog.setToolTipText("colorbar logarithmic scale");
@@ -601,12 +603,13 @@ public class AxisPanel extends javax.swing.JPanel {
                 .add(zAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(zLog)
                     .add(cbVisibleCB))
-                .addContainerGap(22, Short.MAX_VALUE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         yAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Y Axis [?]"));
         yAxisPanel.setToolTipText("click title for help");
         yAxisPanel.setMaximumSize(new java.awt.Dimension(1000, 1000));
+        yAxisPanel.setMinimumSize(new java.awt.Dimension(200, 300));
 
         yAxisRangePanel.setLayout(new java.awt.BorderLayout());
 
@@ -685,6 +688,7 @@ public class AxisPanel extends javax.swing.JPanel {
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Plot [?]"));
         jPanel1.setToolTipText("click title for help");
         jPanel1.setMaximumSize(new java.awt.Dimension(1000, 1000));
+        jPanel1.setMinimumSize(new java.awt.Dimension(300, 300));
 
         titleTextField.setText("title will go here");
         titleTextField.setMaximumSize(new java.awt.Dimension(700, 25));
@@ -748,7 +752,7 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(timeRangeEditor1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 395, Short.MAX_VALUE)
+                    .add(timeRangeEditor1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(jPanel1Layout.createSequentialGroup()
@@ -779,7 +783,7 @@ public class AxisPanel extends javax.swing.JPanel {
                     .add(jButton2))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(timeRangeEditor1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(20, Short.MAX_VALUE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
