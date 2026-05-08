@@ -1335,8 +1335,9 @@ public final class AutoplotUI extends javax.swing.JFrame {
     private Runnable addAxes() {
         return () -> {
             APSplash.checkTime("addAxes in");
-            final JScrollPane sp= new JScrollPane();
-            tabs.insertTab("axes", null, sp,
+            final JPanel p= new JPanel();
+            p.setLayout(new BorderLayout());
+            tabs.insertTab("axes", null, p,
                     String.format(  TAB_TOOLTIP_AXES, TABS_TOOLTIP), 1);
             invokeLater( 2500, true, new Runnable() {
                 @Override
@@ -1347,10 +1348,9 @@ public final class AutoplotUI extends javax.swing.JFrame {
                     final JComponent c= new AxisPanel(applicationModel);
                     SwingUtilities.invokeLater( new Runnable() {
                         @Override
-                        public void run( ) { 
-                            tabs.remove(sp);
-                            tabs.insertTab("axes", null, c,
-                            String.format(  TAB_TOOLTIP_AXES, TABS_TOOLTIP), 1); }
+                        public void run( ) {
+                            p.add(c,BorderLayout.CENTER);
+                        }
                     } );
                     APSplash.checkTime("addAxes1 out");
                 }
