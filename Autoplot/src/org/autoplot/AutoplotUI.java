@@ -257,10 +257,11 @@ public final class AutoplotUI extends javax.swing.JFrame {
      */
     public static GrannyTextEditor newGrannyTextEditorWithMacros() {
         GrannyTextEditor edit= GraphUtil.newGrannyTextEditor();
-        edit.addButton( "macros", "%{CONTEXT} with format", "%{CONTEXT,format=%d}" );
-        edit.addButton( "macros", "%{CONTEXT} with time", "%{CONTEXT,format=$H:$M}" );
-        edit.addButton( "macros", "%{CONTEXT} with name", "%{CONTEXT,name=pitch}" );
-        edit.addButton( "macros", "%{TIMERANGE}", "%{TIMERANGE}" );
+        edit.addButton( "Macros", "%{CONTEXT} with format", "%{CONTEXT,format=%d}" );
+        edit.addButton( "Macros", "%{CONTEXT} with time", "%{CONTEXT,format=$H:$M}" );
+        edit.addButton( "Macros", "%{CONTEXT} with name", "%{CONTEXT,name=pitch}" );
+        edit.addButton( "Macros", "%{TIMERANGE}", "%{TIMERANGE}" );
+        edit.addButton( "Macros", "TIMERANGE as Orbit", "%{TIMERANGE;CONTEXT=ts2-roi-list;FORMAT=$o}" );
         return edit;
     }
 
