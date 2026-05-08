@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Bug where "no renderers" message is repeated excessively is fixed.</small></p>
+        <p><small>Red, Green, and Blue components are shown in crosshair digitizer.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -32,6 +32,7 @@
                 
         <p>Bugfixes (2026-05-08):</p>
         <ul>
+            <li>Add %{TIMERANGE;CONTEXT=ts-tandem-rois;FORMAT=$o} to GrannyText editor, so we'll remember how that's done.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2833/">2833</a>: Don't put the axis tab in a scroll pane, since long titles would enlarge the GUI within the view port.
             <li><a href="https://github.com/das-developers/das2java/issues/175">175</a>: property "VALID_MIN" should be type "Number" log messages quieted from WARNING to FINE.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2831/">2831</a>: Jython trace mode supports triple-quoted multi-line strings.
