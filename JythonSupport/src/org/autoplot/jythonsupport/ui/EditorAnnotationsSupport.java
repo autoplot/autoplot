@@ -387,9 +387,6 @@ public class EditorAnnotationsSupport {
      * @param interp the interpreter or null, to allow for further queries by resetting the interpreter.
      */
     public void annotateChars( final int i0, final int i1, final String name, final String text, final PythonInterpreter interp ) {
-        if ( name.equals(ANNO_MAYBE_ERROR) ) {
-            System.err.println("stop here");
-        }
         
         SwingUtilities.invokeLater(() -> {
             boolean lightBackground= ( (
