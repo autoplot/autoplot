@@ -645,7 +645,7 @@ public class AppScriptPanelSupport {
                 PyObject o= ex.value;
                 if ( o!=null ) {
                     //findbugs pointed out the absurd code I had here.
-                    logger.info("when does 574 happen?");
+                    logger.fine("when does 574 happen?");
                 }
                 otraceback= traceback.tb_next;
             } else { // typical
