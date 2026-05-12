@@ -231,8 +231,12 @@ public class NameValueTreeModel implements TreeModel {
         if (parent == root) {
             return nodes.size();
         } else {
-            TreeNode p = (TreeNode) parent;
-            return p.childCount();
+            if ( parent instanceof TreeNode ) {
+                TreeNode p = (TreeNode) parent;
+                return p.childCount();
+            } else {
+                return 0;
+            }
         }
     }
 
