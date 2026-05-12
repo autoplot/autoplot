@@ -16,8 +16,10 @@ import org.das2.datum.DatumUtil;
 import org.das2.util.CombinedTreeModel;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JPopupMenu;
@@ -43,6 +45,7 @@ import org.autoplot.datasource.MetadataModel;
 import org.das2.qds.util.AutoHistogram;
 import org.das2.qds.util.PropertiesTreeModel;
 import org.autoplot.metatree.NameValueTreeModel;
+import org.autoplot.util.TreeStateUtil;
 import org.das2.datum.Datum;
 import org.das2.datum.Units;
 
@@ -65,6 +68,8 @@ public class MetadataPanel extends javax.swing.JPanel {
     Thread updateComponentDataSetThread= null;
     Thread updateStatisticsThread= null;
     
+    Set<String> expandedPaths= Collections.emptySet();
+    
     private static final Logger logger= LoggerManager.getLogger("gui.metadata");
     
     public MetadataPanel(ApplicationModel applicationModel) {
@@ -75,7 +80,7 @@ public class MetadataPanel extends javax.swing.JPanel {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                metaDataTree.setModel(null);
+                metadataTree.setModel(null);
             }
         });
 
@@ -103,7 +108,7 @@ public class MetadataPanel extends javax.swing.JPanel {
         bindToPlotElement(dom.getController().getPlotElement());
 
         MouseListener popupTrigger = createPopupTrigger();
-        metaDataTree.addMouseListener( popupTrigger );
+        metadataTree.addMouseListener( popupTrigger );
         
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "metadataPanel");
         
@@ -180,9 +185,21 @@ public class MetadataPanel extends javax.swing.JPanel {
 
     }
 
+    private void invokeOnEventOrLater(Runnable run) {
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            run.run();
+        } else {
+            SwingUtilities.invokeLater(run);
+        }
+    }
+    
     private void updateProperties() {
 
         try {
+            Set<String> possibleExpandedPaths= TreeStateUtil.saveExpandedPaths( this.metadataTree );
+            if ( !possibleExpandedPaths.isEmpty() ) {
+                expandedPaths= possibleExpandedPaths;
+            }            
             DataSourceFilter dsf = dom.getController().getDataSourceFilter();
             DataSourceController dsfc= null;
             DataSource dataSource = null;
@@ -193,11 +210,8 @@ public class MetadataPanel extends javax.swing.JPanel {
             if ( dsfc==null ) {
                 String label = "(data source controller is null)";
                 tree = new CombinedTreeModel(label);
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        metaDataTree.setModel(tree);
-                    }
+                invokeOnEventOrLater(() -> {
+                    metadataTree.setModel(tree);
                 });
 
             } else if (dataSource != null) {
@@ -213,12 +227,9 @@ public class MetadataPanel extends javax.swing.JPanel {
 
                 final TreeModel dsrcMeta = NameValueTreeModel.create(root, meta);
                 if (dsrcMeta != null) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            tree.mountTree(dsrcMeta, 10);
-                            metaDataTree.setModel(tree);
-                        }
+                    invokeOnEventOrLater(() -> {
+                        tree.mountTree(dsrcMeta, 10);
+                        metadataTree.setModel(tree);
                     });
                 }
 
@@ -228,11 +239,8 @@ public class MetadataPanel extends javax.swing.JPanel {
                     label = "dataset";
                 }
                 tree = new CombinedTreeModel(label);
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        metaDataTree.setModel(tree);
-                    }
+                invokeOnEventOrLater(() -> {
+                    metadataTree.setModel(tree);
                 });
                 
             }
@@ -256,7 +264,6 @@ public class MetadataPanel extends javax.swing.JPanel {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getPropertyName().equals(DataSourceController.PROP_FILLDATASET)) {
-                //System.err.println("fillChanged: "+evt+" "+evt.getPropertyName()+" "+evt.getOldValue()+" "+evt.getNewValue());
                 updateStatistics();
             }
         }
@@ -309,7 +316,7 @@ public class MetadataPanel extends javax.swing.JPanel {
 //        }
 //
 //        String scale;
-//        if (metaDataTree.getFont().canDisplay((char) 2581)) {
+//        if (metadataTree.getFont().canDisplay((char) 2581)) {
 //            scale = "\u2581\u2582\u2583\u2584\u2585\u2586\u2587\u2588";
 //        } else {
 //            scale = " .:!#";
@@ -380,6 +387,7 @@ public class MetadataPanel extends javax.swing.JPanel {
                     tree.unmountTree(unmount);
                 }
                 tree.mountTree(dsTree, 30);
+                TreeStateUtil.restoreExpandedPaths( metadataTree, expandedPaths );
             }
         });
     }
@@ -550,7 +558,7 @@ public class MetadataPanel extends javax.swing.JPanel {
         copyValueMenuItem = new javax.swing.JMenuItem();
         copyWithPathMenuItem = new javax.swing.JMenuItem();
         jScrollPane1 = new javax.swing.JScrollPane();
-        metaDataTree = new javax.swing.JTree();
+        metadataTree = new javax.swing.JTree();
 
         copyMenuItem.setText("copy");
         copyMenuItem.setToolTipText("Copy item to system clip board");
@@ -577,7 +585,7 @@ public class MetadataPanel extends javax.swing.JPanel {
         });
         jPopupMenu1.add(copyWithPathMenuItem);
 
-        jScrollPane1.setViewportView(metaDataTree);
+        jScrollPane1.setViewportView(metadataTree);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -593,7 +601,7 @@ public class MetadataPanel extends javax.swing.JPanel {
 
     private void copyMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyMenuItemActionPerformed
         LoggerManager.logGuiEvent(evt);
-        TreePath tp= metaDataTree.getSelectionPath();
+        TreePath tp= metadataTree.getSelectionPath();
         if ( tp==null ) return;
         StringSelection stringSelection = new StringSelection( tp.getLastPathComponent().toString() );
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -606,7 +614,7 @@ public class MetadataPanel extends javax.swing.JPanel {
 
     private void copyValueMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyValueMenuItemActionPerformed
         LoggerManager.logGuiEvent(evt);
-        TreePath tp= metaDataTree.getSelectionPath();
+        TreePath tp= metadataTree.getSelectionPath();
         if ( tp==null ) return;
         String s= tp.getLastPathComponent().toString();
         int i= s.indexOf('=');
@@ -624,7 +632,7 @@ public class MetadataPanel extends javax.swing.JPanel {
 
     private void copyWithPathMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyWithPathMenuItemActionPerformed
         LoggerManager.logGuiEvent(evt);
-        TreePath tp= metaDataTree.getSelectionPath();
+        TreePath tp= metadataTree.getSelectionPath();
         if ( tp==null ) return;
         StringBuilder sb= new StringBuilder("/"); // note two slashes to start, as with xpath.
         Object[] path= tp.getPath();
@@ -647,6 +655,6 @@ public class MetadataPanel extends javax.swing.JPanel {
     private javax.swing.JMenuItem copyWithPathMenuItem;
     private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTree metaDataTree;
+    private javax.swing.JTree metadataTree;
     // End of variables declaration//GEN-END:variables
 }
