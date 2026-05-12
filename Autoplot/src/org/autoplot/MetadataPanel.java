@@ -198,8 +198,14 @@ public class MetadataPanel extends javax.swing.JPanel {
         try {
             Set<String> possibleExpandedPaths= TreeStateUtil.saveExpandedPaths( this.metadataTree );
             if ( !possibleExpandedPaths.isEmpty() ) {
-                expandedPaths= possibleExpandedPaths;
-            }            
+                if ( possibleExpandedPaths.size()==1 ) {
+                    if ( expandedPaths.size()==1 ) {
+                        expandedPaths= possibleExpandedPaths;
+                    } 
+                } else {                
+                    expandedPaths= possibleExpandedPaths;
+                }
+            }
             DataSourceFilter dsf = dom.getController().getDataSourceFilter();
             DataSourceController dsfc= null;
             DataSource dataSource = null;
