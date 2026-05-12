@@ -30,8 +30,9 @@
 
         <p>Autoplot's development is guided by feedback from those using it.  Thanks for your feedback!</p>
                 
-        <p>Bugfixes (2026-05-08):</p>
+        <p>Bugfixes (2026-05-12):</p>
         <ul>
+            <li>Support &amp;shortparallel; &amp;NotDoubleVerticalBar; (&shortparallel; &NotDoubleVerticalBar;) in Entities.  There was a max length that was preventing them from working.
             <li>Add %{TIMERANGE;CONTEXT=ts-tandem-rois;FORMAT=$o} to GrannyText editor, so we'll remember how that's done.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2833/">2833</a>: Don't put the axis tab in a scroll pane, since long titles would enlarge the GUI within the view port.
             <li><a href="https://github.com/das-developers/das2java/issues/175">175</a>: property "VALID_MIN" should be type "Number" log messages quieted from WARNING to FINE.
@@ -56,6 +57,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/872/">872</a>: try to keep metadata folders open as focus switches.
             <li>Add File->"Open Local .jy Script..." to menubar.
             <li>Support $s (integer number of seconds since 1970-01-01T00:00Z) in aggregations.
         </ul>
