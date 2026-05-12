@@ -62,7 +62,7 @@ public class TreeStateUtil {
 
         String s = pathToString(parent);
 
-        if (expandedPaths.contains(s)) {
+        if (expandedPaths.contains(s) ) {
             tree.expandPath(parent);
         }
 
@@ -90,8 +90,16 @@ public class TreeStateUtil {
 
         for (int i = 0; i < objs.length; i++) {
             if (i > 0) sb.append("/");
-
-            sb.append(objs[i].toString());
+            if (i==0 ) {
+                sb.append("dataset"); // kludge for Autoplot: ignore the URI which is the root.
+            } else {
+                String s= objs[i].toString();
+                int ieq= s.indexOf("=");
+                if ( ieq>-1 ) {
+                    s= s.substring(0,ieq);
+                }
+                sb.append(s);
+            }
         }
 
         return sb.toString();
