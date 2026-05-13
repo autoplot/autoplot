@@ -73,11 +73,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TooManyListenersException;
@@ -190,6 +192,8 @@ import org.das2.components.propertyeditor.AxisFormatStringSchemeEditor;
 import org.das2.components.propertyeditor.TickValuesStringSchemeEditor;
 import org.das2.graph.GraphUtil;
 import org.das2.components.propertyeditor.SpecialColorsStringSchemeEditor;
+import org.das2.event.DasMouseInputAdapter;
+import org.das2.event.MouseModule;
 import org.das2.system.DasLogger;
 import org.das2.util.CsvFileLogHandler;
 import org.das2.util.FileUtil;
@@ -2330,6 +2334,59 @@ APSplash.checkTime("init 52.9");
         }
     }
 
+    /**
+     * do reset actions, but also remove extra panels and mouse event handlers
+     */
+    public void fullReset() {
+        getDocumentModel().getController().reset();
+        clearRightPanel();
+        clearLeftPanel();
+        clearBottomPanel();
+        
+        Set<String> keep= new HashSet<>();
+        keep.add("canvas");
+        keep.add("axes");
+        keep.add("style");
+        keep.add("layout");
+        keep.add("data");
+        keep.add("metadata");
+        keep.add("script");
+        keep.add("console");
+        
+        Component[] cc= getTabs().getComponents();
+        for ( int i=0; i<cc.length; i++ ) {
+            Component c= cc[i];
+            String title= getTabs().getTitleAt(i);
+            if ( keep.contains(title) ) {
+                
+            } else {
+                logger.log(Level.FINE, "Removing tab {0}", title);
+                getTabs().remove(c);
+            }
+        }
+        
+        keep= new HashSet<>();
+        keep.add("Zoom X");
+        keep.add("Zoom Y");
+        keep.add("Crosshair Digitizer");
+        keep.add("Zoom Pan");
+        keep.add("Box Zoom");
+        keep.add("Length");
+        keep.add("Display Data");
+        keep.add("Slope");
+        for ( Plot p: dom.getPlots() ) {
+            DasMouseInputAdapter dmia= p.getController().getDasPlot().getDasMouseInputAdapter();
+            MouseModule[] mm= dmia.getMouseModules();
+            for ( int i=0; i<mm.length; i++ ) {
+                MouseModule m= mm[i];
+                String label= m.getLabel();
+                if ( !keep.contains(label) ) {
+                    logger.log(Level.FINE, "removing MouseModule {0}", label);
+                    dmia.removeMouseModule(m);
+                }
+            }
+        }
+    }
 
     private JPanel initLogConsole() throws SecurityException {
         logConsole = new LogConsole();

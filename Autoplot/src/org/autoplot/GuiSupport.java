@@ -799,7 +799,11 @@ public class GuiSupport {
                     @Override
                     public void run() {
                         parent.resizeForCanvasSize(parent.dom.getOptions().getWidth(), parent.dom.getOptions().getHeight()); 
-                        parent.dom.getController().reset();
+                        if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
+                            parent.fullReset(); //TODO: probably should happen on event thread
+                        } else {
+                            parent.dom.getController().reset();
+                        }
                         parent.undoRedoSupport.resetHistory();
                         parent.applicationModel.setVapFile(null);
                         parent.stateSupport.close();
