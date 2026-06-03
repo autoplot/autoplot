@@ -326,6 +326,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
     }
 
     public void setApplicationModel(ApplicationModel appModel ) {
+        logger.log(Level.FINE, "setApplicationModel appModel.id: {0}", Integer.toHexString(appModel.hashCode()));
         this.appModel= appModel;
     }
 
@@ -334,12 +335,12 @@ public final class GuiExceptionHandler implements ExceptionHandler {
     }
 
     String updateText( GuiExceptionHandlerSubmitForm form, String userComments ) {
-        map.put( INCLDOM, form.isAllowDom() );
-        map.put( INCLSCREEN, form.isAllowScreenshot() );
-        map.put( EMAIL, form.getEmailTextField().getText() );
-        map.put( USER_ID, form.getUsernameTextField().getText().replaceAll(" ","_") );
+        data.put( INCLDOM, form.isAllowDom() );
+        data.put( INCLSCREEN, form.isAllowScreenshot() );
+        data.put( EMAIL, form.getEmailTextField().getText() );
+        data.put( USER_ID, form.getUsernameTextField().getText().replaceAll(" ","_") );
 
-        return formatReport( t, bis, recs, map, uncaught, userComments );
+        return formatReport(t, bis, recs, data, uncaught, userComments );
     }
 
     static class DiaDescriptor {
@@ -870,20 +871,20 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
     List<LogRecord> recs;
     List<String> bis;
-    Map<String,Object> map;
+    Map<String,Object> data;
     boolean uncaught;
     Throwable t;
 
     private synchronized String getReport( GuiExceptionHandlerSubmitForm form ) {
         String id= form.getUsernameTextField().getText().replaceAll(" ","_");
         if ( id.trim().equals("") ) id= "anon";
-        map.put( USER_ID, id );
+        data.put( USER_ID, id );
 
         String email= form.getEmailTextField().getText();
-        map.put( EMAIL, email );
+        data.put( EMAIL, email );
 
-        map.put( INCLSCREEN, form.isAllowScreenshot() );
-        String report= formatReport( t, bis, recs, map, uncaught, form.getUserTextArea().getText() );
+        data.put( INCLSCREEN, form.isAllowScreenshot() );
+        String report= formatReport(t, bis, recs, data, uncaught, form.getUserTextArea().getText() );
         logger.log(Level.FINE, "indexOf arrow= {0}", report.indexOf( (char)8594 ));
         return report;
 
@@ -926,24 +927,26 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
         if ( lc!=null ) recs= lc.records;
 
-        map=new HashMap();
+        data=new HashMap();
 
-        map.put( APP_MODEL, appModel );
-        map.put( UNDO_REDO_SUPPORT, undoRedoSupport );
+        logger.log(Level.FINE, "appModel: {0}", Integer.toHexString(appModel.hashCode()));
+        
+        data.put( APP_MODEL, appModel );
+        data.put( UNDO_REDO_SUPPORT, undoRedoSupport );
         
         String id;
         id= System.getProperty("user.name");
 
-        map.put( USER_ID, id );
-        map.put( EMAIL, "" );
-        map.put( FOCUS_URI, focusURI );
-        map.put( PENDING_FOCUS_URI, pendingFocus );
-        map.put( APP_COUNT, appCount );
+        data.put( USER_ID, id );
+        data.put( EMAIL, "" );
+        data.put( FOCUS_URI, focusURI );
+        data.put( PENDING_FOCUS_URI, pendingFocus );
+        data.put( APP_COUNT, appCount );
         
         this.uncaught= uncaught;
         this.t= t;
 
-        String report= formatReport( t, bis, recs, map, uncaught, "USER COMMENTS" );
+        String report= formatReport(t, bis, recs, data, uncaught, "USER COMMENTS" );
 
         String url = "https://cottagesystems.com/RTEReceiver/LargeUpload.jsp";
 
@@ -956,8 +959,8 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
             form.getDataTextArea().setText( report );
 
-            form.getUsernameTextField().setText( (String)map.get(USER_ID) );
-            form.getEmailTextField().setText( (String)map.get(EMAIL) );
+            form.getUsernameTextField().setText((String)data.get(USER_ID) );
+            form.getEmailTextField().setText((String)data.get(EMAIL) );
 
             String[] choices= { "Copy to Clipboard", "Save to File", "Cancel", "Switch to Email", "Submit" };
             
@@ -1021,9 +1024,9 @@ public final class GuiExceptionHandler implements ExceptionHandler {
                         
                     } else {
                         //TODO soon: this needs to be done off the event thread.  It causes the app to hang when there is no internet.
-                        report= formatReport( t, bis, recs, map, uncaught, form.getUserTextArea().getText() );
+                        report= formatReport(t, bis, recs, data, uncaught, form.getUserTextArea().getText() );
                         
-                        String sid= (String)map.get("USER_ID");
+                        String sid= (String)data.get("USER_ID");
                         sid= safe( sid.replaceAll(" ","").replaceAll("_","") );
                         fname=  String.format( "rte_%010d_%s_%s.xml", rteHash, eventId, sid );
                         
@@ -1060,10 +1063,10 @@ public final class GuiExceptionHandler implements ExceptionHandler {
                 case 0:
                     id= form.getUsernameTextField().getText().replaceAll(" ","_");
                     if ( id.trim().equals("") ) id= "anon";
-                    map.put( USER_ID, id );
+                    data.put( USER_ID, id );
                     String email= form.getEmailTextField().getText();
-                    map.put( EMAIL, email );
-                    report= formatReport( t, bis, recs, map, uncaught, form.getUserTextArea().getText() );
+                    data.put( EMAIL, email );
+                    report= formatReport(t, bis, recs, data, uncaught, form.getUserTextArea().getText() );
                     StringSelection stringSelection = new StringSelection(report);
                     Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                     clipboard.setContents(stringSelection, new ClipboardOwner() {
