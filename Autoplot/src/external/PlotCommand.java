@@ -427,7 +427,7 @@ public class PlotCommand extends PyObject {
                 String kw= keywords[i-nparm];
                 PyObject val= args[i];
 
-                String sval= (String) val.__str__().__tojava__(String.class);
+                String sval= ( val==Py.None ) ? "" : (String) val.__str__().__tojava__(String.class);
                 if ( kw.equals("ytitle") ) {
                     plot.getYaxis().setLabel( sval);
                 } else if ( kw.equals("yrange") ) {
