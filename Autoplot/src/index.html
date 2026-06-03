@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Autoplot keeps nodes open in metadata tab as dataset focus changes, allowing comparisons.</small></p>
+        <p><small>More attempts to parse a TIFF using the BinaryDataSource.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,9 @@
 
         <p>Autoplot's development is guided by feedback from those using it.  Thanks for your feedback!</p>
                 
-        <p>Bugfixes (2026-05-12):</p>
+        <p>Bugfixes (2026-06-03):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2841/">2841</a>: starting a second Autoplot instance could result in the wrong vap being submitted for runtime errors.
             <li>Support &amp;shortparallel; &amp;NotDoubleVerticalBar; (&shortparallel; &NotDoubleVerticalBar;) in Entities.  There was a max length that was preventing them from working.
             <li>Add %{TIMERANGE;CONTEXT=ts-tandem-rois;FORMAT=$o} to GrannyText editor, so we'll remember how that's done.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2833/">2833</a>: Don't put the axis tab in a scroll pane, since long titles would enlarge the GUI within the view port.
