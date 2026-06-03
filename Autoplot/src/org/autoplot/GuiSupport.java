@@ -153,6 +153,7 @@ import org.autoplot.dom.Column;
 import org.autoplot.dom.DomNode;
 import org.autoplot.dom.Row;
 import org.autoplot.renderer.AnnotationEditorPanel;
+import org.autoplot.scriptconsole.GuiExceptionHandler;
 import org.das2.components.propertyeditor.EnumerationEditor;
 import org.das2.datum.Datum;
 import org.das2.graph.DasColorBar;
@@ -835,7 +836,11 @@ public class GuiSupport {
      */
     ApplicationModel newApplication() {
         final ApplicationModel model = new ApplicationModel();
-        model.setExceptionHandler( GuiSupport.this.parent.applicationModel.getExceptionHandler() );
+        if ( DasApplication.getDefaultApplication().isHeadless() ) {
+            model.setExceptionHandler( DasApplication.getDefaultApplication().getExceptionHandler() );
+        } else {
+            model.setExceptionHandler( new GuiExceptionHandler() );
+        }
         Runnable run= new Runnable() {
             @Override
             public void run() {
