@@ -144,7 +144,7 @@ public class PlotCommand extends PyObject {
      * implement the python call.
      * @param args the "rightmost" elements are the keyword values.
      * @param keywords the names for the keywords.
-     * @return Py.None
+     * @return a two-element list containing the plot and plotElement used.
      */
     @Override
     public PyObject __call__(PyObject[] args, String[] keywords) {
@@ -234,110 +234,128 @@ public class PlotCommand extends PyObject {
         dom= scriptContext.getDocumentModel();
         String renderType=null;
         for ( int i=0; i<keywords.length; i++  ) {
-            if ( keywords[i].equals("renderType" ) ) {
-                renderType= args[i+nparm].toString();
-            } else if ( keywords[i].equals("column") || keywords[i].equals("xpos")) {
-                String spec= args[i+nparm].toString();
-                if ( Ops.isSafeName(spec) ) {
-                    DomNode n= DomUtil.getElementById( dom, spec );
-                    if ( n instanceof Column ) {
-                        column= (Column)n;
-                    } else {
-                        throw new IllegalArgumentException("column named parameter is not the name of a column");
-                    }
-                } else if ( args[i+nparm] instanceof PyString ) {
-                    column= dom.getCanvases(0).getController().maybeAddColumn( spec );
-                } else {
-                    try {
-                        column= (Column)args[i+nparm].__tojava__(Column.class);
-                    } catch (Exception e ) {
-                        String columnId=((Plot)args[i+nparm].__tojava__(Plot.class)).getColumnId();
-                        DomNode n= DomUtil.getElementById( dom, columnId );
-                        column= (Column)n;
-                    }
-                }
-                if ( row==null ) row=dom.getCanvases(0).getMarginRow();
-            } else if ( keywords[i].equals("row") || keywords[i].equals("ypos")) {
-                String spec= args[i+nparm].toString();
-                if ( Ops.isSafeName(spec) ) {
-                    DomNode n= DomUtil.getElementById( dom, spec );
-                    if ( n instanceof Row ) {
-                        row= (Row)n;                        
-                    } else {
-                        throw new IllegalArgumentException("row named parameter is not the name of a row");
-                    }
-                } else if ( args[i+nparm] instanceof PyString ) {
-                    row= dom.getCanvases(0).getController().maybeAddRow( spec );                 
-                } else {
-                    try {
-                        row= (Row)args[i+nparm].__tojava__(Row.class);
-                    } catch (Exception e ) {
-                        String rowId=((Plot)args[i+nparm].__tojava__(Plot.class)).getRowId();
-                        DomNode n= DomUtil.getElementById( dom, rowId );
-                        row= (Row)n;
-                    }
-                }
-                if ( column==null ) column=dom.getCanvases(0).getMarginColumn();
-            } else if ( keywords[i].equals("rightAxisOf") || keywords[i].equals("topAxisOf") || keywords[i].equals("overplotOf") ) {
-                String spec= args[i+nparm].toString();
-                Plot p=null;
-                if ( Ops.isSafeName(spec) ) {
-                    DomNode n= DomUtil.getElementById( dom, spec );
-                    if ( n instanceof PlotElement ) {
-                        n= DomUtil.getElementById( dom, ((PlotElement)n).getPlotId() );
-                    }
-                    p= (Plot)n;
-                } else {
-                    try {
-                        p = (Plot)args[i+nparm].__tojava__(Plot.class);
-                    } catch ( Exception e ) {
-                        PlotElement pe= ((PlotElement)args[i+nparm].__tojava__(PlotElement.class));
-                        if ( pe!=null ) {
-                            p= (Plot) DomUtil.getElementById( dom, ((PlotElement)pe).getPlotId() );
-                        }                        
-                    }
-                }
-                if ( p==null ) {
-                    throw new IllegalArgumentException("unable to identify plot");
-                }
-                Plot underPlot=null;
-                row= (Row)DomUtil.getElementById(dom,p.getRowId());
-                column= (Column)DomUtil.getElementById(dom,p.getColumnId());
-                if ( keywords[i].equals("overplotOf") ) {
-                    plot= p;
-                    iplot= dom.getDataSourceFilters().length;
-                } else {
-                    for ( Plot p1: dom.getPlots() ) {
-                        if ( p1.getRowId().equals(row.getId()) && p1.getColumnId().equals(column.getId()) ) {
-                            if ( p1.getYaxis().isOpposite() ) {
-                                plot= p1;
+            switch (keywords[i]) {
+                case "renderType":
+                    renderType= args[i+nparm].toString();
+                    break;
+                case "column":
+                case "xpos":
+                    {
+                        String spec= args[i+nparm].toString();
+                        if ( Ops.isSafeName(spec) ) {
+                            DomNode n= DomUtil.getElementById( dom, spec );
+                            if ( n instanceof Column ) {
+                                column= (Column)n;
                             } else {
-                                underPlot= p1;
+                                throw new IllegalArgumentException("column named parameter is not the name of a column");
                             }
-                        }
+                        } else if ( args[i+nparm] instanceof PyString ) {
+                            column= dom.getCanvases(0).getController().maybeAddColumn( spec );
+                        } else {
+                            try {
+                                column= (Column)args[i+nparm].__tojava__(Column.class);
+                            } catch (Exception e ) {
+                                String columnId=((Plot)args[i+nparm].__tojava__(Plot.class)).getColumnId();
+                                DomNode n= DomUtil.getElementById( dom, columnId );
+                                column= (Column)n;
+                            }
+                        }       
+                        if ( row==null ) row=dom.getCanvases(0).getMarginRow();
+                        break;
                     }
-                }
-                
-                if ( plot==null ) {
-                    plot= dom.getController().addPlot( row, column );
-                    if ( keywords[i].equals("rightAxisOf") ) {
-                        plot.getYaxis().setOpposite(true);
-                        dom.getController().bind( underPlot.getXaxis(), "range", plot.getXaxis(), "range"  );
-                        plot.getXaxis().setVisible(false);
-                    } else if ( keywords[i].equals("topAxisOf") ) {
-                        plot.getXaxis().setOpposite(true);
-                        dom.getController().bind( underPlot.getYaxis(), "range", plot.getYaxis(), "range"  );
-                        plot.getYaxis().setVisible(false);
+                case "row":
+                case "ypos":
+                    {
+                        String spec= args[i+nparm].toString();
+                        if ( Ops.isSafeName(spec) ) {
+                            DomNode n= DomUtil.getElementById( dom, spec );
+                            if ( n instanceof Row ) {
+                                row= (Row)n;
+                            } else {
+                                throw new IllegalArgumentException("row named parameter is not the name of a row");
+                            }
+                        } else if ( args[i+nparm] instanceof PyString ) {
+                            row= dom.getCanvases(0).getController().maybeAddRow( spec );
+                        } else {
+                            try {
+                                row= (Row)args[i+nparm].__tojava__(Row.class);
+                            } catch (Exception e ) {
+                                String rowId=((Plot)args[i+nparm].__tojava__(Plot.class)).getRowId();
+                                DomNode n= DomUtil.getElementById( dom, rowId );
+                                row= (Row)n;
+                            }
+                        }       
+                        if ( column==null ) column=dom.getCanvases(0).getMarginColumn();
+                        break;
                     }
-                }
-                
-            } else if ( keywords[i].equals("index") ) {
-                int sindex= Integer.parseInt( args[i+nparm].toString() );
-                iplot= sindex;
-            } else if ( keywords[i].equals("reset") ) {
-                reset= args[i+nparm].equals(True);
-            } else if ( keywords[i].equals("renderer") ) {
-                renderType="internal";
+                case "rightAxisOf":
+                case "topAxisOf":
+                case "overplotOf":
+                    {
+                        String spec= args[i+nparm].toString();
+                        Plot p=null;
+                        if ( Ops.isSafeName(spec) ) {
+                            DomNode n= DomUtil.getElementById( dom, spec );
+                            if ( n instanceof PlotElement ) {
+                                n= DomUtil.getElementById( dom, ((PlotElement)n).getPlotId() );
+                            }
+                            p= (Plot)n;
+                        } else {
+                            try {
+                                p = (Plot)args[i+nparm].__tojava__(Plot.class);
+                            } catch ( Exception e ) {
+                                PlotElement pe= ((PlotElement)args[i+nparm].__tojava__(PlotElement.class));
+                                if ( pe!=null ) {
+                                    p= (Plot) DomUtil.getElementById( dom, ((PlotElement)pe).getPlotId() );
+                                }
+                            }
+                        }       
+                        if ( p==null ) {
+                            throw new IllegalArgumentException("unable to identify plot");
+                        }       
+                        Plot underPlot=null;
+                        row= (Row)DomUtil.getElementById(dom,p.getRowId());
+                        column= (Column)DomUtil.getElementById(dom,p.getColumnId());
+                        if ( keywords[i].equals("overplotOf") ) {
+                            plot= p;
+                            iplot= dom.getDataSourceFilters().length;
+                        } else {
+                            for ( Plot p1: dom.getPlots() ) {
+                                if ( p1.getRowId().equals(row.getId()) && p1.getColumnId().equals(column.getId()) ) {
+                                    if ( p1.getYaxis().isOpposite() ) {
+                                        plot= p1;
+                                    } else {
+                                        underPlot= p1;
+                                    }
+                                }
+                            }
+                        }       
+                        if ( plot==null ) {
+                            plot= dom.getController().addPlot( row, column );
+                            if ( keywords[i].equals("rightAxisOf") ) {
+                                plot.getYaxis().setOpposite(true);
+                                dom.getController().bind( underPlot.getXaxis(), "range", plot.getXaxis(), "range"  );
+                                plot.getXaxis().setVisible(false);
+                            } else if ( keywords[i].equals("topAxisOf") ) {
+                                plot.getXaxis().setOpposite(true);
+                                dom.getController().bind( underPlot.getYaxis(), "range", plot.getYaxis(), "range"  );
+                                plot.getYaxis().setVisible(false);
+                            }
+                        }       
+                        break;
+                    }
+                case "index":
+                    int sindex= Integer.parseInt( args[i+nparm].toString() );
+                    iplot= sindex;
+                    break;
+                case "reset":
+                    reset= args[i+nparm].equals(True);
+                    break;
+                case "renderer":
+                    renderType="internal";
+                    break;
+                default:
+                    break;
             }
         }
         
@@ -386,12 +404,21 @@ public class PlotCommand extends PyObject {
                 qargs[i]= ds;
             }
 
-            if ( nargs==1 ) {  // x
-                scriptContext.plot( iplot, null, null, qargs[0], renderType, reset );
-            } else if ( nargs==2 ) {  // x, y
-                scriptContext.plot( iplot, null, qargs[0], qargs[1], renderType, reset );
-            } else if ( nargs==3 ) {  // x, y, z
-                scriptContext.plot( iplot, null, qargs[0], qargs[1], qargs[2], renderType, reset );
+            switch (nargs) {
+                case 1:
+                    // x
+                    scriptContext.plot( iplot, null, null, qargs[0], renderType, reset );
+                    break;
+                case 2:
+                    // x, y
+                    scriptContext.plot( iplot, null, qargs[0], qargs[1], renderType, reset );
+                    break;
+                case 3:
+                    // x, y, z
+                    scriptContext.plot( iplot, null, qargs[0], qargs[1], qargs[2], renderType, reset );
+                    break;
+                default:
+                    break;
             }
 
         }
@@ -428,172 +455,224 @@ public class PlotCommand extends PyObject {
                 PyObject val= args[i];
 
                 String sval= ( val==Py.None ) ? "" : (String) val.__str__().__tojava__(String.class);
-                if ( kw.equals("ytitle") ) {
-                    plot.getYaxis().setLabel( sval);
-                } else if ( kw.equals("yrange") ) {
-                    DatumRange newRange= JythonOps.datumRange(val,plot.getYaxis().getRange().getUnits());
-                    if ( plot.getYaxis().isLog() && newRange.min().doubleValue(newRange.getUnits())<0 ) {
-                        plot.getYaxis().setLog(false);
-                    }
-                    plot.getYaxis().setRange( newRange );
-                } else if ( kw.equals("ylog") ) {
-                    plot.getYaxis().setLog( booleanValue( val ) );
-                } else if ( kw.equals("yscale") ) {
-                    plot.getYaxis().setScale(JythonOps.datum(val));
-                } else if ( kw.equals("xtitle") ) {
-                    plot.getXaxis().setLabel( sval);
-                } else if ( kw.equals("xrange") ) {
-                    DatumRange newRange= JythonOps.datumRange( val,plot.getXaxis().getRange().getUnits() );
-                    if ( plot.getXaxis().isLog() && newRange.min().doubleValue(newRange.getUnits())<0 ) {
-                        plot.getXaxis().setLog(false);
-                    }
-                    plot.getXaxis().setRange( newRange );
-                } else if ( kw.equals("xlog") ) {
-                    plot.getXaxis().setLog( booleanValue(val) );
-                } else if ( kw.equals("xscale") ) {
-                    plot.getXaxis().setScale(JythonOps.datum(val));
-                } else if ( kw.equals("ztitle") ) {
-                    plot.getZaxis().setLabel( sval);
-                } else if ( kw.equals("zrange") ) {
-                    DatumRange newRange= JythonOps.datumRange(val,plot.getZaxis().getRange().getUnits());
-                    if ( plot.getZaxis().isLog() && newRange.min().doubleValue(newRange.getUnits())<0 ) {
-                        plot.getZaxis().setLog(false);
-                    }
-                    plot.getZaxis().setRange( newRange );
-                } else if ( kw.equals("zlog") ) {
-                    plot.getZaxis().setLog( booleanValue(val) );
-                } else if ( kw.equals("color" ) ) {
-                    Color c= JythonOps.color(val);
-                    element.getStyle().setColor( c );
-                } else if ( kw.equals("fillColor" ) ) { // because you can specify renderType=stairSteps, we need fillColor.
-                    Color c;
-                    c= JythonOps.color(val);
-                    element.getStyle().setFillColor( c );
-                } else if ( kw.equals("colorTable" ) ) { 
-                    if ( val.__tojava__(DasColorBar.Type.class) == Py.NoConversion) {
-                        DasColorBar.Type t= org.das2.graph.DasColorBar.Type.parse(sval);
-                        element.getStyle().setColortable(t);
-                    } else {
-                        DasColorBar.Type t = (DasColorBar.Type) val.__tojava__(DasColorBar.Type.class);
-                        element.getStyle().setColortable( t );
-                    }
-                } else if ( kw.equals("title") ) {
-                    plot.setTitle(sval);
-                } else if ( kw.equals("symsize") || kw.equals("symbolSize") ) {
-                    element.getStyle().setSymbolSize( Double.valueOf(sval) );
-                } else if ( kw.equals("symbolFill") ) {
-                    if ( element.getController().getRenderer() instanceof SeriesRenderer ) {
-                        FillStyle sfs;
-                        if ( val==Py.None ) {
-                            sfs= FillStyle.STYLE_NONE;
+                switch (kw) {
+                    case "ytitle":
+                        plot.getYaxis().setLabel( sval);
+                        break;
+                    case "yrange":
+                        {
+                            DatumRange newRange= JythonOps.datumRange(val,plot.getYaxis().getRange().getUnits());
+                            if ( plot.getYaxis().isLog() && newRange.min().doubleValue(newRange.getUnits())<0 ) {
+                                plot.getYaxis().setLog(false);
+                            }       
+                            plot.getYaxis().setRange( newRange );
+                            break;
+                        }
+                    case "ylog":
+                        plot.getYaxis().setLog( booleanValue( val ) );
+                        break;
+                    case "yscale":
+                        plot.getYaxis().setScale(JythonOps.datum(val));
+                        break;
+                    case "xtitle":
+                        plot.getXaxis().setLabel( sval);
+                        break;
+                    case "xrange":
+                        {
+                            DatumRange newRange= JythonOps.datumRange( val,plot.getXaxis().getRange().getUnits() );
+                            if ( plot.getXaxis().isLog() && newRange.min().doubleValue(newRange.getUnits())<0 ) {
+                                plot.getXaxis().setLog(false);
+                            }       
+                            plot.getXaxis().setRange( newRange );
+                            break;
+                        }
+                    case "xlog":
+                        plot.getXaxis().setLog( booleanValue(val) );
+                        break;
+                    case "xscale":
+                        plot.getXaxis().setScale(JythonOps.datum(val));
+                        break;
+                    case "ztitle":
+                        plot.getZaxis().setLabel( sval);
+                        break;
+                    case "zrange":
+                        {
+                            DatumRange newRange= JythonOps.datumRange(val,plot.getZaxis().getRange().getUnits());
+                            if ( plot.getZaxis().isLog() && newRange.min().doubleValue(newRange.getUnits())<0 ) {
+                                plot.getZaxis().setLog(false);
+                            }       
+                            plot.getZaxis().setRange( newRange );
+                            break;
+                        }
+                    case "zlog":
+                        plot.getZaxis().setLog( booleanValue(val) );
+                        break;
+                    case "color":
+                        {
+                            Color c= JythonOps.color(val);
+                            element.getStyle().setColor( c );
+                            break;
+                        }
+                    case "fillColor":
+                        {
+                            // because you can specify renderType=stairSteps, we need fillColor.
+                            Color c;c= JythonOps.color(val);
+                            element.getStyle().setFillColor( c );
+                            break;
+                        }
+                    case "colorTable":
+                        if ( val.__tojava__(DasColorBar.Type.class) == Py.NoConversion) {
+                            DasColorBar.Type t= org.das2.graph.DasColorBar.Type.parse(sval);
+                            element.getStyle().setColortable(t);
                         } else {
-                            sfs = (FillStyle) ClassMap.getEnumElement( FillStyle.class, sval );
+                            DasColorBar.Type t = (DasColorBar.Type) val.__tojava__(DasColorBar.Type.class);
+                            element.getStyle().setColortable( t );
+                        }   
+                        break;
+                    case "title":
+                        plot.setTitle(sval);
+                        break;
+                    case "symsize":
+                    case "symbolSize":
+                        element.getStyle().setSymbolSize( Double.valueOf(sval) );
+                        break;
+                    case "symbolFill":
+                        if ( element.getController().getRenderer() instanceof SeriesRenderer ) {
+                            FillStyle sfs;
+                            if ( val==Py.None ) {
+                                sfs= FillStyle.STYLE_NONE;
+                            } else {
+                                sfs = (FillStyle) ClassMap.getEnumElement( FillStyle.class, sval );
+                            }
+                            ((SeriesRenderer) element.getController().getRenderer() ).setFillStyle(sfs);
+                        }   
+                        break;
+                    case "linewidth":
+                    case "lineWidth":
+                        element.getStyle().setLineWidth( Double.valueOf(sval) );
+                        break;
+                    case "linethick":
+                    case "lineThick":
+                        element.getStyle().setLineWidth( Double.valueOf(sval) );
+                        break;
+                    case "linestyle":
+                    case "lineStyle":
+                        {
+                            PsymConnector p;
+                            if ( val==Py.None ) {
+                                p= PsymConnector.NONE;
+                            } else {
+                                p= (PsymConnector) ClassMap.getEnumElement( PsymConnector.class, sval );
+                            }       element.getStyle().setSymbolConnector( p );
+                            break;
                         }
-                        ((SeriesRenderer) element.getController().getRenderer() ).setFillStyle(sfs);
-                    }
-                } else if ( kw.equals("linewidth" ) || kw.equals("lineWidth") ) {
-                    element.getStyle().setLineWidth( Double.valueOf(sval) );
-                } else if ( kw.equals("linethick" ) || kw.equals("lineThick") ) {
-                    element.getStyle().setLineWidth( Double.valueOf(sval) );
-                } else if ( kw.equals("linestyle") || kw.equals("lineStyle") ) {
-                    PsymConnector p;
-                    if ( val==Py.None ) {
-                        p= PsymConnector.NONE;
-                    } else {
-                        p= (PsymConnector) ClassMap.getEnumElement( PsymConnector.class, sval );
-                    }
-                    element.getStyle().setSymbolConnector( p );
-                } else if ( kw.equals("symbol") ) {
-                    PlotSymbol p;
-                    if ( val==Py.None ) {
-                        p= DefaultPlotSymbol.NONE;
-                    } else {
-                        p= (PlotSymbol) ClassMap.getEnumElement( DefaultPlotSymbol.class, sval );
-                    }
-                    if ( p!=null ) {
-                        element.getStyle().setPlotSymbol( p );
-                    } else {
-                        throw new IllegalArgumentException("unable to identify symbol: "+sval);
-                    }
-                } else if ( kw.equals("renderType") ) {
-                    String srenderType= sval;
-                    String renderControl;
-                    if ( srenderType!=null && srenderType.trim().length()>0 ) {
-                        int ii= srenderType.indexOf('>');
-                        if ( ii==-1 ) {
-                            renderControl= "";
+                    case "symbol":
+                        {
+                            PlotSymbol p;
+                            if ( val==Py.None ) {
+                                p= DefaultPlotSymbol.NONE;
+                            } else {
+                                p= (PlotSymbol) ClassMap.getEnumElement( DefaultPlotSymbol.class, sval );
+                            }       if ( p!=null ) {
+                                element.getStyle().setPlotSymbol( p );
+                            } else {
+                                throw new IllegalArgumentException("unable to identify symbol: "+sval);
+                            }
+                            break;
+                        }
+                    case "renderType":
+                        String srenderType= sval;
+                        String renderControl;
+                        if ( srenderType!=null && srenderType.trim().length()>0 ) {
+                            int ii= srenderType.indexOf('>');
+                            if ( ii==-1 ) {
+                                renderControl= "";
+                            } else {
+                                renderControl= srenderType.substring(ii+1);
+                                srenderType= srenderType.substring(0,ii);
+                            }
+                            RenderType rt= RenderType.valueOf(srenderType);
+                            element.setRenderType(rt);
+                            element.setRenderControl(renderControl);
+                        }   
+                        break;
+                    case "renderer":
+                        Renderer r;
+                        if (val.__tojava__(Renderer.class) != Py.NoConversion) {
+                            Renderer oldRenderer= element.getController().getRenderer();
+                            String control= oldRenderer.getControl();
+                            r = (Renderer) val.__tojava__(Renderer.class);
+                            QDataSet ds1=null;
+                            switch (nargs) {
+                                case 1:
+                                    ds1= qargs[0];
+                                    break;
+                                case 2:
+                                    ds1= Ops.link( qargs[0], qargs[1] );
+                                    break;
+                                case 3:
+                                    ds1= Ops.link( qargs[0], qargs[1], qargs[2] );
+                                    break;
+                                default:
+                                    break;
+                            }
+                            PyObject doAuto= val.__findattr__( "doAutorange" );
+                            if ( doAuto==null ) {
+                                doAuto= val.__findattr__( "autorange" );
+                            }
+                            if ( doAuto!=null && doAuto!=Py.None && ds1!=null ) {
+                                PyObject range= ((PyMethod)doAuto).__call__(new PyQDataSetAdapter().adapt(ds1));
+                                QDataSet rangeds= (QDataSet) range.__tojava__(QDataSet.class);
+                                plot.getXaxis().setRange( DataSetUtil.asDatumRange(rangeds.slice(0) ) );
+                                if ( rangeds.length()>1 ) plot.getYaxis().setRange( DataSetUtil.asDatumRange(rangeds.slice(1) ) );
+                                if ( rangeds.length()>2 ) plot.getZaxis().setRange( DataSetUtil.asDatumRange(rangeds.slice(2) ) );
+                            }
+                            plot.getController().getDasPlot().removeRenderer(oldRenderer);
+                            plot.getController().getDasPlot().addRenderer(r);
+                            r.setDataSet(ds1);
+                            r.setColorBar((DasColorBar) plot.getZaxis().getController().getDasAxis());
+                            element.getController().setRenderer(r);
+                            element.setRenderType(RenderType.internal);
+                            r.setControl(control);
                         } else {
-                            renderControl= srenderType.substring(ii+1);
-                            srenderType= srenderType.substring(0,ii);
-                        }                    
-                        RenderType rt= RenderType.valueOf(srenderType);
-                        element.setRenderType(rt);
-                        element.setRenderControl(renderControl);
-                    }
-                } else if ( kw.equals("renderer") ) {
-                    Renderer r;
-                    if (val.__tojava__(Renderer.class) != Py.NoConversion) {
-                        Renderer oldRenderer= element.getController().getRenderer();
-                        String control= oldRenderer.getControl();
-                        r = (Renderer) val.__tojava__(Renderer.class);
-                        QDataSet ds1=null;
-                        switch (nargs) {
-                            case 1:
-                                ds1= qargs[0];
-                                break;
-                            case 2:
-                                ds1= Ops.link( qargs[0], qargs[1] );
-                                break;
-                            case 3:
-                                ds1= Ops.link( qargs[0], qargs[1], qargs[2] );
-                                break;
-                            default:
-                                break;
-                        }
-                        PyObject doAuto= val.__findattr__( "doAutorange" );
-                        if ( doAuto==null ) {
-                            doAuto= val.__findattr__( "autorange" );
-                        }
-                        if ( doAuto!=null && doAuto!=Py.None && ds1!=null ) {
-                            PyObject range= ((PyMethod)doAuto).__call__(new PyQDataSetAdapter().adapt(ds1));
-                            QDataSet rangeds= (QDataSet) range.__tojava__(QDataSet.class);
-                            plot.getXaxis().setRange( DataSetUtil.asDatumRange(rangeds.slice(0) ) );
-                            if ( rangeds.length()>1 ) plot.getYaxis().setRange( DataSetUtil.asDatumRange(rangeds.slice(1) ) );
-                            if ( rangeds.length()>2 ) plot.getZaxis().setRange( DataSetUtil.asDatumRange(rangeds.slice(2) ) );
-                        }
-                        plot.getController().getDasPlot().removeRenderer(oldRenderer);
-                        plot.getController().getDasPlot().addRenderer(r);
-                        r.setDataSet(ds1);
-                        r.setColorBar((DasColorBar) plot.getZaxis().getController().getDasAxis());
-                        element.getController().setRenderer(r);
-                        element.setRenderType(RenderType.internal);
-                        r.setControl(control);
-                    } else {
-                        logger.warning("no conversion for renderer");
-                    }
-                } else if ( kw.equals("legendLabel" ) ) {
-                    if ( !sval.equals("") ) {
-                        element.setLegendLabel(sval);
-                        element.setDisplayLegend(true);
-                    }
-                } else if ( kw.equals("isotropic" ) ) {
-                    plot.setIsotropic(true);
-                } else if ( kw.equals("xdrawTickLabels") ) {
-                    plot.getXaxis().setDrawTickLabels( booleanValue(val) );
-                } else if ( kw.equals("ydrawTickLabels") ) {
-                    plot.getYaxis().setDrawTickLabels( booleanValue(val) );
-                } else if ( kw.equals("xtickValues") ) {
-                    plot.getXaxis().setTickValues(sval);
-                } else if ( kw.equals("ytickValues") ) {
-                    plot.getYaxis().setTickValues(sval);
-                } else if ( kw.equals("ztickValues") ) {
-                    plot.getZaxis().setTickValues(sval);
-                } else if ( kw.equals("xautoRangeHints") ) {
-                    plot.getXaxis().setAutoRangeHints( sval );
-                } else if ( kw.equals("yautoRangeHints") ) {
-                    plot.getYaxis().setAutoRangeHints( sval );
-                } else if ( kw.equals("zautoRangeHints") ) {
-                    plot.getZaxis().setAutoRangeHints( sval );
+                            logger.warning("no conversion for renderer");
+                        }   
+                        break;
+                    case "legendLabel":
+                        if ( !sval.equals("") ) {
+                            element.setLegendLabel(sval);
+                            element.setDisplayLegend(true);
+                        }   
+                        break;
+                    case "isotropic":
+                        plot.setIsotropic(true);
+                        break;
+                    case "xdrawTickLabels":
+                        plot.getXaxis().setDrawTickLabels( booleanValue(val) );
+                        break;
+                    case "ydrawTickLabels":
+                        plot.getYaxis().setDrawTickLabels( booleanValue(val) );
+                        break;
+                    case "xtickValues":
+                        plot.getXaxis().setTickValues(sval);
+                        break;
+                    case "ytickValues":
+                        plot.getYaxis().setTickValues(sval);
+                        break;
+                    case "ztickValues":
+                        plot.getZaxis().setTickValues(sval);
+                        break;
+                    case "xautoRangeHints":
+                        plot.getXaxis().setAutoRangeHints( sval );
+                        break;
+                    case "yautoRangeHints":
+                        plot.getYaxis().setAutoRangeHints( sval );
+                        break;
+                    case "zautoRangeHints":
+                        plot.getZaxis().setAutoRangeHints( sval );
+                        break;
+                    default:
+                        break;
                 }
             }
             
