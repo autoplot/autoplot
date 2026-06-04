@@ -483,7 +483,12 @@ public class PlotCommand extends PyObject {
                     element.getStyle().setSymbolSize( Double.valueOf(sval) );
                 } else if ( kw.equals("symbolFill") ) {
                     if ( element.getController().getRenderer() instanceof SeriesRenderer ) {
-                        FillStyle sfs= (FillStyle) ClassMap.getEnumElement( FillStyle.class, sval ) ;
+                        FillStyle sfs;
+                        if ( val==Py.None ) {
+                            sfs= FillStyle.STYLE_NONE;
+                        } else {
+                            sfs = (FillStyle) ClassMap.getEnumElement( FillStyle.class, sval );
+                        }
                         ((SeriesRenderer) element.getController().getRenderer() ).setFillStyle(sfs);
                     }
                 } else if ( kw.equals("linewidth" ) || kw.equals("lineWidth") ) {
@@ -491,10 +496,20 @@ public class PlotCommand extends PyObject {
                 } else if ( kw.equals("linethick" ) || kw.equals("lineThick") ) {
                     element.getStyle().setLineWidth( Double.valueOf(sval) );
                 } else if ( kw.equals("linestyle") || kw.equals("lineStyle") ) {
-                    PsymConnector p= (PsymConnector) ClassMap.getEnumElement( PsymConnector.class, sval );
+                    PsymConnector p;
+                    if ( val==Py.None ) {
+                        p= PsymConnector.NONE;
+                    } else {
+                        p= (PsymConnector) ClassMap.getEnumElement( PsymConnector.class, sval );
+                    }
                     element.getStyle().setSymbolConnector( p );
                 } else if ( kw.equals("symbol") ) {
-                    PlotSymbol p= (PlotSymbol) ClassMap.getEnumElement( DefaultPlotSymbol.class, sval );
+                    PlotSymbol p;
+                    if ( val==Py.None ) {
+                        p= DefaultPlotSymbol.NONE;
+                    } else {
+                        p= (PlotSymbol) ClassMap.getEnumElement( DefaultPlotSymbol.class, sval );
+                    }
                     if ( p!=null ) {
                         element.getStyle().setPlotSymbol( p );
                     } else {
