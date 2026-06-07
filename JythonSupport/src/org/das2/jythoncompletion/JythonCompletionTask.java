@@ -333,6 +333,28 @@ public class JythonCompletionTask implements CompletionTask {
             lcontext = interp.eval(cc.contextString);
         } catch (PyException ex) {
             try {
+                if ( cc.contextString.endsWith("()") ) {
+                    String[] ss= cc.contextString.split("\\."); // look for pe.getController().
+                    if ( ss.length==2 ) {
+                        PyObject occ= interp.eval(ss[0]+__CLASSTYPE);
+                        if ( occ!=null && occ instanceof PyJavaClass ) {
+                            try {
+                                if ( occ.toString().contains("org.autoplot.dom.PlotElement") ) {
+                                    lcontextClass= PyJavaClass.lookup( Class.forName( "org.autoplot.dom.PlotElementController") );
+                                } else if ( occ.toString().contains("org.autoplot.dom.Plot") ) {
+                                    lcontextClass= PyJavaClass.lookup( Class.forName( "org.autoplot.dom.PlotController") );
+                                } else {
+                                    System.err.println("Class not supported: "+occ.toString());
+                                }
+                            } catch (ClassNotFoundException ex1) {
+                                Logger.getLogger(JythonCompletionTask.class.getName()).log(Level.SEVERE, null, ex1);
+                            }
+                        } else {
+                            rs.addItem(new MessageCompletionItem("EVAL error: " + cc.contextString, ex.toString()));
+                            return 0;
+                        }
+                    }
+                }
                 if ( cc.contextString.endsWith("]") ) {
                     int k= cc.contextString.lastIndexOf("[");
                     if ( k>-1 ) {
