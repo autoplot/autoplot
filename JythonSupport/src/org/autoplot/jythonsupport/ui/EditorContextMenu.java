@@ -479,10 +479,13 @@ public final class EditorContextMenu {
 "    return result\n" +
 "( mlat, MLT ) = mysynchronize( hfr_spectra, mlat, MLT )" ) );
 
-			fragmentsMenu.add( createInsertMenuItem( "logger", "from org.das2.util import LoggerManager\n" +
-															   "from java.util.logging import Level\n" +
-															   "logger= LoggerManager.getLogger( 'aascript' )\n" +
-															   "logger.log( Level.INFO, 'created logger for {0}', 'aascript')"));
+            fragmentsMenu.add( createInsertMenuItem( "logger", "from org.das2.util import LoggerManager\n" +
+                "from java.util.logging import Level\n" +
+                "logger= LoggerManager.getLogger( 'aascript' )\n" +
+		"logger.log( Level.INFO, 'created logger for {0}', 'aascript')"));
+
+            fragmentsMenu.add( createInsertMenuItem( "assert type", "assert isinstance( p, Plot )\n" ) );
+            
             insertCodeMenu.add(fragmentsMenu);
             
             a= new AbstractAction("getDataSet()") {
