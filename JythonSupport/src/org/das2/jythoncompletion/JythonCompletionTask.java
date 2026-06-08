@@ -599,7 +599,7 @@ public class JythonCompletionTask implements CompletionTask {
     public static final String __CLASSTYPE = "__CLASSTYPE";
 
     /**
-     * 
+     * return a completion list of items found in a particular package.
      * @param cc
      * @param rs
      * @return the count
@@ -607,7 +607,34 @@ public class JythonCompletionTask implements CompletionTask {
     private int queryModules(CompletionContext cc, CompletionResultSet rs) {
         logger.fine("queryModules");
         PythonInterpreter interp = getInterpreter();
-
+        
+        // bring in the giant list of imports of things imported over the years
+        try (BufferedReader r = new BufferedReader(new InputStreamReader(
+                JythonToJavaConverter.class.getResourceAsStream("/importLookup.jy")))) {
+            String l;
+            Pattern p = Pattern.compile("from (.*) import (.*)");
+            while ((l = r.readLine()) != null) {
+                if (l.length() == 0) {
+                    continue;
+                }
+                if (l.charAt(0) == '#') {
+                    continue;
+                }
+                Matcher m = p.matcher(l);
+                if (m.matches()) {
+                    // here is the logic
+                    String tpkg= m.group(1);
+                    if ( tpkg.equals(cc.contextString) ) {
+                        interp.exec(l);
+                    }
+                } else {
+                    logger.log(Level.INFO, "does not match pattern: {0}", l);
+                }
+            }
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+        
         String eval = "targetComponents = '" + cc.contextString + "'.split('.')\n" +
                 "base = targetComponents[0]\n" +
                 "baseModule = __import__(base, globals(), locals())\n" +
