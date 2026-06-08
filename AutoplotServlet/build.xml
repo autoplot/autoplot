@@ -10,7 +10,7 @@
 <project name="AutoplotServlet" default="default" basedir=".">
     <description>Builds, tests, and runs the project AutoplotServlet.</description>
     <import file="nbproject/build-impl.xml"/>
-    
+
     <target name="-pre-compile">
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
@@ -21,48 +21,6 @@
         <echo file="build/web/WEB-INF/classes/buildTime.txt">${timestamp}</echo>
     </target>
     
-    <!-- allow for use outside of Netbeans by including copy of CopyLibs task. -->
-    <property name="libs.CopyLibs.classpath" value="../APLibs/lib/CopyLibs/org-netbeans-modules-java-j2seproject-copylibstask.jar" />
-	 
-	<!-- <taskdef name="deploy"  classname="org.apache.catalina.ant.DeployTask"/> -->
-	<!-- <taskdef name="undeploy"  classname="org.apache.catalina.ant.UndeployTask"/> -->
-	
-<!--	<target name="release" depends="" >
-		<tstamp/>
-		<sshexec host="ec2-174-129-62-39.compute-1.amazonaws.com"
-			username="ubuntu"
-			keyfile="${user.home}/ec2/ec2-keypair.pem"
-			command="cp apache-tomcat-6.0.35/webapps/AutoplotServlet.war release/ &amp;&amp; mv release/AutoplotServlet.war release/AutoplotServlet-${DSTAMP}.war"/>
-	</target>
-	
-	<target name="deploy" depends="default"
-	   description="Deploy application to a remote servlet container">
-
-	  	<tstamp/>
-
-		<echo>Warning: You must run undeploy if more than one deploy is to be executed on the same date.</echo> 
-	  	<echo>Warning: You should undeploy older versions of VxOware to prevent OutOfMemory problems.</echo>	       
-	    <deploy url="http://ec2-174-129-62-39.compute-1.amazonaws.com:8080/manager/html"
-	        username="admin"
-	        password="nimda!exist"
-	            path="/AutoplotServlet"
-	             war="file:./dist/AutoplotServlet.war"/>
-
-	  </target>
-	
-	
-	  <target name="undeploy" depends=""
-	   description="undeploy application to a remote servlet container">
-
-	  	<tstamp/>
-
-		<undeploy url="http://ec2-174-129-62-39.compute-1.amazonaws.com:8080/manager"
-			   username="admin"
-				        password=""
-				            path="/AutoplotServlet"/>
-
-	</target>
--->
     <!--
 
     There exist several targets which are by default empty and which can be 
