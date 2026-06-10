@@ -2154,7 +2154,7 @@ APSplash.checkTime("init 270");
         fileMenu.add( mi );
 
         mi= new JMenuItem( support.createNewDOMAction() );
-        mi.setToolTipText("Reset application to initial state");
+        mi.setToolTipText("Reset application to initial state. Holding shift will reset mouse actions and added tabs.");
         fileMenu.add(mi);
 
         fileMenu.add( new JSeparator() );
