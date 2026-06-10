@@ -969,7 +969,7 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
     /**
      * add code that will paint custom graphics on the canvas or on a plot.
      * The command will be invoked after all other painting is done, making
-     * the decoration to be on top.  Note plots can only have one decoration,
+     * the decoration to be on top.  Note plots and plotElements can only have one decoration,
      * and the Canvas can have any number.  Calling reset() will remove all
      * decorations.
      *<blockquote><pre><small>{@code
@@ -979,14 +979,16 @@ def paint(g):
 
 addTopDecoration( dom.canvases[0], paint )
      *}</small></pre></blockquote>
-     * @param node the plot or canvas over which to plot
+     * @param node the plot, plotElement, or canvas over which to plot
      * @param painter the PyFunction to call when painting
      * @see https://github.com/autoplot/dev/blob/master/demos/2020/20200229/demoAddBottomDecoration.jy
      * 
      */
     public void addTopDecoration( DomNode node, final PyFunction painter ) {
-        if ( !( node instanceof Plot ) && ! ( node instanceof org.autoplot.dom.Canvas ) ) {
-            throw new IllegalArgumentException("first argument must be plot or canvas");
+        if ( !( node instanceof Plot ) 
+                && ! ( node instanceof org.autoplot.dom.Canvas )
+                && ! ( node instanceof org.autoplot.dom.PlotElement ) ) {
+            throw new IllegalArgumentException("first argument must be plotElement, plot, or canvas");
         }
         if ( node instanceof Plot ) {
             final Plot p= (Plot)node;
@@ -1006,6 +1008,15 @@ addTopDecoration( dom.canvases[0], paint )
                 }   
             };
             c.getController().getDasCanvas().addTopDecorator(thep);
+        } else if ( node instanceof org.autoplot.dom.PlotElement ) {
+            final PlotElement pe= (PlotElement)node;
+            Painter thep= new Painter() {
+                @Override
+                public void paint(Graphics2D g) {
+                    painter.__call__(Py.java2py(g));
+                }   
+            };
+            pe.getController().getRenderer().setTopDecorator(thep);
         }
     }
     
@@ -1023,14 +1034,16 @@ def paint(g):
 
 addBottomDecoration( dom.canvases[0], paint )
      *}</small></pre></blockquote>
-     * @param node the plot or canvas over which to plot
+     * @param node the plotElement, plot, or canvas over which to decorate
      * @param painter the PyFunction to call when painting
      * @see https://github.com/autoplot/dev/blob/master/demos/2020/20200229/demoAddBottomDecoration.jy
      * 
      */
     public void addBottomDecoration( DomNode node, final PyFunction painter ) {
-        if ( !( node instanceof Plot ) && ! ( node instanceof org.autoplot.dom.Canvas ) ) {
-            throw new IllegalArgumentException("first argument must be plot or canvas");
+        if ( !( node instanceof Plot ) 
+                && ! ( node instanceof org.autoplot.dom.Canvas )
+                && ! ( node instanceof org.autoplot.dom.PlotElement ) ) {
+            throw new IllegalArgumentException("first argument must be plotElement, plot, or canvas");
         }
         if ( node instanceof Plot ) {
             final Plot p= (Plot)node;
@@ -1050,6 +1063,15 @@ addBottomDecoration( dom.canvases[0], paint )
                 }   
             };
             c.getController().getDasCanvas().addBottomDecorator(thep);
+        } else if ( node instanceof org.autoplot.dom.PlotElement ) {
+            final PlotElement pe= (PlotElement)node;
+            Painter thep= new Painter() {
+                @Override
+                public void paint(Graphics2D g) {
+                    painter.__call__(Py.java2py(g));
+                }   
+            };
+            pe.getController().getRenderer().setBottomDecorator(thep);
         }
     }
     
