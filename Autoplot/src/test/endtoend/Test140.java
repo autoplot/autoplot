@@ -269,6 +269,9 @@ public class Test140 {
         }
         
         String name1= getUniqueFilename( name, ".png", true );
+        String nameVap= name1.substring(0,name1.length()-4)+ ".vap";
+        
+        save(nameVap);
         
         if ( isPublic ) {
             writeToPng( name1 );
