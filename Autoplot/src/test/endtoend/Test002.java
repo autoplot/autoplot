@@ -79,7 +79,7 @@ public class Test002 {
             //mem "007 file:///home/jbf/ct/hudsonvap/Cluster1_HEEA_slices.vap",
             "008 file:///home/jbf/ct/hudson/vap/lanl/lanlGeoEpDemo4.vap",
             "009 file:///home/jbf/ct/hudson/vap/ninePanels.vap",
-            "010 http://autoplot.org/data/autoplot-applet.vap",
+            "010 https://autoplot.org/data/autoplot-applet.vap",
             "011 file:///home/jbf/ct/hudson/vap/twoConnectorsOneDataSource.v1_07.vap",
             "013 file:///home/jbf/ct/autoplot/demos/science/de_eics_species.vap",
          //TODO: why does this rerange?   "014 file:///home/jbf/ct/hudsonvap/garageTemps_v1_07.vap",
