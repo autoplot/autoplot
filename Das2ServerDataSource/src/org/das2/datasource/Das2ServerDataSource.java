@@ -681,7 +681,7 @@ public final class Das2ServerDataSource extends AbstractDataSource {
                 }
             }
             CacheTag ct= (CacheTag) result1.property(QDataSet.CACHE_TAG);
-            if ( ct == null ) ct= (CacheTag) dep.property(QDataSet.CACHE_TAG);
+            if ( ct == null && dep!=null ) ct= (CacheTag) dep.property(QDataSet.CACHE_TAG);
             if ( ct == null) {
                 if (SemanticOps.isBundle(result1)) {
                     QDataSet bounds = SemanticOps.bounds(dep);
