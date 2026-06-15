@@ -674,10 +674,16 @@ public final class Das2ServerDataSource extends AbstractDataSource {
             String prop = QDataSet.DEPEND_0;
             QDataSet dep = (QDataSet) result1.property(prop);
             if (dep == null) {
-                prop = QDataSet.JOIN_0;
-                Object o = result1.property(prop);
+                Object o = result1.property(QDataSet.JOIN_0);
                 if (o instanceof QDataSet) {
                     dep = (QDataSet) o;
+                    prop= QDataSet.JOIN_0;
+                }
+            }
+            if (dep == null) {
+                Object o = result1.property(QDataSet.BUNDLE_1);
+                if (o instanceof QDataSet) {
+                    dep = DataSetOps.unbundle(result1,0);
                 }
             }
             CacheTag ct= (CacheTag) result1.property(QDataSet.CACHE_TAG);
