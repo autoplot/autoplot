@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>A decorator is used to paint radial axes in a script.</small></p>
+        <p><small>Bug in weights after BinAverage routine incorrectly counts any point outside of the range, see <a href="https://github.com/autoplot/dev/blob/master/demos/2021/20210512/scatterBinAverage2D.jy">the script</a>.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -32,6 +32,7 @@
                 
         <p>Bugfixes (2026-06-10):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2849/">2849</a>: properly handle events list in old scheme without cache tag.
             <li>rte_0437651749: Das2Server client code assumed DEPEND_0 was non-null.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2819/">2819</a>: add tooltip about shift+reset.
         </ul>
