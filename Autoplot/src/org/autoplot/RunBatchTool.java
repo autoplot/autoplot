@@ -1594,6 +1594,7 @@ public class RunBatchTool extends javax.swing.JPanel {
             step.setMaximumSize( new Dimension(h*10,h));
             boolean isInt;
             min.setText( String.valueOf( pd.deft ) );
+            max.setText( String.valueOf( pd.deft ) );
             if ( pd.deft instanceof Integer ) {
                 step.setText( "1" ); 
                 isInt= true;
