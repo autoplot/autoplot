@@ -1700,6 +1700,7 @@ addBottomDecoration( dom.canvases[0], paint )
      * formatDataSet( ds, 'foo.dat' ) # also okay
      *}</small></pre></blockquote>
      * 
+     * Since v2026a_6, this will make the directory if it does not exist.
      * @param ds
      * @param file local file name that is the target.
      * @param monitor
@@ -1710,6 +1711,15 @@ addBottomDecoration( dom.canvases[0], paint )
         if ( !file.startsWith("/") && !file.startsWith("vap+") ) {
             String s= getLocalFilename(file);
             file= s;
+        }
+        
+        File dir= new File(file).getParentFile();
+        if ( !dir.exists() ) {
+            if ( !dir.mkdirs() ) {
+                logger.log(Level.INFO, "unable to make directory: {0}", dir);
+            } else {
+                logger.log(Level.FINE, "directory created: {0}", dir);
+            }
         }
 
         DataSourceFormat format;

@@ -674,6 +674,17 @@ public class GuiSupport {
                         if (ext == null) {
                             ext = "";
                         }
+                        
+                        if ( !ext.equals(".audiosystem") ) { 
+                            File dir= new File(file).getParentFile();
+                            if ( !dir.exists() ) {
+                                if ( !dir.mkdirs() ) {
+                                    logger.log(Level.INFO, "unable to make directory: {0}", dir);
+                                } else {
+                                    logger.log(Level.FINE, "directory created: {0}", dir);
+                                }
+                            }
+                        }
 
                         URISplit split= URISplit.parse(file);
                         
