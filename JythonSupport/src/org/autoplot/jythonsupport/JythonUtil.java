@@ -64,6 +64,7 @@ import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
 import org.das2.util.StringTools;
 import org.python.core.PyTuple;
+import org.python.core.PyXRange;
 import org.python.parser.ast.BinOp;
 import org.python.parser.ast.TryExcept;
 
@@ -2177,6 +2178,16 @@ public class JythonUtil {
                 List<Object> enums = new ArrayList(pyList.size());
                 for (int j = 0; j < pyList.size(); j++) {
                     enums.add(j, pyList.get(j));
+                }
+                p.enums = enums;
+            } else if (oo.__getitem__(3) instanceof PyXRange) {
+                PyXRange py = ((PyXRange) oo.__getitem__(3));
+                List<Object> enums = new ArrayList((py.stop-py.start)/py.step);
+                int v= py.start;
+                int nj= ( py.stop- py.start ) / py.step;
+                for (int j = 0; j < nj; j++) {
+                    enums.add(j, v);
+                    v= v + py.step;
                 }
                 p.enums = enums;
             } else if (oo.__getitem__(3) instanceof PyDictionary) {
