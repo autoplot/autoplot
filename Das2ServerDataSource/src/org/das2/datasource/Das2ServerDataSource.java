@@ -57,6 +57,7 @@ import org.das2.client.AccessDeniedException;
 import org.das2.client.DasServerException;
 import org.das2.datum.DatumVector;
 import org.das2.datum.TimeUtil;
+import org.das2.qds.examples.Schemes;
 import org.das2.qds.ops.Ops;
 import org.das2.qstream.QDataSetStreamHandler;
 import org.das2.stream.PacketDescriptor;
@@ -680,27 +681,33 @@ public final class Das2ServerDataSource extends AbstractDataSource {
                     prop= QDataSet.JOIN_0;
                 }
             }
-            if (dep == null) {
-                Object o = result1.property(QDataSet.BUNDLE_1);
-                if (o instanceof QDataSet) {
-                    dep = DataSetOps.unbundle(result1,0);
-                }
-            }
             CacheTag ct= (CacheTag) result1.property(QDataSet.CACHE_TAG);
             if ( ct == null && dep!=null ) ct= (CacheTag) dep.property(QDataSet.CACHE_TAG);
             if ( ct == null) {
                 if (SemanticOps.isBundle(result1)) {
-                    QDataSet bounds = SemanticOps.bounds(dep);
-                    ct = new CacheTag(DataSetUtil.asDatumRange(bounds.slice(1), true), resolution);
+                    QDataSet bounds;
+                    if ( dep!=null ) {
+                        bounds= SemanticOps.bounds(dep);
+                        ct = new CacheTag(DataSetUtil.asDatumRange(bounds.slice(1), true), resolution);
+                    } else if ( result1.rank()==2 && Schemes.isEventsList(result1) ) { // check for events dataset                        
+                        bounds= SemanticOps.bounds(Ops.unbundle(result1,0));
+                        ct = new CacheTag(DataSetUtil.asDatumRange(bounds.slice(1), true), resolution);
+                    }
                 } else {
                     QDataSet bounds = SemanticOps.bounds(result1);
                     ct = new CacheTag(DataSetUtil.asDatumRange(bounds.slice(0), true), resolution);
                 }
-                MutablePropertyDataSet dep2 = DataSetOps.makePropertiesMutable(dep);
-                dep2.putProperty(QDataSet.CACHE_TAG, ct);
-                MutablePropertyDataSet result2 = DataSetOps.makePropertiesMutable(result1);
-                result2.putProperty(prop, dep2);
-                return result2;
+                if ( dep!=null ) {
+                    MutablePropertyDataSet dep2 = DataSetOps.makePropertiesMutable(dep);
+                    dep2.putProperty(QDataSet.CACHE_TAG, ct);
+                    MutablePropertyDataSet result2 = DataSetOps.makePropertiesMutable(result1);
+                    result2.putProperty(prop, dep2);
+                    return result2;
+                } else {
+                    MutablePropertyDataSet result2 = DataSetOps.makePropertiesMutable(result1);
+                    result2.putProperty(QDataSet.CACHE_TAG,ct);
+                    return result2;
+                }
             } else {
                 this.resolution= ct.getResolution();
             }
