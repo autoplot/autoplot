@@ -1671,6 +1671,8 @@ public class JythonCompletionTask implements CompletionTask {
                                 for ( int i1=0; i1<argss.size(); i1++ ) {
                                     argss.set(i1,"");
                                 }
+                            } else if ( jclass.isInterface() ) { // QDataSe<T>t TODO: make nice completion
+                                doConstructors(jclass.getConstructors(),labels,signatures,n,argss);
                             } else {
                                 doConstructors(jclass.getConstructors(),labels,signatures,n,argss);
                             }
