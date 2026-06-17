@@ -424,6 +424,7 @@ public class JythonCompletionTask implements CompletionTask {
                     continue;
                 }
                 String label = ss;
+                // the signature, should end in .html and be relative to the root
                 String signature = null;
                 String args = "";
                 ImageIcon icon= null;
@@ -1366,7 +1367,7 @@ public class JythonCompletionTask implements CompletionTask {
      */
     private static String getPyJavaClassSignature( PyJavaClass pf ) {
         Class javaClass= getJavaClass(pf);
-        return javaClass.getCanonicalName().replaceAll("\\.","/");
+        return javaClass.getCanonicalName().replaceAll("\\.","/")+".html";
     }
     
     /**
