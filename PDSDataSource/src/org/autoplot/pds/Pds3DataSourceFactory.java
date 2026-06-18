@@ -289,9 +289,9 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
         return null;
     } 
     
-    private static WeakHashMap<String,Document> documents= new WeakHashMap<>();
+    private static final WeakHashMap<String,Document> documents= new WeakHashMap<>();
     
-    private static WeakHashMap<String,Long> documentBirthMilli= new WeakHashMap<>();
+    private static final WeakHashMap<String,Long> documentBirthMilli= new WeakHashMap<>();
     
     /**
      * read in the PDS label, resolving STRUCTURES which are loaded with a pointer.  This will look in the current
@@ -319,6 +319,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
                     Long birthTime= documentBirthMilli.get(slabelUrl);
                     if ( birthTime!=null ) {
                         if ( System.currentTimeMillis()-birthTime < 10000 ) {
+                            logger.exiting( "Pds3DataSourceFactory", "getDocumentWithImports" );
                             return doc1;
                         }
                     }                    
