@@ -37,7 +37,6 @@ import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -48,7 +47,7 @@ import org.xml.sax.SAXException;
  */
 public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
 
-    private static Logger logger= LoggerManager.getLogger("apdss.pds");
+    private static final Logger logger= LoggerManager.getLogger("apdss.pds");
 
     @Override
     public DataSource getDataSource(URI uri) throws Exception {
@@ -208,7 +207,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
             if ( id==null ) id= params.get("Z");
 
             FilePointer filePointer;
-            File xmlfile = DataSetURI.getFile( split.resourceUri.toURL() ,new NullProgressMonitor());
+            DataSetURI.getFile( split.resourceUri.toURL() ,new NullProgressMonitor());
             try {
                 filePointer= getFileResource( split.resourceUri.toURL(), mon);
             } catch ( IOException | URISyntaxException | ParserConfigurationException | XPathExpressionException | SAXException ex ) {
@@ -231,7 +230,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
                 try {
                     getDataObjectPds3( split.resourceUri.toURL(), id ); 
                     return false;
-                } catch ( Exception ex ) {
+                } catch ( PDSException | IOException | XPathExpressionException ex ) {
                     problems.add(ex.getMessage());
                     return true;
                 }
