@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Old code demonstrates a custom label painter, see <a href="https://github.com/autoplot/dev/blob/master/demos/2025/20250807/testTickLabellers.jy">the script</a>.</small></p>
+        <p><small>Demonstration of getting and plotting a bounding box for data, in this <a href="https://github.com/autoplot/dev/blob/master/demos/2022/20221118/boundsDemoH.jy">script</a>.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,9 @@
 
         <p>Autoplot's development is guided by feedback from those using it.  Thanks for your feedback!</p>
                 
-        <p>Bugfixes (2026-06-15):</p>
+        <p>Bugfixes (2026-06-19):</p>
         <ul>
+            <li><a href="https://github.com/das-developers/das2java/issues/182">182</a>: Das2's SeriesRenderer object "simplifyPaths" switch can be used to disable incorrect simplification with Juno data.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2854/">2854</a>: Correct where ne logic for CSV and ASCII files.  Thanks, Sadie!
             <li>Correct completion of QDataSe&lt;T&gt;.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2847/">2847</a>: 1D and 2D binAverage routines properly handle edges.
