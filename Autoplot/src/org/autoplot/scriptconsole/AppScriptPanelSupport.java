@@ -521,6 +521,8 @@ public class AppScriptPanelSupport {
             } else {
                 panel.setContext(JythonScriptPanel.CONTEXT_APPLICATION);
             }
+            Preferences prefs = AutoplotSettings.settings().getPreferences(AppScriptPanelSupport.class);
+            prefs.put(PREFERENCE_OPEN_FILE, file.toString());
         }
         restartWatcher(file);
     }
