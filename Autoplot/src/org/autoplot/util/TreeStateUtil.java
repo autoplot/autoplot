@@ -48,6 +48,7 @@ public class TreeStateUtil {
             Set<String> expandedPaths) {
 
         TreeModel model = tree.getModel();
+        if ( model==null ) return;
         Object root = model.getRoot();
 
         expandMatching(tree,
