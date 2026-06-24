@@ -1022,8 +1022,11 @@ public class AppScriptPanelSupport {
             } catch (PyException ex) {
                 if ( !mon.isFinished() ) mon.finished();
                 annotateError(ex, offset, interp );
-                //logger.log(Level.WARNING, ex.getMessage(), ex );
                 applicationController.setStatus("error: " + ex.toString());
+                if ( ex.toString().contains("InaccessibleObjectException") ) {
+                    applicationController.setStatus("Strange Java version reflect error, see console.");
+                    logger.log(Level.WARNING, ex.getMessage(), ex );
+                }
             }
         } catch (IOException ex) {
             throw new RuntimeException(ex);
