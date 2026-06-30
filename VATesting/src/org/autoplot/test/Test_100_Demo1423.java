@@ -16,6 +16,7 @@ import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.autoplot.AutoplotUI;
 import org.autoplot.ScriptContext;
 import static org.autoplot.ScriptContext.writeToPng;
+import org.autoplot.dom.Canvas;
 import util.RegexComponentChooser;
 
 /**
@@ -28,6 +29,7 @@ public class Test_100_Demo1423 {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
         
         ScriptContext.createGui();
+        ScriptContext.reset();
         
         AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
         
@@ -60,6 +62,10 @@ public class Test_100_Demo1423 {
         ScriptContext.setStatus("done waiting 5 seconds.");
         
         ScriptContext.waitUntilIdle();
+        
+        Canvas c= ScriptContext.getDocumentModel().getCanvases(0);
+        System.err.println("writing png dom dimensions: "+c.getWidth()+ "x"+c.getHeight());
+        System.err.println("writing png canvas dims: "+c.getController().getDasCanvas().getWidth()+ "x"+c.getController().getDasCanvas().getHeight());
         
         writeToPng("Test_100_Demo1423.png"); // Leave artifacts for testing.
 
