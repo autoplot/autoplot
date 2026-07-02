@@ -115,7 +115,12 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
     
     private void addCompletions( ReadIDLSav reader, String root, String key, ByteBuffer buf, List<CompletionContext> ccresult ) throws IOException {
         String keyn= root==null ? key : root + "." + key;
-        
+        String paramName= null;
+        if ( key.contains("=") ) {
+            int i= key.indexOf("=");
+            paramName= key.substring(0,i);
+            key= key.substring(i+1);
+        }
         if ( root!=null ) {
             Object o= reader.readVar( buf, root );
             Map<String,Object> m= (Map<String,Object>)o;
@@ -149,9 +154,16 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
                     sqube.append(",").append(String.valueOf(desc.dims[i]));
                 }
                 sqube.append("]");
-                CompletionContext cc1= new CompletionContext( 
+                CompletionContext cc1; 
+     if ( paramName!=null ) {
+         cc1 = new CompletionContext( 
+                        CompletionContext.CONTEXT_PARAMETER_VALUE,
+                        key, this, "arg_0", keyn+" " +sqube, "", true );
+     } else {
+                cc1 = new CompletionContext( 
                         CompletionContext.CONTEXT_PARAMETER_NAME,
                         keyn, this, "arg_0", keyn+" " +sqube, "", true );
+     }
                 ccresult.add(cc1);
             } else { // complex numbers
                 String stype = ReadIDLSav.decodeTypeCode(tagDesc.typecode);
@@ -296,7 +308,11 @@ public class IdlsavDataSourceFactory extends AbstractDataSourceFactory {
                     }
                 }
             } else {
-                addCompletions(reader, null, name, buf, ccresult);
+                if ( paramName==null ) {
+                    addCompletions(reader, null, name, buf, ccresult);
+                } else {
+                    addCompletions(reader, null, paramName+"="+name, buf, ccresult);
+                }
             }
         }
     }
