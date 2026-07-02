@@ -62,6 +62,16 @@ public class IdlsavDataSource extends AbstractDataSource {
         return up;
     }
     
+    /**
+     * read the data into a QDataSet.  Complex data is returned with an extra dimension of length 2.
+     * if the name contains the string "epoch" and is long64, then CDF_TT2000 is assumed.
+     * xunits can be used to override this.
+     * @param reader
+     * @param buffer
+     * @param arg
+     * @return
+     * @throws IOException 
+     */
     public static QDataSet getArray( ReadIDLSav reader, ByteBuffer buffer, String arg ) throws IOException {
         Object v;
         
@@ -111,7 +121,11 @@ public class IdlsavDataSource extends AbstractDataSource {
                     result= ArrayDataSet.wrap( arrayData.array, arrayData.dims, false );
                 }
                 if ( result instanceof SDataSet || result instanceof IDataSet || result instanceof LDataSet ) {
-                    result.putProperty( QDataSet.FORMAT, "%d" );
+                    if ( result instanceof LDataSet && result.rank()==1 && arg.toLowerCase().contains("epoch") ) {
+                        result.putProperty( QDataSet.UNITS, Units.cdfTT2000 );
+                    } else {
+                        result.putProperty( QDataSet.FORMAT, "%d" );
+                    }
                 }
                 result.putProperty( QDataSet.USER_PROPERTIES, getUserProperties( arrayData ) );
                 return result;
