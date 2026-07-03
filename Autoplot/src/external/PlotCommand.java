@@ -319,6 +319,16 @@ public class PlotCommand extends PyObject {
                         if ( keywords[i].equals("overplotOf") ) {
                             plot= p;
                             iplot= dom.getDataSourceFilters().length;
+                            //Uncomment the following after the production release v2026a_6
+                            //PlotElement pe;
+                            //DataSourceFilter dsf= dom.getDataSourceFilters().length > iplot ? dom.getDataSourceFilters(iplot) : null;
+                            //if ( dsf!=null ) { // check to see if it has already been added.
+                            //    List<PlotElement> pes= DomUtil.getPlotElementsFor( dom, dom.getDataSourceFilters(iplot) );
+                            //    if ( pes.size()>0 ) {
+                            //        row= null;
+                            //    }
+                            //}
+                            //if ( row!=null ) iplot= dom.getDataSourceFilters().length;                            
                         } else {
                             for ( Plot p1: dom.getPlots() ) {
                                 if ( p1.getRowId().equals(row.getId()) && p1.getColumnId().equals(column.getId()) ) {
