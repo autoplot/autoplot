@@ -407,7 +407,7 @@ public class PDS3DataObject {
             }
         }
         args.put( "recOffset", String.valueOf(startByte-1)); // +rowPrefixBytes
-        if ( missingConstant!=Double.NaN ) args.put( "fillValue", String.valueOf(missingConstant));
+        if ( !Double.isNaN(missingConstant ) ) args.put( "fillValue", String.valueOf(missingConstant));
         if ( validMaximum!=Double.POSITIVE_INFINITY ) args.put( "validMax", String.valueOf(validMaximum) );
         if ( validMinimum!=Double.NEGATIVE_INFINITY ) args.put( "validMin", String.valueOf(validMinimum) );
         if ( unit.trim().length()!=0 && !args.get("type").startsWith("time") ) args.put( "units", unit );
