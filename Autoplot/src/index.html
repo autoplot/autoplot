@@ -32,6 +32,8 @@
                 
         <p>Bugfixes (2026-07-02):</p>
         <ul>
+            <li>incorrect check (Nan==Nan is false) for fill broke fill value used for times in JUNO/JADE PDS3.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2863/">2863</a>: repeat runs of script without reset and overplotOf would keep adding plot elements.
             <li>IDLSav of CDF_TT2000 is detected when name contains "epoch". Thanks, Dave!
             <li>Completions for IDLSav Y=BSUM_&lt;T&gt; corrected.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2856/">2856</a>: "Horizontal Interval Average" wasn't removed after Spectrogram&rarr;Series, resulting in clutter and memory leak.
