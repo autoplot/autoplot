@@ -8,8 +8,12 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.das2.datum.Units;
@@ -19,8 +23,10 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.das2.qds.QDataSet;
 import org.das2.qds.SemanticOps;
 import org.autoplot.datasource.AbstractDataSourceFormat;
+import org.autoplot.datasource.DataSourceUtil;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.ops.Ops;
+import org.das2.util.LoggerManager;
 
 /**
  * Export to idlsav support.  rank 0, rank 1 datasets, rank 2 datasets, rank 3 datasets, and rank 2 bundles are supported.
@@ -28,6 +34,12 @@ import org.das2.qds.ops.Ops;
  */
 public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
 
+    private static final Logger logger= LoggerManager.getLogger("apdss.format.idlsav");
+    
+    Map<String,QDataSet> namesFwd= new HashMap<>();
+    Map<QDataSet,String> namesRev= new HashMap<>();
+
+    
     /**
      * Add the data to the container which will be written to an IDLSave file.
      * @param write the container
@@ -205,10 +217,11 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
                 fc.read(byteBuffer);
             }
             names= reader.readVarNames( byteBuffer );
-            guessName= maybeIncrementName(guessName,names);
-            for ( String n: names ) {
+            for ( String n:names ) {
+                //guessName= maybeIncrementName(guessName,names);
                 QDataSet v= IdlsavDataSource.getArray( reader, byteBuffer, n );
-                doOne( write, v, n );
+                String nn= DataSourceUtil.guessNameFor( namesRev, namesFwd, v ); // n should not change
+                doOne( write, v, nn );
             }
         }
                 
@@ -219,14 +232,15 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
 
             QDataSet dep0= (QDataSet) data.property(QDataSet.DEPEND_0);
             if ( dep0!=null ) {
-                doOne( write,dep0,"dep0" );
+                String name= DataSourceUtil.guessNameFor( namesRev, namesFwd, dep0 );
+                doOne( write,dep0,name );
             }
 
-            doOne( write,data,guessName );
+            doOne( write,data,DataSourceUtil.guessNameFor( namesRev, namesFwd, data ) );
 
             QDataSet dep1= (QDataSet) data.property(QDataSet.DEPEND_1);
             if ( dep1!=null ) {
-                doOne( write,dep1,"dep1" );
+                doOne( write,dep1,DataSourceUtil.guessNameFor( namesRev, namesFwd, dep1 ) );
             }
 
         }
