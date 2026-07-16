@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small><a href="https://github.com/autoplot/dev/blob/master/demos/2026/20260629/readGeoJson.jy">Parser</a> written by ChatGPT used to visualize geojson file from <a href="https://zenodo.org/records/17122148">this paper</a>.</small></p>
+        <p><small><a href="https://hapi.spaceweather.knmi.nl/hapi/info?id=swarm_efia_lp_lttb_Ne_PT15M">KNMI HAPI server</a> uses LTTB method for reducing data while preserving extent of the data.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,9 +30,10 @@
 
         <p>Autoplot's development is guided by feedback from those using it.  Thanks for your feedback!</p>
                 
-        <p>Bugfixes (2026-07-02):</p>
+        <p>Bugfixes (2026-07-16):</p>
         <ul>
-            <li>incorrect check (Nan==Nan is false) for fill broke fill value used for times in JUNO/JADE PDS3.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2864"/>2864</a>: improve names automatically picked on export to IDLSave.
+            <li>incorrect check for fill (Nan==Nan is always false) broke fill value used for times in JUNO/JADE PDS3.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2863/">2863</a>: repeat runs of script without reset and overplotOf would keep adding plot elements.
             <li>IDLSav of CDF_TT2000 is detected when name contains "epoch". Thanks, Dave!
             <li>Completions for IDLSav Y=BSUM_&lt;T&gt; corrected.
