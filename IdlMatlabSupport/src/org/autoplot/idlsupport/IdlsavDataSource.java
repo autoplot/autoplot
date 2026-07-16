@@ -66,10 +66,10 @@ public class IdlsavDataSource extends AbstractDataSource {
      * read the data into a QDataSet.  Complex data is returned with an extra dimension of length 2.
      * if the name contains the string "epoch" and is long64, then CDF_TT2000 is assumed.
      * xunits can be used to override this.
-     * @param reader
-     * @param buffer
-     * @param arg
-     * @return
+     * @param reader the IDLSav reader
+     * @param buffer the data bytes
+     * @param arg the name or expression (x.y.z) of the variable
+     * @return QDataSet representation of the data
      * @throws IOException 
      */
     public static QDataSet getArray( ReadIDLSav reader, ByteBuffer buffer, String arg ) throws IOException {
@@ -77,6 +77,7 @@ public class IdlsavDataSource extends AbstractDataSource {
         
         int i= arg.indexOf('.');
         String t=arg;
+        String name= arg.replaceAll("\\.", "_"); // the name for the result dataset
         if ( i>-1 ) { // structure
             String h= t.substring(0,i);
             t= t.substring(i+1);
@@ -128,6 +129,7 @@ public class IdlsavDataSource extends AbstractDataSource {
                     }
                 }
                 result.putProperty( QDataSet.USER_PROPERTIES, getUserProperties( arrayData ) );
+                result.putProperty( QDataSet.NAME, name );
                 return result;
             }
         } else if ( v instanceof Map ) { 
@@ -137,21 +139,35 @@ public class IdlsavDataSource extends AbstractDataSource {
         } else if ( v instanceof double[] && Array.getLength(v)==2 ) { //
             ArrayDataSet result= ArrayDataSet.wrap( v, new int [] { 2 }, false );
             result.putProperty( QDataSet.DEPEND_0, Schemes.complexCoordinateSystemDepend() );
+            result.putProperty( QDataSet.NAME, name );
             return result;
         } else if ( v instanceof float[] && Array.getLength(v)==2 ) { //
             ArrayDataSet result= ArrayDataSet.wrap( v, new int [] { 2 }, false );
             result.putProperty( QDataSet.DEPEND_0, Schemes.complexCoordinateSystemDepend() );
+            result.putProperty( QDataSet.NAME, name );
             return result;
         } else {
             return Ops.dataset(v);
         }
     }
 
+    /**
+     * read the data into a QDataSet.  Complex data is returned with an extra dimension of length 2.
+     * if the name contains the string "epoch" and is long64, then CDF_TT2000 is assumed.
+     * xunits can be used to override this.
+     * @param reader the IDLSav reader
+     * @param inch the file channel
+     * @param arg the name or expression (x.y.z) of the variable
+     * @return QDataSet representation of the data
+     * @throws IOException 
+     */
     public static QDataSet getArray( ReadIDLSav reader, FileChannel inch, String arg ) throws IOException {
         Object v;
         
         int i= arg.indexOf('.');
         String t=arg;
+        String name= arg.replaceAll("\\.", "_"); // the name for the result dataset
+        
         if ( i>-1 ) { // structure
             String h= t.substring(0,i);
             t= t.substring(i+1);
@@ -198,7 +214,9 @@ public class IdlsavDataSource extends AbstractDataSource {
                 if ( result instanceof SDataSet || result instanceof IDataSet || result instanceof LDataSet ) {
                     result.putProperty( QDataSet.FORMAT, "%d" );
                 }
+                assert result!=null;
                 result.putProperty( QDataSet.USER_PROPERTIES, getUserProperties( arrayData ) );
+                result.putProperty( QDataSet.NAME, name );
                 return result;
             }
         } else if ( v instanceof Map ) { 
@@ -208,13 +226,17 @@ public class IdlsavDataSource extends AbstractDataSource {
         } else if ( v instanceof double[] && Array.getLength(v)==2 ) { //
             ArrayDataSet result= ArrayDataSet.wrap( v, new int [] { 2 }, false );
             result.putProperty( QDataSet.DEPEND_0, Schemes.complexCoordinateSystemDepend() );
+            result.putProperty( QDataSet.NAME, name );
             return result;
         } else if ( v instanceof float[] && Array.getLength(v)==2 ) { //
             ArrayDataSet result= ArrayDataSet.wrap( v, new int [] { 2 }, false );
             result.putProperty( QDataSet.DEPEND_0, Schemes.complexCoordinateSystemDepend() );
+            result.putProperty( QDataSet.NAME, name );
             return result;
         } else {
-            return Ops.dataset(v);
+            QDataSet result= Ops.dataset(v);
+            result= Ops.putProperty( result, QDataSet.NAME, name );
+            return result;
         }
     }
     
