@@ -1244,6 +1244,46 @@ public class DataSourceUtil {
     }
     
     /**
+     * provide a standard way to allocate names to datasets in a namespace.
+     * @param names a mutable map used to store names
+     * @param namesRev a mutable map used to store names
+     * @param data the data to name
+     * @return a name for the data, which will be a Python and IDL-friendly name.
+     */
+    public static synchronized String guessNameFor( Map<QDataSet,String> names, Map<String,QDataSet> namesRev, QDataSet data) {
+        String name= names.get(data);
+        if ( name!=null ) return name;
+                if ( name!=null ) {
+            return name;
+        } else {
+            logger.log(Level.FINE, "new variable: {0}", data);
+        }
+        
+        name = (String) data.property(QDataSet.NAME);
+        if ( namesRev.containsKey(name) ) {
+            int i= 1;
+            while ( namesRev.containsKey(name+"_"+i) ) {
+                i=i+1;
+            }
+            name= name + "_"+ i;
+        }
+        
+        Units units = (Units) data.property(QDataSet.UNITS);
+        if (name == null) {
+            if ( units!=null && UnitsUtil.isTimeLocation(units)) {
+                name = "Epoch";
+            } else {
+                name = "Variable_" + namesRev.size();
+            }
+        }
+        
+        names.put(data, name);
+        namesRev.put(name, data);
+        
+        return name;
+    }
+    
+    /**
      * return a one-line string representation of the exception.  This was introduced
      * when a NullPointerException was represented as "null", and it was somewhat
      * unclear about what was going on.
