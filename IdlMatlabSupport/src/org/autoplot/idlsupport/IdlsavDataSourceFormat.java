@@ -6,16 +6,10 @@ import java.io.FileOutputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsConverter;
 import org.das2.datum.UnitsUtil;
@@ -154,43 +148,40 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
 
         QDataSet dep0= (QDataSet) data.property(QDataSet.DEPEND_0);
         if ( dep0!=null ) {
-            doOne( write,dep0,"dep0" );
+            doOne( write,dep0,DataSourceUtil.guessNameFor(namesRev, namesFwd, dep0) );
         }
         
         for ( int i=0; i<data.length(0); i++ ) {
             QDataSet ds1= Ops.unbundle( data, i );
-            String guessName= maybeIncrementName("data"+i,names);
-            doOne( write,ds1,guessName );
+            doOne( write,ds1,DataSourceUtil.guessNameFor(namesRev, namesFwd, data)  );
         }  
         
     }
     
     /**
-     * return a name which is unique from names.
-     * @param n
-     * @param names
-     * @return 
+     * return true if these timetags are already in the file as t1970 or cdf_tt2000.  Note that since
+     * the timetags come off an existing idlsav file, we may have lost the units.
+     * @return true if these timetags are already in the file as t1970 or cdf_tt2000.
      */
-    private String maybeIncrementName( String n, String[] names ) {
-        Set<String> nnames;
-        if ( names==null ) {
-            nnames= Collections.emptySet();
-        } else {
-            nnames= new HashSet<>(Arrays.asList(names));
-        }
-        if ( nnames.contains(n) ) {
-            if ( Character.isDigit( n.charAt(n.length()-1) ) ) {
-                Pattern p= Pattern.compile("([a-zA-Z_])(d+)");
-                Matcher m= p.matcher(n);
-                if ( m.matches() ) {
-                    int d= Integer.parseInt( m.group(2) );
-                    return m.group(1)+String.valueOf(d);
+    private boolean haveTimeTags( QDataSet dep0 ) {
+        boolean haveDep0=false;
+        for ( Entry<QDataSet,String> e: namesRev.entrySet() ) {
+            if ( UnitsUtil.isTimeLocation( SemanticOps.getUnits(dep0) ) ) {
+                QDataSet timeDs= Ops.putProperty( e.getKey(), QDataSet.UNITS, Units.t1970 );
+                if ( Ops.equivalent( timeDs, Ops.convertUnitsTo( dep0, Units.t1970 ) ) ) {
+                    haveDep0=true;
+                    break;
+                }
+                if ( haveDep0==false ) {
+                    timeDs= Ops.putProperty( e.getKey(), QDataSet.UNITS, Units.cdfTT2000 );
+                    if ( Ops.equivalent( timeDs, Ops.convertUnitsTo( dep0, Units.cdfTT2000 ) ) ) {
+                        haveDep0=true;
+                        break;
+                    }
                 }
             }
-            return n+"1";
-        } else {
-            return n;
         }
+        return haveDep0;
     }
     
     @Override
@@ -232,15 +223,40 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
 
             QDataSet dep0= (QDataSet) data.property(QDataSet.DEPEND_0);
             if ( dep0!=null ) {
-                String name= DataSourceUtil.guessNameFor( namesRev, namesFwd, dep0 );
-                doOne( write,dep0,name );
+                boolean haveDep0=false;
+                if ( UnitsUtil.isTimeLocation( SemanticOps.getUnits(dep0) ) ) {
+                    haveDep0= haveTimeTags(dep0);
+                } else {
+                    for ( Entry<QDataSet,String> e: namesRev.entrySet() ) {
+                        if ( Ops.equivalent( e.getKey(), Ops.putProperty( dep0, QDataSet.UNITS, Units.dimensionless ) ) ) {
+                            haveDep0=true;
+                            break;
+                        }
+                    }
+                }
+                if ( haveDep0 ) {
+                    logger.fine("assuming timetags variable exists already");
+                } else {
+                    String name= DataSourceUtil.guessNameFor( namesRev, namesFwd, dep0 );
+                    doOne( write,dep0,name );
+                }
             }
 
             doOne( write,data,DataSourceUtil.guessNameFor( namesRev, namesFwd, data ) );
 
             QDataSet dep1= (QDataSet) data.property(QDataSet.DEPEND_1);
             if ( dep1!=null ) {
-                doOne( write,dep1,DataSourceUtil.guessNameFor( namesRev, namesFwd, dep1 ) );
+                boolean haveDep1=false;
+                for ( Entry<QDataSet,String> e: namesRev.entrySet() ) {
+                    if ( Ops.equivalent( e.getKey(), dep0 ) ) {
+                        haveDep1=true;
+                        break;
+                    }
+                }
+                if ( haveDep1 ) {
+                    String name= DataSourceUtil.guessNameFor( namesRev, namesFwd, dep1 );
+                    doOne( write,dep1,name );
+                }
             }
 
         }
