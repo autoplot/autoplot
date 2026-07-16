@@ -318,7 +318,6 @@ public class PlotCommand extends PyObject {
                         column= (Column)DomUtil.getElementById(dom,p.getColumnId());
                         if ( keywords[i].equals("overplotOf") ) {
                             plot= p;
-                            PlotElement pe;
                             DataSourceFilter dsf= dom.getDataSourceFilters().length > iplot ? dom.getDataSourceFilters(iplot) : null;
                             if ( dsf!=null ) { // check to see if it has already been added.
                                 List<PlotElement> pes= DomUtil.getPlotElementsFor( dom, dom.getDataSourceFilters(iplot) );
