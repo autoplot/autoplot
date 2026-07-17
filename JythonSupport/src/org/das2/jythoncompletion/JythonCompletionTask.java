@@ -1104,7 +1104,7 @@ public class JythonCompletionTask implements CompletionTask {
                 if ( !pwd.endsWith("/") ) pwd=null;
             }
         }
-        if (method.equals("getDataSet") || method.equals("getFile") || method.equals("plot") || method.equals("plotx") || method.equals("getCompletions") ) {
+        if (method.equals("load") || method.equals("getDataSet") || method.equals("getFile") || method.equals("plot") || method.equals("plotx") || method.equals("getCompletions") ) {
             DataSetUrlCompletionTask task = new DataSetUrlCompletionTask(editor);
             task.query(arg0);
         } else if ( method.equals("'resourceURI'") ) {
