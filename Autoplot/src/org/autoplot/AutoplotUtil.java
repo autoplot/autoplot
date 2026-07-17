@@ -45,8 +45,10 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
@@ -89,6 +91,7 @@ import javax.swing.JTextField;
 import javax.swing.table.TableModel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.xml.parsers.DocumentBuilder;
@@ -2044,6 +2047,18 @@ public class AutoplotUtil {
                 logger.log(Level.WARNING, "write initial {0} failed.  {1}", new Object[] { propFile, ex } );
             }
         }
+    }
+
+    /**
+     * convenient and quick way to tie the close (cancel) dialog action to the escape key.
+     * @param dialog 
+     */
+    public static void addCancelPress(JDialog dialog) {
+        dialog.getRootPane().registerKeyboardAction((ActionEvent e) -> {
+            org.das2.util.LoggerManager.logGuiEvent(e);
+            dialog.setVisible(false);
+            dialog.dispose();
+        }, KeyStroke.getKeyStroke( KeyEvent.VK_ESCAPE, 0 ), JComponent.WHEN_IN_FOCUSED_WINDOW );
     }
 
 }
