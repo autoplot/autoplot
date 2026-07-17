@@ -117,7 +117,8 @@ public class IdlsavDataSource extends AbstractDataSource {
                 ArrayDataSet result;
                 if ( arrayData.typeCode==ReadIDLSav.TYPECODE_COMPLEX_FLOAT || arrayData.typeCode==ReadIDLSav.TYPECODE_COMPLEX_DOUBLE ) {
                     result= ArrayDataSet.wrap( arrayData.array, DataSetOps.addElement(arrayData.dims, 2), false );
-                    result.putProperty( QDataSet.DEPEND_1, Schemes.complexCoordinateSystemDepend() );
+                    int rank= result.rank();
+                    result.putProperty( "DEPEND_"+(rank-1), Schemes.complexCoordinateSystemDepend() );
                 } else {
                     result= ArrayDataSet.wrap( arrayData.array, arrayData.dims, false );
                 }
