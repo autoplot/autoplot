@@ -193,7 +193,8 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
         String append = getParam( "append", "F" );
         WriteIDLSav write= new WriteIDLSav();
 
-        String guessName= getParam( "arg_0", "DATA" );
+        String explicitName= getParam("name",getParam( "arg_0", "" ));
+        
         String[] names= new String[0];
         
         if ( append.equals("T") ) { 
@@ -241,8 +242,11 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
                     doOne( write,dep0,name );
                 }
             }
-
-            doOne( write,data,DataSourceUtil.guessNameFor( namesRev, namesFwd, data ) );
+            String name= DataSourceUtil.guessNameFor( namesRev, namesFwd, data );
+            if ( explicitName.length()>0 ) {
+                name= explicitName;
+            }
+            doOne( write,data,name );
 
             QDataSet dep1= (QDataSet) data.property(QDataSet.DEPEND_1);
             if ( dep1!=null ) {
@@ -254,8 +258,8 @@ public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
                     }
                 }
                 if ( haveDep1 ) {
-                    String name= DataSourceUtil.guessNameFor( namesRev, namesFwd, dep1 );
-                    doOne( write,dep1,name );
+                    String dep1Name= DataSourceUtil.guessNameFor( namesRev, namesFwd, dep1 );
+                    doOne( write,dep1,dep1Name );
                 }
             }
 
