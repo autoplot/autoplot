@@ -631,6 +631,18 @@ public final class PyQDataSet extends PyJavaInstance {
                         if ( i==rods.rank()-1 ) {
                             QDataSet bds= (QDataSet) rods.property( "BUNDLE_"+i );
                             if ( bds!=null && rods.property( "DEPEND_"+i )==null ) { // https://sourceforge.net/p/autoplot/bugs/1478/
+                                if ( idx<0 ) {
+                                    int n;
+                                    switch ( rods.rank() ) {
+                                        case 0: throw new IndexOutOfBoundsException("data has no indices");
+                                        case 1: n=rods.length(); break;
+                                        case 2: n=rods.length(0); break;
+                                        case 3: n=rods.length(0,0); break;
+                                        case 4: n=rods.length(0,0,0); break;
+                                        default: throw new IndexOutOfBoundsException("negative index not supported for high rank data");
+                                    }
+                                    idx= idx+n;
+                                }
                                 DataSetUtil.sliceProperties( bds, idx, bundleProps );
                             }
                         }
