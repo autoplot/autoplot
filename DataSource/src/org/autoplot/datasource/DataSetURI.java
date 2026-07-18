@@ -232,14 +232,15 @@ public class DataSetURI {
     }
 
     /**
-     * check that the string uri is aggregating by looking for %Y's (etc) in the
+     * check that the string uri is aggregating by looking for $Y's (etc) in the
      * file part of the URI.  This also looks for:<ul>
      * <li>$y -- two digit year
      * <li>$(o -- orbit number
      * <li>$(periodic -- interval number
      * <li>$v -- version
+     * <li>$s -- seconds since 1970-01-01T00:00Z.
      * </ul>
-     * 
+     * TODO: this should match $(m;Y=2024) but it doesn't.
      * @param surl
      * @return
      */

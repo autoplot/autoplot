@@ -386,17 +386,13 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         return result;
     }
 
+    /**
+     * Call over to DataSetURI.isAggregating.
+     * @param surl the URI
+     * @return true if there are fields like $Y or $(periodic,...) or $s or $(m;Y=2026).
+     */
     protected static boolean hasTimeFields( String surl ) {
-        if ( surl.contains("%Y") || surl.contains("%25Y" ) ) {
-            logger.warning("URIs should no longer contain percents (%s).");
-            return true;
-        }
-        int ipercy = surl.lastIndexOf("%Y");
-        if (ipercy == -1) ipercy = surl.lastIndexOf("$Y");
-        if (ipercy == -1) ipercy = surl.lastIndexOf("$y");
-        if (ipercy == -1) ipercy = surl.lastIndexOf("$(o");
-        if (ipercy == -1) ipercy = surl.lastIndexOf("$(periodic");
-        return ipercy != -1;
+        return DataSetURI.isAggregating(surl);
     }
     
     @Override
