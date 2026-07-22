@@ -2034,8 +2034,15 @@ private void dataSetSelectorComboBoxPopupMenuCanceled(javax.swing.event.PopupMen
         if ( val==null ) {
             return "";
         } else {
+            val= val.trim();
             if ( val.startsWith("file://" ) && val.length()>7 && val.charAt(7)!='/' ) { // kludge for Windows
                 val= "file:/" + val.substring(7); //https://sourceforge.net/p/autoplot/bugs/1383/
+            }
+            if ( val.startsWith("http : //") ) {
+                val= "http://"+val.substring(9);
+            }
+            if ( val.startsWith("https : //") ) {
+                val= "https://"+val.substring(10);
             }
             return val.trim();
         }
