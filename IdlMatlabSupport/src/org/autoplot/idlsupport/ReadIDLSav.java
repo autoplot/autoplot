@@ -1271,9 +1271,9 @@ public class ReadIDLSav {
         int limit0= src.limit();
         src.position(position);
         src.limit(limit);
-        ByteBuffer r1= ByteBuffer.allocate(limit-position);
-        r1.put(src.slice());
-        r1.flip();
+        
+        ByteBuffer r1= src.slice();
+        
         src.limit(limit0);
         src.position(position0);
         
@@ -1322,11 +1322,7 @@ public class ReadIDLSav {
         if ( fileSize>Integer.MAX_VALUE ) {
             throw new IllegalArgumentException("file is too large to read, and must be less than 2GB: "+f);
         }
-        ByteBuffer buffer = ByteBuffer.allocate((int) fileSize);        
-        int bytesRead= 0;
-        while ( bytesRead<fileSize ) {
-            bytesRead+= inChannel.read(buffer);
-        }
+        ByteBuffer buffer = inChannel.map(FileChannel.MapMode.READ_ONLY,0, fileSize);        
         return buffer;
     }
    
@@ -1445,9 +1441,10 @@ public class ReadIDLSav {
             logger.log(Level.CONFIG, "RecType: {0} Length: {1,number,#}", new Object[]{labelType(type), nextPos-pos});
             switch ( type ) {
                 case RECTYPE_VARIABLE:
-                    logger.config("variable");
+                    
                     StringData varName= readString( rec, 20 );
-
+                    logger.log(Level.CONFIG, "variable {0}", varName);
+                    
                     int nextField= varName._lengthBytes;
 
                     ByteBuffer var= slice(rec, 20+nextField, rec.limit(), "var_x", "" );
