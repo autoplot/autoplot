@@ -347,12 +347,7 @@ public class IdlsavDataSource extends AbstractDataSource {
         RandomAccessFile aFile = new RandomAccessFile(f,"r");
         FileChannel inChannel = aFile.getChannel();
         long fileSize = inChannel.size();
-        ByteBuffer buffer = ByteBuffer.allocate((int) fileSize);
-        int bytesRead= 0;
-        while ( bytesRead<fileSize ) {
-            bytesRead+= inChannel.read(buffer);
-        }
-        buffer.flip();
+        ByteBuffer buffer = inChannel.map( FileChannel.MapMode.READ_ONLY, 0, fileSize);
         buffer.order(ByteOrder.BIG_ENDIAN);
         String x= getParam("X","");
         String y= getParam("Y","");
