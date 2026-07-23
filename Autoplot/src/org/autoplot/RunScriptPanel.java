@@ -32,7 +32,8 @@ import org.autoplot.jythonsupport.ui.EditorTextPane;
 import org.das2.components.DasProgressPanel;
 
 /**
- *
+ * Panel offering to run the script, showing the code and the interface created by getParam calls, a
+ * a warning about script safety, and also a checkbox which will add the script to the tools menu.
  * @author jbf
  */
 public class RunScriptPanel extends javax.swing.JPanel {
@@ -44,7 +45,7 @@ public class RunScriptPanel extends javax.swing.JPanel {
     /** Creates new form RunScriptPanel */
     public RunScriptPanel() {
         initComponents();
-        this.jScrollPane1.getVerticalScrollBar().setUnitIncrement(12);
+        this.jScrollPane1.getVerticalScrollBar().setUnitIncrement(this.jScrollPane1.getFont().getSize());
         textArea = new org.autoplot.jythonsupport.ui.EditorTextPane();
         scriptPanel.add( textArea );
         textArea.setEditable(false);
