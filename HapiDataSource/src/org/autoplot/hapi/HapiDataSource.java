@@ -1365,7 +1365,7 @@ public final class HapiDataSource extends AbstractDataSource {
             monitor.finished();
             throw e;
         } finally {
-            if ( httpConnect!=null ) httpConnect.disconnect();
+            httpConnect.disconnect();
         }
         
         monitor.setTaskProgress(95);
@@ -1945,7 +1945,9 @@ public final class HapiDataSource extends AbstractDataSource {
                             if ( k<pds.length ) {
                                 MutablePropertyDataSet depds= Ops.copy( Ops.trim1( ds, start, start+length1 ) );
                                 depds.putProperty( QDataSet.DEPEND_0, depend0 );
-                                depds.putProperty( QDataSet.BUNDLE_1, sdsbs[k].getDataSet() );    
+                                if ( sdsbs[k].getDataSet().length()==depds.length(0) ) { //https://sourceforge.net/p/autoplot/bugs/2875/
+                                    depds.putProperty( QDataSet.BUNDLE_1, sdsbs[k].getDataSet() );
+                                }
                                 depds= copyProperties( depds, pds[k] );
                                 start= start+length1;
                                 if ( pds[k].size.length>1 ) {
