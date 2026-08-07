@@ -39,7 +39,7 @@ public class ReplaceFilePanel extends javax.swing.JPanel {
         List<String> urls1= new ArrayList<String>();
         for ( String url: urls ) {
             URISplit split= URISplit.parse( url );
-            if ( ext.equals(split.ext) ) {
+            if ( ext!=null && ext.equals(split.ext) ) {
                 urls1.add( split.file );
             }
         }
@@ -56,14 +56,43 @@ public class ReplaceFilePanel extends javax.swing.JPanel {
         this.dataSetSelector1.setBrowseTypeExt( split.ext );
     }
     
+    private String inlineTemplate= "";
+    
+    /**
+     * handles URIs like vap+inline as well as resource URIs.
+     * @param uri 
+     */
+    public void setCurrentURI( String uri ) {
+        if ( uri.startsWith("vap+inline:") ) {
+            // do something to pull out the URI, keep track of the rest
+        } else {
+            setCurrentFile(uri);
+        }
+        
+    }
+    
     public String getSelectedFile() {
         return this.dataSetSelector1.getValue();
+    }
+    
+    /**
+     * this also supports vap+inline, where only one file is used.
+     * @return 
+     */
+    public String getSelectedURI() {
+        String uri= getSelectedFile();
+        if ( inlineTemplate.length()==0 ) {
+            return uri;
+        } else {
+            return inlineTemplate.replaceAll("__URI__", uri);
+        }
     }
     
     public static void main( String[] args ) {
         ReplaceFilePanel rfp= new ReplaceFilePanel();
         //rfp.setCurrentFile("vap+cdaweb:ds=MMS1_EDP_SLOW_L2_SCPOT&filter=mms&id=mms1_edp_scpot_slow_l2&timerange=2016-01-04+10:00+to+11:00");
         rfp.setCurrentFile("https://cdaweb.gsfc.nasa.gov/sp_phys/data/mms/mms1/edp/slow/l2/scpot/2016/01/mms1_edp_slow_l2_scpot_20160104000000_v2.7.0.cdf?mms1_edp_psp_slow_l2");
+        rfp.setCurrentFile("vap+inline:ds=getDataSet('https://autoplot.org/data/agg/efi/2000/po_k0_efi_20000103_v01.cdf?POTENT')&add(ds,30)");
         JOptionPane.showMessageDialog( null, rfp );
         System.err.println(rfp.getSelectedFile());
     }
