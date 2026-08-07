@@ -188,6 +188,7 @@ public final class JythonDataSource extends AbstractDataSource implements Cachin
         Map<String,String> params1= URISplit.parseParams(split1.params);
         split1.params= URISplit.formatParams(params1);
         suri= URISplit.format( split1 ); // 
+        String pwd= split1.path;
         
         params1.remove("arg_0");
         split1.params= URISplit.formatParams(params1);
@@ -259,7 +260,7 @@ public final class JythonDataSource extends AbstractDataSource implements Cachin
                     logger.warning("done.");
                 }
 
-                interp.set("PWD", URISplit.parse( jythonScript.toURI() ).path );
+                interp.set("PWD", pwd );
                 interp.exec("import autoplot2025 as autoplot");
                 interp.exec("autoplot.params=dict()");
                 for ( Entry<String,String> e : paramsl.entrySet()) {
