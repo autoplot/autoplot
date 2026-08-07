@@ -178,9 +178,54 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
                 Param pp= po2.get(paramName);
                 if ( pp!=null ) {
                     if ( pp.deft instanceof Number ) {
-                        result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, String.valueOf(pp.deft), paramName + " default is '"+ pp.deft + "'", pp.doc ) );
+                        boolean vv=false;
+                        if ( pp.enums!=null ) {
+                            for ( Object o: pp.enums ) {
+                                if ( o.equals(pp.deft) ) {
+                                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, String.valueOf(o), "(default)", pp.doc ) );
+                                } else {
+                                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, String.valueOf(o), pp.doc ) );
+                                }
+                                vv= true;
+                            }
+                        } else if ( pp.examples!=null ) {
+                            for ( Object o: pp.examples ) {
+                                if ( o.equals(pp.deft) ) {
+                                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, String.valueOf(o), "(default)", pp.doc ) );
+                                } else {
+                                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, String.valueOf(o), pp.doc ) );
+                                }
+                                vv= true;
+                            }
+                        }
+                        if ( vv==false ) {
+                            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, String.valueOf(pp.deft), paramName + " default is '"+ pp.deft + "'", pp.doc ) );
+                        }
                     } else {
-                        result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, String.format( "'%s'", pp.deft ), paramName + " default is '"+ pp.deft + "'", pp.doc ) );
+                        boolean vv=false;
+                        if ( pp.enums!=null ) {
+                            for ( Object o: pp.enums ) {
+                                if ( o.equals(pp.deft) ) {
+                                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, String.format( "'%s'", o ), "(default)", pp.doc ) );
+                                } else {
+                                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, String.format( "'%s'", o ), pp.doc ) );
+                                }
+                                vv= true;
+                            }
+                        } else if ( pp.examples!=null ) {
+                            for ( Object o: pp.examples ) {
+                                if ( o.equals(pp.deft) ) {
+                                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, String.format( "'%s'", o ), "(default)", pp.doc ) );
+                                } else {
+                                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, String.format( "'%s'", o ), pp.doc ) );
+                                }
+                                vv= true;
+                            }
+                        }
+                        if ( vv==false ) {
+                            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, String.format( "'%s'", pp.deft ), paramName + " default is '"+ pp.deft + "'", pp.doc ) );
+                        }
+                        
                     }
                 }
             }
