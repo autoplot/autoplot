@@ -818,6 +818,33 @@ public class DataMashUp extends javax.swing.JPanel {
         boolean synchronize;
         String expr;
         
+        /**
+         * return the ids.
+         * @return 
+         */
+        public List<String> getIds() {
+            return new ArrayList<>(ids);
+        }
+        
+        /**
+         * return the URIs loaded.
+         * @return 
+         */
+        public List<String> getUris() {
+            return new ArrayList<>(uris);
+        }
+        
+        /**
+         * reset the URIs.
+         * @param n
+         */
+        public void setUris(List<String> n) {
+            if ( n.size()!=uris.size() ) throw new IllegalArgumentException("number of URIs cannot change");
+            for ( int i=0; i<uris.size(); i++ ) {
+                uris.set(i,n.get(i));
+            }
+        }
+
         public String getAsJythonInline() {
             StringBuilder b= new StringBuilder("vap+inline:");
             for ( int i=0; i<this.uris.size(); i++ ) {
