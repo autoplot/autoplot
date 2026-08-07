@@ -146,6 +146,7 @@ import org.autoplot.datasource.WindowManager;
 import org.autoplot.datasource.capability.Caching;
 import org.autoplot.dom.BindingModel;
 import org.autoplot.dom.PlotController;
+import org.autoplot.jythonsupport.ui.DataMashUp;
 import org.das2.graph.BoundsRenderer;
 import org.das2.graph.PolarPlotRenderer;
 import org.das2.qds.ops.Ops;
@@ -353,16 +354,32 @@ public class AutoplotUtil {
            
            URISplit split= URISplit.parse( dsf.getUri() );
            
-           if ( split.file==null || split.file.length()==0 ) {
-               JOptionPane.showMessageDialog( parent, "<html>URI should refer to a file, but this doesn't: <br>"+dsf.getUri() );
-               return;
+           String oldf=null;
+           
+           if ( "vap+inline".equals(split.vapScheme) ) {
+               if ( DataMashUp.isDataMashupJythonInline(dsf.getUri()) ) {
+                   DataMashUp.JythonInlineDescriptor dsc= DataMashUp.verifyJythonInline(dsf.getUri());
+                   if ( dsc.getIds().size()==1 ) {
+                       oldf= dsc.getUris().get(0);
+                   }
+               }
+           }
+           
+           if ( oldf==null ) {
+               if ( split.file==null || split.file.length()==0 ) {
+                   JOptionPane.showMessageDialog( parent, "<html>URI should refer to a file, but this doesn't: <br>"+dsf.getUri() );
+                   return;
+               }
+           } else {
+               if ( split.file!=null ) {
+                   oldf= split.file;
+               }
            }
 
            Application dom2= (Application) dom.copy();
-            
-           String oldf= split.file;
 
            ReplaceFilePanel p= new ReplaceFilePanel();
+           
            p.setCurrentFile(oldf);
            p.setApplicationModel( dom.getController().getApplicationModel() );
            
@@ -371,10 +388,20 @@ public class AutoplotUtil {
 
            if ( result==JOptionPane.OK_OPTION ) {
                 String newf= p.getSelectedFile();
+                
+                if ( "vap+inline".equals(split.vapScheme) ) {
+                   DataMashUp.JythonInlineDescriptor dsc= DataMashUp.verifyJythonInline(dsf.getUri());
+                   dsc.setUris(Collections.singletonList(newf));
+                   oldf= dsf.getUri();
+                   newf= dsc.getAsJythonInline();
+                }
+                
                 dom.getController().getApplicationModel().addRecent(newf);
                 
-                split= URISplit.parse( newf );
-                newf= split.file;
+                if ( !newf.startsWith("vap+inline") ) {
+                    split= URISplit.parse( newf );
+                    newf= split.file;
+                }
                 
                 for ( DataSourceFilter i: dom2.getDataSourceFilters() ) {
                     String oldf1= i.getUri();
