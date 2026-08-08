@@ -359,8 +359,21 @@ public class AutoplotUtil {
            if ( "vap+inline".equals(split.vapScheme) ) {
                if ( DataMashUp.isDataMashupJythonInline(dsf.getUri()) ) {
                    DataMashUp.JythonInlineDescriptor dsc= DataMashUp.verifyJythonInline(dsf.getUri());
-                   if ( dsc.getIds().size()==1 ) {
-                       oldf= dsc.getUris().get(0);
+                   oldf= null;
+                   for ( int i=0; i<dsc.getUris().size(); i++ ) {
+                       String thisUri= dsc.getUris().get(i);
+                       URISplit thisSplit= URISplit.parse(thisUri);
+                       if ( oldf==null ) {
+                           oldf= thisSplit.file;
+                       } else if ( oldf.length()>0 ) {
+                           if ( !oldf.equals(thisSplit.file) ) {
+                               oldf= "";
+                           }
+                       }
+                   }
+                   if ( "".equals(oldf) ) {
+                       oldf=null;
+                       split.file=null;
                    }
                }
            }
@@ -369,9 +382,7 @@ public class AutoplotUtil {
                if ( split.file==null || split.file.length()==0 ) {
                    JOptionPane.showMessageDialog( parent, "<html>URI should refer to a file, but this doesn't: <br>"+dsf.getUri() );
                    return;
-               }
-           } else {
-               if ( split.file!=null ) {
+               } else {
                    oldf= split.file;
                }
            }
@@ -388,13 +399,6 @@ public class AutoplotUtil {
 
            if ( result==JOptionPane.OK_OPTION ) {
                 String newf= p.getSelectedFile();
-                
-                if ( "vap+inline".equals(split.vapScheme) ) {
-                   DataMashUp.JythonInlineDescriptor dsc= DataMashUp.verifyJythonInline(dsf.getUri());
-                   dsc.setUris(Collections.singletonList(newf));
-                   oldf= dsf.getUri();
-                   newf= dsc.getAsJythonInline();
-                }
                 
                 dom.getController().getApplicationModel().addRecent(newf);
                 
