@@ -3543,8 +3543,12 @@ public class PlotElementController extends DomNodeController {
     public void doResetRenderType(RenderType renderType) {
         PlotElement parentPele= getParentPlotElement();
         if ( parentPele != null ) {
-            parentPele.setRenderType(renderType);
-            return;
+            if ( renderType==RenderType.hugeScatter 
+                    || renderType==RenderType.series 
+                    || renderType==RenderType.scatter ) {
+                parentPele.setRenderType(renderType);
+                return;
+            }
         }
 
         for ( PlotElement ch: getChildPlotElements() ) {
