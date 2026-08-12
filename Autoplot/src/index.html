@@ -30,11 +30,12 @@
 
         <p>Autoplot's development is guided by feedback from those using it.  Thanks for your feedback!</p>
                 
-        <p>Bugfixes (2026-08-11):</p>
+        <p>Bugfixes (2026-08-12):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2872/">2872</a>: clear state within AsciiTableDataSource which would have the effect of the second call to getDataSet returning a different dataset.  Thanks, Ivar!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2877/">2877</a>: Support FFTPower of X component.  Thanks, Dave!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2876/">2876</a>: PWD in remote .jyds scripts was the download directory, not the https:// site, so adjacent calibration table could not be loaded.
-            <li>rte 1817056005: QStream yrange was interpretted with Z units for spectrograms.  Thanks, Larry!
+            <li>rte 1817056005: QStream yrange was interpreted with Z units for spectrograms.  Thanks, Larry!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2870/">2870</a>: use mapped memory to access data in IDLSave files.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2864/">2864</a>: correct read of two-element complex array.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2862/">2827</a>: /tmp/data/data.$s?avail=T properly triggers TimeSeriesBrowse.
