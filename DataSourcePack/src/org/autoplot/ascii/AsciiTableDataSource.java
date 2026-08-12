@@ -223,6 +223,10 @@ public class AsciiTableDataSource extends AbstractDataSource {
 
         logger.fine("read file");
         
+        column= null;
+        bundle= null;
+        
+        
         ds = doReadFile(mon);
         
         logger.fine("done read file");
