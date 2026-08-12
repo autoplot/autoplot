@@ -630,6 +630,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                             Ops.slice1(ds,eventListColorColumn),
                             vds ) );
                     ((MutablePropertyDataSet)vds.property(QDataSet.BUNDLE_1)).putProperty( QDataSet.FORMAT,2,"0x%06x" );
+                    ((MutablePropertyDataSet)vds.property(QDataSet.BUNDLE_1)).putProperty( QDataSet.UNITS,2,Units.rgbColor );
                 }
                 vds.putProperty(QDataSet.RENDER_TYPE,"eventsBar");
             }
