@@ -53,7 +53,68 @@ public class SimplifyScriptSupport {
     private static final Logger logger = LoggerManager.getLogger("jython.simplify");
 
     /**
-     * eat away at the end of the script until it can be parsed
+     * see if there's a little code we can add to the last line to make it parsable.
+     * @param s line like """T= getDataSet( resourceURI + '?"""
+     * @return line or completed line like """T= getDataSet( resourceURI + '?"""
+     */
+    public static String maybeCompleteLine(String s) {
+        StringBuilder result = new StringBuilder(s);
+        StringBuilder stack = new StringBuilder();
+
+        char quote = 0;
+        boolean escaped = false;
+
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+
+            if (quote != 0) {
+                if (escaped) {
+                    escaped = false;
+                } else if (c == '\\') {
+                    escaped = true;
+                } else if (c == quote) {
+                    quote = 0;
+                }
+            } else {
+                if (c == '\'' || c == '"') {
+                    quote = c;
+
+                } else if (c == '(') {
+                    stack.append(')');
+                } else if (c == '[') {
+                    stack.append(']');
+                } else if (c == '{') {
+                    stack.append('}');
+
+                } else if (c == ')' || c == ']' || c == '}') {
+                    if (stack.length() > 0
+                            && c == stack.charAt(stack.length() - 1)) {
+                        stack.setLength(stack.length() - 1);
+                    }
+                }
+            }
+        }
+
+        // Close an unterminated string.
+        if (quote != 0) {
+            if (escaped) {
+                // Prevent the quote we're about to add from being escaped.
+                result.append('\\');
+            }
+            result.append(quote);
+        }
+
+        // Close brackets in reverse nesting order.
+        for (int i = stack.length() - 1; i >= 0; i--) {
+            result.append(stack.charAt(i));
+        }
+
+        return result.toString();
+    }
+
+    /**
+     * eat away at the end of the script until it can be parsed.  If the last line
+     * is in the middle of the string, terminate the string and close off open parenthesis.
      *
      * @param script a Jython script.
      * @return the script with lines at the end removed such that the script can compile.
@@ -62,6 +123,8 @@ public class SimplifyScriptSupport {
     public static String alligatorParse(String script) {
         logger.entering("SimplifyScriptSupport", "alligatorParse");
         String[] ss = JythonUtil.splitCodeIntoLines(null, script);
+        
+        ss[ss.length-1]= maybeCompleteLine(ss[ss.length-1]);
         String scri = script;
         int lastLine = ss.length;
         boolean parseOkay= false;
