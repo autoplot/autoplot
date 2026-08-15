@@ -544,6 +544,10 @@ public class SimplifyScriptSupport {
                 if ( !simplifyScriptToGetCompletionsOkay(o, variableNames,importedNames) ) {
                     // check for method calls where we know the type.
                     Assign a = (Assign) o;
+                    exprType t= a.targets[0];
+                    if ( t instanceof Name && ((Name)t).id.equals("mon") ) {
+                        System.err.println("here stop");
+                    }
                     String cl = maybeIdentifyType(a, importedNames);
                     if (cl != null) {
                         if (acceptLine > -1) {
@@ -1232,6 +1236,8 @@ public class SimplifyScriptSupport {
                 String attrName = ((Name) at.value).id;
                 if (attrName.equals("PngWalkTool") && at.attr.equals("start")) {
                     return "from org.autoplot.pngwalk import PngWalkTool\n" + id + JythonCompletionTask.__CLASSTYPE + "= PngWalkTool #(spot line802)\n";
+                } else if ( attrName.equals("monitor") && at.attr.equals("getSubtaskMonitor") ) {
+                    return "from org.das2.util.monitor import ProgressMonitor\n" + id + JythonCompletionTask.__CLASSTYPE + "= ProgressMonitor #(spot line1240)\n";
                 } else if (importedNames.containsKey(attrName)) {
                     Class claz = getClassFor(attrName, importedNames);
                     if (claz == null) {
@@ -1291,7 +1297,19 @@ public class SimplifyScriptSupport {
             return null;
         }
     }
-
+    
+    private static String maybeIdentifyType(Name a, Map<String, String> importedNames) {
+        if ( a.id.equals("monitor") ) {
+            return "import org.das2.util.monitor.ProgressMonitor\n"
+                + a.id + JythonCompletionTask.__CLASSTYPE + " = org.das2.util.monitor.ProgressMonitor  # (spot line1298)\n";
+        } else if ( a.id.equals("dom") ) {
+            return "import org.autoplot.dom.Application\n"
+                + a.id + JythonCompletionTask.__CLASSTYPE + " = org.autoplot.dom.Application  # (spot line1301)\n";
+        } else {
+            return null;
+        }
+    }
+    
     /**
      * if we recognize the function that is called, then go ahead and keep track of the type. This is a quick and cheesy
      * implementation that just looks for a few names. For example,<ul>
@@ -1344,6 +1362,11 @@ public class SimplifyScriptSupport {
                     return id + " = " + ((Num)a.value).n;
                 } else if ( a.value instanceof Str ) {
                     return id + " = \"\"\"" + ((Str)a.value).s + "\"\"\"";
+                } else if ( a.value instanceof Name ) {
+                    String s= maybeIdentifyType( (Name)a.value, importedNames );
+                    if ( s!=null ) {
+                        return id + " = " + ((Name)a.value).id;
+                    }
                 }
             } else if ( et instanceof Tuple && a.value instanceof Tuple ) {  // lowCut_toggle, highcut_toggle, filttype_toggle, order_toggle = 0.5, 20, 'Bandpass', 4 # filter toggles LOW FLYER
                 Tuple targetTuple= (Tuple)et;
