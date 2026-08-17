@@ -575,9 +575,14 @@ public class SimplifyScriptSupport {
                                 appendToResult(result, ss[i]).append("\n");
                             }
                         }
-                        appendToResult(result, getIndent(theLine) + cl).append("\n") ;
-                        acceptLine = -1;
-                        continue;
+                        if ( cl.contains("CLASSTYPE = Str" ) ) {
+                            appendToResult(result, theLine ).append("\n") ;
+                            continue;
+                        } else {
+                            appendToResult(result, getIndent(theLine) + cl).append("\n") ;
+                            acceptLine = -1;
+                            continue;
+                        }
                     }
                 }
             }
@@ -1298,6 +1303,27 @@ public class SimplifyScriptSupport {
         }
     }
     
+    /**
+     * see if we can identify the exprType
+     * @param a
+     * @param importedNames
+     * @return 
+     */
+    private static String maybeIdentifyType(exprType a, Map<String, String> importedNames) {
+        if ( a instanceof Str ) {
+            return "Str";
+        } else if ( a instanceof Num ) {
+            return "Num";
+        } else if ( a instanceof Name ) {
+            String s= maybeIdentifyType( (Name)a, importedNames);
+            if ( s!=null ) {
+                int i= s.indexOf(" = ");
+                return s.substring(i+3);
+            }
+        }
+        return null;
+    }
+    
     private static String maybeIdentifyType(Name a, Map<String, String> importedNames) {
         if ( a.id.equals("monitor") ) {
             return "import org.das2.util.monitor.ProgressMonitor\n"
@@ -1357,7 +1383,21 @@ public class SimplifyScriptSupport {
                         return id + JythonCompletionTask.__CLASSTYPE + " = QDataSet  # (spot line1014 a)\n";
                     }
                 } else if ( a.value instanceof BinOp ) { // just go ahead and assume it's a QDataSet
-                    return id + JythonCompletionTask.__CLASSTYPE + " = QDataSet  # (spot line1014 b)\n";
+                    BinOp op= (BinOp)a.value;
+                    if ( op.op==BinOp.Mod ) {
+                        String typeLeft= maybeIdentifyType(op.left, importedNames);
+                        return id + JythonCompletionTask.__CLASSTYPE + " = Str  # (spot line1387)\n";
+                    } else if ( op.op==BinOp.Add ) {
+                        String typeLeft= maybeIdentifyType(op.left, importedNames);
+                        String typeRight= maybeIdentifyType(op.right, importedNames);
+                        if ( typeLeft.equals("Num") && typeRight.equals("Num") ) {
+                            return id + JythonCompletionTask.__CLASSTYPE + " = Num  # (spot line1389)\n";
+                        } else if ( typeLeft.equals("Str") && typeRight.equals("Str") ) {
+                            return id + JythonCompletionTask.__CLASSTYPE + " = Str  # (spot line1391)\n";
+                        }
+                    }
+                    return null;
+                    //return id + JythonCompletionTask.__CLASSTYPE + " = QDataSet  # (spot line1014 b)\n";
                 } else if ( a.value instanceof Num ) {
                     return id + " = " + ((Num)a.value).n;
                 } else if ( a.value instanceof Str ) {
