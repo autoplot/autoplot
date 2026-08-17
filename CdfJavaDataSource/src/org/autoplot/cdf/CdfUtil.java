@@ -1589,6 +1589,9 @@ public class CdfUtil {
         //    dataOnly= false;
         //}
 
+        Pattern idealPattern= Pattern.compile("[a-zA-Z0-9_]+");
+        Pattern okayPattern= Pattern.compile("[a-zA-Z0-9_\\ \\-\\+]+");
+        
         i=-1;
         for (String v1 : v) {
             i=i+1;
@@ -1640,6 +1643,13 @@ public class CdfUtil {
                 if ( dataOnly ) {
                     if ( !isData[i] ) continue;
                 }
+                
+                if ( !okayPattern.matcher(svar).matches() ) {
+                    warn.add("CDF variable name is not supported in Autoplot (and probably other systems)");
+                } else if ( !idealPattern.matcher(svar).matches() ) {
+                    warn.add("Usually CDF variable names are ASCII letters, numbers, and underscores");
+                }
+                
                 Object att= getAttribute( cdf, svar, "VIRTUAL" );
                 if ( att!=null ) {
                     logger.log(Level.FINER, "get attribute VIRTUAL entry for {0}", svar );
