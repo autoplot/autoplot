@@ -1101,7 +1101,25 @@ public final class TimeRangeTool extends javax.swing.JPanel {
                 orbitFeedbackLabel.setText( sorbit + ": "+ dr.toString() ); // note result is not an orbit datum range.
                 pendingTimeRange= dr;
             } catch (ParseException ex) {
-                orbitFeedbackLabel.setText("No such orbit found: "+ sorbit);
+                String found=null;
+                for ( String s=o.first(); s!=null; s=o.next(s)  ) {
+                    if ( s.contains(sorbit) ) {
+                        found= s;
+                        break;
+                    }
+                }
+                if ( found!=null ) {
+                    try {
+                        dr = o.getDatumRange(found);
+                        orbitFeedbackLabel.setText( found + ": "+ dr.toString() ); // note result is not an orbit datum range.
+                        pendingTimeRange= dr;
+                        return found;
+                    } catch (ParseException ex1) {
+                        logger.log(Level.SEVERE, null, ex1);
+                    }
+                } else { 
+                    orbitFeedbackLabel.setText("No such orbit found: "+ sorbit);
+                }
             }
             return sorbit;
         } catch ( IllegalArgumentException ex ) {
