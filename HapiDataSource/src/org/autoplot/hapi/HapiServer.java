@@ -445,9 +445,28 @@ public class HapiServer {
      */
     public static JSONArray getParameters(URL server, String dataset) throws IOException, JSONException {
         JSONObject o= getInfo( server, dataset );
-        JSONArray catalog= o.getJSONArray(HapiSpec.PARAMETERS);
-        return catalog;
+        JSONArray parameters= o.getJSONArray(HapiSpec.PARAMETERS);
+        return parameters;
     }
+    
+    /**
+     * return just the parameters for the server and dataset.
+     * @param server
+     * @param dataset
+     * @return JSONArray of parameters
+     * @throws IOException
+     * @throws JSONException 
+     */
+    public static List<String> getParameterIds(URL server, String dataset) throws IOException, JSONException {
+        JSONArray pp= getParameters(server, dataset);
+        int n= pp.length();
+        ArrayList<String> result= new ArrayList(n);
+        for ( int i=0; i<n; i++ ) {
+            JSONObject jo= pp.getJSONObject(i);
+            result.add(i,jo.getString("name"));
+        }
+        return result;
+    }    
     
     private static URL setQuery( URL url, String newQuery ) {
         URL newUrl;
