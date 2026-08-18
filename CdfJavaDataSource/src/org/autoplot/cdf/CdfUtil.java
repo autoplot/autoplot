@@ -1524,7 +1524,7 @@ public class CdfUtil {
     }
     
     private static Pattern idealPattern= Pattern.compile("[a-zA-Z0-9_\\-\\.]+");
-    private static Pattern okayPattern= Pattern.compile("[a-zA-Z0-9_\\ \\-\\.\\*\\+\\/\\%]+");
+    private static Pattern okayPattern= Pattern.compile("[a-zA-Z0-9_\\ \\-\\.\\*\\+\\/\\%\\>\\<]+");
 
     /**
      * return null if the variable name is okay, or warning if not okay.
