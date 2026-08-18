@@ -1523,6 +1523,28 @@ public class CdfUtil {
         }
     }
     
+    private static Pattern idealPattern= Pattern.compile("[a-zA-Z0-9_\\-\\.]+");
+    private static Pattern okayPattern= Pattern.compile("[a-zA-Z0-9_\\ \\-\\.\\*\\+\\/\\%]+");
+
+    /**
+     * return null if the variable name is okay, or warning if not okay.
+     * @param svar the variable name, like "SIGMA-T1800"
+     * @return null if the variable name is okay, or warning if not okay.
+     */
+    public static String checkLegalVariableName( String svar ) {
+        String result= null;
+        if ( !okayPattern.matcher(svar).matches() ) {
+            result= "CDF variable name is not supported in Autoplot (and probably other systems)";
+        } else if ( !idealPattern.matcher(svar).matches() ) {
+            if ( svar.contains(" ") ) {
+                result= "Usually CDF variable names are ASCII letters, numbers, and underscores. (Name contains spaces)";
+            } else {
+                result= "Usually CDF variable names are ASCII letters, numbers, and underscores";
+            }
+        }
+        return result;
+    }
+    
     /**
      * Return a map where keys are the names of the variables, and values are descriptions.  This 
      * allows for a deeper query, getting detailed descriptions within the values, and also supports the
@@ -1588,9 +1610,6 @@ public class CdfUtil {
         //    logger.fine( "turning off dataOnly because it rejects everything");
         //    dataOnly= false;
         //}
-
-        Pattern idealPattern= Pattern.compile("[a-zA-Z0-9_]+");
-        Pattern okayPattern= Pattern.compile("[a-zA-Z0-9_\\ \\-\\+]+");
         
         i=-1;
         for (String v1 : v) {
@@ -1644,11 +1663,8 @@ public class CdfUtil {
                     if ( !isData[i] ) continue;
                 }
                 
-                if ( !okayPattern.matcher(svar).matches() ) {
-                    warn.add("CDF variable name is not supported in Autoplot (and probably other systems)");
-                } else if ( !idealPattern.matcher(svar).matches() ) {
-                    warn.add("Usually CDF variable names are ASCII letters, numbers, and underscores");
-                }
+                String nameWarning= checkLegalVariableName(svar);
+                if ( nameWarning!=null ) warn.add(nameWarning);
                 
                 Object att= getAttribute( cdf, svar, "VIRTUAL" );
                 if ( att!=null ) {
@@ -1773,7 +1789,7 @@ public class CdfUtil {
                     descbuf.append("<p><small>").append(svarNotes).append("</small></p><br>");
                 }
                 Vector variablePurpose= cdf.getAttributeEntries(svar,"VARIABLE_PURPOSE");
-                if ( variablePurpose.size()>0 ) {
+                if ( !variablePurpose.isEmpty() ) {
                     AttributeEntry e= (AttributeEntry)variablePurpose.get(0);
                     StringBuilder s= new StringBuilder( String.valueOf(e.getValue()) );
                     for ( int i1=1; i1<variablePurpose.size(); i1++ ) {
