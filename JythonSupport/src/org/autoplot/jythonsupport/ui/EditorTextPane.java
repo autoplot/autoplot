@@ -564,12 +564,17 @@ public class EditorTextPane extends JEditorPane {
                     pos= pos-1;
                 }
                 int i3= line.lastIndexOf("'",pos);
+                if ( i3==-1 ) i3= line.lastIndexOf("\"",pos);
                 if ( i3>-1 ) i3= i3+1;
                 int i4= line.indexOf("'",i3);
                 if ( i4==-1 ) i4= line.length();
-                String s= line.substring(i3,i4);
-                doInspectURIFormat(lineStart,line,s);
-                return;
+                try {
+                    String s= line.substring(i3,i4);
+                    doInspectURIFormat(lineStart,line,s);
+                    return;
+                } catch ( IndexOutOfBoundsException ex ) {
+                    throw new IndexOutOfBoundsException( ex.getMessage() + ": " + line ); 
+                }
             }
         
             CompletionContext cc= CompletionSupport.getCompletionContext( line, pos, i0, i1, i2 );
