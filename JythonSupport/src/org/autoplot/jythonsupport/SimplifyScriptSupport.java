@@ -1390,9 +1390,9 @@ public class SimplifyScriptSupport {
                     } else if ( op.op==BinOp.Add ) {
                         String typeLeft= maybeIdentifyType(op.left, importedNames);
                         String typeRight= maybeIdentifyType(op.right, importedNames);
-                        if ( typeLeft.equals("Num") && typeRight.equals("Num") ) {
+                        if ( "Num".equals(typeLeft) && "Num".equals(typeRight) ) {
                             return id + JythonCompletionTask.__CLASSTYPE + " = Num  # (spot line1389)\n";
-                        } else if ( typeLeft.equals("Str") && typeRight.equals("Str") ) {
+                        } else if ( "Str".equals(typeLeft) && "Str".equals(typeRight) ) {
                             return id + JythonCompletionTask.__CLASSTYPE + " = Str  # (spot line1391)\n";
                         }
                     }
