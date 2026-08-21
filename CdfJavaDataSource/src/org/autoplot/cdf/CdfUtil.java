@@ -1523,8 +1523,9 @@ public class CdfUtil {
         }
     }
     
-    private static Pattern idealPattern= Pattern.compile("[a-zA-Z0-9_\\-\\.]+");
-    private static Pattern okayPattern= Pattern.compile("[a-zA-Z0-9_\\ \\-\\.\\*\\+\\/\\%\\>\\<]+");
+    private static final Pattern IDEAL_PATTERN= Pattern.compile("[a-zA-Z][a-zA-Z0-9_]*");
+    private static final Pattern ACCEPTED_PATTERN= Pattern.compile("[a-zA-Z][a-zA-Z0-9_\\-\\.]*");
+    private static final Pattern OKAY_PATTERN= Pattern.compile("[a-zA-Z0-9_\\ \\-\\.\\*\\+\\/\\%\\>\\<]+");
 
     /**
      * return null if the variable name is okay, or warning if not okay.
@@ -1532,15 +1533,21 @@ public class CdfUtil {
      * @return null if the variable name is okay, or warning if not okay.
      */
     public static String checkLegalVariableName( String svar ) {
-        String result= null;
-        if ( !okayPattern.matcher(svar).matches() ) {
+        String result;
+        if ( !OKAY_PATTERN.matcher(svar).matches() ) {
             result= "CDF variable name is not supported in Autoplot (and probably other systems)";
-        } else if ( !idealPattern.matcher(svar).matches() ) {
-            if ( svar.contains(" ") ) {
-                result= "Usually CDF variable names are ASCII letters, numbers, and underscores. (Name contains spaces)";
+        } else if ( !ACCEPTED_PATTERN.matcher(svar).matches() ) {
+            if ( svar.endsWith(" ") ) {
+                result= "Variable name ends with a space. Usually CDF variable names are ASCII letters, numbers, and underscores.  This name may cause problems with other systems.";
+            } else if ( svar.startsWith(" ") ) {
+                result= "Variable name starts with a space. Usually CDF variable names are ASCII letters, numbers, and underscores.  This name may cause problems with other systems.";
             } else {
-                result= "Usually CDF variable names are ASCII letters, numbers, and underscores";
+                result= "Usually CDF variable names are ASCII letters, numbers, and underscores.  This name may cause problems with other systems.";
             }
+        } else if ( !IDEAL_PATTERN.matcher(svar).matches() ) {
+            result= "Ideally variable names contain only ASCII letters, numbers, and underscores.  This name may cause problems with other systems.";
+        } else {
+            result= null;
         }
         return result;
     }
