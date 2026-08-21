@@ -1577,6 +1577,12 @@ public class JythonCompletionTask implements CompletionTask {
         return false;
     }
     
+    /**
+     * a number of routines have both Object and QDataSet versions.  This detects.
+     * @param signatures
+     * @param labels
+     * @param argss 
+     */
     public static void reduceObject( List<String> signatures, List<String> labels, List<String> argss ) {
         if ( signatures.size()>1 ) {
             for ( int i=1; i<signatures.size(); i++ ) {
