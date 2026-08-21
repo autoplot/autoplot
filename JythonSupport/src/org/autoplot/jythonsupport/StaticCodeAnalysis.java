@@ -23,6 +23,7 @@ import org.python.core.PyObject;
 import org.python.core.PyStringMap;
 import org.python.parser.SimpleNode;
 import org.python.parser.ast.Assign;
+import org.python.parser.ast.BinOp;
 import org.python.parser.ast.Call;
 import org.python.parser.ast.ClassDef;
 import org.python.parser.ast.For;
@@ -31,12 +32,15 @@ import org.python.parser.ast.Global;
 import org.python.parser.ast.If;
 import org.python.parser.ast.Import;
 import org.python.parser.ast.ImportFrom;
+import org.python.parser.ast.ListComp;
 import org.python.parser.ast.Module;
 import org.python.parser.ast.Name;
+import org.python.parser.ast.Tuple;
 import org.python.parser.ast.VisitorBase;
 import org.python.parser.ast.While;
 import org.python.parser.ast.aliasType;
 import org.python.parser.ast.exprType;
+import org.python.parser.ast.listcompType;
 import org.python.parser.ast.stmtType;
 import org.python.util.InteractiveInterpreter;
 
@@ -266,6 +270,12 @@ public class StaticCodeAnalysis {
         private void handleExprTypeRead( exprType t ) throws Exception {
             if ( t instanceof Name ) {
                 visitName((Name)t);
+            } else if ( t instanceof ListComp ) {
+                visitListComp((ListComp)t);
+            } else if ( t instanceof BinOp ) {
+                BinOp bo= (BinOp)t;
+                handleExprTypeRead(bo.left);
+                handleExprTypeRead(bo.right);
             } else {
                 t.traverse(this);
             }
@@ -286,7 +296,12 @@ public class StaticCodeAnalysis {
                 }
                 this.assignButNotReadWarning.put( n, t );
               
-            } 
+            } else if ( t instanceof Tuple ) {
+                Tuple tuple= (Tuple)t;
+                for ( int i=0; i<tuple.elts.length; i++ ) {
+                    handleExprTypeAssign(tuple.elts[i]);
+                }
+            }
             t.traverse(this);
         }
         
@@ -316,6 +331,20 @@ public class StaticCodeAnalysis {
             }
             
             return node;
+        }
+
+        @Override
+        public Object visitListComp(ListComp node) throws Exception {
+            for ( listcompType t : node.generators ) {
+                for ( exprType et: t.ifs ) {
+                    handleExprTypeRead(et);
+                }
+                handleExprTypeRead(t.iter);
+                handleExprTypeAssign(t.target);
+            }
+            handleExprTypeRead(node.elt);
+            return node;
+            
         }
 
         @Override
