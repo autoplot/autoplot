@@ -340,7 +340,7 @@ public class StaticCodeAnalysis {
                     handleExprTypeRead(et);
                 }
                 handleExprTypeRead(t.iter);
-                handleExprTypeAssign(t.target);
+                handleExprTypeRead(t.target);
             }
             handleExprTypeRead(node.elt);
             return node;
