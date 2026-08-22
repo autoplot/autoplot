@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Fun data from new HAPI server.</small></p>
+        <p><small>Small improvements to the HTML data source allow table of Adventureland admission prices to be plotted against time.  Prices from <a href="https://www.adventureland.parkhopping.com/wiki/index.php/Ticket_Prices">adventureland.parkhopping.com</a>.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -32,6 +32,7 @@
                 
         <p>Bugfixes (2026-08-18):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2857/">2857</a>: improve static code analysis by handling list comprehensions.
             <li>rte 0188745986: runtime error with full reset and two added tabs caused index out of bounds error.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2880/">2880</a>: Display warning when CDF variable name is not proper Python variable name or will cause problems. 
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2845/">2845</a>: improvements to Jython completions.
@@ -55,6 +56,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2879/">2879</a>: HTML table source allows depend0 and units to be specified.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/883/">883</a>: Select time range by Orbits allows simple search.
         </ul>
         <p>Less recent features:</p>
