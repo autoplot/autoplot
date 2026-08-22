@@ -87,7 +87,7 @@ public class HtmlTableDataSource extends AbstractDataSource {
             }
         }
         
-        }
+    }
         
     /**
      * return a list of the tables, with column and human readable description after.
@@ -126,7 +126,7 @@ public class HtmlTableDataSource extends AbstractDataSource {
             final HtmlParserStreamer callback = new HtmlParserStreamer(  );
             callback.ascii= result;
 
-            String units= getParam("units",null);
+            String units= getParam(PARAM_UNITS,null);
             if ( units!=null ) {
                 callback.setUnits(URLDecoder.decode(units,"UTF-8"));
             }
@@ -158,5 +158,6 @@ public class HtmlTableDataSource extends AbstractDataSource {
             return result;
 
         }
+        private static final String PARAM_UNITS = "units";
     }
 }
