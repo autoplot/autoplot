@@ -1,9 +1,12 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.html;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -11,11 +14,14 @@ import java.util.logging.Logger;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.parser.ParserDelegator;
+import org.autoplot.datasource.DataSetURI;
 import org.das2.qds.DDataSet;
 import org.das2.qds.QDataSet;
+import org.das2.util.monitor.NullProgressMonitor;
 
 /**
- *
+ * Callback for reading the tables of an HTML document.
  * @author jbf
  */
 public class HtmlParserCallback extends HTMLEditorKit.ParserCallback {
@@ -198,4 +204,19 @@ public class HtmlParserCallback extends HTMLEditorKit.ParserCallback {
         return new ArrayList<>(tables);
     }
 
+    public static void main( String[] args ) throws MalformedURLException, IOException {
+        //File f= DataSetURI.downloadResourceAsTempFile( new URL("https://jfaden.net/~jbf/autoplot/data/html/data.html"), new NullProgressMonitor() );
+        File f= DataSetURI.downloadResourceAsTempFile( new URL("https://jfaden.net/~jbf/autoplot/data/html/adventureland.html"), new NullProgressMonitor() );
+        BufferedReader reader = new BufferedReader( new FileReader(f));
+
+        HtmlParserCallback callback = new HtmlParserCallback(  );
+
+        new ParserDelegator().parse( reader, callback, true );
+
+        List<String> tables= new ArrayList(callback.getTables());
+
+        for ( String t : tables ) {
+            System.err.println(t);
+        }
+    }
 }
