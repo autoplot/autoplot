@@ -71,6 +71,15 @@ public class HtmlParserCallback extends HTMLEditorKit.ParserCallback {
     void setUnits(String units) {
         ascii.setUnits( units );
     }
+
+    /**
+     * set the units for the column.
+     * @param icol the column number, 0 is the first column.
+     * @param units 
+     */
+    void setUnits( int icol, String units) {
+        ascii.setUnits( icol, units );
+    }
     
     @Override
     public void handleText(char[] data, int pos) {

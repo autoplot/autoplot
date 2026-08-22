@@ -3,7 +3,9 @@ package org.autoplot.html;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.EnumerationUnits;
@@ -26,6 +28,7 @@ public class AsciiTableMaker {
     DataSetBuilder builder = null;
     QDataSet desc = null;  // bundle descriptor
     List<Units> units = null;
+    Map<Integer,String> requestedUnits= new HashMap<>();
     Units defaultUnits= null;
     List<String> labels = null;
     List<String> names = null;
@@ -37,6 +40,10 @@ public class AsciiTableMaker {
     
     void setUnits(String units) {
         this.defaultUnits= Units.lookupUnits(units);
+    }
+    
+    void setUnits(int icol, String units) {
+        requestedUnits.put(icol, units);
     }
     
     private void setUnitsAndFormat( List<String> values ) {
@@ -55,6 +62,12 @@ public class AsciiTableMaker {
                 Logger.getLogger(AsciiTableMaker.class.getName()).log(Level.SEVERE, null, ex);
             }
             if ( units.get(i)==null ) {
+                String requestedUnit= requestedUnits.get(i);
+                if ( requestedUnit!=null ) {
+                    units.set(i,Units.lookupUnits(requestedUnit));
+                    format.set(i,null);
+                    continue;
+                }
                 if ( isTime ) {
                     units.set(i,Units.us2000);
                     format.set(i,null);

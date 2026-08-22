@@ -20,6 +20,7 @@ import org.das2.qds.DataSetOps;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.capability.Streaming;
+import org.das2.qds.ops.Ops;
 
 /**
  * Data source for extracting data from HTML tables.  This has been used
@@ -36,6 +37,8 @@ public class HtmlTableDataSource extends AbstractDataSource {
     public static final String PARAM_COLUMN= "column";
     public static final String PARAM_TABLE= "table";
     public static final String PARAM_UNITS= "units";
+    public static final String PARAM_DEPEND0_UNITS= "depend0Units";
+    public static final String PARAM_DEPEND0= "depend0";
     
     public HtmlTableDataSource(URI uri) {
         super(uri);
@@ -60,17 +63,36 @@ public class HtmlTableDataSource extends AbstractDataSource {
                 callback.setUnits(URLDecoder.decode(units,"UTF-8"));
             }
             
+            String dep0units= getParam(PARAM_DEPEND0_UNITS,null);
+            if ( dep0units!=null ) {
+                int idep0= getDepend0Column();
+                callback.setUnits(idep0,dep0units);
+            }
             String stable= (String)getParams().get( PARAM_TABLE );
             if ( stable!=null ) callback.setTable( stable );
             new ParserDelegator().parse( reader, callback, true );
 
             QDataSet ds= callback.getDataSet();
-
+            
             return ds;
             
         }
     }
 
+    private int getDepend0Column( ) {
+        String dep0= getParam(PARAM_DEPEND0,"");
+        if ( dep0.length()>0 ) {
+            try {
+                int icol= Integer.parseInt(dep0);
+                return icol;
+            } catch ( NumberFormatException ex ) {
+                return 0;
+            }                    
+        } else {
+            return -1;
+        }
+    }
+    
     @Override
     public QDataSet getDataSet( ProgressMonitor mon ) throws IOException {
         QDataSet ds = getTable( mon );
@@ -79,12 +101,27 @@ public class HtmlTableDataSource extends AbstractDataSource {
         if ( column==null ) {
             return ds;
         } else {
+            QDataSet result;
+
             try {
                 int icol= Integer.parseInt(column);
-                return DataSetOps.unbundle( ds, icol );
+                result= DataSetOps.unbundle( ds, icol );
             } catch ( NumberFormatException ex ) {
-                return DataSetOps.unbundle( ds, column );
+                result= DataSetOps.unbundle( ds, column );
             }
+            
+            String dep0= getParam(PARAM_DEPEND0,"");
+            if ( dep0.length()>0 ) {
+                QDataSet tt;
+                try {
+                    int icol= Integer.parseInt(dep0);
+                    tt= DataSetOps.unbundle( ds,icol );
+                } catch ( NumberFormatException ex ) {
+                    tt= DataSetOps.unbundle( ds,dep0 );
+                }                    
+                result= Ops.link( tt,result );
+            }
+            return result;
         }
         
     }
