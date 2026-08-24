@@ -16,5 +16,30 @@ triggered, we run a simplified version of the script which allows us to query
 for completions.  When a GUI is needed a simplified version of the script which
 only has the "getParam" calls is created.
     </p>
+    
+    <p>This package also implements argument types and constraints on these types.</p>
+    <table>
+        <tr><td>Type</td><td>TypeCode</td><td>Description</td><td>Constraints</td></tr>
+        <tr><td>Num</td><td>F</td><td>Number</td><td>min,max,values</td></tr>
+        <tr><td>Str</td><td>A</td><td>String</td><td>regex,values,stringType</td></tr>
+        <tr><td>Time Range</td><td>T</td><td>Time range</td><td>min,max,values</td></tr>
+        <tr><td>resourceURI</td><td>R</td><td>Resource URI</td><td>regex,glob</td></tr>
+        <tr><td>URI</td><td>U</td><td>URI</td><td>regex,glob</td></tr>
+        <tr><td>URL</td><td>L</td><td>URL</td><td>regex,glob</td></tr>
+        <tr><td>File</td><td>M</td><td>Local file or directory</td><td>values</td></tr>
+        <tr><td>Datum</td><td>D</td><td>Physical value (5 cm) or nominal value (Chicago)</td><td>regex,glob,values</td></tr>
+        <tr><td>DatumRange</td><td>S</td><td>Physical range (5-10 cm, 2026-08-24)</td><td>values</td></tr>
+        <tr><td>Color</td><td>C</td><td>Color</td><td>values</td></tr>
+    </table>
+    
+    <p>Constraints:</p>
+    <ul>
+        <li>values -- list of allowed values
+        <li>min -- the minimum allowed value
+        <li>max -- the maximum allowed value
+        <li>regex -- regular expression (*\.cdf) which must be matched.
+        <li>glob -- glob pattern (*.cdf) which much be matched.
+        <li>format -- if URI template with $Y etc, then reformat with this, if starts with % then reformat double.
+    </ul>
     </body>
 </html>
