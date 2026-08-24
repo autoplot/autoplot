@@ -322,6 +322,16 @@ public class RunBatchTool extends javax.swing.JPanel {
 
             Map<String,org.autoplot.jythonsupport.Param> parms= Util.getParams( env, script, URISplit.parseParams(split.params), new NullProgressMonitor() );
 
+            StringBuilder sb= new StringBuilder();
+            for ( Entry<String,org.autoplot.jythonsupport.Param> p: parms.entrySet() ) {                
+                sb.append("&");
+                sb.append(p.getValue().toString());
+            }
+            String constantScript= split.file + "?" + sb.substring(1);
+            
+            // insert URL with default parameters here
+            dataSetSelector1.setValue(constantScript) ; //+ "?" + URISplit.formatParams(parms) );
+            
             String[] items= new String[parms.size()+2];
             int i=0;
             items[0]="";
