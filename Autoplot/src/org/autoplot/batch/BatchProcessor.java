@@ -91,7 +91,7 @@ import org.python.util.InteractiveInterpreter;
  * A job is moved from one directory to the next as each job is performed.  Note
  * this is a guess at how this should work, and may change.
  * 
- * Output (stdout but not stderr) is written to stdout.
+ * Output (stdout but not stderr) is written to the directory stdout.
  * 
  * If setWritePngTemplate is a non-empty string, then image files are written to this location, and a link from the images
  * directory to this image will be created.
