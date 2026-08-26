@@ -1839,12 +1839,13 @@ public class RunBatchTool extends javax.swing.JPanel {
     }
     
     /**
-     * TODO: this is not complete!
+     * Set the parameter and do validation
      * @param interp
      * @param paramDescription
      * @param paramName
      * @param f1
      * @throws IOException 
+     * @throws IllegalArgumentException when a parameter is not properly constrained.
      */
     private static void setParam( InteractiveInterpreter interp, String pwd, org.autoplot.jythonsupport.Param paramDescription, 
             String paramName, String f1 ) throws IOException {
@@ -1874,6 +1875,12 @@ public class RunBatchTool extends javax.swing.JPanel {
                 interp.exec("from java.io import File");
                 interp.exec("autoplot2025.params[\'"+paramName+"\']=File(\'"+f1+"\')"); // JythonRefactory okay
                 break;
+            case 'D':
+                interp.exec("autoplot2025.params[\'"+paramName+"\']=datum(\'"+f1+"\')"); // JythonRefactory okay
+                break;
+            case 'S':
+                interp.exec("autoplot2025.params[\'"+paramName+"\']=datumRange(\'"+f1+"\')"); // JythonRefactory okay
+                break;
             case 'A':
                 if ( f1.startsWith("'") && f1.endsWith("'") && f1.length()>1 ) {
                     f1= f1.substring(1,f1.length()-1);
@@ -1887,6 +1894,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                     interp.exec("autoplot2025.params[\'"+paramName+"\']=_apdr");// JythonRefactory okay
                 } catch (ParseException ex) {
                     Logger.getLogger(RunBatchTool.class.getName()).log(Level.SEVERE, null, ex);
+                    throw new IllegalArgumentException("unable to use value for time range: "+f1,ex);
                 }   break;
             default:
                 interp.exec("autoplot2025.params[\'"+paramName+"\']="+f1);// JythonRefactory okay
