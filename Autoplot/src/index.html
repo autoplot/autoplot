@@ -30,8 +30,12 @@
 
         <p>Autoplot's development is guided by feedback from those using it.  Thanks for your feedback!</p>
                 
-        <p>Bugfixes (2026-08-18):</p>
+        <p>Bugfixes (2026-08-26):</p>
         <ul>
+            <li>Correct Util.generateTimeRanges when orbit is used.  Thanks, Jim!
+            <li>Correct toString of ISO8601 duration object, when all components are zero.
+            <li>Return "P0S" for ISO8601 duration of zero length.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2878/">2878</a>: Run Batch Tool shows constant arguments.  Thanks, Sadie!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2857/">2857</a>: improve static code analysis by handling list comprehensions.
             <li>rte 0188745986: runtime error with full reset and two added tabs caused index out of bounds error.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2880/">2880</a>: Display warning when CDF variable name is not proper Python variable name or will cause problems. 
