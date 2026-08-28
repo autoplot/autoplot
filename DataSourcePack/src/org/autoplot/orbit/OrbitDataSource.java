@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.orbit;
 
 import java.net.URI;
@@ -32,6 +29,9 @@ class OrbitDataSource extends AbstractDataSource {
         super(uri);
         tsb= new DefaultTimeSeriesBrowse();
         sc= params.get( URISplit.PARAM_ARG_0 );
+        if ( sc==null ) {
+            sc= params.get( URISplit.PARAM_ID );
+        }
         String str= params.get( URISplit.PARAM_TIME_RANGE );
         if ( str!=null ) {
             try {

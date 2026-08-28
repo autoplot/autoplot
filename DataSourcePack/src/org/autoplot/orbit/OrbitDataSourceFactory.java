@@ -27,6 +27,15 @@ public class OrbitDataSourceFactory extends AbstractDataSourceFactory {
     public DataSource getDataSource(URI uri) throws Exception {
         return new OrbitDataSource(uri);
     }
+    
+    private List<CompletionContext> getSpacecraft(boolean idValue) {
+        List<CompletionContext> ccresult= new ArrayList<>();
+        Map<String,String> ids= Orbits.getSpacecraftIdExamples();
+        for ( Entry<String,String> e: ids.entrySet() ) {
+            ccresult.add( new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, e.getKey() ) );
+        }
+        return ccresult;
+    }
 
     @Override
     public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
@@ -34,21 +43,20 @@ public class OrbitDataSourceFactory extends AbstractDataSourceFactory {
             
             List<CompletionContext> ccresult= new ArrayList<>();
                         
-            Map<String,String> names= Orbits.getSpacecraftIdExamples();
-            for ( Entry<String,String> n : names.entrySet() ) {
-                CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, 
-                        n.getKey(), this, "arg_0", n.getValue(), null, true );
-                ccresult.add(cc1);
-            }
-            CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "timerange=", "timerange to plot" );
+            CompletionContext cc1;
+            cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "id=", "id", "spacecraft id" );
+            ccresult.add(cc1);
+            cc1 = new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "timerange=", "timerange", "timerange to plot" );
             ccresult.add(cc1);
             return ccresult;
         } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
             String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
             if ( paramName.equals("timerange") ) {
                 return Arrays.asList( new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<timerange>") );
+            } else if ( paramName.equals("id") ) {
+                return getSpacecraft(true);
             } else {
-                return super.getCompletions(cc, mon);
+                return getSpacecraft(false);
             }
         } else {
             return super.getCompletions(cc, mon); 
@@ -74,8 +82,10 @@ public class OrbitDataSourceFactory extends AbstractDataSourceFactory {
             return true;
         } else {
             if ( !map.containsKey( URISplit.PARAM_ARG_0 ) ) {
-                problems.add( "no spacecraft" );
-                return true;
+                if ( !map.containsKey("id") ) {
+                    problems.add( "no spacecraft" );
+                    return true;
+                }
             }
         }
         return super.reject(surl, problems, mon); //To change body of generated methods, choose Tools | Templates.
