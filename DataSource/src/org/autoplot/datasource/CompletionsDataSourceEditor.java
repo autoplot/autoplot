@@ -159,7 +159,11 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
             String resourceUri= CompletionContext.get(CompletionContext.CONTEXT_FILE, cc);
             if ( resourceUri!=null ) {
                 URI uri = DataSetURI.getURI( CompletionContext.get(CompletionContext.CONTEXT_FILE, cc) );
-                cc.resourceURI= DataSetURI.getResourceURI(uri);
+                if ( uri==null ) {
+                    cc.resourceURI= uri; // vap+orbit:junoPJ
+                } else {
+                    cc.resourceURI= DataSetURI.getResourceURI(uri);
+                }
             }
             cc.params = split.params;
 
@@ -171,7 +175,11 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
             } else {
                 URI uri;
                 uri= DataSetURI.getURI(CompletionContext.get(CompletionContext.CONTEXT_FILE, cc));
-                cc.resourceURI= DataSetURI.getResourceURI(uri);
+                if ( uri==null ) {
+                    cc.resourceURI= uri; 
+                } else {
+                    cc.resourceURI= DataSetURI.getResourceURI(uri);
+                }
             }
 
             cc.params = split.params;
