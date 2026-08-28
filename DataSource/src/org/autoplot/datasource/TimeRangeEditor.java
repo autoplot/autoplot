@@ -502,24 +502,8 @@ public class TimeRangeEditor extends javax.swing.JPanel {
                 }
             }  
             
-            try {
-                edit = DataSourceEditorPanelUtil.getDataSourceEditorPanel(DataSetURI.getURIValid(surl));
-                if ( edit!=null && edit.reject(surl) ) {
-                    edit= null;
-                    //wasRejected= true;
-                }
-            } catch (URISyntaxException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-                edit= null;
-            } catch ( Exception ex ) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-                edit= null;
-            }
-            if ( edit==null ) {
-                JOptionPane.showMessageDialog( prevButton, "<html>The selected plot element has no editor:<br>"+surl, "no editor", JOptionPane.OK_OPTION );
-            } else {
-                peer.browseSourceType();
-            }
+            peer.browseSourceType();
+            
         }
     }//GEN-LAST:event_browseButtonActionPerformed
 
