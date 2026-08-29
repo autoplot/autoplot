@@ -62,6 +62,7 @@ public final class TimeRangeTool extends javax.swing.JPanel {
      */
     private DatumRange pendingTimeRange;
     private DasAxis dasAxis;
+    final DasCanvas canvas;  // preview of timerange
     
     private final Preferences prefs;
     private static final String PREF_SPACECRAFT = "spacecraft";
@@ -154,7 +155,7 @@ public final class TimeRangeTool extends javax.swing.JPanel {
         });
         interpretationLabel.setText( interpretIso8601Range( nrtComboBox.getSelectedItem().toString() ));
         
-        final DasCanvas canvas= new DasCanvas( 528, 89 );
+        canvas= new DasCanvas( 528, 89 );
         DasRow row= new DasRow( canvas, 0.3, 0.5 );
         DasColumn column= new DasColumn( canvas, 0.1, 0.9 );
         dasAxis= new DasAxis( DatumRangeUtil.parseTimeRangeValid( nrtComboBox.getSelectedItem().toString() ), DasAxis.HORIZONTAL ) {
@@ -172,6 +173,7 @@ public final class TimeRangeTool extends javax.swing.JPanel {
                 g.setColor(Color.BLUE.darker());
                 g.drawPolygon( new int[] {inow-7,inow,inow+7,inow-7}, 
                         new int[] { iy-11,iy, iy-11, iy-11 }, 4 );
+                g.drawString("now", inow-7, iy-12);
             }
             
         };
@@ -1082,6 +1084,9 @@ public final class TimeRangeTool extends javax.swing.JPanel {
         } catch ( ParseException ex ) {
             
         }
+        canvas.invalidate();
+        canvas.revalidate();
+        canvas.repaint();
     }//GEN-LAST:event_nrtComboBoxActionPerformed
 
     /**
