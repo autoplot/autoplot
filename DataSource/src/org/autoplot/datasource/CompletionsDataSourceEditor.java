@@ -377,6 +377,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
                     JPanel valuePanel= new JPanel(  );
                     valuePanel.setLayout( new BoxLayout( valuePanel, BoxLayout.X_AXIS ) );
                     valuePanel.add(jcheckBox);
+                    jcheckBox.setSelected(true);
                     final RecentComboBox tcb= new RecentComboBox();
                     tcb.setPreferenceNode( RecentComboBox.PREF_NODE_TIMERANGE );
                     Dimension x= tcb.getPreferredSize();
