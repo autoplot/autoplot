@@ -48,11 +48,13 @@ class OrbitDataSource extends AbstractDataSource {
         Orbits o= Orbits.getOrbitsFor(sc);
         DatumRange tr= tsb.getTimeRange();
         String s= o.getOrbitOnOrBefore(tr.min());
-        
+        if ( s==null ) {
+            s= o.first();
+        }
         QDataSet result= null;
         while ( s!=null ) {
             DatumRange dr= o.getDatumRange(s);
-            if ( dr.min().lt(tr.max())) {
+            if ( dr.intersects(tr) ) {
                 result= Ops.createEvent( result, dr.toString(), 0x808080, s );
                 s= o.next(s);
             } else {
