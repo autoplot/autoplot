@@ -376,6 +376,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
                 if ( key.equals(URISplit.PARAM_TIME_RANGE) ) {      
                     JPanel valuePanel= new JPanel(  );
                     valuePanel.setLayout( new BoxLayout( valuePanel, BoxLayout.X_AXIS ) );
+                    valuePanel.add(jcheckBox);
                     final RecentComboBox tcb= new RecentComboBox();
                     tcb.setPreferenceNode( RecentComboBox.PREF_NODE_TIMERANGE );
                     Dimension x= tcb.getPreferredSize();
@@ -388,12 +389,14 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
                     JButton button= new JButton( fileIcon );
                     button.addActionListener((ActionEvent e) -> {
                         TimeRangeTool tt= new TimeRangeTool();
-                        tt.setSelectedRange(tcb.getSelectedItem().toString());
+                        if (tcb.getSelectedItem()!=null) {
+                            tt.setSelectedRange(tcb.getSelectedItem().toString());
+                        }
                         int r= WindowManager.showConfirmDialog( this, tt, "Select Time Range", JOptionPane.OK_CANCEL_OPTION );
                         if ( r==JOptionPane.OK_OPTION) {
                             tcb.setSelectedItem(tt.getSelectedRange());
                         }
-                    });     
+                    });
                     button.setToolTipText("Time Range Tool");
                     valuePanel.add( tcb );
                     button.setAlignmentX( JComponent.LEFT_ALIGNMENT );
