@@ -50,6 +50,7 @@ import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.AutoplotUI;
+import static org.autoplot.AutoplotUI.ERROR_ICON;
 import org.autoplot.datasource.AutoplotSettings;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.das2.util.filesystem.GitCommand;
@@ -112,7 +113,20 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
                             Set<String> exclude= new HashSet();
                             exclude.add("ro_cache.txt");
                             exclude.add("keychain.txt");
-                            okay = FileUtil.deleteFileTree(f,exclude);
+                            Runnable run= new Runnable() {
+                                public void run() {
+                                    Component parent= null;
+                                    DasProgressPanel monitor= DasProgressPanel.createFramed("Clear Cache");
+                                    boolean okay = FileUtil.deleteFileTree(f,exclude,monitor);
+                                    if ( okay ) {
+                                        JOptionPane.showMessageDialog( parent, "Branch deleted: " + f.getName() );
+                                    } else {
+                                        JOptionPane.showMessageDialog( parent, "Error deleting branch: " + f.getName() );
+                                    }
+                                }
+                            };
+                            new Thread(run).start();
+                            
                         } catch (IllegalArgumentException ex1) {
                             ex = ex1;
                             okay = false;
