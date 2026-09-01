@@ -2853,16 +2853,21 @@ APSplash.checkTime("init 52.9");
 
     private void clearCache() {
         if ( AutoplotUtil.showConfirmDialog(this, "delete all cached files?", "clear cache", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-            try {
-                if (applicationModel.clearCache()) {
-                    setStatus("cache cleared");
-                } else {
-                    setStatus(ERROR_ICON,"unable to clear cache");
-                    JOptionPane.showMessageDialog(this, "unable to clear cache");
+            final DasCanvas parent= this.applicationModel.getCanvas();
+            Runnable run= new Runnable() {
+                public void run() {
+                    DasProgressPanel monitor= DasProgressPanel.createComponentPanel(parent, "Clear Cache");
+                    if (applicationModel.clearCache(monitor)) {
+                        setStatus("cache cleared");
+                    } else {
+                        setStatus(ERROR_ICON,"unable to clear cache");
+                        JOptionPane.showMessageDialog(AutoplotUI.this, "unable to clear cache");
+                    }
                 }
-            } catch (IllegalArgumentException ex) {
-                JOptionPane.showMessageDialog(this, "unable to clear cache: " + ex.getMessage());
-            }
+            };
+            
+            new Thread(run).start();
+            
         }
     }
 

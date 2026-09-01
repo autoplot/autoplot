@@ -1390,6 +1390,15 @@ public final class ApplicationModel {
      * @throws IllegalArgumentException if the delete operation fails
      */
     boolean clearCache() throws IllegalArgumentException {
+        return clearCache(new NullProgressMonitor());
+    }
+    
+    /**
+     * remove all cached downloads.
+     * Currently, this is implemented by deleting the das2 fsCache area.
+     * @throws IllegalArgumentException if the delete operation fails
+     */
+    boolean clearCache(ProgressMonitor monitor) throws IllegalArgumentException {
         File local;
 
         local = new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE) );
@@ -1397,12 +1406,17 @@ public final class ApplicationModel {
         Set<String> exclude= new HashSet();
         exclude.add("ro_cache.txt");
         exclude.add("keychain.txt");
-        okay= okay && FileUtil.deleteFileTree( new File(local,"http"), exclude );
-        okay= okay && FileUtil.deleteFileTree( new File(local,"https"), exclude );
-        okay= okay && FileUtil.deleteFileTree( new File(local,"ftp"), exclude );
-        okay= okay && FileUtil.deleteFileTree( new File(local,"zip"), exclude );
-        okay= okay && FileUtil.deleteFileTree( new File(local,"vfsCache"), exclude );
-        okay= okay && FileUtil.deleteFileTree( new File(local,"fscache"), exclude ); // future
+        monitor.setTaskSize(120);
+        monitor.started();
+        okay= okay && FileUtil.deleteFileTree( new File(local,"http"), exclude, monitor.getSubtaskMonitor(0,10,"http") );
+        okay= okay && FileUtil.deleteFileTree( new File(local,"https"), exclude, monitor.getSubtaskMonitor(10,70,"https") );
+        okay= okay && FileUtil.deleteFileTree( new File(local,"ftp"), exclude, monitor.getSubtaskMonitor(70,80,"ftp") );
+        okay= okay && FileUtil.deleteFileTree( new File(local,"zip"), exclude, monitor.getSubtaskMonitor(80,90,"zip") );
+        okay= okay && FileUtil.deleteFileTree( new File(local,"vfsCache"), exclude, monitor.getSubtaskMonitor(90,95,"vfsCache") );
+        okay= okay && FileUtil.deleteFileTree( new File(local,"fscache"), exclude, monitor.getSubtaskMonitor(95,100,"fscache") ); 
+        okay= okay && FileUtil.deleteFileTree( new File(local,"jar"), exclude, monitor.getSubtaskMonitor(100,110,"jar") ); 
+        okay= okay && FileUtil.deleteFileTree( new File(local,"temp"), exclude, monitor.getSubtaskMonitor(110,120,"temp") ); 
+        monitor.finished();
         return okay;
         //return Util.deleteFileTree(local);
     }
