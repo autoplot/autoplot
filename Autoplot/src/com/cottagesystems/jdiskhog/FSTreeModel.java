@@ -305,7 +305,8 @@ public class FSTreeModel implements TreeModel {
             if (hideListingFile) {
                 List<File> lff = new ArrayList(Arrays.asList(ff));
                 lff.remove(new File(f, ".listing"));
-                ff = lff.toArray(new File[lff.size()]);
+                lff.remove(new File(f, ".meta"));
+                ff = lff.toArray(new File[lff.size()]);                
             }
 
             if ( comparator!=null ) {
