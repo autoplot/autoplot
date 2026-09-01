@@ -325,7 +325,8 @@ public class Util {
     }
     
     /**
-     * remove empty branches from file tree.  This is like "rm -r $root"
+     * remove empty branches from file tree.  This is not like "rm -r &gt;root&lt;",
+     * but just removes any empty folders below and including the root.
      * @param root the root directory from which to start a search.
      * @param problems any files which could not be deleted are listed here.
      * @return true if successful.
@@ -347,6 +348,8 @@ public class Util {
                 success = success && pruneFileTree(children1, problems);
             }
         }
+        
+        children = root.listFiles();
         
         if ( children.length==0 ) {
             if ( !root.delete() ) {
