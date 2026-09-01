@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Code to iterate through an orbit list has quadratic execution time, so long orbit lists will eventually cause problems.  <a href="https://github.com/autoplot/dev/blob/master/bugs/2026/20260826/demoN2timeOrbits.jy">The script.</a></small></p>
+        <p><small>Spectrogram of storm sirens.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,9 @@
 
         <p>Autoplot's development is guided by feedback from those using it.  Thanks for your feedback!</p>
                 
-        <p>Bugfixes (2026-08-31):</p>
+        <p>Bugfixes (2026-09-01):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2888/">2888</a>: Tools->Cache->"Clear cache" happens on event thread.  Bugfix when ro_cache.txt file is within filesystem.
             <li><a href="https://github.com/das-developers/das2java/issues/185">185</a>: More carefully use getSubTaskMonitor to imply progress.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2887/">2887</a>: NRT TimeRange dialog doesn't update DasAxis.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2883/">2883</a>: recent changes to SubtaskMonitor caused runtime error with old scripts.
