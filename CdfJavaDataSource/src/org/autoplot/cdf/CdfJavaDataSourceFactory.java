@@ -243,7 +243,15 @@ public class CdfJavaDataSourceFactory extends AbstractDataSourceFactory implemen
             if ( param==null ) {
                 param= args.get("id");
                 if ( param==null ) {
-                    return true;
+                    if ( args.get("Z")==null ) {
+                        if ( args.get("Y")==null ) {
+                            return true;
+                        } else {
+                            param= args.remove("Y");
+                        }
+                    } else {
+                        param= args.remove("Z");
+                    }
                 }
             }
             String slice1= args.get("slice1");

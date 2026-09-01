@@ -316,6 +316,14 @@ public class CdfDataSource extends AbstractDataSource {
             if (svariable == null) {
                 svariable = (String) map.get("arg_0");
             }
+            
+            if ( svariable==null ) {
+                if ( map.containsKey("Z") ) {
+                    svariable= (String)map.remove("Z");
+                } else if ( map.containsKey("Y") ) {
+                    svariable= (String)map.remove("Y");
+                }
+            }
             String constraint = null;
 
             if ( svariable==null ) {
@@ -486,6 +494,13 @@ public class CdfDataSource extends AbstractDataSource {
         if (svariable == null) {
             svariable = (String) map.get("arg_0");
         }
+        if ( svariable==null ) {
+            if ( map.containsKey("Z") ) {
+                svariable= (String)map.remove("Z");
+            } else if ( map.containsKey("Y") ) {
+                svariable= (String)map.remove("Y");
+            }
+        }        
 
         if ( svariable==null ) {
             throw new IllegalArgumentException("CDF URI needs an argument");
@@ -1787,6 +1802,12 @@ public class CdfDataSource extends AbstractDataSource {
                 String svariable = (String) map.get("id");
                 if (svariable == null) {
                     svariable = (String) map.get("arg_0");
+                }
+                if ( svariable==null ) {
+                    svariable= map.get("Z");
+                    if ( svariable==null ) {
+                        svariable= map.get("Y");
+                    }
                 }
                 if (svariable == null) {
                     throw new IllegalArgumentException("variable not specified");
