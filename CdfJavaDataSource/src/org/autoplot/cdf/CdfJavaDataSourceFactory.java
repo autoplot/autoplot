@@ -176,6 +176,12 @@ public class CdfJavaDataSourceFactory extends AbstractDataSourceFactory implemen
 
                 LinkedHashMap<String,String> pp= URISplit.parseParams(cc.params);
                 String param0= pp.get("arg_0");
+                if ( param0==null ) {
+                    param0= pp.get("Z");
+                    if ( param0==null ) {
+                        param0= pp.get("Y");
+                    }
+                }
                 LinkedHashMap<String, CdfUtil.CdfVariableDescription> cdfParameterInfo= org.autoplot.cdf.CdfUtil.getPlottable( cdf, null );
                 LinkedHashMap<String, CdfUtil.CdfVariableDescription> compatible= 
                         CdfJavaDataSourceEditorPanel.getCompatible( cdfParameterInfo, param0, 
