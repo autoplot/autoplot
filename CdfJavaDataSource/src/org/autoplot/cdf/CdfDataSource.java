@@ -80,7 +80,7 @@ public class CdfDataSource extends AbstractDataSource {
     
     private static final Logger logger= LoggerManager.getLogger("apdss.cdf");
 
-    private Map<String, Object> attributes;
+    //private Map<String, Object> attributes;
 
     public CdfDataSource( URI uri ) {
         super(uri);
@@ -170,15 +170,12 @@ public class CdfDataSource extends AbstractDataSource {
      * file.  Now we automatically unload all the cached files.  I did look at just disabling the cache, but the file is
      * open and closed three times during the load.  See http://sourceforge.net/p/autoplot/bugs/1002.
      */
-    public static final TickleTimer timer= new TickleTimer( 10000, new PropertyChangeListener() {
-        @Override
-        public void propertyChange(PropertyChangeEvent evt) {
-            logger.log(Level.FINER, "unloading CDF cache to resolve bug 1002" );
-            synchronized (lock ) {
-                openFiles.clear();
-                openFilesRev.clear();
-                openFilesFresh.clear();
-            }
+    public static final TickleTimer timer= new TickleTimer( 10000, (PropertyChangeEvent evt) -> {
+        logger.log(Level.FINER, "unloading CDF cache to resolve bug 1002" );
+        synchronized (lock ) {
+            openFiles.clear();
+            openFilesRev.clear();
+            openFilesFresh.clear();
         }
     });
  
@@ -297,6 +294,8 @@ public class CdfDataSource extends AbstractDataSource {
             
             File cdfFile;
             cdfFile = getFile(mon.getSubtaskMonitor("download file"));
+             
+            Map<String, Object> attributes=null;    
 
             logger.log(Level.FINE, "getDataSet ({0})", getURI() );
 
@@ -1788,6 +1787,8 @@ public class CdfDataSource extends AbstractDataSource {
 
     @Override
     public synchronized Map<String, Object> getMetadata(ProgressMonitor mon) throws IOException {
+        long t0= System.currentTimeMillis();
+        Map<String, Object> attributes= null;
         if (attributes == null) {
             try {
                 File cdfFile;
@@ -1849,7 +1850,7 @@ public class CdfDataSource extends AbstractDataSource {
                 if ( map.containsKey(PARAM_Y) ) {
                     attributes.remove("DEPEND_1");
                 }
-
+                
                 return attributes; // transient state
             } catch ( IOException | IllegalArgumentException ex ) {
                 if ( ex instanceof IllegalArgumentException ) {
@@ -1873,6 +1874,7 @@ public class CdfDataSource extends AbstractDataSource {
                 }
             }
         }
+        
         return result;
     }
 
