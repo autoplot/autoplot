@@ -1795,29 +1795,42 @@ public class CdfDataSource extends AbstractDataSource {
                 cdfFile = getFile(mon);
                 String fileName = cdfFile.toString();
                 Map<String,String> map = getParams();
-                if ( map.containsKey( PARAM_SLICE1 ) ) {
-                    return null;
-                }
-                CDFReader cdf;
-                cdf = getCdfFile( fileName );
-                String svariable = (String) map.get("id");
+                
+                String svariable = (String) map.get(PARAM_ID);
                 if (svariable == null) {
                     svariable = (String) map.get("arg_0");
                 }
+            
                 if ( svariable==null ) {
-                    svariable= map.get("Z");
-                    if ( svariable==null ) {
-                        svariable= map.get("Y");
+                    if ( map.containsKey("Z") ) {
+                        svariable= (String)map.remove("Z");
+                    } else if ( map.containsKey("Y") ) {
+                        svariable= (String)map.remove("Y");
                     }
                 }
+                String constraint = null;
+
+                int i = svariable.indexOf("[");
+                if (i != -1) {
+                    constraint = svariable.substring(i);
+                    int i2= constraint.indexOf(";");
+                    if ( i2>-1 ) {
+                        constraint= constraint.substring(0,i2);
+                    }
+                    svariable = svariable.substring(0, i);
+                }
+            
+                if ( map.containsKey( PARAM_SLICE1 ) ) {
+                    return null;
+                }
+                
+                CDFReader cdf;
+                cdf = getCdfFile( fileName );
+                
                 if (svariable == null) {
                     throw new IllegalArgumentException("variable not specified");
                 }
-                int i = svariable.indexOf("[");
-                if (i != -1) {
-                    //constraint = svariable.substring(i);
-                    svariable = svariable.substring(0, i);
-                }
+
                 i= svariable.lastIndexOf(";");
                 if ( i!=-1 ) {
                     return Collections.emptyMap();
@@ -1850,6 +1863,20 @@ public class CdfDataSource extends AbstractDataSource {
                 if ( map.containsKey(PARAM_Y) ) {
                     attributes.remove("DEPEND_1");
                 }
+                
+                if ( constraint!=null ) {
+                    Pattern p= Pattern.compile("\\[(-?\\d+)\\]");
+                    Matcher m= p.matcher(constraint);
+                    if ( m.matches() ) {
+                        for ( i=0; i<QDataSet.MAX_RANK-1; i++ ) {
+                            Object o= attributes.get("DEPEND_"+(i+1));
+                            if ( attributes.containsKey("DEPEND_"+i) ) {
+                                attributes.put( "DEPEND_"+i, o );
+                            }
+                        }
+                    }
+                }    
+            
                 
                 return attributes; // transient state
             } catch ( IOException | IllegalArgumentException ex ) {
