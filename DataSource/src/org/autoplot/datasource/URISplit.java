@@ -1039,7 +1039,7 @@ public class URISplit {
     public static boolean isUriEncoded( String surl ) {
         boolean result= false;
         // check for illegal characters.
-        if ( surl.contains(" ") ) result= false;
+        // if ( surl.contains(" ") ) result= false;
         // check for encoded characters.
         if ( Pattern.compile("%[0-9A-F][0-9A-F]").matcher(surl).find() ) result= true;
         return result;
@@ -1052,11 +1052,27 @@ public class URISplit {
      * @return the URL-encoded URI
      */
     public static String uriEncode(String surl) {
-        if ( isUriEncoded(surl) ) return surl;
+        if ( isUriEncoded(surl) ) {
+            // I saw a case where both space and encoded parts.
+            int i= surl.indexOf("?"); 
+            if ( i==-1 ) {
+                surl = surl.replaceAll(" ", "%20" );
+            } else {
+                surl = surl.substring(0,i).replaceAll(" ", "%20" ) + surl.substring(i).replaceAll(" ","+");
+            }
+            return surl;
+        }
+        
+        int i= surl.indexOf("?");
+        if ( i==-1 ) {
+            surl = surl.replaceAll(" ", "%20" );
+        } else {
+            surl = surl.substring(0,i).replaceAll(" ", "%20" ) + surl.substring(i).replaceAll(" ","+");
+        }
+        
         surl = surl.replaceAll("%([^0-9])", "%25$1");  //%Y, %j, etc
         surl = surl.replaceAll("\\%24", "\\$"); // What's this--seems backward.  We like $'s in URIs...
 
-        surl = surl.replaceAll(" ", "%20" );
         //surl = surl.replaceAll("#", "%23" );
         //surl = surl.replaceAll("%", "%25" ); // see above
         //surl = surl.replaceAll("&", "%26" );
