@@ -794,7 +794,7 @@ public class DataSetSelector extends javax.swing.JPanel {
      * @param problems we're entering this GUI because of problems with the URI, so mark these problems.  See DataSourceFactory.reject.
      */
     public void browseSourceType( final List<String> problems ) {
-        String surl = ((String) dataSetSelectorComboBox.getEditor().getItem()).trim();
+        String surl = getValue();
 
         logger.log(Level.FINE, "browseSourceType {0}", surl);
         
@@ -2024,7 +2024,10 @@ private void dataSetSelectorComboBoxPopupMenuCanceled(javax.swing.event.PopupMen
     private String lastValue= null;
 
     /**
-     * Getter for property value.
+     * Getter for property value.  The value will be trimmed, having no leading or trailing spaces.
+     * Ticket https://sourceforge.net/p/autoplot/feature-requests/877/ has "https : //" replaced
+     * with "https://", to thwart Outlook and software that tries to manipulate URLs.
+     * 
      * TODO: this should really be redone, returning the value property.
      * @return Value of property value.
      */
