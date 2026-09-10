@@ -23,8 +23,8 @@ public class AnnotationController extends DomNodeController {
     private final Annotation annotation;
     private final Application dom;
     private final DasAnnotation dasAnnotation;
-    private DasRow allRow;
-    private DasColumn allColumn;    
+    private final DasRow allRow;
+    private final DasColumn allColumn;    
     
     public AnnotationController( Application dom, Annotation annotation, DasAnnotation dasAnnotation ) {
         super( annotation );
@@ -110,6 +110,7 @@ public class AnnotationController extends DomNodeController {
         ac.bind( annotation, "scale", dasAnnotation, "scale" );
         ac.bind( annotation, "borderType", dasAnnotation, "borderType" );
         ac.bind( annotation, "anchorPosition", dasAnnotation, "anchorPosition" );
+        ac.bind( annotation, "anchorStyle", dasAnnotation, "anchorStyle" );
         ac.bind( annotation, Annotation.PROP_ANCHORTYPE, dasAnnotation, DasAnnotation.PROP_ANCHORTYPE );
         ac.bind( annotation, Annotation.PROP_SPLITANCHORTYPE, dasAnnotation, DasAnnotation.PROP_SPLITANCHORTYPE );
         ac.bind( annotation, Annotation.PROP_VERTICALANCHORTYPE, dasAnnotation, DasAnnotation.PROP_VERTICALANCHORTYPE );

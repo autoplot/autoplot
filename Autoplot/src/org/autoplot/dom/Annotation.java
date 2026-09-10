@@ -117,6 +117,21 @@ public class Annotation extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_ANCHORPOSITION, oldAnchorPosition, anchorPosition);
     }
     
+    private String anchorStyle="";
+
+    public static final String PROP_ANCHORSTYLE = "anchorStyle";
+
+    public String getAnchorStyle() {
+        return anchorStyle;
+    }
+
+    public void setAnchorStyle(String anchorStyle) {
+        String oldAnchorStyle = this.anchorStyle;
+        this.anchorStyle = anchorStyle;
+        propertyChangeSupport.firePropertyChange(PROP_ANCHORSTYLE, oldAnchorStyle, anchorStyle);
+    }
+    
+    
     private DatumRange xrange= DatumRange.newDatumRange(0,10,Units.dimensionless);
 
     public static final String PROP_XRANGE = "xrange";
@@ -443,6 +458,7 @@ public class Annotation extends DomNode {
         if ( !exclude.contains( PROP_ANCHORPOSITION ) ) this.setAnchorPosition(that.getAnchorPosition() );
         if ( !exclude.contains( PROP_ANCHOROFFSET ) ) this.setAnchorOffset(that.getAnchorOffset() );
         if ( !exclude.contains( PROP_ANCHORTYPE ) ) this.setAnchorType(that.getAnchorType() );
+        if ( !exclude.contains( PROP_ANCHORSTYLE ) ) this.setAnchorStyle(that.getAnchorStyle() );
         if ( !exclude.contains( PROP_SPLITANCHORTYPE ) ) this.setSplitAnchorType( that.isSplitAnchorType() );
         if ( !exclude.contains( PROP_VERTICALANCHORTYPE ) ) this.setVerticalAnchorType( that.getVerticalAnchorType() );
         if ( !exclude.contains( PROP_ANCHORBORDERTYPE ) ) this.setAnchorBorderType(that.getAnchorBorderType() );
@@ -493,6 +509,8 @@ public class Annotation extends DomNode {
         b=  that.anchorOffset.equals(this.anchorOffset) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_ANCHOROFFSET, that.anchorOffset, this.anchorOffset ) );
         b=  that.anchorType.equals(this.anchorType) ;
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_ANCHORSTYLE, that.anchorStyle, this.anchorStyle ) );
+        b=  that.anchorStyle.equals(this.anchorStyle);
         if ( !b ) result.add(new PropertyChangeDiff( PROP_ANCHORTYPE, that.anchorType, this.anchorType ) );
         b=  that.splitAnchorType==this.splitAnchorType;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_SPLITANCHORTYPE, that.splitAnchorType, this.splitAnchorType ) );
