@@ -538,15 +538,25 @@ public class JythonOps {
         }
         if ( name.equals("timerange") ) {
             String min= constraint.getOrDefault("min", "" ).toString();
+            DatumRange drv=Ops.datumRange(v); 
             if ( min.length()>0 ) {
-                if ( Ops.datumRange(v).min().lt( Ops.datumRange(min).min() ) ) {
-                    throw new IllegalArgumentException(String.format("value for %s is less than min %s: %s",name,min,v));
+                DatumRange drmin= Ops.datumRange(min);
+                if ( drv.min().lt( drmin.min() ) ) {
+                    drv= DatumRange.newRange( drmin.min(), drv.max() );
+                    //throw new IllegalArgumentException(String.format("value for %s is less than min %s: %s",name,min,v));
                 }
             }
             String max= constraint.getOrDefault("max", "" ).toString();
             if ( max.length()>0 ) {
-                if ( Ops.datumRange(v).max().gt( Ops.datumRange(max).max() ) ) {
-                    throw new IllegalArgumentException(String.format("value for %s is greater than max %s: %s",name,max,v));
+                DatumRange drmax= Ops.datumRange(max);
+                if ( drv.max().gt( drmax.max() ) ) {
+                    drv= DatumRange.newRange( drv.min(), drmax.max() );
+                }
+            }
+            if ( drv.width().lt(Ops.datumRange(v).width()) ) {
+                if ( drv.width().value()>0 ) {
+                    logger.info("timerange clipped to meet min and max");
+                    v= drv.toString();
                 }
             }
         } else {
