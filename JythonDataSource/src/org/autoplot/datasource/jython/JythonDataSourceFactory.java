@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -39,6 +40,7 @@ import org.autoplot.jythonsupport.JythonRefactory;
 import org.autoplot.jythonsupport.JythonUtil;
 import org.autoplot.jythonsupport.Param;
 import org.autoplot.jythonsupport.PyQDataSet;
+import org.das2.datum.DatumRangeUtil;
 
 /**
  *
@@ -252,6 +254,14 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
             if ( parms.containsKey( JythonDataSource.PARAM_TIMERANGE ) && !uriParams.containsKey(JythonDataSource.PARAM_TIMERANGE) ) {
                 problems.add(TimeSeriesBrowse.PROB_NO_TIMERANGE_PROVIDED);
                 return true;
+            } else if ( parms.containsKey( JythonDataSource.PARAM_TIMERANGE ) && uriParams.containsKey(JythonDataSource.PARAM_TIMERANGE) ) {
+                String str= uriParams.get(JythonDataSource.PARAM_TIMERANGE);
+                try { 
+                    DatumRangeUtil.parseDatumRange(str);
+                } catch ( ParseException ex ) {
+                    problems.add("timerange is not parseable: "+str);
+                    return true;
+                }
             }
         } catch ( IOException | PyException ex ) {
             String s= ex.toString();
