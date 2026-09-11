@@ -148,8 +148,12 @@ public class JythonDataSourceTimeSeriesBrowse implements TimeSeriesBrowse {
                             str= str.substring(1,str.length()-1);
                         }
                     }
-                    DatumRange tr= DatumRangeUtil.parseTimeRange(str);
-                    tsb1.setTimeRange(tr);
+                    try {
+                        DatumRange tr= DatumRangeUtil.parseTimeRange(str);
+                        tsb1.setTimeRange(tr);
+                    } catch ( ParseException ex ) {
+                        throw new ParseException("default timerange argument is not iso8601 time range: "+str,ex.getErrorOffset());
+                    }
                 } else if ( line.contains("timerange") && line.contains("getParam(") ) {
                     // There was a strange test here which seemed unnecessary.  TODO: remove this branch
                 }
