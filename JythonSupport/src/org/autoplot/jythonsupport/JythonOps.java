@@ -542,14 +542,19 @@ public class JythonOps {
             if ( min.length()>0 ) {
                 DatumRange drmin= Ops.datumRange(min);
                 if ( drv.min().lt( drmin.min() ) ) {
+                    if ( drv.max().lt(drmin.min()) ) {
+                        throw new IllegalArgumentException(String.format("value for %s is less than min %s: %s",name,min,v));
+                    }
                     drv= DatumRange.newRange( drmin.min(), drv.max() );
-                    //throw new IllegalArgumentException(String.format("value for %s is less than min %s: %s",name,min,v));
                 }
             }
             String max= constraint.getOrDefault("max", "" ).toString();
             if ( max.length()>0 ) {
                 DatumRange drmax= Ops.datumRange(max);
                 if ( drv.max().gt( drmax.max() ) ) {
+                    if ( drv.min().gt(drmax.max() ) ) {
+                        throw new IllegalArgumentException(String.format("value for %s is greater than max %s: %s",name,min,v));
+                    }
                     drv= DatumRange.newRange( drv.min(), drmax.max() );
                 }
             }
