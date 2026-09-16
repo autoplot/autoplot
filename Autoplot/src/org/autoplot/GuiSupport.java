@@ -156,6 +156,7 @@ import org.autoplot.renderer.AnnotationEditorPanel;
 import org.autoplot.scriptconsole.GuiExceptionHandler;
 import org.das2.components.propertyeditor.EnumerationEditor;
 import org.das2.datum.Datum;
+import org.das2.datum.DatumRangeUtil;
 import org.das2.graph.DasColorBar;
 import org.das2.util.FontChooser;
 
@@ -2613,8 +2614,32 @@ public class GuiSupport {
                 Datum datay= plot.getYAxis().invTransform( plot.getDasMouseInputAdapter().getMousePressPositionOnCanvas().y );
                 ann.setPointAtX( datax );
                 ann.setPointAtY( datay );
-                ann.setXrange( DatumRange.newRange( datax, datax ) );
-                ann.setYrange( DatumRange.newRange( datay, datay ) );
+                DatumRange xrange= plot.getXAxis().getDatumRange();
+                if ( plot.getXAxis().isLog() ) {
+                    double f= Math.pow( 10, Math.log10( xrange.max().divide(xrange.min()).value() ) / 10 );
+                    Datum xmin= plot.getXAxis().findTick( datax.divide(f), -1, true );
+                    Datum xmax= plot.getXAxis().findTick( datax.multiply(f), 1, true );
+                    xrange= DatumRange.newRange(xmin,xmax);
+                } else {
+                    Datum f= xrange.width().divide(10);
+                    Datum xmin= plot.getXAxis().findTick( datax.subtract(f), -1, true );
+                    Datum xmax= plot.getXAxis().findTick( datax.add(f), 1, true );
+                    xrange= DatumRange.newRange(xmin,xmax);
+                }
+                DatumRange yrange= plot.getYAxis().getDatumRange();
+                if ( plot.getYAxis().isLog() ) {
+                    double f= Math.pow( 10, Math.log10(yrange.max().divide(yrange.min()).value()) / 10 );
+                    Datum ymin= plot.getYAxis().findTick( datay.divide(f), -1, true );
+                    Datum ymax= plot.getYAxis().findTick( datay.multiply(f), 1, true );
+                    yrange= DatumRange.newRange(ymin,ymax);
+                } else {
+                    Datum f= yrange.width().divide(10);
+                    Datum ymin= plot.getYAxis().findTick( datay.subtract(f), -1, true );
+                    Datum ymax= plot.getYAxis().findTick( datay.add(f), 1, true );
+                    yrange= DatumRange.newRange(ymin,ymax);
+                }
+                ann.setXrange( xrange );
+                ann.setYrange( yrange );
                 p.doBindings(ann);
                 if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( app, p, "Add Annotation", JOptionPane.OK_CANCEL_OPTION ) ) {
                     controller.addAnnotation( ann );
