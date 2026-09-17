@@ -1986,6 +1986,10 @@ public class DataSetURI {
             if ( timeRange!=null ) {
                 String ss1= fsm.getRepresentativeFile(mon);
                 timeRange= fsm.getRangeFor(ss1);
+            } else if ( timeRange==null ) {
+                String ss1= fsm.getRepresentativeFile(mon);
+                timeRange= fsm.getRangeFor(ss1);
+                timeRange= timeRange.rescale( -10, 11 ); // I found that not expanding this caused fail
             }
             
             String [] ss2= fsm.getNamesFor(timeRange);
@@ -2094,7 +2098,7 @@ public class DataSetURI {
                     String doc= "Use aggregation ("+tr+" available)";
                     int splitIndex= AggregatingDataSourceFactory.splitIndex(sagg);
                     String label= ".../"+sagg.substring(splitIndex);
-                    completions.add( new DataSetURI.CompletionResult( sagg, label, doc, prefix, true ) );
+                    completions.add( new DataSetURI.CompletionResult( sagg, label, doc, surlDir + prefix, true ) );
                 }
             }
         }
