@@ -24,7 +24,10 @@ public class DataSetUrlCompletionItem implements CompletionItem {
     private static final Logger logger = Logger.getLogger("jython.editor");
     CompletionResult rs;
 
-    DataSetUrlCompletionItem(CompletionResult rs) {
+    public DataSetUrlCompletionItem(CompletionResult rs) {
+        if ( !rs.completion.startsWith(rs.completable) ) {
+            //throw new IllegalArgumentException("no this won't work");
+        }
         this.rs = rs;
     }
 
@@ -65,7 +68,16 @@ public class DataSetUrlCompletionItem implements CompletionItem {
                 }
                 d.insertString(pos, rs.completion.substring(rs.completable.length()), null);
             } else {
-                throw new IllegalArgumentException("implementation problem, completion (" + rs.completion + ") must start with completable (" + rs.completable + ")");
+                // For example, 2015 is going to be replaced with $Y, so we need to delete everything.
+                String txt = d.getText(pos, d.getLength() - pos);
+                int ii = txt.indexOf("'");
+                int jj = txt.indexOf("\n");
+                if (ii > -1 && ii < jj) {
+                    logger.log(Level.FINE, "ii={0}", ii);
+                    d.remove(pos, ii);
+                }
+                d.remove(pos-rs.completable.length(),rs.completable.length());
+                d.insertString(pos-rs.completable.length(), rs.completion, null);
             }
         } catch (BadLocationException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
