@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Comparing Autoplot rendering of HAPI dataset to <a href="https://data.phys.ucalgary.ca/tools/software/hapi_server.html">the server's</a> rendering.</small></p>
+        <p><small>Annotations can now have "ellipse" shape, and anchorStyle allows more control over its appearance.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -32,6 +32,9 @@
                 
         <p>Bugfixes (2026-09-17):</p>
         <ul>
+            <li>rte_1195634314: StaticCodeAnalysis still loaded old 2017 python file, somehow causing crash on startup.  Thanks, nicolec!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2878/">2878</a>: Run Batch Tool removes dynamic arguments from constant values.  Thanks, Sadie!
+            <li>findgen can be used to create enumeration of values, as well as range.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2896/">2896</a>: transition from slice1(5) to slice(5) failed because of incorrect test.
             <li><a href="https://github.com/das-developers/das2java/issues/184">184</a>: excessive https listing for URL with aggregation.
             <li>Correction to annotation when crosshash fill was used on data, where clipping was incorrect.
