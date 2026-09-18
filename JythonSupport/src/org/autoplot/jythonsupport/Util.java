@@ -929,6 +929,11 @@ public class Util {
     /**
      * return true if we should do the imports as before, where all of Autoplot is
      * imported with each session.  This is used to ease migration.
+     * 
+     * Note, I think at one time we were going to <i>not</i> import Autoplot
+     * stuff automatically.  But this idea was abandoned.  (This is Autoplot Jython, not
+     * Python!)
+     * 
      * @return true if the old behavior should be used.
      */
     public static boolean isLegacyImports() {
