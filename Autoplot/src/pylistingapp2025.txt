@@ -1,0 +1,4 @@
+# This is used in JythonSupport to advertise what is available.
+autoplotapp2025.py
+imports2025.py
+appContextImports2025.py
