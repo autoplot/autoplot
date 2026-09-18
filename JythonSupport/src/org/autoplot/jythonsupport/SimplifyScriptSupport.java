@@ -1022,7 +1022,7 @@ public class SimplifyScriptSupport {
         "DatumRangeUtil,", "TimeParser,",
         "str,", "int,", "long,", "float,", "datum,", "datumRange,", "dataset,",
         "indgen,", "findgen,", "dindgen,",
-        "ones,", "zeros,",
+        "ones,", "zeros,", "labelsDataset,",
         "linspace,", "logspace,",
         "dblarr,", "fltarr,", "strarr,", "intarr,", "bytarr,",
         "ripples,",//"split,", // remove split because it is confused with the URISplit.
