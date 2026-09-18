@@ -58,7 +58,7 @@ public class Param {
 
     @Override
     public String toString() {
-        return name + "=" + deft;
+        return name + "=" + ( value!=null ? value : deft );
     }
     
 }
