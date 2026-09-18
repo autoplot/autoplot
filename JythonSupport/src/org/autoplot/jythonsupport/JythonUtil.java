@@ -2190,6 +2190,24 @@ public class JythonUtil {
                     v= v + py.step;
                 }
                 p.enums = enums;
+            } else if (oo.__getitem__(3) instanceof PyQDataSet ) {
+                PyQDataSet values= ((PyQDataSet) oo.__getitem__(3));
+                
+                boolean isInt= ( p.deft instanceof PyInteger );
+                
+                if ( values.rods.rank()==1 ) {
+                    int n=values.rods.length();
+                    if ( n>150 ) n=150;
+                    List<Object> enums = new ArrayList(n);
+                    for (int j = 0; j < n; j++) {
+                        if ( isInt ) {
+                            enums.add( j, new PyInteger((int)values.rods.value(j)));
+                        } else {
+                            enums.add( j, new PyFloat( values.rods.value(j) ) );
+                        }
+                    }
+                    p.enums = enums;
+                }
             } else if (oo.__getitem__(3) instanceof PyDictionary) {
                 PyDictionary pyDict = ((PyDictionary) oo.__getitem__(3));
                 PyObject enumsObject;
