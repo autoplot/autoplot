@@ -16,38 +16,43 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jScrollPane1" alignment="0" max="32767" attributes="0"/>
-          <Component id="jScrollPane2" alignment="0" pref="679" max="32767" attributes="0"/>
-          <Group type="102" alignment="1" attributes="0">
+          <Group type="102" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jLabel5" alignment="1" pref="667" max="32767" attributes="0"/>
-                  <Component id="jLabel1" alignment="1" pref="0" max="32767" attributes="0"/>
-                  <Group type="102" attributes="0">
+                  <Component id="jLabel1" pref="678" max="32767" attributes="0"/>
+                  <Component id="jScrollPane2" alignment="0" pref="678" max="32767" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="jLabel5" alignment="1" pref="672" max="32767" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
+                                          <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="emailTextField" min="-2" pref="349" max="-2" attributes="0"/>
+                                          <Component id="usernameTextField" min="-2" pref="133" max="-2" attributes="0"/>
+                                      </Group>
+                                  </Group>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="submitDOMCB" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace min="-2" pref="62" max="-2" attributes="0"/>
+                                      <Component id="screenshotCB" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="emailTextField" min="-2" pref="349" max="-2" attributes="0"/>
-                                  <Component id="usernameTextField" min="-2" pref="133" max="-2" attributes="0"/>
-                              </Group>
+                              <EmptySpace min="0" pref="133" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
-                              <Component id="submitDOMCB" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="62" max="-2" attributes="0"/>
-                              <Component id="screenshotCB" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
+                              <Component id="updateButton" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace min="0" pref="139" max="32767" attributes="0"/>
                   </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
-                      <Component id="updateButton" min="-2" max="-2" attributes="0"/>
-                  </Group>
+                  <Component id="jScrollPane1" alignment="1" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -56,7 +61,7 @@
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <Component id="jLabel1" min="-2" pref="60" max="-2" attributes="0"/>
+              <Component id="jLabel1" min="-2" pref="92" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -82,7 +87,7 @@
                   <Component id="updateButton" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jScrollPane2" pref="157" max="32767" attributes="0"/>
+              <Component id="jScrollPane2" pref="184" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -90,7 +95,7 @@
   <SubComponents>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
-        <Property name="text" type="java.lang.String" value="&lt;html&gt;Press &quot;Submit&quot; to submit stack traces, application state, and undo information to the Autoplot developers.  Optionally, add comments briefly describing actions preceding the event.  Your username is automatically detected, and provide an email address if you&apos;d like to be contacted.  See &lt;a href=&apos;http://autoplot.org/runtime_errors&apos;&gt;http://autoplot.org/runtime_errors&lt;/a&gt; for more information.&lt;/html&gt; "/>
+        <Property name="text" type="java.lang.String" value="&lt;html&gt;Press &quot;Submit&quot; to submit stack traces, application state, and undo information to the Autoplot developers.  Optionally, add comments briefly describing actions preceding the event.  Your username is automatically detected, and provide an email address if you&apos;d like to be contacted.  See &lt;a href=&apos;https://autoplot.org/runtime_errors&apos;&gt;https://autoplot.org/runtime_errors&lt;/a&gt; for more information.&lt;/html&gt; "/>
         <Property name="verticalAlignment" type="int" value="1"/>
       </Properties>
     </Component>

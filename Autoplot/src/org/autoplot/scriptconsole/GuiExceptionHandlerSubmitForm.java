@@ -81,7 +81,7 @@ public class GuiExceptionHandlerSubmitForm extends javax.swing.JPanel {
         jLabel5 = new javax.swing.JLabel();
         screenshotCB = new javax.swing.JCheckBox();
 
-        jLabel1.setText("<html>Press \"Submit\" to submit stack traces, application state, and undo information to the Autoplot developers.  Optionally, add comments briefly describing actions preceding the event.  Your username is automatically detected, and provide an email address if you'd like to be contacted.  See <a href='http://autoplot.org/runtime_errors'>http://autoplot.org/runtime_errors</a> for more information.</html> ");
+        jLabel1.setText("<html>Press \"Submit\" to submit stack traces, application state, and undo information to the Autoplot developers.  Optionally, add comments briefly describing actions preceding the event.  Your username is automatically detected, and provide an email address if you'd like to be contacted.  See <a href='https://autoplot.org/runtime_errors'>https://autoplot.org/runtime_errors</a> for more information.</html> ");
         jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         jLabel2.setText("Preview of data that will be submitted:");
@@ -124,37 +124,40 @@ public class GuiExceptionHandlerSubmitForm extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane1)
-            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 679, Short.MAX_VALUE)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+            .add(layout.createSequentialGroup()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jLabel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 667, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 678, Short.MAX_VALUE)
+                    .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 678, Short.MAX_VALUE)
                     .add(layout.createSequentialGroup()
+                        .addContainerGap()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(org.jdesktop.layout.GroupLayout.TRAILING, jLabel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 672, Short.MAX_VALUE)
                             .add(layout.createSequentialGroup()
                                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(jLabel4)
-                                    .add(jLabel3))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(emailTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 349, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                    .add(usernameTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 133, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                                    .add(layout.createSequentialGroup()
+                                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                            .add(jLabel4)
+                                            .add(jLabel3))
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                            .add(emailTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 349, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                            .add(usernameTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 133, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                                    .add(layout.createSequentialGroup()
+                                        .add(submitDOMCB)
+                                        .add(62, 62, 62)
+                                        .add(screenshotCB)))
+                                .add(0, 133, Short.MAX_VALUE))
                             .add(layout.createSequentialGroup()
-                                .add(submitDOMCB)
-                                .add(62, 62, 62)
-                                .add(screenshotCB)))
-                        .add(0, 139, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(jLabel2)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .add(updateButton)))
+                                .add(jLabel2)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .add(updateButton))))
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane1))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 92, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jLabel5)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -176,7 +179,7 @@ public class GuiExceptionHandlerSubmitForm extends javax.swing.JPanel {
                     .add(jLabel2)
                     .add(updateButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE))
+                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
