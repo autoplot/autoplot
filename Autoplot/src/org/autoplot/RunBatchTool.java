@@ -294,18 +294,14 @@ public class RunBatchTool extends javax.swing.JPanel {
         }
     }
     
-    /**
-     * do the stuff to do when the play button is pressed.
-     */
-    private void doPlayButton() {
-        lastActiveLabel= null;
-        state= STATE_LOADING;                  
+    private Map<String,org.autoplot.jythonsupport.Param> doUpdateDataSetSelector() throws IOException {
+        Map<String,org.autoplot.jythonsupport.Param> parms=null;
         try {
             String scriptName= dataSetSelector1.getValue();
             URISplit split= URISplit.parse(scriptName);
             if ( !split.file.endsWith(".jy") ) {
                 JOptionPane.showMessageDialog(RunBatchTool.this, "script must end in .jy: "+scriptName );
-                return;
+                return null;
             }
 
             pwd= split.path;
@@ -318,12 +314,16 @@ public class RunBatchTool extends javax.swing.JPanel {
             String script= readScript( scriptFile );
 
             env.put( "dom", dom );
-            env.put( "PWD", split.path );
-
-            Map<String,org.autoplot.jythonsupport.Param> parms= Util.getParams( env, script, URISplit.parseParams(split.params), new NullProgressMonitor() );
-
+            env.put( "PWD", split.path ); 
+            
+            parms = Util.getParams( env, script, URISplit.parseParams(split.params), new NullProgressMonitor() );
+            
             StringBuilder sb= new StringBuilder();
-            for ( Entry<String,org.autoplot.jythonsupport.Param> p: parms.entrySet() ) {                
+            for ( Entry<String,org.autoplot.jythonsupport.Param> p: parms.entrySet() ) {
+                if ( p.getKey().equals(param1NameCB.getSelectedItem() ) ||
+                        p.getKey().equals(param2NameCB.getSelectedItem() ) ) {
+                    continue;
+                }
                 sb.append("&");
                 sb.append(p.getValue().toString());
             }
@@ -331,6 +331,24 @@ public class RunBatchTool extends javax.swing.JPanel {
             
             // insert URL with default parameters here
             dataSetSelector1.setValue(constantScript) ; //+ "?" + URISplit.formatParams(parms) );
+            
+            /**
+             * do the stuff to do when the play button is pressed.
+             */
+        } catch (IOException ex) {
+            Logger.getLogger(RunBatchTool.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
+        }
+        
+        return parms;
+    }
+    
+    private void doPlayButton() {
+        lastActiveLabel= null;
+        state= STATE_LOADING;                  
+        try {
+
+            Map<String,org.autoplot.jythonsupport.Param> parms= doUpdateDataSetSelector();
             
             String[] items= new String[parms.size()+2];
             int i=0;
@@ -1312,10 +1330,20 @@ public class RunBatchTool extends javax.swing.JPanel {
 
     private void param1NameCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_param1NameCBActionPerformed
         checkNumberOfParams();
+        try {
+            doUpdateDataSetSelector();
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_param1NameCBActionPerformed
 
     private void param2NameCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_param2NameCBActionPerformed
         checkNumberOfParams();
+        try {
+            doUpdateDataSetSelector();
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_param2NameCBActionPerformed
 
     private void writeCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_writeCheckBoxActionPerformed
