@@ -622,7 +622,7 @@ public class JythonUtil {
         "DatumRangeUtil,", "TimeParser,",
         "str,", "int,", "long,", "float,", "datum,", "datumRange,","dataset,",
         "indgen,", "findgen,","dindgen,",
-        "ones,", "zeros,",
+        "ones,", "zeros,", "labelsDataset,",
         "linspace,", "logspace,",
         "dblarr,", "fltarr,", "strarr,", "intarr,", "bytarr,",
         "ripples,", "split,", 
@@ -686,7 +686,16 @@ public class JythonUtil {
         @Override
         public Object visitName(Name node) throws Exception {
             if (!names.contains(node.id)) {
-                visitNameFail = true;
+                boolean okayFunction= false;
+                for ( int i=0; i<okay.length; i++ ) {
+                    if ( okay[i].equals(node.id+",") ) {
+                        okayFunction= true;
+                        break;
+                    } 
+                }
+                if ( !okayFunction ) {
+                    visitNameFail = true;
+                }
             }
             return null;
         }
