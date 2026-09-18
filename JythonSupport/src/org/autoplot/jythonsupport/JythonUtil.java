@@ -1766,6 +1766,24 @@ public class JythonUtil {
                     enums.add(j, pyList.get(j));
                 }
                 p.enums = enums;
+            } else if (oconstraints instanceof PyQDataSet ) {
+                PyQDataSet values= (PyQDataSet)oconstraints;
+                
+                boolean isInt= ( p.deft instanceof PyInteger );
+                
+                if ( values.rods.rank()==1 ) {
+                    int n=values.rods.length();
+                    if ( n>150 ) n=150;
+                    List<Object> enums = new ArrayList(n);
+                    for (int j = 0; j < n; j++) {
+                        if ( isInt ) {
+                            enums.add( j, new PyInteger((int)values.rods.value(j)));
+                        } else {
+                            enums.add( j, new PyFloat( values.rods.value(j) ) );
+                        }
+                    }
+                    p.enums = enums;
+                }                
             } else if (oconstraints instanceof PyDictionary) {
                 PyDictionary pyDict = ((PyDictionary) oconstraints);
                 PyObject enumsObject;
