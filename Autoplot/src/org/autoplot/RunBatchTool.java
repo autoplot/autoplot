@@ -327,7 +327,7 @@ public class RunBatchTool extends javax.swing.JPanel {
                 sb.append("&");
                 sb.append(p.getValue().toString());
             }
-            String constantScript= split.file + "?" + sb.substring(1);
+            String constantScript= ( sb.length()==0 ) ? split.file : ( split.file + "?" + sb.substring(1) );
             
             // insert URL with default parameters here
             dataSetSelector1.setValue(constantScript) ; //+ "?" + URISplit.formatParams(parms) );
