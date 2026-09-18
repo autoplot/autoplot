@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.text.BadLocationException;
-import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
 import org.das2.jythoncompletion.Utilities;
 import org.das2.util.LoggerManager;
 import org.python.core.PyList;
@@ -78,8 +76,8 @@ public class StaticCodeAnalysis {
             if ( org.autoplot.jythonsupport.Util.isLegacyImports() ) {
                 boolean appContext= true;
                 if ( appContext ) {
-                    try ( InputStream in = JythonUtil.class.getResource("/appContextImports2017.py").openStream() ) {
-                        interp.execfile( in, "/appContextImports2017.py" ); // JythonRefactory okay
+                    try ( InputStream in = JythonUtil.class.getResource("/appContextImports2025.py").openStream() ) {
+                        interp.execfile( in, "/appContextImports2025.py" ); // JythonRefactory okay
                     }
                 }
             }
