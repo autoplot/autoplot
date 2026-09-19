@@ -32,6 +32,7 @@ public class Test_100_Demo1423 {
         ScriptContext.reset();
         
         AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
+        app.getDom().getCanvases(0).setFitted(false);
         
         ScriptContext.waitUntilIdle();
         
