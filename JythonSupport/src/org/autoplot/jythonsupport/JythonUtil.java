@@ -112,7 +112,7 @@ public class JythonUtil {
                     } else {
                         logger.log(Level.WARNING, "Couldn''t find jar containing {0}.  See https://sourceforge.net/p/autoplot/bugs/576/", pysrc);
                     }   break;
-                case "autoplotapp2017.py":
+                case "autoplotapp2025.py":
                     {
                         String f = getLocalJythonAutoplotAppLib();
                         if (!pySys.path.contains(new PyString(f))) { // TODO possible bug here: PyString/String means local path is in there 4 times.
@@ -322,7 +322,7 @@ public class JythonUtil {
     private static String getLocalJythonAutoplotAppLib() throws IOException {
         File ff2 = new File(AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA));
         File ff3 = new File(ff2.toString() + "/jython");
-        File ff4 = new File(ff3.toString(), "pylistingapp2017.txt");
+        File ff4 = new File(ff3.toString(), "pylistingapp2025.txt");
         if (ff4.exists()) {
             return ff3.toString();
         }
@@ -334,12 +334,12 @@ public class JythonUtil {
             }
         }
 
-        if (JythonUtil.class.getResource("/pylistingapp2017.txt") == null) {
-            logger.log(Level.FINE, "unable to find pylistingapp2017.txt in application, assuming this is not the Autoplot client application.");
+        if (JythonUtil.class.getResource("/pylistingapp2025.txt") == null) {
+            logger.log(Level.FINE, "unable to find pylistingapp2025.txt in application, assuming this is not the Autoplot client application.");
         } else {
-            logger.log(Level.FINE, "unpacking jython codes in {0}", JythonUtil.class.getResource("/pylistingapp2017.txt"));
+            logger.log(Level.FINE, "unpacking jython codes in {0}", JythonUtil.class.getResource("/pylistingapp2025.txt"));
 
-            try (BufferedReader r = new BufferedReader(new InputStreamReader(JythonUtil.class.getResourceAsStream("/pylistingapp2017.txt")))) {
+            try (BufferedReader r = new BufferedReader(new InputStreamReader(JythonUtil.class.getResourceAsStream("/pylistingapp2025.txt")))) {
                 String s = r.readLine();
                 while (s != null) {
                     int i = s.indexOf("#");
