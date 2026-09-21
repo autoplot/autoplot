@@ -78,7 +78,7 @@ public class Axis extends DomNode {
 //        }
         DatumRange oldRange = this.range;
         
-        if (!range.equals(oldRange)) {
+        if ( false && !range.equals(oldRange)) {
             if ( getId().equals("yaxis_0")) {
                 if ( "true".equals(System.getProperty("test_verbose")) ) {
                     System.err.println(
