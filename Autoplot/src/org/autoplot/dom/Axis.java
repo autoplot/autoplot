@@ -80,19 +80,21 @@ public class Axis extends DomNode {
         
         if (!range.equals(oldRange)) {
             if ( getId().equals("yaxis_0")) {
-                System.err.print(
-                    "Axis.setRange " + getId()
-                    + " " + oldRange
-                    + " -> " + range
-                    + " thread=" + Thread.currentThread().getName() + " callers: "
-                );
-
-                StackTraceElement[] stack = Thread.currentThread().getStackTrace();
-                for (int i = 2; i < Math.min(stack.length, 8); i++) {
-                    if (i > 2) System.err.print(" <- ");
-                    System.err.print(stack[i].getClassName() + "." + stack[i].getMethodName());
+                if ( "true".equals(System.getProperty("test_verbose")) ) {
+                    System.err.println(
+                        "Axis.setRange " + getId()
+                        + " " + oldRange
+                        + " -> " + range
+                        + " thread=" + Thread.currentThread().getName() );
+                    Thread.dumpStack();
+                    
+                    //StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+                    //for (int i = 2; i < Math.min(stack.length, 8); i++) {
+                    //    if (i > 2) System.err.print(" <- ");
+                    //    System.err.print(stack[i].getClassName() + "." + stack[i].getMethodName());
+                    //}
+                    //System.err.println("");
                 }
-                System.err.println("");
             }
         }   
         
