@@ -77,6 +77,26 @@ public class Axis extends DomNode {
 //            logger.log( Level.WARNING, "breakpoint here in setRange");
 //        }
         DatumRange oldRange = this.range;
+        
+        if (!range.equals(oldRange)) {
+            if ( getId().equals("yaxis_0")) {
+                System.err.println(
+                    "Axis.setRange " + getId()
+                    + " " + oldRange
+                    + " -> " + range
+                    + " thread=" + Thread.currentThread().getName()
+                );
+
+                StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+                System.err.print("Axis.setRange "  + getId() + " " + oldRange + " -> " + range + " callers: ");
+                for (int i = 2; i < Math.min(stack.length, 6); i++) {
+                    if (i > 2) System.err.print(" <- ");
+                    System.err.print(stack[i].getClassName() + "." + stack[i].getMethodName());
+                }
+                System.err.println("");
+            }
+        }   
+        
         this.range= range;
         propertyChangeSupport.firePropertyChange(PROP_RANGE, oldRange, range);
     }
