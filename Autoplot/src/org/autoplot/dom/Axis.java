@@ -88,7 +88,7 @@ public class Axis extends DomNode {
                 );
 
                 StackTraceElement[] stack = Thread.currentThread().getStackTrace();
-                for (int i = 2; i < Math.min(stack.length, 5); i++) {
+                for (int i = 2; i < Math.min(stack.length, 8); i++) {
                     if (i > 2) System.err.print(" <- ");
                     System.err.print(stack[i].getClassName() + "." + stack[i].getMethodName());
                 }
