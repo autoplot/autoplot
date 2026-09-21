@@ -122,6 +122,12 @@ public class Test140 {
      */
     private static String do1( String uri, String shortId, int iid, boolean doTest, boolean isPublic ) throws Exception {
 
+        if ( testid==149 && iid==3 )  {
+            System.setProperty("test_verbose","true");
+        } else {
+            System.setProperty("test_verbose","false");
+        }
+        
         System.err.printf( "== %03d %03d %s ==\n", testid, iid, shortId );
         if ( isPublic ) {
             System.err.printf( "uri: %s\n", uri );
