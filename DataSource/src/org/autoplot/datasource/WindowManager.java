@@ -148,7 +148,7 @@ public class WindowManager {
         Rectangle screenSize= getVirtualScreenSize();
         Pattern p= Pattern.compile("(?<width>\\d+)x(?<height>\\d+)");
         String s= prefs.get( "window."+name+".screensize", "" );
-        logger.log(Level.FINE, "found for window.{0}.screensize: {1} currentSize: {2}x{3}", new Object[]{name, s, screenSize.width, screenSize.height });
+        logger.log(Level.FINE, "found for window.{0}.screensize: {1} currentSize: {2,number,0}x{3,number,0}", new Object[]{name, s, screenSize.width, screenSize.height });
         Matcher m0= p.matcher(s);
         if ( m0.matches() && Integer.parseInt( m0.group("width") )==screenSize.width && Integer.parseInt( m0.group("height") )==screenSize.height ) {
             String wh= prefs.get("window."+name+".size", "" );
@@ -168,7 +168,7 @@ public class WindowManager {
             Matcher m2= p2.matcher(xy);
             int x= m2.matches() ? Integer.parseInt( m2.group("x") ) : -9999;
             int y= m2.matches() ? Integer.parseInt( m2.group("y") ) : -9999;
-            logger.log(Level.FINER, "got x={0} y={1}", new Object[]{x, y});
+            logger.log(Level.FINER, "got x={0,number,0} y={1,number,0}", new Object[]{x, y});
             if ( x!=0 && y!=0 && x>-9999 && y>-9999 ) {
                 int newx= x;
                 int newy= y;
@@ -302,7 +302,7 @@ public class WindowManager {
                 Matcher m2= p2.matcher(rxy);
                 int x= m2.matches() ? Integer.parseInt( m2.group("x") ) : -9999;
                 int y= m2.matches() ? Integer.parseInt( m2.group("y") ) : -9999;
-                logger.log(Level.FINER, "got x={0} y={1}", new Object[]{x, y});
+                logger.log(Level.FINER, "got x={0,number,0} y={1,number,0}", new Object[]{x, y});
                 if ( x>-9999 && y>-9999 ) {
                     int newx= parent.getX()+x;
                     int newy= parent.getY()+y;
@@ -321,7 +321,7 @@ public class WindowManager {
                 Matcher m2= p2.matcher(xy);
                 int x= m2.matches() ? Integer.parseInt( m2.group("x") ) : -9999;
                 int y= m2.matches() ? Integer.parseInt( m2.group("y") ) : -9999;
-                logger.log(Level.FINER, "got x={0} y={1}", new Object[]{x, y});
+                logger.log(Level.FINER, "got x={0,number,0} y={1,number,0}", new Object[]{x, y});
                 if ( x>-9999 && y>-9999 ) {
                     int newx= x;
                     int newy= y;
@@ -357,7 +357,7 @@ public class WindowManager {
         if ( name==null ) return;
         
         final Preferences prefs= getPrefs();
-        logger.log( Level.FINE, "saving last location {0} {1} {2} {3}", new Object[]{x, y, h, w});
+        logger.log( Level.FINE, "saving last location {0,number,0},{1,number,0} {2,number,0}x{3,number,0}", new Object[]{x, y, h, w});
         // so that we know these settings are still valid.
         Rectangle d= getVirtualScreenSize();
         prefs.put( "window."+name+".screensize", String.format("%dx%d",d.width,d.height) );
