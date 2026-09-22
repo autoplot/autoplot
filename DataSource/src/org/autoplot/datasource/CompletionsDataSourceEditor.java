@@ -579,6 +579,8 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
         jScrollPane1 = new javax.swing.JScrollPane();
         optionsPanel = new javax.swing.JPanel();
 
+        setName("completionsDataSourceEditor"); // NOI18N
+
         jLabel1.setText("<html>Autoplot has attempted to create a GUI editor based on the completions of the data source. ");
         jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
