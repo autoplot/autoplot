@@ -15,7 +15,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -61,6 +60,10 @@ public class WindowManager {
         return instance;
     }
 
+    private static Preferences getPrefs() {
+        return AutoplotSettings.settings().getPreferences(WindowManager.class);
+    }
+    
     /**
      * TODO: this will indicate the message type
      * @param parent
@@ -87,7 +90,21 @@ public class WindowManager {
     public static int showConfirmDialog( Component parent, Object omessage, String title, int optionType, int messageType, Icon icon ) {
         return showConfirmDialog( parent, omessage, title, optionType );
     }
-            
+     
+    /**
+     * TODO: this will show the icon.
+     * @param parent
+     * @param omessage
+     * @param title
+     * @param optionType
+     * @param messageType
+     * @param icon
+     * @return 
+     */
+    public static int showConfirmDialog( Component parent, JPanel omessage, String title, int optionType, int messageType, Icon icon ) {
+        return showConfirmDialog( parent, omessage, title, optionType );
+    }
+    
     private boolean isOnScreen( Rectangle pos, int grab ) {
         GraphicsEnvironment ge=GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice[] gs=ge.getScreenDevices();
@@ -126,7 +143,7 @@ public class WindowManager {
         String name= window.getName(); 
         if (name==null) name="fileChooser";
         logger.log(Level.FINE, "looking up position for {0}", name);
-        final Preferences prefs= AutoplotSettings.settings().getPreferences(WindowManager.class);
+        final Preferences prefs= getPrefs();
         int grab= 4 * 12; // pixels so mouse operator has something to grab
         Rectangle screenSize= getVirtualScreenSize();
         Pattern p= Pattern.compile("(?<width>\\d+)x(?<height>\\d+)");
@@ -189,6 +206,32 @@ public class WindowManager {
         });
     }
     
+    /**
+     * get the name used to store this window configuration.  If allocate is true,
+     * then possibly create a new name if the old one is not found.
+     * @param window
+     * @param allocate
+     * @return 
+     */
+    public String getRecallName( Window window, boolean allocate) {
+        String name= window.getName(); 
+        logger.log(Level.FINE, "looking up position for {0}", name);
+        if ( name==null ) return null;
+        final Preferences prefs= getPrefs();
+        Rectangle d= getVirtualScreenSize();
+        
+        String screenSize= String.format("%dx%d",d.width,d.height);
+        
+        String result;        
+        String s= prefs.get( "window."+name+".screensize", "" );
+        if ( s.equals(screenSize) ) {
+            result= name;
+        } else {
+            result= name+"."+screenSize;
+        } 
+        return result;
+    }    
+    
     public void recordWindowSizePosition( JFileChooser window ) {
         int x= lastFileChooserX;
         int y= lastFileChooserY;
@@ -203,7 +246,7 @@ public class WindowManager {
         if ( name==null ) name="fileChooser";
         logger.log(Level.FINE, "storing position for {0}", name);
         
-        final Preferences prefs= AutoplotSettings.settings().getPreferences(WindowManager.class);
+        final Preferences prefs= getPrefs();
         logger.log( Level.FINE, "saving last location {0} {1} {2} {3}", new Object[]{x, y, h, w});
         // so that we know these settings are still valid.
         Rectangle d= getVirtualScreenSize();
@@ -224,13 +267,18 @@ public class WindowManager {
      * @param window the window.
      */
     public void recallWindowSizePosition( Window window ) {
-        Container parent= window.getParent();
-        String name= window.getName(); 
-        logger.log(Level.FINE, "looking up position for {0}", name);
-        if ( name==null ) return;
-        final Preferences prefs= AutoplotSettings.settings().getPreferences(WindowManager.class);
-        int grab= 4 * window.getFont().getSize(); // pixels so mouse operator has something to grab
+        
+        final Preferences prefs= getPrefs();
         Rectangle screenSize= getVirtualScreenSize();
+        
+        String name= getRecallName( window, false );
+        if ( name==null ) return;
+
+        logger.log(Level.FINE, "looking up position for {0}", name);
+
+        Container parent= window.getParent();
+        int grab= 4 * window.getFont().getSize(); // pixels so mouse operator has something to grab
+
         Pattern p= Pattern.compile("(?<width>\\d+)x(?<height>\\d+)");
         String s= prefs.get( "window."+name+".screensize", "" );
         logger.log(Level.FINE, "found for window.{0}.screensize: {1} currentSize: {2}x{3}", new Object[]{name, s, screenSize.width, screenSize.height });
@@ -296,12 +344,12 @@ public class WindowManager {
         int h= window.getHeight();
         
         Container c= window.getParent();
-        String name= window.getName(); 
+        String name= getRecallName(window, true);
         
         logger.log(Level.FINE, "storing position for {0}", name);
         if ( name==null ) return;
         
-        final Preferences prefs= AutoplotSettings.settings().getPreferences(WindowManager.class);
+        final Preferences prefs= getPrefs();
         logger.log( Level.FINE, "saving last location {0} {1} {2} {3}", new Object[]{x, y, h, w});
         // so that we know these settings are still valid.
         Rectangle d= getVirtualScreenSize();
