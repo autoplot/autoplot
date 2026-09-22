@@ -250,7 +250,7 @@ public class WindowManager {
         logger.log(Level.FINE, "storing position for {0}", name);
         
         final Preferences prefs= getPrefs();
-        logger.log( Level.FINE, "saving last location {0} {1} {2} {3}", new Object[]{x, y, h, w});
+        logger.log( Level.FINE, "saving last location {0,number,0},{1,number,0} {2,number,0}x{3,number,0}", new Object[]{x, y, w, h});
         // so that we know these settings are still valid.
         Rectangle d= getVirtualScreenSize();
         prefs.put( "window."+name+".screensize", String.format("%dx%d",d.width,d.height) );
@@ -357,7 +357,7 @@ public class WindowManager {
         if ( name==null ) return;
         
         final Preferences prefs= getPrefs();
-        logger.log( Level.FINE, "saving last location {0,number,0},{1,number,0} {2,number,0}x{3,number,0}", new Object[]{x, y, h, w});
+        logger.log( Level.FINE, "saving last location {0,number,0},{1,number,0} {2,number,0}x{3,number,0}", new Object[]{x, y, w, h});
         // so that we know these settings are still valid.
         Rectangle d= getVirtualScreenSize();
         prefs.put( "window."+name+".screensize", String.format("%dx%d",d.width,d.height) );
