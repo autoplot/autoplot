@@ -52,6 +52,7 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
     BindingGroup bindings;
     DatumRangeEditor xrangeEditor, yrangeEditor;
     AnchorType anchorType;
+    AnchorType verticalAnchorType;
     Annotation ann;
             
     /**
@@ -112,7 +113,27 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         firePropertyChange( "anchorType", oldValue, anchorType );
     }
     
+    public AnchorType getVerticalAnchorType() {
+        return anchorType;
+    }
     
+    public void setVerticalAnchorType(AnchorType anchorType) {
+        AnchorType oldValue= this.verticalAnchorType;
+        this.verticalAnchorType = anchorType;
+        
+        if ( verticalAnchorType==AnchorType.DATA ) {
+            this.ydataAnchor.setSelected( true );
+        } else if ( verticalAnchorType==AnchorType.PLOT ) {
+            this.yplotAnchor.setSelected( true );
+        } else if ( verticalAnchorType==AnchorType.CANVAS ) {
+            this.ycanvasAnchor.setSelected( true );
+        } else {
+            return;
+        }
+        this.validate();
+        this.repaint();
+        firePropertyChange( "verticalAnchorType", oldValue, anchorType );
+    }    
     private Converter getDatumToStringConverter() {
         return new Converter() {
             Units u= null;
@@ -207,6 +228,13 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         addBinding( bc, ann, Annotation.PROP_POINTATOFFSET, pointAtOffsetCB, "selectedItem" );
         addBinding( bc, ann, Annotation.PROP_BORDERTYPE, borderTypeEnumerationEditor, "value" );
         addBinding( bc, ann, Annotation.PROP_ANCHORBORDERTYPE, anchorBorderTypeEnumerationEditor, "value" );
+        addBinding( bc, ann, Annotation.PROP_SPLITANCHORTYPE, jCheckBox1, "selected" );
+        addBinding( bc, ann, Annotation.PROP_VERTICALANCHORTYPE, this, "verticalAnchorType" );
+        
+        addBinding( bc, jCheckBox1, "selected", this.ycanvasAnchor, "enabled" );
+        addBinding( bc, jCheckBox1, "selected", this.yplotAnchor, "enabled" );
+        addBinding( bc, jCheckBox1, "selected", this.ydataAnchor, "enabled" );
+
         bc.bind();
         
         bindings= bc;
