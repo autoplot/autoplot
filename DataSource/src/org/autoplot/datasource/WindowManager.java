@@ -164,10 +164,11 @@ public class WindowManager {
 
             String xy= prefs.get( "window."+name+".location", "" );
             logger.log(Level.FINER, "window.{0}.location={1}", new Object[]{name, xy});
-            Pattern p2= Pattern.compile("(?<x>\\d+),(?<y>\\d+)");
+            Pattern p2= Pattern.compile("(?<x>\\-?\\d+),(?<y>\\-?\\d+)");
             Matcher m2= p2.matcher(xy);
             int x= m2.matches() ? Integer.parseInt( m2.group("x") ) : -9999;
             int y= m2.matches() ? Integer.parseInt( m2.group("y") ) : -9999;
+            logger.log(Level.FINER, "got x={0} y={1}", new Object[]{x, y});
             if ( x!=0 && y!=0 && x>-9999 && y>-9999 ) {
                 int newx= x;
                 int newy= y;
@@ -179,6 +180,8 @@ public class WindowManager {
                     window.setLocation( newx, newy );
                 }
             }
+        } else {
+            logger.log(Level.FINER, "test didn't match");
         }
         window.addComponentListener( new ComponentAdapter() {
             @Override
@@ -299,6 +302,7 @@ public class WindowManager {
                 Matcher m2= p2.matcher(rxy);
                 int x= m2.matches() ? Integer.parseInt( m2.group("x") ) : -9999;
                 int y= m2.matches() ? Integer.parseInt( m2.group("y") ) : -9999;
+                logger.log(Level.FINER, "got x={0} y={1}", new Object[]{x, y});
                 if ( x>-9999 && y>-9999 ) {
                     int newx= parent.getX()+x;
                     int newy= parent.getY()+y;
@@ -317,6 +321,7 @@ public class WindowManager {
                 Matcher m2= p2.matcher(xy);
                 int x= m2.matches() ? Integer.parseInt( m2.group("x") ) : -9999;
                 int y= m2.matches() ? Integer.parseInt( m2.group("y") ) : -9999;
+                logger.log(Level.FINER, "got x={0} y={1}", new Object[]{x, y});
                 if ( x>-9999 && y>-9999 ) {
                     int newx= x;
                     int newy= y;
@@ -329,6 +334,8 @@ public class WindowManager {
                     }
                 }
             }
+        } else {
+            logger.log(Level.FINER, "test didn't match");
         }
     }
     
