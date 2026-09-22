@@ -2354,15 +2354,19 @@ APSplash.checkTime("init 52.9");
         keep.add("console");
         
         Component[] cc= getTabs().getComponents();
+        ArrayList<Component> rm= new ArrayList<>();
+        
         for ( int i=0; i<cc.length; i++ ) {
             Component c= cc[i];
             String title= getTabs().getTitleAt(i);
-            if ( keep.contains(title) ) {
-                
-            } else {
+            if ( !keep.contains(title) ) {
                 logger.log(Level.FINE, "Removing tab {0}", title);
-                getTabs().remove(c);
+                rm.add(c);
             }
+        }
+        
+        for ( Component c: rm ) {
+             getTabs().remove(c);
         }
         
         keep= new HashSet<>();
