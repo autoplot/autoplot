@@ -569,7 +569,11 @@ public class BatchProcessor {
                     File outf= new File( new File( batchDirectory, "images" ), String.format("%06d.png",jobNumber) );
                     Path target = Paths.get(image);
                     Path link   = outf.toPath();
-                    Files.createSymbolicLink(link, target);
+                    if ( target.isAbsolute() ) {
+                        Files.createSymbolicLink(link, target);
+                    } else {
+                        Files.createSymbolicLink(link, target.toAbsolutePath());
+                    }
                     runResults.put("writeFile", image );
                 }
             } catch ( NumberFormatException ex ) {
