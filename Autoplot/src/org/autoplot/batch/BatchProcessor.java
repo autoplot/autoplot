@@ -223,7 +223,7 @@ public class BatchProcessor {
         }
         
         // now the tricky part will be to pull out all the fields from the template.
-        String[] ss= template.split("\\%");
+        String[] ss= template.split("\\%",-2);
         
         boolean packArgments=false;
         if ( argList.size() != ss.length-1 ) {
@@ -465,7 +465,7 @@ public class BatchProcessor {
 
             if ( paramNames1!=null ) { // v1;v2;v3 form used
                 char splitc= param1Name.charAt(paramNames1[0].length());
-                String[] paramValues= param1Value.trim().split("\\"+splitc);
+                String[] paramValues= param1Value.trim().split("\\"+splitc,-2);
                 for ( int j= 0; j<paramNames1.length; j++ ) {
                     String p= paramNames1[j].trim();
                     String v= paramValues[j].trim();
@@ -500,7 +500,7 @@ public class BatchProcessor {
 
                 if ( paramNames2!=null ) { // v1;v2;v3 form used
                     char splitc= param2Name.charAt(paramNames2[0].length());
-                    String[] paramValues= param2Value.trim().split("\\"+splitc);
+                    String[] paramValues= param2Value.trim().split("\\"+splitc,-2);
                     for ( int j= 0; j<paramNames2.length; j++ ) {
                         String p= paramNames2[j].trim();
                         String v= paramValues[j].trim();
