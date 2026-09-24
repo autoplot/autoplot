@@ -4956,7 +4956,7 @@ private void updateFrameTitle() {
         alm.addOptionalSwitchArgument("runBatch", null, "runBatch", "", "Run the Run Batch Tool .batch and exit.");
         alm.addOptionalSwitchArgument("runBatchDirectory", null, "runBatchDirectory", "", "The batch will be controlled using this directory.");
         alm.addOptionalSwitchArgument("runBatchThreads", null, "runBatchThreads", "8", "Initial (and final for now) number of threads in batch job.");
-
+        alm.addOptionalSwitchArgument("runBatchImageTemplate", null, "runBatchImageTemplate", "", "Template to name image files, like $x_$x.png.");
         alm.addOptionalSwitchArgument("autoLayout",null,"autoLayout",ArgumentList.TRUE,"turn on/off initial autolayout setting");
         alm.addOptionalSwitchArgument("mode","m","mode","expert","start in basic (browse,reduced) mode or expert mode" );
         //alm.addOptionalSwitchArgument("exit", null, "exit", "0", "exit after running script" );
@@ -5461,7 +5461,9 @@ APSplash.checkTime("init 240");
                 
                 URI pwd= new File(".").getAbsoluteFile().toURI();
                     
-                final String runBatchPngTemplate=alm.getValue("testPngFilename"); // this may change
+                String s= alm.getValue("testPngFilename");// this may change
+                if ( s.equals("") ) s= alm.getValue("runBatchImageTemplate");
+                final String runBatchPngTemplate=s;
                 String runBatch= alm.getValue("runBatch");
                 if ( !runBatch.equals("") ) {
                     runBatch= FileUtil.maybeMakeAbsolute( runBatch, pwd, false );
