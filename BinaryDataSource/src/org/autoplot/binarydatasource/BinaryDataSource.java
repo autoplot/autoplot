@@ -8,6 +8,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
+import java.util.HashMap;
+import java.util.Map;
 import org.das2.qds.buffer.BufferDataSet;
 import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
@@ -17,6 +19,7 @@ import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.AbstractDataSource;
 import org.das2.qds.buffer.AsciiDataSet;
+import org.das2.qds.buffer.CcsdsReader;
 import org.das2.qds.ops.Ops;
 
 /**
@@ -32,13 +35,28 @@ public class BinaryDataSource extends AbstractDataSource {
         super(uri);
     }
 
+    /**
+     * this will parse the following:<ul>
+     * <li>42
+     * <li>40+2
+     * <li>23+10*4
+     * <l1>0x20  (32 decimal)
+     * <li>0x20+4  (36 decimal)
+     * </ul>
+     * @param sval
+     * @return 
+     */
     private long parseLong( String sval ) {
         String[] ssum= sval.split("\\+");
         if ( ssum.length==1 ) {
             String[] sprod= sval.split("\\*");
             if ( sprod.length==1 ) {
-                int result = Integer.parseInt(sval);
-                return result;
+                if ( sval.startsWith("0x") ) {
+                    return Long.parseLong(sval.substring(2),16);
+                } else {
+                    int result = Integer.parseInt(sval);
+                    return result;
+                }
             } else {
                 long prod= parseLong(sprod[0]);
                 for ( int i=1; i<sprod.length; i++ ) {
@@ -70,6 +88,7 @@ public class BinaryDataSource extends AbstractDataSource {
 
     private long getLongParameter(String name, long deflt) {
         String sval = params.get(name);
+        
         long result = sval == null ? deflt : parseLong(sval);
         return result;
     }
@@ -165,9 +184,7 @@ public class BinaryDataSource extends AbstractDataSource {
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
         File f = getFile(mon);
-
-        FileChannel fc = new FileInputStream(f).getChannel();
-
+        
         final long offset = getLongParameter("byteOffset", 0);
 
         long defLen= f.length() - offset;
@@ -177,19 +194,54 @@ public class BinaryDataSource extends AbstractDataSource {
             throw new IllegalArgumentException("default length (entire file) is bigger than 2G, which is not supported.");
         }
 
-        int fieldCount = getIntParameter("fieldCount", params.get("depend0") == null ? 1 : 2);
-
-        int recCount= getIntParameter("recCount", Integer.MAX_VALUE );
-        
         if ( f.length()<(offset+length) ) {
             String info= String.format( "(byteOffset=%d byteLength=%d file.length=%d)", offset, length, f.length() );
             throw new IllegalArgumentException("byteLength and byteOffset parameters would read past the end of the file. "+info );
         }
-                
-        ByteBuffer buf = fc.map(MapMode.READ_ONLY, offset, length);
-
-        fc.close();
+    
+        ByteBuffer buf;
         
+        String ccsds= getParam("ccsds", "");
+        
+        if ( ccsds.length()>0 ) {
+            CcsdsReader cr= new CcsdsReader();
+            final ByteBuffer newbuf= ByteBuffer.allocate((int)f.length());
+            int packetType;
+            if ( ccsds.startsWith("0x") ) {
+                packetType= Integer.parseInt(ccsds.substring(2), 16);
+            } else {
+                packetType= Integer.parseInt(ccsds);
+            }
+            final Map<String,Integer> recLen=new HashMap();
+            cr.addPacketHandler( packetType, new CcsdsReader.PacketHandler() {
+                @Override
+                public int packet(int packetId, ByteBuffer buf) {
+                    Integer rl= recLen.get("reclen");
+                    if ( rl==null ) { // we limit to the length of the first record.
+                        recLen.put( "reclen",buf.limit());
+                    } else {
+                        buf.limit(rl);
+                    }
+                    newbuf.put(buf);
+                    return 0;
+                }
+            } );
+            cr.parse(f);
+            buf= newbuf;
+            
+            params.put( "recLength", String.valueOf(recLen.get("reclen")) );
+            
+        } else {
+            FileChannel fc = new FileInputStream(f).getChannel();
+            buf = fc.map(MapMode.READ_ONLY, offset, length);
+            fc.close();
+
+        }
+
+        int fieldCount = getIntParameter("fieldCount", params.get("depend0") == null ? 1 : 2);
+
+        int recCount= getIntParameter("recCount", Integer.MAX_VALUE );
+                
         String recFormat= getParameter( "recFormat", null );
 
         Object[] recFormatParse= null;
@@ -315,7 +367,20 @@ public class BinaryDataSource extends AbstractDataSource {
         } else {
             ds= BufferDataSet.makeDataSetBits( 1, recSizeBits, recOffset*8, frecCount, 1, 1, 1, buf, columnType );
         }
+        
+        String m= getParam("mask", "");
+        if ( m.length()>0 ) {
+            long mask= parseLong(m);
+            ds= Ops.maybeCopy( Ops.bitwiseAnd(ds,mask) );
+        }
 
+        String bf= getParam("bitField", "");
+        if ( bf.length()>0 ) {
+            long mask= parseLong(bf);
+            int ishift=Integer.lowestOneBit((int)mask);
+            ds= Ops.maybeCopy( Ops.div( Ops.bitwiseAnd(ds,mask), Ops.pow(2,ishift-1) ) );
+        }
+        
         if (dep0 > -1 || dep0Offset > -1 ) {
             String dep0Type = getParameter("depend0Type", columnType);
             if ( recFormatParse!=null ) {
