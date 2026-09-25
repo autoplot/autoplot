@@ -36,41 +36,18 @@ public class BinaryDataSource extends AbstractDataSource {
     }
 
     /**
-     * this will parse the following:<ul>
+     * Parse simple integer expressions in the string.  This will parse the following:<ul>
      * <li>42
      * <li>40+2
      * <li>23+10*4
-     * <l1>0x20  (32 decimal)
+     * <li>0x20  (32 decimal)
      * <li>0x20+4  (36 decimal)
      * </ul>
-     * @param sval
-     * @return 
+     * @param sval the integer expression
+     * @return the integer value.
      */
-    private long parseLong( String sval ) {
-        String[] ssum= sval.split("\\+");
-        if ( ssum.length==1 ) {
-            String[] sprod= sval.split("\\*");
-            if ( sprod.length==1 ) {
-                if ( sval.startsWith("0x") ) {
-                    return Long.parseLong(sval.substring(2),16);
-                } else {
-                    int result = Integer.parseInt(sval);
-                    return result;
-                }
-            } else {
-                long prod= parseLong(sprod[0]);
-                for ( int i=1; i<sprod.length; i++ ) {
-                    prod *= parseLong(sprod[i]);
-                }
-                return prod;
-            }
-        } else {
-            long sum=parseLong(ssum[0]);
-            for ( int i=1; i<ssum.length; i++ ) {
-                sum += parseLong(ssum[i]);
-            }
-            return sum;
-        }
+    public long parseLong( String sval ) {
+        return BufferDataSet.parseLong(sval);
     }
     
     private int getIntParameter(String name, int deflt) {
