@@ -360,7 +360,7 @@ public class BinaryDataSource extends AbstractDataSource {
         if ( bf.length()>0 ) {
             long mask= parseLong(bf);
             int ishift=Integer.lowestOneBit((int)mask);
-            ds= Ops.maybeCopy( Ops.div( Ops.bitwiseAnd(ds,mask), Ops.pow(2,ishift-1) ) );
+            ds= Ops.maybeCopy( Ops.div( Ops.bitwiseAnd(ds,mask), ishift ) );
         }
         
         if (dep0 > -1 || dep0Offset > -1 ) {
