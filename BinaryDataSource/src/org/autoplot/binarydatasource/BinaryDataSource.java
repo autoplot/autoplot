@@ -18,6 +18,7 @@ import org.das2.qds.DataSetUtil;
 import org.das2.qds.MutablePropertyDataSet;
 import org.das2.qds.QDataSet;
 import org.autoplot.datasource.AbstractDataSource;
+import org.das2.dataset.NoDataInIntervalException;
 import org.das2.qds.buffer.AsciiDataSet;
 import org.das2.qds.buffer.CcsdsReader;
 import org.das2.qds.ops.Ops;
@@ -204,6 +205,10 @@ public class BinaryDataSource extends AbstractDataSource {
                 }
             } );
             cr.parse(f);
+            
+            if ( newbuf.position()==0 ) {
+                throw new NoDataInIntervalException("No ccsds records with packetId="+ccsds+" found");
+            }
             buf= newbuf;
             
             params.put( "recLength", String.valueOf(recLen.get("reclen")) );
