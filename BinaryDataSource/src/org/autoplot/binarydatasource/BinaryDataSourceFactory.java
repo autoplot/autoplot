@@ -57,6 +57,8 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "reportOffset=T", "depend0 is byte offset into file, this is the legacy (2010) behavior"));
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "format=", "specify format"));
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "ccsds=", "CCSDS format packet id"));
+            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "mask=", "Look at only these bits"));
+            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "bitField=", "Look at only these bits and shift them to right") );
             return result;
         } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
             String paramName= CompletionContext.get( CompletionContext.CONTEXT_PARAMETER_NAME, cc );
@@ -192,6 +194,17 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
                     } catch (IOException ex) {
                         Logger.getLogger(BinaryDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
                     }
+                    return result;
+                }
+                case "mask": {
+                    List<CompletionContext> result= new ArrayList<>();
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "0xF0", "mask off bits 4,5,6,7") );
+                    return result;
+                }
+                case "bitField": {
+                    List<CompletionContext> result= new ArrayList<>();
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "0x80", "shift the high bit so that only it is shown as 0 or 1") );
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "0x80+0x40", "shift the two high bits so that they are shown as 0,1,2, or 3") );
                     return result;
                 }
                 default:
