@@ -1,14 +1,23 @@
 
 package org.autoplot.binarydatasource;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.datasource.AbstractDataSourceFactory;
 import org.autoplot.datasource.CompletionContext;
+import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
+import org.autoplot.datasource.URISplit;
+import org.das2.qds.buffer.CcsdsReader;
 
 /**
  * Factory for BinaryDataSource, which reads data from binary files.
@@ -47,6 +56,7 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "byteOrder=", "endianess of the data" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "reportOffset=T", "depend0 is byte offset into file, this is the legacy (2010) behavior"));
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "format=", "specify format"));
+            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "ccsds=", "CCSDS format packet id"));
             return result;
         } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
             String paramName= CompletionContext.get( CompletionContext.CONTEXT_PARAMETER_NAME, cc );
@@ -167,7 +177,23 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "%x", "format as hexidecimal") );
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "%.1f", "format as double with one decimal") );
                     return result;
-                }                
+                }       
+                case "ccsds": {
+                    List<CompletionContext> result= new ArrayList<>();
+                    CcsdsReader r= new CcsdsReader();
+                    try {
+                        Map<String,String> params = URISplit.parseParams(cc.params);
+                        File file = DataSetURI.getFile(cc.resourceURI, mon);
+                        r.parse(file);
+                        Set<Integer> p= r.getAppIds();
+                        for ( Integer i : p ) {
+                            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "0x"+Integer.toHexString(i), "") );
+                        }
+                    } catch (IOException ex) {
+                        Logger.getLogger(BinaryDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    return result;
+                }
                 default:
                     return Collections.emptyList();
             }
