@@ -182,7 +182,11 @@ public class BinaryDataSource extends AbstractDataSource {
         String ccsds= getParam("ccsds", "");
         
         if ( ccsds.length()>0 ) {
+            int offs= getIntParameter("ccsdsOffsetCorrection", 0);
             CcsdsReader cr= new CcsdsReader();
+            if ( offs!=0 ) {
+                cr.setOffsetCorrection(offs);
+            }
             final ByteBuffer newbuf= ByteBuffer.allocate((int)f.length());
             int packetType;
             if ( ccsds.startsWith("0x") ) {

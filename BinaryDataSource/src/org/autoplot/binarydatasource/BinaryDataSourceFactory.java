@@ -17,6 +17,7 @@ import org.autoplot.datasource.CompletionContext;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.URISplit;
+import org.das2.qds.ArrayDataSet;
 import org.das2.qds.buffer.CcsdsReader;
 
 /**
@@ -57,6 +58,7 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "reportOffset=T", "depend0 is byte offset into file, this is the legacy (2010) behavior"));
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "format=", "specify format"));
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "ccsds=", "CCSDS format packet id"));
+            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "ccsdsOffsetCorrection=", "CCSDS correction to incorrect packet lengths found in file"));
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "mask=", "Look at only these bits"));
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "bitField=", "Look at only these bits and shift them to right") );
             return result;
@@ -185,6 +187,11 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
                     CcsdsReader r= new CcsdsReader();
                     try {
                         Map<String,String> params = URISplit.parseParams(cc.params);
+                        String s= params.get("ccsdsOffsetCorrection");
+                        if ( s!=null ) {
+                            int i= Integer.parseInt(s);
+                            r.setOffsetCorrection(i);
+                        }
                         File file = DataSetURI.getFile(cc.resourceURI, mon);
                         r.parse(file);
                         Set<Integer> p= r.getAppIds();
@@ -196,6 +203,12 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
                     }
                     return result;
                 }
+                case "ccsdsOffsetCorrection":
+                {
+                    List<CompletionContext> result= new ArrayList<>();
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "10", "add ten bytes to incorrect length found in file") );
+                    return result;
+                } 
                 case "mask": {
                     List<CompletionContext> result= new ArrayList<>();
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "0xF0", "mask off bits 4,5,6,7") );
