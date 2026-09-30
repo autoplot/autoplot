@@ -417,7 +417,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         } 
         
-        logger.fine("loading icon for "+o);
+        logger.log(Level.FINE, "loading icon for {0}", o);
         if (result==null && wait ) {
             try {
                 
