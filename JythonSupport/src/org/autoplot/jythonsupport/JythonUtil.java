@@ -686,6 +686,14 @@ public class JythonUtil {
         @Override
         public Object visitName(Name node) throws Exception {
             if (!names.contains(node.id)) {
+                visitNameFail = true;
+            }
+            return null;
+        }
+        
+        //@Override
+        public Object visitNameNew(Name node) throws Exception {
+            if (!names.contains(node.id)) {
                 boolean okayFunction= false;
                 for ( int i=0; i<okay.length; i++ ) {
                     if ( okay[i].equals(node.id+",") ) {
