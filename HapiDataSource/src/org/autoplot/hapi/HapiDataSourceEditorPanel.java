@@ -7,7 +7,6 @@ import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Window;
@@ -25,7 +24,6 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,7 +36,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.swing.BoxLayout;
-import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
@@ -57,9 +54,7 @@ import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import org.autoplot.datasource.DataSetURI;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -389,17 +384,42 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
     }
     
-    private static final Map<String,ImageIcon> icons= Collections.synchronizedMap( new HashMap() );
+    private static class IconData {
+        private IconData( ImageIcon icon, long freshMillis ) {
+            this.icon= icon;
+            this.freshMillis= freshMillis;
+        }
+        private final ImageIcon icon;
+        private final long freshMillis;
+        public ImageIcon getIcon() {
+            return icon;
+        }
+        public long getFreshMillis() {
+            return freshMillis;
+        }
+    }
+    
+    private static final Map<String,IconData> icons= Collections.synchronizedMap( new HashMap() );
     
     private static Icon iconFor( Object o, boolean wait ) {
         
         final String faviconUrl;
         faviconUrl= findFavIcon( o.toString() );
         
-        ImageIcon result= icons.get( faviconUrl );
+        long t1= System.currentTimeMillis();
+        
+        IconData icond= icons.get( faviconUrl );
+        ImageIcon result=null;
+                
+        if ( icond!=null ) {
+            if ( ( System.currentTimeMillis()-icond.getFreshMillis() )<3600000 ) {
+                return icond.getIcon();
+            }
+        } 
+        
+        logger.fine("loading icon for "+o);
         if (result==null && wait ) {
             try {
-                long t1= System.currentTimeMillis();
                 
                 try {
                     File ff= DataSetURI.getFile( faviconUrl, null );
@@ -428,7 +448,10 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                     result= null;
                 }
                 logger.log(Level.FINE, "time to load icon for {0}: {1} ms", new Object[]{ o, System.currentTimeMillis()-t1});
-                icons.put( faviconUrl, result );
+                
+                icond= new IconData(result,t1);
+                
+                icons.put( faviconUrl, icond );
                 
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, null, ex);
