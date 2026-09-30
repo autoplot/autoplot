@@ -30,7 +30,11 @@
 
         <p>Autoplot's development is guided by feedback from those using it.  Thanks for your feedback!</p>
                 
-        <p>Bugfixes (2026-09-22):</p>
+        <p>Bugfixes (2026-09-30):</p>
+        <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2900/">2900</a>: Clean up event handling in HAPI Data Source Editor, correct recents.
+        </ul>
+        <p>Older Bugfixes (2026-09-28):</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2897/">2897</a>: record window sizes with the screen resolution, so that undocked laptop works properly.
             <li>rte_1195634314: StaticCodeAnalysis still loaded old 2017 python file, somehow causing crash on startup.  Thanks, nicolec!
@@ -62,24 +66,11 @@
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2880/">2880</a>: Display warning when CDF variable name is not proper Python variable name or will cause problems. 
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2845/">2845</a>: improvements to Jython completions.
         </ul>
-        <p>Older Bugfixes (2026-08-15):</p>
-        <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2872/">2872</a>: clear state within AsciiTableDataSource which would have the effect of the second call to getDataSet returning a different dataset.  Thanks, Ivar!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2877/">2877</a>: Support FFTPower of X component.  Thanks, Dave!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2876/">2876</a>: PWD in remote .jyds scripts was the download directory, not the https:// site, so adjacent calibration table could not be loaded.
-            <li>rte 1817056005: QStream yrange was interpreted with Z units for spectrograms.  Thanks, Larry!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2870/">2870</a>: use mapped memory to access data in IDLSave files.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2864/">2864</a>: correct read of two-element complex array.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2862/">2827</a>: /tmp/data/data.$s?avail=T properly triggers TimeSeriesBrowse.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2860/">2860</a>: add escape key to runtime error dialog 
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2863/">2863</a>: repeat runs of script without reset and overplotOf would keep adding plot elements. (Code is now enabled)
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2862/">2862</a>: support "print ds[0,-1]" in Jython
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2864/">2864</a>: improve names automatically picked on export to IDLSave.
-            <li>incorrect check for fill (Nan==Nan is always false) broke fill value used for times in JUNO/JADE PDS3.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2863/">2863</a>: repeat runs of script without reset and overplotOf would keep adding plot elements.
-            <li>IDLSav of CDF_TT2000 is detected when name contains "epoch". Thanks, Dave!
-        </ul>
         <p>Features:</p>
+        <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2900/">2900</a>: Jemmy regression testing of HAPI server dialog.
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>BinaryDataSource has ccsds control to select binary from telemetry stream.  
             <li>Experimental ccsds switch to the BinaryDataSource, to parse simple ccsds files.
@@ -88,13 +79,6 @@
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/884/">884</a>: Annotation anchor box should have style controls.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2879/">2879</a>: HTML table source allows depend0 and units to be specified.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/883/">883</a>: Select time range by Orbits allows simple search.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2873/">2873</a>: vap+inline URIs with one getDataSet call now support "replace file" action.  Thanks, Ivar!
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/879/">879</a>: add completions for each enum of getParam, also from examples.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2867/">2867</a>: add routines for realPart and imaginaryPart.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/877/">877</a>: Allow "https : //..." to be used in the address bar, so that Autoplot URIs are left alone in Outlook.
         </ul>
 
         <p>Data is input from:</p>
