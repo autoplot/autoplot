@@ -683,8 +683,8 @@ public class JythonUtil {
             this.names = names;
         }
 
-        @Override
-        public Object visitName(Name node) throws Exception {
+        //@Override
+        public Object visitNameOld(Name node) throws Exception {
             if (!names.contains(node.id)) {
                 visitNameFail = true;
             }
@@ -708,6 +708,17 @@ public class JythonUtil {
             return null;
         }
 
+        @Override
+        public Object visitName(Name node) throws Exception {
+            // See 
+            boolean useNew=false;
+            if ( useNew ) {
+                return visitNameNew(node);
+            } else {
+                return visitNameOld(node);
+            }
+        }
+        
         @Override
         protected Object unhandled_node(SimpleNode sn) throws Exception {
             return sn;
