@@ -511,7 +511,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 String[] servers = HapiServer.listHapiServersArray();
                 for ( String s: servers ) {
                     Icon i= iconFor( s, true ); // load of icon off the event thread.
-                    if ( i!=null ) logger.log(Level.FINER, "iconHeight={0}", i.getIconHeight());
+                    if ( i!=null ) logger.log(Level.FINEST, "iconHeight={0}", i.getIconHeight());
                 }
             };
         };
@@ -1256,6 +1256,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
      * @throws JSONException 
      */    
     private void resetServerCatalog( URL server ) {
+        logger.entering("HapiDataSourceEditorPanel","resetServerCatalog");
         try {
             if ( !EventQueue.isDispatchThread() ) {
                 System.err.println("Here Jeremy");
@@ -1303,6 +1304,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         } catch ( JSONException ex ) {
             logger.log(Level.SEVERE, null, ex );
         }
+        logger.exiting("HapiDataSourceEditorPanel","resetServerCatalog");
 
     }
         
