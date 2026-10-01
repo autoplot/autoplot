@@ -83,6 +83,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     
     private JSONArray idsJSON;
     private boolean supportsBinary;
+    private boolean supportsJson;
     
     private URL defaultServer;
 	
@@ -574,6 +575,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         exampleTimeRangesCB = new javax.swing.JComboBox<>();
         disableCacheCheckBox = new javax.swing.JCheckBox();
         hapiServerRecentComboBox = new org.autoplot.datasource.RecentComboBox();
+        jsonCB = new javax.swing.JCheckBox();
 
         jLabel1.setText("HAPI Server:");
 
@@ -603,7 +605,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         parametersPanel.setLayout(parametersPanelLayout);
         parametersPanelLayout.setHorizontalGroup(
             parametersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 485, Short.MAX_VALUE)
+            .addGap(0, 495, Short.MAX_VALUE)
         );
         parametersPanelLayout.setVerticalGroup(
             parametersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -654,7 +656,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(parametersScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 497, Short.MAX_VALUE)
+            .addComponent(parametersScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 507, Short.MAX_VALUE)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addComponent(clearAllB)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -758,11 +760,15 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         });
 
+        jsonCB.setText("Use JSON");
+        jsonCB.setToolTipText("Some servers support JSON data transfers, and this will use JSON to transfer data.");
+        jsonCB.setEnabled(false);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 712, Short.MAX_VALUE)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 722, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -785,6 +791,8 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(disableCacheCheckBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jsonCB)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(binaryCB)))
                 .addContainerGap())
         );
@@ -802,7 +810,8 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(messagesLabel)
                     .addComponent(binaryCB, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
-                    .addComponent(disableCacheCheckBox))
+                    .addComponent(disableCacheCheckBox)
+                    .addComponent(jsonCB))
                 .addGap(5, 5, 5)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -1014,6 +1023,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JCheckBox jsonCB;
     private javax.swing.JLabel messagesLabel;
     private org.autoplot.datasource.RecentComboBox parameterFilterComboBox;
     private javax.swing.JPanel parametersPanel;
@@ -1183,6 +1193,12 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             this.binaryCB.setSelected(false);
         }
         
+        if ( HapiSpec.JSON.equals(params.get("format") ) ) {
+            this.jsonCB.setSelected(true);
+        } else {
+            this.jsonCB.setSelected(false);
+        }
+        
         if ( !HapiServer.useCache() ) {
             cachedFileButton.setVisible(false);
             disableCacheCheckBox.setVisible(false);
@@ -1227,6 +1243,9 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         if ( binaryCB.isSelected() && binaryCB.isEnabled() ) {
             uri+= "&format=binary";
         }
+        if ( jsonCB.isSelected() && jsonCB.isEnabled() ) {
+            uri+= "&format=json";
+        }
         if ( disableCacheCheckBox.isSelected() ) {
             uri+= "&cache=F";
         }
@@ -1239,6 +1258,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     
     private void loadServerCapabilities( URL server ) throws JSONException {
         boolean binaryIsEnabled= false;
+        boolean jsonIsEnabled= false;
         try {
             JSONObject capabilitiesDoc= HapiServer.getCapabilities(server);
             if ( capabilitiesDoc.has(HapiSpec.OUTPUT_FORMATS ) ) { // new 2016-11-21.  Other is deprecated.
@@ -1246,6 +1266,9 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 for ( int i=0; i<outputFormats.length(); i++ ) {
                     if ( outputFormats.getString(i).equals(HapiSpec.BINARY) ) {
                         binaryIsEnabled= true;
+                    }
+                    if ( outputFormats.getString(i).equals(HapiSpec.JSON) ) {
+                        jsonIsEnabled= true;
                     }
                 }                    
             } else {
@@ -1267,6 +1290,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             logger.log( Level.WARNING, ex.getMessage(), ex );
         }
         this.supportsBinary= binaryIsEnabled;
+        this.supportsJson= jsonIsEnabled;
     }
     
     /**
@@ -1323,6 +1347,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 }
             }
             binaryCB.setEnabled(supportsBinary);
+            jsonCB.setEnabled(supportsJson);
             
         } catch ( JSONException ex ) {
             logger.log(Level.SEVERE, null, ex );

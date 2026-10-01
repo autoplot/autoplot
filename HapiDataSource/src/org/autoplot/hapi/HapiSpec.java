@@ -107,6 +107,11 @@ public final class HapiSpec {
     protected static final String BINARY = "binary";
     
     /**
+     * @see https://github.com/hapi-server/data-specification#capabilities
+     */
+    protected static final String JSON = "json";
+
+    /**
      * some HAPI servers have optional title for IDs.  
      * @see https://github.com/hapi-server/data-specification#catalog
      */

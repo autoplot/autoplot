@@ -16,7 +16,7 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jSplitPane1" alignment="0" pref="712" max="32767" attributes="0"/>
+          <Component id="jSplitPane1" alignment="0" pref="722" max="32767" attributes="0"/>
           <Group type="102" attributes="0">
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
@@ -38,9 +38,11 @@
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="messagesLabel" max="32767" attributes="0"/>
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="disableCacheCheckBox" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="jsonCB" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="binaryCB" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -64,6 +66,7 @@
                   <Component id="messagesLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="binaryCB" alignment="3" pref="25" max="32767" attributes="0"/>
                   <Component id="disableCacheCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jsonCB" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
@@ -135,7 +138,7 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="parametersScrollPane" pref="497" max="32767" attributes="0"/>
+                  <Component id="parametersScrollPane" pref="507" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="clearAllB" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -188,7 +191,7 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="485" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="495" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                     <DimensionLayout dim="1">
@@ -382,6 +385,13 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="hapiServerRecentComboBoxActionPerformed"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="jsonCB">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Use JSON"/>
+        <Property name="toolTipText" type="java.lang.String" value="Some servers support JSON data transfers, and this will use JSON to transfer data."/>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>
