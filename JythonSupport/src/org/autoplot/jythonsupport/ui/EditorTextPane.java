@@ -356,7 +356,7 @@ public class EditorTextPane extends JEditorPane {
      */
     public void showParametersView() {
         String script= this.getText();
-        String scriptPrime= JythonUtil.simplifyScriptToGetParams( script, true );
+        String scriptPrime= JythonUtil.simplifyScriptToGetParams2026( script, true );
         showInCompletionsEditorPane( scriptPrime, "Parameters");
     }
     
