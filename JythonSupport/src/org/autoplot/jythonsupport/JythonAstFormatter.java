@@ -412,6 +412,27 @@ public class JythonAstFormatter {
             return;
         }
         
+        if (node instanceof Slice) {
+            Slice n = (Slice) node;
+
+            if (n.lower != null) {
+                format(n.lower, out, indent);
+            }
+
+            out.append(":");
+
+            if (n.upper != null) {
+                format(n.upper, out, indent);
+            }
+
+            if (n.step != null) {
+                out.append(":");
+                format(n.step, out, indent);
+            }
+
+            return;
+        }
+        
         /*
          * Unknown node -- make this conspicuous.
          */
