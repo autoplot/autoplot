@@ -391,6 +391,27 @@ public class JythonAstFormatter {
             return;
         }
         
+        if (node instanceof BoolOp) {
+            BoolOp n = (BoolOp) node;
+
+            String op = boolOperator(n.op);
+
+            out.append("(");
+
+            for (int i = 0; i < n.values.length; i++) {
+                if (i > 0) {
+                    out.append(" ");
+                    out.append(op);
+                    out.append(" ");
+                }
+
+                format(n.values[i], out, indent);
+            }
+
+            out.append(")");
+            return;
+        }
+        
         /*
          * Unknown node -- make this conspicuous.
          */
@@ -507,6 +528,17 @@ public class JythonAstFormatter {
                 return "not in";
             default:
                 return "<cmpop:" + op + ">";
+        }
+    }
+    
+    private static String boolOperator(int op) {
+        switch (op) {
+            case boolopType.And:
+                return "and";
+            case boolopType.Or:
+                return "or";
+            default:
+                return "<boolop:" + op + ">";
         }
     }
     
