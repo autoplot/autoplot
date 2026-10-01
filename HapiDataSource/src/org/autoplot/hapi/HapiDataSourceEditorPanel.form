@@ -352,6 +352,9 @@
         <Property name="toolTipText" type="java.lang.String" value="Some servers support binary data transfers, and this will use binary to transfer data."/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="binaryCBActionPerformed"/>
+      </Events>
     </Component>
     <Component class="org.autoplot.datasource.RecentComboBox" name="timeRangeComboBox">
     </Component>
@@ -392,6 +395,9 @@
         <Property name="toolTipText" type="java.lang.String" value="Some servers support JSON data transfers, and this will use JSON to transfer data."/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jsonCBActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

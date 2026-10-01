@@ -742,6 +742,11 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         binaryCB.setText("Use Binary");
         binaryCB.setToolTipText("Some servers support binary data transfers, and this will use binary to transfer data.");
         binaryCB.setEnabled(false);
+        binaryCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                binaryCBActionPerformed(evt);
+            }
+        });
 
         exampleTimeRangesCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Example Time Ranges" }));
         exampleTimeRangesCB.addItemListener(new java.awt.event.ItemListener() {
@@ -763,6 +768,11 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         jsonCB.setText("Use JSON");
         jsonCB.setToolTipText("Some servers support JSON data transfers, and this will use JSON to transfer data.");
         jsonCB.setEnabled(false);
+        jsonCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jsonCBActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -1003,6 +1013,18 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     private void hapiServerRecentComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hapiServerRecentComboBoxActionPerformed
         loadKnownServersSoon();
     }//GEN-LAST:event_hapiServerRecentComboBoxActionPerformed
+
+    private void binaryCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_binaryCBActionPerformed
+        if ( binaryCB.isSelected() ) {
+            jsonCB.setSelected(false);
+        }
+    }//GEN-LAST:event_binaryCBActionPerformed
+
+    private void jsonCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jsonCBActionPerformed
+        if ( jsonCB.isSelected() ) {
+            binaryCB.setSelected(false);
+        }
+    }//GEN-LAST:event_jsonCBActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
