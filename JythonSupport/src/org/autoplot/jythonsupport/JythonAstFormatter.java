@@ -522,6 +522,30 @@ public class JythonAstFormatter {
             formatStatements(n.body, out, indent + 1);
             return;
         }
+
+        if (node instanceof Raise) {
+            Raise n = (Raise) node;
+
+            indent(out, indent);
+            out.append("raise");
+
+            if (n.type != null) {
+                out.append(" ");
+                format(n.type, out, indent);
+
+                if (n.inst != null) {
+                    out.append(", ");
+                    format(n.inst, out, indent);
+
+                    if (n.tback != null) {
+                        out.append(", ");
+                        format(n.tback, out, indent);
+                    }
+                }
+            }
+
+            return;
+        }
         
         /*
          * Unknown node -- make this conspicuous.
