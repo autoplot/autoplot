@@ -1563,15 +1563,19 @@ public class JythonUtil {
      * 
      * See test038 (https://jfaden.net/jenkins/job/autoplot-test038/)
      *
-     * @param stmts statements being processed.
+     * @param stmts null or the statements being processed.
      * @param variableNames variable/procedure names that have been resolved.
      * @param depth recursion depth, for debugging.
-     * @return
+     * @return null for input null, or subset of statements which are safe to run.
      * @see SimplifyScriptSupport#simplifyScriptToGetCompletions(java.lang.String[], org.python.parser.ast.stmtType[], java.util.HashSet, int, int, int) 
      */
     public static stmtType[] simplifyScriptToGetParams2026( stmtType[] stmts, HashSet variableNames, int depth) {
         
         ArrayList<stmtType> outstmts= new ArrayList<>();
+        
+        if ( stmts==null ) {
+            return null;
+        }
         
         for (int istatement = 0; istatement < stmts.length; istatement++) {
             stmtType o = stmts[istatement];
