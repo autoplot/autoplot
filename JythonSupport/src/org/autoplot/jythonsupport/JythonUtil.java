@@ -990,10 +990,10 @@ public class JythonUtil {
         //    System.err.println("here at line "+o.beginLine);
         //}
         if ((o instanceof org.python.parser.ast.ImportFrom)) {
-            return true;
+            return false;
         }
         if ((o instanceof org.python.parser.ast.Import)) {
-            return true;
+            return false;
         }
         if ((o instanceof org.python.parser.ast.Assign)) {
             Assign a = (Assign) o;
