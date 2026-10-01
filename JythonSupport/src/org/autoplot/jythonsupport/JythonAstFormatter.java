@@ -547,6 +547,57 @@ public class JythonAstFormatter {
             return;
         }
         
+        if (node instanceof ClassDef) {
+            ClassDef n = (ClassDef) node;
+
+            indent(out, indent);
+            out.append("class ");
+            out.append(n.name);
+
+            if (n.bases != null && n.bases.length > 0) {
+                out.append("(");
+
+                for (int i = 0; i < n.bases.length; i++) {
+                    if (i > 0) {
+                        out.append(", ");
+                    }
+                    format(n.bases[i], out, indent);
+                }
+
+                out.append(")");
+            }
+
+            out.append(":\n");
+            formatStatements(n.body, out, indent + 1);
+            return;
+        }
+        
+        if (node instanceof AugAssign) {
+            AugAssign n = (AugAssign) node;
+
+            indent(out, indent);
+            format(n.target, out, indent);
+            out.append(" ");
+            out.append(binaryOperator(n.op));
+            out.append("= ");
+            format(n.value, out, indent);
+
+            return;
+        }
+        
+        if (node instanceof ExtSlice) {
+            ExtSlice n = (ExtSlice) node;
+
+            for (int i = 0; i < n.dims.length; i++) {
+                if (i > 0) {
+                    out.append(", ");
+                }
+
+                format(n.dims[i], out, indent);
+            }
+
+            return;
+        }   
         /*
          * Unknown node -- make this conspicuous.
          */
