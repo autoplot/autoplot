@@ -16,15 +16,54 @@ import org.python.parser.ast.*;
  */
 public class JythonAstFormatter {
 
+    private static class LineCountingStringBuilder {
+
+        private final StringBuilder builder = new StringBuilder();
+        private int lineCount = 1;
+
+        public LineCountingStringBuilder append(String s) {
+            builder.append(s);
+
+            for (int i = 0; i < s.length(); i++) {
+                if (s.charAt(i) == '\n') {
+                    lineCount++;
+                }
+            }
+            return this;
+        }
+
+        public LineCountingStringBuilder append(char c) {
+            builder.append(c);
+
+            if (c == '\n') {
+                lineCount++;
+            }
+            return this;
+        }
+
+        public LineCountingStringBuilder append(Object o) {
+            return append(String.valueOf(o));
+        }
+
+        public int getLineCount() {
+            return lineCount;
+        }
+
+        @Override
+        public String toString() {
+            return builder.toString();
+        }
+    }
+
     private static final String INDENT = "    ";
 
     public static String format(Node node) {
-        StringBuilder out = new StringBuilder();
+        LineCountingStringBuilder out = new LineCountingStringBuilder();
         format(node, out, 0);
         return out.toString();
     }
 
-    private static void format(Node node, StringBuilder out, int indent) {
+    private static void format(Node node, LineCountingStringBuilder out, int indent) {
         if (node == null) {
             return;
         }
@@ -265,6 +304,9 @@ public class JythonAstFormatter {
         if (node instanceof org.python.parser.ast.Module) {
             org.python.parser.ast.Module n = (org.python.parser.ast.Module) node;
             for ( stmtType n1 : n.body ) {
+                while ( n1.beginLine>out.getLineCount() ) {
+                    out.append("\n");
+                }
                 format( n1, out, indent);
                 out.append("\n");
             }
@@ -445,7 +487,7 @@ public class JythonAstFormatter {
 
     private static void formatStatements(
             stmtType[] statements,
-            StringBuilder out,
+            LineCountingStringBuilder out,
             int indent) {
 
         if (statements == null) {
@@ -461,14 +503,14 @@ public class JythonAstFormatter {
     }
 
 
-    private static void indent(StringBuilder out, int level) {
+    private static void indent(LineCountingStringBuilder out, int level) {
         for (int i = 0; i < level; i++) {
             out.append(INDENT);
         }
     }
 
 
-    private static void appendString(StringBuilder out, String s) {
+    private static void appendString(LineCountingStringBuilder out, String s) {
         out.append("'");
 
         for (int i = 0; i < s.length(); i++) {
