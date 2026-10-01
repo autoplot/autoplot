@@ -66,6 +66,7 @@ import org.das2.util.StringTools;
 import org.python.core.PyTuple;
 import org.python.core.PyXRange;
 import org.python.parser.ast.BinOp;
+import org.python.parser.ast.Pass;
 import org.python.parser.ast.TryExcept;
 
 /**
@@ -1416,6 +1417,190 @@ public class JythonUtil {
         }
         return result.toString();
     }
+    
+    /**
+     * extracts the parts of the program that get parameters.
+     *
+     * @param script the entire Jython program
+     * @param addSort if true, add parameters to keep track of the order that
+     * getParam was called. This has no effect now.
+     * @return the Jython program with expensive calls removed, up to the last
+     * getParam call.
+     * @see SimplifyScriptSupport#simplifyScriptToCompletions(java.lang.String) 
+     */
+    public static String simplifyScriptToGetParams2026(String script, boolean addSort) throws PySyntaxError {
+        
+        Logger llogger= LoggerManager.getLogger("jython.simplify");
+        
+        String[] ss1 = script.split("\n");
+        String[] ss= new String[ss1.length+1];
+        System.arraycopy( ss1, 0, ss, 1, ss1.length );
+        ss[0]= "# simplifyScriptToGetParams";
+
+        int lastLine = -1; // the last line we need to include
+        
+        boolean withinSimplifyLine= false;
+        
+        boolean withinTripleQuote= false;
+        for (int ilineNum = 1; ilineNum < ss.length; ilineNum++) {
+            String line = ss[ilineNum];
+            int ich = line.indexOf('#');
+            if (ich > -1) {
+                line = line.substring(0, ich);
+            }
+            if (line.contains("getParam")) {
+                llogger.log(Level.FINER, "getParam at line {0}", ilineNum);
+                lastLine = ilineNum;
+                withinSimplifyLine= true;
+            } else if (line.contains("setScriptTitle")) {
+                llogger.log(Level.FINER, "setScriptTitle at line {0}", ilineNum);
+                lastLine = ilineNum;
+                withinSimplifyLine= true;
+            } else if (line.contains("setScriptDescription")) {
+                llogger.log(Level.FINER, "setScriptDescription at line {0}", ilineNum);
+                lastLine = ilineNum;
+                withinSimplifyLine= true;
+            } else if (line.contains("setScriptLabel")) {
+                llogger.log(Level.FINER, "setScriptLabel at line {0}", ilineNum);
+                lastLine = ilineNum;
+                withinSimplifyLine= true;
+            } else if (line.contains("setScriptIcon")) {
+                llogger.log(Level.FINER, "setScriptIcon at line {0}", ilineNum);
+                lastLine = ilineNum;
+                withinSimplifyLine= true;
+            } else {
+                if ( !withinTripleQuote ) {
+                    withinSimplifyLine= false;
+                }
+            }
+            if ( line.contains("'''") ) {
+                if ( withinTripleQuote ) {
+                    if ( !Character.isWhitespace(line.charAt(0)) && withinSimplifyLine ) {
+                        lastLine = ilineNum;
+                    }
+                }
+                if ( withinTripleQuote ) {
+                    llogger.log(Level.FINER, "close triple quote at line {0}", ilineNum);
+                } else {
+                    llogger.log(Level.FINER, "open triple quote at line {0}", ilineNum);
+                }
+                withinTripleQuote= !withinTripleQuote;
+            } 
+
+        }
+
+        if (lastLine == -1) {
+            return "";
+        }
+
+        // check for continuation in last getParam call.
+        while (ss.length > lastLine + 1 && ss[lastLine].trim().length() > 0 && Character.isWhitespace(ss[lastLine].charAt(0))) {
+            lastLine++;
+        }
+        // Chris showed that a closing bracket or paren doesn't need to be indented.  See test038/jydsCommentBug.jyds
+        if (lastLine < ss.length) {
+            String closeParenCheck = ss[lastLine].trim();
+            if (closeParenCheck.equals(")") || closeParenCheck.equals("]")) {
+                lastLine++;
+            }
+        }
+
+        HashSet variableNames = new HashSet();
+        variableNames.add("getParam");  // this is what allows the getParam calls to be included.
+        variableNames.add("map");
+        variableNames.add("str");  // include casts.
+        variableNames.add("int");
+        variableNames.add("long");
+        variableNames.add("float");
+        variableNames.add("datum");
+        variableNames.add("datumRange");
+        variableNames.add("URI");
+        variableNames.add("URL");
+        variableNames.add("True");
+        variableNames.add("False");
+        variableNames.add("range");
+        variableNames.add("xrange");
+        variableNames.add("list");
+        variableNames.add("len");
+        variableNames.add("map");
+        variableNames.add("dict");
+        variableNames.add("zip");
+        variableNames.add("PWD");
+        variableNames.add("dom");
+
+        try {
+            Module n = (Module) org.python.core.parser.parse(script, "exec");
+            stmtType[] newStmts= simplifyScriptToGetParams2026( n.body,variableNames,0);
+            n.body= newStmts;
+            return JythonAstFormatter.format(n);
+        } catch (PySyntaxError ex) {
+            throw ex;
+        }
+    }
+    
+    /**
+     * Extracts the parts of the program that get parameters or take a trivial
+     * amount of time to execute.  This may call itself recursively when if
+     * blocks are encountered. 
+     * 
+     * This scans through, where acceptLine is the first line we'll accept
+     * to the currentLine, copying over script from acceptLine to currentLine.
+     * 
+     * See test038 (https://jfaden.net/jenkins/job/autoplot-test038/)
+     *
+     * @param stmts statements being processed.
+     * @param variableNames variable/procedure names that have been resolved.
+     * @param depth recursion depth, for debugging.
+     * @return
+     * @see SimplifyScriptSupport#simplifyScriptToGetCompletions(java.lang.String[], org.python.parser.ast.stmtType[], java.util.HashSet, int, int, int) 
+     */
+    public static stmtType[] simplifyScriptToGetParams2026( stmtType[] stmts, HashSet variableNames, int depth) {
+        
+        ArrayList<stmtType> outstmts= new ArrayList<>();
+        
+        for (int istatement = 0; istatement < stmts.length; istatement++) {
+            stmtType o = stmts[istatement];
+            
+            logger.log( Level.FINER, "line {0}: {1}", new Object[] { o.beginLine, o.getImage() } );
+
+            if ( o instanceof TryExcept ) {
+                TryExcept t= (TryExcept)o;
+                t.body= simplifyScriptToGetParams2026( t.body, variableNames, depth+1 );
+                t.orelse= simplifyScriptToGetParams2026( t.orelse, variableNames, depth+1 );
+                continue;
+            }
+            
+            if (o instanceof org.python.parser.ast.If) {
+                If iff = (If) o;
+                boolean includeBlock;
+                if (simplifyScriptToGetParamsCanResolve(iff.test, variableNames)) {
+                    includeBlock = true;
+                } else {
+                    includeBlock = false;
+                }
+
+                if (includeBlock) {
+                    iff.body= simplifyScriptToGetParams2026( iff.body, variableNames, depth + 1);
+                    if (iff.orelse != null) {
+                        iff.orelse= simplifyScriptToGetParams2026( iff.orelse, variableNames, depth + 1);
+                    }
+                }
+                outstmts.add(iff);
+                
+            } else {
+                if (simplifyScriptToGetParamsOkay(o, variableNames)) {
+                    outstmts.add(o);
+                } else if (isSetScriptCall(o, variableNames)) {
+                    outstmts.add(o);
+                } else {
+                    outstmts.add(new Pass());
+                    // do nothing
+                }
+            }
+        }
+        
+        return outstmts.toArray( new stmtType[0] );
+    }
 
     /**
      * there's a problem where multi-line strings and expressions have a begin line at the end not the beginning.
@@ -1692,7 +1877,7 @@ public class JythonUtil {
     public static ScriptDescriptor describeScript( Map<String,Object> env, String script, Map<String, String> params) throws IOException {        
         String prog;
         try {
-            prog= simplifyScriptToGetParams(script, true);  // removes calls to slow methods, and gets the essence of the controls of the script.
+            prog= simplifyScriptToGetParams2026(script, true);  // removes calls to slow methods, and gets the essence of the controls of the script.
         } catch ( PySyntaxError ex ) {
             return errorScriptDescriptor(ex);
         }
@@ -2137,7 +2322,7 @@ public class JythonUtil {
      * @see #describeScript(java.util.Map, java.lang.String, java.util.Map) 
      */
     public static List<Param> getGetParams(Map<String, Object> env, String script, Map<String, String> params) throws PyException {
-        String prog = simplifyScriptToGetParams(script, true);  // removes calls to slow methods, and gets the essence of the controls of the script.
+        String prog = simplifyScriptToGetParams2026(script, true);  // removes calls to slow methods, and gets the essence of the controls of the script.
 
         logger.log(Level.FINER, "Simplified script: {0}", prog);
 

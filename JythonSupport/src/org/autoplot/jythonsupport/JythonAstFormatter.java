@@ -11,6 +11,8 @@ import org.python.parser.ast.*;
  * Convert a Jython AST back into reasonably formatted Jython source.
  *
  * Intended for the AST used by Jython 2.2.
+ * 
+ * @see JythonSourceEmitter
  */
 public class JythonAstFormatter {
 
@@ -283,6 +285,70 @@ public class JythonAstFormatter {
             return;
         }
         
+        if (node instanceof Import) {
+            Import n = (Import) node;
+
+            indent(out, indent);
+            out.append("import ");
+
+            for (int i = 0; i < n.names.length; i++) {
+                if (i > 0) {
+                    out.append(", ");
+                }
+
+                aliasType a = n.names[i];
+                out.append(a.name);
+
+                if (a.asname != null) {
+                    out.append(" as ");
+                    out.append(a.asname);
+                }
+            }
+            return;
+        }
+
+        if (node instanceof ImportFrom) {
+            ImportFrom n = (ImportFrom) node;
+
+            indent(out, indent);
+            out.append("from ");
+            out.append(n.module);
+            out.append(" import ");
+
+            for (int i = 0; i < n.names.length; i++) {
+                if (i > 0) {
+                    out.append(", ");
+                }
+
+                aliasType a = n.names[i];
+                out.append(a.name);
+
+                if (a.asname != null) {
+                    out.append(" as ");
+                    out.append(a.asname);
+                }
+            }
+            return;
+        }
+        
+        if (node instanceof Dict) {
+            Dict n = (Dict) node;
+
+            out.append("{");
+
+            for (int i = 0; i < n.keys.length; i++) {
+                if (i > 0) {
+                    out.append(", ");
+                }
+
+                format(n.keys[i], out, indent);
+                out.append(": ");
+                format(n.values[i], out, indent);
+            }
+
+            out.append("}");
+            return;
+        }
         /*
          * Unknown node -- make this conspicuous.
          */

@@ -19,6 +19,8 @@ import org.python.parser.ast.exprType;
  *
  * Notes: - This emits structurally-correct Python/Jython source, not original formatting. - Comments are not preserved. - Some rare
  * node forms may need small adjustments for your exact jar.
+ * 
+ * @see JythonAstFormatter
  */
 public class JythonSourceEmitter {
 
