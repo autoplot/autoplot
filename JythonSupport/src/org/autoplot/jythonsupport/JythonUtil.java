@@ -649,7 +649,7 @@ public class JythonUtil {
             boolean klugdyOkay = false;
             String ss = c.func.toString();
             for (String s : okay) {
-                if (ss.contains(s)) {
+                if (ss.contains("="+s)) {
                     klugdyOkay = true;
                 }
             }
@@ -1534,6 +1534,7 @@ public class JythonUtil {
         variableNames.add("indgen");
         variableNames.add("findgen");
         variableNames.add("dindgen");
+        variableNames.add("linspace");
         variableNames.add("list");
         variableNames.add("len");
         variableNames.add("map");
