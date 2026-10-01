@@ -475,6 +475,54 @@ public class JythonAstFormatter {
             return;
         }
         
+        if (node instanceof Print) {
+            Print n = (Print) node;
+
+            indent(out, indent);
+            out.append("print");
+
+            if (n.dest != null) {
+                out.append(" >>");
+                format(n.dest, out, indent);
+
+                if (n.values.length > 0) {
+                    out.append(", ");
+                }
+            } else if (n.values.length > 0) {
+                out.append(" ");
+            }
+
+            for (int i = 0; i < n.values.length; i++) {
+                if (i > 0) {
+                    out.append(", ");
+                }
+                format(n.values[i], out, indent);
+            }
+
+            // nl == false means the Python statement ended with a comma.
+            if (!n.nl) {
+                out.append(",");
+            }
+
+            return;
+        }
+        
+        if (node instanceof FunctionDef) {
+            FunctionDef n = (FunctionDef) node;
+
+            indent(out, indent);
+            out.append("def ");
+            out.append(n.name);
+            out.append("(");
+
+            formatArguments(n.args, out, indent);
+
+            out.append("):\n");
+
+            formatStatements(n.body, out, indent + 1);
+            return;
+        }
+        
         /*
          * Unknown node -- make this conspicuous.
          */
@@ -498,6 +546,9 @@ public class JythonAstFormatter {
             if (i > 0) {
                 out.append("\n");
             }
+            while ( statements[i].beginLine>out.getLineCount() ) {
+                out.append("\n");
+            }            
             format(statements[i], out, indent);
         }
     }
@@ -604,5 +655,51 @@ public class JythonAstFormatter {
                 return "<boolop:" + op + ">";
         }
     }
+    
+    private static void formatArguments(
+            argumentsType args,
+            LineCountingStringBuilder out,
+            int indent) {
+
+        int nargs = args.args.length;
+        int ndefaults = args.defaults.length;
+        int firstDefault = nargs - ndefaults;
+
+        boolean needComma = false;
+
+        for (int i = 0; i < nargs; i++) {
+            if (needComma) {
+                out.append(", ");
+            }
+
+            format(args.args[i], out, indent);
+
+            if (i >= firstDefault) {
+                out.append("=");
+                format(args.defaults[i - firstDefault], out, indent);
+            }
+
+            needComma = true;
+        }
+
+        if (args.vararg != null) {
+            if (needComma) {
+                out.append(", ");
+            }
+
+            out.append("*");
+            out.append(args.vararg);
+            needComma = true;
+        }
+
+        if (args.kwarg != null) {
+            if (needComma) {
+                out.append(", ");
+            }
+
+            out.append("**");
+            out.append(args.kwarg);
+        }
+    }    
     
 }
