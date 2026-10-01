@@ -349,6 +349,48 @@ public class JythonAstFormatter {
             out.append("}");
             return;
         }
+        
+        if (node instanceof Subscript) {
+           Subscript n = (Subscript) node;
+
+            format(n.value, out, indent);
+            out.append("[");
+            format(n.slice, out, indent);
+            out.append("]");
+            return;
+        }
+        
+        if (node instanceof Index) {
+            Index n = (Index) node;
+            format(n.value, out, indent);
+            return;
+        }
+        
+        if (node instanceof ListComp) {
+            ListComp n = (ListComp) node;
+
+            out.append("[");
+            format(n.elt, out, indent);
+
+            for (int i = 0; i < n.generators.length; i++) {
+                org.python.parser.ast.listcompType c= n.generators[i];
+
+                out.append(" for ");
+                format(c.target, out, indent);
+
+                out.append(" in ");
+                format(c.iter, out, indent);
+
+                for (int j = 0; j < c.ifs.length; j++) {
+                    out.append(" if ");
+                    format(c.ifs[j], out, indent);
+                }
+            }
+
+            out.append("]");
+            return;
+        }
+        
         /*
          * Unknown node -- make this conspicuous.
          */
