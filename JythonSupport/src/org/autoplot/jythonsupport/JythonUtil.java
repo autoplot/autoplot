@@ -66,6 +66,7 @@ import org.das2.util.StringTools;
 import org.python.core.PyTuple;
 import org.python.core.PyXRange;
 import org.python.parser.ast.BinOp;
+import org.python.parser.ast.ListComp;
 import org.python.parser.ast.Pass;
 import org.python.parser.ast.TryExcept;
 
@@ -859,6 +860,16 @@ public class JythonUtil {
                 }
             }
         }
+        if ( o instanceof ListComp ) {
+            ListComp l= (ListComp)o;
+            variableNames= new HashSet<>(variableNames);
+            for ( org.python.parser.ast.listcompType lct: l.generators ) {
+                if ( lct.target instanceof Name ) {
+                    variableNames.add(((Name)lct.target).id);
+                }
+            }
+            return simplifyScriptToGetParamsCanResolve( l.elt, variableNames );
+        }
         MyVisitorBase vb = new MyVisitorBase(variableNames,o);
         try {
             o.traverse(vb);
@@ -1520,6 +1531,9 @@ public class JythonUtil {
         variableNames.add("False");
         variableNames.add("range");
         variableNames.add("xrange");
+        variableNames.add("indgen");
+        variableNames.add("findgen");
+        variableNames.add("dindgen");
         variableNames.add("list");
         variableNames.add("len");
         variableNames.add("map");
@@ -1584,8 +1598,8 @@ public class JythonUtil {
                     if (iff.orelse != null) {
                         iff.orelse= simplifyScriptToGetParams2026( iff.orelse, variableNames, depth + 1);
                     }
+                    outstmts.add(iff);
                 }
-                outstmts.add(iff);
                 
             } else {
                 if (simplifyScriptToGetParamsOkay(o, variableNames)) {
