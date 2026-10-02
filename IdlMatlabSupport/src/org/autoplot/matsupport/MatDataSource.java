@@ -100,6 +100,12 @@ public class MatDataSource extends AbstractDataSource {
                 QDataSet result;
                 int t;
                 switch (qube.length) {
+                    case 4:
+                        qube= new int[] { qube[3], qube[2], qube[1], qube[0] };
+                        reclen= qube[3] * qube[2] * qube[1] * BufferDataSet.byteCount(type);
+                        result= BufferDataSet.makeDataSet( qube.length, reclen, 0, 
+                                qube, buffer, type );
+                        break;                    
                     case 3:
                         t= qube[0]; // transpose
                         qube[0]= qube[2];
