@@ -3,13 +3,15 @@ package org.autoplot;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import org.das2.qds.DataSetOps;
+import org.das2.qds.DataSetUtil;
+import org.das2.qds.IndexGenDataSet;
 import org.das2.qds.QDataSet;
 import org.das2.qds.ops.Ops;
 import org.das2.qds.util.QDataSetTableModel;
@@ -173,24 +175,40 @@ public final class ExportDataBundle extends javax.swing.JPanel {
     private void updateDataSet() {
         String[] ids= namedURIListTool1.getIds();
         String[] uris= namedURIListTool1.getUris();
-        QDataSet[] dss= new QDataSet[ids.length];
-        QDataSet bundle= null;
+        QDataSet[] dss;
+        QDataSet bundl= null;
         try {
             List<QDataSet> dssa= org.autoplot.jythonsupport.Util.getDataSets( Arrays.asList(uris), createProgressMonitor() );
-            dss= dssa.toArray( dss );
+            dss= dssa.toArray( new QDataSet[0] );
             if ( dss.length>0 ) {
-                dssa= Ops.synchronizeNN( dssa.get(0), dss );
-                bundle= Ops.bundle( (QDataSet)dssa.get(0).property(QDataSet.DEPEND_0) );
+                QDataSet dep0= Ops.xtags((QDataSet)dssa.get(0));
+                if ( dep0 instanceof IndexGenDataSet ) {
+                    // we have to assume they are already synchronized.
+                    bundl= null;
+                } else {
+                    dssa= Ops.synchronizeNN( dssa.get(0), dss );
+                    bundl= Ops.bundle( dep0 );
+                }
+                
                 for ( int i=0; i<dssa.size(); i++ ) {
                     QDataSet ds1= dssa.get(i);
                     switch (ds1.rank()) {
                         case 1:
-                            bundle= Ops.bundle( bundle, dssa.get(i) );
+                            bundl= Ops.bundle( bundl, dssa.get(i) );
                             break;
                         case 2:
                             for ( int j=0; j<ds1.length(0); j++ ) {
-                                bundle= Ops.bundle( bundle, Ops.slice1(ds1,j) );
-                            }   break;
+                                bundl= Ops.bundle( bundl, Ops.slice1(ds1,j) );
+                            }   
+                            break;
+                        case 3:
+                            int[] qube= DataSetUtil.qubeDims(ds1);
+                            for ( int j=0; j<qube[1]; j++ ) {
+                                for ( int k=0; k<qube[2]; k++ ) {
+                                    bundl= Ops.bundle( bundl, Ops.slice1(Ops.slice1(ds1,j),k) );
+                                }
+                            }   
+                            break;                            
                         default:
                             logger.warning("unable to use data, rank is not 1 or 2");
                             break;
@@ -200,7 +218,7 @@ public final class ExportDataBundle extends javax.swing.JPanel {
         } catch (Exception ex) {
             logger.log(Level.SEVERE, null, ex);
         }
-        this.bundle= bundle;
+        this.bundle= bundl;
     }
         
     QDataSet bundle= null;
