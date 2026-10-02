@@ -17,7 +17,6 @@ import org.autoplot.datasource.CompletionContext;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.URISplit;
-import org.das2.qds.ArrayDataSet;
 import org.das2.qds.buffer.CcsdsReader;
 
 /**
