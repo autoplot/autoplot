@@ -8,6 +8,7 @@ package org.autoplot.datasource.ui;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -23,6 +24,7 @@ import org.das2.datum.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.autoplot.datasource.CompletionContext;
 import org.autoplot.datasource.DataSourceFactory;
+import org.autoplot.datasource.URISplit;
 
 /**
  * Attempt to make a general-purpose way to make a GUI for a data
@@ -36,6 +38,8 @@ public class ParamsTextArea extends JTextArea {
     private static final Logger logger= LoggerManager.getLogger("apdss.gui");
     
     DataSourceFactory dsf= null;
+    URI resourceURI= null;
+    
     List<String> excludeParams= new ArrayList();
 
     JPopupMenu popup;
@@ -63,6 +67,10 @@ public class ParamsTextArea extends JTextArea {
         });
     }
     
+    public void setResourceURI( URI url ) {
+        this.resourceURI= url;
+    }
+    
     public void showPopup( MouseEvent e ) {
         final int pos= this.viewToModel( e.getPoint() );
         this.setCaretPosition(pos);
@@ -77,7 +85,7 @@ public class ParamsTextArea extends JTextArea {
 	 */
     public void showPopup( int x, int y ) {
         try {
-			final int pos= this.getCaretPosition();
+            final int pos= this.getCaretPosition();
 			
             int row= this.getLineOfOffset(pos);
             int linePos= this.getLineStartOffset(row);
@@ -87,7 +95,10 @@ public class ParamsTextArea extends JTextArea {
             popup = new JPopupMenu();
 
             CompletionContext cc = new CompletionContext();
-
+            
+            cc.resourceURI= this.resourceURI;
+            cc.params= this.getText().replace("\n","&");
+   
             if ( line.trim().endsWith("=") ) {
                 cc.context = CompletionContext.CONTEXT_PARAMETER_VALUE;
                 cc.completable= "?"+line;
