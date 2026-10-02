@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
 import org.das2.qds.DataSetOps;
 import org.das2.qds.DataSetUtil;
 import org.das2.qds.IndexGenDataSet;
@@ -31,6 +32,7 @@ public final class ExportDataBundle extends javax.swing.JPanel {
      */
     public ExportDataBundle() {
         initComponents();
+        TableColumnModel m= jTable1.getColumnModel();
         namedURIListTool1.setShowIds(false);
         refresh();
     }
@@ -258,6 +260,8 @@ public final class ExportDataBundle extends javax.swing.JPanel {
             DefaultTableModel n= new DefaultTableModel(1,1);
             n.setValueAt( "No Data", 0, 0 );
             jTable1.setModel( n );
+            TableColumnModel m= jTable1.getColumnModel();
+            for ( int i=0; i<m.getColumnCount(); i++ ) m.getColumn(i).setMinWidth(getFont().getSize()*4);
             exportDataFormatPanel1.setDataSet(null);
             exportDataFormatPanel1.setEnabled(true);
             
@@ -267,6 +271,8 @@ public final class ExportDataBundle extends javax.swing.JPanel {
             exportDataFormatPanel1.setEnabled(true);
             jTable1.setModel(tm);
             jTable1.getTableHeader().addMouseListener( tm.getTableHeaderMouseListener(jTable1) );
+            TableColumnModel m= jTable1.getColumnModel();
+            for ( int i=0; i<m.getColumnCount(); i++ ) m.getColumn(i).setMinWidth(getFont().getSize()*4);
         }
     }
 
