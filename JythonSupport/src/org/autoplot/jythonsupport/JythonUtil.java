@@ -1526,7 +1526,16 @@ public class JythonUtil {
 
         try {
             Module n = (Module) org.python.core.parser.parse(script, "exec");
-            stmtType[] newStmts= simplifyScriptToGetParams2026( n.body,variableNames,0);
+            stmtType[] statements= n.body;
+            int lastStatement=0;
+            for ( int i=0; i<statements.length; i++ ) {
+                lastStatement= i;
+                if ( statements[i].beginLine>lastLine ) {
+                    break;
+                }
+            }
+            statements= Arrays.copyOfRange( statements, 0, lastStatement );
+            stmtType[] newStmts= simplifyScriptToGetParams2026( statements,variableNames,0);
             n.body= newStmts;
             return JythonAstFormatter.format(n);
         } catch (PySyntaxError ex) {
