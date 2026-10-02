@@ -1619,6 +1619,14 @@ public class JythonUtil {
             } else if ( o instanceof Assign ) {
                 Assign a = ((Assign) o);
                 exprType et = a.value;
+                for ( exprType t: a.targets) {
+                    if ( t instanceof Name ) {
+                        Name n= (Name)t;
+                        if ( variableNames.contains(n.id) ) { // Don't allow a hostile script to redefine getParam, for example.
+                            variableNames.remove(n.id);
+                        }
+                    }
+                }
                 if ( simplifyScriptToGetParamsCanResolve( et, variableNames ) ) {
                     for ( exprType et2 : a.targets ) {
                         if ( et2 instanceof Name ) {
