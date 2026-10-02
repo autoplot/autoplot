@@ -416,11 +416,12 @@ public class JythonCompletionTask implements CompletionTask {
                 try {
                     po = lcontext.__getattr__(ss);
                 } catch (PyException e) {
-                    logger.log(Level.FINE, "PyException from \"{0}\":", ss);
-                    logger.log( Level.SEVERE, e.getMessage(), e );
+                    logger.log(Level.FINE, "PyException from \"{0}\": {1}",  new Object[] { ss, e.getMessage() } );
+                    //logger.log( Level.SEVERE, e.getMessage(), e );
                     continue;
                 } catch ( IllegalArgumentException e ) {
-                    logger.log( Level.SEVERE, e.getMessage(), e );
+                    logger.log(Level.FINE, "PyException from \"{0}\": {1}", new Object[] { ss, e.getMessage() } );
+                    //logger.log( Level.SEVERE, e.getMessage(), e );
                     continue;
                 }
                 String label = ss;
