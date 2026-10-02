@@ -595,6 +595,73 @@ public class JythonAstFormatter {
 
             return;
         }   
+        
+        if (node instanceof Yield) {
+            Yield n = (Yield) node;
+            indent(out, indent);
+            out.append("yield");
+            if (n.value != null) {
+                out.append(" ");
+                format(n.value, out, indent);
+            }
+            return;
+        }
+
+        if (node instanceof Delete) {
+            Delete n = (Delete) node;
+            indent(out, indent);
+            out.append("del ");
+            for (int i = 0; i < n.targets.length; i++) {
+                if (i > 0) out.append(", ");
+                format(n.targets[i], out, indent);
+            }
+            return;
+        }
+
+        if (node instanceof Assert) {
+            Assert n = (Assert) node;
+            indent(out, indent);
+            out.append("assert ");
+            format(n.test, out, indent);
+            if (n.msg != null) {
+                out.append(", ");
+                format(n.msg, out, indent);
+            }
+            return;
+        }
+
+        if (node instanceof Global) {
+            Global n = (Global) node;
+            indent(out, indent);
+            out.append("global ");
+            for (int i = 0; i < n.names.length; i++) {
+                if (i > 0) out.append(", ");
+                out.append(n.names[i]);
+            }
+            return;
+        }
+
+        if (node instanceof Lambda) {
+            Lambda n = (Lambda) node;
+            out.append("lambda ");
+            formatArguments(n.args, out, indent);
+            out.append(": ");
+            format(n.body, out, indent);
+            return;
+        }
+
+        if (node instanceof Repr) {
+            Repr n = (Repr) node;
+            out.append("`");
+            format(n.value, out, indent);
+            out.append("`");
+            return;
+        }
+
+        if (node instanceof Ellipsis) {
+            out.append("...");
+            return;
+        }        
         /*
          * Unknown node -- make this conspicuous.
          */
