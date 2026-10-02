@@ -364,6 +364,7 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
             File f= DataSetURI.getFile(new URL(split.file), new NullProgressMonitor());
             infoLabel.setText(""+f.length()+" bytes");
             Map<String, String> params= URISplit.parseParams( split.params );
+            paramsTextArea1.setResourceURI(split.resourceUri);
             paramsTextArea1.setParams(params);
             paramsTextArea1.setFactory( new BinaryDataSourceFactory(), new ArrayList<String>() );
             
