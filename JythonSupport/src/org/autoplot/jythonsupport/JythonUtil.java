@@ -1639,7 +1639,6 @@ public class JythonUtil {
                 } else if (isSetScriptCall(o, variableNames)) {
                     outstmts.add(o);
                 } else {
-                    outstmts.add(new Pass());
                     // do nothing
                 }
             }
