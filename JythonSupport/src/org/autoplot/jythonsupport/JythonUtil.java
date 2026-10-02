@@ -66,8 +66,15 @@ import org.das2.util.StringTools;
 import org.python.core.PyTuple;
 import org.python.core.PyXRange;
 import org.python.parser.ast.BinOp;
+import org.python.parser.ast.BoolOp;
+import org.python.parser.ast.Compare;
+import org.python.parser.ast.Dict;
+import org.python.parser.ast.Expr;
+import org.python.parser.ast.Index;
 import org.python.parser.ast.ListComp;
+import org.python.parser.ast.Num;
 import org.python.parser.ast.Pass;
+import org.python.parser.ast.Str;
 import org.python.parser.ast.TryExcept;
 
 /**
@@ -677,7 +684,8 @@ public class JythonUtil {
     private static class MyVisitorBase<R> extends VisitorBase {
 
         boolean looksOkay = true;
-        boolean visitNameFail = false;
+        
+        private boolean visitNameFail = false;
 
         HashSet names = new HashSet();
 
@@ -741,7 +749,10 @@ public class JythonUtil {
                         }
                     }
                 }
-                looksOkay = newLooksOkay;
+                if ( !newLooksOkay ) looksOkay = false;
+            } else if (sn instanceof Expr) {
+                Expr e= (Expr)sn;
+                traverse(e.value);
             } else if (sn instanceof Assign) { // TODO: I have to admit I don't understand what traverse means.  I would have thought it was all nodes...
                 Assign a = ((Assign) sn);
                 exprType et = a.value;
@@ -751,7 +762,11 @@ public class JythonUtil {
             } else if ( sn instanceof BinOp ) {
                 traverse(((BinOp) sn).left);
                 traverse(((BinOp) sn).right);
-
+            } else if ( sn instanceof BoolOp ) {
+                exprType[] values= ((BoolOp) sn).values;
+                for ( exprType et: values ) {
+                    traverse(et);
+                }
             } else if ( sn instanceof Subscript ) {
                 traverse(((Subscript) sn).value);
                 traverse(((Subscript) sn).slice);
@@ -770,7 +785,7 @@ public class JythonUtil {
         /**
          * this contains a node whose name we can't resolve.
          *
-         * @return
+         * @return true if this contains a node whose name we can't resolve.
          */
         public boolean visitNameFail() {
             return visitNameFail;
@@ -812,20 +827,49 @@ public class JythonUtil {
     /**
      * can we resolve this node given the variable names we know?
      *
-     * @param o
-     * @param variableNames
+     * @param o the node
+     * @param variableNames known symbols
      * @return true if the node can be resolved.
      */
-    private static boolean simplifyScriptToGetParamsCanResolve(SimpleNode o, HashSet<String> variableNames) {
+    public static boolean simplifyScriptToGetParamsCanResolve(SimpleNode o, HashSet<String> variableNames) {
         //if ( o.beginLine>=617 && o.beginLine<619 ) {
         //    System.err.println( "here at 617-ish");
         //}
+        
+        logger.log(Level.FINE, "simplifyScriptToGetParamsCanResolve {0} {1}", new Object[]{o.beginLine, o});
+        
+        if ( o instanceof Str ) return true;
+        if ( o instanceof Num ) return true;
+        if ( o instanceof Dict ) {
+            Dict d= (Dict)o;
+            for ( exprType k: d.keys ) {
+                if ( !simplifyScriptToGetParamsCanResolve(k,variableNames) ) {
+                    return false;
+                }
+            }
+            for ( exprType k: d.values ) {
+                if ( !simplifyScriptToGetParamsCanResolve(k,variableNames) ) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        if ( o instanceof org.python.parser.ast.List ) {
+            org.python.parser.ast.List l= (org.python.parser.ast.List)o;
+            for ( exprType k: l.elts ) {
+                if ( !simplifyScriptToGetParamsCanResolve(k,variableNames) ) {
+                    return false;
+                }
+            }
+            return true;
+        }
         if (o instanceof Name) {
             Name c = (Name) o;
             if (!variableNames.contains(c.id)) {
                 logger.finest(String.format("%04d canResolve->false: %s", o.beginLine, o.toString()));
                 return false;
             }
+            return true;
         }
         if (o instanceof Attribute) {
             Attribute at = (Attribute) o;
@@ -841,24 +885,27 @@ public class JythonUtil {
                     }
                 }
             }
-            if (at.value instanceof Name) {
-                Name n = (Name) at.value;
-                if (!variableNames.contains(n.id)) {
-                    return false;
-                }
-            } else if ( at.value instanceof Call ) {
-                return simplifyScriptToGetParamsCanResolve( at.value, variableNames );
-            } else {
-                return false;
+            return simplifyScriptToGetParamsCanResolve( at.value, variableNames );
+        }
+        if ( o instanceof Compare ) {
+            Compare c= (Compare)o;
+            if ( !( simplifyScriptToGetParamsCanResolve(c.left,variableNames) ) ) return false;
+            for ( exprType et : c.comparators ) {
+                if ( !simplifyScriptToGetParamsCanResolve(et,variableNames) ) return false;
             }
+            return true;
         }
         if ( o instanceof Call ) {  // ds.property( QDataSet.DEPEND_0 )
             Call c= (Call) o;
-            if ( c.func instanceof Attribute ) {
-                if ( !simplifyScriptToGetParamsCanResolve( c.func, variableNames ) ){
+            if ( !simplifyScriptToGetParamsCanResolve( c.func, variableNames ) ){
+                return false;
+            }
+            for ( exprType et: c.args ) {
+                if ( !simplifyScriptToGetParamsCanResolve( et, variableNames ) ){
                     return false;
                 }
             }
+            return true;
         }
         if ( o instanceof ListComp ) {
             ListComp l= (ListComp)o;
@@ -869,16 +916,32 @@ public class JythonUtil {
                 }
             }
             return simplifyScriptToGetParamsCanResolve( l.elt, variableNames );
+        } else if (o instanceof Expr) {
+            Expr e= (Expr)o;
+            return simplifyScriptToGetParamsCanResolve( e.value, variableNames );
+        } else if (o instanceof Assign) { // TODO: I don't know how there can be an assignment in an expr
+            Assign a = ((Assign) o);
+            exprType et = a.value;
+            return simplifyScriptToGetParamsCanResolve( et, variableNames );
+        } else if ( o instanceof BinOp ) {
+            BinOp op= (BinOp)o;
+            return simplifyScriptToGetParamsCanResolve( op.left, variableNames ) &&
+                simplifyScriptToGetParamsCanResolve( op.right, variableNames );
+        } else if ( o instanceof BoolOp ) {
+            BoolOp op= (BoolOp)o;
+            exprType[] values= op.values;
+            for ( exprType et: values ) {
+                simplifyScriptToGetParamsCanResolve( et, variableNames );
+            }
+        } else if ( o instanceof Subscript ) {
+            Subscript s = (Subscript)o;
+            return simplifyScriptToGetParamsCanResolve(s.value,variableNames) &&
+                simplifyScriptToGetParamsCanResolve(s.slice,variableNames);
+        } else if ( o instanceof Index ) {
+            Index idx= (Index)o;
+            return simplifyScriptToGetParamsCanResolve(idx.value,variableNames);
         }
-        MyVisitorBase vb = new MyVisitorBase(variableNames,o);
-        try {
-            o.traverse(vb);
-            logger.finest(String.format(" %04d canResolve->%s: %s", o.beginLine, vb.visitNameFail, o));
-            return !vb.visitNameFail;
-
-        } catch (Exception ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        }
+        
         logger.finest(String.format("!! %04d canResolve->false: %s", o.beginLine, o));
         return false;
     }
@@ -1517,7 +1580,6 @@ public class JythonUtil {
         }
 
         HashSet variableNames = new HashSet();
-        variableNames.add("getParam");  // this is what allows the getParam calls to be included.
         variableNames.add("map");
         variableNames.add("str");  // include casts.
         variableNames.add("int");
@@ -1542,6 +1604,11 @@ public class JythonUtil {
         variableNames.add("zip");
         variableNames.add("PWD");
         variableNames.add("dom");
+        variableNames.add("setScriptDescription");
+        variableNames.add("setScriptTitle");
+        variableNames.add("setScriptLabel");
+        variableNames.add("setScriptIcon");
+        variableNames.add("getParam");
 
         try {
             Module n = (Module) org.python.core.parser.parse(script, "exec");
@@ -1551,6 +1618,20 @@ public class JythonUtil {
         } catch (PySyntaxError ex) {
             throw ex;
         }
+    }
+    
+    /**
+     * return true if all the statements are Pass and the block has no effect.
+     * @param statements the statements
+     * @return true if all the statements are Pass and the block has no effect.
+     */
+    private static boolean isAllPass( stmtType[] statements ) {
+        for ( stmtType st: statements ) {
+            if ( !( st instanceof Pass ) ) {
+                return false;
+            }
+        }
+        return true;
     }
     
     /**
@@ -1602,8 +1683,31 @@ public class JythonUtil {
                     iff.body= simplifyScriptToGetParams2026( iff.body, variableNames, depth + 1);
                     if (iff.orelse != null) {
                         iff.orelse= simplifyScriptToGetParams2026( iff.orelse, variableNames, depth + 1);
+                        if ( isAllPass(iff.orelse) && isAllPass(iff.body) ) {
+                            continue;
+                        }
+                    } else {
+                        if ( isAllPass(iff.body) ) {
+                            continue;
+                        }
                     }
                     outstmts.add(iff);
+                }
+            } else if ( o instanceof Assign ) {
+                Assign a = ((Assign) o);
+                exprType et = a.value;
+                if ( simplifyScriptToGetParamsCanResolve( et, variableNames ) ) {
+                    for ( exprType et2 : a.targets ) {
+                        if ( et2 instanceof Name ) {
+                            variableNames.add(((Name)et2).id);
+                            outstmts.add(a);
+                        } else if ( et2 instanceof Subscript ) {
+                            Subscript a2= (Subscript)et2;
+                            if ( simplifyScriptToGetParamsCanResolve( a2.value, variableNames ) ) {
+                                outstmts.add(a);
+                            }
+                        }
+                    }
                 }
                 
             } else {
