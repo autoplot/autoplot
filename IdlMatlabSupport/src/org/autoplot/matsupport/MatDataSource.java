@@ -98,9 +98,18 @@ public class MatDataSource extends AbstractDataSource {
                 int[] qube= array.getDimensions();
                 int reclen;
                 QDataSet result;
+                int t;
                 switch (qube.length) {
+                    case 3:
+                        t= qube[0]; // transpose
+                        qube[0]= qube[2];
+                        qube[2]= t;
+                        reclen= qube[2] * qube[1] * BufferDataSet.byteCount(type);
+                        result= BufferDataSet.makeDataSet( qube.length, reclen, 0, 
+                                qube, buffer, type );
+                        break;
                     case 2:
-                        int t= qube[0];
+                        t= qube[0];
                         qube[0]= qube[1];
                         qube[1]= t;
                         reclen= qube[1] * BufferDataSet.byteCount(type);
@@ -125,7 +134,7 @@ public class MatDataSource extends AbstractDataSource {
                                 qube, buffer, type );
                         break;
                     default:
-                        throw new IllegalArgumentException("rank 3 and up is not supported");
+                        throw new IllegalArgumentException("rank 4 and up is not supported");
                 }
                 result= Ops.putProperty( result, QDataSet.NAME, names[i].replaceAll("\\.","_") );
                 result= Ops.putProperty( result, QDataSet.LABEL, names[i] );
