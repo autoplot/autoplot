@@ -1015,10 +1015,11 @@ public class JythonUtil {
     /**
      * return true if the call is a setScriptTitle or setScriptDescription call.
      * setScriptTitle( 'Batch Master Demo' )
-     *
+     * 
      * @param o
      * @param variableNames
      * @return
+     * @see #isSetScriptDescription(java.lang.String) 
      */
     private static boolean isSetScriptCall(stmtType o, HashSet<String> variableNames) {
         if (o instanceof org.python.parser.ast.Expr) {
@@ -1027,10 +1028,7 @@ public class JythonUtil {
                 Call c = ((Call) expr.value);
                 if (c.func instanceof Name) {
                     Name n = (Name) c.func;
-                    if (n.id.equals("setScriptTitle")
-                            || n.id.equals("setScriptDescription")
-                            || n.id.equals("setScriptLabel")
-                            || n.id.equals("setScriptIcon")) {
+                    if ( isSetScriptDescription(n.id) ) {
                         return true;
                     }
                 }
@@ -1558,6 +1556,24 @@ public class JythonUtil {
     }
     
     /**
+     * return true if the name is getParam, setScriptDescription, setScriptTitle, etc.  I didn't want to use
+     * a Map for performance and security.
+     * @param name
+     * @return true if this is the case.
+     */
+    private static boolean isSetScriptDescription( String name ) {
+        if ( name.equals("getParam") ) {
+            return true;
+        } else if ( name.startsWith("setScript") ) {
+            String rest= name.substring(9);
+            if ( rest.equals("Description") || name.equals("Title") || name.equals("Label") || name.equals("Icon") ) {
+                return true;
+            }
+        }
+        return false;
+    }
+            
+    /**
      * Extracts the parts of the program that get parameters or take a trivial
      * amount of time to execute.  This may call itself recursively when if
      * blocks are encountered. 
@@ -1622,7 +1638,7 @@ public class JythonUtil {
                 for ( exprType t: a.targets) {
                     if ( t instanceof Name ) {
                         Name n= (Name)t;
-                        if ( variableNames.contains(n.id) ) { // Don't allow a hostile script to redefine getParam, for example.
+                        if ( isSetScriptDescription(n.id) ) { // Don't allow a hostile script to redefine getParam, for example.
                             variableNames.remove(n.id);
                         }
                     }
