@@ -70,12 +70,15 @@ import org.python.parser.ast.BoolOp;
 import org.python.parser.ast.Compare;
 import org.python.parser.ast.Dict;
 import org.python.parser.ast.Expr;
+import org.python.parser.ast.Import;
+import org.python.parser.ast.ImportFrom;
 import org.python.parser.ast.Index;
 import org.python.parser.ast.ListComp;
 import org.python.parser.ast.Num;
 import org.python.parser.ast.Pass;
 import org.python.parser.ast.Str;
 import org.python.parser.ast.TryExcept;
+import org.python.parser.ast.aliasType;
 
 /**
  * Utilities to support Jython scripting.
@@ -1051,11 +1054,22 @@ public class JythonUtil {
         //    System.err.println("here at line "+o.beginLine);
         //}
         if ((o instanceof org.python.parser.ast.ImportFrom)) {
+            ImportFrom imp=(ImportFrom)o;
+            if ( imp.module.equals("org.das2.util") ) {
+                for ( aliasType n: imp.names ) {
+                    if ( !n.name.equals("ColorUtil") ) return false;
+                }
+                return true;
+            }
             return false;
         }
         if ((o instanceof org.python.parser.ast.Import)) {
-            return false;
-        }
+            Import imp=(Import)o;
+            for ( aliasType n: imp.names ) {
+                if ( !n.name.equals("org.das2.util.ColorUtil") ) return false;
+            }
+            return true;
+        }        
         if ((o instanceof org.python.parser.ast.Assign)) {
             Assign a = (Assign) o;
             for ( exprType a1 : a.targets ) {
@@ -1405,7 +1419,9 @@ public class JythonUtil {
     }
     
     /**
-     * extracts the parts of the program that get parameters.
+     * extracts the parts of the program that get parameters.  This should leave commands
+     * which are safe to execute because they are trivial to execute and can do 
+     * no damage to the scientist's computer.  
      *
      * @param script the entire Jython program
      * @param addSort if true, add parameters to keep track of the order that
@@ -1516,6 +1532,7 @@ public class JythonUtil {
         variableNames.add("zip");
         variableNames.add("PWD");
         variableNames.add("dom");
+        variableNames.add("ColorUtil"); 
         variableNames.add("setScriptDescription");
         variableNames.add("setScriptTitle");
         variableNames.add("setScriptLabel");
@@ -1527,12 +1544,12 @@ public class JythonUtil {
             stmtType[] statements= n.body;
             int lastStatement=0;
             for ( int i=0; i<statements.length; i++ ) {
-                lastStatement= i;
                 if ( statements[i].beginLine>lastLine ) {
                     break;
                 }
+                lastStatement= i;
             }
-            statements= Arrays.copyOfRange( statements, 0, lastStatement );
+            statements= Arrays.copyOfRange( statements, 0, lastStatement+1 );
             stmtType[] newStmts= simplifyScriptToGetParams2026( statements,variableNames,0);
             n.body= newStmts;
             return JythonAstFormatter.format(n);
@@ -1578,8 +1595,7 @@ public class JythonUtil {
      * amount of time to execute.  This may call itself recursively when if
      * blocks are encountered. 
      * 
-     * This scans through, where acceptLine is the first line we'll accept
-     * to the currentLine, copying over script from acceptLine to currentLine.
+     * This scans through copying over script commands which are can be quickly and safely executed.
      * 
      * See test038 (https://jfaden.net/jenkins/job/autoplot-test038/)
      *
@@ -1606,6 +1622,7 @@ public class JythonUtil {
                 TryExcept t= (TryExcept)o;
                 t.body= simplifyScriptToGetParams2026( t.body, variableNames, depth+1 );
                 t.orelse= simplifyScriptToGetParams2026( t.orelse, variableNames, depth+1 );
+                //note this is not allowed because it is not copied into outstmts.
                 continue;
             }
             
