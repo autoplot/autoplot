@@ -991,6 +991,12 @@ public class JythonUtil {
                 variableNames.add("ColorUtil");
                 return true;
             }
+            if ( imp.module.equals("org.das2.util.ColorUtil") ) {
+                for ( aliasType n: imp.names ) {
+                    variableNames.add(n.name);
+                }
+                return true;
+            }
             if ( imp.module.equals("java.io") ) {
                 for ( aliasType n: imp.names ) {
                     if ( !n.name.equals("File") ) return false;
@@ -1003,6 +1009,13 @@ public class JythonUtil {
                     if ( !n.name.equals("System") ) return false;
                 }
                 variableNames.add("System");
+                return true;
+            }
+            if ( imp.module.equals("java.awt") ) {
+                for ( aliasType n: imp.names ) {
+                    if ( !n.name.equals("Color") ) return false;
+                }
+                variableNames.add("Color");
                 return true;
             }
             return false;
