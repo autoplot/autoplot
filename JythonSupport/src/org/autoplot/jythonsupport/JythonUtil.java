@@ -78,7 +78,9 @@ import org.python.parser.ast.Num;
 import org.python.parser.ast.Pass;
 import org.python.parser.ast.Str;
 import org.python.parser.ast.TryExcept;
+import org.python.parser.ast.UnaryOp;
 import org.python.parser.ast.aliasType;
+import static org.python.parser.ast.unaryopType.USub;
 
 /**
  * Utilities to support Jython scripting.
@@ -758,6 +760,10 @@ public class JythonUtil {
         
         if ( o instanceof Str ) return true;
         if ( o instanceof Num ) return true;
+        if ( o instanceof UnaryOp ) {
+            UnaryOp u=(UnaryOp)o;
+            return simplifyScriptToGetParamsCanResolve(u.operand,variableNames);
+        }
         if ( o instanceof Dict ) {
             Dict d= (Dict)o;
             for ( exprType k: d.keys ) {
@@ -1165,6 +1171,7 @@ public class JythonUtil {
         
         boolean withinSimplifyLine= false;
         
+        // Figure out how many lines at the top contain the interface.
         boolean withinTripleQuote= false;
         for (int ilineNum = 1; ilineNum < ss.length; ilineNum++) {
             String line = ss[ilineNum];
