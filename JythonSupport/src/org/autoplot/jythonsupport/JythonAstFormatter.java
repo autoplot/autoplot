@@ -45,9 +45,17 @@ public class JythonAstFormatter {
         public int getLineCount() {
             return lineCount;
         }
-
+        
+        public void setLineCount(int lineCount) {
+            this.lineCount= lineCount;
+        }
+        
         @Override
         public String toString() {
+            return "LineCountStringBuilder at line "+ lineCount;
+        }
+        
+        public String getString() {
             return builder.toString();
         }
     }
@@ -66,7 +74,7 @@ public class JythonAstFormatter {
             format(node, out, indent);
             out.append("\n");
         }
-        return out.toString();
+        return out.getString();
     }
     
     /**
@@ -77,7 +85,7 @@ public class JythonAstFormatter {
     public static String format(Node node) {
         LineCountingStringBuilder out = new LineCountingStringBuilder();
         format(node, out, 0);
-        return out.toString();
+        return out.getString();
     }
 
     private static void format(Node node, LineCountingStringBuilder out, int indent) {
@@ -320,12 +328,31 @@ public class JythonAstFormatter {
 
         if (node instanceof org.python.parser.ast.Module) {
             org.python.parser.ast.Module n = (org.python.parser.ast.Module) node;
+            //if ( n.body.length==11 ) {
+            //    System.err.println("here stop 11");
+            //}
             for ( stmtType n1 : n.body ) {
-                while ( n1.beginLine>out.getLineCount() ) {
-                    out.append("\n");
-                }
-                format( n1, out, indent);
-                out.append("\n");
+                //if ( n.body.length==11 && n1 instanceof TryFinally ) {
+                //    System.err.println("here stop 11 -- 2");
+                //}
+                LineCountingStringBuilder newBlock= new LineCountingStringBuilder();
+                int initialLineCount=out.getLineCount();
+                newBlock.setLineCount(initialLineCount);
+                format( n1, newBlock, indent);
+                
+                //int additionalLinesNeededBefore= 0 ; //n1.beginLine-(newBlock.getLineCount()-initialLineCount)-out.getLineCount();
+                //int linesAdded=0;
+                //while ( linesAdded<additionalLinesNeededBefore ) { //TODO: Does this make sense?
+                //    out.append("\n");
+                //    linesAdded++;
+                //}
+                out.append(newBlock.getString());
+                //while ( n1.beginLine>out.getLineCount() ) {
+                //    out.append("\n");
+                //    linesAdded++;
+                //}
+                int linesAdded=0;
+                if ( linesAdded==0 ) out.append("\n");
             }
             return;
         }
@@ -498,18 +525,20 @@ public class JythonAstFormatter {
             indent(out, indent);
             out.append("print");
 
+            int nvalues= n.values==null ? 0 : n.values.length;
+            
             if (n.dest != null) {
                 out.append(" >>");
                 format(n.dest, out, indent);
 
-                if (n.values.length > 0) {
+                if (nvalues > 0) {
                     out.append(", ");
                 }
-            } else if (n.values.length > 0) {
+            } else if (nvalues > 0) {
                 out.append(" ");
             }
 
-            for (int i = 0; i < n.values.length; i++) {
+            for (int i = 0; i < nvalues; i++) {
                 if (i > 0) {
                     out.append(", ");
                 }
@@ -683,7 +712,7 @@ public class JythonAstFormatter {
             return;
         }
         
-        if (node instanceof TryFinally) {
+        if (node instanceof TryFinally) { //TODO: OrElse
             TryFinally n = (TryFinally) node;
 
             indent(out, indent);
@@ -697,6 +726,29 @@ public class JythonAstFormatter {
 
             return;
         }
+
+        if (node instanceof TryExcept) {
+            TryExcept n = (TryExcept) node;
+
+            indent(out, indent);
+            out.append("try:\n");
+            formatSuite(n.body, out, indent + 1);
+
+            for (int i = 0; i < n.handlers.length; i++) {
+                out.append("\n");
+                formatExceptHandler(n.handlers[i], out, indent);
+            }
+
+            if (n.orelse != null && n.orelse.length > 0) {
+                out.append("\n");
+                indent(out, indent);
+                out.append("else:\n");
+                formatSuite(n.orelse, out, indent + 1);
+            }
+
+            return;
+        }
+        
         /*
          * Unknown node -- make this conspicuous.
          */
@@ -720,9 +772,9 @@ public class JythonAstFormatter {
             if (i > 0) {
                 out.append("\n");
             }
-            while ( statements[i].beginLine>out.getLineCount() ) {
-                out.append("\n");
-            }            
+            //while ( statements[i].beginLine>out.getLineCount() ) {
+            //    out.append("\n");
+            //}            
             format(statements[i], out, indent);
         }
     }
@@ -739,8 +791,30 @@ public class JythonAstFormatter {
         }
 
         formatStatements(statements, out, indent);
-    }    
+    }
 
+    private static void formatExceptHandler(
+            excepthandlerType handler,
+            LineCountingStringBuilder out,
+            int indent) {
+
+        indent(out, indent);
+        out.append("except");
+
+        if (handler.type != null) {
+            out.append(" ");
+            format(handler.type, out, indent);
+
+            if (handler.name != null) {
+                out.append(", ");
+                format(handler.name, out, indent);
+            }
+        }
+
+        out.append(":\n");
+        formatSuite(handler.body, out, indent + 1);
+    }
+    
     private static void indent(LineCountingStringBuilder out, int level) {
         for (int i = 0; i < level; i++) {
             out.append(INDENT);
