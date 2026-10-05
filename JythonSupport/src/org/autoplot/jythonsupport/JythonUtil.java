@@ -76,6 +76,7 @@ import org.python.parser.ast.Index;
 import org.python.parser.ast.ListComp;
 import org.python.parser.ast.Num;
 import org.python.parser.ast.Pass;
+import org.python.parser.ast.Slice;
 import org.python.parser.ast.Str;
 import org.python.parser.ast.TryExcept;
 import org.python.parser.ast.UnaryOp;
@@ -756,6 +757,8 @@ public class JythonUtil {
         //    System.err.println( "here at 617-ish");
         //}
         
+        if ( o==null ) return true; // many arguments are null when they are not used, so just return true.
+        
         logger.log(Level.FINE, "simplifyScriptToGetParamsCanResolve {0} {1}", new Object[]{o.beginLine, o});
         
         if ( o instanceof Str ) return true;
@@ -864,6 +867,11 @@ public class JythonUtil {
         } else if ( o instanceof Index ) {
             Index idx= (Index)o;
             return simplifyScriptToGetParamsCanResolve(idx.value,variableNames);
+        } else if ( o instanceof Slice ) {
+            Slice s= (Slice)o;
+            return simplifyScriptToGetParamsCanResolve( s.lower, variableNames ) &&
+                simplifyScriptToGetParamsCanResolve( s.step, variableNames ) &&
+                simplifyScriptToGetParamsCanResolve( s.upper, variableNames );
         }
         
         logger.finest(String.format("!! %04d canResolve->false: %s", o.beginLine, o));
