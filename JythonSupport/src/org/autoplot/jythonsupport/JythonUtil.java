@@ -688,111 +688,34 @@ public class JythonUtil {
 
         boolean looksOkay = true;
         
-        private boolean visitNameFail = false;
-
-        HashSet names = new HashSet();
-
-        MyVisitorBase(HashSet names, SimpleNode node ) {
-            this.names = names;
-        }
-
-        //@Override
-        public Object visitNameOld(Name node) throws Exception {
-            if (!names.contains(node.id)) {
-                visitNameFail = true;
-            }
-            return null;
-        }
-        
-        //@Override
-        public Object visitNameNew(Name node) throws Exception {
-            if (!names.contains(node.id)) {
-                boolean okayFunction= false;
-                for ( int i=0; i<okay.length; i++ ) {
-                    if ( okay[i].equals(node.id+",") ) {
-                        okayFunction= true;
-                        break;
-                    } 
-                }
-                if ( !okayFunction ) {
-                    visitNameFail = true;
-                }
-            }
-            return null;
-        }
-
-        @Override
-        public Object visitName(Name node) throws Exception {
-            // See 
-            boolean useNew=false;
-            if ( useNew ) {
-                return visitNameNew(node);
-            } else {
-                return visitNameOld(node);
-            }
+        MyVisitorBase(SimpleNode node ) {
         }
         
         @Override
         protected Object unhandled_node(SimpleNode sn) throws Exception {
-            return sn;
+            return null;
         }
-
+        
         @Override
-        public void traverse(SimpleNode sn) throws Exception {
-            if (sn instanceof Call) {
-                boolean newLooksOkay = trivialFunctionCall(sn);
-                if (!newLooksOkay) {
-                    logger.log(Level.FINE, "looksOkay=False, {0}", sn);
-                } else {
-                    Call c= (Call)sn;
-                    for ( exprType e: c.args ) {
-                        if ( !simplifyScriptToGetParamsCanResolve( e, names ) ) {
-                            newLooksOkay= false;
-                            visitNameFail= true;  // TODO: I don't understand why there are two variables...
-                        }
-                    }
-                }
-                if ( !newLooksOkay ) looksOkay = false;
-            } else if (sn instanceof Expr) {
-                Expr e= (Expr)sn;
-                traverse(e.value);
-            } else if (sn instanceof Assign) { // TODO: I have to admit I don't understand what traverse means.  I would have thought it was all nodes...
-                Assign a = ((Assign) sn);
-                exprType et = a.value;
-                if (et instanceof Call) {
-                    traverse( et );
-                }
-            } else if ( sn instanceof BinOp ) {
-                traverse(((BinOp) sn).left);
-                traverse(((BinOp) sn).right);
-            } else if ( sn instanceof BoolOp ) {
-                exprType[] values= ((BoolOp) sn).values;
-                for ( exprType et: values ) {
-                    traverse(et);
-                }
-            } else if ( sn instanceof Subscript ) {
-                traverse(((Subscript) sn).value);
-                traverse(((Subscript) sn).slice);
-            } else if ( sn instanceof Name ) {
-                if ( !simplifyScriptToGetParamsCanResolve( sn, names ) ) {
-                    visitNameFail= true;
-                    looksOkay = false;
-                }
+        public Object visitCall(Call node) throws Exception {
+            boolean newLooksOkay = trivialFunctionCall(node);
+            if (!newLooksOkay) {
+                logger.log(Level.FINE, "looksOkay=False, {0}", node);
             }
+            if ( !newLooksOkay ) looksOkay = false;
+            node.traverse(this);
+            return null;
+        }
+        
+        @Override
+        public void traverse(SimpleNode node) throws Exception {
+            node.traverse(this);
         }
 
         public boolean looksOkay() {
             return looksOkay;
         }
 
-        /**
-         * this contains a node whose name we can't resolve.
-         *
-         * @return true if this contains a node whose name we can't resolve.
-         */
-        public boolean visitNameFail() {
-            return visitNameFail;
-        }
     }
 
     /**
@@ -806,15 +729,7 @@ public class JythonUtil {
      */
     private static boolean simplifyScriptToGetParamsOkayNoCalls(SimpleNode o, HashSet<String> variableNames) {
 
-        if (o instanceof Call) {
-            Call c = (Call) o;
-
-            if (!trivialFunctionCall(c)) {
-                logger.finest(String.format("%04d simplify->false: %s", o.beginLine, o.toString()));
-                return false;
-            }
-        }
-        MyVisitorBase vb = new MyVisitorBase(variableNames,o);
+        MyVisitorBase vb = new MyVisitorBase(o);
         try {
             o.traverse(vb);
             logger.finest(String.format(" %04d simplify->%s: %s", o.beginLine, vb.looksOkay(), o));
@@ -1138,18 +1053,6 @@ public class JythonUtil {
         return false;
     }
 
-    private static void maybeAppendSort(String theLine, StringBuilder result) {
-        int i = theLine.indexOf("getParam");
-        if (i != -1) {
-            i = theLine.indexOf("=");
-            String v = theLine.substring(0, i).trim();
-            int indent = theLine.indexOf(v);
-            if (indent > 0) {
-                result.append(theLine.substring(0, indent));
-            }
-            result.append("sort_.append( \'").append(v).append("\')\n");
-        }
-    }
     
     /**
      * return the indentation string (spaces or tabs or empty) for the line.
@@ -1192,10 +1095,6 @@ public class JythonUtil {
     
     }
     
-    private static StringBuilder appendToResult(StringBuilder result, String line) {
-        result.append(line);
-        return result;
-    }
     
     /**
      * one-stop place for splitting a script into lines for simplifyScriptToGetParams
@@ -1238,184 +1137,7 @@ public class JythonUtil {
      * @see SimplifyScriptSupport#simplifyScriptToGetCompletions(java.lang.String[], org.python.parser.ast.stmtType[], java.util.HashSet, int, int, int) 
      */
     public static String simplifyScriptToGetParams(String[] ss, stmtType[] stmts, HashSet variableNames, int beginLine, int lastLine, int depth) {
-        String spaces= StringTools.spaces(90);
-        
-        if ( lastLine>=ss.length ) {
-            throw new IllegalArgumentException("lastLine is >= number of lines");
-        }
-        if ( !ss[0].equals("# simplifyScriptToGetParams") ) {
-            throw new IllegalArgumentException("first line must be '# simplifyScriptToGetParams'");
-        }
-        int acceptLine = -1; // first line to accept
-        int currentLine = 1; // current line we are writing (1 is first line).
-        StringBuilder result = new StringBuilder();
-        for (int istatement = 0; istatement < stmts.length; istatement++) {
-            stmtType o = stmts[istatement];
-            String theLine= SimplifyScriptSupport.getSourceForStatement( ss, o );
-            //if ( stmts.length==109 && o.beginLine >50 ) {
-            //    System.err.println("theLine: "+ o.beginLine + " " +theLine);
-            //}
-            int lineCount= theLine.split("\n",-2).length;
-            
-            if ( depth==0 ) {
-                logger.finest(theLine); //breakpoint here.
-                //System.err.println(theLine);
-            }
-            logger.log( Level.FINER, "line {0}: {1}", new Object[] { o.beginLine, theLine } );
-            if ( o.beginLine>0 ) {
-                 if ( beginLine<0 && istatement==0 ) acceptLine= o.beginLine;
-                 if ( lineCount>1 ) {
-                    beginLine= o.beginLine - (lineCount-1) ;
-                 } else {
-                    beginLine= o.beginLine;
-                 }
-            } else {
-                acceptLine = beginLine; // elif clause in autoplot-test038/lastSuccessfulBuild/artifact/test038_demoParms1.jy
-            }
-            if (beginLine > lastLine) {
-                continue;
-            }
-            if ( o instanceof TryExcept ) {
-                //System.err.println("here try except");
-                acceptLine= -1;
-                continue;
-            }
-            
-            if (o instanceof org.python.parser.ast.If) {
-                if (acceptLine > -1) {
-                    for (int i = acceptLine; i < beginLine; i++) {
-                        appendToResult(result, ss[i]).append("\n");
-                    }
-                }
-                If iff = (If) o;
-                boolean includeBlock;
-                if (simplifyScriptToGetParamsCanResolve(iff.test, variableNames)) {
-                    for (int i = beginLine; i < iff.body[0].beginLine; i++) {
-                        appendToResult(result,ss[i]).append("\n");
-                    } // write out the 'if' part
-                    includeBlock = true;
-                } else {
-                    includeBlock = false;
-                }
-                int lastLine1;  //lastLine1 is the last line of the "if" clause.
-                int elseLine=-1;
-                if (iff.orelse != null && iff.orelse.length > 0) {
-                    if (iff.orelse[0].beginLine > 0) {
-                        lastLine1 = iff.orelse[0].beginLine - 1;  // -1 is for the "else:" part.
-                        if ( ss[lastLine1].trim().startsWith("else") ) {
-                            elseLine= lastLine1;
-                            lastLine1=lastLine1-1;
-                        } else if ( ss[lastLine1].trim().startsWith("elif") ) {
-                            elseLine= lastLine1;
-                            lastLine1=lastLine1-1;
-                        }
-                    } else {
-                        if (iff.orelse[0] instanceof If) {
-                            elseLine = ((If) iff.orelse[0]).test.beginLine;
-                            lastLine1= elseLine-1;
-                        } else {
-                            lastLine1= elseLine+1;
-                            logger.fine("failure to deal with another day...");
-                            //throw new RuntimeException("this case needs to be dealt with...");
-                        }
-                    }
-                } else if ((istatement + 1) < stmts.length) {
-                    lastLine1 = stmts[istatement + 1].beginLine - 1;
-                } else {
-                    lastLine1 = lastLine;
-                }
-                if (includeBlock) {
-                    String ss1 = simplifyScriptToGetParams(ss, iff.body, variableNames, -1, lastLine1, depth + 1);
-                    if (ss1.trim().length() == 0) {
-                        String line;
-                        if ( iff.body[0].beginLine > 0) {
-                            line = ss[iff.body[0].beginLine];
-                        } else {
-                            line = ss[iff.beginLine];
-                        }
-                        String indent = indentForLine( line );
-                        result.append(indent).append("pass  # ").append(line).append("\n");
-                        logger.fine("things have probably gone wrong...");
-                    } else {
-                        appendToResult(result, ss1);
-                    }
-                    if (iff.orelse != null) {
-                        if ( elseLine>-1 ) {
-                            appendToResult(result, ss[elseLine]);
-                        } else {
-                            //appendToResult(result, ss[iff.orelse[0].beginLine]);
-                            logger.fine("failure #2 to deal with another day...");
-                        }
-                        int lastLine2;
-                        if ((istatement + 1) < stmts.length) {
-                            lastLine2 = stmts[istatement + 1].beginLine - 1;
-                        } else {
-                            lastLine2 = lastLine;
-                        }
-                        String ss2 = simplifyScriptToGetParams(ss, iff.orelse, variableNames, elseLine + 1, lastLine2, depth + 1);
-                        if (ss2.length() > 0) {
-                            result.append("\n");
-                        }
-                        appendToResult(result, ss2);
-                        if (ss2.length() == 0) { // we didn't add anything...
-                            String line;
-                            line = ss[iff.orelse[0].beginLine];
-                            String indent =  indentForLine( line );
-                            result.append("\n").append(indent).append("pass  # ").append(line).append("\n");
-                        } else {
-                            result.append("\n");  // write of the else or elif line
-                        }
-                    }
-                }
-                acceptLine = -1;
-            } else {
-                if (simplifyScriptToGetParamsOkay(o, variableNames)) {
-                    if (acceptLine < 0) {
-                        acceptLine = beginLine;
-                        for (int i = currentLine; i < acceptLine; i++) {
-                            String indent= indentForLine( ss[i] );
-                            int icomment= ss[i].indexOf("#");
-                            if ( icomment>=0 ) {
-                                String line= indent + spaces.substring(indent.length(),icomment)+ss[i].substring(icomment);
-                                result.append(line).append("\n");
-                            }
-                            currentLine = acceptLine;
-                        }
-                    }
-                } else if (isSetScriptCall(o, variableNames)) {
-                    if (acceptLine < 0) {
-                        acceptLine = beginLine;
-                        for (int i = currentLine + 1; i < acceptLine; i++) {
-                            result.append("\n");
-                            currentLine = acceptLine;
-                        }
-                    }
-                } else {
-                    if (acceptLine > -1) {
-                        int thisLine = getBeginLine( ss, o ) ;
-                        String indent= indentForLine( ss[acceptLine] );
-                        for (int i = acceptLine; i < thisLine; i++) {
-                            if ( ss[i].contains("getDataSet") ) {
-                                appendToResult(result, indent + "pass  #1139  "+ ss[i]).append("\n"); // TODO: kludge--how did this work before???
-                            } else {
-                                appendToResult(result, ss[i]).append("\n");
-                            }
-                        }
-                        appendToResult(result, "\n");
-                        currentLine = o.beginLine;
-                        acceptLine = -1;
-                    } 
-                }
-            }
-        }
-        if (acceptLine > -1) {
-            lastLine= handleContinue( ss, lastLine );
-            int thisLine = lastLine;
-            for (int i = acceptLine; i <= thisLine; i++) {
-                appendToResult(result, ss[i]).append("\n");
-            }
-        }
-        return result.toString();
+        return JythonAstFormatter.format(simplifyScriptToGetParams2026(stmts,variableNames,depth),0);
     }
     
     /**
@@ -1702,124 +1424,6 @@ public class JythonUtil {
             if ( bl2<beginLine ) beginLine= bl2;
         }
         return beginLine;
-    }
-
-    /**
-     * extracts the parts of the program that get parameters.
-     *
-     * @param script the entire Jython program
-     * @param addSort if true, add parameters to keep track of the order that
-     * getParam was called. This has no effect now.
-     * @return the Jython program with expensive calls removed, up to the last
-     * getParam call.
-     * @see SimplifyScriptSupport#simplifyScriptToCompletions(java.lang.String) 
-     */
-    public static String simplifyScriptToGetParams(String script, boolean addSort) throws PySyntaxError {
-        
-        Logger llogger= LoggerManager.getLogger("jython.simplify");
-        
-        String[] ss1 = script.split("\n");
-        String[] ss= new String[ss1.length+1];
-        System.arraycopy( ss1, 0, ss, 1, ss1.length );
-        ss[0]= "# simplifyScriptToGetParams";
-
-        int lastLine = -1; // the last line we need to include
-        
-        boolean withinSimplifyLine= false;
-        
-        boolean withinTripleQuote= false;
-        for (int ilineNum = 1; ilineNum < ss.length; ilineNum++) {
-            String line = ss[ilineNum];
-            int ich = line.indexOf('#');
-            if (ich > -1) {
-                line = line.substring(0, ich);
-            }
-            if (line.contains("getParam")) {
-                llogger.log(Level.FINER, "getParam at line {0}", ilineNum);
-                lastLine = ilineNum;
-                withinSimplifyLine= true;
-            } else if (line.contains("setScriptTitle")) {
-                llogger.log(Level.FINER, "setScriptTitle at line {0}", ilineNum);
-                lastLine = ilineNum;
-                withinSimplifyLine= true;
-            } else if (line.contains("setScriptDescription")) {
-                llogger.log(Level.FINER, "setScriptDescription at line {0}", ilineNum);
-                lastLine = ilineNum;
-                withinSimplifyLine= true;
-            } else if (line.contains("setScriptLabel")) {
-                llogger.log(Level.FINER, "setScriptLabel at line {0}", ilineNum);
-                lastLine = ilineNum;
-                withinSimplifyLine= true;
-            } else if (line.contains("setScriptIcon")) {
-                llogger.log(Level.FINER, "setScriptIcon at line {0}", ilineNum);
-                lastLine = ilineNum;
-                withinSimplifyLine= true;
-            } else {
-                if ( !withinTripleQuote ) {
-                    withinSimplifyLine= false;
-                }
-            }
-            if ( line.contains("'''") ) {
-                if ( withinTripleQuote ) {
-                    if ( !Character.isWhitespace(line.charAt(0)) && withinSimplifyLine ) {
-                        lastLine = ilineNum;
-                    }
-                }
-                if ( withinTripleQuote ) {
-                    llogger.log(Level.FINER, "close triple quote at line {0}", ilineNum);
-                } else {
-                    llogger.log(Level.FINER, "open triple quote at line {0}", ilineNum);
-                }
-                withinTripleQuote= !withinTripleQuote;
-            } 
-
-        }
-
-        if (lastLine == -1) {
-            return "";
-        }
-
-        // check for continuation in last getParam call.
-        while (ss.length > lastLine + 1 && ss[lastLine].trim().length() > 0 && Character.isWhitespace(ss[lastLine].charAt(0))) {
-            lastLine++;
-        }
-        // Chris showed that a closing bracket or paren doesn't need to be indented.  See test038/jydsCommentBug.jyds
-        if (lastLine < ss.length) {
-            String closeParenCheck = ss[lastLine].trim();
-            if (closeParenCheck.equals(")") || closeParenCheck.equals("]")) {
-                lastLine++;
-            }
-        }
-
-        HashSet variableNames = new HashSet();
-        variableNames.add("getParam");  // this is what allows the getParam calls to be included.
-        variableNames.add("map");
-        variableNames.add("str");  // include casts.
-        variableNames.add("int");
-        variableNames.add("long");
-        variableNames.add("float");
-        variableNames.add("datum");
-        variableNames.add("datumRange");
-        variableNames.add("URI");
-        variableNames.add("URL");
-        variableNames.add("True");
-        variableNames.add("False");
-        variableNames.add("range");
-        variableNames.add("xrange");
-        variableNames.add("list");
-        variableNames.add("len");
-        variableNames.add("map");
-        variableNames.add("dict");
-        variableNames.add("zip");
-        variableNames.add("PWD");
-        variableNames.add("dom");
-
-        try {
-            Module n = (Module) org.python.core.parser.parse(script, "exec");
-            return simplifyScriptToGetParams(ss, n.body, variableNames, 1, lastLine, 0);
-        } catch (PySyntaxError ex) {
-            throw ex;
-        }
     }
 
     /**
