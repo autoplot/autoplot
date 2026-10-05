@@ -54,6 +54,26 @@ public class JythonAstFormatter {
 
     private static final String INDENT = "    ";
 
+    /**
+     * format the nodes into Jython code, one after another, starting with the given indent level.
+     * @param nodes the statements
+     * @param indent the indent level, where 0 is no indent, 1 is typically 4 spaces, etc.
+     * @return the script
+     */
+    public static String format(stmtType[] nodes,int indent) {
+        LineCountingStringBuilder out = new LineCountingStringBuilder();
+        for ( stmtType node : nodes ) {
+            format(node, out, indent);
+            out.append("\n");
+        }
+        return out.toString();
+    }
+    
+    /**
+     * format the node into Jython code
+     * @param node
+     * @return 
+     */
     public static String format(Node node) {
         LineCountingStringBuilder out = new LineCountingStringBuilder();
         format(node, out, 0);
