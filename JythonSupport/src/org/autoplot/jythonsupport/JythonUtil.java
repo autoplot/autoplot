@@ -988,14 +988,37 @@ public class JythonUtil {
                 for ( aliasType n: imp.names ) {
                     if ( !n.name.equals("ColorUtil") ) return false;
                 }
+                variableNames.add("ColorUtil");
+                return true;
+            }
+            if ( imp.module.equals("java.io") ) {
+                for ( aliasType n: imp.names ) {
+                    if ( !n.name.equals("File") ) return false;
+                }
+                variableNames.add("File");
+                return true;
+            }
+            if ( imp.module.equals("java.lang") ) {
+                for ( aliasType n: imp.names ) {
+                    if ( !n.name.equals("System") ) return false;
+                }
+                variableNames.add("System");
                 return true;
             }
             return false;
         }
         if ((o instanceof org.python.parser.ast.Import)) {
             Import imp=(Import)o;
+            boolean result= true;
+            HashSet okay= new HashSet();
+            okay.add("org.das2.util.ColorUtil");
+            okay.add("java.io.File");
+            okay.add("java.lang.System");
             for ( aliasType n: imp.names ) {
-                if ( !n.name.equals("org.das2.util.ColorUtil") ) return false;
+                if ( !okay.contains(n.name) ) return false;
+            }
+            for ( aliasType n: imp.names ) {
+                variableNames.add(n.name);
             }
             return true;
         }        
