@@ -219,7 +219,7 @@ public class Test038 {
         
         try {
             String script= JythonUtil.readScript( new FileReader(file) );
-            String scrip= org.autoplot.jythonsupport.JythonUtil.simplifyScriptToGetParams(script,true);
+            String scrip= org.autoplot.jythonsupport.JythonUtil.simplifyScriptToGetParams2026(script,true);
             File f= new File(file);
             //String fout= "./test038_params_"+testId+"_"+f.getName();
             String fout= "./test038_params_"+f.getName();
