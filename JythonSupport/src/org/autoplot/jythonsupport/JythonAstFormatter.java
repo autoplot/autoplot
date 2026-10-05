@@ -681,7 +681,22 @@ public class JythonAstFormatter {
         if (node instanceof Ellipsis) {
             out.append("...");
             return;
-        }        
+        }
+        
+        if (node instanceof TryFinally) {
+            TryFinally n = (TryFinally) node;
+
+            indent(out, indent);
+            out.append("try:\n");
+            formatSuite(n.body, out, indent + 1);
+
+            out.append("\n");
+            indent(out, indent);
+            out.append("finally:\n");
+            formatSuite(n.finalbody, out, indent + 1);
+
+            return;
+        }
         /*
          * Unknown node -- make this conspicuous.
          */
@@ -712,6 +727,19 @@ public class JythonAstFormatter {
         }
     }
 
+    private static void formatSuite(
+        stmtType[] statements,
+        LineCountingStringBuilder  out,
+        int indent) {
+
+        if (statements == null || statements.length == 0) {
+            indent(out, indent);
+            out.append("pass");
+            return;
+        }
+
+        formatStatements(statements, out, indent);
+    }    
 
     private static void indent(LineCountingStringBuilder out, int level) {
         for (int i = 0; i < level; i++) {
