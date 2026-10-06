@@ -1393,8 +1393,11 @@ public class JythonUtil {
 
             if ( o instanceof TryExcept ) {
                 TryExcept t= (TryExcept)o;
-                t.body= simplifyScriptToGetParams2026( t.body, variableNames, depth+1 );
-                t.orelse= simplifyScriptToGetParams2026( t.orelse, variableNames, depth+1 );
+                //t.body= simplifyScriptToGetParams2026( t.body, variableNames, depth+1 );
+                //t.orelse= simplifyScriptToGetParams2026( t.orelse, variableNames, depth+1 );
+                //for (int i = 0; i < t.handlers.length; i++) {
+                //    t.handlers[i].body = simplifyScriptToGetParams2026(t.handlers[i].body, variableNames, depth + 1);
+                //}
                 //note this is not allowed because it is not copied into outstmts.
                 continue;
             }
