@@ -20,7 +20,10 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,6 +38,8 @@ import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.dom.Plot;
+import org.autoplot.jythonsupport.JythonUtil;
+import org.autoplot.jythonsupport.JythonUtil.ScriptDescriptor;
 import org.das2.qstream.SimpleStreamFormatter;
 import org.das2.qstream.StreamException;
 import org.das2.qstream.StreamTool;
@@ -165,7 +170,41 @@ public class EmbedDataExperiment {
         maybeAddResource( s, dom, result );
         return result;
     }
+    
+    private static boolean isJydsUri(URISplit split) {
+        if ( split.file!=null && split.file.endsWith(".jyds") ) {
+            return true;
+        }
+        Map<String,String> params= URISplit.parseParams(split.params);
+        if ( split.ext.equals("vap+jyds:") && params.containsKey("script") ) {
+            return true;
+        }
+        return false;
+    }
 
+    /**
+     * The plan is this will figure out if resources can be embedded as well, see
+     * https://sourceforge.net/p/autoplot/bugs/2359/ and https://sourceforge.net/p/autoplot/bugs/1278/.
+     * Maybe the "describeScript" can work by embedded an alternate getDataSet command
+     * which will capture URIs.  For now, this does nothing, is just a stub...
+     * @param split
+     * @param dom
+     * @param result
+     * @return true if something was done.
+     */
+    private static boolean maybeAddJydsResource(URISplit split, Application dom, Set<URI> result) {
+        Map<String,Object> env= new HashMap<>();
+        env.put("PWD",split.path);
+        try {
+            ScriptDescriptor sd= JythonUtil.describeScript( env, split.surl, Collections.emptyMap() );
+            
+            return false;
+        } catch (IOException ex) { 
+            logger.log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+    
     private static boolean maybeAddResource(String suri, Application dom, Set<URI> result) {
         if ( suri.trim().length()==0 ) return false;
         URISplit split= URISplit.parse(suri);
@@ -173,6 +212,9 @@ public class EmbedDataExperiment {
             URI uri= makeCanonical( split.resourceUri );
             if (hasNoResource( split )) {
                 return false;
+            }
+            if ( isJydsUri(split) ) {
+                maybeAddJydsResource(split,dom,result);
             }
             if ( DataSetURI.isAggregating( uri.toString() ) ) {
                 try {
