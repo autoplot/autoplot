@@ -65,6 +65,7 @@ import org.autoplot.datasource.URISplit;
 import org.das2.util.StringTools;
 import org.python.core.PyTuple;
 import org.python.core.PyXRange;
+import org.python.parser.ast.AugAssign;
 import org.python.parser.ast.BinOp;
 import org.python.parser.ast.BoolOp;
 import org.python.parser.ast.Compare;
@@ -1079,6 +1080,58 @@ public class JythonUtil {
                             if (!variableNames.contains(n.id)) {
                                 return false;
                             }
+                        }
+                    }
+                }
+                return true;
+            } else {
+                return false;
+            }
+        }
+        if ((o instanceof org.python.parser.ast.AugAssign)) {
+            AugAssign a = (AugAssign) o;
+            exprType a1=a.target;
+            if ( a1 instanceof Subscript ) {
+                Subscript ss= (Subscript)a1;
+                if ( !simplifyScriptToGetParamsCanResolve(ss.value,variableNames) ) {
+                    return false;
+                }
+                if ( !simplifyScriptToGetParamsCanResolve(ss.slice,variableNames) ) {
+                    return false;
+                }
+            } else if ( a1 instanceof Attribute ) {
+                return false;
+            } else if ( a1 instanceof Name ) {
+                if ( !simplifyScriptToGetParamsCanResolve(a1,variableNames) ) {
+                    return false;
+                }
+            }
+            if (simplifyScriptToGetParamsOkayNoCalls(a.value, variableNames)) {
+                if (!simplifyScriptToGetParamsCanResolve(a.value, variableNames)) {
+                    return false;
+                }
+                exprType target = a.target;
+                if (target instanceof Name) {
+                    String id = ((Name) target).id;
+                    logger.log(Level.FINEST, "assign to variable {0}", id);
+                } else if (target instanceof Attribute) {
+                    Attribute at = (Attribute) target;
+                    while (at.value instanceof Attribute || at.value instanceof Subscript) {
+                        if (at.value instanceof Attribute) {
+                            at = (Attribute) at.value;
+                        } else {
+                            Subscript s = (Subscript) at.value;
+                            if (s.value instanceof Attribute) {
+                                at = (Attribute) s.value;
+                            } else {
+                                return false; // oh just give up...
+                            }
+                        }
+                    }
+                    if (at.value instanceof Name) {
+                        Name n = (Name) at.value;
+                        if (!variableNames.contains(n.id)) {
+                            return false;
                         }
                     }
                 }
