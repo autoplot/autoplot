@@ -1392,7 +1392,7 @@ public class JythonUtil {
             logger.log( Level.FINER, "line {0}: {1}", new Object[] { o.beginLine, o.getImage() } );
 
             if ( o instanceof TryExcept ) {
-                TryExcept t= (TryExcept)o;
+                //TryExcept t= (TryExcept)o;
                 //t.body= simplifyScriptToGetParams2026( t.body, variableNames, depth+1 );
                 //t.orelse= simplifyScriptToGetParams2026( t.orelse, variableNames, depth+1 );
                 //for (int i = 0; i < t.handlers.length; i++) {
