@@ -1294,17 +1294,22 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                     }
                 }                    
             } else {
-                JSONArray capabilities= capabilitiesDoc.getJSONArray("capabilities"); // deprecated.
-                for ( int i=0; i<capabilities.length(); i++ ) {
-                    JSONObject c= capabilities.getJSONObject(i);
-                    if ( c.has(HapiSpec.FORMATS) ) {
-                        JSONArray formats= c.getJSONArray(HapiSpec.FORMATS);
-                        for ( int j=0; j<formats.length(); j++ ) {
-                            if ( formats.getString(j).equals(HapiSpec.BINARY) ) {
-                                binaryIsEnabled= true;
+                if ( capabilitiesDoc.has("capabilities") ) {
+                    JSONArray capabilities= capabilitiesDoc.getJSONArray("capabilities"); // deprecated.
+                    for ( int i=0; i<capabilities.length(); i++ ) {
+                        JSONObject c= capabilities.getJSONObject(i);
+                        if ( c.has(HapiSpec.FORMATS) ) {
+                            JSONArray formats= c.getJSONArray(HapiSpec.FORMATS);
+                            for ( int j=0; j<formats.length(); j++ ) {
+                                if ( formats.getString(j).equals(HapiSpec.BINARY) ) {
+                                    binaryIsEnabled= true;
+                                }
                             }
                         }
                     }
+                } else {
+                    logger.warning("server doesn't advertise its capabilities!");
+                    binaryIsEnabled= false;
                 }
             }
         } catch ( IOException ex ) {
