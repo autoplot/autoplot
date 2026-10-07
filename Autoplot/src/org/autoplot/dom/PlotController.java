@@ -1349,6 +1349,9 @@ public final class PlotController extends DomNodeController {
             plot.getZaxis().setRange( newAxis.getRange() );
             plot.getZaxis().setAutoRange(true);
             plot.getZaxis().getController().dasAxis.setScanRange(  newAxis.getRange() );
+            if ( plot.getZaxis().getRange().getUnits()==Units.rgbColor ) {
+                plot.getZaxis().setVisible(false);
+            }
         }
         
         logger.log(Level.FINER, "xrange: {0}", plot.getXaxis().getRange());
