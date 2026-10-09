@@ -101,36 +101,40 @@ public class RowPngWalkView extends PngWalkView {
             }
         });
 
-        scrollPane.getHorizontalScrollBar().getModel().addChangeListener(new ChangeListener() {
-            //Timer repaintTimer = new Timer("RowViewRepaintDelay", true);
-            //ScheduledThreadPoolExecutor xrepaintTimer = new ScheduledThreadPoolExecutor("RowViewRepaintDelay", true);
-            ScheduledExecutorService ex = Executors.newSingleThreadScheduledExecutor();
-            //TimerTask task;
+        final javax.swing.Timer loadTimer =
+            new javax.swing.Timer(200, e -> {
+                if (seq == null || !canvas.isShowing()) {
+                    return;
+                }
 
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                // Cancel any pending timer events
-                //if (task != null) task.cancel();
-                if (seq == null) return;
-                if ( !canvas.isShowing() ) return;
-                
-                // Schedule a new one
-                //task = new TimerTask() {
-                Runnable run= new Runnable() {
-                    @Override
-                    public void run() {
-                        Rectangle bounds = scrollPane.getViewport().getViewRect();
-                        int first = Math.max( 0, ( bounds.x - bounds.width ) / cellSize );
-                        int last = Math.min(seq.size(), (bounds.x +  2 * bounds.width) / cellSize + 1);
-                        for(int i=first; i<last; i++) {
-                            seq.imageAt(i).getThumbnail(true);
-                        }
-                    }
-                };
-                ex.schedule( run, 200, TimeUnit.MILLISECONDS );
-                //repaintTimer.schedule(task, 200L);
-            }
-        });
+                Rectangle bounds =
+                    scrollPane.getViewport().getViewRect();
+
+                int first = Math.max(
+                    0, (bounds.x - bounds.width) / cellSize
+                );
+
+                int last = Math.min(
+                    seq.size(),
+                    (bounds.x + 2 * bounds.width) / cellSize + 1
+                );
+
+                for (int i = first; i < last; i++) {
+                    seq.imageAt(i).getThumbnail(true);
+                }
+            });
+
+        loadTimer.setRepeats(false);
+
+        scrollPane.getHorizontalScrollBar()
+            .getModel()
+            .addChangeListener(e -> {
+                if (seq != null && canvas.isShowing()) {
+                    loadTimer.restart();
+                } else {
+                    loadTimer.stop();
+                }
+            });
 
         add(scrollPane);
     }
