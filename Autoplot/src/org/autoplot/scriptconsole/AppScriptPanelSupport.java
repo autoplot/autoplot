@@ -1530,7 +1530,7 @@ public class AppScriptPanelSupport {
     }
 
     
-    protected void open() {
+    protected void open(java.awt.event.ActionEvent e) {
         try {
             if (this.file == null) {
                 String sfile = selector.getValue();
@@ -1553,6 +1553,18 @@ public class AppScriptPanelSupport {
             Preferences prefs = AutoplotSettings.settings().getPreferences(AppScriptPanelSupport.class);
             String openFile = prefs.get(PREFERENCE_OPEN_FILE, "");
 
+            boolean useNative= System.getProperty("fileDialogNative","").equals("true");
+            if ( ( e.getModifiers() & KeyEvent.SHIFT_MASK )==KeyEvent.SHIFT_MASK ) {
+                useNative= !useNative;
+            }
+
+            //    if ( useNative ) {
+            //        result = Util.browseLocalJyNative( AutoplotUI.this, null );
+            //    } else {
+            //        result=  Util.browseLocalJy( AutoplotUI.this, null );
+            //    }
+                            
+            
             JFileChooser chooser = new JFileChooser();
             chooser.setFileSelectionMode( JFileChooser.FILES_ONLY );
             chooser.setFileFilter(new FileNameExtensionFilter( "python and jython scripts", new String [] { "jy", "py", "jyds" } ));

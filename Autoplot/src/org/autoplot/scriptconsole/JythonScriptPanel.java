@@ -571,7 +571,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
     private void openButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openButtonActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);                
-        support.open();
+        support.open(evt);
         updateStatus();
 }//GEN-LAST:event_openButtonActionPerformed
 
