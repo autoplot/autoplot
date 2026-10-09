@@ -945,38 +945,35 @@ public class WalkImageSequence implements PropertyChangeListener  {
         int loadingCount=0;
         int loadedCount=0;
         int thumbLoadingCount=0;
-        //int thumbLoadedCount=0;
+        int thumbLoadedCount=0;
         //int sizeThumbCount= 0;
         int totalCount= 0;
-        for ( WalkImage i : existingImages ) {
+        for ( WalkImage walkImage : existingImages ) {
             totalCount++;
-            if ( i.getStatus()==WalkImage.Status.IMAGE_LOADING ) loadingCount++;
-            if ( i.getStatus()==WalkImage.Status.IMAGE_LOADED ) loadedCount++;
-            if ( i.getStatus()==WalkImage.Status.THUMB_LOADING ) thumbLoadingCount++;
-            //if ( i.getStatus()==WalkImage.Status.THUMB_LOADED ) thumbLoadedCount++;
+            if ( walkImage.getStatus()==WalkImage.Status.IMAGE_LOADING ) {
+                loadingCount++;
+            }
+            if ( walkImage.getStatus()==WalkImage.Status.IMAGE_LOADED ) {
+                loadedCount++;
+            }
+            if ( walkImage.getStatus()==WalkImage.Status.THUMB_LOADING ) {
+                thumbLoadingCount++;
+            }
+            if ( walkImage.getStatus()==WalkImage.Status.THUMB_LOADED ) {
+                thumbLoadedCount++;
+            }
             //if ( i.getStatus()==WalkImage.Status.SIZE_THUMB_LOADED ) sizeThumbCount++;
         }
 
-/*        if ( loadingCount>5 ) {
-            System.err.println( Thread.currentThread() );
-            new Exception().printStackTrace();
-        }
-
-        if ( thumbLoadingCount>30 ) {
-            System.err.println( Thread.currentThread() );
-            new Exception().printStackTrace();
-        }*/
-
-        //long mem= ( Runtime.getRuntime().freeMemory() ) / (1024 * 1024);
         if ( loadingCount==0 && thumbLoadingCount==0) {
             if ( limitWarning ) {
                 setStatus("<html>"+loadedCount+" of "+totalCount + " images loaded.  Limitations of the PNG Walk Tool prevent use of the entire series." );
             } else {
-                setStatus(""+loadedCount+" of "+totalCount + " images loaded." );
+                setStatus(""+loadedCount+" of "+totalCount + " images loaded, " + thumbLoadedCount + " thumbs loaded." );
             }
         } else {
             setStatus("busy: "+loadedCount+" of "+totalCount + " images loaded, " 
-                    + loadingCount + " are loading and "+ thumbLoadingCount + " thumbs are loading.");
+                    + loadingCount + " are loading and "+ thumbLoadedCount + " thumbs loaded.");
         }
         
     }
