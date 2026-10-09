@@ -49,7 +49,7 @@ public class WalkImage  {
     /**
      * number of full-size images we can load at once.
      */
-    private static final int LOADED_IMAGE_COUNT_LIMIT = 10;
+    private static final int LOADED_IMAGE_COUNT_LIMIT = 16;
     
     /**
      * number of full-size images we can load at once.
