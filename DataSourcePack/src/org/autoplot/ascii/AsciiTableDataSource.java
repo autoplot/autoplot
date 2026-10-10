@@ -225,7 +225,9 @@ public class AsciiTableDataSource extends AbstractDataSource {
         
         column= null;
         bundle= null;
-        
+        depend0= null;
+        eventListColumn= null;
+        eventListColorColumn=-1;
         
         ds = doReadFile(mon);
         
