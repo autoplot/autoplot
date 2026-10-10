@@ -147,7 +147,7 @@ public final class BoundsStylePanel extends javax.swing.JPanel implements PlotSt
 
         jLabel3.setText("Fill Texture:");
 
-        textureComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " ", "solid", "hash", "backhash", "crosshash" }));
+        textureComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "solid", "hatch", "backhatch", "crosshatch", "hash", "backhash", "crosshash" }));
         textureComboBox.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 textureComboBoxItemStateChanged(evt);

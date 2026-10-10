@@ -114,12 +114,14 @@
     <Component class="javax.swing.JComboBox" name="textureComboBox">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="5">
-            <StringItem index="0" value=" "/>
-            <StringItem index="1" value="solid"/>
-            <StringItem index="2" value="hash"/>
-            <StringItem index="3" value="backhash"/>
-            <StringItem index="4" value="crosshash"/>
+          <StringArray count="7">
+            <StringItem index="0" value="solid"/>
+            <StringItem index="1" value="hatch"/>
+            <StringItem index="2" value="backhatch"/>
+            <StringItem index="3" value="crosshatch"/>
+            <StringItem index="4" value="hash"/>
+            <StringItem index="5" value="backhash"/>
+            <StringItem index="6" value="crosshash"/>
           </StringArray>
         </Property>
       </Properties>
