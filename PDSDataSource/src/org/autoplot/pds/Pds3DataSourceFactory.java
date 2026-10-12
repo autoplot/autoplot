@@ -55,7 +55,7 @@ public class Pds3DataSourceFactory extends AbstractDataSourceFactory {
         if ( split.file.toLowerCase().endsWith(".lbl") ) {
             return new Pds3DataSource( uri );
         } else {
-            return new PdsDataSource( uri );
+            return new Pds4DataSource( uri );
         }
     }
 

@@ -1,20 +1,13 @@
 
 package org.autoplot.pds;
 
-import gov.nasa.pds.label.Label;
-import gov.nasa.pds.label.object.ArrayObject;
-import gov.nasa.pds.label.object.DataObject;
-import gov.nasa.pds.label.object.FieldDescription;
-import gov.nasa.pds.label.object.TableObject;
-import gov.nasa.pds.objectAccess.ParseException;
-import gov.nasa.pds.ppi.label.PDSException;
-import gov.nasa.pds.ppi.label.PDSLabel;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -36,6 +29,8 @@ import org.autoplot.datasource.DataSetURI;
 import static org.autoplot.datasource.DataSetURI.fromUri;
 import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.URISplit;
+import org.autoplot.pds4.Pds4Reader;
+import org.autoplot.pds4.Pds4Reader.DataObject;
 import org.das2.datum.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -58,42 +53,10 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
         if ( split.file.toLowerCase().endsWith(".lbl") ) {
             return new Pds3DataSource( uri );
         } else {
-            return new PdsDataSource( uri );
+            return new Pds4DataSource( uri );
         }
     }
 
-    private DataObject getDataObject( URL url, String name ) throws MalformedURLException, ParseException, Exception {
-        
-        //Label label = Label.open( f ); // this doesn't work.
-        Label label = Label.open( url ); // this works
-        
-        DataObject result=null;
-        
-        try {
-            List<DataObject> objects = label.getObjects();
-            
-            for ( DataObject d : objects ) {
-                if ( d instanceof TableObject ) {
-                    TableObject t=(TableObject)d;
-                    for ( FieldDescription fd: t.getFields() ) {
-                        if ( name.startsWith( fd.getName() ) ) { //TODO: why startsWith?
-                             result= t;
-                        }
-                    }
-                } else if ( d instanceof ArrayObject ) {
-                    ArrayObject a= (ArrayObject)d;
-                    if ( a.getName().equals(name) ) {
-                        result= a;
-                    }
-                }
-                if ( d!=null ) d.closeChannel(); //TODO: not sure why I need to check for null here, but Netbeans says I do.
-            }
-        } finally {
-            label.close();
-        }
-        
-        return result;
-    }
             
     @Override
     public boolean reject(String suri, List<String> problems, ProgressMonitor mon) {
@@ -121,87 +84,23 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
                 return true;
             } else {
                 try {
-                    getDataObject( xmlfile.toURI().toURL(), id );
+                    //Pds4DataSource.getDataObject( xmlfile.toURI().toURL(), id ); // TODO
                     return false;
                 } catch ( Exception ex ) {
                     problems.add(ex.getMessage());
                     return true;
                 }
             }
-        } catch ( IOException | IllegalArgumentException | PDSException ex ) {
+        } catch ( IOException | IllegalArgumentException ex ) {
             logger.log(Level.SEVERE, null, ex);
             problems.add(ex.getMessage());
             return false;
         }
     }
 
-    /**
-     * return a list of parameters.
-     * @param f
-     * @return 
-     */
-    private Map<String,String> getDataObjectNames( URL url, ProgressMonitor mon) throws Exception {
-        
-        URL fileUrl= getFileResource( url, mon );
-        File xmlfile = DataSetURI.getFile( url,new NullProgressMonitor());
-        DataSetURI.getFile( fileUrl,mon );
-            
-        Map<String,String> result= new LinkedHashMap<>();
-        
-        Label label = Label.open( xmlfile.toURI().toURL() ); // this works
-
-        try {
-            
-            List<DataObject> objects=  label.getObjects();
-            
-            for ( DataObject d : objects ) {
-                if ( d instanceof TableObject ) {
-                    TableObject t= (TableObject)d;
-                    //TODO: can there be more than one table?
-                    for ( FieldDescription fd: t.getFields() ) {
-                        result.put( fd.getName(), fd.getName() + " of a table" );
-                    }
-                }
-            }
-
-            DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
-            domFactory.setNamespaceAware(false);
-            DocumentBuilder builder = domFactory.newDocumentBuilder();
-            Document doc = builder.parse(xmlfile);
-
-            for ( DataObject d: objects ) {
-                if ( d instanceof ArrayObject ) {
-                    ArrayObject a= (ArrayObject)d;
-                    //result.put( a.getName(), a.getDescription() ); //TODO: update PDS4 library
-                    String n= a.getName();
-                    XPathExpression xp= XPathFactory.newInstance().newXPath().compile(
-                        "//Product_Observational/File_Area_Observational/Array[name='"+n+"']");
-                    org.w3c.dom.Node n1= (org.w3c.dom.Node)xp.evaluate(doc,XPathConstants.NODE);
-                    XPathExpression xp2= XPathFactory.newInstance().newXPath().compile(
-                        "Axis_Array/axis_name/text()");
-
-                    org.w3c.dom.NodeList nn= (org.w3c.dom.NodeList)xp2.evaluate(n1,XPathConstants.NODESET);
-                    String[] ss= new String[nn.getLength()];
-                    for ( int i=0; i<ss.length; i++ ) {
-                        ss[i]= nn.item(i).getTextContent();
-                    }
-                    result.put( a.getName(), a.getName() + " ("+ String.join(",", ss)+")");
-                }
-            }
-            
-            for ( DataObject d : objects ) {
-                if ( d!=null ) d.closeChannel();
-            }
-            
-        } finally {
-            label.close();
-        }
-
-        return result;
-    }
     
     protected static URL getFileResource( URL labelFile, ProgressMonitor mon ) 
-            throws IOException, URISyntaxException, ParserConfigurationException, SAXException, XPathExpressionException, PDSException {
+            throws IOException, URISyntaxException, ParserConfigurationException, SAXException, XPathExpressionException {
         String suri= fromUri( labelFile.toURI() );
         File file = DataSetURI.getFile(suri,mon);
         File xmlfile= file;
@@ -242,7 +141,7 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
              
             Map<String,String> result;
             try {
-                result = getDataObjectNames(xmlfile.toURI().toURL(), mon);
+                result = Pds4DataSource.getDataObjectNames(xmlfile.toURI().toURL(), mon);
             } catch ( java.lang.NoClassDefFoundError ex ) {
                 result= Collections.singletonMap( "Java 8 needed", "Must run under Java 8, or use dmg, exe, deb or rpm" );
             }
@@ -276,7 +175,7 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
 
                 Map<String,String> result;
                 try {
-                    result = getDataObjectNames(cc.resourceURI.toURL(), mon);
+                    result = Pds4DataSource.getDataObjectNames(cc.resourceURI.toURL(), mon);
                 } catch ( java.lang.NoClassDefFoundError ex ) {
                     result= Collections.singletonMap( "Java 8 needed", "Must run under Java 8, or use dmg, exe, deb or rpm" );
                 }
