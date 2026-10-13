@@ -816,9 +816,9 @@ public class Pds4DataSource extends AbstractDataSource {
             for ( Pds4Reader.DataObject d : objects ) {
                 if ( d instanceof Pds4Reader.Table ) {
                     Pds4Reader.Table t=(Pds4Reader.Table)d;
-                    for ( Pds4Reader.Field fd: t.fields ) {
+                    for ( Pds4Reader.Field fd: t.fields ) {   
                         if ( name.startsWith( fd.name ) ) { //TODO: why startsWith?
-                             result= t;
+                            result= t;
                         }
                     }
                 } else if ( d instanceof Pds4Reader.Array ) {
