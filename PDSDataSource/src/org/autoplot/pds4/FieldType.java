@@ -1,5 +1,6 @@
 package org.autoplot.pds4;
 
+import java.nio.ByteOrder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -103,13 +104,29 @@ public enum FieldType {
                 || this == ASCII_NUMERIC_BASE8 || this == ASCII_NUMERIC_BASE16;
     }
 
+    /** Physical byte width; zero means variable-width text or packed-bit metadata needed. */
+    public int getByteWidth() {
+        if (this == SIGNEDBYTE || this == UNSIGNEDBYTE) return 1;
+        if (xmlType.matches("(?:Signed|Unsigned)(?:MSB|LSB)[248]")) return xmlType.charAt(xmlType.length() - 1) - '0';
+        if (xmlType.startsWith("IEEE754")) return xmlType.endsWith("Single") ? 4 : 8;
+        if (xmlType.startsWith("Complex")) return xmlType.endsWith("16") ? 16 : 8;
+        return 0;
+    }
+
+    /** Multi-byte numeric byte order; null when order is inapplicable/unspecified. */
+    public ByteOrder getByteOrder() {
+        if (xmlType.contains("LSB")) return ByteOrder.LITTLE_ENDIAN;
+        if (xmlType.contains("MSB")) return ByteOrder.BIG_ENDIAN;
+        return null;
+    }
+
     /** Whether the current reader implements this encoding. */
     public boolean isSupported() {
         switch (this) {
             case COMPLEXLSB8: case COMPLEXLSB16:
             case COMPLEXMSB8: case COMPLEXMSB16:
             case SIGNEDBITSTRING: case UNSIGNEDBITSTRING:
-            case UTF8_STRING: case UNKNOWN: return false;
+            case UNKNOWN: return false;
             default: return true;
         }
     }
