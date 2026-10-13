@@ -6,9 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * PDS4 field/element type names. Enum identifiers match NASA's FieldType names;
- * this independent enumeration has no NASA library dependency.
- * Recognition of a name does not imply the reader can decode that encoding.
+ * PDS4 field/element type names. Enum identifiers match NASA's FieldType names; this independent enumeration has no NASA library
+ * dependency. Recognition of a name does not imply the reader can decode that encoding.
  */
 public enum FieldType {
     ASCII_ANYURI("ASCII_AnyURI"),
@@ -69,33 +68,48 @@ public enum FieldType {
 
     private final String xmlType;
     private static final Map<String, FieldType> BY_XML_NAME;
+
     static {
         Map<String, FieldType> lookup = new HashMap<>();
-        for (FieldType type : values()) lookup.put(type.xmlType, type);
+        for (FieldType type : values()) {
+            lookup.put(type.xmlType, type);
+        }
         BY_XML_NAME = Collections.unmodifiableMap(lookup);
     }
 
-    FieldType(String xmlType) { this.xmlType = xmlType; }
-
-    /** Return the exact case-sensitive spelling used in PDS4 XML labels. */
-    public String getXMLType() { return xmlType; }
+    FieldType(String xmlType) {
+        this.xmlType = xmlType;
+    }
 
     /**
-     * Resolve an XML data_type value, such as ASCII_Date_DOY or SignedMSB8.
-     * Unknown or null spellings throw IllegalArgumentException; no guessing.
+     * Return the exact case-sensitive spelling used in PDS4 XML labels.
+     */
+    public String getXMLType() {
+        return xmlType;
+    }
+
+    /**
+     * Resolve an XML data_type value, such as ASCII_Date_DOY or SignedMSB8. Unknown or null spellings throw
+     * IllegalArgumentException; no guessing.
      */
     public static FieldType getFieldType(String xmlType) {
         FieldType result = BY_XML_NAME.get(xmlType);
-        if (result == null) throw new IllegalArgumentException("Unknown PDS4 data_type: " + xmlType);
+        if (result == null) {
+            throw new IllegalArgumentException("Unknown PDS4 data_type: " + xmlType);
+        }
         return result;
     }
 
-    /** Date or time text, including legacy PDS4 date-type spellings. */
+    /**
+     * Date or time text, including legacy PDS4 date-type spellings.
+     */
     public boolean isTime() {
         return xmlType.startsWith("ASCII_Date") || this == ASCII_TIME;
     }
 
-    /** Is this type a number (including recognized complex/bit encodings)? */
+    /**
+     * Is this type a number (including recognized complex/bit encodings)?
+     */
     public boolean isNumeric() {
         return xmlType.startsWith("Signed") || xmlType.startsWith("Unsigned")
                 || xmlType.startsWith("IEEE754") || xmlType.startsWith("Complex")
@@ -104,30 +118,53 @@ public enum FieldType {
                 || this == ASCII_NUMERIC_BASE8 || this == ASCII_NUMERIC_BASE16;
     }
 
-    /** Physical byte width; zero means variable-width text or packed-bit metadata needed. */
+    /**
+     * Physical byte width; zero means variable-width text or packed-bit metadata needed.
+     */
     public int getByteWidth() {
-        if (this == SIGNEDBYTE || this == UNSIGNEDBYTE) return 1;
-        if (xmlType.matches("(?:Signed|Unsigned)(?:MSB|LSB)[248]")) return xmlType.charAt(xmlType.length() - 1) - '0';
-        if (xmlType.startsWith("IEEE754")) return xmlType.endsWith("Single") ? 4 : 8;
-        if (xmlType.startsWith("Complex")) return xmlType.endsWith("16") ? 16 : 8;
+        if (this == SIGNEDBYTE || this == UNSIGNEDBYTE) {
+            return 1;
+        }
+        if (xmlType.matches("(?:Signed|Unsigned)(?:MSB|LSB)[248]")) {
+            return xmlType.charAt(xmlType.length() - 1) - '0';
+        }
+        if (xmlType.startsWith("IEEE754")) {
+            return xmlType.endsWith("Single") ? 4 : 8;
+        }
+        if (xmlType.startsWith("Complex")) {
+            return xmlType.endsWith("16") ? 16 : 8;
+        }
         return 0;
     }
 
-    /** Multi-byte numeric byte order; null when order is inapplicable/unspecified. */
+    /**
+     * Multi-byte numeric byte order; null when order is inapplicable/unspecified.
+     */
     public ByteOrder getByteOrder() {
-        if (xmlType.contains("LSB")) return ByteOrder.LITTLE_ENDIAN;
-        if (xmlType.contains("MSB")) return ByteOrder.BIG_ENDIAN;
+        if (xmlType.contains("LSB")) {
+            return ByteOrder.LITTLE_ENDIAN;
+        }
+        if (xmlType.contains("MSB")) {
+            return ByteOrder.BIG_ENDIAN;
+        }
         return null;
     }
 
-    /** Whether the current reader implements this encoding. */
+    /**
+     * Whether the current reader implements this encoding.
+     */
     public boolean isSupported() {
         switch (this) {
-            case COMPLEXLSB8: case COMPLEXLSB16:
-            case COMPLEXMSB8: case COMPLEXMSB16:
-            case SIGNEDBITSTRING: case UNSIGNEDBITSTRING:
-            case UNKNOWN: return false;
-            default: return true;
+            case COMPLEXLSB8:
+            case COMPLEXLSB16:
+            case COMPLEXMSB8:
+            case COMPLEXMSB16:
+            case SIGNEDBITSTRING:
+            case UNSIGNEDBITSTRING:
+            case UNKNOWN:
+                return false;
+            default:
+                return true;
         }
     }
 }
