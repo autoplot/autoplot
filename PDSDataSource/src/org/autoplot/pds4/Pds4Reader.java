@@ -812,7 +812,9 @@ public final class Pds4Reader {
                     cell.write((char) c);
                 }
             } else if (c == delimiter) {
-                fields.add(cell.toByteArray());
+                byte[] bb= cell.toByteArray();
+                fields.add(bb);
+                //new String(bb, 0,bb.length);
                 cell.reset();
                 afterQuote = false;
                 if (fields.size() > MAX_FIELDS) {
@@ -829,7 +831,7 @@ public final class Pds4Reader {
             } else if (c == '\r' || c == '\n') {
                 throw new IOException("Wrong record delimiter");
             } else if (afterQuote) {
-                throw new IOException("Characters after closing quote");
+                //throw new IOException("Characters after closing quote");
             } else if (c == '"') {
                 if (cell.size() != 0) {
                     throw new IOException("Quote inside unquoted field");
