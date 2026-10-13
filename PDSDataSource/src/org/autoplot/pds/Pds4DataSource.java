@@ -1,6 +1,7 @@
 
 package org.autoplot.pds;
 
+import gov.nasa.pds.ppi.label.PDSLabel;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -47,6 +48,7 @@ import org.das2.qds.util.DataSetBuilder;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -59,6 +61,29 @@ import org.xml.sax.SAXException;
 public class Pds4DataSource extends AbstractDataSource {
     public Pds4DataSource(URI uri) {
         super(uri);
+    }
+
+    @Override
+    public Map<String, Object> getMetadata(ProgressMonitor mon) throws Exception {
+        URISplit split= URISplit.parse( getURI() );
+        
+        File f= getFile( split.resourceUri,mon);
+
+        Document doc= readXML(f);
+                
+        String name= URISplit.parseParams(split.params).get("arg_0");
+        
+        XPathFactory factory= XPathFactory.newInstance();
+        XPath xpath= factory.newXPath();
+        Element e= (Element) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']", doc, XPathConstants.NODE );
+        
+        //Document doc2 = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        //doc2.appendChild(doc2.importNode(e, true));
+        
+        //doc2.appendChild(doc2.importNode(doc.getDocumentElement(),true));
+        
+        Map<String,Object> metadata= DocumentUtil.convertDocumentToMap(doc);
+        return metadata;
     }
     
     /**
@@ -934,17 +959,10 @@ public class Pds4DataSource extends AbstractDataSource {
         for (Map.Entry<String, String> entry
                 : array.element.specialConstants.entrySet()) {
             String name = entry.getKey();
-            if (name.equals("valid_minimum")
-                    || name.equals("valid_maximum")) {
-                continue;
+            if (name.equals("missing_constant")) {
+                fill= entry.getValue();
             }
 
-            String value = entry.getValue();
-            if (fill != null && !fill.equals(value)) {
-                throw new IllegalArgumentException(
-                        "Multiple special constants require postprocessing");
-            }
-            fill = value;
         }
         if (fill != null) {
             args.put("fillValue", fill);
