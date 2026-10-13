@@ -370,7 +370,9 @@ public final class Pds4Reader {
         /** Enum type for comparisons such as getType() == FieldType.ASCII_DATE_DOY. */
         public FieldType getType() { return type.dataType; }
         Field(String name, ValueType type, int location, int length) {
-            this.name = name; this.type = type; this.location = location; this.length = length;
+            this.name = name; 
+            this.type = type; 
+            this.location = location; this.length = length;
         }
     }
     public static final class Table extends DataObject {
@@ -461,7 +463,7 @@ public final class Pds4Reader {
                 if (type.dataType != FieldType.UTF8_STRING && !type.dataTypeName.startsWith("ASCII_") && binaryWidth(type.dataTypeName) != len)
                     throw new IOException("Unsupported type/width: " + type.dataTypeName);
                 if (fields.size() >= MAX_FIELDS) throw new IOException("Too many expanded fields");
-                fields.add(new Field(prefix + required(e, "name"), type, delimited ? loc : Math.addExact(base, loc), len));
+                fields.add(new Field(required(e, "name"), type, delimited ? loc : Math.addExact(base, loc), len));
             } else if (e.getLocalName().equals("Group_Field_" + kind)) {
                 int repeats = positiveInt(number(e, "repetitions"), "repetitions");
                 if (repeats > MAX_FIELDS) throw new IOException("Too many repetitions");
