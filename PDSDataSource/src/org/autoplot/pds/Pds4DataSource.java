@@ -1,11 +1,11 @@
 
 package org.autoplot.pds;
 
-import gov.nasa.pds.ppi.label.PDSLabel;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -375,8 +375,10 @@ public class Pds4DataSource extends AbstractDataSource {
                     }
                     if ( o instanceof String ) {
                         dsb.putValue( -1, i, (String)o );
-                    } else {
+                    } else if ( o instanceof Double ) {
                         dsb.putValue( -1, i, (Double)o );
+                    } else if ( o instanceof BigInteger ) {
+                        dsb.putValue( -1, i, ((BigInteger)o).doubleValue() );
                     }
                 } catch (ParseException ex) {
                     dsb.putValue( -1, i, dsb.getUnits(i).getFillDatum() );
