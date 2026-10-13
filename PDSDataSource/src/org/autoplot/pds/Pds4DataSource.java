@@ -9,8 +9,10 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.ByteOrder;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,6 +29,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.autoplot.datasource.AbstractDataSource;
 import org.autoplot.datasource.DataSetURI;
+import org.autoplot.datasource.DataSource;
 import org.autoplot.datasource.URISplit;
 import static org.autoplot.pds.PdsDataSourceFactory.getFileResource;
 import org.autoplot.pds4.FieldType;
@@ -334,13 +337,22 @@ public class Pds4DataSource extends AbstractDataSource {
         while ( ( record= c.next() )!=null ) {
             for ( int i=0; i<ncols; i++ ) {
                 try {
+                    Object o= record[icols[i]];
                     if ( doTimeCheck ) {
-                        String s= (String)record[icols[i]+1];
-                        if ( DatumRangeUtil.parseISO8601(s)!=null && !( dsb.getUnits(i) instanceof NumberUnits ) ) {
-                            dsb.setUnits( i, Units.us2000 );
+                        if ( o instanceof String ) {
+                            String s= (String)o;
+                            if ( DatumRangeUtil.parseISO8601(s)!=null && !( dsb.getUnits(i) instanceof NumberUnits ) ) {
+                                dsb.setUnits( i, Units.us2000 );
+                            }
+                        } else {
+                            dsb.putValue( -1, i, dsb.getUnits(i).getFillDatum() );
                         }
                     }
-                    dsb.putValue( -1, i, (String)record[icols[i]+1] );
+                    if ( o instanceof String ) {
+                        dsb.putValue( -1, i, (String)o );
+                    } else {
+                        dsb.putValue( -1, i, (Double)o );
+                    }
                 } catch (ParseException ex) {
                     dsb.putValue( -1, i, dsb.getUnits(i).getFillDatum() );
                 }
@@ -352,6 +364,55 @@ public class Pds4DataSource extends AbstractDataSource {
         return dsb.getDataSet();
     }
     
+    private void addMetadata( String name, MutablePropertyDataSet result1, Document doc ) {
+        if ( result1!=null && doc!=null ) {
+            try {
+                Units units=null;
+                XPathFactory factory= XPathFactory.newInstance();
+                XPath xpath= factory.newXPath();
+                
+                String sunits= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/Element_Array/unit/text()", doc );
+                sunits= sunits.trim();
+                if ( sunits.length()>0 && units==null ) {
+                    result1.putProperty( QDataSet.UNITS, Units.lookupUnits(sunits) );
+                }
+                if ( units==null || !UnitsUtil.isTimeLocation(units) ) {
+                    String labl= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/name/text()", doc );
+                    if ( labl.length()==0 ) labl= name;
+                    result1.putProperty( QDataSet.LABEL, labl );
+                    String title= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/description/text()", doc );
+                    if ( title.length()>0 ) {
+                        result1.putProperty( QDataSet.TITLE, title.trim() );
+                    }
+                }
+                
+                String sfillValue= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/Special_Constants/invalid_constant/text()", doc );
+                if ( sfillValue.length()==0 )
+                    sfillValue= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/Special_Constants/missing_constant/text()", doc );
+                String svalidMax= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/Special_Constants/valid_maximum/text()", doc );
+                String svalidMin= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/Special_Constants/valid_minimum/text()", doc );
+                if ( sfillValue.trim().length()>0 ) {
+                    double fillValue= Double.parseDouble(sfillValue);
+                    result1.putProperty( QDataSet.FILL_VALUE, fillValue );
+                }
+                if ( svalidMax.trim().length()>0 ) {
+                    double validMax= Double.parseDouble(svalidMax);
+                    if ( Math.log10(validMax)>-50  ) {  //https://pds-ppi.igpp.ucla.edu/data/maven-static-c/data/c6_32e64m/2014/10/mvn_sta_l2_c6-32e64m_20141013_v02_r01.xml?TT2000
+                        result1.putProperty( QDataSet.VALID_MAX, validMax );
+                    } else {
+                        logger.log(Level.WARNING, "Unbelievable value found for Special_Constants/valid_maximum, ignoring: {0}", svalidMax);
+                    }
+                }
+                if ( svalidMin.trim().length()>0 ) {
+                    double validMin= Double.parseDouble(svalidMin);
+                    result1.putProperty( QDataSet.VALID_MIN, validMin );
+                }   
+            } catch (XPathExpressionException ex) {
+                Logger.getLogger(Pds4DataSource.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
     @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception, URISyntaxException, ParserConfigurationException, SAXException, XPathExpressionException {
         String name= getParam("arg_0","");
@@ -566,88 +627,26 @@ public class Pds4DataSource extends AbstractDataSource {
                 for ( Pds4Reader.DataObject d : objects ) {
                     if ( d instanceof Pds4Reader.Array ) {
                         Pds4Reader.Array a= (Pds4Reader.Array)d;
-                        Units units=null;
                         if ( a.name.equals(name) ) {
-                            MutablePropertyDataSet result1;
-                            switch (a.axes.size()) {
-                                case 1:    {
-                                        double[] dd= a.read(a.elements, mon);
-                                        int[] qube= new int[] { dd.length };
-                                        DDataSet ddresult= DDataSet.wrap( dd, qube );
-                                        boolean isCDF= fileUrl.getFile().toLowerCase().endsWith(".cdf");
-                                        //TODO: maybe check for SignedMSB8
-                                        if ( isCDF && ( name.equalsIgnoreCase("Epoch") || name.equalsIgnoreCase("tt2000") ) ) { 
-                                            logger.fine("Epoch kludge results in CDF_TT2000 units");
-                                            units= Units.cdfTT2000;
-                                            ddresult.putProperty( QDataSet.UNITS, units );
-                                        }       
-                                        results[i]= ddresult;
-                                        result1= ddresult;
-                                        break;
-                                    }
-                                case 2:    {
-                                        double[] rank1= a.read(a.elements, mon);
-                                        int[] qube= new int[] { a.axes.get(0).elements, a.axes.get(1).elements }; //TODO: verify
-                                        DDataSet ddresult= DDataSet.wrap( rank1, qube );
-                                        results[i]= ddresult;
-                                        result1= ddresult;
-                                        break;
-                                    }
-                                case 3:    {
-                                        double[] rank1= a.read(a.elements, mon);
-                                        int[] qube= new int[] { a.axes.get(0).elements, a.axes.get(1).elements, a.axes.get(2).elements }; //TODO: verify
-                                        DDataSet ddresult= DDataSet.wrap( rank1, qube );
-                                        results[i]= ddresult;
-                                        result1= ddresult;
-                                        break;
-                                    }
-                                default:
-                                    logger.warning("Unsupported number of axes, only one, two, or three.");
-                                    results[i]= null;
-                                    continue;
+                            String delegateUri= resolveUri(a);
+
+                            DataSource delegate= DataSetURI.getDataSource(delegateUri);
+                            QDataSet ds= delegate.getDataSet( mon.getSubtaskMonitor( "dataset "+ i ) );
+                            ds= Ops.putProperty( ds, QDataSet.NAME, Ops.safeName(name) );
+                            ds= Ops.putProperty( ds, QDataSet.LABEL, name );
+                            ds= Ops.putProperty(ds, QDataSet.DESCRIPTION, DocumentUtil.cleanDescriptionString( a.description ) );
+                            HashMap<String,Object> user= new HashMap<>();
+                            user.put("delegate_uri",delegateUri);
+                            ds= Ops.putProperty( ds, QDataSet.USER_PROPERTIES, user );
+                            boolean isCDF= fileUrl.getFile().toLowerCase().endsWith(".cdf") 
+                                    && ( a.element.dataType==FieldType.SIGNEDMSB8 || a.element.dataType==FieldType.SIGNEDLSB8 );
+                            addMetadata(name, (MutablePropertyDataSet)ds, doc);
+                            if ( isCDF && ( name.equalsIgnoreCase("Epoch") || name.equalsIgnoreCase("tt2000") ) ) { 
+                                logger.fine("Epoch kludge results in CDF_TT2000 units");
+                                Units units= Units.cdfTT2000;
+                                ds= Ops.putProperty( ds, QDataSet.UNITS, units );
                             }
-
-                            if ( result1!=null && doc!=null ) {
-                                XPathFactory factory= XPathFactory.newInstance();
-                                XPath xpath= factory.newXPath();
-
-                                String sunits= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/Element_Array/unit/text()", doc );
-                                sunits= sunits.trim();
-                                if ( sunits.length()>0 && units==null ) {
-                                    result1.putProperty( QDataSet.UNITS, Units.lookupUnits(sunits) );
-                                }
-                                if ( units==null || !UnitsUtil.isTimeLocation(units) ) {
-                                    String labl= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/name/text()", doc );
-                                    if ( labl.length()==0 ) labl= name;
-                                    ((MutablePropertyDataSet)results[i]).putProperty( QDataSet.LABEL, labl );
-                                    String title= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/description/text()", doc );
-                                    if ( title.length()>0 ) {
-                                        result1.putProperty( QDataSet.TITLE, title.trim() );
-                                    }
-                                }
-
-                                String sfillValue= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/Special_Constants/invalid_constant/text()", doc );
-                                if ( sfillValue.length()==0 ) 
-                                    sfillValue= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/Special_Constants/missing_constant/text()", doc );
-                                String svalidMax= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/Special_Constants/valid_maximum/text()", doc );
-                                String svalidMin= (String) xpath.evaluate( "//Product_Observational/File_Area_Observational/Array[name='"+name+"']/Special_Constants/valid_minimum/text()", doc );
-                                if ( sfillValue.trim().length()>0 ) {
-                                    double fillValue= Double.parseDouble(sfillValue);
-                                    result1.putProperty( QDataSet.FILL_VALUE, fillValue );
-                                }
-                                if ( svalidMax.trim().length()>0 ) {
-                                    double validMax= Double.parseDouble(svalidMax);
-                                    if ( Math.log10(validMax)>-50  ) {  //https://pds-ppi.igpp.ucla.edu/data/maven-static-c/data/c6_32e64m/2014/10/mvn_sta_l2_c6-32e64m_20141013_v02_r01.xml?TT2000
-                                        result1.putProperty( QDataSet.VALID_MAX, validMax );
-                                    } else {
-                                        logger.log(Level.WARNING, "Unbelievable value found for Special_Constants/valid_maximum, ignoring: {0}", svalidMax);
-                                    }
-                                }
-                                if ( svalidMin.trim().length()>0 ) {
-                                    double validMin= Double.parseDouble(svalidMin);
-                                    result1.putProperty( QDataSet.VALID_MIN, validMin );
-                                }
-                            }
+                            results[i]= ds;
                         }
                     }
                 }
@@ -809,6 +808,150 @@ public class Pds4DataSource extends AbstractDataSource {
         }
         
         return result;
+    }
+
+    /**
+     * given the array object, what is the binary URI to read this?
+     * @param a
+     * @return 
+     */
+    private String resolveUri(Pds4Reader.Array array) {
+          FieldType fieldType = array.element.dataType;
+
+        String type;
+        switch (fieldType) {
+            case SIGNEDBYTE:   type = "byte";   break;
+            case UNSIGNEDBYTE: type = "ubyte";  break;
+
+            case SIGNEDLSB2:
+            case SIGNEDMSB2:   type = "short";  break;
+
+            case UNSIGNEDLSB2:
+            case UNSIGNEDMSB2: type = "ushort"; break;
+
+            case SIGNEDLSB4:
+            case SIGNEDMSB4:   type = "int";    break;
+
+            case UNSIGNEDLSB4:
+            case UNSIGNEDMSB4: type = "uint";   break;
+
+            case SIGNEDLSB8:
+            case SIGNEDMSB8:   type = "long";   break;
+
+            case UNSIGNEDLSB8:
+            case UNSIGNEDMSB8: type = "ulong";  break;
+
+            case IEEE754LSBSINGLE:
+            case IEEE754MSBSINGLE:
+                type = "float";
+                break;
+
+            case IEEE754LSBDOUBLE:
+            case IEEE754MSBDOUBLE:
+                type = "double";
+                break;
+
+            default:
+                throw new IllegalArgumentException(
+                        "Unsupported array element type: " + fieldType);
+        }
+
+        int[] shape = array.shape;
+        if (shape.length < 1 || shape.length > 4) {
+            throw new IllegalArgumentException(
+                    "Unsupported array rank: " + shape.length);
+        }
+
+        if (array.firstIndexFastest && shape.length > 1) {
+            throw new IllegalArgumentException(
+                    "First Index Fastest requires reordering after reading");
+        }
+
+        // vap+bin does not implement PDS4 scaling through these parameters.
+        if (array.element.scalingFactor != 1.0
+                || array.element.valueOffset != 0.0) {
+            throw new IllegalArgumentException(
+                    "PDS4 scaling must be applied after reading");
+        }
+
+        // One record contains all dimensions following the first axis.
+        long itemsPerRecord = 1;
+        for (int i = 1; i < shape.length; i++) {
+            itemsPerRecord = Math.multiplyExact(itemsPerRecord, shape[i]);
+        }
+
+        long recordBytes = Math.multiplyExact(
+                itemsPerRecord, fieldType.getByteWidth());
+
+        long byteLength = Math.multiplyExact(
+                recordBytes, (long) shape[0]);
+
+        // The current binary reader uses int-sized buffers and bit strides.
+        if (recordBytes > Integer.MAX_VALUE / 8
+                || byteLength > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException(
+                    "Array exceeds the binary reader's size limits");
+        }
+
+        Map<String, String> args = new LinkedHashMap<>();
+        args.put("type", type);
+        args.put("byteOffset", Long.toString(array.offset));
+        args.put("byteLength", Long.toString(byteLength));
+        args.put("recLength", Long.toString(recordBytes));
+        args.put("recCount", Integer.toString(shape[0]));
+        args.put("recOffset", "0");
+
+        ByteOrder order = fieldType.getByteOrder();
+        if (order != null) {
+            args.put("byteOrder",
+                    order == ByteOrder.LITTLE_ENDIAN ? "little" : "big");
+        }
+
+        if (shape.length > 1) {
+            StringBuilder dims = new StringBuilder("[");
+            for (int i = 1; i < shape.length; i++) {
+                if (i > 1) dims.append(",");
+                dims.append(shape[i]);
+            }
+            dims.append("]");
+            args.put("dims", dims.toString());
+        }
+
+        if (!array.element.unit.isEmpty()) {
+            args.put("units", array.element.unit);
+        }
+
+        if (array.element.validMinimum != null) {
+            args.put("validMin", array.element.validMinimum);
+        }
+        if (array.element.validMaximum != null) {
+            args.put("validMax", array.element.validMaximum);
+        }
+
+        // The binary reader supports one fillValue. Multiple distinct PDS4
+        // special constants require additional processing after reading.
+        String fill = null;
+        for (Map.Entry<String, String> entry
+                : array.element.specialConstants.entrySet()) {
+            String name = entry.getKey();
+            if (name.equals("valid_minimum")
+                    || name.equals("valid_maximum")) {
+                continue;
+            }
+
+            String value = entry.getValue();
+            if (fill != null && !fill.equals(value)) {
+                throw new IllegalArgumentException(
+                        "Multiple special constants require postprocessing");
+            }
+            fill = value;
+        }
+        if (fill != null) {
+            args.put("fillValue", fill);
+        }
+
+        return "vap+bin:" + array.resource.toASCIIString()
+            + "?" + URISplit.formatParams(args);
     }
 
 }
