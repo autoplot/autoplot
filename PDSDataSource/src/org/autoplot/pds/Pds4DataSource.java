@@ -439,7 +439,19 @@ public class Pds4DataSource extends AbstractDataSource {
             }
         }
     }
-
+        
+    /**
+     * pluses get turned into spaces and spaces turn into pluses.  Compare them without caring.
+     * @param a
+     * @param b
+     * @return 
+     */
+    public static boolean plusSpaceAliasEquals( String a, String b ) {
+        a= a.replaceAll(" ","+");
+        b= b.replaceAll(" ","+");
+        return a.equals(b);
+    }
+    
     @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception, URISyntaxException, ParserConfigurationException, SAXException, XPathExpressionException {
         String name= getParam("arg_0","");
@@ -464,10 +476,7 @@ public class Pds4DataSource extends AbstractDataSource {
         URL fileUrl;
         fileUrl = PdsDataSourceFactory.getFileResource( labelUrl, mon );
         
-        DataSetURI.getFile( fileUrl,mon );
-        
-        
-
+        DataSetURI.getFile( fileUrl,mon );        
         
         File labelFile = DataSetURI.getFile(labelUrl,mon );
                     
@@ -531,7 +540,7 @@ public class Pds4DataSource extends AbstractDataSource {
                                     
                                 } else {
                                     for ( Pds4Reader.Field fd: t.fields ) {
-                                        if ( name.equals( fd.name ) ) { 
+                                        if ( plusSpaceAliasEquals(name,fd.name) ) { 
                                             if ( !newNames.get(0).equals(dep0name) ) {
                                                 newNames.add( 0, dep0name );
                                             }
@@ -560,7 +569,7 @@ public class Pds4DataSource extends AbstractDataSource {
 
                         } else {
                             for ( Pds4Reader.Field fd: t.fields ) {
-                                if ( name.equals( fd.name ) ) { 
+                                if ( plusSpaceAliasEquals(name,fd.name) ) { 
                                     tableColumnNames.add( fd.name );
                                     datasetColumnIndexes.add(i);
                                 }
