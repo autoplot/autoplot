@@ -761,7 +761,7 @@ public class Pds4DataSource extends AbstractDataSource {
                     Pds4Reader.Table t= (Pds4Reader.Table)d;
                     //TODO: can there be more than one table?
                     for ( Pds4Reader.Field fd: t.fields ) {
-                        result.put( fd.name, fd.name + " of a table" );
+                        result.put( fd.name, fd.name );
                     }
                 }
             }

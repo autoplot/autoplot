@@ -126,7 +126,7 @@ public class PdsDataSourceFactory extends AbstractDataSourceFactory {
                     TableObject t= (TableObject)d;
                     //TODO: can there be more than one table?
                     for ( FieldDescription fd: t.getFields() ) {
-                        result.put( fd.getName(), fd.getName() + " of a table" );
+                        result.put( fd.getName(), fd.getName() );
                     }
                 }
             }
