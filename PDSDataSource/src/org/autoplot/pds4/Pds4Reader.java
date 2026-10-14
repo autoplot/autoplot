@@ -535,6 +535,7 @@ public final class Pds4Reader {
     public static final class Field {
 
         public final String name;
+        public final String description;
         public final ValueType type;
         /**
          * Fixed-width: zero-based byte offset in the RECORD, including group offsets. Delimited: zero-based expanded cell index.
@@ -549,8 +550,9 @@ public final class Pds4Reader {
             return type.dataType;
         }
 
-        Field(String name, ValueType type, int location, int length) {
+        Field(String name, String description, ValueType type, int location, int length) {
             this.name = name;
+            this.description= description;
             this.type = type;
             this.location = location;
             this.length = length;
@@ -682,7 +684,8 @@ public final class Pds4Reader {
                 if (fields.size() >= MAX_FIELDS) {
                     throw new IOException("Too many expanded fields");
                 }
-                fields.add(new Field(required(e, "name"), type, delimited ? loc : Math.addExact(base, loc), len));
+                
+                fields.add(new Field(required(e, "name"), text(e,"description",""), type, delimited ? loc : Math.addExact(base, loc), len));
             } else if (e.getLocalName().equals("Group_Field_" + kind)) {
                 int repeats = positiveInt(number(e, "repetitions"), "repetitions");
                 if (repeats > MAX_FIELDS) {
