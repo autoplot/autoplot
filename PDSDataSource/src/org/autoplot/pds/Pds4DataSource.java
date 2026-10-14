@@ -735,7 +735,7 @@ public class Pds4DataSource extends AbstractDataSource {
         
         
     }
-        
+    
     /**
      * return a list of parameters.
      * @param url
@@ -761,7 +761,7 @@ public class Pds4DataSource extends AbstractDataSource {
                     Pds4Reader.Table t= (Pds4Reader.Table)d;
                     //TODO: can there be more than one table?
                     for ( Pds4Reader.Field fd: t.fields ) {
-                        result.put( fd.name, fd.name );
+                        result.put( fd.name, DocumentUtil.createTitleFrom(fd.description) );
                     }
                 }
             }
