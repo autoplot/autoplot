@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -72,6 +73,7 @@ import org.autoplot.datasource.RecentComboBox;
 import org.autoplot.datasource.TimeRangeTool;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.ui.PromptComboBoxEditor;
+import org.das2.util.BooleanSearch;
 
 /**
  * Swing editor for HAPI URIs
@@ -485,10 +487,10 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         if ( item==null ) item = "";
         item = item.trim();
         if ( item.length()>0 ) {
-            Pattern p= Pattern.compile(item,Pattern.CASE_INSENSITIVE);
+            Predicate<String> s= BooleanSearch.compile(item);
             List<String> newServers= new ArrayList<>();
             for ( int i=0; i<servers1.length; i++ ) {
-                if ( p.matcher(servers1[i]).find() ) {
+                if ( s.test(servers1[i]) ) {
                     newServers.add(servers1[i]);
                 }
             }
@@ -703,7 +705,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         });
 
-        datasetFilterComboBox.setToolTipText("search bar, any id or title containing regular expression (.* matches anything) is shown");
+        datasetFilterComboBox.setToolTipText("<html>search bar which allows predicates AND, OR, NOT, and groups:\n<table><tr>Search examples</tr>\n<tr><td>rbsp density</td>\t<td>Both terms</td></tr>\n<tr><td>rbsp OR themis</td>\t<td>either term</td></tr>\n<tr><td>rbsp NOT density</td>\t<td>Exclude density</td></tr>\n<tr><td>\"electron density\"</td>\t<td>Exact phrase</td></tr>\n<tr><td>(rbsp OR themis) AND density</td>\t<td>Grouped search</td></tr>\n</table>\nCase-insensitive. Precedence: NOT, AND, OR.");
         datasetFilterComboBox.setMaximumSize(new java.awt.Dimension(1028, 32767));
         datasetFilterComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1338,15 +1340,21 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             final String filter= datasetFilterComboBox.getSelectedItem().toString().trim();
             DefaultListModel model= new DefaultListModel();
             int maxCharacters=0;
+
+            Predicate<String> search= null;
+            if ( filter.length()>0 ) {
+                search= BooleanSearch.compile(filter);
+            }
+
             for ( JSONObject catalogEntry: new JSONArrayIterator(idsJSON) ) {
-                if ( filter.length()>0 ) {
-                    Pattern p= Pattern.compile(filter,Pattern.CASE_INSENSITIVE);
+                if ( search!=null ) {
                     String id= catalogEntry.getString("id");
                     String title= null;
                     if ( catalogEntry.has(HapiSpec.TITLE) ) {
                         title= catalogEntry.getString(HapiSpec.TITLE);
                     }
-                    if ( p.matcher(id).find() || ( title!=null && p.matcher(title).find() ) ) {
+                    String both= id + " " + title;
+                    if ( search.test(both) ) {
                         model.addElement( catalogEntry );
                         maxCharacters= Math.max( catalogEntry.getString("id").length(), maxCharacters );
                     }
@@ -1532,7 +1540,11 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         JSONArray parameters= info.getJSONArray("parameters");
         String parameterFilter= (String)parameterFilterComboBox.getSelectedItem();
         if ( parameterFilter==null ) parameterFilter="";
-        Pattern p= parameterFilter.length()>0 ? Pattern.compile(parameterFilter,Pattern.CASE_INSENSITIVE) : null ;
+        
+        Predicate filter=null;
+        if ( parameterFilter.length()>0 ) {
+            filter= BooleanSearch.compile(parameterFilter);
+        }
 
         StringBuilder extra= new StringBuilder();
         extra.append("<html><table>");
@@ -1638,7 +1650,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             cb.setText( labelDesc );
             parameterCheckboxes.add( cb );
             
-            if ( p==null || ( p.matcher(labelDesc).find() ) ) {
+            if ( filter==null || ( filter.test(labelDesc) ) ) {
                 parametersPanel.add( cb );
             } else {
                 cb.setSelected(false);

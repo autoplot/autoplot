@@ -328,7 +328,7 @@
             </Component>
             <Component class="org.autoplot.datasource.RecentComboBox" name="datasetFilterComboBox">
               <Properties>
-                <Property name="toolTipText" type="java.lang.String" value="search bar, any id or title containing regular expression (.* matches anything) is shown"/>
+                <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;search bar which allows predicates AND, OR, NOT, and groups:&#xa;&lt;table&gt;&lt;tr&gt;Search examples&lt;/tr&gt;&#xa;&lt;tr&gt;&lt;td&gt;rbsp density&lt;/td&gt;&#x9;&lt;td&gt;Both terms&lt;/td&gt;&lt;/tr&gt;&#xa;&lt;tr&gt;&lt;td&gt;rbsp OR themis&lt;/td&gt;&#x9;&lt;td&gt;either term&lt;/td&gt;&lt;/tr&gt;&#xa;&lt;tr&gt;&lt;td&gt;rbsp NOT density&lt;/td&gt;&#x9;&lt;td&gt;Exclude density&lt;/td&gt;&lt;/tr&gt;&#xa;&lt;tr&gt;&lt;td&gt;&quot;electron density&quot;&lt;/td&gt;&#x9;&lt;td&gt;Exact phrase&lt;/td&gt;&lt;/tr&gt;&#xa;&lt;tr&gt;&lt;td&gt;(rbsp OR themis) AND density&lt;/td&gt;&#x9;&lt;td&gt;Grouped search&lt;/td&gt;&lt;/tr&gt;&#xa;&lt;/table&gt;&#xa;Case-insensitive. Precedence: NOT, AND, OR."/>
                 <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                   <Dimension value="[1028, 32767]"/>
                 </Property>
