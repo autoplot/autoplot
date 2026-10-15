@@ -668,26 +668,29 @@ public class Pds4DataSource extends AbstractDataSource {
 
                             DataSource delegate= DataSetURI.getDataSource(delegateUri);
                             QDataSet ds= delegate.getDataSet( mon.getSubtaskMonitor( "dataset "+ i ) );
-                            ds= Ops.putProperty( ds, QDataSet.NAME, Ops.safeName(name) );
-                            ds= Ops.putProperty( ds, QDataSet.LABEL, name );
-                            ds= Ops.putProperty(ds, QDataSet.DESCRIPTION, DocumentUtil.cleanDescriptionString( a.description ) );
                             HashMap<String,Object> user= new HashMap<>();
                             user.put("delegate_uri",delegateUri);
                             ds= Ops.putProperty( ds, QDataSet.USER_PROPERTIES, user );
                             boolean isCDF= fileUrl.getFile().toLowerCase().endsWith(".cdf") 
                                     && ( a.element.dataType==FieldType.SIGNEDMSB8 || a.element.dataType==FieldType.SIGNEDLSB8 );
                             addMetadata(name, (MutablePropertyDataSet)ds, doc);
+                            Units units=null;
                             if ( isCDF && ( name.equalsIgnoreCase("Epoch") || name.equalsIgnoreCase("tt2000") ) ) { 
                                 logger.fine("Epoch kludge results in CDF_TT2000 units");
-                                Units units= Units.cdfTT2000;
+                                units= Units.cdfTT2000;
                                 ds= Ops.putProperty( ds, QDataSet.UNITS, units );
                             }
+                            ds= Ops.putProperty( ds, QDataSet.NAME, Ops.safeName(name) );
+                            if ( Units.cdfTT2000!=units ) {
+                                ds= Ops.putProperty( ds, QDataSet.LABEL, name );
+                            }
+                            ds= Ops.putProperty(ds, QDataSet.DESCRIPTION, DocumentUtil.cleanDescriptionString( a.description ) );
                             results[i]= ds;
                         }
                     }
                 }
             }
-
+            
             //for ( DataObject d : objects ) {
             //    if ( d!=null ) d.closeChannel();
             //}
@@ -913,14 +916,12 @@ public class Pds4DataSource extends AbstractDataSource {
         // One record contains all dimensions following the first axis.
         long itemsPerRecord = 1;
         for (int i = 1; i < shape.length; i++) {
-            itemsPerRecord = Math.multiplyExact(itemsPerRecord, shape[i]);
+            itemsPerRecord = itemsPerRecord * shape[i];
         }
 
-        long recordBytes = Math.multiplyExact(
-                itemsPerRecord, fieldType.getByteWidth());
+        long recordBytes = itemsPerRecord * fieldType.getByteWidth();
 
-        long byteLength = Math.multiplyExact(
-                recordBytes, (long) shape[0]);
+        long byteLength = recordBytes * (long) shape[0];
 
         // The current binary reader uses int-sized buffers and bit strides.
         if (recordBytes > Integer.MAX_VALUE / 8
