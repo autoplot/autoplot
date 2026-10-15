@@ -127,7 +127,7 @@ public class CDAWebDataSetIdDialog extends javax.swing.JDialog {
             }
         });
 
-        filterTF.setToolTipText("filter on ID and description using predicates AND, OR, NOT, and groups:\n<table><tr>Search examples</tr>\n<tr><td>rbsp density</td>\t<td>Both terms</td></tr>\n<tr><td>rbsp OR themis</td>\t<td>either term</td></tr>\n<tr><td>rbsp NOT density</td>\t<td>Exclude density</td></tr>\n<tr><td>\"electron density\"</td>\t<td>Exact phrase</td></tr>\n<tr><td>(rbsp OR themis) AND density</td>\t<td>Grouped search</td></tr>\n</table>\nCase-insensitive. Precedence: NOT, AND, OR.");
+        filterTF.setToolTipText("<html>filter on ID and description using predicates AND, OR, NOT, and groups:\n<table><tr>Search examples</tr>\n<tr><td>rbsp density</td>\t<td>Both terms</td></tr>\n<tr><td>rbsp OR themis</td>\t<td>either term</td></tr>\n<tr><td>rbsp NOT density</td>\t<td>Exclude density</td></tr>\n<tr><td>\"electron density\"</td>\t<td>Exact phrase</td></tr>\n<tr><td>(rbsp OR themis) AND density</td>\t<td>Grouped search</td></tr>\n</table>\nCase-insensitive. Precedence: NOT, AND, OR.");
         filterTF.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 filterTFActionPerformed(evt);
