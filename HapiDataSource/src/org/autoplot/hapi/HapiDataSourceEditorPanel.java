@@ -487,7 +487,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         if ( item==null ) item = "";
         item = item.trim();
         if ( item.length()>0 ) {
-            Predicate<String> s= BooleanSearch.compile(item);
+            Predicate<String> s= BooleanSearch.compileLenient(item);
             List<String> newServers= new ArrayList<>();
             for ( int i=0; i<servers1.length; i++ ) {
                 if ( s.test(servers1[i]) ) {
@@ -1343,7 +1343,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
 
             Predicate<String> search= null;
             if ( filter.length()>0 ) {
-                search= BooleanSearch.compile(filter);
+                search= BooleanSearch.compileLenient(filter);
             }
 
             for ( JSONObject catalogEntry: new JSONArrayIterator(idsJSON) ) {
@@ -1543,7 +1543,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         
         Predicate filter=null;
         if ( parameterFilter.length()>0 ) {
-            filter= BooleanSearch.compile(parameterFilter);
+            filter= BooleanSearch.compileLenient(parameterFilter);
         }
 
         StringBuilder extra= new StringBuilder();
