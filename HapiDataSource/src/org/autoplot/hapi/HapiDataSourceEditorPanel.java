@@ -198,7 +198,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         hapiServerRecentComboBox.invalidate();
         hapiServerRecentComboBox.revalidate();
         
-        datasetFilterComboBox.setPreferenceNode("hapi.filters");
+        datasetFilterComboBox.setPreferenceNode("hapi.server.filters");
         editor= new PromptComboBoxEditor("search regex");
         editor.setTooltipText( datasetFilterComboBox.getToolTipText() );
         datasetFilterComboBox.setEditor( editor );
@@ -207,7 +207,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         datasetFilterComboBox.revalidate();
         serverSearch= editor;
         
-        parameterFilterComboBox.setPreferenceNode("hapi.filters");
+        parameterFilterComboBox.setPreferenceNode("hapi.parameters.filters");
         editor= new PromptComboBoxEditor("search");
         editor.setTooltipText( datasetFilterComboBox.getToolTipText() );
         parameterFilterComboBox.setEditor( editor );
