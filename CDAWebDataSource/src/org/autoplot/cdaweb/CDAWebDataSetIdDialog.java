@@ -9,9 +9,11 @@ package org.autoplot.cdaweb;
 
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
 import javax.swing.SwingUtilities;
+import org.das2.util.BooleanSearch;
 
 /**
  * Dialog for picking dataset ID.
@@ -60,20 +62,19 @@ public class CDAWebDataSetIdDialog extends javax.swing.JDialog {
         Map<String,String> ids= db.getServiceProviderIds();
         String filter="";
         if ( filterCheckBox.isSelected() ) {
-            filter= filterTF.getText().toLowerCase();
+            filter= filterTF.getText();
         }
 
         DefaultListModel model= new DefaultListModel();
 
-        Pattern p= null;
+        Predicate<String> filt= null;        
         if ( filter.length()>0 ) {
-            String regex= toRegexSafe(filter);
-            p = Pattern.compile( regex );
+            filt= BooleanSearch.compileLenient(filter);
         }
         
         for ( Entry<String,String> e: ids.entrySet() ) {
             String add= e.getKey() + ": " +e.getValue();
-            if ( p==null || p.matcher( add ).find() ) {
+            if ( filt==null || filt.test(add) ) {
                model.addElement( add );
             }
         }
@@ -126,7 +127,7 @@ public class CDAWebDataSetIdDialog extends javax.swing.JDialog {
             }
         });
 
-        filterTF.setToolTipText("filter on ID and description");
+        filterTF.setToolTipText("filter on ID and description using predicates AND, OR, NOT, and groups:\n<table><tr>Search examples</tr>\n<tr><td>rbsp density</td>\t<td>Both terms</td></tr>\n<tr><td>rbsp OR themis</td>\t<td>either term</td></tr>\n<tr><td>rbsp NOT density</td>\t<td>Exclude density</td></tr>\n<tr><td>\"electron density\"</td>\t<td>Exact phrase</td></tr>\n<tr><td>(rbsp OR themis) AND density</td>\t<td>Grouped search</td></tr>\n</table>\nCase-insensitive. Precedence: NOT, AND, OR.");
         filterTF.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 filterTFActionPerformed(evt);

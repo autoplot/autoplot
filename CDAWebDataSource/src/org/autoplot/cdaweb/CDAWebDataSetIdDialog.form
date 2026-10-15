@@ -90,7 +90,7 @@
     </Component>
     <Component class="javax.swing.JTextField" name="filterTF">
       <Properties>
-        <Property name="toolTipText" type="java.lang.String" value="filter on ID and description"/>
+        <Property name="toolTipText" type="java.lang.String" value="filter on ID and description using predicates AND, OR, NOT, and groups:&#xa;&lt;table&gt;&lt;tr&gt;Search examples&lt;/tr&gt;&#xa;&lt;tr&gt;&lt;td&gt;rbsp density&lt;/td&gt;&#x9;&lt;td&gt;Both terms&lt;/td&gt;&lt;/tr&gt;&#xa;&lt;tr&gt;&lt;td&gt;rbsp OR themis&lt;/td&gt;&#x9;&lt;td&gt;either term&lt;/td&gt;&lt;/tr&gt;&#xa;&lt;tr&gt;&lt;td&gt;rbsp NOT density&lt;/td&gt;&#x9;&lt;td&gt;Exclude density&lt;/td&gt;&lt;/tr&gt;&#xa;&lt;tr&gt;&lt;td&gt;&quot;electron density&quot;&lt;/td&gt;&#x9;&lt;td&gt;Exact phrase&lt;/td&gt;&lt;/tr&gt;&#xa;&lt;tr&gt;&lt;td&gt;(rbsp OR themis) AND density&lt;/td&gt;&#x9;&lt;td&gt;Grouped search&lt;/td&gt;&lt;/tr&gt;&#xa;&lt;/table&gt;&#xa;Case-insensitive. Precedence: NOT, AND, OR."/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filterTFActionPerformed"/>
