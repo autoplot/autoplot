@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>The Data Mash-up Tool is used to plot Polar/Hydra density against R<sub>E</sub>.</small></p>
+        <p><small>HapiDataSource now uses simpler filter strings, like "rbsp AND density NOT source".</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -75,6 +75,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>HapiDataSource now uses simpler filter strings, like "rbsp AND density NOT source".  
             <li>Huge Scatter performance gain with 126M-point dataset, from 2800ms -> 500ms per draw, by using addValue to increment count and removing loop invariants.
             <li>Kludgy unit "rgbColor" detected now and colorbar is turned off.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/888/">888</a>: support rank 3 and rank 4 data in .mat files. Thanks, Ivar!
