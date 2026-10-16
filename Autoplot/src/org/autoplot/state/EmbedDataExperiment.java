@@ -40,6 +40,8 @@ import org.autoplot.datasource.URISplit;
 import org.autoplot.dom.Plot;
 import org.autoplot.jythonsupport.JythonUtil;
 import org.autoplot.jythonsupport.JythonUtil.ScriptDescriptor;
+import org.das2.datum.DatumRange;
+import org.das2.datum.OrbitDatumRange;
 import org.das2.qstream.SimpleStreamFormatter;
 import org.das2.qstream.StreamException;
 import org.das2.qstream.StreamTool;
@@ -165,6 +167,30 @@ public class EmbedDataExperiment {
         for ( Plot p: dom.getPlots() ) {
             String s= p.getTicksURI();
             maybeAddResource( s, dom, result );
+            if ( p.getXaxis().getRange() instanceof OrbitDatumRange ) {
+                OrbitDatumRange mdr= (OrbitDatumRange)p.getXaxis().getRange();
+                if ( mdr.getSpacecraft().startsWith("file:") ) {
+                    maybeAddResource( mdr.getSpacecraft(), dom, result );
+                }
+            }
+            if ( p.getYaxis().getRange() instanceof OrbitDatumRange ) {
+                OrbitDatumRange mdr= (OrbitDatumRange)p.getYaxis().getRange();
+                if ( mdr.getSpacecraft().startsWith("file:") ) {
+                    maybeAddResource( mdr.getSpacecraft(), dom, result );
+                }
+            }
+            if ( p.getZaxis().getRange() instanceof OrbitDatumRange ) {
+                OrbitDatumRange mdr= (OrbitDatumRange)p.getZaxis().getRange();
+                if ( mdr.getSpacecraft().startsWith("file:") ) {
+                    maybeAddResource( mdr.getSpacecraft(), dom, result );
+                }
+            }
+            if ( p.getContext() instanceof OrbitDatumRange ) {
+                OrbitDatumRange mdr= (OrbitDatumRange)p.getContext();
+                if ( mdr.getSpacecraft().startsWith("file:") ) {
+                    maybeAddResource( mdr.getSpacecraft(), dom, result );
+                }
+            }
         }
         String s= dom.getEventsListUri();
         maybeAddResource( s, dom, result );
@@ -401,7 +427,42 @@ public class EmbedDataExperiment {
                     String name= makeRelativeName(commonPath,split.resourceUri);
                     split.file= "%{PWD}/"+name;
                     p.setTicksURI( URISplit.format(split) );
-                } 
+                }
+                if ( p.getXaxis().getRange() instanceof OrbitDatumRange ) {
+                    OrbitDatumRange mdr= (OrbitDatumRange)p.getXaxis().getRange();
+                    if ( mdr.getSpacecraft().startsWith("file:") ) {
+                        DatumRange dr= OrbitDatumRange.maybeRelativize(commonPath,mdr,"file/");
+                        p.getXaxis().setRange(dr);
+                    }
+                }
+                if ( p.getYaxis().getRange() instanceof OrbitDatumRange ) {
+                    OrbitDatumRange mdr= (OrbitDatumRange)p.getYaxis().getRange();
+                    if ( mdr.getSpacecraft().startsWith("file:") ) {
+                        DatumRange dr= OrbitDatumRange.maybeRelativize(commonPath,mdr,"file/");
+                        p.getYaxis().setRange(dr);
+                    }
+                }
+                if ( p.getZaxis().getRange() instanceof OrbitDatumRange ) {
+                    OrbitDatumRange mdr= (OrbitDatumRange)p.getZaxis().getRange();
+                    if ( mdr.getSpacecraft().startsWith("file:") ) {
+                        DatumRange dr= OrbitDatumRange.maybeRelativize(commonPath,mdr,"file/");
+                        p.getZaxis().setRange(dr);
+                    }
+                }
+                if ( p.getContext() instanceof OrbitDatumRange ) {
+                    OrbitDatumRange mdr= (OrbitDatumRange)p.getContext();
+                    if ( mdr.getSpacecraft().startsWith("file:") ) {
+                        DatumRange dr= OrbitDatumRange.maybeRelativize(commonPath,mdr,"file/");
+                        p.setContext(dr);
+                    }
+                }
+            }
+            if ( dom.getTimeRange() instanceof OrbitDatumRange ) {
+                OrbitDatumRange mdr= (OrbitDatumRange)dom.getTimeRange();
+                if ( mdr.getSpacecraft().startsWith("file:") ) {
+                    DatumRange dr= OrbitDatumRange.maybeRelativize(commonPath,mdr,"file/");
+                    dom.setTimeRange(dr);
+                }
             }
             {
                 String uri = dom.getEventsListUri();
