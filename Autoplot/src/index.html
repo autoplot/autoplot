@@ -32,6 +32,7 @@
                 
         <p>Bugfixes (2026-10-10):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2906/">2906</a>: Embed data in .vap works with orbit datum ranges with local file references.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2882/">2882</a>: ASCII data source also kept state which caused runtime error on reload.
             <li>Minor clean up of PngWalkTool while considering more major corrections with ChatGPT.
             <li>splitAnchorType with verticalAnchorType=PLOT was incorrectly implemented, locating the plot as if it were "DATA".
@@ -75,7 +76,8 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>HapiDataSource now uses simpler filter strings, like "rbsp AND density NOT source".  
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/889/">889</a>: CDAWeb, HapiDataSource now uses simple filter strings, like "rbsp AND density NOT source".  
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/890/">890</a>: New PDS4 reader supports Java 8 and will be maintained within Autoplot.
             <li>Huge Scatter performance gain with 126M-point dataset, from 2800ms -> 500ms per draw, by using addValue to increment count and removing loop invariants.
             <li>Kludgy unit "rgbColor" detected now and colorbar is turned off.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/888/">888</a>: support rank 3 and rank 4 data in .mat files. Thanks, Ivar!
