@@ -37,6 +37,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -86,6 +87,7 @@ import org.autoplot.bookmarks.BookmarksException;
 import org.autoplot.dom.CanvasController;
 import org.autoplot.datasource.HtmlResponseIOException;
 import org.autoplot.datasource.Version;
+import org.das2.datum.OrbitDatumRange;
 /**
  * Internal model of the application to separate model from view.
  * Note this is the legacy model that still remains from the first implementation
@@ -1149,8 +1151,8 @@ public final class ApplicationModel {
         Application app = createState(true);
         if ( options.getOrDefault(PersistentStateSupport.LOCAL_PWD_REFERENCES,Boolean.FALSE)==Boolean.TRUE ) {
             //app= (Application)app.copy();
-            File pp= f.getParentFile();
-            String spp= pp.getCanonicalPath();
+            File pp= f.getParentFile();            
+            String spp= pp.getCanonicalPath() + "/"; //TODO: Sorry Windows.
             for ( int i=0; i<app.getDataSourceFilters().length; i++ ) {
                 DataSourceFilter dsf= app.getDataSourceFilters(i);
                 //dsf= (DataSourceFilter)dsf.copy();
@@ -1159,11 +1161,29 @@ public final class ApplicationModel {
                 if ( split.file.startsWith("file:") ) {
                     File f1= new File( split.file.substring(5) ).getCanonicalFile();
                     if ( f1.getCanonicalPath().startsWith(spp) ) {
-                        split.file= "%{PWD}"+f1.getCanonicalPath().substring(spp.length()+1);  // +1 is for the /, which PWD contains
+                        split.file= "%{PWD}"+f1.getCanonicalPath().substring(spp.length());  
                         dsf.setUri( URISplit.format(split) );
                         app.setDataSourceFilters(i,dsf);
                     }
                 }
+            }
+            for ( Plot p: app.getPlots() ) {
+                if ( p.getXaxis().getRange() instanceof OrbitDatumRange ) {
+                    p.getXaxis().setRange(OrbitDatumRange.maybeRelativize(spp,(OrbitDatumRange)p.getXaxis().getRange()) );
+                }
+                if ( p.getYaxis().getRange() instanceof OrbitDatumRange ) {
+                    p.getYaxis().setRange(OrbitDatumRange.maybeRelativize(spp,(OrbitDatumRange)p.getYaxis().getRange()) );
+                }
+                if ( p.getZaxis().getRange() instanceof OrbitDatumRange ) {
+                    p.getZaxis().setRange(OrbitDatumRange.maybeRelativize(spp,(OrbitDatumRange)p.getZaxis().getRange()) );
+                }
+                if ( p.getContext() instanceof OrbitDatumRange ) {
+                    p.setContext(OrbitDatumRange.maybeRelativize(spp,(OrbitDatumRange)p.getContext()) );
+                }
+            }
+            if ( app.getTimeRange() instanceof OrbitDatumRange ) {
+                OrbitDatumRange odr= (OrbitDatumRange)app.getTimeRange();
+                app.setTimeRange( OrbitDatumRange.maybeRelativize( spp, odr ) );
             }
         }
         StatePersistence.saveState(f, app, scheme);

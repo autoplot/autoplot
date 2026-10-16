@@ -18,6 +18,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PushbackInputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -465,6 +466,30 @@ public class StatePersistence {
         
     }
 
+    /**
+     * replace each instance of orbit:%{PWD} in the input stream with the replacement value.  This
+     * is a special kludge required because valid OrbitDatumRanges must be created, and the stream
+     * cannot be deserialized unless this is resolved.
+     * @param in the InputStream which may contain the sequence "orbit:%{PWD}" multiple times.
+     * @param pwd insert this value, which should end in slash (/).
+     * @return a new InputStream with the value resolved.
+     * @throws IOException 
+     */
+    private static InputStream replacePwdInOrbitDatums(InputStream in, String pwd) throws IOException {
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        byte[] buffer = new byte[8192];
+        int n;
+
+        while ((n = in.read(buffer)) != -1) {
+            out.write(buffer, 0, n);
+        }
+
+        String text = new String(out.toByteArray(), StandardCharsets.UTF_8);
+        text = text.replace("orbit:%{PWD}", "orbit:" + pwd);
+        
+        return new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
+}    
     
     /**
      * restore the .vap file into an Application (dom) object, applying the deltas if any.
@@ -476,6 +501,10 @@ public class StatePersistence {
      * @see #restoreState(java.io.InputStream) which just restores the state.
      */
     public static Application restoreState(InputStream in, LinkedHashMap<String, String> deltas) throws IOException {
+        
+        if ( deltas.containsKey("PWD") ) {
+            in= replacePwdInOrbitDatums(in,deltas.get("PWD"));
+        }
         
         Application state = (Application) StatePersistence.restoreState(in);
         
