@@ -38,6 +38,7 @@ import org.das2.qds.QDataSet;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.dom.Plot;
+import org.autoplot.dom.PlotElement;
 import org.autoplot.jythonsupport.JythonUtil;
 import org.autoplot.jythonsupport.JythonUtil.ScriptDescriptor;
 import org.das2.datum.DatumRange;
@@ -421,6 +422,44 @@ public class EmbedDataExperiment {
                 dsfCount++;
             }
             for ( Plot p: dom.getPlots() ) {
+                String uri = p.getTicksURI();
+                URISplit split= URISplit.parse(uri);
+                if ( uri.trim().length()>0 && !hasNoResource(split) ) {
+                    String name= makeRelativeName(commonPath,split.resourceUri);
+                    split.file= "%{PWD}/"+name;
+                    p.setTicksURI( URISplit.format(split) );
+                }
+                if ( p.getXaxis().getRange() instanceof OrbitDatumRange ) {
+                    OrbitDatumRange mdr= (OrbitDatumRange)p.getXaxis().getRange();
+                    if ( mdr.getSpacecraft().startsWith("file:") ) {
+                        DatumRange dr= OrbitDatumRange.maybeRelativize(commonPath,mdr,"file/");
+                        p.getXaxis().setRange(dr);
+                    }
+                }
+                if ( p.getYaxis().getRange() instanceof OrbitDatumRange ) {
+                    OrbitDatumRange mdr= (OrbitDatumRange)p.getYaxis().getRange();
+                    if ( mdr.getSpacecraft().startsWith("file:") ) {
+                        DatumRange dr= OrbitDatumRange.maybeRelativize(commonPath,mdr,"file/");
+                        p.getYaxis().setRange(dr);
+                    }
+                }
+                if ( p.getZaxis().getRange() instanceof OrbitDatumRange ) {
+                    OrbitDatumRange mdr= (OrbitDatumRange)p.getZaxis().getRange();
+                    if ( mdr.getSpacecraft().startsWith("file:") ) {
+                        DatumRange dr= OrbitDatumRange.maybeRelativize(commonPath,mdr,"file/");
+                        p.getZaxis().setRange(dr);
+                    }
+                }
+                if ( p.getContext() instanceof OrbitDatumRange ) {
+                    OrbitDatumRange mdr= (OrbitDatumRange)p.getContext();
+                    if ( mdr.getSpacecraft().startsWith("file:") ) {
+                        DatumRange dr= OrbitDatumRange.maybeRelativize(commonPath,mdr,"file/");
+                        p.setContext(dr);
+                    }
+                }
+            }
+            for ( PlotElement pe: dom.getPlotElements() ) {
+                Plot p= pe.getPlotDefaults();
                 String uri = p.getTicksURI();
                 URISplit split= URISplit.parse(uri);
                 if ( uri.trim().length()>0 && !hasNoResource(split) ) {
