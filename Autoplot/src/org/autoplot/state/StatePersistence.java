@@ -28,6 +28,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerConfigurationException;
@@ -56,6 +58,7 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.TransformerException;
+import org.autoplot.datasource.DataSetURI;
 import org.jdesktop.beansbinding.AutoBinding;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
@@ -69,6 +72,8 @@ import org.autoplot.dom.Plot;
 import org.autoplot.dom.Row;
 import org.das2.qstream.SerializeDelegate;
 import org.das2.qstream.SerializeRegistry;
+import org.das2.util.FileUtil;
+import org.das2.util.monitor.NullProgressMonitor;
 
 /**
  * Class for serializing and deserializing application configuration.
@@ -487,6 +492,26 @@ public class StatePersistence {
 
         String text = new String(out.toByteArray(), StandardCharsets.UTF_8);
         text = text.replace("orbit:%{PWD}", "orbit:" + pwd);
+        
+        if ( pwd.endsWith(".zip/") ) {
+            // kludge to extract orbit files, which must exist before the DatumRange is produced, also it cannot be
+            // retrieved through the FileSystem API, because OrbitDatumRanges need a File reference.
+            StringBuffer newtext= new StringBuffer();
+            Pattern p= Pattern.compile("orbit:(.+):(.+)");
+            Matcher m= p.matcher(text);
+            while ( m.find() ) {
+                String orbitFile= m.group(1);
+                if ( orbitFile.startsWith("file:") ) {
+                    File f= DataSetURI.getFile(orbitFile,new NullProgressMonitor());
+                    m.appendReplacement(newtext,"orbit:file:"+f.getCanonicalPath()+":"+m.group(2));
+                } else {
+                    m.appendReplacement(newtext,Matcher.quoteReplacement(m.group()));
+                }
+            }
+            m.appendTail(newtext);
+            text= newtext.toString();
+            FileUtil.writeStringToFile( new File("/home/jbf/tmp/20261017/x.vap"), text );
+        }
         
         return new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
 }    
