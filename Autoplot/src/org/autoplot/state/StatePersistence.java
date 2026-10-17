@@ -510,7 +510,6 @@ public class StatePersistence {
             }
             m.appendTail(newtext);
             text= newtext.toString();
-            FileUtil.writeStringToFile( new File("/home/jbf/tmp/20261017/x.vap"), text );
         }
         
         return new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
