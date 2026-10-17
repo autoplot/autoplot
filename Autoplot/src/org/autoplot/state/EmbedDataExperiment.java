@@ -11,8 +11,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
@@ -27,6 +25,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import org.das2.util.LoggerManager;
@@ -45,7 +45,6 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.OrbitDatumRange;
 import org.das2.qstream.SimpleStreamFormatter;
 import org.das2.qstream.StreamException;
-import org.das2.qstream.StreamTool;
 
 /**
  * Embed data and vap in a zip file.  Now that we have PWD, this will
@@ -276,7 +275,11 @@ public class EmbedDataExperiment {
     private static String makeRelativeName( String commonPath, URI uri ) {
         String name;
         if ( uri.getScheme().equals("file")) {
-            name= uri.getPath();
+            try {
+                name= new File(uri).getCanonicalPath();
+            } catch ( IOException ex ) {
+                name= uri.getPath();
+            }
             if ( name.startsWith(commonPath) ) {
                 name= uri.getScheme() + "/"+ name.substring(commonPath.length());
             } else {
@@ -299,6 +302,8 @@ public class EmbedDataExperiment {
         return uri.getScheme().equals("file");
     }
     
+    private static Pattern ORBIT_PATTERN= Pattern.compile("orbit:(.+):(.+)"); // first group is greedy
+            
     /**
      * save the application, but embed data file resources within the 
      * zip, along with the .vap.  The vap is saved with the name default.vap.
@@ -316,7 +321,12 @@ public class EmbedDataExperiment {
     }    
     /**
      * save the application, but embed data file resources within the 
-     * zip, along with the .vap.  The vap is saved with the name default.vap.
+     * zip, along with the .vap.  This includes references to:<ul>
+     * <li>URIs
+     * <li>Events lists
+     * <li>orbit timeranges
+     * </ul>
+     * The vap is saved with the name default.vap.
      * When the data source contains a dataset that was created internally (with
      * the Jython plot command, for example), it will be formatted as a QStream and 
      * embedded within the vap.
@@ -376,12 +386,15 @@ public class EmbedDataExperiment {
         
         FileOutputStream fout= new FileOutputStream(f+".tmp");
         ZipOutputStream out=null;
+        Map<String,String> filesInZip= new HashMap<>();  // maps from local filename to zip filename
+        
         try {
             out= new ZipOutputStream( fout );
             for ( URI uri: uris ) { // resolve aggregations, etc.
                 String name= makeRelativeName(commonPath,uri);
                 File file1= DataSetURI.getFile(uri,new NullProgressMonitor());
                 writeToZip( out, name, file1 );
+                filesInZip.put(file1.getCanonicalPath(),name);
             }
             int nameGenCount= 0; // for automatically named data files.
             int dsfCount= 0;
@@ -391,6 +404,24 @@ public class EmbedDataExperiment {
                 if ( uri.trim().length()>0 && !hasNoResource(split) ) {
                     String name= makeRelativeName(commonPath,split.resourceUri);
                     split.file= "%{PWD}/"+name;
+                    Map<String,String> params= URISplit.parseParams(split.params);
+                    String tr= params.getOrDefault(URISplit.PARAM_TIME_RANGE,"");
+                    Matcher m= ORBIT_PATTERN.matcher(tr);
+                    if ( m.matches() ) {
+                        String fln= m.group(1);
+                        try {
+                            URI uri2= new URI(fln);
+                            String fil2= makeRelativeName(commonPath,uri2);
+                            File file2= DataSetURI.getFile(fln,new NullProgressMonitor());
+                            if ( !filesInZip.containsKey(file2.getCanonicalPath()) ) {
+                                writeToZip( out, name, file2 );
+                            }
+                            params.put(URISplit.PARAM_TIME_RANGE,"orbit:%{PWD}"+fil2+":"+m.group(2));
+                            split.params= URISplit.formatParams(params);
+                        } catch (URISyntaxException ex) {
+                            logger.log(Level.SEVERE, null, ex);
+                        }
+                    }
                     dsf.setUri( URISplit.format(split) );
                 } else if ( uri.equals("vap+internal:") ) {
                     QDataSet ds= datasets[dsfCount];
@@ -405,7 +436,7 @@ public class EmbedDataExperiment {
                     try {
                         ff.format( ds, pout, false );
                         pout.close();
-                        pin= new FileInputStream(tmpFile);
+                        pin= new FileInputStream(tmpFile); // TODO: couldn't we check to see if two interval files are the same file?
                         writeToZip( out, fname, pin );
                         if ( !tmpFile.delete() ) {
                             logger.log(Level.WARNING, "unable to delete temp file: {0}", tmpFile);
@@ -427,6 +458,9 @@ public class EmbedDataExperiment {
                 if ( uri.trim().length()>0 && !hasNoResource(split) ) {
                     String name= makeRelativeName(commonPath,split.resourceUri);
                     split.file= "%{PWD}/"+name;
+                    Map<String,String> params= URISplit.parseParams(split.params);
+                    params.remove(URISplit.PARAM_TIME_RANGE);
+                    split.params= URISplit.formatParams(params);
                     p.setTicksURI( URISplit.format(split) );
                 }
                 if ( p.getXaxis().getRange() instanceof OrbitDatumRange ) {
@@ -463,9 +497,7 @@ public class EmbedDataExperiment {
                 String uri = p.getTicksURI();
                 URISplit split= URISplit.parse(uri);
                 if ( uri.trim().length()>0 && !hasNoResource(split) ) {
-                    String name= makeRelativeName(commonPath,split.resourceUri);
-                    split.file= "%{PWD}/"+name;
-                    p.setTicksURI( URISplit.format(split) );
+                    p.setTicksURI( "" ); // just clear it, since it is not used anyway.
                 }
                 if ( p.getXaxis().getRange() instanceof OrbitDatumRange ) {
                     OrbitDatumRange mdr= (OrbitDatumRange)p.getXaxis().getRange();
