@@ -959,10 +959,48 @@ public class Pds4DataSource extends AbstractDataSource {
         }
 
         if (array.element.validMinimum != null) {
-            args.put("validMin", array.element.validMinimum);
+            try {
+                double d= Double.parseDouble(array.element.validMinimum);
+                // if extremely close to zero, assume it was a mistake
+                if ( d!=0 ) {
+                    double t= Math.abs(d);
+                    double ex= Math.log10(t);
+                    if ( ex<-200 ) {
+                        logger.warning("tiny validMinimum looks suspicious");
+                    } else if ( ex>200 ) {
+                        logger.warning("huge validMinimum looks suspicious");
+                    } else {
+                
+                        args.put("validMin", array.element.validMinimum);
+                    }
+                } else {
+                    args.put("validMin", array.element.validMinimum);
+                }
+            } catch ( NumberFormatException ex ) {
+                logger.log(Level.WARNING, "couldn''t parse validMinimum: {0}", array.element.validMinimum);
+            }
         }
         if (array.element.validMaximum != null) {
-            args.put("validMax", array.element.validMaximum);
+            try {
+                double d=  Double.parseDouble(array.element.validMaximum);
+                if ( d!=0 ) {
+                    double t= Math.abs(d);
+                    double ex= Math.log10(t);
+                    if ( ex<-200 ) {
+                        logger.warning("tiny validMaximum looks suspicious");
+                    } else if ( ex>200 ) {
+                        logger.warning("huge validMaximum looks suspicious");
+                    } else {
+                
+                        args.put("validMin", array.element.validMinimum);
+                    }
+                } else {
+                    args.put("validMax", array.element.validMaximum);
+                }
+            } catch ( NumberFormatException ex ) {
+                logger.log(Level.WARNING, "couldn''t parse validMaximum: {0}", array.element.validMaximum);
+            }
+            
         }
 
         // The binary reader supports one fillValue. Multiple distinct PDS4
