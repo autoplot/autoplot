@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -48,6 +49,7 @@ import org.das2.datum.Units;
 import org.das2.util.filesystem.Glob;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.datasource.AutoplotSettings;
+import org.das2.util.BooleanSearch;
 
 /**
  * This presents the URI history in a useful dialog where URIs are
@@ -127,7 +129,9 @@ public class RecentUrisGUI extends javax.swing.JPanel {
     }
     
     private void update( ProgressMonitor mon ) {
+        
         MyTreeModel ltheModel= new MyTreeModel(mon);
+        
         synchronized ( this ) {
             theModel= ltheModel;
         }
@@ -240,14 +244,13 @@ public class RecentUrisGUI extends javax.swing.JPanel {
 
             LinkedHashMap<String,String> daysURIs= new LinkedHashMap<String,String>(); // things we've already displayed
 
-            Pattern filtPattern= null;
-            String filt= RecentUrisGUI.this.filter;
-            if ( filt!=null && filt.length()==0 ) filt=null;
-            if ( filt!=null ) filt= filt.toLowerCase();
-            if ( filt!=null ) { // make into regex
-                filt= "(?i)"+ Glob.globToRegex(filt);
-                filtPattern= Pattern.compile(filt);
+            Predicate<String> filt;
+            if ( filter.trim().isEmpty() ) {
+                filt= null;
+            } else {
+                filt = BooleanSearch.compile(filter);
             }
+            
             long tzOffsetMs= Calendar.getInstance().getTimeZone().getRawOffset();
 
             String midnight= tp.format( Units.t1970.createDatum(0).subtract( tzOffsetMs,Units.milliseconds ), null );
@@ -281,7 +284,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                                 suri= "file:/" + suri.substring(7);
                                 ss[1]= suri;
                             }
-                            if ( filtPattern!=null && !filtPattern.matcher(ss[1]).find() ) {
+                            if ( filt!=null && !filt.test(ss[1]) ) {
                                 continue;
                             }
                             if ( ss[0].compareTo( midnight )>0 || !scan.hasNextLine() ) {
@@ -295,7 +298,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                                     tlocal= tp.parse( ent.getValue() ).getTimeDatum().add(tzOffsetMs,Units.milliseconds);
                                     uris.put( tlocal, new String[] { tp.format(tlocal,null), uri } );
                                 }
-                                daysURIs= new LinkedHashMap<String,String>();
+                                daysURIs= new LinkedHashMap<>();
                                 if ( tlocal==null ) tlocal= tp.parse(ss[0]).getTimeDatum().add(tzOffsetMs,Units.milliseconds);
                                 midnight= tp.format( TimeUtil.nextMidnight( tlocal ).subtract(tzOffsetMs,Units.milliseconds), null );
                             }

@@ -113,9 +113,9 @@ public final class RecentUrisDialog extends javax.swing.JDialog {
         setName("recentUrisDialog"); // NOI18N
 
         jLabel1.setText("Filter:");
-        jLabel1.setToolTipText("Filter URIs with free text, as in 'vap+cdf:'");
+        jLabel1.setToolTipText("Filter URIs with text, can contain AND and OR");
 
-        filterTextField.setToolTipText("Filter URIs with free text, as in 'vap+cdf:'");
+        filterTextField.setToolTipText("Filter URIs with text, can contain AND and OR");
         filterTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 filterTextFieldActionPerformed(evt);
