@@ -30,13 +30,14 @@
 
         <p>Autoplot's development is guided by feedback from those using it.  Thanks for your feedback!</p>
                 
-        <p>Bugfixes (2026-10-17):</p>
+        <p>Bugfixes (2026-10-23):</p>
         <ul>
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2906/">2906</a>: Embed data in .vap works with orbit datum ranges with local file references.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2882/">2882</a>: ASCII data source also kept state which caused runtime error on reload.
             <li>Minor clean up of PngWalkTool while considering more major corrections with ChatGPT.
             <li>splitAnchorType with verticalAnchorType=PLOT was incorrectly implemented, locating the plot as if it were "DATA".
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2903/">2903</a>: delim-based ASCII parser will always skip empty lines.  Thanks Darrelle!
+            <li>Das2 PropertyEditor doesn't show the button for the custom property editor if it is the (useless) default editor.
             <li>Support Rank 3 data in Export All Data.  Don't assume data has timetags.  Thanks, Ivar!
             <li><a href="https://github.com/das-developers/das2java/issues/192">192:</a>: synchronizeNN had incorrect test on "close" point, resulting in fill value when NN was possible. Thanks, Darrelle!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2901/">2901</a>: Revert change which broke UIowa digitizing script.
@@ -76,6 +77,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>New totalSpectralPower function added, showing total power in waveform components.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/889/">889</a>: CDAWeb, HapiDataSource now uses simple filter strings, like "rbsp AND density NOT source".  
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/890/">890</a>: New PDS4 reader supports Java 8 and will be maintained within Autoplot.
             <li>Huge Scatter performance gain with 126M-point dataset, from 2800ms -> 500ms per draw, by using addValue to increment count and removing loop invariants.
