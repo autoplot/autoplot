@@ -681,8 +681,8 @@ public class Pds4DataSource extends AbstractDataSource {
                                 ds= Ops.putProperty( ds, QDataSet.UNITS, units );
                             }
                             ds= Ops.putProperty( ds, QDataSet.NAME, Ops.safeName(name) );
-                            if ( Units.cdfTT2000!=units ) {
-                                ds= Ops.putProperty( ds, QDataSet.LABEL, name );
+                            if ( units!=null && UnitsUtil.isTimeLocation(units) ) {
+                                ds= Ops.putProperty( ds, QDataSet.LABEL, null );
                             }
                             ds= Ops.putProperty(ds, QDataSet.DESCRIPTION, DocumentUtil.cleanDescriptionString( a.description ) );
                             results[i]= ds;
