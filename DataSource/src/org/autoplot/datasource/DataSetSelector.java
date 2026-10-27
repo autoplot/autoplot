@@ -454,7 +454,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                             return;
                         }
                         browser.getDataSetSelector().setValue(DataSetURI.fromUri(resourceURI));
-                        int r= JOptionPane.showConfirmDialog(this, browser,"Select Data Source Type",JOptionPane.OK_CANCEL_OPTION);
+                        int r= WindowManager.showConfirmDialog(this, browser,"Select Data Source Type",JOptionPane.OK_CANCEL_OPTION);
                         if ( r==JOptionPane.OK_OPTION ) {
                             surl= browser.getUri();
                             setTextInternal(surl);

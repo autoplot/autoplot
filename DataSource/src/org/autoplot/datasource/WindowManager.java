@@ -38,6 +38,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import org.das2.util.LoggerManager;
 
 /**
@@ -65,12 +66,22 @@ public class WindowManager {
     }
     
     /**
-     * TODO: this will indicate the message type
+     * Show the message in a confirm dialog with YES, NO, and CANCEL options.
+     * @param parent
+     * @param omessage
+     * @return 
+     */
+    public static int showConfirmDialog( Component parent, Object omessage ) {
+        return showConfirmDialog( parent, omessage, UIManager.getString("OptionPane.titleText"), JOptionPane.YES_NO_CANCEL_OPTION );
+    }
+    
+    /**
+     * Show the message in a confirm dialog
      * @param parent
      * @param omessage
      * @param title
      * @param optionType
-     * @param messageType
+     * @param messageType -- ignored!
      * @return 
      */
     public static int showConfirmDialog( Component parent, Object omessage, String title, int optionType, int messageType ) {
@@ -78,13 +89,13 @@ public class WindowManager {
     }
                 
     /**
-     * TODO: this will show the icon.
+     * Show the message in a confirm dialog
      * @param parent
      * @param omessage
      * @param title
      * @param optionType
-     * @param messageType
-     * @param icon
+     * @param messageType -- ignored
+     * @param icon -- ignored
      * @return 
      */
     public static int showConfirmDialog( Component parent, Object omessage, String title, int optionType, int messageType, Icon icon ) {
@@ -92,13 +103,13 @@ public class WindowManager {
     }
      
     /**
-     * TODO: this will show the icon.
+     * Show the message in a confirm dialog
      * @param parent
      * @param omessage
      * @param title
      * @param optionType
-     * @param messageType
-     * @param icon
+     * @param messageType -- ignored
+     * @param icon -- ignored
      * @return 
      */
     public static int showConfirmDialog( Component parent, JPanel omessage, String title, int optionType, int messageType, Icon icon ) {

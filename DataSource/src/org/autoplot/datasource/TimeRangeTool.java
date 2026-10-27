@@ -1134,7 +1134,7 @@ public final class TimeRangeTool extends javax.swing.JPanel {
 
     public static void main( String[] args ) {
         TimeRangeTool trt= new TimeRangeTool();
-        JOptionPane.showConfirmDialog(null,trt);
+        WindowManager.showConfirmDialog(null,trt);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

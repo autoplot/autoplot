@@ -47,6 +47,7 @@ import org.autoplot.datasource.DataSourceEditorPanelUtil;
 import org.autoplot.datasource.SourceTypesBrowser;
 import org.autoplot.datasource.TimeRangeTool;
 import org.autoplot.datasource.URISplit;
+import org.autoplot.datasource.WindowManager;
 import org.autoplot.datasource.capability.TimeSeriesBrowse;
 import org.autoplot.datasource.ui.PromptComboBoxEditor;
 
@@ -325,7 +326,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
             tr= "2010-01-01"; // default
         }
         t.setSelectedRange( tr );
-        if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( this, t, "Select time range", JOptionPane.OK_CANCEL_OPTION ) ) {
+        if ( JOptionPane.OK_OPTION==WindowManager.showConfirmDialog( this, t, "Select time range", JOptionPane.OK_CANCEL_OPTION ) ) {
             String str= t.getSelectedRange();
             timeRangeComboBox.setSelectedItem( DatumRangeUtil.parseTimeRangeValid(str).toString() );
         }

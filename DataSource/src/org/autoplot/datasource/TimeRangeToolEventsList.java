@@ -674,7 +674,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         TimeRangeTool tt= new TimeRangeTool();
         JTextField tf= timeRangeTF;
         tt.setSelectedRange(tf.getText());
-        int r= JOptionPane.showConfirmDialog( this, tt, "Select Time Range", JOptionPane.OK_CANCEL_OPTION );
+        int r= WindowManager.showConfirmDialog( this, tt, "Select Time Range", JOptionPane.OK_CANCEL_OPTION );
         if ( r==JOptionPane.OK_OPTION) {
             tf.setText(tt.getSelectedRange());
             String str= timeRangeTF.getText();

@@ -333,6 +333,6 @@ public class RecentComboBox extends JComboBox {
     }
 
     public static void main( String[] args ) {
-        JOptionPane.showConfirmDialog( null, new RecentComboBox() );
+        WindowManager.showConfirmDialog( null, new RecentComboBox() );
     }
 }

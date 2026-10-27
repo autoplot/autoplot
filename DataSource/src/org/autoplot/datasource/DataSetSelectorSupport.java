@@ -225,7 +225,7 @@ public class DataSetSelectorSupport {
                 return null;
             }
         } else {
-            if ( JOptionPane.showConfirmDialog( parent, trPanel, "New Time Range", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+            if ( WindowManager.showConfirmDialog( parent, trPanel, "New Time Range", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
                 URISplit split= URISplit.parse( initialSelection );
                 Map<String,String> params= URISplit.parseParams(split.params);
                 if ( b2.isSelected() ) {
