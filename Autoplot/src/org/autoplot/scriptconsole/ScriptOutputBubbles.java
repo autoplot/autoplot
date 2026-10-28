@@ -135,16 +135,21 @@ public final class ScriptOutputBubbles extends JComponent {
                     g.fillRoundRect(x, y, bubbleWidth, h, 12, 12);
                     g.setColor(new Color(166, 135, 67));
                     g.drawRoundRect(x, y, bubbleWidth, h, 12, 12);
-                    g.setColor(new Color(45, 45, 45));
+                    Color textColor= new Color(45, 45, 45);
+                    g.setColor(textColor);
                     for (int j = 0; j < count; j++) {
                         String text = lines[j];
-                        while (fm.stringWidth(text) > bubbleWidth - 16 && text.length() > 1) {
+                        int len= fm.stringWidth(text);
+                        while ( len > ( bubbleWidth - 16 ) && text.length() > 1) {
                             text = text.substring(0, text.length() - 1);
-                        }
-                        if ( text.length()<lines[j].length() ) {
-                            text= text + "...";
+                            len= fm.stringWidth(text);
                         }
                         g.drawString(text, x + 8, y + 6 + fm.getAscent() + j * fm.getHeight());
+                        if ( text.length()<lines[j].length() ) {
+                            g.setColor( Color.LIGHT_GRAY );
+                            g.drawString("...", x + len, y + 6 + fm.getAscent() + j * fm.getHeight());
+                            g.setColor( textColor );
+                        }
                     }
                 } catch (BadLocationException ignored) {
                     // Document may have changed since output was captured.
