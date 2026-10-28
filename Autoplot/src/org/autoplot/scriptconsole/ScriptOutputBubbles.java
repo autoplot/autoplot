@@ -141,6 +141,9 @@ public final class ScriptOutputBubbles extends JComponent {
                         while (fm.stringWidth(text) > bubbleWidth - 16 && text.length() > 1) {
                             text = text.substring(0, text.length() - 1);
                         }
+                        if ( text.length()<lines[j].length() ) {
+                            text= text + "...";
+                        }
                         g.drawString(text, x + 8, y + 6 + fm.getAscent() + j * fm.getHeight());
                     }
                 } catch (BadLocationException ignored) {
