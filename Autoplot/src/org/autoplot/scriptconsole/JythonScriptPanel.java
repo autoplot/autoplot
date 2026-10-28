@@ -215,6 +215,13 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             }
         });
         
+        this.textArea.getActionMap().put( ACTIONKEY_CLEAR, new AbstractAction( ACTIONKEY_CLEAR ) {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                outputBubbles.clear();
+            }
+        });
+        
         AppManager.getInstance().addCloseCallback( app, "jythonScriptPanel", new AppManager.CloseCallback() {
             @Override
             public boolean checkClose() {
@@ -247,6 +254,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         this.textArea.getInputMap().put(KeyStroke.getKeyStroke( KeyEvent.VK_S,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ), ACTIONKEY_SAVE);
         this.textArea.getInputMap().put(KeyStroke.getKeyStroke( KeyEvent.VK_F6, 0 ), ACTIONKEY_EXECUTE);
         this.textArea.getInputMap().put(KeyStroke.getKeyStroke( KeyEvent.VK_F6, InputEvent.SHIFT_DOWN_MASK ), ACTIONKEY_EXECUTE );
+        this.textArea.getInputMap().put(KeyStroke.getKeyStroke( KeyEvent.VK_ESCAPE, 0 ), ACTIONKEY_CLEAR );
         
         EditorContextMenu menu= new EditorContextMenu( this.textArea );
 
@@ -364,6 +372,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     
     private static final String ACTIONKEY_SAVE = "save";
     private static final String ACTIONKEY_EXECUTE = "execute";
+    private static final String ACTIONKEY_CLEAR = "clear";
     
     /**
      * load in an example, replacing the current editor text.
@@ -459,7 +468,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
         executeButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/go.png"))); // NOI18N
         executeButton.setText("Run");
-        executeButton.setToolTipText("<html>Run the script.  <br>Alt enters editor GUI.  <br>Ctrl attempts to trace program location.  <br>Shift enters editor GUI.");
+        executeButton.setToolTipText("<html>Run the script.  \n<br>Alt enters editor GUI.  \n<br>Ctrl attempts to trace program location.  \n<br>Shift enters editor GUI.\n<br>Escape key clears the print bubbles.");
         executeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 executeButtonActionPerformed(evt);
