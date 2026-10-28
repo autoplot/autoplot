@@ -12,7 +12,6 @@ import org.python.util.PythonInterpreter;
 public final class JythonOutputCapture {
 
     public interface Sink {
-
         void output(String filename, int line, String text);
     }
 
@@ -57,5 +56,13 @@ public final class JythonOutputCapture {
         // Jython's interpreter.setOut(OutputStream) adapts a Java stream
         // into Python sys.stdout; the script's print statements use it.
         interpreter.setOut(new Writer(console, sink));
+    }
+    
+    public static void install(PythonInterpreter interpreter,
+            PrintStream console, PrintStream stderr, Sink sink, Sink stderrSink) {
+        // Jython's interpreter.setOut(OutputStream) adapts a Java stream
+        // into Python sys.stdout; the script's print statements use it.
+        interpreter.setOut(new Writer(console, sink));
+        interpreter.setErr(new Writer(console, stderrSink));
     }
 }

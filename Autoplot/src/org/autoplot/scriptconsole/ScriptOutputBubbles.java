@@ -16,8 +16,11 @@ public final class ScriptOutputBubbles extends JComponent {
     private final JTextComponent editor;
     private final JViewport viewport;
     private final Map<Integer, StringBuilder> output = new LinkedHashMap<>();
+    private final Map<Integer, Color> outputColors = new LinkedHashMap<>();
+    
     private final Color fill = new Color(255, 249, 215, 235);
-
+    private final Color textColor= new Color(45, 45, 45);
+    
     public ScriptOutputBubbles(JTextComponent editor, JViewport viewport) {
         this.editor = editor;
         this.viewport = viewport;
@@ -42,6 +45,36 @@ public final class ScriptOutputBubbles extends JComponent {
     /**
      * 1-based source line. May be called from a script execution thread.
      */
+    public void setOutput(int line, String text, Color color) {
+        if (!SwingUtilities.isEventDispatchThread()) {
+            SwingUtilities.invokeLater(() -> setOutput(line, text, color));
+            return;
+        }
+        if ( line < 1 ) return;
+        if ( text==null ) {
+            output.remove(line);
+            return;
+        }
+        if (text.isEmpty()) {
+            return;
+        }
+        String ttext= text.trim();
+        if (text.isEmpty()) {
+            return;
+        }
+        StringBuilder b= new StringBuilder();
+        output.put(line,b);
+        outputColors.put(line,color);
+        b.append(ttext);
+        if (b.length() > 2000) {
+            b.delete(0, b.length() - 2000);
+        }
+        repaint();
+    }
+    
+    /**
+     * 1-based source line. May be called from a script execution thread.
+     */
     public void setOutput(int line, String text) {
         if (!SwingUtilities.isEventDispatchThread()) {
             SwingUtilities.invokeLater(() -> setOutput(line, text));
@@ -61,6 +94,7 @@ public final class ScriptOutputBubbles extends JComponent {
         }
         StringBuilder b= new StringBuilder();
         output.put(line,b);
+        outputColors.put(line,textColor);
         b.append(ttext);
         if (b.length() > 2000) {
             b.delete(0, b.length() - 2000);
@@ -88,6 +122,7 @@ public final class ScriptOutputBubbles extends JComponent {
         if (b.length() > 2000) {
             b.delete(0, b.length() - 2000);
         }
+        outputColors.put(line,textColor);
         repaint();
     }
 
@@ -135,8 +170,8 @@ public final class ScriptOutputBubbles extends JComponent {
                     g.fillRoundRect(x, y, bubbleWidth, h, 12, 12);
                     g.setColor(new Color(166, 135, 67));
                     g.drawRoundRect(x, y, bubbleWidth, h, 12, 12);
-                    Color textColor= new Color(45, 45, 45);
-                    g.setColor(textColor);
+                    Color tc= outputColors.get(entry.getKey());
+                    g.setColor(tc);
                     for (int j = 0; j < count; j++) {
                         String text = lines[j];
                         int len= fm.stringWidth(text);
@@ -148,7 +183,7 @@ public final class ScriptOutputBubbles extends JComponent {
                         if ( text.length()<lines[j].length() ) {
                             g.setColor( Color.LIGHT_GRAY );
                             g.drawString("...", x + len, y + 6 + fm.getAscent() + j * fm.getHeight());
-                            g.setColor( textColor );
+                            g.setColor( tc );
                         }
                     }
                 } catch (BadLocationException ignored) {

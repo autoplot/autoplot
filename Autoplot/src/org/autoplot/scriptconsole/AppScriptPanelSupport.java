@@ -817,11 +817,17 @@ public class AppScriptPanelSupport {
                 JythonOutputCapture.install(
                     interp,
                     System.out,
+                    System.err,
                     (filename, line, text) -> {
                         if (filename.equals("<string>") || filename.equals(file.getName())) {
                             panel.outputBubbles.setOutput(line, text);
                         }
-                    }
+                    },
+                    (filename, line, text) -> {
+                        if (filename.equals("<string>") || filename.equals(file.getName())) {
+                            panel.outputBubbles.setOutput(line, text, Color.RED);
+                        }
+                    }                        
                 );
                 
                 if ( file!=null ) {
