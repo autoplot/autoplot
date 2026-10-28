@@ -807,10 +807,23 @@ public class AppScriptPanelSupport {
             }
             InteractiveInterpreter interp = null;
             try {
+                
+                panel.outputBubbles.clear();
+                
                 interp= JythonUtil.createInterpreter(true, false, model.getDom(), mon );
 
                 EditorAnnotationsSupport.setExpressionLookup(annotationsSupport.getForInterp(interp));
 
+                JythonOutputCapture.install(
+                    interp,
+                    System.out,
+                    (filename, line, text) -> {
+                        if (filename.equals("<string>") || filename.equals(file.getName())) {
+                            panel.outputBubbles.setOutput(line, text);
+                        }
+                    }
+                );
+                
                 if ( file!=null ) {
                     URISplit split= URISplit.parse(file.toString());
                     interp.set( "PWD", split.path );   

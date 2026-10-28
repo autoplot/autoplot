@@ -11,6 +11,8 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
@@ -26,6 +28,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
+import javax.swing.JLayeredPane;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -80,6 +83,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     private int context = 0;
     File runningScript= null; // the script being run.
     EditorContextMenu menu;
+    ScriptOutputBubbles outputBubbles;
             
     /**
      * true if the current file contains tabs.
@@ -114,6 +118,20 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         jScrollPane2.getVerticalScrollBar().setUnitIncrement( 12 ); // TODO: should be line height.
 
         setContext(CONTEXT_APPLICATION);
+        
+        outputBubbles= new ScriptOutputBubbles(textArea,jScrollPane2.getViewport());
+        
+        jLayeredPane1.add(outputBubbles, JLayeredPane.PALETTE_LAYER);
+        outputBubbles.setBounds(0,0,1000,1000);
+        
+        textArea.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                Dimension size = textArea.getSize();
+                //System.out.println("EditorPanel resized: " + size);
+                outputBubbles.setBounds(0,0,size.width,size.height);
+            }
+        });
 
         this.model = app.getApplicationModel();
         this.app= app;
@@ -433,6 +451,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         contextSelector = new javax.swing.JComboBox();
         caretPositionLabel = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
+        jLayeredPane1 = new javax.swing.JLayeredPane();
         textArea = new org.autoplot.jythonsupport.ui.EditorTextPane();
         newScriptButton = new javax.swing.JButton();
         interruptButton = new javax.swing.JButton();
@@ -480,7 +499,27 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                 textAreaFocusGained(evt);
             }
         });
-        jScrollPane2.setViewportView(textArea);
+
+        jLayeredPane1.setLayer(textArea, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+        org.jdesktop.layout.GroupLayout jLayeredPane1Layout = new org.jdesktop.layout.GroupLayout(jLayeredPane1);
+        jLayeredPane1.setLayout(jLayeredPane1Layout);
+        jLayeredPane1Layout.setHorizontalGroup(
+            jLayeredPane1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 687, Short.MAX_VALUE)
+            .add(jLayeredPane1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                .add(org.jdesktop.layout.GroupLayout.TRAILING, textArea, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 687, Short.MAX_VALUE))
+        );
+        jLayeredPane1Layout.setVerticalGroup(
+            jLayeredPane1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 330, Short.MAX_VALUE)
+            .add(jLayeredPane1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                .add(org.jdesktop.layout.GroupLayout.TRAILING, jLayeredPane1Layout.createSequentialGroup()
+                    .add(textArea, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 324, Short.MAX_VALUE)
+                    .addContainerGap()))
+        );
+
+        jScrollPane2.setViewportView(jLayeredPane1);
 
         newScriptButton.setText("New");
         newScriptButton.setToolTipText("Reset the buffer to a new file.");
@@ -524,7 +563,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                 .add(fileNameTextField)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(caretPositionLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 99, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane2)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -537,7 +576,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                     .add(newScriptButton)
                     .add(interruptButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
+                .add(jScrollPane2)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(caretPositionLabel)
@@ -601,6 +640,7 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
     private javax.swing.JButton executeButton;
     private javax.swing.JTextField fileNameTextField;
     private javax.swing.JButton interruptButton;
+    private javax.swing.JLayeredPane jLayeredPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JButton newScriptButton;
     private javax.swing.JButton openButton;
@@ -667,6 +707,10 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
      */
     public JScrollPane getScrollPane() {
         return jScrollPane2;
+    }
+    
+    public ScriptOutputBubbles getOutputBubbles() {
+        return outputBubbles;
     }
     
     protected String filename = null;
