@@ -701,6 +701,7 @@ public class AppScriptPanelSupport {
      */
     private void clearAnnotations() {
         annotationsSupport.clearAnnotations();
+        panel.outputBubbles.clear();
                     
         List<String> errs= new ArrayList();
         try {
@@ -829,6 +830,7 @@ public class AppScriptPanelSupport {
                         }
                     }                        
                 );
+                //TODO: we will probably need uninstall too, to prevent memory leaks.
                 
                 if ( file!=null ) {
                     URISplit split= URISplit.parse(file.toString());
