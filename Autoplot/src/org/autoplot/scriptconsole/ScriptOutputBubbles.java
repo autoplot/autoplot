@@ -135,6 +135,18 @@ public final class ScriptOutputBubbles extends JComponent {
         repaint();
     }
 
+    private void drawString( Graphics2D g, String text, String originalText, int x, int y ) {
+        Color tc= g.getColor();
+        FontMetrics fm= g.getFontMetrics();
+        g.drawString(text, x + 8, y + 6 + fm.getAscent());
+        if ( text.length()<originalText.length() ) {
+            int len= fm.stringWidth(text);
+            g.setColor( Color.LIGHT_GRAY );
+            g.drawString("...", x + 8 + len, y + 6 + fm.getAscent());
+            g.setColor( tc );
+        }
+    }
+    
     @Override
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
@@ -144,7 +156,7 @@ public final class ScriptOutputBubbles extends JComponent {
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
             Element root = editor.getDocument().getDefaultRootElement();
-            FontMetrics fm = g.getFontMetrics(editor.getFont());
+            FontMetrics fm = g.getFontMetrics(g.getFont());
             int bubbleWidth = Math.min(280, Math.max(100, getWidth() / 2));
             for (Map.Entry<Integer, StringBuilder> entry : output.entrySet()) {
                 int index = entry.getKey() - 1;
@@ -172,19 +184,18 @@ public final class ScriptOutputBubbles extends JComponent {
                     g.drawRoundRect(x, y, bubbleWidth, h, 12, 12);
                     Color tc= outputColors.get(entry.getKey());
                     g.setColor(tc);
+                    int ellipsesLen= fm.stringWidth("...");
                     for (int j = 0; j < count; j++) {
                         String text = lines[j];
                         int len= fm.stringWidth(text);
-                        while ( len > ( bubbleWidth - 16 ) && text.length() > 1) {
-                            text = text.substring(0, text.length() - 1);
-                            len= fm.stringWidth(text);
+                        if ( len > ( bubbleWidth - 16 ) && text.length() > 1 ) {
+                            while ( len > ( bubbleWidth - 16 - ellipsesLen ) && text.length() > 1) {
+                                text = text.substring(0, text.length() - 1);
+                                len= fm.stringWidth(text);
+                            }
                         }
-                        g.drawString(text, x + 8, y + 6 + fm.getAscent() + j * fm.getHeight());
-                        if ( text.length()<lines[j].length() ) {
-                            g.setColor( Color.LIGHT_GRAY );
-                            g.drawString("...", x + len, y + 6 + fm.getAscent() + j * fm.getHeight());
-                            g.setColor( tc );
-                        }
+                        drawString( g, text, lines[j], x+8, y + j * fm.getHeight() );
+
                     }
                 } catch (BadLocationException ignored) {
                     // Document may have changed since output was captured.
