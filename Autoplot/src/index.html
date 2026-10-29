@@ -30,9 +30,11 @@
 
         <p>Autoplot's development is guided by feedback from those using it.  Thanks for your feedback!</p>
                 
-        <p>Bugfixes (2026-10-26):</p>
+        <p>Bugfixes (2026-10-29):</p>
         <ul>
             <li>Some overly verbose logging with --script argument quieted.
+            <li>"slices" function explicitly checks for ":" so that one doesn't assume "10:20" would be acceptable.  Thanks, Dave!
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2913/">2913</a>: TimeRangeDialog and others are resizeable.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2906/">2906</a>: Embed data in .vap works with orbit datum ranges with local file references.  Thanks, Dave!
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2882/">2882</a>: ASCII data source also kept state which caused runtime error on reload.
             <li>Minor clean up of PngWalkTool while considering more major corrections with ChatGPT.
