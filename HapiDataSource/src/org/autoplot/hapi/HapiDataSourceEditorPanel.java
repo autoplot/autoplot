@@ -1347,7 +1347,12 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
 
             Predicate<String> search= null;
             if ( filter.length()>0 ) {
-                search= BooleanSearch.compileLenient(filter);
+                try {
+                    search= BooleanSearch.compileLenient(filter);
+                } catch ( IllegalArgumentException ex ) {
+                    logger.log(Level.WARNING, "partial search not handled by BooleanSearch: {0}", filter);
+                    search= null;
+                }
             }
 
             for ( JSONObject catalogEntry: new JSONArrayIterator(idsJSON) ) {
