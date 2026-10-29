@@ -264,12 +264,10 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         datasetFilterComboBox.getEditor().getEditorComponent().addKeyListener( new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
-                Runnable run= () -> {
-                    resetServerCatalog( currentServer );
-                };
-                SwingUtilities.invokeLater(run);
+                resetDatasetFilterTimer.tickle();
             }
         } );
+        
         parameterFilterComboBox.getEditor().getEditorComponent().addKeyListener( new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
@@ -306,7 +304,15 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         
     }
     
-    
+    TickleTimer resetDatasetFilterTimer= new TickleTimer( 300, new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) { 
+            SwingUtilities.invokeLater(() -> {
+                resetServerCatalog( currentServer );
+            });
+        }
+    } );
+        
     TickleTimer resetVariableTimer= new TickleTimer( 100, new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
@@ -944,11 +950,8 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     }//GEN-LAST:event_clearButtonActionPerformed
 
     private void datasetFilterComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_datasetFilterComboBoxActionPerformed
-        Runnable run= new Runnable() {
-            @Override
-            public void run() {
-                resetServerCatalog( currentServer );
-            }
+        Runnable run= () -> {
+            resetServerCatalog( currentServer );
         };
         SwingUtilities.invokeLater(run);
     }//GEN-LAST:event_datasetFilterComboBoxActionPerformed
@@ -1335,9 +1338,10 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         logger.entering("HapiDataSourceEditorPanel","resetServerCatalog");
         try {
             if ( !EventQueue.isDispatchThread() ) {
-                System.err.println("Here Jeremy");
+                throw new IllegalStateException("this must be called from the event thread");
             }
-            final String filter= datasetFilterComboBox.getSelectedItem().toString().trim();
+            final String filter= datasetFilterComboBox.getEditor().getItem().toString();
+            
             DefaultListModel model= new DefaultListModel();
             int maxCharacters=0;
 
@@ -1407,11 +1411,9 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
         idsJSON= HapiServer.getCatalog(server);
         loadServerCapabilities(server);
-        Runnable run= new Runnable() {
-            public void run() {
-                datasetFilterComboBox.setSelectedItem("");
-                resetServerCatalog(server);
-            }
+        Runnable run= () -> {
+            datasetFilterComboBox.setSelectedItem("");
+            resetServerCatalog(server);
         };
         SwingUtilities.invokeLater(run);
     }
