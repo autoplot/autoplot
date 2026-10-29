@@ -768,7 +768,10 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
     public void setDirty(boolean dirty) {
         boolean oldDirty = this.dirty;
         this.dirty = dirty;
-        if ( oldDirty!=dirty ) updateStatus();
+        if ( oldDirty!=dirty ) {
+            updateStatus();
+            outputBubbles.clear();
+        }
         firePropertyChange(PROP_DIRTY, oldDirty, dirty);
     }
     
