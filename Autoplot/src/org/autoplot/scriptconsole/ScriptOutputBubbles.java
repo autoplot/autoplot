@@ -1,4 +1,3 @@
-
 package org.autoplot.scriptconsole;
 
 import java.awt.*;
@@ -17,10 +16,10 @@ public final class ScriptOutputBubbles extends JComponent {
     private final JViewport viewport;
     private final Map<Integer, StringBuilder> output = new LinkedHashMap<>();
     private final Map<Integer, Color> outputColors = new LinkedHashMap<>();
-    
+
     private final Color fill = new Color(255, 249, 215, 235);
-    private final Color textColor= new Color(45, 45, 45);
-    
+    private final Color textColor = new Color(45, 45, 45);
+
     public ScriptOutputBubbles(JTextComponent editor, JViewport viewport) {
         this.editor = editor;
         this.viewport = viewport;
@@ -50,28 +49,30 @@ public final class ScriptOutputBubbles extends JComponent {
             SwingUtilities.invokeLater(() -> setOutput(line, text, color));
             return;
         }
-        if ( line < 1 ) return;
-        if ( text==null ) {
+        if (line < 1) {
+            return;
+        }
+        if (text == null) {
             output.remove(line);
             return;
         }
         if (text.isEmpty()) {
             return;
         }
-        String ttext= text.trim();
+        String ttext = text.trim();
         if (text.isEmpty()) {
             return;
         }
-        StringBuilder b= new StringBuilder();
-        output.put(line,b);
-        outputColors.put(line,color);
+        StringBuilder b = new StringBuilder();
+        output.put(line, b);
+        outputColors.put(line, color);
         b.append(ttext);
         if (b.length() > 2000) {
             b.delete(0, b.length() - 2000);
         }
         repaint();
     }
-    
+
     /**
      * 1-based source line. May be called from a script execution thread.
      */
@@ -80,28 +81,30 @@ public final class ScriptOutputBubbles extends JComponent {
             SwingUtilities.invokeLater(() -> setOutput(line, text));
             return;
         }
-        if ( line < 1 ) return;
-        if ( text==null ) {
+        if (line < 1) {
+            return;
+        }
+        if (text == null) {
             output.remove(line);
             return;
         }
         if (text.isEmpty()) {
             return;
         }
-        String ttext= text.trim();
+        String ttext = text.trim();
         if (text.isEmpty()) {
             return;
         }
-        StringBuilder b= new StringBuilder();
-        output.put(line,b);
-        outputColors.put(line,textColor);
+        StringBuilder b = new StringBuilder();
+        output.put(line, b);
+        outputColors.put(line, textColor);
         b.append(ttext);
         if (b.length() > 2000) {
             b.delete(0, b.length() - 2000);
         }
         repaint();
     }
-    
+
     /**
      * 1-based source line. May be called from a script execution thread.
      */
@@ -122,7 +125,7 @@ public final class ScriptOutputBubbles extends JComponent {
         if (b.length() > 2000) {
             b.delete(0, b.length() - 2000);
         }
-        outputColors.put(line,textColor);
+        outputColors.put(line, textColor);
         repaint();
     }
 
@@ -135,28 +138,28 @@ public final class ScriptOutputBubbles extends JComponent {
         repaint();
     }
 
-    private void drawString( Graphics2D g, String text, String originalText, int x, int y ) {
-        Color tc= g.getColor();
-        FontMetrics fm= g.getFontMetrics();
+    private void drawString(Graphics2D g, String text, String originalText, int x, int y) {
+        Color tc = g.getColor();
+        FontMetrics fm = g.getFontMetrics();
         g.drawString(text, x + 8, y + 6 + fm.getAscent());
-        if ( text.length()<originalText.length() ) {
-            int len= fm.stringWidth(text);
-            g.setColor( Color.LIGHT_GRAY );
+        if (text.length() < originalText.length()) {
+            int len = fm.stringWidth(text);
+            g.setColor(Color.LIGHT_GRAY);
             g.drawString("...", x + 8 + len, y + 6 + fm.getAscent());
-            g.setColor( tc );
+            g.setColor(tc);
         }
     }
-    
+
     @Override
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
         Graphics2D g = (Graphics2D) graphics.create();
         try {
-            
+
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
             Element root = editor.getDocument().getDefaultRootElement();
-            FontMetrics editorFm= g.getFontMetrics(editor.getFont());
+            FontMetrics editorFm = g.getFontMetrics(editor.getFont());
             FontMetrics fm = g.getFontMetrics(g.getFont());
             int bubbleWidth = Math.min(280, Math.max(100, getWidth() / 2));
             for (Map.Entry<Integer, StringBuilder> entry : output.entrySet()) {
@@ -183,19 +186,19 @@ public final class ScriptOutputBubbles extends JComponent {
                     g.fillRoundRect(x, y, bubbleWidth, h, 12, 12);
                     g.setColor(new Color(166, 135, 67));
                     g.drawRoundRect(x, y, bubbleWidth, h, 12, 12);
-                    Color tc= outputColors.get(entry.getKey());
+                    Color tc = outputColors.get(entry.getKey());
                     g.setColor(tc);
-                    int ellipsesLen= fm.stringWidth("...");
+                    int ellipsesLen = fm.stringWidth("...");
                     for (int j = 0; j < count; j++) {
                         String text = lines[j];
-                        int len= fm.stringWidth(text);
-                        if ( len > ( bubbleWidth - 16 ) && text.length() > 1 ) {
-                            while ( len > ( bubbleWidth - 16 - ellipsesLen ) && text.length() > 1) {
+                        int len = fm.stringWidth(text);
+                        if (len > (bubbleWidth - 16) && text.length() > 1) {
+                            while (len > (bubbleWidth - 16 - ellipsesLen) && text.length() > 1) {
                                 text = text.substring(0, text.length() - 1);
-                                len= fm.stringWidth(text);
+                                len = fm.stringWidth(text);
                             }
                         }
-                        drawString( g, text, lines[j], x+8, y + j * editorFm.getHeight() );
+                        drawString(g, text, lines[j], x + 8, y + j * editorFm.getHeight());
 
                     }
                 } catch (BadLocationException ignored) {
