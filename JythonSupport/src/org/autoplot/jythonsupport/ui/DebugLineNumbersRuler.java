@@ -5,6 +5,9 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -13,6 +16,9 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.swing.AbstractAction;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import jsyntaxpane.components.LineNumbersRuler;
 import org.das2.util.LoggerManager;
 
@@ -29,7 +35,10 @@ public class DebugLineNumbersRuler extends LineNumbersRuler {
 
     BufferedImage pc;
     BufferedImage breakpoint;
-
+    
+    private JPopupMenu lineNumbersPopup;
+    int selectedLine=-1;
+    
     public DebugLineNumbersRuler() {
         try {
             pc = ImageIO.read( this.getClass().getResource("/resources/pc_16.png") );
@@ -37,6 +46,46 @@ public class DebugLineNumbersRuler extends LineNumbersRuler {
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
+        
+        lineNumbersPopup= new JPopupMenu();
+        lineNumbersPopup.add( new JMenuItem( new AbstractAction("Set Breakpoint") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int line= selectedLine;
+                setBreakpoint(line,true);
+            }
+        }));
+        lineNumbersPopup.add( new JMenuItem( new AbstractAction("Clear Breakpoint") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int line= selectedLine;
+                setBreakpoint(line,false);
+            }
+        }));
+        super.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                FontMetrics fontMetrics = getFontMetrics(getFont());
+                int lh = fontMetrics.getHeight();
+                selectedLine= (int)(e.getY()/lh+1);
+                if ( e.isPopupTrigger() ) {
+                    lineNumbersPopup.show(DebugLineNumbersRuler.this,e.getX(),e.getY());
+                }
+                super.mousePressed(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                FontMetrics fontMetrics = getFontMetrics(getFont());
+                int lh = fontMetrics.getHeight();
+                selectedLine= (int)(e.getY()/lh+1);
+                if ( e.isPopupTrigger() ) {
+                    lineNumbersPopup.show(DebugLineNumbersRuler.this,e.getX(),e.getY());
+                }
+                super.mouseReleased(e);
+            }
+            
+        });
     }
     /**
      * set the line number, 1 being the first line.  -1 will turn off.
