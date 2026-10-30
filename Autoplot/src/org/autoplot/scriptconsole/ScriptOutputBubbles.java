@@ -156,6 +156,7 @@ public final class ScriptOutputBubbles extends JComponent {
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
             Element root = editor.getDocument().getDefaultRootElement();
+            FontMetrics editorFm= g.getFontMetrics(editor.getFont());
             FontMetrics fm = g.getFontMetrics(g.getFont());
             int bubbleWidth = Math.min(280, Math.max(100, getWidth() / 2));
             for (Map.Entry<Integer, StringBuilder> entry : output.entrySet()) {
@@ -194,7 +195,7 @@ public final class ScriptOutputBubbles extends JComponent {
                                 len= fm.stringWidth(text);
                             }
                         }
-                        drawString( g, text, lines[j], x+8, y + j * fm.getHeight() );
+                        drawString( g, text, lines[j], x+8, y + j * editorFm.getHeight() );
 
                     }
                 } catch (BadLocationException ignored) {
