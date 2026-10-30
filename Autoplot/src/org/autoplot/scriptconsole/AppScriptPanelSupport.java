@@ -101,6 +101,7 @@ import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.jython.JythonDataSource;
 import org.autoplot.datasource.jython.JythonDataSourceFactory;
 import org.autoplot.dom.Application;
+import org.autoplot.jythonsupport.ui.DebugLineNumbersRuler;
 import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
 import org.das2.util.ColorUtil;
@@ -822,7 +823,8 @@ public class AppScriptPanelSupport {
                     debugger.setListener( new JythonDebugger.DebuggerListener() {
                         @Override
                         public void tracedLine(String filename, int line) {
-                            panel.getEditorPanel().getRuler().setProgramCounter(line);
+                            DebugLineNumbersRuler r= panel.getEditorPanel().getRuler();
+                            if ( r!=null ) r.setProgramCounter(line);
                         }
 
                         @Override
@@ -837,7 +839,8 @@ public class AppScriptPanelSupport {
 
                         @Override
                         public void finished() {
-                            panel.getEditorPanel().getRuler().setProgramCounter(-1);
+                            DebugLineNumbersRuler r= panel.getEditorPanel().getRuler();
+                            if ( r!=null ) r.setProgramCounter(-1);
                         }
 
                     });
