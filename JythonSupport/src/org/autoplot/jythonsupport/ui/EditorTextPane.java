@@ -35,6 +35,7 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -115,7 +116,7 @@ public class EditorTextPane extends JEditorPane {
         if ( !DasApplication.getDefaultApplication().isHeadless() ) {
             SwingUtilities.invokeLater(run);
         }
-
+        
     }
 
     public final Runnable getInitializeRunnable() {
@@ -290,13 +291,6 @@ public class EditorTextPane extends JEditorPane {
 
                     ruler.install(EditorTextPane.this);
                     
-                    ruler.addMouseListener( new MouseAdapter() { 
-                        @Override
-                        public void mouseClicked(MouseEvent e) {
-                            System.err.println("hi there");
-                        }
-                        
-                    });
                 }
                 
                 initialized= true;
