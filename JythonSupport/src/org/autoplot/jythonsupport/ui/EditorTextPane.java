@@ -279,7 +279,7 @@ public class EditorTextPane extends JEditorPane {
                 String sf= JythonCompletionProvider.getInstance().settings().getEditorFont();
                 setFont( Font.decode(sf) );
                 
-                String doDebug= System.setProperty("jythonDebugger","false");
+                String doDebug= System.getProperty("jythonDebugger","false");
                 
                 if ( "true".equals(doDebug) ) {
                     ruler = new DebugLineNumbersRuler();

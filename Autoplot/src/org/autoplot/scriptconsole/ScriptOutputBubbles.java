@@ -178,7 +178,7 @@ public final class ScriptOutputBubbles extends JComponent {
             FontMetrics fm = g.getFontMetrics(g.getFont());
             int bubbleWidth = Math.min(280, Math.max(100, getWidth() / 2));
             
-            int lastLine=-1;
+            int lastLine=-99;
             
             for (Map.Entry<Integer, StringBuilder> entry : output.entrySet()) {
                 int index = entry.getKey() - 1;

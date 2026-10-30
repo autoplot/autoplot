@@ -368,7 +368,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         CompletionImpl impl = CompletionImpl.get();
         impl.startPopup(this.textArea);
 
-        String doDebug= System.setProperty("jythonDebugger","false");
+        String doDebug= System.getProperty("jythonDebugger","false");
         if ( "true".equals(doDebug) ) {
             DebugLineNumbersRuler ruler = new DebugLineNumbersRuler();
         

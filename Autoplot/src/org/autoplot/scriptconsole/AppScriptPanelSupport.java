@@ -810,7 +810,7 @@ public class AppScriptPanelSupport {
             InteractiveInterpreter interp = null;
             JythonDebugger debugger= null;
             
-            String doDebug= System.setProperty("jythonDebugger","false");
+            String doDebug= System.getProperty("jythonDebugger","false");
                     
             try {
                 
