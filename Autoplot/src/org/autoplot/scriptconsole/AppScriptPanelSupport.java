@@ -864,12 +864,12 @@ public class AppScriptPanelSupport {
                     System.err,
                     (filename, line, text) -> {
                         if (filename.equals("<string>") || filename.equals(file.getName())) {
-                            panel.outputBubbles.setOutput(line, text);
+                            panel.outputBubbles.appendOutput(line, text);
                         }
                     },
                     (filename, line, text) -> {
                         if (filename.equals("<string>") || filename.equals(file.getName())) {
-                            panel.outputBubbles.setOutput(line, text, Color.RED);
+                            panel.outputBubbles.appendOutput(line, text, Color.RED);
                         }
                     }                        
                 );
