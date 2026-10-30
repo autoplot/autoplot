@@ -96,6 +96,16 @@ public class EditorTextPane extends JEditorPane {
     private EditorAnnotationsSupport support= new EditorAnnotationsSupport( this );
 
     private boolean initialized= false;
+
+    DebugLineNumbersRuler ruler=null;
+
+    /**
+     * return the LineNumberRuler which allows PC and breakpoints to be identified.
+     * @return 
+     */
+    public DebugLineNumbersRuler getRuler() {
+        return ruler;
+    }
     
     public EditorTextPane() {
 
@@ -267,7 +277,19 @@ public class EditorTextPane extends JEditorPane {
 
                 String sf= JythonCompletionProvider.getInstance().settings().getEditorFont();
                 setFont( Font.decode(sf) );
+                
+                String doDebug= System.setProperty("jythonDebugger","false");
+                
+                if ( "true".equals(doDebug) ) {
+                    ruler = new DebugLineNumbersRuler();
+                
+                    ruler.config(
+                        ((DefaultSyntaxKit) EditorTextPane.this.getEditorKit()).getConfig()
+                    );
 
+                    ruler.install(EditorTextPane.this);
+                }
+                
                 initialized= true;
             }
 
