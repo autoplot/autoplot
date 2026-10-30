@@ -56,12 +56,11 @@ import org.autoplot.AppManager;
 import org.autoplot.ApplicationModel;
 import org.autoplot.AutoplotUI;
 import org.autoplot.JythonUtil;
-import org.autoplot.ScriptContext;
-import org.autoplot.ScriptContext2023;
 import org.autoplot.dom.ApplicationController;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceUtil;
+import org.autoplot.jythonsupport.ui.DebugLineNumbersRuler;
 import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
 import org.autoplot.jythonsupport.ui.EditorTextPane;
 
@@ -114,9 +113,9 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     public JythonScriptPanel( AutoplotUI app, final DataSetSelector selector) {
         initComponents();
         setMinimumSize( new Dimension(400,400) );
-        
+                
         jScrollPane2.getVerticalScrollBar().setUnitIncrement( 12 ); // TODO: should be line height.
-
+        
         setContext(CONTEXT_APPLICATION);
         
         outputBubbles= new ScriptOutputBubbles(textArea,jScrollPane2.getViewport());
@@ -368,6 +367,16 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
         CompletionImpl impl = CompletionImpl.get();
         impl.startPopup(this.textArea);
+
+        String doDebug= System.setProperty("jythonDebugger","false");
+        if ( "true".equals(doDebug) ) {
+            DebugLineNumbersRuler ruler = new DebugLineNumbersRuler();
+        
+            ruler.install( textArea );
+        
+            jScrollPane2.setRowHeaderView(ruler);
+        }
+
     }
     
     private static final String ACTIONKEY_SAVE = "save";

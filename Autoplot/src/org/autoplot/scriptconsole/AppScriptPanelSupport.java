@@ -807,11 +807,54 @@ public class AppScriptPanelSupport {
                 }
             }
             InteractiveInterpreter interp = null;
+            JythonDebugger debugger= null;
+            
+            String doDebug= System.setProperty("jythonDebugger","false");
+                    
             try {
                 
                 panel.outputBubbles.clear();
                 
                 interp= JythonUtil.createInterpreter(true, false, model.getDom(), mon );
+                
+                if ( "true".equals(doDebug) ) {
+                    debugger = new JythonDebugger();
+                    debugger.setListener( new JythonDebugger.DebuggerListener() {
+                        @Override
+                        public void tracedLine(String filename, int line) {
+                            panel.getEditorPanel().getRuler().setProgramCounter(line);
+                        }
+
+                        @Override
+                        public void pausedAtLine(String filename, int line) {
+                            System.err.println(filename+" " +line);
+                        }
+
+                        @Override
+                        public void resumed() {
+
+                        }
+
+                        @Override
+                        public void finished() {
+                            panel.getEditorPanel().getRuler().setProgramCounter(-1);
+                        }
+
+                    });
+
+                    interp.set("debugger",debugger);
+
+                    //debugger.addBreakpoint(3);
+
+                    interp.exec(
+                        "import sys\n" +
+                        "def debugTrace(frame, event, arg):\n" +
+                        "    debugger.trace(frame, event, arg)\n" +
+                        "    return debugTrace\n" +
+                        "sys.settrace(debugTrace)\n"
+                    );
+
+                }
 
                 EditorAnnotationsSupport.setExpressionLookup(annotationsSupport.getForInterp(interp));
 
@@ -979,15 +1022,6 @@ public class AppScriptPanelSupport {
                         interp.exec(JythonRefactory.fixImports(panel.getEditorPanel().getText()));
                     }
                 } else {
-                    boolean experiment= System.getProperty("jythonDebugger","false").equals("true");
-                    if ( experiment ) {
-                        final DebuggerConsole dc= DebuggerConsole.getInstance(panel);
-                        dc.setInterp(interp);
-                        interp.setOut(getOutput(dc));
-                        EditorAnnotationsSupport.setExpressionLookup( 
-                            (final String expr) -> dc.setEval(expr) //return dc.getEval();
-                        );
-                    }
                     String code= JythonRefactory.fixImports(panel.getEditorPanel().getText());
                     if ( file!=null ) {
                         char[] cc= code.toCharArray();
@@ -1007,22 +1041,10 @@ public class AppScriptPanelSupport {
                         
                         setParametersStruct(interp, code);
                         
-                        //experiment with writing to a temporary file and executing it.
-                        if ( experiment ) {
-                            String fixedCode= JythonRefactory.fixImports( code );
-                            if ( fixedCode.equals(code) ) {
-                                interp.execfile( file.getAbsolutePath() );
-                            } else {
-                                File tempFile= new File( file.getAbsolutePath() + ".t" );
-                                Files.copy( new ByteArrayInputStream( fixedCode.getBytes() ), 
-                                        tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
-                                interp.execfile( tempFile.getAbsolutePath() );
-                            }
-                        } else {
-                            try (InputStream in = new ByteArrayInputStream( code.getBytes() )) {
-                                interp.execfile(JythonRefactory.fixImports(in,file.getName()),file.getName());
-                            }
+                        try (InputStream in = new ByteArrayInputStream( code.getBytes() )) {
+                            interp.execfile(JythonRefactory.fixImports(in,file.getName()),file.getName());
                         }
+                        
                     } else {
                         
                         setParametersStruct(interp, code);
@@ -1049,6 +1071,8 @@ public class AppScriptPanelSupport {
                     logger.log(Level.WARNING, ex.getMessage(), ex );
                 }
             }
+            if ( debugger!=null ) debugger.finished();
+            
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         } catch ( Error ex ) {
