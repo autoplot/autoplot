@@ -10,6 +10,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.File;
@@ -288,6 +289,14 @@ public class EditorTextPane extends JEditorPane {
                     );
 
                     ruler.install(EditorTextPane.this);
+                    
+                    ruler.addMouseListener( new MouseAdapter() { 
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            System.err.println("hi there");
+                        }
+                        
+                    });
                 }
                 
                 initialized= true;
