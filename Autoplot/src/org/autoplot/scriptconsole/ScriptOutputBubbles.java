@@ -16,6 +16,7 @@ public final class ScriptOutputBubbles extends JComponent {
     private final JViewport viewport;
     private final Map<Integer, StringBuilder> output = new LinkedHashMap<>();
     private final Map<Integer, Color> outputColors = new LinkedHashMap<>();
+    private final Map<Integer, Boolean> gotEoln = new LinkedHashMap<>();
 
     private final Color fill = new Color(255, 249, 215, 235);
     private final Color textColor = new Color(45, 45, 45);
@@ -104,11 +105,15 @@ public final class ScriptOutputBubbles extends JComponent {
         }
         repaint();
     }
-
+    
+    public void appendOutput(int line, String text) {
+        appendOutput(line,text,this.textColor);
+    }
+    
     /**
      * 1-based source line. May be called from a script execution thread.
      */
-    public void appendOutput(int line, String text) {
+    public void appendOutput(int line, String text, Color textColor) {
         if (!SwingUtilities.isEventDispatchThread()) {
             SwingUtilities.invokeLater(() -> appendOutput(line, text));
             return;
@@ -116,12 +121,22 @@ public final class ScriptOutputBubbles extends JComponent {
         if (line < 1 || text == null || text.isEmpty()) {
             return;
         }
+        
         StringBuilder b = output.get(line);
+        if ( Boolean.TRUE.equals(gotEoln.get(line)) ) {
+            b= null;
+            gotEoln.put(line,Boolean.TRUE);
+        }
+        
         if (b == null) {
             b = new StringBuilder();
             output.put(line, b);
         }
         b.append(text);
+        if (text.endsWith("\n") ) {
+            gotEoln.put(line,Boolean.TRUE);
+        }
+        
         if (b.length() > 2000) {
             b.delete(0, b.length() - 2000);
         }
@@ -162,6 +177,9 @@ public final class ScriptOutputBubbles extends JComponent {
             FontMetrics editorFm = g.getFontMetrics(editor.getFont());
             FontMetrics fm = g.getFontMetrics(g.getFont());
             int bubbleWidth = Math.min(280, Math.max(100, getWidth() / 2));
+            
+            int lastLine=-1;
+            
             for (Map.Entry<Integer, StringBuilder> entry : output.entrySet()) {
                 int index = entry.getKey() - 1;
                 if (index >= root.getElementCount()) {
@@ -175,13 +193,20 @@ public final class ScriptOutputBubbles extends JComponent {
                     Point p = SwingUtilities.convertPoint(editor, r.x, r.y, viewport);
                     int x = Math.max(4, getWidth() - bubbleWidth - 8);
                     int y = p.y + Math.max(0, (r.height - fm.getHeight()) / 2);
-                    String s = entry.getValue().toString().replace('\r', ' ');
+                    String s = entry.getValue().toString().replace('\r', ' ').trim();
                     String[] lines = s.split("\n", -1);
                     int count = Math.min(5, lines.length);
                     int h = count * fm.getHeight() + 12;
                     if (y + h < 0 || y > getHeight()) {
                         continue;
                     }
+                    if ( index==lastLine+1 ) {
+                        g.setClip(new Rectangle(x,y+fm.getHeight()-(int)(fm.getAscent()*0.5), bubbleWidth+1, h+1) );
+                    } else {
+                        g.setClip( null );
+                    }
+                    lastLine= index;
+                    
                     g.setColor(fill);
                     g.fillRoundRect(x, y, bubbleWidth, h, 12, 12);
                     g.setColor(new Color(166, 135, 67));
