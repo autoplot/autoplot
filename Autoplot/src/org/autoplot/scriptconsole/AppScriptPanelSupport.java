@@ -103,6 +103,7 @@ import org.autoplot.datasource.jython.JythonDataSourceFactory;
 import org.autoplot.dom.Application;
 import org.autoplot.jythonsupport.ui.DebugLineNumbersRuler;
 import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
+import org.autoplot.jythonsupport.ui.JythonDebugger;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
 import org.das2.util.ColorUtil;
 import org.das2.util.filesystem.GitCommand;
