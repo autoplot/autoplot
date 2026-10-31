@@ -92,6 +92,12 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
     private transient DocumentListener dirtyListener; // this contains repeated code in AppScriptPanelSupport  
 
+    public static String runToolTipText= "<html>Run the script.  \n" +
+            "<br>Alt enters editor GUI.  \n" +
+            "<br>Ctrl attempts to trace program location.  \n" +
+            "<br>Shift enters editor GUI.\n" +
+            "<br>Escape key clears the print bubbles.";
+        
     /**
      * this downloads the URI and loads the local version into the editor.
      * @param uri the URI
@@ -115,6 +121,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         initComponents();
         
         getRunButton().setAction( createRunAction() );
+        getRunButton().setToolTipText(runToolTipText);
         
         setMinimumSize( new Dimension(400,400) );
                 
