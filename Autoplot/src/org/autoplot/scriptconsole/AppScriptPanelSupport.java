@@ -13,6 +13,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.HeadlessException;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -55,6 +56,8 @@ import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -101,10 +104,12 @@ import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.jython.JythonDataSource;
 import org.autoplot.datasource.jython.JythonDataSourceFactory;
 import org.autoplot.dom.Application;
+import org.autoplot.jythonsupport.ui.BreakpointModel;
 import org.autoplot.jythonsupport.ui.DebugLineNumbersRuler;
 import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
 import org.autoplot.jythonsupport.ui.JythonDebugger;
 import org.autoplot.jythonsupport.ui.ParametersFormPanel;
+import org.autoplot.jythonsupport.ui.ScriptDebugSession;
 import org.das2.util.ColorUtil;
 import org.das2.util.filesystem.GitCommand;
 import org.python.core.PyDictionary;
@@ -770,7 +775,16 @@ public class AppScriptPanelSupport {
         
         //interp.set("params",d);
     }
-    
+        
+    private Action getResumeAction(ScriptDebugSession session) {
+        return new AbstractAction("Resume",new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/resources/resume.png"))) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                session.continueExecution();
+            } 
+        };
+    }
+            
     /**
      * Execute the script in the current thread.  For context data source, 
      * this means putting the URI in the data set selector and telling it to 
@@ -794,6 +808,8 @@ public class AppScriptPanelSupport {
         //ProgressMonitor mon= //DasProgressPanel.createComponentPanel(model.getCanvas(),"running script");
         ProgressMonitor mon= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(panel), "running script");
 
+        ScriptDebugSession session= null;
+
         try {
             try {
                 if (file != null && ( file.exists() && file.canWrite() || file.getParentFile().canWrite() ) ) {
@@ -809,7 +825,6 @@ public class AppScriptPanelSupport {
                 }
             }
             InteractiveInterpreter interp = null;
-            JythonDebugger debugger= null;
             
             String doDebug= System.getProperty("jythonDebugger","false");
                     
@@ -820,43 +835,34 @@ public class AppScriptPanelSupport {
                 interp= JythonUtil.createInterpreter(true, false, model.getDom(), mon );
                 
                 if ( "true".equals(doDebug) ) {
-                    debugger = new JythonDebugger();
-                    debugger.setListener( new JythonDebugger.DebuggerListener() {
+                    
+                    final DebugLineNumbersRuler r= panel.getEditorPanel().getRuler();
+                    session= new ScriptDebugSession(interp,r.getBreakpointModel());
+                    
+                    panel.getRunButton().setAction( getResumeAction(session) );
+                    
+                    session.setSessionListener( new JythonDebugger.Listener() {
                         @Override
                         public void tracedLine(String filename, int line) {
-                            DebugLineNumbersRuler r= panel.getEditorPanel().getRuler();
                             if ( r!=null ) r.setProgramCounter(line);
                         }
 
                         @Override
-                        public void pausedAtLine(String filename, int line) {
-                            System.err.println(filename+" " +line);
+                        public void pausedAtLine(String filename,int line) {
+                            panel.getRunButton().setEnabled(true);
                         }
 
                         @Override
                         public void resumed() {
-
+                            panel.getRunButton().setEnabled(false);
                         }
 
                         @Override
                         public void finished() {
-                            DebugLineNumbersRuler r= panel.getEditorPanel().getRuler();
                             if ( r!=null ) r.setProgramCounter(-1);
                         }
 
                     });
-
-                    interp.set("debugger",debugger);
-
-                    //debugger.addBreakpoint(3);
-
-                    interp.exec(
-                        "import sys\n" +
-                        "def debugTrace(frame, event, arg):\n" +
-                        "    debugger.trace(frame, event, arg)\n" +
-                        "    return debugTrace\n" +
-                        "sys.settrace(debugTrace)\n"
-                    );
 
                 }
 
@@ -1075,7 +1081,6 @@ public class AppScriptPanelSupport {
                     logger.log(Level.WARNING, ex.getMessage(), ex );
                 }
             }
-            if ( debugger!=null ) debugger.finished();
             
         } catch (IOException ex) {
             throw new RuntimeException(ex);
@@ -1089,6 +1094,12 @@ public class AppScriptPanelSupport {
             if ( !mon.isFinished() ) mon.finished();  // bug1251: in case script didn't call finished
             setInterruptible( null );
             panel.setRunningScript(null);
+            if ( session!=null ) {
+                session.finished();
+                panel.getRunButton().setAction( panel.createRunAction() );
+                panel.getRunButton().setEnabled(true);
+            }
+
         }
     }
                     
@@ -1181,6 +1192,10 @@ public class AppScriptPanelSupport {
             panel.setRunningScript(null);
         }
 
+    }
+
+    void resume() {
+        
     }
 
     

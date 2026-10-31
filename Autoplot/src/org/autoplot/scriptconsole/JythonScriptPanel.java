@@ -60,6 +60,7 @@ import org.autoplot.dom.ApplicationController;
 import org.autoplot.datasource.DataSetSelector;
 import org.autoplot.datasource.DataSetURI;
 import org.autoplot.datasource.DataSourceUtil;
+import org.autoplot.jythonsupport.ui.BreakpointModel;
 import org.autoplot.jythonsupport.ui.DebugLineNumbersRuler;
 import org.autoplot.jythonsupport.ui.EditorAnnotationsSupport;
 import org.autoplot.jythonsupport.ui.EditorTextPane;
@@ -112,6 +113,9 @@ public class JythonScriptPanel extends javax.swing.JPanel {
      */
     public JythonScriptPanel( AutoplotUI app, final DataSetSelector selector) {
         initComponents();
+        
+        getRunButton().setAction( createRunAction() );
+        
         setMinimumSize( new Dimension(400,400) );
                 
         jScrollPane2.getVerticalScrollBar().setUnitIncrement( 12 ); // TODO: should be line height.
@@ -210,7 +214,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         this.textArea.getActionMap().put( ACTIONKEY_EXECUTE, new AbstractAction( ACTIONKEY_EXECUTE ) {
             @Override
             public void actionPerformed( ActionEvent e ) {
-                executeButtonActionPerformed(e);
+                getRunButton().getAction().actionPerformed(e);
             }
         });
         
@@ -371,6 +375,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         String doDebug= System.getProperty("jythonDebugger","false");
         if ( "true".equals(doDebug) ) {
             DebugLineNumbersRuler ruler = new DebugLineNumbersRuler();
+            ruler.setBreakpointModel(new BreakpointModel());
         
             ruler.install( textArea );
         
@@ -478,11 +483,6 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         executeButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/go.png"))); // NOI18N
         executeButton.setText("Run");
         executeButton.setToolTipText("<html>Run the script.  \n<br>Alt enters editor GUI.  \n<br>Ctrl attempts to trace program location.  \n<br>Shift enters editor GUI.\n<br>Escape key clears the print bubbles.");
-        executeButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                executeButtonActionPerformed(evt);
-            }
-        });
 
         saveAsButton.setFont(saveAsButton.getFont());
         saveAsButton.setText("Save As...");
@@ -524,9 +524,9 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         jLayeredPane1.setLayout(jLayeredPane1Layout);
         jLayeredPane1Layout.setHorizontalGroup(
             jLayeredPane1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 687, Short.MAX_VALUE)
+            .add(0, 703, Short.MAX_VALUE)
             .add(jLayeredPane1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                .add(org.jdesktop.layout.GroupLayout.TRAILING, textArea, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 687, Short.MAX_VALUE))
+                .add(org.jdesktop.layout.GroupLayout.TRAILING, textArea, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 703, Short.MAX_VALUE))
         );
         jLayeredPane1Layout.setVerticalGroup(
             jLayeredPane1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -604,22 +604,6 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         layout.linkSize(new java.awt.Component[] {executeButton, interruptButton, newScriptButton, openButton, saveAsButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
 
     }// </editor-fold>//GEN-END:initComponents
-    private void executeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_executeButtonActionPerformed
-        org.das2.util.LoggerManager.logGuiEvent(evt);                
-        if ( dirty && support.file!=null ) {
-            try {
-                support.save(); 
-            } catch ( IOException ex ) {
-                
-            }
-        }
-        System.err.println("== Executing Script ==");
-        if ( this.context==CONTEXT_APPLICATION ) {
-            model.getDom().getController().getScriptContext().setWindow(model);
-        }
-        if ( support.file!=null ) this.setRunningScript(support.file);
-        support.executeScript( evt.getModifiers() );
-    }//GEN-LAST:event_executeButtonActionPerformed
 
     private void saveAsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveAsButtonActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);                
@@ -729,6 +713,36 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
     
     public ScriptOutputBubbles getOutputBubbles() {
         return outputBubbles;
+    }
+    
+    public final javax.swing.JButton getRunButton() {
+        return executeButton;
+    }
+    
+    protected void setRunAction( javax.swing.Action action ) {
+        this.executeButton.setAction(action);
+    }
+    
+    protected javax.swing.Action createRunAction() {
+        return new javax.swing.AbstractAction("Run",new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/resources/go.png"))) {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                org.das2.util.LoggerManager.logGuiEvent(evt);                
+                if ( dirty && support.file!=null ) {
+                    try {
+                        support.save(); 
+                    } catch ( IOException ex ) {
+                        
+                    }
+                }
+                System.err.println("== Executing Script ==");
+                if ( JythonScriptPanel.this.context==CONTEXT_APPLICATION ) {
+                    model.getDom().getController().getScriptContext().setWindow(model);
+                }
+                if ( support.file!=null ) JythonScriptPanel.this.setRunningScript(support.file);
+                support.executeScript( evt.getModifiers() );
+            }
+        };
     }
     
     protected String filename = null;
