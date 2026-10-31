@@ -1,6 +1,8 @@
 
 package org.autoplot.jythonsupport.ui;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import org.python.util.PythonInterpreter;
 
 public class ScriptDebugSession {
@@ -15,6 +17,12 @@ public class ScriptDebugSession {
         this.interp = interpreter;
         debugger = new JythonDebugger();
 
+        breakpoints.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                debugger.setBreakpoints(breakpoints.getBreakpoints());
+            }
+        });
         debugger.setBreakpoints(breakpoints.getBreakpoints());
         
         interp.set("debugger",debugger);
