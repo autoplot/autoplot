@@ -1,8 +1,14 @@
 package org.autoplot.jythonsupport.ui;
 
+import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+import org.python.core.Py;
 import org.python.core.PyFrame;
 import org.python.core.PyObject;
 
@@ -18,6 +24,7 @@ import org.python.core.PyObject;
 public final class JythonDebugger {
 
     public interface Listener {
+
         /**
          * Called whenever the interpreter reaches a new source line.
          *
@@ -198,7 +205,7 @@ public final class JythonDebugger {
             boolean breakpoint = breakpoints.contains(line);
 
             listener.tracedLine(event, line);
-            
+
             if (breakpoint) {
                 shouldPause = true;
             } else if (mode == Mode.STEP_INTO) {
@@ -214,7 +221,7 @@ public final class JythonDebugger {
         if (shouldPause) {
             pauseAtLine(pyFrame, line);
         }
-        
+
     }
 
     private void pauseAtLine(PyFrame frame, int line) {
@@ -228,22 +235,38 @@ public final class JythonDebugger {
             pauseOnNextLine = false;
             mode = Mode.PAUSED;
         }
-        
+
         PyObject code = frame.__getattr__("f_code");
         String filename = code.__getattr__("co_filename").toString();
         Listener l = listener;
         if (l != null) {
-            l.pausedAtLine(filename,line);
+            l.pausedAtLine(filename, line);
         }
 
         synchronized (pauseLock) {
-            while (mode == Mode.PAUSED) {
-                try {
-                    pauseLock.wait();
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                    mode = Mode.STOPPED;
-                    break;
+            while (true) {
+                FutureTask<String> task;
+
+                synchronized (pauseLock) {
+                    while (mode == Mode.PAUSED && evaluations.isEmpty()) {
+                        try {
+                            pauseLock.wait();
+                        } catch (InterruptedException ex) {
+                            Thread.currentThread().interrupt();
+                            mode = Mode.STOPPED;
+                            break;
+                        }
+                    }
+
+                    if (mode != Mode.PAUSED) {
+                        break;
+                    }
+
+                    task = evaluations.poll();
+                }
+
+                if (task != null) {
+                    task.run();
                 }
             }
             if (mode == Mode.STOPPED) {
@@ -255,6 +278,8 @@ public final class JythonDebugger {
         if (l != null) {
             l.resumed();
         }
+        
+        evaluations.removeAll(evaluations);
     }
 
     /**
@@ -283,6 +308,47 @@ public final class JythonDebugger {
 
         public DebuggerStoppedException() {
             super("Script execution stopped by debugger");
+        }
+    }
+
+    private final Queue<FutureTask<String>> evaluations
+            = new ArrayDeque<FutureTask<String>>();
+
+    private PyObject expressionEvaluator;
+
+    public void setExpressionEvaluator(PyObject evaluator) {
+        synchronized (pauseLock) {
+            expressionEvaluator = evaluator;
+        }
+    }
+
+    public Future<String> evaluate(final String expression) {
+        synchronized (pauseLock) {
+            if (mode != Mode.PAUSED || currentFrame == null) {
+                throw new IllegalStateException("Debugger is not paused");
+            }
+
+            final PyFrame frame = currentFrame;
+            final PyObject evaluator = expressionEvaluator;
+
+            if (evaluator == null) {
+                throw new IllegalStateException("No expression evaluator installed");
+            }
+
+            FutureTask<String> task = new FutureTask<String>(
+                    new Callable<String>() {
+                @Override
+                public String call() {
+                    PyObject result = evaluator.__call__(
+                            frame,
+                            Py.newString(expression));
+                    return result.toString();
+                }
+            });
+
+            evaluations.add(task);
+            pauseLock.notifyAll();
+            return task;
         }
     }
 }

@@ -3,6 +3,8 @@ package org.autoplot.jythonsupport.ui;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import org.python.util.PythonInterpreter;
 
 public class ScriptDebugSession {
@@ -57,7 +59,20 @@ public class ScriptDebugSession {
     public void setSessionListener(JythonDebugger.Listener listener) {
         debugger.setListener(listener);
     }
+    
+    public String eval( String expr ) {
+        Future<String> f= debugger.evaluate(expr);
+        try {
+            return f.get();
+        } catch (InterruptedException | ExecutionException ex) {
+            return "not available";
+        }
+    }
 
+    public JythonDebugger getDebugger() {
+        return this.debugger;
+    }
+    
     /**
      * this is a bit different than ChatGPT suggested
      */
