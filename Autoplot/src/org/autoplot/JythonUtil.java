@@ -297,16 +297,6 @@ public class JythonUtil {
 
     /**
      * invoke the Jython script on another thread.
-     * @param url the address of the script.
-     * @throws java.io.IOException
-     * @deprecated use invokeScriptSoon with URI.
-     */
-    public static void invokeScriptSoon( final URL url ) throws IOException {
-        invokeScriptSoon( url, null, new NullProgressMonitor() );
-    }
-
-    /**
-     * invoke the Jython script on another thread.
      * @param uri the address of the script.
      * @throws java.io.IOException
      */
@@ -314,18 +304,6 @@ public class JythonUtil {
         invokeScriptSoon( uri, null, new NullProgressMonitor() );
     }
 
-    
-    /**
-     * invoke the Jython script on another thread.
-     * @param url the address of the script.
-     * @param dom if null, then null is passed into the script and the script must not use dom.
-     * @param mon monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
-     * @throws java.io.IOException
-     * @deprecated use invokeScriptSoon with URI.
-     */
-    public static void invokeScriptSoon( final URL url, final Application dom, ProgressMonitor mon ) throws IOException {
-        invokeScriptSoon( url, dom, new HashMap(), false, false, mon );
-    }
     
     /**
      * invoke the Jython script on another thread.
@@ -540,34 +518,6 @@ public class JythonUtil {
             okayed.put( file.toString(), theScript );
         }
         return result;
-    }
-            
-            
-    /**
-     * invoke the Jython script on another thread.  Script parameters can be passed in, and the scientist can be 
-     * provided a dialog to set the parameters.  Note this will return before the script is actually
-     * executed, and monitor should be used to detect that the script is finished.
-     * @param url the address of the script.
-     * @param dom if null, then null is passed into the script and the script must not use dom.
-     * @param params values for parameters, or null.
-     * @param askParams if true, query the scientist for parameter settings.
-     * @param makeTool if true, offer to put the script into the tools area for use later (only if askParams).
-     * @param mon1 monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
-     * @return JOptionPane.OK_OPTION of the script is invoked.
-     * @throws java.io.IOException
-     * @deprecated use invokeScriptSoon with URI.
-     */
-    public static int invokeScriptSoon( 
-            final URL url, 
-            final Application dom, 
-            Map<String,String> params, 
-            boolean askParams, boolean makeTool, 
-            ProgressMonitor mon1) throws IOException {
-        try {
-            return invokeScriptSoon( url.toURI(), dom, params, askParams, makeTool, null, mon1 );
-        } catch (URISyntaxException ex) {
-            throw new RuntimeException(ex);
-        }
     }
     
     /**
@@ -874,67 +824,4 @@ public class JythonUtil {
         return response;
     }
     
-    /**
-     * Invoke the script on the current thread.
-     * @param uri the URI, providing pwd.
-     * @param file null or the file to use.
-     * @param dom the application 
-     * @param fparams parameters to pass into the script.
-     * @param mon feedback monitor for the thread.
-     * @throws IOException 
-     */
-    public static void invokeScript20181217( 
-            URI uri, 
-            File file, 
-            Application dom, 
-            Map<String,String> fparams, 
-            ProgressMonitor mon ) throws IOException {
-        
-        if ( mon==null ) mon= new NullProgressMonitor();
-
-        if ( file==null ) {    
-            if ( SwingUtilities.isEventDispatchThread() ) {
-                throw new IllegalArgumentException("invokeScript called from EventQueue");
-            }
-            file = DataSetURI.getFile( uri, new NullProgressMonitor() ); 
-        }
-        
-        ParametersFormPanel.FormData fd;
-          
-        PythonInterpreter interp = JythonUtil.createInterpreter(true, false, dom, mon );
-
-        ParametersFormPanel pfp= new org.autoplot.jythonsupport.ui.ParametersFormPanel();
-        
-        Map<String,Object> env= new HashMap();
-        env.put("dom",dom );
-        URISplit split= URISplit.parse(uri);
-        env.put( "PWD", split.path );
-        
-        fd=  pfp.doVariables( env, file, fparams, null );
-
-        logger.log(Level.FINE, "invokeScriptSoon({0})", uri);
-        
-        for ( Map.Entry<String,String> p: fparams.entrySet() ) {
-            try {
-                fd.implement( interp, p.getKey(), p.getValue() );
-            } catch ( ParseException ex ) {
-                logger.log( Level.WARNING, null, ex );
-            }
-        }
-
-        interp.set( "dom", dom );
-        interp.set( "PWD", split.path ); 
-
-        try ( FileInputStream in = new FileInputStream(file) ) {
-
-            interp.execfile( JythonRefactory.fixImports(in,file.getName()), uri.toString());
-
-        } catch ( PyException ex ) {
-            throw ex;
-
-        } finally {
-            if ( !mon.isFinished() ) mon.finished();
-        } 
-        
-    }
 }
