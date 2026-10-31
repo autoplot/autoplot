@@ -126,12 +126,11 @@ public class DebugLineNumbersRuler extends LineNumbersRuler {
         FontMetrics fontMetrics = getFontMetrics(getFont());
         int lh = fontMetrics.getHeight();
         Graphics2D g2= (Graphics2D)g;
+        g2.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );        
+        g2.drawImage( pc, 0, lh*(programCounter-1), this );
         for ( Integer i : breakpoints.getBreakpoints() ) {
-            g2.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
             g2.drawImage( breakpoint, 0, lh*(i-1), this );
         }
-        g2.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
-        g2.drawImage( pc, 0, lh*(programCounter-1), this );
     }
 
     @Override
