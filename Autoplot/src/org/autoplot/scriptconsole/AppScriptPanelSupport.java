@@ -838,10 +838,11 @@ public class AppScriptPanelSupport {
                     
                     final DebugLineNumbersRuler r= panel.getEditorPanel().getRuler();
                     session= new ScriptDebugSession(interp,r.getBreakpointModel());
-                    
-                    panel.getRunButton().setAction( getResumeAction(session) );
+                    final ScriptDebugSession fsession= session;
                     
                     session.setSessionListener( new JythonDebugger.Listener() {
+                        int hits=0;
+                        
                         @Override
                         public void tracedLine(String filename, int line) {
                             if ( r!=null ) r.setProgramCounter(line);
@@ -849,6 +850,10 @@ public class AppScriptPanelSupport {
 
                         @Override
                         public void pausedAtLine(String filename,int line) {
+                            if ( hits==0 ) {
+                                panel.getRunButton().setAction( getResumeAction(fsession) );
+                            }
+                            hits++;
                             panel.getRunButton().setEnabled(true);
                         }
 
