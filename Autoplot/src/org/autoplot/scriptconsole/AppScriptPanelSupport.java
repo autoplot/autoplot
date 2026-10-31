@@ -875,9 +875,24 @@ public class AppScriptPanelSupport {
 
                     });
 
-                }
+                    interp.exec(
+                        "def debugEval(frame, expression):\n" +
+                        "    return repr(eval(expression, frame.f_globals, frame.f_locals))\n"
+                    );
 
-                EditorAnnotationsSupport.setExpressionLookup(annotationsSupport.getForInterp(interp));
+                    session.getDebugger().setExpressionEvaluator(interp.get("debugEval"));
+
+                    EditorAnnotationsSupport.setExpressionLookup( new EditorAnnotationsSupport.ExpressionLookup() {
+                        @Override
+                        public PyObject lookup(String expr) {
+                            return new PyString(fsession.eval(expr));
+                        }
+                    });
+                    
+                } else {
+                    EditorAnnotationsSupport.setExpressionLookup(annotationsSupport.getForInterp(interp));
+                    
+                }
 
                 JythonOutputCapture.install(
                     interp,
