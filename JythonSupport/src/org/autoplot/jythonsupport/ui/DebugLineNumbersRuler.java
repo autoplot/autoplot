@@ -30,7 +30,9 @@ public class DebugLineNumbersRuler extends LineNumbersRuler {
 
     private static final Logger logger= LoggerManager.getLogger("jython.debugger");
     
-    private final Set<Integer> breakpoints = new HashSet<>();
+    public static BreakpointModel NO_BREAKPOINTS= new BreakpointModel();
+    private BreakpointModel breakpoints= NO_BREAKPOINTS;
+    
     private int programCounter = -1;
 
     BufferedImage pc;
@@ -98,11 +100,24 @@ public class DebugLineNumbersRuler extends LineNumbersRuler {
 
     public void setBreakpoint(int line, boolean enabled) {
         if (enabled) {
-            breakpoints.add(line);
+            this.breakpoints.set(line);
         } else {
-            breakpoints.remove(line);
+            this.breakpoints.clear(line);
         }
         repaint();
+    }
+    
+    
+    public void setBreakpointModel(BreakpointModel model) {
+        this.breakpoints = model;
+
+        model.addPropertyChangeListener(evt -> repaint());
+
+        repaint();
+    }
+    
+    public BreakpointModel getBreakpointModel() {
+        return this.breakpoints;
     }
             
     @Override
@@ -111,7 +126,7 @@ public class DebugLineNumbersRuler extends LineNumbersRuler {
         FontMetrics fontMetrics = getFontMetrics(getFont());
         int lh = fontMetrics.getHeight();
         Graphics2D g2= (Graphics2D)g;
-        for ( Integer i : breakpoints ) {
+        for ( Integer i : breakpoints.getBreakpoints() ) {
             g2.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
             g2.drawImage( breakpoint, 0, lh*(i-1), this );
         }
