@@ -779,8 +779,13 @@ public class AppScriptPanelSupport {
     private Action getResumeAction(ScriptDebugSession session) {
         return new AbstractAction("Resume",new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/resources/resume.png"))) {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                session.continueExecution();
+            public void actionPerformed(ActionEvent evt) {
+                boolean shift = (evt.getModifiers() & ActionEvent.SHIFT_MASK) != 0;
+                if (shift) {
+                    session.stepOver();
+                } else {
+                    session.continueExecution();
+                }
             } 
         };
     }
@@ -852,6 +857,7 @@ public class AppScriptPanelSupport {
                         public void pausedAtLine(String filename,int line) {
                             if ( hits==0 ) {
                                 panel.getRunButton().setAction( getResumeAction(fsession) );
+                                panel.getRunButton().setToolTipText("Resume execution, shift is step");
                             }
                             hits++;
                             panel.getRunButton().setEnabled(true);
@@ -1103,6 +1109,7 @@ public class AppScriptPanelSupport {
                 session.finished();
                 panel.getRunButton().setAction( panel.createRunAction() );
                 panel.getRunButton().setEnabled(true);
+                panel.getRunButton().setToolTipText(panel.runToolTipText);
             }
 
         }
