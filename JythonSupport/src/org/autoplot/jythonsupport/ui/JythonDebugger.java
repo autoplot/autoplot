@@ -1,6 +1,5 @@
 package org.autoplot.jythonsupport.ui;
 
-import java.awt.Color;
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,7 +12,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import org.das2.util.ColorUtil;
 import org.python.core.Py;
-import org.python.core.PyFile;
 import org.python.core.PyFrame;
 import org.python.core.PyObject;
 
@@ -63,25 +61,6 @@ public final class JythonDebugger {
         RUNNING, PAUSED, STEP_INTO, STEP_OVER, STEP_OUT, STOPPED
     }
     
-    public static class Breakpoint implements Comparable {
-        public Breakpoint(int line) {
-            this.line= line;
-        }
-        public Breakpoint(String filename,int line) {
-            this.filename= filename;
-            this.line= line;
-        }
-        int line;
-        String filename=null; // This will need more work, for now one file is assumed.
-        boolean enabled=true;
-        String expr="";
-
-        @Override
-        public int compareTo(Object o) {
-            Breakpoint obp= (Breakpoint)o;
-            return obp.line - this.line;
-        }
-    }
 
     private final Object pauseLock = new Object();
     private volatile Map<Integer,Breakpoint> breakpoints = Collections.emptyMap();

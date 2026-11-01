@@ -19,7 +19,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import jsyntaxpane.components.LineNumbersRuler;
-import org.autoplot.jythonsupport.ui.JythonDebugger.Breakpoint;
+import org.autoplot.jythonsupport.ui.Breakpoint;
 import org.das2.util.LoggerManager;
 
 /**
@@ -59,7 +59,7 @@ public class DebugLineNumbersRuler extends LineNumbersRuler {
                 setBreakpoint(line,true);
             }
         }));
-        lineNumbersPopup.add( new JMenuItem( new AbstractAction("Edit Breakpoint") {
+        lineNumbersPopup.add(new JMenuItem( new AbstractAction("Edit Breakpoint") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int line= selectedLine;

@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import org.autoplot.jythonsupport.ui.JythonDebugger.Breakpoint;
+import org.autoplot.jythonsupport.ui.Breakpoint;
 
 public class BreakpointModel {
 

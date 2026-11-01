@@ -1,7 +1,7 @@
 
 package org.autoplot.jythonsupport.ui;
 
-import org.autoplot.jythonsupport.ui.JythonDebugger.Breakpoint;
+import org.autoplot.jythonsupport.ui.Breakpoint;
 
 /**
  * modal Editor for breakpoints.  This should be called with 
