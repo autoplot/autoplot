@@ -99,7 +99,7 @@ public class EditorTextPane extends JEditorPane {
 
     private boolean initialized= false;
 
-    DebugLineNumbersRuler ruler=null;
+    private DebugLineNumbersRuler ruler=null;
 
     /**
      * return the LineNumberRuler which allows PC and breakpoints to be identified.
@@ -107,6 +107,10 @@ public class EditorTextPane extends JEditorPane {
      */
     public DebugLineNumbersRuler getRuler() {
         return ruler;
+    }
+    
+    public void setRuler( DebugLineNumbersRuler ruler ) {
+        this.ruler= ruler;
     }
     
     public EditorTextPane() {
