@@ -68,6 +68,9 @@ public class ScriptDebugSession {
     }
     
     public String eval( String expr ) {
+        if ( !debugger.isPaused() ) {
+            return "(debugger not paused)";
+        }
         Future<String> f= debugger.evaluate(expr);
         try {
             return f.get();
