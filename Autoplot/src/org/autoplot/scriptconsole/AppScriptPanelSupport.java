@@ -841,9 +841,23 @@ public class AppScriptPanelSupport {
                 
                 interp= JythonUtil.createInterpreter(true, false, model.getDom(), mon );
                 
-                if ( "true".equals(doDebug) ) {
+                if ( "true".equals(doDebug) && panel.getEditorPanel().getRuler()==null ) {
+                    DebugLineNumbersRuler ruler = new DebugLineNumbersRuler();
+                    ruler.setBreakpointModel(new BreakpointModel( panel.getEditorPanel().getDocument()));
+        
+                    ruler.install( panel.getEditorPanel() );
+        
+                    panel.getScrollPane().setRowHeaderView(ruler);
+                    //setRuler
                     
-                    final DebugLineNumbersRuler r= panel.getEditorPanel().getRuler();
+                    panel.getEditorPanel().setRuler( ruler );
+                    
+                }
+
+                final DebugLineNumbersRuler r= panel.getEditorPanel().getRuler();
+                
+                if ( "true".equals(doDebug) && r!=null ) {
+                    
                     session= new ScriptDebugSession(interp,r.getBreakpointModel(),panel.outputBubbles);
                     final ScriptDebugSession fsession= session;
                     
