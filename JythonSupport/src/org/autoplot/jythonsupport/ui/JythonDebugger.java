@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
+import javax.swing.text.Position;
 import org.das2.util.ColorUtil;
 import org.python.core.Py;
 import org.python.core.PyFrame;
@@ -83,7 +84,7 @@ public final class JythonDebugger {
         } else {
             Map<Integer,Breakpoint> bs= new HashMap<>();
             for ( Breakpoint b : lines ) {
-                bs.put(b.line,b);
+                bs.put(b.getLine(),b);
             }
             breakpoints = bs;
         }

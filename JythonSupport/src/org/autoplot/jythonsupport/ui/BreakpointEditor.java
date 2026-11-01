@@ -1,7 +1,9 @@
 
 package org.autoplot.jythonsupport.ui;
 
-import org.autoplot.jythonsupport.ui.Breakpoint;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.text.BadLocationException;
 
 /**
  * modal Editor for breakpoints.  This should be called with 
@@ -21,7 +23,7 @@ public class BreakpointEditor extends javax.swing.JPanel {
     public void setBreakpoint( Breakpoint bp ) {
         this.enabledButton.setSelected(bp.enabled);
         this.filenameLabel.setText(bp.filename);
-        this.lineNumberTF.setText(String.valueOf(bp.line));
+        this.lineNumberTF.setText(String.valueOf(bp.getLine()));
         this.exprTF.setText(bp.expr);
     }
     
@@ -29,9 +31,9 @@ public class BreakpointEditor extends javax.swing.JPanel {
         bp.enabled= this.enabledButton.isSelected();
         bp.filename= this.filenameLabel.getText();
         try {
-            bp.line= Integer.parseInt(this.lineNumberTF.getText());
-        } catch ( NumberFormatException ex ) {
-            ex.printStackTrace();
+            bp.position= Breakpoint.getPositionForLine( bp.document, Integer.parseInt(this.lineNumberTF.getText()) );
+        } catch ( NumberFormatException | BadLocationException ex ) {
+            Logger.getLogger(BreakpointEditor.class.getName()).log(Level.SEVERE, null, ex);
         }
         bp.expr= exprTF.getText();
     }

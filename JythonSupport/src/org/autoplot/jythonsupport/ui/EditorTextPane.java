@@ -284,7 +284,7 @@ public class EditorTextPane extends JEditorPane {
                 
                 if ( "true".equals(doDebug) ) {
                     ruler = new DebugLineNumbersRuler();
-                    ruler.setBreakpointModel( new BreakpointModel() );
+                    ruler.setBreakpointModel( new BreakpointModel(getDocument()) );
                 
                     ruler.config(
                         ((DefaultSyntaxKit) EditorTextPane.this.getEditorKit()).getConfig()

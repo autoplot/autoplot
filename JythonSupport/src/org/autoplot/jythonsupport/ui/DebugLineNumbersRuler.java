@@ -18,8 +18,9 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
 import jsyntaxpane.components.LineNumbersRuler;
-import org.autoplot.jythonsupport.ui.Breakpoint;
 import org.das2.util.LoggerManager;
 
 /**
@@ -30,7 +31,8 @@ public class DebugLineNumbersRuler extends LineNumbersRuler {
 
     private static final Logger logger= LoggerManager.getLogger("jython.debugger");
     
-    public static BreakpointModel NO_BREAKPOINTS= new BreakpointModel();
+    public static BreakpointModel NO_BREAKPOINTS= new BreakpointModel(new PlainDocument());
+    
     private BreakpointModel breakpoints= NO_BREAKPOINTS;
     
     private int programCounter = -1;
@@ -115,12 +117,16 @@ public class DebugLineNumbersRuler extends LineNumbersRuler {
     }
 
     public void setBreakpoint(int line, boolean enabled) {
-        if (enabled) {
-            this.breakpoints.set(line);
-        } else {
-            this.breakpoints.clear(line);
+        try {
+            if (enabled) {
+                this.breakpoints.set(line);
+            } else {
+                this.breakpoints.clear(line);
+            }
+            repaint();
+        } catch ( BadLocationException ex ) {
+            ex.printStackTrace();
         }
-        repaint();
     }
     
     
@@ -146,9 +152,9 @@ public class DebugLineNumbersRuler extends LineNumbersRuler {
         g2.drawImage(pcImage, 0, lh*(programCounter-1), this );
         for ( Breakpoint bp : breakpoints.getBreakpoints() ) {
             if ( bp.enabled ) {
-                g2.drawImage(breakpointImage, 0, lh*(bp.line-1), this );
+                g2.drawImage(breakpointImage, 0, lh*(bp.getLine()-1), this );
             } else {
-                g2.drawImage(disabledBreakpointImage, 0, lh*(bp.line-1), this );
+                g2.drawImage(disabledBreakpointImage, 0, lh*(bp.getLine()-1), this );
             }
         }
     }
