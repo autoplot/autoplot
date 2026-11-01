@@ -383,7 +383,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         String doDebug= System.getProperty("jythonDebugger","false");
         if ( "true".equals(doDebug) ) {
             DebugLineNumbersRuler ruler = new DebugLineNumbersRuler();
-            ruler.setBreakpointModel(new BreakpointModel());
+            ruler.setBreakpointModel(new BreakpointModel(this.textArea.getDocument()));
         
             ruler.install( textArea );
         
