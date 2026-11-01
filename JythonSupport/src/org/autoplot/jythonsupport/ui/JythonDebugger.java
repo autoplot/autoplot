@@ -222,9 +222,11 @@ public final class JythonDebugger {
             
             listener.tracedLine(event, line);
             if ( b!=null && !b.expr.isEmpty() ) { // TODO: Java 11 has isBlank
-                PyObject result = expressionEvaluator.__call__(
-                    frame, Py.newString(b.expr));
-                scriptOutputBubbles.setOutput( line, result.toString(), ColorUtil.PURPLE );
+                if ( expressionEvaluator!=null ) {
+                    PyObject result = expressionEvaluator.__call__(
+                        frame, Py.newString(b.expr));
+                    scriptOutputBubbles.setOutput( line, result.toString(), ColorUtil.PURPLE );
+                }
             }
 
             if (b!=null && b.enabled) {
