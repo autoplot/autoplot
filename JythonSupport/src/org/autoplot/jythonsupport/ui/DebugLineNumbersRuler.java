@@ -11,13 +11,12 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import jsyntaxpane.components.LineNumbersRuler;
 import org.autoplot.jythonsupport.ui.JythonDebugger.Breakpoint;
@@ -58,6 +57,20 @@ public class DebugLineNumbersRuler extends LineNumbersRuler {
             public void actionPerformed(ActionEvent e) {
                 int line= selectedLine;
                 setBreakpoint(line,true);
+            }
+        }));
+        lineNumbersPopup.add( new JMenuItem( new AbstractAction("Edit Breakpoint") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int line= selectedLine;
+                Breakpoint bp= breakpoints.getBreakpoint(line);
+                if ( bp==null ) return;
+                BreakpointEditor edit= new BreakpointEditor();
+                edit.setBreakpoint(bp);
+                if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( lineNumbersPopup, edit, "Edit Breakpoint", JOptionPane.OK_CANCEL_OPTION ) ) {
+                    edit.resetBreakpoint(bp);
+                    repaint();
+                }
             }
         }));
         lineNumbersPopup.add( new JMenuItem( new AbstractAction("Clear Breakpoint") {

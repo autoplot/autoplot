@@ -5,6 +5,7 @@
  */
 package org.autoplot.scriptconsole;
 
+import org.autoplot.jythonsupport.ui.ScriptOutputBubbles;
 import java.awt.Dimension;
 import org.autoplot.jythonsupport.ui.EditorContextMenu;
 import java.awt.Font;

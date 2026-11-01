@@ -1,5 +1,6 @@
 package org.autoplot.jythonsupport.ui;
 
+import java.awt.Color;
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,7 +11,9 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
+import org.das2.util.ColorUtil;
 import org.python.core.Py;
+import org.python.core.PyFile;
 import org.python.core.PyFrame;
 import org.python.core.PyObject;
 
@@ -24,6 +27,8 @@ import org.python.core.PyObject;
  * are traced.
  */
 public final class JythonDebugger {
+
+    private ScriptOutputBubbles scriptOutputBubbles;
 
     public interface Listener {
 
@@ -109,6 +114,10 @@ public final class JythonDebugger {
         return new HashSet<>(breakpoints.values());
     }
 
+    public void setOutputBubbles( ScriptOutputBubbles sb ) {
+        this.scriptOutputBubbles= sb;
+    }
+    
     /**
      * Continue until the next breakpoint or completion.
      */
@@ -232,6 +241,11 @@ public final class JythonDebugger {
             Breakpoint b= breakpoints.get(line);
             
             listener.tracedLine(event, line);
+            if ( b!=null && !b.expr.isEmpty() ) { // TODO: Java 11 has isBlank
+                PyObject result = expressionEvaluator.__call__(
+                    frame, Py.newString(b.expr));
+                scriptOutputBubbles.setOutput( line, result.toString(), ColorUtil.PURPLE );
+            }
 
             if (b!=null && b.enabled) {
                 shouldPause = true;

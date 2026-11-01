@@ -1,4 +1,4 @@
-package org.autoplot.scriptconsole;
+package org.autoplot.jythonsupport.ui;
 
 import java.awt.*;
 import java.awt.event.*;

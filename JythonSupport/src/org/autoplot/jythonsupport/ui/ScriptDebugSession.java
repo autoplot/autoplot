@@ -11,13 +11,20 @@ public class ScriptDebugSession {
 
     private final PythonInterpreter interp;
     private final JythonDebugger debugger;
+    private final ScriptOutputBubbles scriptOutputBubbles;
 
     public ScriptDebugSession(
             PythonInterpreter interpreter,
-            BreakpointModel breakpoints) {
+            BreakpointModel breakpoints,
+            ScriptOutputBubbles scriptOutputBubbles
+    ) {
 
         this.interp = interpreter;
+        
+        this.scriptOutputBubbles= scriptOutputBubbles;
+        
         debugger = new JythonDebugger();
+        debugger.setOutputBubbles(scriptOutputBubbles);
 
         breakpoints.addPropertyChangeListener(new PropertyChangeListener() {
             @Override

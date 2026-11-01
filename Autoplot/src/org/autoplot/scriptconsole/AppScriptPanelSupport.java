@@ -842,7 +842,7 @@ public class AppScriptPanelSupport {
                 if ( "true".equals(doDebug) ) {
                     
                     final DebugLineNumbersRuler r= panel.getEditorPanel().getRuler();
-                    session= new ScriptDebugSession(interp,r.getBreakpointModel());
+                    session= new ScriptDebugSession(interp,r.getBreakpointModel(),panel.outputBubbles);
                     final ScriptDebugSession fsession= session;
                     
                     session.setSessionListener( new JythonDebugger.Listener() {

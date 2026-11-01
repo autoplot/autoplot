@@ -52,6 +52,15 @@ public class BreakpointModel {
         return new TreeSet<>(lines.values());
     }
 
+    /**
+     * return the first breakpoint with this line
+     * @param line
+     * @return 
+     */
+    public Breakpoint getBreakpoint(int line) {
+        return lines.get(line);
+    }
+    
     public void addPropertyChangeListener(
             PropertyChangeListener l) {
         pcs.addPropertyChangeListener(l);
