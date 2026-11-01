@@ -530,6 +530,7 @@ public class AppScriptPanelSupport {
             }
             Preferences prefs = AutoplotSettings.settings().getPreferences(AppScriptPanelSupport.class);
             prefs.put(PREFERENCE_OPEN_FILE, file.toString());
+            resetBreakpoints(panel.getEditorPanel().getDocument());
         }
         restartWatcher(file);
     }
@@ -564,6 +565,7 @@ public class AppScriptPanelSupport {
                     d.insertString(0, fs, null);
                     panel.setDirty(false);
                     panel.resetUndo();
+                    resetBreakpoints(d);
                 } catch ( NullPointerException ex ) {
                     try {
                         Document d = panel.getEditorPanel().getDocument();
@@ -1225,6 +1227,14 @@ public class AppScriptPanelSupport {
         
     }
 
+    private void resetBreakpoints(Document d) {
+        String doDebug= System.getProperty("jythonDebugger","false");
+        if ( "true".equals(doDebug) ) { 
+            final DebugLineNumbersRuler r= panel.getEditorPanel().getRuler();
+            r.setBreakpointModel(new BreakpointModel(d));
+        }
+    }
+
     
     protected class MyOutputStream extends FilterOutputStream {
         
@@ -1489,6 +1499,7 @@ public class AppScriptPanelSupport {
             panel.setDirty(false);
             panel.setFilename(null);
             annotationsSupport.clearAnnotations();
+            resetBreakpoints(d);
             this.file= null;
         } catch (BadLocationException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
