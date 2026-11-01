@@ -2,7 +2,9 @@ package org.autoplot.jythonsupport.ui;
 
 import java.util.ArrayDeque;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -55,9 +57,29 @@ public final class JythonDebugger {
     private enum Mode {
         RUNNING, PAUSED, STEP_INTO, STEP_OVER, STEP_OUT, STOPPED
     }
+    
+    public static class Breakpoint implements Comparable {
+        public Breakpoint(int line) {
+            this.line= line;
+        }
+        public Breakpoint(String filename,int line) {
+            this.filename= filename;
+            this.line= line;
+        }
+        int line;
+        String filename=null; // This will need more work, for now one file is assumed.
+        boolean enabled=true;
+        String expr="";
+
+        @Override
+        public int compareTo(Object o) {
+            Breakpoint obp= (Breakpoint)o;
+            return obp.line - this.line;
+        }
+    }
 
     private final Object pauseLock = new Object();
-    private volatile Set<Integer> breakpoints = Collections.emptySet();
+    private volatile Map<Integer,Breakpoint> breakpoints = Collections.emptyMap();
     private volatile Listener listener;
 
     // Accessed only while holding pauseLock.
@@ -71,16 +93,20 @@ public final class JythonDebugger {
         this.listener = listener;
     }
 
-    public void setBreakpoints(Set<Integer> lines) {
+    public void setBreakpoints(Set<Breakpoint> lines) {
         if (lines == null) {
-            breakpoints = Collections.emptySet();
+            breakpoints = Collections.emptyMap();
         } else {
-            breakpoints = Collections.unmodifiableSet(new HashSet<Integer>(lines));
+            Map<Integer,Breakpoint> bs= new HashMap<>();
+            for ( Breakpoint b : lines ) {
+                bs.put(b.line,b);
+            }
+            breakpoints = bs;
         }
     }
 
-    public Set<Integer> getBreakpoints() {
-        return breakpoints;
+    public Set<Breakpoint> getBreakpoints() {
+        return new HashSet<>(breakpoints.values());
     }
 
     /**
@@ -202,11 +228,12 @@ public final class JythonDebugger {
             line = pyFrame.f_lineno;
             PyObject code = pyFrame.__getattr__("f_code");
             String filename = code.__getattr__("co_filename").toString();
-            boolean breakpoint = breakpoints.contains(line);
-
+            
+            Breakpoint b= breakpoints.get(line);
+            
             listener.tracedLine(event, line);
 
-            if (breakpoint) {
+            if (b!=null && b.enabled) {
                 shouldPause = true;
             } else if (mode == Mode.STEP_INTO) {
                 shouldPause = true;

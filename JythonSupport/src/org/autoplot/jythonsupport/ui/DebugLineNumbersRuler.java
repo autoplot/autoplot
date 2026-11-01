@@ -20,6 +20,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import jsyntaxpane.components.LineNumbersRuler;
+import org.autoplot.jythonsupport.ui.JythonDebugger.Breakpoint;
 import org.das2.util.LoggerManager;
 
 /**
@@ -35,16 +36,18 @@ public class DebugLineNumbersRuler extends LineNumbersRuler {
     
     private int programCounter = -1;
 
-    BufferedImage pc;
-    BufferedImage breakpoint;
+    BufferedImage pcImage;
+    BufferedImage breakpointImage;
+    BufferedImage disabledBreakpointImage;
     
     private JPopupMenu lineNumbersPopup;
     int selectedLine=-1;
     
     public DebugLineNumbersRuler() {
         try {
-            pc = ImageIO.read( this.getClass().getResource("/resources/pc_16.png") );
-            breakpoint= ImageIO.read( this.getClass().getResource("/resources/breakpoint_16.png") );
+            pcImage = ImageIO.read( this.getClass().getResource("/resources/pc_16.png") );
+            breakpointImage= ImageIO.read( this.getClass().getResource("/resources/breakpoint_16.png") );
+            disabledBreakpointImage= ImageIO.read( this.getClass().getResource("/resources/disabled_breakpoint_16.png") );
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
@@ -127,9 +130,13 @@ public class DebugLineNumbersRuler extends LineNumbersRuler {
         int lh = fontMetrics.getHeight();
         Graphics2D g2= (Graphics2D)g;
         g2.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );        
-        g2.drawImage( pc, 0, lh*(programCounter-1), this );
-        for ( Integer i : breakpoints.getBreakpoints() ) {
-            g2.drawImage( breakpoint, 0, lh*(i-1), this );
+        g2.drawImage(pcImage, 0, lh*(programCounter-1), this );
+        for ( Breakpoint bp : breakpoints.getBreakpoints() ) {
+            if ( bp.enabled ) {
+                g2.drawImage(breakpointImage, 0, lh*(bp.line-1), this );
+            } else {
+                g2.drawImage(disabledBreakpointImage, 0, lh*(bp.line-1), this );
+            }
         }
     }
 
