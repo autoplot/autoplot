@@ -45,6 +45,7 @@ import org.das2.util.filesystem.FileSystem;
 import org.autoplot.dom.Application;
 import org.autoplot.state.EmbedDataExperiment;
 import org.autoplot.datasource.AutoplotSettings;
+import org.autoplot.datasource.WindowManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.ls.DOMImplementationLS;
@@ -272,9 +273,14 @@ public class PersistentStateSupport {
         VapSchemeChooser vapVersion= new VapSchemeChooser();
         chooser.setAccessory( vapVersion );
         
+        WindowManager.getInstance().recallWindowSizePosition(chooser);
+        
         chooser.setFileFilter( new FileNameExtensionFilter( "*"+ext, ext.substring(1) ) );
         int result= chooser.showSaveDialog(this.component);
         if ( result==JFileChooser.APPROVE_OPTION ) {
+            
+            WindowManager.getInstance().recordWindowSizePosition(chooser);
+            
             String lext= ext;
         
             if ( vapVersion.isEmbedData() ) {
