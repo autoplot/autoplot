@@ -209,6 +209,8 @@ public class EditorTextPane extends JEditorPane {
                     }
                 } );
                 
+                WordSelection.install(EditorTextPane.this);
+                
                 Toolkit tk= Toolkit.getDefaultToolkit();
 
                 getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_Z,tk.getMenuShortcutKeyMask() ), "undo" );
