@@ -181,7 +181,8 @@ public final class ScriptOutputBubbles extends JComponent {
             int lastLine=-99;
             
             for (Map.Entry<Integer, StringBuilder> entry : output.entrySet()) {
-                int index = entry.getKey() - 1;
+                int lineNumber= entry.getKey();
+                int index = lineNumber - 1;
                 if (index >= root.getElementCount()) {
                     continue;
                 }
@@ -190,7 +191,7 @@ public final class ScriptOutputBubbles extends JComponent {
                     if (r == null) {
                         continue;
                     }
-                    Point p = SwingUtilities.convertPoint(editor, r.x, r.y, viewport);
+                    Point p = SwingUtilities.convertPoint(editor, r.x, r.y, this);
                     int x = Math.max(4, getWidth() - bubbleWidth - 8);
                     int y = p.y + Math.max(0, (r.height - fm.getHeight()) / 2);
                     String s = entry.getValue().toString().replace('\r', ' ').trim();
@@ -223,7 +224,7 @@ public final class ScriptOutputBubbles extends JComponent {
                                 len = fm.stringWidth(text);
                             }
                         }
-                        drawString(g, text, lines[j], x + 8, y + j * editorFm.getHeight());
+                        drawString(g, text, lines[j], x, y + j * fm.getHeight());
 
                     }
                 } catch (BadLocationException ignored) {
