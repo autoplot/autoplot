@@ -17,7 +17,8 @@ public class Breakpoint implements Comparable {
     
     String filename = null; // This will need more work, for now one file is assumed.
     boolean enabled = true;
-    String expr = "";
+    String printExpr = "";
+    String ifExpr= ""; 
 
     public Breakpoint(Document document, int line) throws BadLocationException {
         this("",document,line);

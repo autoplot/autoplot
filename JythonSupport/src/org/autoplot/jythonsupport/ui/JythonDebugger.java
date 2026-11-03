@@ -15,6 +15,7 @@ import org.das2.util.ColorUtil;
 import org.python.core.Py;
 import org.python.core.PyFrame;
 import org.python.core.PyObject;
+import org.python.core.PyString;
 
 /**
  * Line-oriented debugger for Jython scripts.
@@ -221,10 +222,10 @@ public final class JythonDebugger {
             Breakpoint b= breakpoints.get(line);
             
             listener.tracedLine(event, line);
-            if ( b!=null && !b.expr.isEmpty() ) { // TODO: Java 11 has isBlank
+            if ( b!=null && !b.printExpr.isEmpty() ) { // TODO: Java 11 has isBlank
                 if ( expressionEvaluator!=null ) {
                     PyObject result = expressionEvaluator.__call__(
-                        frame, Py.newString(b.expr));
+                        frame, Py.newString(b.printExpr));
                     scriptOutputBubbles.setOutput( line, result.toString(), ColorUtil.PURPLE );
                 }
             }
@@ -238,6 +239,22 @@ public final class JythonDebugger {
                         || (pauseOnNextLine && pyFrame == targetFrame);
             } else if (mode == Mode.STEP_OUT) {
                 shouldPause = pauseOnNextLine && pyFrame == targetFrame;
+            }
+            
+            if ( shouldPause ) {
+                if ( !b.ifExpr.isEmpty() ) {
+                    PyObject result = expressionEvaluator.__call__(
+                        frame, Py.newString(b.ifExpr));
+                    int test;
+                    try {
+                        test= Integer.parseInt(result.toString());
+                    } catch ( NumberFormatException ex ) {
+                        test= 0;
+                    }                    
+                    if ( test==0 ) {
+                        shouldPause= false;
+                    }
+                }
             }
         }
 
