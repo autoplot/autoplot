@@ -1128,7 +1128,7 @@ public class AppScriptPanelSupport {
             panel.setRunningScript(null);
             if ( session!=null ) {
                 session.finished();
-                panel.getRunButton().setAction( panel.createRunAction() );
+                panel.getRunButton().setAction( panel.RUN_ACTION );
                 panel.getRunButton().setEnabled(true);
                 panel.getRunButton().setToolTipText(JythonScriptPanel.runToolTipText);
             }

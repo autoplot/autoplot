@@ -16,6 +16,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -121,12 +123,12 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     public JythonScriptPanel( AutoplotUI app, final DataSetSelector selector) {
         initComponents();
         
-        getRunButton().setAction( createRunAction() );
+        getRunButton().setAction( RUN_ACTION );
         getRunButton().setToolTipText(runToolTipText);
         
         setMinimumSize( new Dimension(400,400) );
                 
-        jScrollPane2.getVerticalScrollBar().setUnitIncrement( 12 ); // TODO: should be line height.
+        jScrollPane2.getVerticalScrollBar().setUnitIncrement( jScrollPane2.getFont().getSize() ); 
         
         setContext(CONTEXT_APPLICATION);
         
@@ -731,27 +733,25 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
         this.executeButton.setAction(action);
     }
     
-    protected javax.swing.Action createRunAction() {
-        return new javax.swing.AbstractAction("Run",new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/resources/go.png"))) {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                org.das2.util.LoggerManager.logGuiEvent(evt);                
-                if ( dirty && support.file!=null ) {
-                    try {
-                        support.save(); 
-                    } catch ( IOException ex ) {
-                        
-                    }
+    protected javax.swing.Action RUN_ACTION= new javax.swing.AbstractAction("Run",new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/resources/go.png"))) {
+        @Override
+        public void actionPerformed(ActionEvent evt) {
+            org.das2.util.LoggerManager.logGuiEvent(evt);                
+            if ( dirty && support.file!=null ) {
+                try {
+                    support.save(); 
+                } catch ( IOException ex ) {
+
                 }
-                System.err.println("== Executing Script ==");
-                if ( JythonScriptPanel.this.context==CONTEXT_APPLICATION ) {
-                    model.getDom().getController().getScriptContext().setWindow(model);
-                }
-                if ( support.file!=null ) JythonScriptPanel.this.setRunningScript(support.file);
-                support.executeScript( evt.getModifiers() );
             }
-        };
-    }
+            System.err.println("== Executing Script ==");
+            if ( JythonScriptPanel.this.context==CONTEXT_APPLICATION ) {
+                model.getDom().getController().getScriptContext().setWindow(model);
+            }
+            if ( support.file!=null ) JythonScriptPanel.this.setRunningScript(support.file);
+            support.executeScript( evt.getModifiers() );
+        }
+    };
     
     protected String filename = null;
 
