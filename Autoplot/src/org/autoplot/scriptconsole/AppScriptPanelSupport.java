@@ -1245,7 +1245,11 @@ public class AppScriptPanelSupport {
         String doDebug= System.getProperty("jythonDebugger","false");
         if ( "true".equals(doDebug) ) { 
             final DebugLineNumbersRuler r= panel.getEditorPanel().getRuler();
-            r.setBreakpointModel(new BreakpointModel(d));
+            if ( r!=null ) {
+                r.setBreakpointModel(new BreakpointModel(d));
+            } else {
+                logger.fine("debug ruler hasn't been installed yet");
+            }
         }
     }
 
