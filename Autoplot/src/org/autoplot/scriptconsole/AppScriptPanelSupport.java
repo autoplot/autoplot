@@ -842,7 +842,7 @@ public class AppScriptPanelSupport {
                 interp= JythonUtil.createInterpreter(true, false, model.getDom(), mon );
                 
                 if ( "true".equals(doDebug) && panel.getEditorPanel().getRuler()==null ) {
-                    DebugLineNumbersRuler ruler = new DebugLineNumbersRuler();
+                    DebugLineNumbersRuler ruler = new DebugLineNumbersRuler(panel);
                     ruler.setBreakpointModel(new BreakpointModel( panel.getEditorPanel().getDocument()));
         
                     ruler.install( panel.getEditorPanel() );

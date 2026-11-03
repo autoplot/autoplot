@@ -62,7 +62,7 @@ public class BreakpointEditor extends javax.swing.JPanel {
 
         lineNumberTF.setText("-1");
 
-        enabledButton.setText("Enabled");
+        enabledButton.setText("Pause before running this line");
         enabledButton.setToolTipText("Code will stop at this breakpoint when enabled");
 
         jLabel4.setText("Evaluate Expression:");

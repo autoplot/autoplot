@@ -289,7 +289,7 @@ public class EditorTextPane extends JEditorPane {
                 String doDebug= System.getProperty("jythonDebugger","false");
                 
                 if ( "true".equals(doDebug) ) {
-                    ruler = new DebugLineNumbersRuler();
+                    ruler = new DebugLineNumbersRuler(EditorTextPane.this);
                     ruler.setBreakpointModel( new BreakpointModel(getDocument()) );
                 
                     ruler.config(

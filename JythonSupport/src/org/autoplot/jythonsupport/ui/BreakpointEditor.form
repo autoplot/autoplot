@@ -88,7 +88,7 @@
     </Component>
     <Component class="javax.swing.JCheckBox" name="enabledButton">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Enabled"/>
+        <Property name="text" type="java.lang.String" value="Pause before running this line"/>
         <Property name="toolTipText" type="java.lang.String" value="Code will stop at this breakpoint when enabled"/>
       </Properties>
     </Component>

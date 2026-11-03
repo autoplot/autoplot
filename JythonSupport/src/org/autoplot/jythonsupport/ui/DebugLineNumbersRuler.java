@@ -1,10 +1,12 @@
 
 package org.autoplot.jythonsupport.ui;
 
+import java.awt.Component;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -18,6 +20,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 import jsyntaxpane.components.LineNumbersRuler;
@@ -44,7 +47,7 @@ public class DebugLineNumbersRuler extends LineNumbersRuler {
     private JPopupMenu lineNumbersPopup;
     int selectedLine=-1;
     
-    public DebugLineNumbersRuler() {
+    public DebugLineNumbersRuler(Component parent) {
         try {
             pcImage = ImageIO.read( this.getClass().getResource("/resources/pc_16.png") );
             breakpointImage= ImageIO.read( this.getClass().getResource("/resources/breakpoint_16.png") );
@@ -69,7 +72,7 @@ public class DebugLineNumbersRuler extends LineNumbersRuler {
                 if ( bp==null ) return;
                 BreakpointEditor edit= new BreakpointEditor();
                 edit.setBreakpoint(bp);
-                if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( lineNumbersPopup, edit, "Edit Breakpoint", JOptionPane.OK_CANCEL_OPTION ) ) {
+                if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( parent, edit, "Edit Breakpoint", JOptionPane.OK_CANCEL_OPTION ) ) {
                     edit.resetBreakpoint(bp);
                     repaint();
                 }
