@@ -367,14 +367,14 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                     //        getClass().getResource(
                     //        "/org/autoplot/resources/stop-icon-disabled.png")) );
                     interruptButton.setEnabled(false);
-                    executeButton.setEnabled(true);
+                    runButton.setEnabled(true);
                 } else {
                     //interruptButton.setIcon(
                     //        new javax.swing.ImageIcon(
                     //        getClass().getResource(
                     //        "/org/autoplot/resources/stop-icon.png")) );
                     interruptButton.setEnabled(true);
-                    executeButton.setEnabled(false);
+                    runButton.setEnabled(false);
                 }
             }
         } );
@@ -478,7 +478,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        executeButton = new javax.swing.JButton();
+        runButton = new javax.swing.JButton();
         saveAsButton = new javax.swing.JButton();
         openButton = new javax.swing.JButton();
         contextSelector = new javax.swing.JComboBox();
@@ -490,9 +490,9 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         interruptButton = new javax.swing.JButton();
         fileNameTextField = new javax.swing.JTextField();
 
-        executeButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/go.png"))); // NOI18N
-        executeButton.setText("Run");
-        executeButton.setToolTipText("<html>Run the script.  \n<br>Alt enters editor GUI.  \n<br>Ctrl attempts to trace program location.  \n<br>Shift enters editor GUI.\n<br>Escape key clears the print bubbles.");
+        runButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/go.png"))); // NOI18N
+        runButton.setText("Run");
+        runButton.setToolTipText("<html>Run the script.  \n<br>Alt enters editor GUI.  \n<br>Ctrl attempts to trace program location.  \n<br>Shift enters editor GUI.\n<br>Escape key clears the print bubbles.");
 
         saveAsButton.setFont(saveAsButton.getFont());
         saveAsButton.setText("Save As...");
@@ -576,7 +576,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(executeButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 121, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(runButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 121, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(interruptButton)
                 .add(18, 18, 18)
@@ -597,7 +597,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(executeButton)
+                    .add(runButton)
                     .add(contextSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(saveAsButton)
                     .add(openButton)
@@ -611,7 +611,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                     .add(fileNameTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
         );
 
-        layout.linkSize(new java.awt.Component[] {executeButton, interruptButton, newScriptButton, openButton, saveAsButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
+        layout.linkSize(new java.awt.Component[] {interruptButton, newScriptButton, openButton, runButton, saveAsButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
 
     }// </editor-fold>//GEN-END:initComponents
 
@@ -649,13 +649,13 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel caretPositionLabel;
     private javax.swing.JComboBox contextSelector;
-    private javax.swing.JButton executeButton;
     private javax.swing.JTextField fileNameTextField;
     private javax.swing.JButton interruptButton;
     private javax.swing.JLayeredPane jLayeredPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JButton newScriptButton;
     private javax.swing.JButton openButton;
+    private javax.swing.JButton runButton;
     private javax.swing.JButton saveAsButton;
     private org.autoplot.jythonsupport.ui.EditorTextPane textArea;
     // End of variables declaration//GEN-END:variables
@@ -726,11 +726,11 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
     }
     
     public final javax.swing.JButton getRunButton() {
-        return executeButton;
+        return runButton;
     }
     
     protected void setRunAction( javax.swing.Action action ) {
-        this.executeButton.setAction(action);
+        this.runButton.setAction(action);
     }
     
     protected javax.swing.Action RUN_ACTION= new javax.swing.AbstractAction("Run",new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/resources/go.png"))) {
