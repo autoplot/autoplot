@@ -794,7 +794,7 @@ public class AppScriptPanelSupport {
      * the parameters GUI first, or by tracing execution.  The bit array is:<ul>
      * <li>0 normal
      * <li>1 parameters GUI (SHIFT is pressed)
-     * <li>2 trace (CRTL is pressed)
+     * <li>2 debug (CRTL is pressed)
      * <li>8 parameters GUI (ALT is pressed)
      * </ul>
      * @param mode bit array controlling execution.
@@ -829,6 +829,7 @@ public class AppScriptPanelSupport {
             InteractiveInterpreter interp = null;
             
             String doDebug= System.getProperty("jythonDebugger","false");
+            if (  ( mode & Event.CTRL_MASK ) == Event.CTRL_MASK  ) doDebug= "true";
                     
             try {
                 
@@ -838,8 +839,15 @@ public class AppScriptPanelSupport {
                 
                 if ( "true".equals(doDebug) && panel.getEditorPanel().getRuler()==null ) {
                     DebugLineNumbersRuler ruler = new DebugLineNumbersRuler(panel);
-                    ruler.setBreakpointModel(new BreakpointModel( panel.getEditorPanel().getDocument()));
-        
+                    BreakpointModel bm= new BreakpointModel( panel.getEditorPanel().getDocument());
+                    ruler.setBreakpointModel(bm);
+                    if  ( ( mode & Event.CTRL_MASK ) == Event.CTRL_MASK  )  {
+                        try {
+                            bm.set(1);
+                        } catch (BadLocationException ex) {
+                            logger.log(Level.SEVERE, null, ex);
+                        }
+                    }
                     ruler.install( panel.getEditorPanel() );
         
                     panel.getScrollPane().setRowHeaderView(ruler);
@@ -941,96 +949,7 @@ public class AppScriptPanelSupport {
                 clearAnnotations();
 
                 panel.setDirty(dirty0);
-                if ( ( ( mode & Event.CTRL_MASK ) == Event.CTRL_MASK ) ) { // trace
-                    String script = panel.getEditorPanel().getText();
-                    
-                    org.python.parser.ast.Module n = (org.python.parser.ast.Module) org.python.core.parser.parse(script, "exec");
-                    
-                    String[] sscript= script.split("\n");
-                    
-                    for ( int iline=0; iline<n.body.length; iline++ )  {
-                        long t0= System.currentTimeMillis();
-                        
-                        stmtType stmt = n.body[iline];
-                        int l0 = stmt.beginLine;
-                        int l1= ( iline<n.body.length-1 ) ? n.body[iline+1].beginLine : sscript.length;
-
-                        if ( stmt instanceof TryExcept ) {  //  we need to kludge because try-except
-                            TryExcept te= (TryExcept)stmt;
-                            l0= te.body[0].beginLine -1;
-                        } else if ( stmt instanceof Expr ) {
-                            Expr exp= (Expr) stmt;
-                            if ( exp.value instanceof Str ) {
-                                Str s= (Str)exp.value;
-                                l0= s.beginLine;
-                            }
-                        }
-                        if ( iline<n.body.length-1 ) { 
-                            if ( n.body[iline+1] instanceof TryExcept ) {// we need to kludge because try-except
-                                TryExcept te= (TryExcept)n.body[iline+1];
-                                l1= te.body[0].beginLine -1; 
-                            } else if ( n.body[iline+1] instanceof Expr ) { // multi-line strings cause problems
-                                Expr exp= (Expr) n.body[iline+1];
-                                if ( exp.value instanceof Str ) {
-                                    Str s= (Str)exp.value;
-                                    l1= s.beginLine;
-                                }
-                            }
-                        }
-                        
-                        if ( stmt instanceof Expr ) {
-                            Expr expr= (Expr)stmt;
-                            l0 = Math.min( l0, expr.value.beginLine );
-                        }
-                        
-                        for ( int i= lineOffset; i<l0-1; i++ ) {
-                            offset= offset + sscript[i].length() + 1;
-                        }
-                        lineOffset= l1;
-                        
-                        int i0= offset; // start character of the line
-                        int i1= i0;     // end character of the line
-                        for ( int itn2= l0-1; itn2<l1-1; itn2++ ) {
-                            i1= i1 + sscript[itn2].length() + 1;
-                        }
-                        
-                        String s= script.substring( i0, i1 );
-                           
-                        try {
-                            clearAnnotations();
-                            annotationsSupport.annotateChars( i0, i1, "programCounter", "pc", interp );
-                            try {
-                                annotationsSupport.scrollToOffset( i0);
-                            } catch (BadLocationException ex) {
-                                logger.log(Level.SEVERE, null, ex);
-                            }
-
-                            logger.finest("add Netbeans breakpoint here to debug jython code line-by-line without GDB");
-
-                            setParametersStruct(interp, script);
-                            
-                            interp.exec(s);
-                        } catch (PyException ex) {
-                            throw ex;
-                        }
-                        offset += s.length();
-                        
-                        if ( logger.isLoggable(Level.FINE) ) {
-                            long elapsedTime= System.currentTimeMillis()-t0;
-                            int i= s.indexOf("\n");
-                            if ( s.length()>i ) {
-                                if ( i>-1 ) {
-                                    s= s.substring(0,i)+"...";
-                                }
-                            } else {
-                                s= s.substring(0,i);
-                            }
-                            logger.log( Level.FINE, String.format( "%4d %.3f %4d # %s", l0, elapsedTime/1000., l1-l0, s ) );
-                        }
-                        
-                    }
-                    clearAnnotations();
-                } else if ( ( doShowParams && fd.count>0 )
+                if ( ( doShowParams && fd.count>0 )
                         || ( ( mode & Event.SHIFT_MASK ) == Event.SHIFT_MASK ) 
                         || ( ( mode & Event.ALT_MASK ) == Event.ALT_MASK ) ) {
                     if ( true ) {
@@ -1142,7 +1061,7 @@ public class AppScriptPanelSupport {
      * The bit array is:<ul>
      * <li>0 normal
      * <li>1 parameters GUI (SHIFT is pressed)
-     * <li>2 trace (CRTL is pressed)
+     * <li>2 debug (CRTL is pressed)
      * <li>8 parameters GUI (ALT is pressed)
      * </ul>
      * @param mode =0 normal.  =2=CTRL_MASK= trace.  ALT_MASK or SHIFT_MASK brings up parameters GUI.
