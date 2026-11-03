@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -36,9 +35,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
@@ -54,8 +51,6 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultListModel;
@@ -898,12 +893,7 @@ public class AppScriptPanelSupport {
 
                     session.getDebugger().setExpressionEvaluator(interp.get("debugEval"));
 
-                    EditorAnnotationsSupport.setExpressionLookup( new EditorAnnotationsSupport.ExpressionLookup() {
-                        @Override
-                        public PyObject lookup(String expr) {
-                            return new PyString(fsession.eval(expr));
-                        }
-                    });
+                    EditorAnnotationsSupport.setExpressionLookup((String expr) -> new PyString(fsession.eval(expr)));
                     
                 } else {
                     EditorAnnotationsSupport.setExpressionLookup(annotationsSupport.getForInterp(interp));
@@ -1140,7 +1130,7 @@ public class AppScriptPanelSupport {
                 session.finished();
                 panel.getRunButton().setAction( panel.createRunAction() );
                 panel.getRunButton().setEnabled(true);
-                panel.getRunButton().setToolTipText(panel.runToolTipText);
+                panel.getRunButton().setToolTipText(JythonScriptPanel.runToolTipText);
             }
 
         }
@@ -1237,10 +1227,6 @@ public class AppScriptPanelSupport {
 
     }
 
-    void resume() {
-        
-    }
-
     private void resetBreakpoints(Document d) {
         String doDebug= System.getProperty("jythonDebugger","false");
         if ( "true".equals(doDebug) ) { 
@@ -1251,195 +1237,6 @@ public class AppScriptPanelSupport {
                 logger.fine("debug ruler hasn't been installed yet");
             }
         }
-    }
-
-    
-    protected class MyOutputStream extends FilterOutputStream {
-        
-        OutputStream sink;
-        DebuggerConsole dc;
-        
-        public MyOutputStream(OutputStream out,DebuggerConsole dc) {
-            super(out);
-            this.sink= out;
-            this.dc= dc;
-        }
-
-        StringBuilder currentLine= new StringBuilder();
-        
-        /**
-         * PDB has just returned from a routine, so don't close the debugging session.
-         */
-        boolean returnFlag= false;
-        
-        /**
-         * PDB has just returned from a routine, so don't close the debugging session.
-         * @return 
-         */
-        public boolean getReturnFlag() {
-            return this.returnFlag;
-        }
-        
-        /**
-         * standard mode output.
-         */
-        private final Object STATE_OPEN="OPEN";
-        /**
-         * collect the prompt so that it is not echoed.
-         */
-        private final Object STATE_FORM_PDB_PROMPT="PROMPT";
-        /**
-         * collect the prompt so that it is not echoed.
-         */
-        private final Object STATE_RETURN_INIT_PROMPT="RETURN";
-        /**
-         * pdb output encountered.
-         */
-        private final Object STATE_PDB="PDB";
-        
-        /**
-         * pdb response
-         */
-        protected final Object STATE_FORM_PDB_RESPONSE="RESPONSE";
-        
-        Object state= STATE_OPEN;
-       
-        public void checkState(int b) throws IOException {
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(AppScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-            if ( dc!=null ) dc.print(String.valueOf((char)b),state);
-            
-            if ( state==STATE_OPEN ) {
-                if ( b>=0 ) currentLine.append((char)b);
-                if ( currentLine.length()==1 && currentLine.substring(0,1).equals("(") ) {
-                    state= STATE_FORM_PDB_PROMPT;
-                } else if ( currentLine.length()==1 && currentLine.substring(0,1).equals(">") ) {
-                    state= STATE_FORM_PDB_RESPONSE;                    
-                } else if ( currentLine.length()>10 && currentLine.substring(0,10).equals("--Return--") ) {
-                    state= STATE_RETURN_INIT_PROMPT;
-                    dc.started();
-                    dc.next();  // jump out of pdb
-                } else if ( currentLine.length()>0 && ( b==10 || b==13 ) ) {
-                    currentLine= new StringBuilder();
-                }
-            } else if ( state==STATE_RETURN_INIT_PROMPT ) {
-                if ( b>=0 ) currentLine.append((char)b);
-                if ( currentLine.length()==1 && currentLine.substring(0,1).equals("(") ) {
-                    state= STATE_FORM_PDB_PROMPT;
-                } else if ( currentLine.length()>0 && ( b==10 || b==13 ) ) {
-                    currentLine= new StringBuilder();
-                }
-            } else if ( state==STATE_FORM_PDB_PROMPT ) {
-                if ( b>=0 ) currentLine.append((char)b);
-                if ( currentLine.length()>=5 ) {
-                    if ( currentLine.substring(0,5).equals("(Pdb)") ) {
-                        state= STATE_PDB;
-                        dc.started();
-                    } else {
-                        sink.write(currentLine.toString().getBytes());
-                        state= STATE_OPEN;
-                    }
-                } else if ( currentLine.length()>0 && ( b==10 || b==13 ) ) { // newlines should clear the currentLine
-                    sink.write(currentLine.toString().getBytes());
-                    currentLine= new StringBuilder();
-                    state= STATE_OPEN;
-                }
-            } else if ( state==STATE_FORM_PDB_RESPONSE ) {
-                if ( b>=0 && b!=10 && b!=13 ) currentLine.append((char)b);  
-                
-                Pattern p= Pattern.compile("\\>? \\S+\\((\\d+)\\)\\S+\\(\\)");
-                Matcher m= p.matcher(currentLine);
-                if ( m.matches() ) {
-                    String linenum= m.group(1);
-                    annotationsSupport.clearAnnotations();
-                    int[] pos= annotationsSupport.getLinePosition(Integer.parseInt(linenum));
-                    annotationsSupport.annotateChars( pos[0], pos[1], "programCounter", "pc", interruptible );
-                    state= STATE_OPEN;
-                    currentLine= new StringBuilder();
-                } else {
-                    
-                    if ( b==13 || b==10 ) {
-                        state= STATE_OPEN;
-                        sink.write(currentLine.toString().getBytes());
-                        currentLine= new StringBuilder();
-                        
-                    }
-                }                
-            } else if ( state==STATE_PDB ) { // the beginning of the currentLine is (Pdb) and we want a terminator
-                Pattern p= Pattern.compile("\\(Pdb\\) (.*)> .*\\.jy\\((\\d+)\\).*\\(\\)\\s*"); // TODO: replace ).* with more precise value.
-                Pattern p2= Pattern.compile("\\(Pdb\\) (.*)--Return--.*");
-                
-                int l= currentLine.length();
-                if ( b>=0 && b!=10 && b!=13 ) currentLine.append((char)b);  //TODO: why is my regex not working when newlines get in there?
-                if ( l>2 && currentLine.substring(l-2,l).equals("()") ) {
-                    Matcher m= p.matcher(currentLine);
-                    if ( m.matches() ) {
-                        String linenum= m.group(2);
-                        annotationsSupport.clearAnnotations();
-                        int[] pos= annotationsSupport.getLinePosition(Integer.parseInt(linenum));
-                        annotationsSupport.annotateChars( pos[0], pos[1], "programCounter", "pc", interruptible );
-                        String userOutput= m.group(1);
-                        if ( userOutput!=null && userOutput.length()>0 ) {
-                            sink.write(userOutput.getBytes());
-                            sink.write("\n".getBytes());
-                        }
-                        state= STATE_OPEN;
-                        currentLine= new StringBuilder();
-                    } else {
-                        Matcher m2= p2.matcher(currentLine);
-                        if ( m2.matches() ) {
-                            annotationsSupport.clearAnnotations();
-                            String userOutput= m2.group(1);
-                            if ( userOutput.length()>0 ) {
-                                sink.write(userOutput.getBytes());
-                                sink.write("\n".getBytes());
-                            }
-                            state= STATE_OPEN;
-                            currentLine= new StringBuilder();
-                            dc.finished();
-                            returnFlag= true;
-                            dc.next();
-                        } else {
-                            state= STATE_OPEN;
-                            currentLine= new StringBuilder();
-                        }
-                    }
-                }
-            }
-        }
-
-        @Override
-        public void write(int b) throws IOException {
-            this.checkState(b); 
-        }
-        
-        @Override
-        public void write(byte[] b) throws IOException {
-            for ( int i=0; i<b.length; i++ ) {
-               this.write(b[i]);
-            }
-        }
-
-        @Override
-        public void write(byte[] b, int off, int len) throws IOException {
-            //String s= new String( b, off, len );
-            for ( int i=off; i<len; i++ ) {
-                this.write(b[i]);
-            }
-        }
-    } 
-    
-    
-   /**
-     * create special output stream for script panel
-     * @return 
-     */
-    private OutputStream getOutput(DebuggerConsole dc) {
-        return new MyOutputStream(System.out, dc);
     }
     
     /**
