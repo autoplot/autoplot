@@ -97,7 +97,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
     public static String runToolTipText= "<html>Run the script.  \n" +
             "<br>Alt enters editor GUI.  \n" +
-            "<br>Ctrl attempts to trace program location.  \n" +
+            "<br>Ctrl starts debugger on the first line.  \n" +
             "<br>Shift enters editor GUI.\n" +
             "<br>Escape key clears the print bubbles.";
         
