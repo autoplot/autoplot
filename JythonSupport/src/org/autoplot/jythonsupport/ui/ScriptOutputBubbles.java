@@ -169,6 +169,16 @@ public final class ScriptOutputBubbles extends JComponent {
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
         Graphics2D g = (Graphics2D) graphics.create();
+        
+        Rectangle visible = SwingUtilities.convertRectangle(
+                viewport,
+                new Rectangle(0, 0, viewport.getWidth(), viewport.getHeight()),
+                this
+        );
+        g.clip(visible);
+        
+        Shape viewportClip = g.getClip();
+        
         try {
 
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -186,6 +196,8 @@ public final class ScriptOutputBubbles extends JComponent {
                 if (index >= root.getElementCount()) {
                     continue;
                 }
+                g.setClip(viewportClip);
+                
                 try {
                     Rectangle r = editor.modelToView(root.getElement(index).getStartOffset());
                     if (r == null) {
@@ -202,9 +214,7 @@ public final class ScriptOutputBubbles extends JComponent {
                         continue;
                     }
                     if ( index==lastLine+1 ) {
-                        g.setClip(new Rectangle(x,y+fm.getHeight()-(int)(fm.getAscent()*0.5), bubbleWidth+1, h+1) );
-                    } else {
-                        g.setClip( null );
+                        g.clip(new Rectangle(x,y+fm.getHeight()-(int)(fm.getAscent()*0.5), bubbleWidth+1, h+1) );
                     }
                     lastLine= index;
                     
