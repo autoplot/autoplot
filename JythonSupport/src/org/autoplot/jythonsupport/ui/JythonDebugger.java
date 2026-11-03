@@ -242,7 +242,7 @@ public final class JythonDebugger {
             }
             
             if ( shouldPause ) {
-                if ( !b.ifExpr.isEmpty() ) {
+                if ( b!=null && !b.ifExpr.isEmpty() ) {
                     PyObject result = expressionEvaluator.__call__(
                         frame, Py.newString(b.ifExpr));
                     int test;
