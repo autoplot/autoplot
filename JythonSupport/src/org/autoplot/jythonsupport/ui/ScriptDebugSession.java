@@ -68,6 +68,10 @@ public class ScriptDebugSession {
     }
     
     public String eval( String expr ) {
+        if ( debugger.isStopped() ) {
+            debugger.evaluate(expr);
+            return "(debugger is stopped)";
+        }
         if ( !debugger.isPaused() ) {
             return "(debugger not paused)";
         }
