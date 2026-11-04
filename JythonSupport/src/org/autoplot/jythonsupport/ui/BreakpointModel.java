@@ -3,9 +3,7 @@ package org.autoplot.jythonsupport.ui;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.text.BadLocationException;
@@ -17,8 +15,8 @@ public class BreakpointModel {
 
     private final Document document;
     
-    private final Map<Position,Breakpoint> breakpoints = new HashMap<>();
-
+    private final List<Breakpoint> breakpoints = new ArrayList<>();
+    
     private final PropertyChangeSupport pcs =
             new PropertyChangeSupport(this);
 
@@ -31,7 +29,7 @@ public class BreakpointModel {
     }
 
     public Breakpoint getBreakpoint(int line) {
-        for (Breakpoint bp : breakpoints.values()) {
+        for (Breakpoint bp : breakpoints ) {
             if (bp.getLine() == line) {
                 return bp;
             }
@@ -47,26 +45,22 @@ public class BreakpointModel {
             throw new IllegalArgumentException("Invalid line: " + line);
         }
 
-        // Line numbers are 1-based; document elements are 0-based.
-        int offset = root.getElement(line - 1).getStartOffset();
-
-        for ( Entry<Position,Breakpoint> ibp: breakpoints.entrySet() ) {
-            Position p = ibp.getValue().getPosition();
-
-            if (root.getElementIndex(p.getOffset()) == line - 1) {
-                breakpoints.remove(ibp.getKey());
-                return;
-            }
+        Breakpoint bp= getBreakpoint(line);
+        if ( bp!=null ) {
+            breakpoints.remove(bp);
+            return;
         }
-
-        Position p= document.createPosition(offset);
-        breakpoints.put( p, new Breakpoint( document, line ) );
+        
+        breakpoints.add( new Breakpoint( document, line ) );
 
         pcs.firePropertyChange(
                 "breakpoints", null, getBreakpoints());
     }
     
-    private Position getPosition(int line) throws BadLocationException {
+    private Position getPosition(int line) throws BadLocationException {        
+        //for ( Position r: breakpoints.keySet() ) {
+         
+        //}
         Element root = document.getDefaultRootElement();
         int offset = root.
                 getElement(line-1).
@@ -74,9 +68,11 @@ public class BreakpointModel {
         return document.createPosition(offset);
     }
     public void set(int line) throws BadLocationException {
-        Position p= getPosition(line);
-        if (!breakpoints.containsKey(p)) {
-            breakpoints.put(p,new Breakpoint(document,line));
+        
+        Breakpoint bp= getBreakpoint(line);
+        
+        if ( bp==null ) {
+            breakpoints.add(new Breakpoint(document,line));
 
             pcs.firePropertyChange(
                 "breakpoints", null, getBreakpoints());
@@ -84,9 +80,11 @@ public class BreakpointModel {
     }
     
     public void clear(int line) throws BadLocationException {
-        Position p= getPosition(line);
-        if (breakpoints.containsKey(p)) {
-            breakpoints.remove(p);
+
+        Breakpoint bp= getBreakpoint(line);
+        
+        if ( bp!=null ) {
+            breakpoints.remove(bp);
 
             pcs.firePropertyChange(
                 "breakpoints", null, getBreakpoints());
@@ -94,7 +92,7 @@ public class BreakpointModel {
     }
 
     public Set<Breakpoint> getBreakpoints() {
-        return new TreeSet<>(breakpoints.values());
+        return new TreeSet<>(breakpoints);
     }
 
     /**
@@ -103,7 +101,12 @@ public class BreakpointModel {
      * @return 
      */
     public Breakpoint getBreakpoint(Position line) {
-        return breakpoints.get(line);
+        for ( Breakpoint bp : breakpoints ) {
+            if ( bp.position.getOffset()==line.getOffset() ) {
+                return bp;
+            }
+        }
+        return null;
     }
     
     public void addPropertyChangeListener(
