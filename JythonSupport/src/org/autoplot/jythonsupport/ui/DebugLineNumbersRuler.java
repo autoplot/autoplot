@@ -149,13 +149,17 @@ public class DebugLineNumbersRuler extends LineNumbersRuler {
         FontMetrics fontMetrics = getFontMetrics(getFont());
         int lh = fontMetrics.getHeight();
         Graphics2D g2= (Graphics2D)g;
+        
+        int ymid = fontMetrics.getHeight() * 11/20; // offset to middle of line number
+        int yoffs= ymid - 8;
+                
         g2.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );        
-        g2.drawImage(pcImage, 0, lh*(programCounter-1), this );
+        g2.drawImage(pcImage, 0, lh*(programCounter-1)+yoffs, this );
         for ( Breakpoint bp : breakpoints.getBreakpoints() ) {
             if ( bp.enabled ) {
-                g2.drawImage(breakpointImage, 0, lh*(bp.getLine()-1), this );
+                g2.drawImage(breakpointImage, 0, lh*(bp.getLine()-1)+yoffs, this );
             } else {
-                g2.drawImage(disabledBreakpointImage, 0, lh*(bp.getLine()-1), this );
+                g2.drawImage(disabledBreakpointImage, 0, lh*(bp.getLine()-1)+yoffs, this );
             }
         }
     }
