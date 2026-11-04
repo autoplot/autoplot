@@ -841,13 +841,6 @@ public class AppScriptPanelSupport {
                     DebugLineNumbersRuler ruler = new DebugLineNumbersRuler(panel);
                     BreakpointModel bm= new BreakpointModel( panel.getEditorPanel().getDocument());
                     ruler.setBreakpointModel(bm);
-                    if  ( ( mode & Event.CTRL_MASK ) == Event.CTRL_MASK  )  {
-                        try {
-                            bm.set(1);
-                        } catch (BadLocationException ex) {
-                            logger.log(Level.SEVERE, null, ex);
-                        }
-                    }
                     ruler.install( panel.getEditorPanel() );
         
                     panel.getScrollPane().setRowHeaderView(ruler);
@@ -858,6 +851,14 @@ public class AppScriptPanelSupport {
                 }
 
                 final DebugLineNumbersRuler r= panel.getEditorPanel().getRuler();
+                
+                if  ( ( mode & Event.CTRL_MASK ) == Event.CTRL_MASK  )  {
+                    try {
+                        r.getBreakpointModel().set(1);
+                    } catch (BadLocationException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
                 
                 if ( "true".equals(doDebug) && r!=null ) {
                     
