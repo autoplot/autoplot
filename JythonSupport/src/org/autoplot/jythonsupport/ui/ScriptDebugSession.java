@@ -5,6 +5,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 
 public class ScriptDebugSession {
@@ -78,8 +79,10 @@ public class ScriptDebugSession {
         Future<String> f= debugger.evaluate(expr);
         try {
             return f.get();
-        } catch (InterruptedException | ExecutionException ex) {
-            return "not available";
+        } catch (InterruptedException ex) {
+            return "not available (interrupted exception)";
+        } catch ( ExecutionException ex ) {
+            return "not available (execution exception)";
         }
     }
 
