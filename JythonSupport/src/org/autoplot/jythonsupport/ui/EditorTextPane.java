@@ -286,19 +286,14 @@ public class EditorTextPane extends JEditorPane {
                 String sf= JythonCompletionProvider.getInstance().settings().getEditorFont();
                 setFont( Font.decode(sf) );
                 
-                String doDebug= System.getProperty("jythonDebugger","false");
-                
-                if ( "true".equals(doDebug) ) {
-                    ruler = new DebugLineNumbersRuler(EditorTextPane.this);
-                    ruler.setBreakpointModel( new BreakpointModel(getDocument()) );
-                
-                    ruler.config(
-                        ((DefaultSyntaxKit) EditorTextPane.this.getEditorKit()).getConfig()
-                    );
+                ruler = new DebugLineNumbersRuler(EditorTextPane.this);
+                ruler.setBreakpointModel( new BreakpointModel(getDocument()) );
 
-                    ruler.install(EditorTextPane.this);
-                    
-                }
+                ruler.config(
+                    ((DefaultSyntaxKit) EditorTextPane.this.getEditorKit()).getConfig()
+                );
+
+                ruler.install(EditorTextPane.this);
                 
                 initialized= true;
             }
