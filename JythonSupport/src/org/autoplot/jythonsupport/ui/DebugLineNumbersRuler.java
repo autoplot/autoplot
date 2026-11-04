@@ -55,14 +55,17 @@ public class DebugLineNumbersRuler extends LineNumbersRuler {
         }
         
         lineNumbersPopup= new JPopupMenu();
-        lineNumbersPopup.add( new JMenuItem( new AbstractAction("Set Breakpoint") {
+        
+        JMenuItem setBreakpointMI= new JMenuItem( new AbstractAction("Set Breakpoint") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int line= selectedLine;
                 setBreakpoint(line,true);
             }
-        }));
-        lineNumbersPopup.add(new JMenuItem( new AbstractAction("Edit Breakpoint") {
+        });
+        lineNumbersPopup.add(setBreakpointMI);
+        
+        JMenuItem editBreakpointMI= new JMenuItem( new AbstractAction("Edit Breakpoint") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int line= selectedLine;
@@ -75,14 +78,18 @@ public class DebugLineNumbersRuler extends LineNumbersRuler {
                     repaint();
                 }
             }
-        }));
-        lineNumbersPopup.add( new JMenuItem( new AbstractAction("Clear Breakpoint") {
+        });
+        lineNumbersPopup.add(editBreakpointMI);
+        
+        JMenuItem clearBreakpointMI= new JMenuItem( new AbstractAction("Clear Breakpoint") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int line= selectedLine;
                 setBreakpoint(line,false);
             }
-        }));
+        });     
+        lineNumbersPopup.add( clearBreakpointMI );
+        
         super.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -90,6 +97,15 @@ public class DebugLineNumbersRuler extends LineNumbersRuler {
                 int lh = fontMetrics.getHeight();
                 selectedLine= (int)(e.getY()/lh+1);
                 if ( e.isPopupTrigger() ) {
+                    if ( getBreakpointModel().getBreakpoint(selectedLine)!=null ) {
+                        setBreakpointMI.setEnabled(false);
+                        editBreakpointMI.setEnabled(true);
+                        clearBreakpointMI.setEnabled(true);
+                    } else {
+                        setBreakpointMI.setEnabled(true);
+                        editBreakpointMI.setEnabled(false);
+                        clearBreakpointMI.setEnabled(false);
+                    }
                     lineNumbersPopup.show(DebugLineNumbersRuler.this,e.getX(),e.getY());
                 }
                 super.mousePressed(e);
