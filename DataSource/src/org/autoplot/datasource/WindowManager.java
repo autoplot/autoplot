@@ -16,6 +16,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.awt.event.WindowStateListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -295,7 +298,7 @@ public class WindowManager {
 
         Pattern p= Pattern.compile("(?<width>\\d+)x(?<height>\\d+)");
         String s= prefs.get( "window."+name+".screensize", "" );
-        logger.log(Level.FINE, "found for window.{0}.screensize: {1} currentSize: {2}x{3}", new Object[]{name, s, screenSize.width, screenSize.height });
+        logger.log(Level.FINE, "found for window.{0}.screensize: {1} currentSize: {2,number,0}x{3,number,0}", new Object[]{name, s, screenSize.width, screenSize.height });
         Matcher m0= p.matcher(s);
         if ( m0.matches() && Integer.parseInt( m0.group("width") )==screenSize.width && Integer.parseInt( m0.group("height") )==screenSize.height ) {
             String wh= prefs.get("window."+name+".size", "" );
@@ -389,9 +392,9 @@ public class WindowManager {
      */
     public void showModalDialog( Dialog dia ) {
         if ( !dia.isModal() ) throw new IllegalArgumentException("dialog should be modal");
-        WindowManager.getInstance().recallWindowSizePosition(dia);
         try { 
             dia.setVisible(true);
+            WindowManager.getInstance().recallWindowSizePosition(dia);
         } catch ( Exception ex ) {
             logger.log( Level.WARNING, null, ex ); // TODO: bug2293: explore where this comes from.
         } 
