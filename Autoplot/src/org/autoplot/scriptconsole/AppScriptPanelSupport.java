@@ -1072,66 +1072,7 @@ public class AppScriptPanelSupport {
 
         try {
             if (panel.getContext() == JythonScriptPanel.CONTEXT_DATA_SOURCE) {
-                if (file != null) {
-                    URI uri;
-                    try {
-                        uri = new URI("vap+jyds:" + file.toURI().toString()); // bug 3055130 okay
-                        JythonDataSourceFactory factory = (JythonDataSourceFactory) DataSetURI.getDataSourceFactory( uri, new NullProgressMonitor());
-                        if (factory != null) {
-                            factory.addExeceptionListener((Exception e) -> {
-                                if (e instanceof PyException) {
-                                    PyException ex= (PyException)e;
-                                    annotateError(ex, 0, null );
-                                }
-                            });
-                        }
-
-                    } catch (URISyntaxException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                }
-
-                boolean updateSurl = false;
-                if ( file == null || ( panel.isDirty() && FileSystemUtil.isChildOf( FileSystem.settings().getLocalCacheDir(), file ) ) ) {
-                    if (getSaveFile() == JFileChooser.APPROVE_OPTION) {
-                        updateSurl = true;
-                    } else {
-                        return;
-                    }
-                }
-                
-                if (file != null) {
-                    try {
-                        if (!uriFilesEqual(selector.getValue(), file.toURI().toString())) {
-                            updateSurl = true;
-                        }
-                    } catch (URISyntaxException ex) {
-                        updateSurl = true;
-                    }
-
-                    if (panel.isDirty() && ( file.exists() && file.canWrite() || file.getParentFile().canWrite() ) ) {
-                        save();
-                    }
-
-                    if (updateSurl) {
-                        selector.setValue("vap+jyds:"+file.toURI().toString());
-                    }
-
-                    clearAnnotations();
-            
-                    if ( ( mode & KeyEvent.ALT_MASK ) == KeyEvent.ALT_MASK
-                            || ( mode & KeyEvent.SHIFT_MASK )== KeyEvent.SHIFT_MASK ) {
-                        selector.maybePlot(KeyEvent.ALT_MASK); //TODO: no editor panel!
-                    } else {
-                        selector.maybePlot(false);
-                    }
-
-                    if ( updateSurl ) {
-                        panel.setFilename(file.toString());
-                    }
-                }
-                
-                panel.setRunningScript(null);
+                if (executeDataSourceScript(mode)) return;
 
             } else if (panel.getContext() == JythonScriptPanel.CONTEXT_APPLICATION) {
                 Runnable run = () -> {
@@ -1145,6 +1086,67 @@ public class AppScriptPanelSupport {
             panel.setRunningScript(null);
         }
 
+    }
+
+    private boolean executeDataSourceScript(final int mode) throws RuntimeException, IOException {
+        if (file != null) {
+            URI uri;
+            try {
+                uri = new URI("vap+jyds:" + file.toURI().toString()); // bug 3055130 okay
+                JythonDataSourceFactory factory = (JythonDataSourceFactory) DataSetURI.getDataSourceFactory( uri, new NullProgressMonitor());
+                if (factory != null) {
+                    factory.addExeceptionListener((Exception e) -> {
+                        if (e instanceof PyException) {
+                            PyException ex= (PyException)e;
+                            annotateError(ex, 0, null );
+                        }
+                    });
+                }
+                
+            } catch (URISyntaxException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+        boolean updateSurl = false;
+        if (file == null || ( panel.isDirty() && FileSystemUtil.isChildOf( FileSystem.settings().getLocalCacheDir(), file ) )) {
+            if (getSaveFile() == JFileChooser.APPROVE_OPTION) {
+                updateSurl = true;
+            } else {
+                return true;
+            }
+        }
+        if (file != null) {
+            try {
+                if (!uriFilesEqual(selector.getValue(), file.toURI().toString())) {
+                    updateSurl = true;
+                }
+            } catch (URISyntaxException ex) {
+                updateSurl = true;
+            }
+            
+            if (panel.isDirty() && ( file.exists() && file.canWrite() || file.getParentFile().canWrite() ) ) {
+                save();
+            }
+            
+            if (updateSurl) {
+                selector.setValue("vap+jyds:"+file.toURI().toString());
+            }
+            
+            clearAnnotations();
+            
+            if ( ( mode & KeyEvent.ALT_MASK ) == KeyEvent.ALT_MASK
+                    || ( mode & KeyEvent.SHIFT_MASK )== KeyEvent.SHIFT_MASK ) {
+                selector.maybePlot(KeyEvent.ALT_MASK); //TODO: no editor panel!
+            } else {
+                selector.maybePlot(false);
+            }
+            
+            if ( updateSurl ) {
+                panel.setFilename(file.toString());
+            }
+        }
+        panel.setRunningScript(null);
+        return false;
     }
 
     private void resetBreakpoints(Document d) {
