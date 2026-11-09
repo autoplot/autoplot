@@ -878,7 +878,7 @@ public class AppScriptPanelSupport {
                         public void pausedAtLine(String filename,int line) {
                             if ( hits==0 ) {
                                 panel.getRunButton().setAction( getResumeAction(fsession) );
-                                panel.getRunButton().setToolTipText("Resume execution, shift is step");
+                                panel.getRunButton().setToolTipText("Resume execution, shift or ctrl is step");
                             }
                             hits++;
                             panel.getRunButton().setEnabled(true);
