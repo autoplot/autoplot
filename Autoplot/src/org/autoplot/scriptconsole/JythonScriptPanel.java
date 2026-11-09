@@ -729,9 +729,6 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
         return runButton;
     }
     
-    protected void setRunAction( javax.swing.Action action ) {
-        this.runButton.setAction(action);
-    }
     
     protected javax.swing.Action RUN_ACTION= new javax.swing.AbstractAction("Run",new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/resources/go.png"))) {
         @Override

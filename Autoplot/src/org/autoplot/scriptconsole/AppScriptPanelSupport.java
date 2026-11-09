@@ -778,6 +778,7 @@ public class AppScriptPanelSupport {
             @Override
             public void actionPerformed(ActionEvent evt) {
                 boolean shift = (evt.getModifiers() & ActionEvent.SHIFT_MASK) != 0;
+                if ( !shift ) shift= (evt.getModifiers() & ActionEvent.CTRL_MASK) != 0;
                 if (shift) {
                     session.stepOver();
                 } else {
