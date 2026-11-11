@@ -1771,7 +1771,8 @@ public class AutoplotUtil {
     
     /**
      * Wrapper for displaying ok,cancel dialogs.  
-     * If the message is a component, then the dialog will be resizeable.
+     * If the message is a component, then the dialog will be resizeable.  Note this returns JOptionPane.CANCEL_OPTION
+     * if escape is pressed.
      * @param parentComponent determines the Frame in which the dialog is displayed; if null, or if the parentComponent has no Frame, a default Frame is used
      * @param message the String or GUI component to display
      * @param title the title string for the dialog
@@ -1780,7 +1781,11 @@ public class AutoplotUtil {
      */
     public static int showConfirmDialog( Component parentComponent, Object message, String title, int optionType ) {
         if ( optionType!=JOptionPane.OK_CANCEL_OPTION ) {
-            return JOptionPane.showConfirmDialog( parentComponent, message, title, optionType );
+            int i= JOptionPane.showConfirmDialog( parentComponent, message, title, optionType );
+            if ( i==JOptionPane.CLOSED_OPTION ) {
+                i= JOptionPane.CANCEL_OPTION;
+            }
+            return i;
         } else {
             return showConfirmDialog2( parentComponent, message, title, optionType );
         }
