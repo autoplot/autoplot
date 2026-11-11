@@ -802,7 +802,6 @@ public class AppScriptPanelSupport {
      */
     private void executeScriptImmediately( int mode ) throws RuntimeException, Error {
         int offset = 0;
-        int lineOffset= 0;
 
         applicationController.setStatus("busy: running application script");
         
@@ -851,17 +850,20 @@ public class AppScriptPanelSupport {
 
                 final DebugLineNumbersRuler r= panel.getEditorPanel().getRuler();
                 
-                if  ( ( mode & Event.CTRL_MASK ) == Event.CTRL_MASK  )  {
-                    try {
-                        r.getBreakpointModel().set(1);
-                    } catch (BadLocationException ex) {
-                        logger.log(Level.SEVERE, null, ex);
-                    }
-                }
-                
                 if ( "true".equals(doDebug) && r!=null ) {
-                    
+
+                    interp.exec(
+                        "def debugEval(frame, expression):\n" +
+                        "    return repr(eval(expression, frame.f_globals, frame.f_locals))\n"
+                    );
+
                     session= new ScriptDebugSession(interp,r.getBreakpointModel(),panel.outputBubbles);
+                    session.getDebugger().setExpressionEvaluator(interp.get("debugEval"));
+                    
+                    if  ( ( mode & Event.CTRL_MASK ) == Event.CTRL_MASK  )  {
+                        session.getDebugger().pauseAtFirstLine();
+                    }
+                    
                     final ScriptDebugSession fsession= session;
                     
                     session.setSessionListener( new JythonDebugger.Listener() {
@@ -893,13 +895,6 @@ public class AppScriptPanelSupport {
                         }
 
                     });
-
-                    interp.exec(
-                        "def debugEval(frame, expression):\n" +
-                        "    return repr(eval(expression, frame.f_globals, frame.f_locals))\n"
-                    );
-
-                    session.getDebugger().setExpressionEvaluator(interp.get("debugEval"));
 
                     EditorAnnotationsSupport.setExpressionLookup((String expr) -> new PyString(fsession.eval(expr)));
                     
@@ -1472,6 +1467,30 @@ public class AppScriptPanelSupport {
 
     public void removePropertyChangeListener(String name,PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(name,listener);
+    }
+
+    /**
+     * return the first line containing code, where a breakpoint can be set.
+     * @param code
+     * @return 
+     */
+    private int findFirstLine(String code) {
+        String[] lines = code.split("\\R");
+        String quote = null;
+
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i].trim();
+
+            if (quote != null) {
+                if (line.contains(quote)) quote = null;
+            } else if (line.startsWith("\"\"\"") || line.startsWith("'''")) {
+                String q = line.substring(0, 3);
+                if (!line.substring(3).contains(q)) quote = q;
+            } else if (!line.isEmpty() && !line.startsWith("#")) {
+                return i + 1;
+            }
+        }
+        return -1;
     }
 
 }
