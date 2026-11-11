@@ -660,6 +660,10 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
     private org.autoplot.jythonsupport.ui.EditorTextPane textArea;
     // End of variables declaration//GEN-END:variables
 
+    public ApplicationModel getApplicationModel() {
+        return this.model;
+    }
+    
     /**
      * returns the editor
      * @return the editor
