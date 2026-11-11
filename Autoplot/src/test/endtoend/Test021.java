@@ -84,7 +84,10 @@ public class Test021 {
         "050 file:///home/jbf/ct/hudson/data.backup/dat/vho.nasa.gov/mission/helios2/H276_021.dat?timeFormat=$Y+$j+$H&column=bn&time=year",
 
         // I broke this URI after v2011a_11.  The $(milli) field needed to be variable length.  I'm not sure how it was parsing okay with v2011a_11.
-        "051 file:///home/jbf/ct/hudson/data.backup/dat/ccmc/sw1_31485.txt?time=field0&timeFormat=$Y+$m+$d+$H+$M+$S+$(milli)&bundle=field7-field9"
+        "051 file:///home/jbf/ct/hudson/data.backup/dat/ccmc/sw1_31485.txt?time=field0&timeFormat=$Y+$m+$d+$H+$M+$S+$(milli)&bundle=field7-field9",
+            
+        // two columns of start and stop times
+        "052 file:///home/jbf/ct/jenkins/data.backup/dat/events/twoColumnEvents.dat"
 
     };
 
