@@ -1727,6 +1727,7 @@ public class AutoplotUtil {
      * @param message, String or Component for the message.
      * @param title
      * @param messageType, like JOptionPane.ERROR_MESSAGE, JOptionPane.INFORMATION_MESSAGE, JOptionPane.WARNING_MESSAGE, JOptionPane.QUESTION_MESSAGE, or JOptionPane.PLAIN_MESSAGE
+     * @see WindowManager#showConfirmDialog(java.awt.Component, java.lang.Object) 
      */
     public static void showMessageDialog( Component parentComponent, Object message, String title, int messageType ) {
         //JOptionPane.showMessageDialog( parent, message, title, messageType );
