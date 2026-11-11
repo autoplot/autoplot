@@ -526,7 +526,7 @@ public class StatePersistence {
      */
     public static Application restoreState(InputStream in, LinkedHashMap<String, String> deltas) throws IOException {
         
-        if ( deltas.containsKey("PWD") ) {
+        if ( deltas!=null && deltas.containsKey("PWD") ) {
             in= replacePwdInOrbitDatums(in,deltas.get("PWD"));
         }
         
