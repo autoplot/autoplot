@@ -133,6 +133,7 @@ public class AppScriptPanelSupport {
     private final String PREFERENCE_OPEN_FILE = "openFile";
     private InteractiveInterpreter interruptible;
     ThreadState ts;
+    ScriptDebugSession session;
 
     AppScriptPanelSupport(final JythonScriptPanel panel, final ApplicationModel model, final DataSetSelector selector) {
         this.model = model;
@@ -808,8 +809,8 @@ public class AppScriptPanelSupport {
         //ProgressMonitor mon= //DasProgressPanel.createComponentPanel(model.getCanvas(),"running script");
         ProgressMonitor mon= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(panel), "running script");
 
-        ScriptDebugSession session= null;
-
+        session = null;
+        
         try {
             try {
                 if (file != null && ( file.exists() && file.canWrite() || file.getParentFile().canWrite() ) ) {
