@@ -882,6 +882,7 @@ public class AppScriptPanelSupport {
                             }
                             hits++;
                             panel.getRunButton().setEnabled(true);
+                            AppScriptPanelSupport.this.panel.getAnnotationsSupport().scrollToLine(line);
                         }
 
                         @Override
