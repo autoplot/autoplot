@@ -360,7 +360,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
             if (validMin != Double.NEGATIVE_INFINITY) {
                 vds.putProperty(QDataSet.VALID_MIN, validMin);
             }
-        } else if ( eventListColumn!=null && eventListColumn.length()>0 ) {
+        } else if ( eventListColumn!=null ) {
             EnumerationUnits eu= EnumerationUnits.create("events");
             vds= ArrayDataSet.maybeCopy( Ops.replicate( DataSetUtil.asDataSet(eu.createDatum("event")), ds.length() ) );
         }
@@ -594,21 +594,6 @@ public class AsciiTableDataSource extends AbstractDataSource {
             return mds;
 
         } else {
-            
-            if ( vds==null && column==null ) {
-                if ( ds.rank()==2 && ds.length(0)==2 ) {
-                    QDataSet bds= (QDataSet) ds.property(QDataSet.BUNDLE_1);
-                    if ( bds!=null ) {
-                        Units u0= (Units) bds.property(QDataSet.UNITS,0);
-                        Units u1= (Units) bds.property(QDataSet.UNITS,1);
-                        if ( UnitsUtil.isTimeLocation(u0) && u0==u1 ) {
-                            vds= ds;
-                            dep0= null;
-                            vds.putProperty(QDataSet.RENDER_TYPE,"eventsBar");
-                        }
-                    }
-                }
-            }
             
             if (vds == null) {
                 if ( column==null ) {
