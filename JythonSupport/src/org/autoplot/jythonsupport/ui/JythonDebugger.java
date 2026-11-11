@@ -113,6 +113,22 @@ public final class JythonDebugger {
         resume(Mode.STEP_INTO);
     }
 
+    private int initialPauseCount=0;
+    
+    /**
+     * Stop at the first traced line of the script.
+     * Call before starting script execution.
+     */
+    public void pauseAtFirstLine() {
+        synchronized (pauseLock) {
+            if (mode != Mode.RUNNING) {
+                throw new IllegalStateException(
+                    "Debugger is not ready to start");
+            }
+            initialPauseCount=1;
+        }
+    }
+    
     /**
      * Execute the current statement, stopping in the same frame or caller.
      */
@@ -228,6 +244,11 @@ public final class JythonDebugger {
                         frame, Py.newString(b.printExpr));
                     scriptOutputBubbles.setOutput( line, result.toString(), ColorUtil.PURPLE );
                 }
+            }
+            
+            if ( initialPauseCount>0 && line>0 ) {
+                shouldPause = true;
+                initialPauseCount--;
             }
 
             if (b!=null && b.enabled) {
