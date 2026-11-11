@@ -185,7 +185,37 @@ public class EditorAnnotationsSupport {
     }
 
     /**
-     * scroll to make sure offset is visible.
+     * scroll to make sure line number is visible.  If the lineNum is less than
+     * 1, then scroll to the first line, if greater than the number of lines, scroll
+     * to the last line.
+     * @param lineNum, where 1 is the first line
+     */
+    public void scrollToLine( int lineNum ) {
+        try {
+            Document doc = editorPanel.getDocument();
+            Element root1 = editorPanel.getDocument().getDefaultRootElement();
+            if (root1.getElementCount() == 1) {
+                // transitional case where the document is cleared.
+                return;
+            }
+
+            int i0;
+            if (lineNum <= root1.getElementCount()) {
+                i0 = root1.getElement(lineNum - 1).getStartOffset();
+            } else if ( lineNum > root1.getElementCount() ) {
+                i0 = root1.getElement( root1.getElementCount() - 1).getStartOffset();
+            } else {
+                i0 = Math.max(0, doc.getLength()-2 );
+            }
+            scrollToOffset( i0 );
+        } catch ( BadLocationException ex ) {
+            logger.warning("bad location should not happen");
+        }
+                    
+    }
+    
+    /**
+     * scroll to make sure character offset is visible.
      * @param offset
      * @throws BadLocationException 
      */
