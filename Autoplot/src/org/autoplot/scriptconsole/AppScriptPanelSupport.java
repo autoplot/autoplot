@@ -1408,6 +1408,8 @@ public class AppScriptPanelSupport {
                 return;
             } 
             
+            result= DataSetURI.getFile(result).toString();
+            
             if ( panel.isDirty() ) {
                 int option= JOptionPane.showConfirmDialog( panel, "Save edits first?", "Save Current Editor", JOptionPane.YES_NO_CANCEL_OPTION );
                 if ( option==JOptionPane.YES_OPTION ) {
