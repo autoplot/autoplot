@@ -7,6 +7,7 @@ package org.autoplot.scriptconsole;
 
 import org.autoplot.jythonsupport.ui.ScriptOutputBubbles;
 import java.awt.Dimension;
+import java.awt.Event;
 import org.autoplot.jythonsupport.ui.EditorContextMenu;
 import java.awt.Font;
 import java.awt.Toolkit;
@@ -642,8 +643,18 @@ private void newScriptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
 }//GEN-LAST:event_newScriptButtonActionPerformed
 
 private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_interruptButtonActionPerformed
-    org.das2.util.LoggerManager.logGuiEvent(evt);                
-    support.interrupt();
+    org.das2.util.LoggerManager.logGuiEvent(evt);
+    if ( ( evt.getModifiers() & Event.CTRL_MASK ) == Event.CTRL_MASK  ) {
+        if ( support.session!=null && support.session.getDebugger()!=null ) {
+            support.session.getDebugger().pauseAtFirstLine();
+        } else {
+            logger.warning("debugger is not active");
+            support.interrupt();
+            applicationController.setStatus( "warning: debugger is not active");
+        }
+    } else {
+        support.interrupt();
+    }
 }//GEN-LAST:event_interruptButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -729,10 +740,21 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
         return outputBubbles;
     }
     
+    /**
+     * return the "Run" button 
+     * @return the "Run" button
+     */
     public final javax.swing.JButton getRunButton() {
         return runButton;
     }
     
+    /**
+     * return the "Stop" button 
+     * @return the "Stop" button
+     */
+    public final javax.swing.JButton getStopButton() {
+        return interruptButton;
+    }
     
     protected javax.swing.Action RUN_ACTION= new javax.swing.AbstractAction("Run",new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/resources/go.png"))) {
         @Override

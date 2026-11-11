@@ -852,6 +852,7 @@ public class AppScriptPanelSupport {
                 final DebugLineNumbersRuler r= panel.getEditorPanel().getRuler();
                 
                 if ( "true".equals(doDebug) && r!=null ) {
+                    panel.getStopButton().setToolTipText("Interrupt running script, ctrl will pause at next line");
 
                     interp.exec(
                         "def debugEval(frame, expression):\n" +
@@ -902,8 +903,8 @@ public class AppScriptPanelSupport {
                     
                 } else {
                     EditorAnnotationsSupport.setExpressionLookup(annotationsSupport.getForInterp(interp));
-                    
-                }
+                    panel.getStopButton().setToolTipText("Interrupt running script");
+                } 
 
                 JythonOutputCapture.install(
                     interp,
@@ -1036,7 +1037,9 @@ public class AppScriptPanelSupport {
             if ( ex.getMessage()!=null && !ex.getMessage().contains("Python interrupt") ) {
                 throw ex;
             } else {
-                applicationController.setStatus("script interrupted");
+                if ( !applicationController.getStatus().contains("debugger is not active") ) {
+                    applicationController.setStatus("script interrupted");
+                }
             }
         } finally {
             if ( !mon.isFinished() ) mon.finished();  // bug1251: in case script didn't call finished
