@@ -341,7 +341,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
     private static final Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.gui");
     private static final Logger resizeLogger= Logger.getLogger("autoplot.dom.canvas.resize");
     
-    private JythonScriptPanel scriptPanel;
+    private JythonScriptPanel scriptPanel; // TODO: seriously?  jythonScriptPanel is a JPanel.
     private DataPanel dataPanel;
     private LayoutPanel layoutPanel;
     private JScrollPane layoutPanel1;
@@ -6907,7 +6907,7 @@ APSplash.checkTime("init 240");
                 if ( useNative ) {
                     result = Util.browseLocalJyNative( AutoplotUI.this, null );
                 } else {
-                    result=  Util.browseLocalJy( AutoplotUI.this, null );
+                    result=  Util.browseLocalJy( scriptPanel, null );
                 }
                 
                 if ( result!=null ) {

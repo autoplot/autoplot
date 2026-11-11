@@ -123,8 +123,6 @@ import org.python.parser.ast.stmtType;
 public class AppScriptPanelSupport {
 
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.jython");
-    
-    private static final int RECENT_FILES_COUNT = 100;
 
     File file;
     final ApplicationModel model;
@@ -1244,7 +1242,7 @@ public class AppScriptPanelSupport {
         }
     }
     
-    private JComponent getRecentAccessory( final String filter, final int limit, final JFileChooser c ) {
+    public static JComponent getRecentAccessory( final ApplicationModel model, final String filter, final int limit, final JFileChooser c ) {
         JPanel recentPanel= new JPanel(new BorderLayout());
 
         final String msgWait= "Getting Recent...                    ..";
@@ -1398,46 +1396,32 @@ public class AppScriptPanelSupport {
                 useNative= !useNative;
             }
 
-            //    if ( useNative ) {
-            //        result = Util.browseLocalJyNative( AutoplotUI.this, null );
-            //    } else {
-            //        result=  Util.browseLocalJy( AutoplotUI.this, null );
-            //    }
+            String result;
+            
+            if ( useNative ) {
+                result = org.autoplot.Util.browseLocalJyNative( panel, null );
+            } else {
+                result=  org.autoplot.Util.browseLocalJy( panel, null );
+            }
                             
+            if ( result==null ) {
+                return;
+            } 
             
-            JFileChooser chooser = new JFileChooser();
-            chooser.setFileSelectionMode( JFileChooser.FILES_ONLY );
-            chooser.setFileFilter(new FileNameExtensionFilter( "python and jython scripts", new String [] { "jy", "py", "jyds" } ));
-            if (file != null) {
-                chooser.setSelectedFile(file);
-            }
-            if (openFile.length() > 0) {
-                // this hangs on Java 1.7.0_17 Linux Centos 6:
-                chooser.getFileSystemView().isParent(chooser.getCurrentDirectory(),new File(openFile));
-                File fopenFile= new File(openFile);
-                chooser.setSelectedFile(fopenFile);
-                // I have to hope that it was an NFS problem we were having.  I don't see the problem on Ubuntu or Macs.
-            }
-            
-            chooser.setAccessory( getRecentAccessory("*.jy*", RECENT_FILES_COUNT,chooser) );
-            chooser.revalidate();
-            
-            int r = chooser.showOpenDialog(panel);
-            if (r == JFileChooser.APPROVE_OPTION) {
-                if ( panel.isDirty() ) {
-                    int option= JOptionPane.showConfirmDialog( panel, "Save edits first?", "Save Current Editor", JOptionPane.YES_NO_CANCEL_OPTION );
-                    if ( option==JOptionPane.YES_OPTION ) {
-                        saveAs();
-                    } else if ( option==JOptionPane.CANCEL_OPTION ) {
-                        return;
-                    }
+            if ( panel.isDirty() ) {
+                int option= JOptionPane.showConfirmDialog( panel, "Save edits first?", "Save Current Editor", JOptionPane.YES_NO_CANCEL_OPTION );
+                if ( option==JOptionPane.YES_OPTION ) {
+                    saveAs();
+                } else if ( option==JOptionPane.CANCEL_OPTION ) {
+                    return;
                 }
-                file = chooser.getSelectedFile();
-                prefs.put(PREFERENCE_OPEN_FILE, file.toString());
-                loadFile(file);
-                panel.setFilename(file.toString());
-                annotationsSupport.clearAnnotations();
             }
+
+            file = new File( result );
+            prefs.put(PREFERENCE_OPEN_FILE, file.toString());
+            loadFile(file);
+            panel.setFilename(file.toString());
+            annotationsSupport.clearAnnotations();
 
         } catch (IOException ex) {
             model.getExceptionHandler().handle(ex);

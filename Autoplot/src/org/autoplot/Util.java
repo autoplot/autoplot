@@ -39,6 +39,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -55,6 +56,7 @@ import org.autoplot.datasource.TimeRangeEditor;
 import org.autoplot.datasource.URISplit;
 import org.autoplot.datasource.WindowManager;
 import org.autoplot.scriptconsole.AppScriptPanelSupport;
+import org.autoplot.scriptconsole.JythonScriptPanel;
 import org.das2.datum.DatumRange;
 
 /**
@@ -413,12 +415,10 @@ public class Util {
     
     /**
      * Use a native browser to pick a file.  Use the system property fileChooserNative=true
-     * @param parent parent component for focus.  If a dataSetSelector is
-     * used then its timerange is used for the initial timerange.
-     * This will now allow a non-local vap to be browsed as well.
+     * @param parent parent component for focus.  
+     * This will now allow a non-local jy to be browsed as well.
      * @param initialSelection if non-null, then the initial selection.
-     * @return the URI for the vap file, or null if cancel was pressed.
-     * @return 
+     * @return the URI for the jy file, or null if cancel was pressed.
      */
     public static String browseLocalJyNative( java.awt.Component parent, String initialSelection) {
         Preferences prefs = AutoplotSettings.settings().getPreferences(AppScriptPanelSupport.class);
@@ -432,8 +432,8 @@ public class Util {
         
         FileDialog chooser=
                 new java.awt.FileDialog( (Frame)(SwingUtilities.getWindowAncestor(parent)), 
-                        "Open .vap file", java.awt.FileDialog.LOAD );
-        chooser.setName("openVapNative");
+                        "Open Jython file", java.awt.FileDialog.LOAD );
+        chooser.setName("openJyNative");
         chooser.setDirectory(currentDirectory);
         chooser.setFile(currentFile);
         //WindowManager.getInstance().recallWindowSizePosition(chooser);
@@ -462,13 +462,12 @@ public class Util {
 
     /**
      * Show a file chooser component, and return the name of a .vap file.
-     * @param parent parent component for focus.  If a dataSetSelector is
-     * used then its timerange is used for the initial timerange.
-     * This will now allow a non-local vap to be browsed as well.
+     * @param parent parent component for focus. 
+     * This will now allow a non-local jy to be browsed as well.
      * @param initialSelection if non-null, then the initial selection.
-     * @return the URI for the vap file, or null if cancel was pressed.
+     * @return the URI for the jy file, or null if cancel was pressed.
      */
-    public static String browseLocalJy( java.awt.Component parent, String initialSelection) {
+    public static String browseLocalJy( JythonScriptPanel parent, String initialSelection) {
         Preferences prefs = AutoplotSettings.settings().getPreferences(AppScriptPanelSupport.class);
         File userHome= new File(System.getProperty("user.home"));
         String PREFERENCE_OPEN_FILE = "openFile";
@@ -487,9 +486,13 @@ public class Util {
         boolean isLocal= initialSelection==null || initialSelection.isEmpty() || !isRemote;
         
         JFileChooser chooser;
-
+        
         chooser= new JFileChooser();
 
+        final int RECENT_FILES_COUNT = 100;        
+        JComponent recent= AppScriptPanelSupport.getRecentAccessory(parent.getApplicationModel(),"*.jy*", RECENT_FILES_COUNT,chooser);
+        chooser.setAccessory(recent);
+        
         WindowManager.getInstance().recallWindowSizePosition(chooser);
 
         try {
