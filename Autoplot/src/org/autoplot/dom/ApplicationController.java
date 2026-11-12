@@ -2666,11 +2666,13 @@ public class ApplicationController extends DomNodeController implements RunLater
                 logger.fine("binding already exists...");
             } else {
                 binding = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, src, BeanProperty.create(srcProp), dst, BeanProperty.create(dstProp));
-                if ( converter!=null ) binding.setConverter( converter );
-
-                List<BindingModel> bindings = new ArrayList<>(Arrays.asList(application.getBindings()));
-                bindings.add(bindingModel);
-                application.setBindings(bindings.toArray(new BindingModel[bindings.size()]));
+                if ( converter!=null ) {
+                    binding.setConverter( converter );
+                } else {
+                    List<BindingModel> bindings = new ArrayList<>(Arrays.asList(application.getBindings()));
+                    bindings.add(bindingModel);
+                    application.setBindings(bindings.toArray(new BindingModel[bindings.size()]));
+                }
                 bc.addBinding(binding);
                 binding.bind();
                 this.bindingImpls.put(bindingModel, binding);
