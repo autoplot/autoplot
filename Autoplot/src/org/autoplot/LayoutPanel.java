@@ -565,21 +565,35 @@ public class LayoutPanel extends javax.swing.JPanel {
             if ( plot==null ) {
                 return;
             }
-            List<PlotElement> p = dom.getController().getPlotElementsFor(plot);
+            List<PlotElement> pes = dom.getController().getPlotElementsFor(plot);
             List<PlotElement> allElements = Arrays.asList(dom.getPlotElements());
             List<Integer> indices = new ArrayList<>();
-            for (int i = 0; i < p.size(); i++) {
-                if ( p.get(i).isActive() ) indices.add( allElements.indexOf(p.get(i)) );
+            List<BindingModel> bindings= Arrays.asList(dom.getController().getBindingsFor(plot));
+            final List<Integer> bindingIndeces= new ArrayList<>();
+            
+            for (int i = 0; i < pes.size(); i++) {
+                if ( pes.get(i).isActive() ) indices.add( allElements.indexOf(pes.get(i)) );
+            }
+            
+            BindingModel[] bms= dom.getBindings();
+            for (int i = 0; i < bms.length; i++) {
+                if ( bindings.contains(bms[i]) ) {
+                    bindingIndeces.add(i);
+                }
             }
 
             final int[] iindices= new int[indices.size()];
             for ( int i=0; i<indices.size(); i++ ) iindices[i]= indices.get(i);
+
+            final int[] ibindingIndices= new int[bindingIndeces.size()];
+            for ( int i=0; i<ibindingIndices.length; i++ ) ibindingIndices[i]= bindingIndeces.get(i);
 
             Runnable run= new Runnable() {
                 @Override
                 public void run() {
                     logger.finer("enter plotListener");
                     plotElementListComponent.setSelectedIndices(iindices);
+                    bindingListComponent.setSelectedIndices(ibindingIndices);
                     selectionChanged= true;
                     updatePlotsList();
                     repaint();
