@@ -32,6 +32,12 @@
                 
         <p>Bugfixes (2026-11-11):</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2921/">2921</a>: Selecting a plot in the layout shows the bindings for the plot.
+            <li>Clean up axis "change units" dialog and put a warning that the label should be updated.
+            <li><a href="https://sourceforge.net/p/autoplot/bugs/2920/">2920</a>: bind command should not insert binding into the dom, when a converter is used.
+        </ul>
+        <p>Older Bugfixes (2026-11-11):</p>
+        <ul>
             <li>TimeUtil.next(SECOND,t) didn't increment property.
             <li>new code in restoreState assumed that the "deltas" was non-null, breaking the "vapfile:" prefix.
             <li>Slice filter dialog properly enables the datum field.
@@ -56,39 +62,10 @@
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2901/">2901</a>: Revert change which broke UIowa digitizing script.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2900/">2900</a>: Clean up event handling in HAPI Data Source Editor, correct recents.
         </ul>
-        <p>Older Bugfixes (2026-09-28):</p>
-        <ul>
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2897/">2897</a>: record window sizes with the screen resolution, so that undocked laptop works properly.
-            <li>rte_1195634314: StaticCodeAnalysis still loaded old 2017 python file, somehow causing crash on startup.  Thanks, nicolec!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2878/">2878</a>: Run Batch Tool removes dynamic arguments from constant values.  Thanks, Sadie!
-            <li>findgen can be used to create enumeration of values, as well as range.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2896/">2896</a>: transition from slice1(5) to slice(5) failed because of incorrect test.
-            <li><a href="https://github.com/das-developers/das2java/issues/184">184</a>: excessive https listing for URL with aggregation.
-            <li>Correction to annotation when crosshash fill was used on data, where clipping was incorrect.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2895/">2895</a>: improve feedback when default timerange is not parseable.  timerange min and max are used to constrain input time.
-            <li><a href="https://github.com/das-developers/das2java/issues/186">186</a>: University onedrive with spaces in the name causes problems with %20.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2893/">2893</a>: DasAnnotation split anchor code had a path where plot member variable was assumed to be non-null.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/877/">877</a>: Browse source didn't apply the "https : //..." logic, causing runtime exception.            
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2882/">2882</a>: CDF metadata should reload when "reload" action (^L) is invoked.  
-            <li>Reduce severity of console error messages when ASCII table source tries to parse "color" as a color.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2874/">2874</a>: Support enumerations in aggregation with availability.  TimeParser.format now has code to generate example extra data.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2888/">2888</a>: Tools->Cache->"Clear cache" happens on event thread.  Bugfix when ro_cache.txt file is within filesystem.
-            <li><a href="https://github.com/das-developers/das2java/issues/185">185</a>: More carefully use getSubTaskMonitor to imply progress.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2887/">2887</a>: NRT TimeRange dialog doesn't update DasAxis.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2883/">2883</a>: recent changes to SubtaskMonitor caused runtime error with old scripts.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2884/">2884</a>: improve vap+orbit:, useful for getting events lists for any spececraft.
-            <li>Put in fast specialized code for total on rank 3 on the last index.  Thanks, Darrelle!
-            <li>Correct Util.generateTimeRanges when orbit is used.  Thanks, Jim!
-            <li>Correct one-pixel error when annotation box is outside plot bounds, where the axes were damaged because annotations are always the top-most layer.
-            <li>Correct toString of ISO8601 duration object, when all components are zero.
-            <li>Return "P0S" for ISO8601 duration of zero length.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2878/">2878</a>: Run Batch Tool shows constant arguments.  Thanks, Sadie!
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2857/">2857</a>: improve static code analysis by handling list comprehensions.
-            <li>rte 0188745986: runtime error with full reset and two added tabs caused index out of bounds error.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2880/">2880</a>: Display warning when CDF variable name is not proper Python variable name or will cause problems. 
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2845/">2845</a>: improvements to Jython completions.
-        </ul>
         <p>Features:</p>
+        <ul>
+        </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>Slice filter dialog supports mouse wheel events on the time, incrementing or decrementing the component.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/893/">893</a>: Jython debugger is used to implement trace when running scripts (ctrl+Run).
@@ -104,16 +81,6 @@
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2901/">2901</a>: New code for simplifyScriptToGetParams operates on the AST, not the source, so is more reliable.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2902/">2902</a>: HAPI JSON read capability is available in the GUI.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2900/">2900</a>: Jemmy regression testing of HAPI server dialog.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>BinaryDataSource has ccsds control to select binary from telemetry stream.  
-            <li>Experimental ccsds switch to the BinaryDataSource, to parse simple ccsds files.
-            <li>BinaryDataSource can have hex values for offsets, like 0x1A, and new mask and bitField controls extract individual bits.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/884/">884</a>: Annotation anchor box style controls have GUI.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/884/">884</a>: Annotation anchor box should have style controls.
-            <li><a href="https://sourceforge.net/p/autoplot/bugs/2879/">2879</a>: HTML table source allows depend0 and units to be specified.
-            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/883/">883</a>: Select time range by Orbits allows simple search.
         </ul>
 
         <p>Data is input from:</p>
