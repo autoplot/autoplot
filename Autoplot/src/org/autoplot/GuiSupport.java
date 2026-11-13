@@ -146,8 +146,10 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.xml.sax.SAXException;
 import ZoeloeSoft.projects.JFontChooser.JFontChooser;
+import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import javax.swing.Box;
 import javax.swing.JDialog;
 import org.autoplot.dom.Column;
 import org.autoplot.dom.DomNode;
@@ -1856,7 +1858,10 @@ public class GuiSupport {
                     JComboBox cb= new JComboBox(uu);
                     cb.setSelectedItem(u);
                     cb.setAlignmentX(0.f);
+                    cb.setMaximumSize( new Dimension( 1000, cb.getFont().getSize()*2 ) );
                     p1.add(cb);
+                    p1.add(new JLabel("<html><em>Verify axis label is correct, it will not be updated.</em>"));
+                    p1.add(Box.createVerticalGlue());
                     if ( JOptionPane.OK_OPTION==WindowManager.showConfirmDialog( p,
                                 p1,
                                 "Reset axis units", JOptionPane.OK_CANCEL_OPTION ) ) {
