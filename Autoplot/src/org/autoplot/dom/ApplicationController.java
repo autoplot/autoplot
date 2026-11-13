@@ -697,20 +697,23 @@ public class ApplicationController extends DomNodeController implements RunLater
             lock= application.controller.changesSupport.mutatorLock();
             lock.lock("plotUriWithoutChanges");
         }
+        try {
         //registerPendingChange( this, PENDING_CHANGE_REPLOTURI );
         //performingChange( this, PENDING_CHANGE_REPLOTURI );
-        DataSourceFilter dsf= getDataSourceFilter();
-        if ( dsf==null ) {
-            logger.warning("dsf is null, doing nothing");
-        } else {
-            dsf.getController().setSuri(suri, new NullProgressMonitor() );
-            //dsf.getController().resolveDataSource( false, new NullProgressMonitor() );
-            dsf.getController().update(true);
-            //changePerformed( this, PENDING_CHANGE_REPLOTURI );
-        }
-        if ( !resetPlot ) {
-            assert lock!=null;
-            lock.unlock();
+            DataSourceFilter dsf= getDataSourceFilter();
+            if ( dsf==null ) {
+                logger.warning("dsf is null, doing nothing");
+            } else {
+                dsf.getController().setSuri(suri, new NullProgressMonitor() );
+                //dsf.getController().resolveDataSource( false, new NullProgressMonitor() );
+                dsf.getController().update(true);
+                //changePerformed( this, PENDING_CHANGE_REPLOTURI );
+            }
+        } finally {
+            if ( !resetPlot ) {
+                assert lock!=null;
+                lock.unlock();
+            }
         }
     }
     
