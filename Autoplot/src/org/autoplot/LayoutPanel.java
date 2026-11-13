@@ -568,16 +568,18 @@ public class LayoutPanel extends javax.swing.JPanel {
             List<PlotElement> pes = dom.getController().getPlotElementsFor(plot);
             List<PlotElement> allElements = Arrays.asList(dom.getPlotElements());
             List<Integer> indices = new ArrayList<>();
-            List<BindingModel> bindings= Arrays.asList(dom.getController().getBindingsFor(plot));
+            List<BindingModel> bindings= new ArrayList( Arrays.asList(dom.getController().getBindingsFor(plot)) );
+            bindings.addAll( Arrays.asList(dom.getController().getBindingsFor(plot.getXaxis())));
+            bindings.addAll( Arrays.asList(dom.getController().getBindingsFor(plot.getYaxis())));
             final List<Integer> bindingIndeces= new ArrayList<>();
             
             for (int i = 0; i < pes.size(); i++) {
                 if ( pes.get(i).isActive() ) indices.add( allElements.indexOf(pes.get(i)) );
             }
             
-            BindingModel[] bms= dom.getBindings();
-            for (int i = 0; i < bms.length; i++) {
-                if ( bindings.contains(bms[i]) ) {
+            List<BindingModel> bms= getDisplayedBindingList();
+            for (int i = 0; i < bms.size(); i++) {
+                if ( bindings.contains(bms.get(i)) ) {
                     bindingIndeces.add(i);
                 }
             }
@@ -775,15 +777,17 @@ public class LayoutPanel extends javax.swing.JPanel {
         return result;
     }
 
-    private void updateBindingList() {
-        final List bindingList= new ArrayList( Arrays.asList(dom.getBindings() ) );
-        List rm= getSublist( bindingList, new Comparator() {
-            @Override
-            public int compare(Object o1, Object o2) {
-                return ((BindingModel)o1).getDstProperty().equals("colortable") ? 0 : 1;
-            }
-        }, null );
+    private List getDisplayedBindingList() {
+        final List<BindingModel> bindingList= new ArrayList( Arrays.asList(dom.getBindings() ) );
+        List rm= getSublist(bindingList, 
+                (Comparator) (Object o1, Object o2) -> ((BindingModel)o1).getDstProperty().equals("colortable") ? 0 : 1, null 
+        );
         bindingList.removeAll(rm);
+        return bindingList;
+    }
+    
+    private void updateBindingList() {
+        List<BindingModel> bindingList= getDisplayedBindingList();
         AbstractListModel elementsList = new AbstractListModel() {
             @Override
             public int getSize() {
