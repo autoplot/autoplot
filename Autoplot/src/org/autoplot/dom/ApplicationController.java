@@ -1217,7 +1217,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             }
         }); 
         impl.getDasMouseInputAdapter().addMenuItem(cbmi);
-
+        
         bind( annotation, "anchorType", cbmi, "selected", new Converter() {
             @Override
             public Object convertForward(Object s) {
@@ -1229,7 +1229,21 @@ public class ApplicationController extends DomNodeController implements RunLater
             }
         } ); 
         
-        impl.getDasMouseInputAdapter().addMenuItem(mi);
+        JMenuItem item= new JMenuItem(new AbstractAction("Bind to...") {
+            public void actionPerformed(ActionEvent e) {
+                DomBindingDialog dialog = new DomBindingDialog(
+                    SwingUtilities.getWindowAncestor(impl),
+                    impl.getCanvas(),
+                    annotation,
+                    new AutoplotBindingBridge(application)
+                );
+                dialog.setVisible(true);
+            }
+        });
+        item.setToolTipText("bind annotation to other objects");
+        impl.getDasMouseInputAdapter().addMenuItem(item);
+
+
         impl.getDasMouseInputAdapter().removeMenuItem("Properties");
         impl.getDasMouseInputAdapter().removeMenuItem("remove arrow");
         impl.getDasMouseInputAdapter().removeMenuItem("remove");
