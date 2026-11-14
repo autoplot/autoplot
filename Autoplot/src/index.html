@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>Annotations with %{CONTEXT,format=$H:$M:$S} macros show image location in time.</small></p>
+        <p><small>New "Add Bindings..." tool is more flexible in creating bindings between plots.</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,9 @@
 
         <p>Autoplot's development is guided by feedback from those using it.  Thanks for your feedback!</p>
                 
-        <p>Bugfixes (2026-11-11):</p>
+        <p>Bugfixes (2026-11-14):</p>
         <ul>
+            <li>BoundsRenderer uses Ops.xtags and Ops.ytags to extract the x and y values, so that either ds[:,2] or y[x] works.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2921/">2921</a>: Selecting a plot in the layout shows the bindings for the plot.
             <li>Clean up axis "change units" dialog and put a warning that the label should be updated.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2920/">2920</a>: bind command should not insert binding into the dom, when a converter is used.
@@ -64,6 +65,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/894/">894</a>: New "Add Bindings..." tool is more flexible in creating bindings between plots.
         </ul>
         <p>Less recent features:</p>
         <ul>
