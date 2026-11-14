@@ -6,6 +6,7 @@ import java.beans.*;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
+import org.das2.qds.filters.AddFilterDialog;
 
 /** One-to-many Autoplot DOM binding editor. Java 8. */
 public final class DomBindingDialog extends JDialog {
@@ -191,7 +192,7 @@ public final class DomBindingDialog extends JDialog {
             label.setPreferredSize(new Dimension(200, 28));
             panel.add(label, BorderLayout.WEST);
             panel.add(property, BorderLayout.CENTER);
-            JButton remove = new JButton("Remove");
+            JButton remove = new JButton(new ImageIcon(AddFilterDialog.class.getResource("/resources/subtract.png")));
             remove.addActionListener(e -> {
                 targets.remove(this);
                 targetRows.remove(panel);
