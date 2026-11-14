@@ -151,7 +151,9 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.Box;
 import javax.swing.JDialog;
+import org.autoplot.dom.AutoplotBindingBridge;
 import org.autoplot.dom.Column;
+import org.autoplot.dom.DomBindingDialog;
 import org.autoplot.dom.DomNode;
 import org.autoplot.dom.Row;
 import org.autoplot.renderer.AnnotationEditorPanel;
@@ -1521,10 +1523,17 @@ public class GuiSupport {
 
 
 
-    protected static void addAxisContextMenuItems( final ApplicationController controller, final DasPlot dasPlot, final PlotController plotController, final Plot plot, final Axis axis) {
+    protected static void addAxisContextMenuItems( 
+            final ApplicationController controller, 
+            final DasPlot dasPlot, 
+            final PlotController plotController, 
+            final Plot plot, 
+            final Axis axis) {
 
         final DasAxis dasAxis = axis.getController().getDasAxis();
         final DasMouseInputAdapter mouseAdapter = dasAxis.getDasMouseInputAdapter();
+        final Application dom= controller.getApplication();
+        final Canvas canvas= dom.getController().getCanvas();
 
         List<JMenuItem> expertMenuItems= new ArrayList();
 
@@ -1725,6 +1734,21 @@ public class GuiSupport {
             }
         });
         item.setToolTipText("remove any plot and plot element property bindings");
+        bindingMenu.add(item);
+
+        
+        item= new JMenuItem(new AbstractAction("Bind to...") {
+            public void actionPerformed(ActionEvent e) {
+                DomBindingDialog dialog = new DomBindingDialog(
+                    SwingUtilities.getWindowAncestor(dasAxis),
+                    dasAxis.getCanvas(),
+                    axis,
+                    new AutoplotBindingBridge(dom)
+                );
+                dialog.setVisible(true);
+            }
+        });
+        item.setToolTipText("bind axis to any other axis on the plot");
         bindingMenu.add(item);
 
         expertMenuItems.add(bindingMenu);
