@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.List;
 import java.util.function.Predicate;
 import javax.swing.*;
+import org.das2.graph.DasCanvasComponent;
 import org.das2.qds.filters.AddFilterDialog;
 
 /** One-to-many Autoplot DOM binding editor. Java 8. */
@@ -310,6 +311,7 @@ public final class DomBindingDialog extends JDialog {
     }
 
     private final class PickerGlassPane extends JComponent {
+        Rectangle selected;
         PickerGlassPane() {
             setOpaque(false);
             setFocusable(true);
@@ -330,7 +332,37 @@ public final class DomBindingDialog extends JDialog {
             });
             addMouseMotionListener(new MouseMotionAdapter() {
                 @Override public void mouseDragged(MouseEvent e) { e.consume(); }
-                @Override public void mouseMoved(MouseEvent e) { e.consume(); }
+                @Override public void mouseMoved(MouseEvent e) { 
+                    Point p = SwingUtilities.convertPoint(PickerGlassPane.this, e.getPoint(), canvas);
+                    if (p.x < 0 || p.y < 0 || p.x >= canvas.getWidth() || p.y >= canvas.getHeight()) {
+                        status.setText("Click inside the canvas; right-click or Escape to finish.");
+                        return;
+                    }
+                    Component deepest = SwingUtilities.getDeepestComponentAt(canvas, p.x, p.y);
+                    Point local = SwingUtilities.convertPoint(canvas, p, deepest);
+                    Object found = bridge.resolve(deepest, local);
+                    if ( found==null ) {
+                        selected= null;
+                    } else {
+                        if ( found instanceof DasCanvasComponent ) {
+                            selected= ((DasCanvasComponent) found).getBounds();
+                        } else if ( found instanceof Plot ) {
+                            selected= ((Plot)found).getController().getDasPlot().getBounds();
+                        } else if ( found instanceof Axis ) {
+                            selected= ((Axis)found).getController().getDasAxis().getBounds();
+                        } else if ( found instanceof Annotation ) {
+                            selected= ((Annotation)found).getController().getDasAnnotation().getBounds();
+                        } else {
+                            selected= null;
+                        }
+                    }
+                    if ( selected!=null ) {
+                        Point p2 = SwingUtilities.convertPoint(PickerGlassPane.this, new Point(0, 0), canvas);
+                        selected.translate( -p2.x, -p2.y );
+                    }
+                    e.consume();
+                    repaint();
+                }
             });
             addMouseWheelListener(e -> e.consume());
         }
@@ -355,6 +387,16 @@ public final class DomBindingDialog extends JDialog {
                 status.setText("Cannot resolve component: " + ex.getMessage());
             }
         }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            System.err.println("selected:"+selected);
+            if ( selected!=null ) {
+                g.setColor( new Color( 255, 100, 100, 80 ) );
+                g.fillRect( selected.x, selected.y, selected.width, selected.height );
+            }
+        }
+        
     }
 
     private static final class Pair {
