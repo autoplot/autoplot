@@ -5,6 +5,7 @@ import java.awt.event.*;
 import java.beans.*;
 import java.util.*;
 import java.util.List;
+import java.util.function.Predicate;
 import javax.swing.*;
 import org.das2.qds.filters.AddFilterDialog;
 
@@ -380,7 +381,11 @@ public final class DomBindingDialog extends JDialog {
                 if (compatible(find(source, name), find(target, name)))
                     result.add(new Pair(name, name));
         } else if (ALL.equals(selection)) {
-            for (PropertyDescriptor a : properties(source)) {
+            List<PropertyDescriptor> ps= properties(source);
+            if ( target instanceof Axis ) {
+                ps.removeIf((PropertyDescriptor t) -> t.getName().equals("scale"));
+            }
+            for (PropertyDescriptor a : ps) {
                 PropertyDescriptor b = find(target, a.getName());
                 if (compatible(a, b)) result.add(new Pair(a.getName(), b.getName()));
             }
