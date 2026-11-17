@@ -16,7 +16,7 @@
         <p>
         <img alt="screenshot"  src="screen.png">
         </p>
-        <p><small>New "Add Bindings..." tool is more flexible in creating bindings between plots.</small></p>
+        <p><small>Old interesting <a href="https://github.com/autoplot/dev/blob/master/demos/2021/20210403/bitwiseOrPattern.jy">script</a> never made the screenshots.  .</small></p>
             <p>Autoplot allows plotting of data from many data sources, including remote CDF files and HAPI servers. 
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into one uniform data model.  Data are 
            then displayed by determining the rendering method and axis ranges to provide a useful display with interactive axes and
@@ -30,8 +30,10 @@
 
         <p>Autoplot's development is guided by feedback from those using it.  Thanks for your feedback!</p>
                 
-        <p>Bugfixes (2026-11-14):</p>
+        <p>Bugfixes (2026-11-17):</p>
         <ul>
+            <li>High performance reduce codes don't handle qubes, so check for this.
+            <li><a href="https://sourceforge.net/p/autoplot/feature-requests/894/">894</a>: don't bind both range and scale, since this can hang Autoplot.
             <li>BoundsRenderer uses Ops.xtags and Ops.ytags to extract the x and y values, so that either ds[:,2] or y[x] works.
             <li><a href="https://sourceforge.net/p/autoplot/bugs/2921/">2921</a>: Selecting a plot in the layout shows the bindings for the plot.
             <li>Clean up axis "change units" dialog and put a warning that the label should be updated.
@@ -65,6 +67,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Introduce high-performance collapse2 with rank 3 qubes, after seeing how slow Juno/JADE L3 files were.
             <li><a href="https://sourceforge.net/p/autoplot/feature-requests/894/">894</a>: New "Add Bindings..." tool is more flexible in creating bindings between plots.
         </ul>
         <p>Less recent features:</p>
