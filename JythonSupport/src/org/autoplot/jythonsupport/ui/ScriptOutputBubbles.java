@@ -172,11 +172,11 @@ public final class ScriptOutputBubbles extends JComponent {
         super.paintComponent(graphics);
         Graphics2D g = (Graphics2D) graphics.create();
         
-        Graphics2D g1= (Graphics2D)g.create();
-        g1.setColor(Color.LIGHT_GRAY);
-        for ( int j=0; j<viewport.getHeight(); j+=16 ) {
-            g1.drawLine( 0, j, viewport.getWidth(), j );
-        }
+        //Graphics2D g1= (Graphics2D)g.create();
+        //g1.setColor(Color.LIGHT_GRAY);
+        //for ( int j=0; j<viewport.getHeight(); j+=16 ) {
+        //    g1.drawLine( 0, j, viewport.getWidth(), j );
+        //}
         
         Rectangle visible = SwingUtilities.convertRectangle(
                 viewport,
