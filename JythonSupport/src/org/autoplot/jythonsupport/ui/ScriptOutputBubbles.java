@@ -1,6 +1,7 @@
 package org.autoplot.jythonsupport.ui;
 
 import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
@@ -17,10 +18,22 @@ public final class ScriptOutputBubbles extends JComponent {
     private final Map<Integer, StringBuilder> output = new LinkedHashMap<>();
     private final Map<Integer, Color> outputColors = new LinkedHashMap<>();
     private final Map<Integer, Boolean> gotEoln = new LinkedHashMap<>();
-
+    private final Map<Integer, Bubble> bubbles = new LinkedHashMap<>();
+    
     private final Color fill = new Color(255, 249, 215, 235);
     private final Color textColor = new Color(45, 45, 45);
 
+    private static class Bubble {
+
+        private Bubble(Rectangle rectangle, String toString) {
+            this.bounds= rectangle;
+            this.output= toString;
+        }
+        
+        Rectangle bounds;
+        String output;
+    }
+    
     public ScriptOutputBubbles(JTextComponent editor, JViewport viewport) {
         this.editor = editor;
         this.viewport = viewport;
@@ -40,6 +53,46 @@ public final class ScriptOutputBubbles extends JComponent {
                 repaint();
             }
         });
+        
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                maybeShowPopup(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                maybeShowPopup(e);
+            }
+
+            private void maybeShowPopup(MouseEvent e) {
+                if (!e.isPopupTrigger()) {
+                    return;
+                }
+
+                // Find the bubble under the mouse.
+                Bubble bubble = getBubbleAt(e.getPoint());
+                if (bubble == null) {
+                    return;
+                }
+
+                JPopupMenu popup = new JPopupMenu();
+                JMenuItem copy = new JMenuItem("Copy");
+
+                copy.addActionListener(a -> {
+                    StringSelection selection
+                            = new StringSelection(bubble.output);
+
+                    Toolkit.getDefaultToolkit()
+                            .getSystemClipboard()
+                            .setContents(selection, null);
+                });
+
+                popup.add(copy);
+                popup.show(e.getComponent(), e.getX(), e.getY());
+            }
+        });
+        
     }
 
     /**
@@ -187,6 +240,8 @@ public final class ScriptOutputBubbles extends JComponent {
         
         Shape viewportClip = g.getClip();
         
+        bubbles.clear();
+        
         try {
 
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -247,6 +302,7 @@ public final class ScriptOutputBubbles extends JComponent {
                         drawString(g, text, lines[j], x, y + j * fm.getHeight());
 
                     }
+                    bubbles.put( lineNumber, new Bubble( new Rectangle(x, y, bubbleWidth, h ), entry.getValue().toString() ) );
                 } catch (BadLocationException ignored) {
                     // Document may have changed since output was captured.
                 }
@@ -256,4 +312,26 @@ public final class ScriptOutputBubbles extends JComponent {
         }
     }
 
+    @Override
+    public boolean contains(int x, int y) {
+        Point p = new Point(x, y);
+
+        for (Bubble bubble : bubbles.values()) {
+            if (bubble.bounds.contains(p)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
+    private Bubble getBubbleAt(Point p) {
+        for (Bubble bubble : bubbles.values()) {
+            if (bubble.bounds.contains(p)) {
+                return bubble;
+            }
+        }
+        return null;
+    }
+        
 }
