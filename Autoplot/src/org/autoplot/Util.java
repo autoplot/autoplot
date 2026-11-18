@@ -17,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -438,8 +439,7 @@ public class Util {
         chooser.setFile(currentFile);
         //WindowManager.getInstance().recallWindowSizePosition(chooser);
         FileFilter ff;
-        ff = new FileNameExtensionFilter( ".jy files", "jy" );
-
+        ff = new FileNameExtensionFilter( ".jy or .jyds files", "jy", "jyds" );
         chooser.setFilenameFilter((File dir, String name) -> ff.accept( new File( dir, name ) ));
         chooser.setVisible(true);
 
@@ -518,7 +518,7 @@ public class Util {
         }
         
         FileFilter ff;
-        ff = new FileNameExtensionFilter( ".jy files", "jy" );
+        ff = new FileNameExtensionFilter( ".jy or .jyds files", "jy", "jyds" );
 
         chooser.addChoosableFileFilter(ff);
         chooser.setFileFilter(ff);
