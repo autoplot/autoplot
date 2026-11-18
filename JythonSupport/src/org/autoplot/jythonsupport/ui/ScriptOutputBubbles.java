@@ -135,6 +135,8 @@ public final class ScriptOutputBubbles extends JComponent {
         b.append(text);
         if (text.endsWith("\n") ) {
             gotEoln.put(line,Boolean.TRUE);
+        } else {
+            gotEoln.put(line,Boolean.FALSE);
         }
         
         if (b.length() > 2000) {
@@ -169,6 +171,12 @@ public final class ScriptOutputBubbles extends JComponent {
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
         Graphics2D g = (Graphics2D) graphics.create();
+        
+        Graphics2D g1= (Graphics2D)g.create();
+        g1.setColor(Color.LIGHT_GRAY);
+        for ( int j=0; j<viewport.getHeight(); j+=16 ) {
+            g1.drawLine( 0, j, viewport.getWidth(), j );
+        }
         
         Rectangle visible = SwingUtilities.convertRectangle(
                 viewport,
@@ -205,7 +213,9 @@ public final class ScriptOutputBubbles extends JComponent {
                     }
                     Point p = SwingUtilities.convertPoint(editor, r.x, r.y, this);
                     int x = Math.max(4, getWidth() - bubbleWidth - 8);
-                    int y = p.y + Math.max(0, (r.height - fm.getHeight()) / 2);
+                    int y = p.y + Math.max(0, (r.height/2)) ; // middle of the line
+                    y= y + fm.getAscent() / 2; // bottom of text
+                    y= y - (int)(fm.getHeight() * 1.2 ); // *1.2 is fudge factor, probably for a particular font (Liberation Mono) I'm using.
                     String s = entry.getValue().toString().replace('\r', ' ').trim();
                     String[] lines = s.split("\n", -1);
                     int count = Math.min(5, lines.length);
