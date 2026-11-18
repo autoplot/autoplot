@@ -40,6 +40,14 @@ public final class JythonOutputCapture {
                 return;
             }
             String filename = frame.f_code.co_filename;
+            while ( filename.endsWith("traceback.py") ) {
+                frame= frame.f_back;
+                if ( frame==null ) break;
+                filename = frame.f_code.co_filename;
+            }
+            if ( frame==null ) {
+                return;
+            }
             int line = frame.f_lineno;
             sink.output(filename, line,
                     new String(b, off, len, java.nio.charset.StandardCharsets.UTF_8));
@@ -63,6 +71,6 @@ public final class JythonOutputCapture {
         // Jython's interpreter.setOut(OutputStream) adapts a Java stream
         // into Python sys.stdout; the script's print statements use it.
         interpreter.setOut(new Writer(console, sink));
-        interpreter.setErr(new Writer(console, stderrSink));
+        interpreter.setErr(new Writer(stderr, stderrSink));
     }
 }
