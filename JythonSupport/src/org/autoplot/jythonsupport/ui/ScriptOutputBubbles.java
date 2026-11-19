@@ -177,8 +177,14 @@ public final class ScriptOutputBubbles extends JComponent {
         
         StringBuilder b = output.get(line);
         if ( Boolean.TRUE.equals(gotEoln.get(line)) ) {
-            b= null;
-            gotEoln.put(line,Boolean.TRUE);
+            if ( text.startsWith("  File") && text.endsWith("in ?\n") ) {
+                // cheesy kludge to capture traceback.print_exc
+            } else if ( b!=null && b.toString().endsWith("in ?\n") ) {
+                // cheesy kludge to capture traceback.print_exc
+            } else {
+                b= null;
+                gotEoln.put(line,Boolean.TRUE);
+            }
         }
         
         if (b == null) {
