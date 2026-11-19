@@ -1210,7 +1210,7 @@ public class JythonUtil {
      * @see SimplifyScriptSupport#simplifyScriptToGetCompletions(java.lang.String[], org.python.parser.ast.stmtType[], java.util.HashSet, int, int, int) 
      */
     public static String[] splitCodeIntoLines( String zerothLine, String script ) {
-        String[] ss1= script.split("\n");
+        String[] ss1= script.split("\n",-2);
         int headerOffset= zerothLine==null ? 0 : 1;
         int lineCount= ss1.length+headerOffset;
         String[] ss= new String[lineCount];
