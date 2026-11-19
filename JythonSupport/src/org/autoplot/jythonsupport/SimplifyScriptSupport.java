@@ -1452,9 +1452,6 @@ public class SimplifyScriptSupport {
         return null;
     }
 
-    private static Object Name(exprType func) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 
     private static class MyVisitorBase<R> extends VisitorBase {
 
