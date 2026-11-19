@@ -93,6 +93,8 @@ public final class ScriptOutputBubbles extends JComponent {
             }
         });
         
+        ToolTipManager.sharedInstance().registerComponent(this);
+        
     }
 
     /**
@@ -338,6 +340,33 @@ public final class ScriptOutputBubbles extends JComponent {
             }
         }
         return null;
+    }
+
+    @Override
+    public String getToolTipText() {
+        return super.getToolTipText(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+    }
+
+    @Override
+    public String getToolTipText(MouseEvent e) {
+        Point p = e.getPoint();
+
+        for (Bubble bubble : bubbles.values()) {
+            if (bubble.bounds.contains(p)) {
+                return tooltipHtml(bubble.output);
+            }
+        }
+        return null;
+    }
+    
+    private static String tooltipHtml(String s) {
+        s = s.replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace("\n", "<br>");
+
+        return "<html><div>"
+            + s + "</div></html>";
     }
         
 }
