@@ -1140,27 +1140,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             }
         });        
         impl.getDasMouseInputAdapter().addMenuItem(mi);
-        
-        final JMenuItem cb2mi= new JMenuItem(new AbstractAction("Copy Annotation") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                org.das2.util.LoggerManager.logGuiEvent(e);
-                Annotation second= new Annotation();
-                second.syncTo(annotation);
-                if ( second.getAnchorOffset().trim().length()==0 ) {
-                    second.setAnchorOffset("1em,1em");
-                } else {
-                    try {
-                        second.setAnchorOffset( DasDevicePosition.addOffset( second.getAnchorOffset(), "1em,1em" ) );
-                    } catch (ParseException ex) {
-                        logger.log(Level.SEVERE, null, ex);
-                    }
-                }
-                addAnnotation(second);
-            }
-        }); 
-        impl.getDasMouseInputAdapter().addMenuItem(cb2mi);
-        
+                
         final JMenuItem cpmi= new JMenuItem(new AbstractAction("Copy Annotation to Clipboard") {
             @Override
             public void actionPerformed(ActionEvent e) {
