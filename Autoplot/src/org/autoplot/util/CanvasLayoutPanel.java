@@ -33,6 +33,9 @@ import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.Timer;
+import org.autoplot.dom.Annotation;
+import org.autoplot.dom.Axis;
+import org.autoplot.dom.Plot;
 import org.autoplot.pngwalk.ImageResize;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasPlot;
@@ -308,7 +311,19 @@ public class CanvasLayoutPanel extends JLabel {
         if ( handlingEvent ) return;
         logger.log(Level.FINER, "setSelectedComponents({0})", selectedComponents);
         List<Object> oldSelectedComponents = this.selectedComponents;
-        this.selectedComponents = new ArrayList( selectedComponents );
+        List<Object> newSelectedComponents= new ArrayList();
+        for ( Object o : selectedComponents ) {
+            if ( o instanceof Plot ) {
+                newSelectedComponents.add(((Plot)o).getController().getDasPlot());
+            } else if ( o instanceof Axis ) {
+                newSelectedComponents.add(((Axis)o).getController().getDasAxis());
+            } else if ( o instanceof Annotation ) {
+                newSelectedComponents.add(((Annotation)o).getController().getDasAnnotation());
+            } else {
+                newSelectedComponents.add(o);
+            }
+        }
+        this.selectedComponents = newSelectedComponents;
         handlingEvent= true;
         propertyChangeSupport.firePropertyChange(PROP_SELECTEDCOMPONENTS, oldSelectedComponents, selectedComponents);
         handlingEvent= false;
