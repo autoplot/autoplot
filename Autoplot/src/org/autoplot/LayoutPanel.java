@@ -157,6 +157,41 @@ public class LayoutPanel extends javax.swing.JPanel {
             }
         });
         
+        bindingListComponent.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if ( e.getValueIsAdjusting() ) {
+                    return;
+                }
+                if ( e.getSource() instanceof JList ) {
+                    JList s= (JList)e.getSource();
+                    BindingModel bm= (BindingModel)s.getSelectedValue();
+                    System.err.println( s.getSelectedValue() );
+                    List<Object> select= new ArrayList<>();
+                    DomNode a= DomUtil.getElementById( dom, bm.getSrcId() );
+                    if ( a instanceof Axis ) {
+                        for ( Plot p: dom.getPlots() ) {
+                            if ( p.getXaxis()==a || p.getYaxis()==a || p.getZaxis()==a ) {
+                                a= p;
+                            }
+                        }
+                    }
+                    select.add(a);
+                    DomNode b= DomUtil.getElementById( dom, bm.getDstId() );
+                    if ( b instanceof Axis ) {
+                        for ( Plot p: dom.getPlots() ) {
+                            if ( p.getXaxis()==b || p.getYaxis()==b || p.getZaxis()==b ) {
+                                b= p;
+                            }
+                        }
+                    }
+                    select.add(b);
+                    canvasLayoutPanel1.setSelectedComponents(select);
+                }
+                
+            }
+        });
+        
         createPopupMenus();
 
         MouseListener popupTrigger = createPopupTrigger();
