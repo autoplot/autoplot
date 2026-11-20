@@ -1834,6 +1834,9 @@ addBottomDecoration( dom.canvases[0], paint )
      * @param c converter for the binding, or null.
      */    
     public void bind( Object src, String srcProp, Object dst, String dstProp, Converter c ) {
+        if ( src==dst && srcProp.equals(dstProp ) ) {
+            throw new IllegalArgumentException("A property cannot be bound to itself.");
+        }
         if ( DasApplication.hasAllPermission() ) {
             if ( src instanceof DomNode && state.dom.getController().getElementById(((DomNode)src).getId())==src ) {
                 DomNode srcNode= (DomNode)src;
