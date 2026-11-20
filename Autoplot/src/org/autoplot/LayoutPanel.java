@@ -166,7 +166,6 @@ public class LayoutPanel extends javax.swing.JPanel {
                 if ( e.getSource() instanceof JList ) {
                     JList s= (JList)e.getSource();
                     BindingModel bm= (BindingModel)s.getSelectedValue();
-                    System.err.println( s.getSelectedValue() );
                     List<Object> select= new ArrayList<>();
                     DomNode a= DomUtil.getElementById( dom, bm.getSrcId() );
                     if ( a instanceof Axis ) {
