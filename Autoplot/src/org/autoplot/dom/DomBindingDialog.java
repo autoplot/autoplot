@@ -390,7 +390,6 @@ public final class DomBindingDialog extends JDialog {
 
         @Override
         protected void paintComponent(Graphics g) {
-            System.err.println("selected:"+selected);
             if ( selected!=null ) {
                 g.setColor( new Color( 255, 100, 100, 80 ) );
                 g.fillRect( selected.x, selected.y, selected.width, selected.height );
