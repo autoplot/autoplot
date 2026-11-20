@@ -77,6 +77,7 @@ import org.autoplot.datasource.DataSourceEditorPanel;
 import org.autoplot.datasource.DataSourceEditorPanelUtil;
 import org.autoplot.datasource.WindowManager;
 import org.autoplot.dom.Annotation;
+import org.autoplot.dom.Canvas;
 import org.autoplot.dom.DomNode;
 import org.das2.graph.DasCanvas;
 
@@ -103,7 +104,11 @@ public class LayoutPanel extends javax.swing.JPanel {
         canvasLayoutPanel1.addPropertyChangeListener(CanvasLayoutPanel.PROP_COMPONENT, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                Plot plot = dom.getController().getPlotFor((Component) canvasLayoutPanel1.getComponent());
+                Object o = canvasLayoutPanel1.getComponent();
+                if ( !( o instanceof Component ) ) {
+                    System.err.println("Here stop");
+                }
+                Plot plot = dom.getController().getPlotFor((Component) o);
                 List<Object> p= canvasLayoutPanel1.getSelectedComponents();
                 if (plot != null) {
                     dom.getController().setPlot(plot);
@@ -166,6 +171,7 @@ public class LayoutPanel extends javax.swing.JPanel {
                 if ( e.getSource() instanceof JList ) {
                     JList s= (JList)e.getSource();
                     BindingModel bm= (BindingModel)s.getSelectedValue();
+                    if ( bm==null ) return;
                     List<Object> select= new ArrayList<>();
                     DomNode a= DomUtil.getElementById( dom, bm.getSrcId() );
                     if ( a instanceof Axis ) {
@@ -185,6 +191,12 @@ public class LayoutPanel extends javax.swing.JPanel {
                         }
                     }
                     select.add(b);
+                    if ( a instanceof Plot ) {
+                        canvasLayoutPanel1.setComponent(a);
+                    } else if ( b instanceof Plot ) {
+                        canvasLayoutPanel1.setComponent(b);
+                    }
+                    
                     canvasLayoutPanel1.setSelectedComponents(select);
                 }
                 

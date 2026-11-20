@@ -275,6 +275,18 @@ public class CanvasLayoutPanel extends JLabel {
         this.rectangleSelect=r;
     }
     
+    private Object maybeFindDasComponent( Object o ) {
+        if ( o instanceof Plot ) {
+            return (((Plot)o).getController().getDasPlot());
+        } else if ( o instanceof Axis ) {
+            return (((Axis)o).getController().getDasAxis());
+        } else if ( o instanceof Annotation ) {
+            return (((Annotation)o).getController().getDasAnnotation());
+        } else {
+            return o;
+        }
+    }
+    
     /**
      * set the primary selected component.
      * @param component null or the selected component.
@@ -285,7 +297,7 @@ public class CanvasLayoutPanel extends JLabel {
         
         logger.log(Level.FINER, "setComponent({0})", component);
         Object oldComponent = this.component;
-        this.component = component;
+        this.component = maybeFindDasComponent(component);
         handlingEvent= true;
         firePropertyChange(PROP_COMPONENT, oldComponent, component);
         handlingEvent= false;
@@ -313,15 +325,7 @@ public class CanvasLayoutPanel extends JLabel {
         List<Object> oldSelectedComponents = this.selectedComponents;
         List<Object> newSelectedComponents= new ArrayList();
         for ( Object o : selectedComponents ) {
-            if ( o instanceof Plot ) {
-                newSelectedComponents.add(((Plot)o).getController().getDasPlot());
-            } else if ( o instanceof Axis ) {
-                newSelectedComponents.add(((Axis)o).getController().getDasAxis());
-            } else if ( o instanceof Annotation ) {
-                newSelectedComponents.add(((Annotation)o).getController().getDasAnnotation());
-            } else {
-                newSelectedComponents.add(o);
-            }
+            newSelectedComponents.add( maybeFindDasComponent(o) );
         }
         this.selectedComponents = newSelectedComponents;
         handlingEvent= true;
