@@ -3,21 +3,32 @@ package org.autoplot.renderer;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import org.autoplot.AutoplotUI;
 import org.autoplot.AutoplotUtil;
+import org.autoplot.GuiSupport;
 import org.autoplot.dom.Annotation;
+import org.autoplot.dom.Application;
 import org.autoplot.dom.Canvas;
 import org.autoplot.dom.Column;
+import org.autoplot.dom.DomUtil;
 import org.autoplot.dom.Row;
 import org.autoplot.jythonsupport.ui.JLinkyLabel;
+import org.autoplot.state.StatePersistence;
 import org.das2.components.DatumRangeEditor;
 import org.das2.components.GrannyTextEditor;
 import org.das2.components.propertyeditor.ColorEditor;
@@ -54,12 +65,18 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
     AnchorType anchorType;
     AnchorType verticalAnchorType;
     Annotation ann;
+    Application dom;
             
     /**
      * Creates new form AnnotationEditorPanel
+     * @param dom null or the application
      */
-    public AnnotationEditorPanel() {
+    public AnnotationEditorPanel(Application dom) {
         initComponents();
+        this.dom= dom;
+        if ( isClipboardUsable() ) {
+            pasteFromClipboardButton.setEnabled(true);
+        }
         anchorType= AnchorType.CANVAS;
         anchorPositionEditor= new EnumerationEditor( AnchorPosition.N );
         backgroundEditor= new ColorEditor(Color.WHITE);
@@ -178,29 +195,16 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         
         plotIdComboBox.setModel( new DefaultComboBoxModel<>( new String[] { ann.getPlotId() } ) );
         
-        ArrayList<String> rows= new ArrayList<>();
-        rows.add("");
-        Canvas c= null;
-        if ( ann.getController()!=null ) {
-            c= ann.getController().getCanvas();
-            rows.add(c.getMarginRow().getId());
-            for ( Row r: c.getRows() ) {
-                rows.add( r.getId() );
-            }
-        }
-        rowIdComboBox.setModel( new DefaultComboBoxModel<>( rows.toArray( new String[rows.size()] ) ) );
+        rowIdComboBox.setModel( new DefaultComboBoxModel<>(
+                DomUtil.getRowIds( dom.getController().getCanvas(),
+                        new ArrayList<>(Collections.singletonList(""))).toArray(new String[0])) );
+        columnIdComboBox.setModel( new DefaultComboBoxModel<>(
+                DomUtil.getColumnIds( dom.getController().getCanvas(),
+                        new ArrayList<>(Collections.singletonList(""))).toArray(new String[0])) );
+        
+        
         rowIdComboBox.setSelectedItem( ann.getRowId() );
         
-        ArrayList<String> columns= new ArrayList<>();
-        columns.add("");
-        if ( ann.getController()!=null ) {
-            c= ann.getController().getCanvas();
-            columns.add(c.getMarginColumn().getId());
-            for ( Column c1: c.getColumns() ) {
-                columns.add( c1.getId() );
-            }
-        }
-        columnIdComboBox.setModel( new DefaultComboBoxModel<>( columns.toArray( new String[columns.size()] ) ) );
         columnIdComboBox.setSelectedItem( ann.getColumnId() );
                 
         BindingGroup bc = new BindingGroup();
@@ -237,32 +241,9 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
 
         bc.bind();
         
-        bindings= bc;
-        
-        useUrl.setSelected( ann.getUrl().trim().length()>0 );
-
-        useUrl.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                resetTextUrlPanel( useUrl.isSelected() );
-            }
-        });
-        
-        resetTextUrlPanel( useUrl.isSelected() );
-        
+        bindings= bc;        
     }
-    
-    private void resetTextUrlPanel( boolean useUrl ) {
-        textUrlPanel.removeAll();
-        if ( useUrl ) {
-            textUrlPanel.add( urlPanel );
-        } else {
-            textUrlPanel.add( this.textFieldPanel );
-        }
-        textUrlPanel.validate();
-        textUrlPanel.repaint();
-    }
-    
+        
     /**
      * remove all the bindings and references to objects.
      */
@@ -304,9 +285,6 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         scaleCB = new javax.swing.JComboBox<>();
         typeButtonGroup = new javax.swing.ButtonGroup();
         borderTypeEnumerationEditor = new org.das2.components.propertyeditor.EnumerationEditor();
-        textFieldPanel = new javax.swing.JPanel();
-        textField = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
         verticalButtonGroup = new javax.swing.ButtonGroup();
         anchorBorderTypeEnumerationEditor = new org.das2.components.propertyeditor.EnumerationEditor();
         jLabel2 = new javax.swing.JLabel();
@@ -331,9 +309,10 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         jLabel13 = new javax.swing.JLabel();
         anchorOffsetTF = new javax.swing.JComboBox<>();
         pointAtCheckBox = new javax.swing.JCheckBox();
-        annotationTextButton = new javax.swing.JRadioButton();
-        useUrl = new javax.swing.JRadioButton();
         textUrlPanel = new javax.swing.JPanel();
+        textFieldPanel = new javax.swing.JPanel();
+        textField = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
         pointAtPanel = new javax.swing.JPanel();
         pointAtXTF = new javax.swing.JTextField();
         jLabel15 = new javax.swing.JLabel();
@@ -349,6 +328,8 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         anchorBorderTypePanel = new javax.swing.JPanel();
         jLabel19 = new javax.swing.JLabel();
         fontSizeTextField = new javax.swing.JTextField();
+        jLabel20 = new javax.swing.JLabel();
+        pasteFromClipboardButton = new javax.swing.JButton();
 
         dataControlPanel.setAlignmentX(0.0F);
         dataControlPanel.setAlignmentY(0.0F);
@@ -479,31 +460,6 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
                 .addComponent(urlTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addComponent(jLabel1)
                 .addComponent(scaleCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-
-        textField.setText("jTextField1");
-
-        jButton1.setText("...");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout textFieldPanelLayout = new javax.swing.GroupLayout(textFieldPanel);
-        textFieldPanel.setLayout(textFieldPanelLayout);
-        textFieldPanelLayout.setHorizontalGroup(
-            textFieldPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(textFieldPanelLayout.createSequentialGroup()
-                .addComponent(textField, javax.swing.GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-        textFieldPanelLayout.setVerticalGroup(
-            textFieldPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(textFieldPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(jButton1)
-                .addComponent(textField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         jLabel2.setText("Position:");
@@ -639,26 +595,37 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, pointAtPanel, org.jdesktop.beansbinding.ELProperty.create("${visible}"), pointAtCheckBox, org.jdesktop.beansbinding.BeanProperty.create("selected"));
         bindingGroup.addBinding(binding);
 
-        typeButtonGroup.add(annotationTextButton);
-        annotationTextButton.setSelected(true);
-        annotationTextButton.setText("Annotation Text:");
-        annotationTextButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                annotationTextButtonActionPerformed(evt);
-            }
-        });
-
-        typeButtonGroup.add(useUrl);
-        useUrl.setText("Image URL:");
-        useUrl.setToolTipText("This is no longer supported, see image in granny strings");
-        useUrl.setEnabled(false);
-        useUrl.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                useUrlActionPerformed(evt);
-            }
-        });
-
         textUrlPanel.setLayout(new java.awt.BorderLayout());
+
+        textField.setText("jTextField1");
+
+        jButton1.setText("...");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout textFieldPanelLayout = new javax.swing.GroupLayout(textFieldPanel);
+        textFieldPanel.setLayout(textFieldPanelLayout);
+        textFieldPanelLayout.setHorizontalGroup(
+            textFieldPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(textFieldPanelLayout.createSequentialGroup()
+                .addComponent(textField, javax.swing.GroupLayout.DEFAULT_SIZE, 634, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        textFieldPanelLayout.setVerticalGroup(
+            textFieldPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(textFieldPanelLayout.createSequentialGroup()
+                .addComponent(jButton1)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(textFieldPanelLayout.createSequentialGroup()
+                .addComponent(textField)
+                .addContainerGap())
+        );
+
+        textUrlPanel.add(textFieldPanel, java.awt.BorderLayout.CENTER);
 
         pointAtXTF.setText("0.0");
 
@@ -732,6 +699,16 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
 
         fontSizeTextField.setText(" ");
 
+        jLabel20.setText("Annotation Text:");
+
+        pasteFromClipboardButton.setText("Paste from Clipboard");
+        pasteFromClipboardButton.setEnabled(false);
+        pasteFromClipboardButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pasteFromClipboardButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -781,26 +758,27 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(anchorBorderTypePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addComponent(pointAtCheckBox))
-                                .addGap(0, 6, Short.MAX_VALUE))))
+                                .addGap(0, 0, Short.MAX_VALUE))))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(annotationTextButton)
-                                .addGap(18, 18, 18)
-                                .addComponent(useUrl))
+                                .addComponent(jLabel20)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(pasteFromClipboardButton))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel19)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(fontSizeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                                .addComponent(fontSizeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(annotationTextButton)
-                    .addComponent(useUrl))
+                    .addComponent(jLabel20)
+                    .addComponent(pasteFromClipboardButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(textUrlPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -839,7 +817,7 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(customColorsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(pointAtPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
                 .addComponent(linkyLabelPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -858,14 +836,6 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
             setAnchorType(AnchorType.CANVAS);
         }
     }//GEN-LAST:event_canvasAnchorTypeButtonActionPerformed
-
-    private void annotationTextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_annotationTextButtonActionPerformed
-        resetTextUrlPanel( useUrl.isSelected() );
-    }//GEN-LAST:event_annotationTextButtonActionPerformed
-
-    private void useUrlActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_useUrlActionPerformed
-        resetTextUrlPanel( useUrl.isSelected() );
-    }//GEN-LAST:event_useUrlActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         GrannyTextEditor textedit= AutoplotUI.newGrannyTextEditorWithMacros();
@@ -886,8 +856,50 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_plotIdComboBoxActionPerformed
 
+    private boolean isClipboardUsable() {
+        Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
+        try {
+            Object clip= clpbrd.getContents(this).getTransferData(DataFlavor.stringFlavor);
+            if ( clip!=null ) {
+                String sclip= (String)clip;
+                if ( sclip.startsWith("<?xml") ) {
+                    return true;
+                }
+            }
+        } catch (UnsupportedFlavorException | IOException ex) {
+            Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+    
+    private void pasteFromClipboardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pasteFromClipboardButtonActionPerformed
+        Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
+        try {
+            Object clip= clpbrd.getContents(this).getTransferData(DataFlavor.stringFlavor);
+            if ( clip!=null ) {
+                String sclip= (String)clip;
+                if ( sclip.startsWith("<?xml") ) {
+                    Application state;
+                    try {
+                        state= (Application)StatePersistence.restoreState(new ByteArrayInputStream(sclip.getBytes()));
+                        if ( state.getAnnotations().length>0 ) {
+                            Annotation ann2= state.getAnnotations(0);
+                            ann.syncTo(ann2,Collections.singletonList(Annotation.PROP_PLOTID));
+                        }
+                    } catch ( IllegalArgumentException ex ) {
+                        logger.warning("text in clipboard is not single-annotation .vap");
+                        return;
+                    }
+                }
+            }
+        } catch (UnsupportedFlavorException | IOException ex) {
+            Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }//GEN-LAST:event_pasteFromClipboardButtonActionPerformed
+
     public static void main( String[] args ) {
-        AnnotationEditorPanel p= new AnnotationEditorPanel();
+        AnnotationEditorPanel p= new AnnotationEditorPanel(null);
         Annotation a= new Annotation();
         p.doBindings(a);
         AutoplotUtil.showMessageDialog( null, p, "tester", JOptionPane.OK_OPTION );
@@ -899,7 +911,6 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
     private javax.swing.JComboBox<String> anchorOffsetTF;
     private javax.swing.JPanel anchorPositionPanel;
     private javax.swing.JPanel anchorToPanel;
-    private javax.swing.JRadioButton annotationTextButton;
     private javax.swing.JPanel backgroundColorPanel;
     private org.das2.components.propertyeditor.EnumerationEditor borderTypeEnumerationEditor;
     private javax.swing.JPanel borderTypePanel;
@@ -927,6 +938,7 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -936,6 +948,7 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel linkyLabelPanel;
+    private javax.swing.JButton pasteFromClipboardButton;
     private javax.swing.JRadioButton plotAnchorTypeButton;
     private javax.swing.JPanel plotControlPanel;
     private javax.swing.JComboBox<String> plotIdComboBox;
@@ -953,7 +966,6 @@ public class AnnotationEditorPanel extends javax.swing.JPanel {
     private javax.swing.ButtonGroup typeButtonGroup;
     private javax.swing.JPanel urlPanel;
     private javax.swing.JTextField urlTextField;
-    private javax.swing.JRadioButton useUrl;
     private javax.swing.ButtonGroup verticalButtonGroup;
     private javax.swing.JPanel xrangePanel;
     private javax.swing.JRadioButton ycanvasAnchor;

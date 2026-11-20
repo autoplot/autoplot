@@ -2636,7 +2636,7 @@ public class GuiSupport {
             @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);
-                AnnotationEditorPanel p= new AnnotationEditorPanel();
+                AnnotationEditorPanel p= new AnnotationEditorPanel(app.getDom());
                 Annotation ann= new Annotation();
                 ann.setPlotId( domPlot.getId() );
                 Datum datax= plot.getXAxis().invTransform( plot.getDasMouseInputAdapter().getMousePressPositionOnCanvas().x );

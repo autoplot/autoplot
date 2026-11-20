@@ -78,6 +78,7 @@ import org.autoplot.ScriptContext2023;
 import org.autoplot.dom.ChangesSupport.DomLock;
 import org.autoplot.layout.LayoutConstants;
 import org.autoplot.renderer.AnnotationEditorPanel;
+import org.autoplot.state.SerializeUtil;
 import org.autoplot.util.RunLaterListener;
 import org.das2.graph.DasDevicePosition;
 import org.das2.qds.QDataSet;
@@ -1119,7 +1120,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);                
-                AnnotationEditorPanel pp= new AnnotationEditorPanel();
+                AnnotationEditorPanel pp= new AnnotationEditorPanel(application);
                 Annotation ann0= (Annotation)annotation.copy();
                 pp.doBindings(annotation);
                 Component parent= application.getCanvases(0).getController().getDasCanvas();
@@ -1160,6 +1161,21 @@ public class ApplicationController extends DomNodeController implements RunLater
         }); 
         impl.getDasMouseInputAdapter().addMenuItem(cb2mi);
         
+        final JMenuItem cpmi= new JMenuItem(new AbstractAction("Copy Annotation to Clipboard") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
+                Annotation second= new Annotation();
+                second.syncTo(annotation);
+                Application dom2= new Application();
+                String s= DomUtil.getAnnotationAsString( dom2, second );
+                StringSelection stringSelection = new StringSelection(s);
+                Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clpbrd.setContents(stringSelection, null);
+            }
+        }); 
+        impl.getDasMouseInputAdapter().addMenuItem(cpmi);
+
         final JCheckBoxMenuItem cbmi= new JCheckBoxMenuItem(new AbstractAction("Anchor to Data") {
             @Override
             public void actionPerformed(ActionEvent e) {

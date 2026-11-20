@@ -1658,6 +1658,31 @@ public class DomUtil {
     }
 
     /**
+     * this was made public for bug 1520.  This returns a 1-plot dom, but 
+     * this may change.
+     * We find all plots sharing the same row and column as the plot, and
+     * also any plots belonging to the rows and columns which are children
+     * of the plot's rows and columns (inset plot).
+     * @param application the application (with a controller)
+     * @param annotation the target annotation
+     * @return a String containing .vap for the one plot, plus any other coincident or inset plots.
+     * @see GuiSupport#insertStringVapIntoPlot(java.awt.Component, org.autoplot.dom.ApplicationController, org.autoplot.dom.Plot, java.lang.String) 
+     */
+    public static String getAnnotationAsString(Application application, Annotation annotation ) {
+        Application newApp= new Application();
+        newApp.setAnnotations(new Annotation[]{ annotation } );
+        
+        ByteArrayOutputStream baos= new ByteArrayOutputStream(1000);
+        try {
+            StatePersistence.saveState( baos, newApp, "" );
+            return baos.toString("UTF-8");
+            
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+    
+    /**
      * return the list of DataSourceFilters for a plot.
      * @param dom the application
      * @param p the plot
@@ -1996,4 +2021,36 @@ public class DomUtil {
         }
         
     }
+    
+    /**
+     * return the names of all the row ids, creating a new list or adding to
+     * an existing.
+     * @param canvas the canvas
+     * @param list null or the list to add these ids.
+     * @return the row ids in a list.
+     */
+    public static List<String> getRowIds( Canvas canvas, List<String> list ) {
+        if ( list==null ) list= new ArrayList();
+        list.add(canvas.getMarginRow().getId());
+        for ( Row r: canvas.getRows() ) {
+            list.add(r.getId());
+        }
+        return list;
+    }
+    
+    /**
+     * return the names of all the column ids, creating a new list or adding to
+     * an existing.
+     * @param canvas the canvas
+     * @param list null or the list to add these ids.
+     * @return the column ids in a list.
+     */
+    public static List<String> getColumnIds( Canvas canvas, List<String> list ) {
+        if ( list==null ) list= new ArrayList();
+        list.add(canvas.getMarginColumn().getId());
+        for ( Column c: canvas.getColumns() ) {
+            list.add(c.getId());
+        }
+        return list;
+    }    
 }
