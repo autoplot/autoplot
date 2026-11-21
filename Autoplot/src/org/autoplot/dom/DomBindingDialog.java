@@ -3,6 +3,7 @@ package org.autoplot.dom;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.List;
 import java.util.function.Predicate;
@@ -58,9 +59,14 @@ public final class DomBindingDialog extends JDialog {
         });
         pickButton.addActionListener(e -> startPicking());
         bindButton.addActionListener(e -> createBindings());
+        
         JButton close = new JButton("Close");
         close.addActionListener(e -> dispose());
-
+        
+        JButton copy = new JButton("Copy");
+        copy.setToolTipText("Copy properties from the source to the targets");
+        copy.addActionListener(e -> copyProperties());
+        
         JPanel top = new JPanel(new GridLayout(0, 2, 8, 8));
         top.add(new JLabel("Source component"));
         top.add(new JLabel(bridge.describe(source)));
@@ -80,6 +86,8 @@ public final class DomBindingDialog extends JDialog {
         center.add(targetButtons, BorderLayout.SOUTH);
 
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        
+        buttons.add(copy);
         buttons.add(close);
         buttons.add(bindButton);
         JPanel bottom = new JPanel(new BorderLayout());
@@ -111,7 +119,7 @@ public final class DomBindingDialog extends JDialog {
             };
         } else if (bean instanceof Annotation) {
             names = new String[] {
-                "text", "background", "foreground"
+                "text", "background", "foreground", "xrange", "yrange"
             };
         } else {
             return Collections.emptyList();
@@ -458,6 +466,55 @@ public final class DomBindingDialog extends JDialog {
                 "Some bindings failed", JOptionPane.WARNING_MESSAGE);
     }
 
+    private static void copyProperty(
+        Object source, 
+        String sourceProperty, 
+        Object target,
+        String targetProperty)
+        throws Exception {
+
+        PropertyDescriptor src = new PropertyDescriptor(
+                sourceProperty, source.getClass());
+
+        PropertyDescriptor dst = new PropertyDescriptor(
+                targetProperty, target.getClass());
+
+        Method getter = src.getReadMethod();
+        Method setter = dst.getWriteMethod();
+
+        if (getter == null || setter == null) {
+            throw new IllegalArgumentException(
+                    "Property is not readable or writable");
+        }
+
+        Object value = getter.invoke(source);
+        setter.invoke(target, value);
+    }
+    
+    private void copyProperties() {
+        stopPicking();
+        int succeeded = 0, failed = 0, skipped = 0;
+        StringBuilder errors = new StringBuilder();
+        for (TargetRow row : new ArrayList<>(targets)) {
+            List<Pair> pairs = bindingsFor(row);
+            if (pairs.isEmpty()) skipped++;
+            for (Pair pair : pairs) {
+                try {
+                    copyProperty(source, pair.a, row.node, pair.b);
+                    succeeded++;
+                } catch (Exception ex) {
+                    failed++;
+                    if (errors.length() < 1200) errors.append(bridge.describe(row.node))
+                            .append(": ").append(pair.a).append(" -> ").append(pair.b)
+                            .append(": ").append(ex.getMessage()).append('\n');
+                }
+            }
+        }
+        status.setText(succeeded + " properties copied; " + failed + " failed; " + skipped + " skipped.");
+        if (failed > 0) JOptionPane.showMessageDialog(this, errors.toString(),
+                "Some properties failed to copy", JOptionPane.WARNING_MESSAGE);
+    }
+    
     @Override public void dispose() { stopPicking(); super.dispose(); }
 
     private static final class DescriptorRenderer extends DefaultListCellRenderer {
