@@ -119,7 +119,7 @@ public final class DomBindingDialog extends JDialog {
             };
         } else if (bean instanceof Annotation) {
             names = new String[] {
-                "text", "background", "foreground", "xrange", "yrange"
+                "text", "background", "foreground", "xrange", "yrange", "anchorOffset", "borderType", "anchorBorderType", "anchorStyle"
             };
         } else {
             return Collections.emptyList();
