@@ -59,6 +59,7 @@ import org.autoplot.datasource.WindowManager;
 import org.autoplot.scriptconsole.AppScriptPanelSupport;
 import org.autoplot.scriptconsole.JythonScriptPanel;
 import org.das2.datum.DatumRange;
+import org.das2.util.FileUtil;
 
 /**
  *
@@ -487,7 +488,7 @@ public class Util {
         
         JFileChooser chooser;
         
-        chooser= new JFileChooser();
+        chooser= FileUtil.createDecoratedFileChooser();
 
         final int RECENT_FILES_COUNT = 100;        
         JComponent recent= AppScriptPanelSupport.getRecentAccessory(parent.getApplicationModel(),"*.jy*", RECENT_FILES_COUNT,chooser);
