@@ -297,7 +297,7 @@ public class AppScriptPanelSupport {
      * @see javax.swing.JFileChooser#showSaveDialog(java.awt.Component) 
      */
     public int getSaveFile() throws IOException {
-        JFileChooser chooser = new JFileChooser();
+        JFileChooser chooser = org.das2.util.FileUtil.createDecoratedFileChooser();
         chooser.setFileFilter(new FileNameExtensionFilter( "python and jython scripts", new String [] { "jy", "py", "jyds" } ));
         final JCheckBox cb= new JCheckBox("rename");
         cb.setEnabled(true);
